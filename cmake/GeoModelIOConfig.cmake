@@ -1,0 +1,6 @@
+get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+# include(${SELF_DIR}/GeoModelIO-GeoModelErrorHandler.cmake)
+include(${SELF_DIR}/GeoModelIO-GeoModelDBManager.cmake)
+include(${SELF_DIR}/GeoModelIO-TFPersistification.cmake)
+include(${SELF_DIR}/GeoModelIO-GeoModelRead.cmake)
+include(${SELF_DIR}/GeoModelIO-GeoModelWrite.cmake)

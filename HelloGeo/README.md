@@ -37,70 +37,35 @@ export QTLIB=$PATHQT/lib
 ```
 
 
-### Build external dependencies
+### Build dependencies
 
-#### CLHEP
-
-We checkout and build the latest release of CLHEP:
+#### Build GeoModelCore
 
 ```bash
-git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
-cd CLHEP
-git checkout CLHEP_2_4_1_0 # get the latest release
-cd ../
-mkdir CLHEP_build
-cd CLHEP_build
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../CLHEP/
-make -j4
-make install
-```
-### Build GeoModelIO dependencies
-
-#### Build GeoModelKernel
-
-**NOTE!** Here, we are currently using a development branch.
-
-```bash
-git clone --recurse-submodules ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelKernel.git
-cd GeoModelKernel
-git checkout master-geomodel-standalone-cmake
-cd ../
+git clone --recurse-submodules ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelCore.git
 mkdir build_gmk
 cd build_gmk
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelKernel
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelCore
 make -j 4
 make install
 ```
-
-#### Build GeoModelIO::GeoModelDBManager
+#### Build GeoModelIO dependencies
 
 ```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO/GeoModelDBManager.git
-mkdir build_gmdb
-cd build_gmdb
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelDBManager/
+git clone --recurse-submodules ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO.git
+mkdir build_gmk
+cd build_gmk
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelIO
 make -j 4
 make install
 ```
-
-#### Build GeoModelIO::TFPersistification
-
-```bash
-git clone
-mkdir TFPersistification_build
-cd TFPersistification_build
-cmake ../TFPersistification -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=../install
-make -j10
-make install
-```
-
-#### Build GeoModelIO::GeoModelRead
+#### Build GeoModelG4 dependencies
 
 ```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO/GeoModelRead.git
-mkdir build_gmread
-cd build_gmread
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelRead
+git clone --recurse-submodules ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelG4.git
+mkdir build_gmk
+cd build_gmk
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelG4
 make -j 4
 make install
 ```

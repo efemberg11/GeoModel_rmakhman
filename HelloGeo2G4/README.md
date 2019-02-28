@@ -37,7 +37,26 @@ export QTLIB=$PATHQT/lib
 
 ### Build external dependencies
 
+#### Geant4
+
+
+We checkout and build the latest release of Geant4:
+
+```bash
+git clone https://gitlab.cern.ch/geant4/geant4.git
+cd geant4
+git checkout v10.5.0
+cd ../
+mkdir build_geant4
+cd build_geant4
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../geant4/
+make -j 4
+make install
+```
+
 #### CLHEP
+
+Geant4 needs [CLHEP](https://gitlab.cern.ch/CLHEP).
 
 We checkout and build the latest release of CLHEP:
 
@@ -52,72 +71,63 @@ cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../CLH
 make -j4
 make install
 ```
-### Build GeoModelIO dependencies
 
-#### Build GeoModelKernel
+### Build GeoModel dependencies
 
-**NOTE!** Here, we are currently using a development branch.
+#### Build GeoModelCore
 
 ```bash
-git clone --recurse-submodules ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelKernel.git
-cd GeoModelKernel
-git checkout master-geomodel-standalone-cmake
-cd ../
+git clone --recurse-submodules ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelCore.git
 mkdir build_gmk
 cd build_gmk
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelKernel
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelCore
 make -j 4
 make install
 ```
-
-#### Build GeoModelIO::GeoModelDBManager
+#### Build GeoModelIO dependencies
 
 ```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO/GeoModelDBManager.git
-mkdir build_gmdb
-cd build_gmdb
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelDBManager/
+git clone --recurse-submodules ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO.git
+mkdir build_gmk
+cd build_gmk
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelIO
 make -j 4
 make install
 ```
-
-#### Build GeoModelIO::TFPersistification
-
-```bash
-git clone
-mkdir TFPersistification_build
-cd TFPersistification_build
-cmake ../TFPersistification -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=../install
-make -j10
-make install
-```
-
-#### Build GeoModelIO::GeoModelRead
+#### Build GeoModelG4 dependencies
 
 ```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO/GeoModelRead.git
-mkdir build_gmread
-cd build_gmread
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelRead
+git clone --recurse-submodules ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelG4.git
+mkdir build_gmk
+cd build_gmk
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelG4
 make -j 4
 make install
 ```
 
 
-## Build 'hellogeo'
+## Build 'hellogeo2g4'
 
-From your work folder:
+**Note:** If you installed Geant4 in a folder other than the `../install`, then you have to specify that in an environmental variable, so CMake knows where to find Geant4:
+
+```bash
+export Geant4_DIR=../install_g4/lib/Geant4-10.5.0/
+```
+
+Then, from your work folder:
 
 ```bash
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples/hellogeo.git
 mkdir build_hellogeo
 cd build_hellogeo
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../hellogeo
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo  ../GeoModelG4/
 make -j4
 make install
 ```
 
-Then, get sample geometry data to play with:
+## Run `hellogeo2g4`
+
+Get sample geometry data to play with:
 
 ```bash
 wget https://atlas-vp1.web.cern.ch/atlas-vp1/doc_new/sample_datafiles/geometry/geometry-ATLAS-R2-2015-03-01-00.db
@@ -127,7 +137,7 @@ ln -s $PWD/geometry-ATLAS-R2-2015-03-01-00.db ../geometry.db
 Now, you can run the example by typing:
 
 ```bash
-./hellogeo
+./hellogeo2g4
 ```
 
 The example program:
@@ -137,3 +147,4 @@ The example program:
  3. builds the GeoModel tree, storing it in memory
  4. gets the RootVolume of the GeoModel tree and it prints out the number of its children
  5. loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them
+ 6. transforms the GeoModel tree to Geant4 geometry

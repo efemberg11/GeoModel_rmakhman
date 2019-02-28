@@ -108,13 +108,7 @@ make install
 
 ## Build 'hellogeo2g4'
 
-**Note:** If you installed Geant4 in a folder other than the `../install`, then you have to specify that in an environmental variable, so CMake knows where to find Geant4:
-
-```bash
-export Geant4_DIR=../install_g4/lib/Geant4-10.5.0/
-```
-
-Then, from your work folder:
+From your work folder:
 
 ```bash
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples/hellogeo.git
@@ -123,6 +117,11 @@ cd build_hellogeo
 cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo  ../GeoModelG4/
 make -j4
 make install
+```
+**Note:** If you installed Geant4 in a folder other than the `../install`, then you have to pass the path to Geant4 adding the -DGeant4_DIR option to cmake 
+
+```bash
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo  ../GeoModelG4/ -DGeant4_DIR=<path-to-Geant4-install>/lib/Geant4-10.x.y/
 ```
 
 ## Run `hellogeo2g4`

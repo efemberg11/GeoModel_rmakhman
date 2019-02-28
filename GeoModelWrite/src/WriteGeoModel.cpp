@@ -1,9 +1,10 @@
 
-// author: Riccardo.Maria.Bianchi@cern.ch
+// author: Riccardo.Maria.Bianchi@cern.ch, 2017
 // major updates: Aug 2018, Feb 2019
 
 // local includes
 #include "GeoModelWrite/WriteGeoModel.h"
+// #include "GeoModelWrite/Transforms.h"
 
 // TFPersistification includes
 #include "TFPersistification/TransFunctionPersistifier.h"
@@ -38,11 +39,6 @@
 
 // C++ includes
 #include <sstream>
-
-// CLHEP includes // TODO: to remove once the migration to Eigen is complete
-#include "CLHEP/Geometry/Transform3D.h"
-#include "CLHEP/Matrix/SymMatrix.h"
-#include "CLHEP/Matrix/Matrix.h"
 
 
 namespace GeoModelIO {
@@ -666,14 +662,63 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 
 
 		//HepGeom::Transform3D tr = Amg::EigenTransformToCLHEP( node->getTransform() );
+        // CLHEP::HepRotation rotation(
+        //                             CLHEP::Hep3Vector(node->getTransform()(0, 0), node->getTransform()(1, 0), node->getTransform()(2, 0)),
+        //                             CLHEP::Hep3Vector(node->getTransform()(0, 1), node->getTransform()(1, 1), node->getTransform()(2, 1)),
+        //                             CLHEP::Hep3Vector(node->getTransform()(0, 2), node->getTransform()(1, 2), node->getTransform()(2, 2)));
+        // CLHEP::Hep3Vector translation(node->getTransform()(0, 3), node->getTransform()(1, 3), node->getTransform()(2, 3));
+        // HepGeom::Transform3D tr(rotation, translation);
 
-        CLHEP::HepRotation rotation(
-                                    CLHEP::Hep3Vector(node->getTransform()(0, 0), node->getTransform()(1, 0), node->getTransform()(2, 0)),
-                                    CLHEP::Hep3Vector(node->getTransform()(0, 1), node->getTransform()(1, 1), node->getTransform()(2, 1)),
-                                    CLHEP::Hep3Vector(node->getTransform()(0, 2), node->getTransform()(1, 2), node->getTransform()(2, 2)));
-        CLHEP::Hep3Vector translation(node->getTransform()(0, 3), node->getTransform()(1, 3), node->getTransform()(2, 3));
-        HepGeom::Transform3D tr(rotation, translation);
-        ///////
+
+				// TODO: simplify and put common code in a separate class
+
+				/* get the 12 matrix elements, as in CLHEP:
+				 *
+				 * CLHEP::HepRotation R;
+				 * R.set(CLHEP::Hep3Vector(xx,yx,zx),
+				 * 		CLHEP::Hep3Vector(xy,yy,zy),
+				 *		CLHEP::Hep3Vector(xz,yz,zz));
+				 */
+				// Get the 9 rotation coefficients
+				double xx = node->getTransform()(0, 0);
+				double xy = node->getTransform()(0, 1);
+				double xz = node->getTransform()(0, 2);
+
+				double yx = node->getTransform()(1, 0);
+				double yy = node->getTransform()(1, 1);
+				double yz = node->getTransform()(1, 2);
+
+				double zx = node->getTransform()(2, 0);
+				double zy = node->getTransform()(2, 1);
+				double zz = node->getTransform()(2, 2);
+
+				// Get the 3 translation coefficients
+				double dx = node->getTransform()(0, 3);
+				double dy = node->getTransform()(1, 3);
+				double dz = node->getTransform()(2, 3);
+
+
+				// Instanciate an Eigen's 3D Transformation
+				Transform3D tr;
+
+				// set rotation
+				tr(0,0)=xx;
+				tr(0,1)=xy;
+				tr(0,2)=xz;
+
+				tr(1,0)=yx;
+				tr(1,1)=yy;
+				tr(1,2)=yz;
+
+				tr(2,0)=zx;
+				tr(2,1)=zy;
+				tr(2,2)=zz;
+
+			 	// set translation
+				tr(3,0)=dx;
+				tr(3,1)=dy;
+				tr(3,2)=dz;
+
 		std::vector<double> params = getTransformParameters(tr);
 		qDebug() << "Transform parameters:" << QVector<double>::fromStdVector(params);
 
@@ -691,7 +736,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 			qDebug() << "Transform stored. Id:" << trId.toString();
 		}
 		else {
-			qDebug() << "WARNING!!! - This type of transformation needs to be customized yet!!";
+			qDebug() << "WARNING!!! - This type of transformation still needs to be persistified!!";
 		}
 
 	} else {
@@ -954,25 +999,41 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 }
 
 
-std::vector<double> WriteGeoModel::getTransformParameters(HepGeom::Transform3D tr)
+std::vector<double> WriteGeoModel::getTransformParameters(Transform3D tr)
 {
 	std::vector<double> vec;
 
-	vec.push_back(tr.xx());
-	vec.push_back(tr.xy());
-	vec.push_back(tr.xz());
+	// vec.push_back(tr.xx());
+	// vec.push_back(tr.xy());
+	// vec.push_back(tr.xz());
+	//
+	// vec.push_back(tr.yx());
+	// vec.push_back(tr.yy());
+	// vec.push_back(tr.yz());
+	//
+	// vec.push_back(tr.zx());
+	// vec.push_back(tr.zy());
+	// vec.push_back(tr.zz());
+	//
+	// vec.push_back(tr.dx());
+	// vec.push_back(tr.dy());
+	// vec.push_back(tr.dz());
 
-	vec.push_back(tr.yx());
-	vec.push_back(tr.yy());
-	vec.push_back(tr.yz());
+	vec.push_back(tr(0,0));
+	vec.push_back(tr(0,1));
+	vec.push_back(tr(0,2));
 
-	vec.push_back(tr.zx());
-	vec.push_back(tr.zy());
-	vec.push_back(tr.zz());
+	vec.push_back(tr(1,0));
+	vec.push_back(tr(1,1));
+	vec.push_back(tr(1,2));
 
-	vec.push_back(tr.dx());
-	vec.push_back(tr.dy());
-	vec.push_back(tr.dz());
+	vec.push_back(tr(2,0));
+	vec.push_back(tr(2,1));
+	vec.push_back(tr(2,2));
+
+	vec.push_back(tr(3,0));
+	vec.push_back(tr(3,1));
+	vec.push_back(tr(3,2));
 
 	return vec;
 }

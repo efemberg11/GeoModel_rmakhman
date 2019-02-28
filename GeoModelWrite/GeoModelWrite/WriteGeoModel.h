@@ -27,11 +27,14 @@
 #include <QString>
 #include <QMap>
 
-// TODO: to remove once the migration to Eigen is complete
-// fwd declaration
-namespace HepGeom {
-	class Transform3D;
-}
+// // TODO: to remove once the migration to Eigen is complete
+// // fwd declaration
+// namespace HepGeom {
+// 	class Transform3D;
+// }
+
+
+typedef Eigen::Affine3d Transform3D;
 
 
 namespace GeoModelIO {
@@ -138,7 +141,7 @@ private:
 
 	QString getQStringFromOss(std::ostringstream &oss);
 
-	std::vector<double> getTransformParameters(HepGeom::Transform3D); // TODO: to be moved to Eigen (GeoTrf) and to be moved to an Utility class, so we can use it from TransFunctionRecorder as well.
+	std::vector<double> getTransformParameters(Transform3D); // TODO: to be moved to Eigen (GeoTrf) and to be moved to an Utility class, so we can use it from TransFunctionRecorder as well.
 	QString getShapeParameters(const GeoShape*);
 
 	QString getGeoTypeFromVPhysVol(const GeoVPhysVol* vol);

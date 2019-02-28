@@ -8,8 +8,6 @@
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
 
-#include "GeoModelUtilities/GeoModelExperiment.h"
-
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
@@ -27,7 +25,7 @@
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 
-GeoModelExperiment* createTheExperiment(GeoPhysVol* world)
+GeoPhysVol* createTheExperiment(GeoPhysVol* world)
 {
   if (world == nullptr)
   {
@@ -38,9 +36,7 @@ GeoModelExperiment* createTheExperiment(GeoPhysVol* world)
     const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
     world = new GeoPhysVol(worldLog);
   }
-  // Setup the 'Experiment' manager
-  GeoModelExperiment* theExperiment = new GeoModelExperiment(world);
-  return theExperiment;
+  return world;
 }
 
 
@@ -87,16 +83,13 @@ int main(int argc, char *argv[])
   GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
   qDebug() << "ReadGeoModel::buildGeoModel() done.";
 
-  // create the world volume container and its manager
-  GeoModelExperiment* theExperiment = createTheExperiment(dbPhys);
-  qDebug() << "ATLAS Geometry is built.";
-
-
-  // --- testing the imported ATLAS Geometry
-
+  // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
   std::cout << "Getting the 'world' GeoPhysVol, i.e. the root volume of the GeoModel tree" << std::endl;
-  GeoPhysVol* world = theExperiment->getPhysVol();
+  GeoPhysVol* world = createTheExperiment(dbPhys);
+
+
+  // --- testing the imported Geometry
 
   // get the 'world' GeoLogVol
   std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;

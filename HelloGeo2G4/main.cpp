@@ -7,7 +7,7 @@
 
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
-#include "GeoModel2G4/Geo2G4Builder.h"
+#include "GeoModel2G4/ExtParameterisedVolumeBuilder.h"
 #include "G4LogicalVolume.hh"
 
 #include "GeoModelUtilities/GeoModelExperiment.h"
@@ -138,11 +138,10 @@ int main(int argc, char *argv[])
         }
   }
     
-  Geo2G4Builder* builder = new Geo2G4Builder(world);
+  ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
   std::cout << "Building G4 geometry."<<std::endl;
-  G4LogicalVolume* g4World = builder->BuildTree();
+  G4LogicalVolume* g4World = builder->Build(world);
   
-
   qDebug() << "Everything done.";
 
   return app.exec();

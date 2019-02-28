@@ -1,0 +1,31 @@
+stages:
+  - build
+
+before_script:
+  - yum -y install cmake glibc-devel which
+  - set +e && source CI/setup_lcg89.sh; set -e
+
+variables:
+  CMAKE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+
+.build_template: &build_template
+  stage: build
+  tags: 
+  - cvmfs
+  script:
+    - mkdir build
+    - mkdir install
+    - cd build
+    - echo "${CMAKE_ARGS}"
+    - cmake ${CMAKE_ARGS}  ..
+    - cmake --build . -- -j$(nproc)
+    - cmake --build . -- install
+
+build_slc6:
+  <<: *build_template
+  image: cern/slc6-base
+
+build_cc7:
+  <<: *build_template
+  image: cern/cc7-base
+

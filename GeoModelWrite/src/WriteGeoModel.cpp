@@ -4,7 +4,6 @@
 
 // local includes
 #include "GeoModelWrite/WriteGeoModel.h"
-// #include "GeoModelWrite/Transforms.h"
 
 // TFPersistification includes
 #include "TFPersistification/TransFunctionPersistifier.h"
@@ -661,23 +660,10 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 		qDebug() << "New Transform, storing it...";
 
 
-		//HepGeom::Transform3D tr = Amg::EigenTransformToCLHEP( node->getTransform() );
-        // CLHEP::HepRotation rotation(
-        //                             CLHEP::Hep3Vector(node->getTransform()(0, 0), node->getTransform()(1, 0), node->getTransform()(2, 0)),
-        //                             CLHEP::Hep3Vector(node->getTransform()(0, 1), node->getTransform()(1, 1), node->getTransform()(2, 1)),
-        //                             CLHEP::Hep3Vector(node->getTransform()(0, 2), node->getTransform()(1, 2), node->getTransform()(2, 2)));
-        // CLHEP::Hep3Vector translation(node->getTransform()(0, 3), node->getTransform()(1, 3), node->getTransform()(2, 3));
-        // HepGeom::Transform3D tr(rotation, translation);
-
-
 				// TODO: simplify and put common code in a separate class
 
-				/* get the 12 matrix elements, as in CLHEP:
-				 *
-				 * CLHEP::HepRotation R;
-				 * R.set(CLHEP::Hep3Vector(xx,yx,zx),
-				 * 		CLHEP::Hep3Vector(xy,yy,zy),
-				 *		CLHEP::Hep3Vector(xz,yz,zz));
+				/*
+				 * get the 12 matrix elements
 				 */
 				// Get the 9 rotation coefficients
 				double xx = node->getTransform()(0, 0);
@@ -699,7 +685,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 
 
 				// Instanciate an Eigen's 3D Transformation
-				Transform3D tr;
+				GeoTrf::Transform3D tr;
 
 				// set rotation
 				tr(0,0)=xx;
@@ -999,7 +985,7 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 }
 
 
-std::vector<double> WriteGeoModel::getTransformParameters(Transform3D tr)
+std::vector<double> WriteGeoModel::getTransformParameters(GeoTrf::Transform3D tr)
 {
 	std::vector<double> vec;
 

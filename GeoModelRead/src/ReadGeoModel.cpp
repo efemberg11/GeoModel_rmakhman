@@ -45,11 +45,6 @@
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
-// TODO: to remove once the migration to Eigen is complete
-//#include "CLHEP/Vector/Rotation.h"
-//#include "CLHEP/Geometry/Transform3D.h"
-// #include "GeoPrimitives/CLHEPtoEigenConverter.h" // TODO: to be removed when dropping CLHEP
-
 //VP1Base
 // TODO: we should get rid of VP1Base::VP1Msg dependency, since GeoModelRead should not depend on VP1 packages. Maybe we can move VP1Msg to a standalone package.
 //#include "VP1Base/VP1Msg.h"
@@ -61,23 +56,6 @@
 using namespace GeoGenfun;
 using namespace GeoXF;
 
-
-// Eigen::Affine3d CLHEPtoEigenConverter(const HepGeom::Transform3D xf) {
-// 	Eigen::Affine3d t = Eigen::Affine3d();
-// 	t(0, 0) = xf(0, 0);
-// 	t(0, 1) = xf(0, 1);
-// 	t(0, 2) = xf(0, 2);
-// 	t(1, 0) = xf(1, 0);
-// 	t(1, 1) = xf(1, 1);
-// 	t(1, 2) = xf(1, 2);
-// 	t(2, 0) = xf(2, 0);
-// 	t(2, 1) = xf(2, 1);
-// 	t(2, 2) = xf(2, 2);
-// 	t(0, 3) = xf(0, 3);
-// 	t(1, 3) = xf(1, 3);
-// 	t(2, 3) = xf(2, 3);
-// 	return t;
-// }
 
 namespace GeoModelIO {
 
@@ -924,7 +902,7 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		// get the referenced shape
 		// const GeoShape* shapeA = getShape( QString::number(shapeId) );
 		const GeoShape* shapeA = buildShape( QString::number(shapeId) );
-		// get the referenced HepGeom::Transform3D
+		// get the referenced Transform
 		QStringList transPars = m_dbManager->getItemFromTableName("Transforms", transfId);
 		if (m_deepDebug) qDebug() << "child:" << transPars;
 		GeoTransform* transf = parseTransform(transPars);
@@ -1071,35 +1049,23 @@ GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 	double dy = values[10].toDouble();
 	double dz = values[11].toDouble();
 
-	// TODO: move to GeoModelKernel::GeoTrf (Eigen)
-	// build a rotation matrix with the first 9 elements
-	//CLHEP::HepRotation R;
-	//R.set(CLHEP::Hep3Vector(xx,yx,zx),
-	//		CLHEP::Hep3Vector(xy,yy,zy),
-	//		CLHEP::Hep3Vector(xz,yz,zz));
-	// build a translation vector with the last 3 elements
-	//CLHEP::Hep3Vector D(dx,dy,dz);
-	// build the Transformation
-	//const HepGeom::Transform3D xf(R, D); // TODO: convert to pure Eigen
-
-	Eigen::Affine3d txf;
+	GeoTrf::Transform3D txf;
 	txf(0,0)=xx;
 	txf(0,1)=xy;
 	txf(0,2)=xz;
-       
+
 	txf(1,0)=yx;
 	txf(1,1)=yy;
 	txf(1,2)=yz;
-       
+
 	txf(2,0)=zx;
 	txf(2,1)=zy;
 	txf(2,2)=zz;
-       
+
 	txf(3,0)=dx;
 	txf(3,1)=dy;
 	txf(3,2)=dz;
-       
-	//	return new GeoAlignableTransform( CLHEPtoEigenConverter(xf) );
+
 	return new GeoAlignableTransform(txf);
 }
 
@@ -1135,33 +1101,23 @@ GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 
 	// build a rotation matrix with the first 9 elements
 	// TODO: move to GeoModelKernel GeoTrf (Eigen)
-	//CLHEP::HepRotation R;
-	//R.set(CLHEP::Hep3Vector(xx,yx,zx),
-	//		CLHEP::Hep3Vector(xy,yy,zy),
-	//		CLHEP::Hep3Vector(xz,yz,zz));
-	// build a translation vector with the last 3 elements
-	//CLHEP::Hep3Vector D(dx,dy,dz);
-	// build the Transformation
-	//const HepGeom::Transform3D xf(R, D); // TODO: convert to pure Eigen
 
-	
-	Eigen::Affine3d txf;
+	GeoTrf::Transform3D txf;
 	txf(0,0)=xx;
 	txf(0,1)=xy;
 	txf(0,2)=xz;
-       
+
 	txf(1,0)=yx;
 	txf(1,1)=yy;
 	txf(1,2)=yz;
-       
+
 	txf(2,0)=zx;
 	txf(2,1)=zy;
 	txf(2,2)=zz;
-       
+
 	txf(3,0)=dx;
 	txf(3,1)=dy;
 	txf(3,2)=dz;
-	//return new GeoTransform( CLHEPtoEigenConverter(xf) );
 	return new GeoTransform(txf );
 }
 

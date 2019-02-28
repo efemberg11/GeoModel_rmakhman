@@ -8,13 +8,6 @@
 #include "GeoGenericFunctions/FunctionProduct.h"
 #include "GeoGenericFunctions/FunctionComposition.h"
 
-//#include "GeoPrimitives/CLHEPtoEigenConverter.h" // TODO: to be removed when dropping CLHEP
-
-//#include "CLHEP/Geometry/Transform3D.h"
-//#include "CLHEP/Geometry/Point3D.h"
-//#include "CLHEP/Vector/Rotation.h"
-//#include "CLHEP/Vector/ThreeVector.h"
-
 #include <stdexcept>
 #include <sstream>
 
@@ -39,12 +32,12 @@ std::pair<std::string, std::string> TransFunctionReader::split(const std::string
     cSearch = ++cComma;
   }
   std::string op1=arg.substr(0,comma);
-  std::string op2=arg.substr(comma+1);  
+  std::string op2=arg.substr(comma+1);
   return std::make_pair(op1,op2);
 }
 TransFunctionReader::~TransFunctionReader () {}
 
-#include "GeoModelKernel/GeoXF.h"                          
+#include "GeoModelKernel/GeoXF.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
 #include <iostream>
@@ -103,15 +96,6 @@ TransFunctionReader::scanT(const std::string & exprString) const {
   double & zx=x[6], & zy=x[7], & zz=x[8];
   double & dx=x[9], & dy=x[10], & dz=x[11];
 
-  // TODO: to drop CLHEP, this below should be replaced with Eigen-based Amg objects
-  //  CLHEP::HepRotation R;
-  //R.set(CLHEP::Hep3Vector(xx,yx,zx),
-  //      CLHEP::Hep3Vector(xy,yy,zy),
-  //      CLHEP::Hep3Vector(xz,yz,zz));
-  //CLHEP::Hep3Vector D(dx,dy,dz);
-  //HepGeom::Transform3D xf(R, D);
-
-  //return Amg::CLHEPTransformToEigen(xf); commented out to remove the dependency from GeoPrimitives
   GeoTrf::Transform3D t;
   t(0, 0) = xx; //xf(0, 0);
   t(0, 1) = xy; //xf(0, 1);

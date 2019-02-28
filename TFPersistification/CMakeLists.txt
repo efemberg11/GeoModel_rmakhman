@@ -18,8 +18,7 @@ include( GNUInstallDirs )
 file( GLOB SOURCES src/*.cpp )
 file( GLOB HEADERS TFPersistification/*.h )
 
-# External dependencies:
-#find_package( CLHEP REQUIRED ) # TODO: we can skip the dependency on CLHEP when we convert all methods to Eigen (GeoTrf::Transform3D)
+# Dependencies.
 find_package( GeoModelCore REQUIRED )
 
 # Find an existing installation of Eigen3.

@@ -7,10 +7,7 @@
 #include "GeoModelKernel/GeoXF.h"
 #undef private
 //=====================================================================//
-//#include "CLHEP/Geometry/Transform3D.h"
-//#include "CLHEP/Geometry/Point3D.h"
-//#include "CLHEP/Vector/Rotation.h"
-//#include "CLHEP/Vector/ThreeVector.h"
+
 
 #include <stdexcept>
 TransFunctionRecorder::TransFunctionRecorder(const std::type_info & info, TransFunctionPersistifier * persistifier):
@@ -29,7 +26,6 @@ TransFunctionRecorder::~TransFunctionRecorder () {}
 #undef private                                             //
 
 #include "GeoModelKernel/GeoDefinitions.h"
-//#include "GeoPrimitives/CLHEPtoEigenConverter.h"
 
 #include <iostream>
 #include <typeinfo>
@@ -60,14 +56,6 @@ void PreMultRecorder::execute( const GeoXF::Function & function) const {
   if (!ptr) throw std::runtime_error("Error in PreMultRecorder:  wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "GeoXF::PreMult" << "{";
-  //const HepGeom::Transform3D & tPtr; //= Amg::EigenTransformToCLHEP(ptr->m_arg1);
-  //  CLHEP::HepRotation rotation( CLHEP::Hep3Vector(ptr->m_arg1(0, 0), ptr->m_arg1(1, 0), ptr->m_arg1(2, 0)),
-  //                            CLHEP::Hep3Vector(ptr->m_arg1(0, 1), ptr->m_arg1(1, 1), ptr->m_arg1(2, 1)),
-  //                            CLHEP::Hep3Vector(ptr->m_arg1(0, 2), ptr->m_arg1(1, 2), ptr->m_arg1(2, 2)));
-  //CLHEP::Hep3Vector translation(ptr->m_arg1(0, 3), ptr->m_arg1(1, 3), ptr->m_arg1(2, 3));
-  //HepGeom::Transform3D tPtr(rotation, translation);
-  ////////
-  
   stream << "Transform["
 	 << ptr->m_arg1(0,0) << ";" << ptr->m_arg1(0,1) << ";" << ptr->m_arg1(0,2) << ";"
 	 << ptr->m_arg1(1,0) << ";" << ptr->m_arg1(1,1) << ";" << ptr->m_arg1(1,2) << ";"
@@ -87,13 +75,6 @@ void PostMultRecorder::execute( const GeoXF::Function & function) const {
   stream << "GeoXF::PostMult" << "{";
   getPersistifier()->persistify(*ptr->m_arg1);
   stream << "|";
-  //    const HepGeom::Transform3D & tPtr;= Amg::EigenTransformToCLHEP(ptr->m_arg2);
-  //CLHEP::HepRotation rotation( CLHEP::Hep3Vector(ptr->m_arg2(0, 0), ptr->m_arg2(1, 0), ptr->m_arg2(2, 0)),
-  //                             CLHEP::Hep3Vector(ptr->m_arg2(0, 1), ptr->m_arg2(1, 1), ptr->m_arg2(2, 1)),
-  //                             CLHEP::Hep3Vector(ptr->m_arg2(0, 2), ptr->m_arg2(1, 2), ptr->m_arg2(2, 2)));
-  //CLHEP::Hep3Vector translation(ptr->m_arg2(0, 3), ptr->m_arg2(1, 3), ptr->m_arg2(2, 3));
-  //HepGeom::Transform3D tPtr(rotation, translation);
-  ////////
   stream << "Transform["
 	 << ptr->m_arg2(0,0) << ";" << ptr->m_arg2(0,1) << ";" << ptr->m_arg2(0,2) << ";"
 	 << ptr->m_arg2(1,0) << ";" << ptr->m_arg2(1,1) << ";" << ptr->m_arg2(1,2) << ";"
@@ -110,13 +91,6 @@ void PowRecorder::execute( const GeoXF::Function & function) const {
   if (!ptr) throw std::runtime_error("Error in PowRecorder:  wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "GeoXF::Pow" << "{";
-  //  const HepGeom::Transform3D & tPtr = Amg::EigenTransformToCLHEP(ptr->m_xf);
-  //CLHEP::HepRotation rotation( CLHEP::Hep3Vector(ptr->m_xf(0, 0), ptr->m_xf(1, 0), ptr->m_xf(2, 0)),
-  //                           CLHEP::Hep3Vector(ptr->m_xf(0, 1), ptr->m_xf(1, 1), ptr->m_xf(2, 1)),
-  //                           CLHEP::Hep3Vector(ptr->m_xf(0, 2), ptr->m_xf(1, 2), ptr->m_xf(2, 2)));
-  //CLHEP::Hep3Vector translation(ptr->m_xf(0, 3), ptr->m_xf(1, 3), ptr->m_xf(2, 3));
-  //HepGeom::Transform3D tPtr(rotation, translation);
-
   stream << "Transform["
 	 << ptr->m_xf(0,0) << ";" << ptr->m_xf(0,1) << ";" << ptr->m_xf(0,2) << ";"
 	 << ptr->m_xf(1,0) << ";" << ptr->m_xf(1,1) << ";" << ptr->m_xf(1,2) << ";"

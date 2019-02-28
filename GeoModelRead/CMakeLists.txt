@@ -9,15 +9,11 @@ cmake_minimum_required(VERSION 3.10)
 # Declare the package name
 project( "GeoModelRead" VERSION 1.0.0 LANGUAGES CXX )
 
-### External dependencies:
-# Third-party dependencies:
+### Dependencies.
+# Third-party dependencies.
 find_package( Qt5 COMPONENTS Core Sql ) # for QDebug # TODO: remove Sql dependency, which is brought by GeoModelDBManager
-#find_package( CLHEP ) # to be dropped when migrated all methods to the new Eigen-based GeoTrf
-# GeoModelIO dependencies:
+# GeoModelIO dependencies.
 find_package( GeoModelCore REQUIRED )
-# find_package( GeoModelDBManager REQUIRED )
-# find_package( TFPersistification REQUIRED )
-
 
 # Project's settings
 set(CMAKE_CXX_STANDARD 17)

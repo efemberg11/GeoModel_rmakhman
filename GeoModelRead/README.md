@@ -30,23 +30,6 @@ export QTLIB=$PATHQT/lib
 ```
 
 
-### Build external dependencies
-
-#### CLHEP
-
-We checkout and build the latest release of CLHEP:
-
-```bash
-git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
-cd CLHEP
-git checkout CLHEP_2_4_1_0 # get the latest release
-cd ../
-mkdir CLHEP_build
-cd CLHEP_build
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../CLHEP/
-make -j4
-make install
-```
 ### Build GeoModelIO dependencies
 
 #### Build GeoModelKernel

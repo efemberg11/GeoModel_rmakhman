@@ -15,14 +15,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Use the GNU install directory names.
 include( GNUInstallDirs ) # it defines CMAKE_INSTALL_LIBDIR
 
-### External dependencies:
-# Third-party dependencies:
-find_package( CLHEP ) # TODO: to be dropped when migrated to new Eigen-based GeoTrf
+# Dependencies.
+## Third-party dependencies.
 find_package( Qt5 COMPONENTS Core Sql) # for Qt containers # TODO: remove Sql dependency, which is brought by GeoModelDBManager
-# GeoModelIO dependencies:
+## GeoModelIO dependencies.
 find_package( GeoModelCore REQUIRED )
-# find_package( GeoModelDBManager REQUIRED )
-# find_package( TFPersistification REQUIRED )
 
 
 if(CMAKE_BUILD_TYPE MATCHES Release)
@@ -39,8 +36,8 @@ file( GLOB HEADERS GeoModelWrite/*.h )
 
 # Set targets and properties
 add_library( GeoModelWrite SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoModelWrite PUBLIC Qt5::Core GeoModelKernel GeoModelDBManager TFPersistification ${CLHEP_LIBRARIES} )
-target_include_directories( GeoModelWrite SYSTEM PUBLIC ${CLHEP_INCLUDE_DIRS} ${GeoModelCore_INCLUDE_DIRS} ${GeoModelDBManager_INCLUDE_DIRS} )
+target_link_libraries( GeoModelWrite PUBLIC Qt5::Core GeoModelKernel GeoModelDBManager TFPersistification )
+target_include_directories( GeoModelWrite SYSTEM PUBLIC ${GeoModelCore_INCLUDE_DIRS} ${GeoModelDBManager_INCLUDE_DIRS} )
 target_include_directories( GeoModelWrite PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include>

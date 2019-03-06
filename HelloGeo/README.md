@@ -12,7 +12,7 @@ It uses many of the GeoModel packages.
 ### Install Qt5
 
 To build and run GeoModel libraries, you must have a working Qt5 installation on your computer. 
-If you are not sure how to install it, please take a look at [the notes on Qt5, below](notes-on-qt5).
+If you are not sure how to install it, please take a look at [the notes on Qt5, below](#notes-on-qt5).
 
 
 

@@ -60,27 +60,26 @@ make install
 
 
 
-## Build 'hellogeo'
+## Build 'HelloGeo'
 
 From your work folder:
 
 ```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples/hellogeo.git
+git clone git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples.git
 mkdir build_hellogeo
 cd build_hellogeo
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../hellogeo
+cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelExamples/HelloGeo/
 make -j4
-make install
 ```
 
-Then, get sample geometry data to play with:
+Then, get sample geometry data to play with, and make a symbolic link to point to that:
 
 ```bash
 wget https://atlas-vp1.web.cern.ch/atlas-vp1/doc_new/sample_datafiles/geometry/geometry-ATLAS-R2-2015-03-01-00.db
 ln -s $PWD/geometry-ATLAS-R2-2015-03-01-00.db ../geometry.db
 ```
 
-Now, you can run the example by typing:
+Now, you can **run the example** by typing:
 
 ```bash
 ./hellogeo

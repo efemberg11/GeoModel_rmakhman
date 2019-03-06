@@ -12,7 +12,9 @@ It uses many of the GeoModel packages.
 
 See: <https://doc.qt.io/qt-5/gettingstarted.html>
 
-On macOS, you can use `brew`:
+On Ubuntu 18, you can use the default Qt5 installation shipped with Ubuntu.
+
+On macOS, you can install Qt5 by using `brew`:
 
 ```bash
 brew install qt5
@@ -46,6 +48,7 @@ cd build_gmcore
 cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelCore
 make -j 4
 make install
+cd ..
 ```
 #### Build GeoModelIO dependencies
 
@@ -56,6 +59,7 @@ cd build_gmio
 cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelIO
 make -j 4
 make install
+cd ..
 ```
 
 

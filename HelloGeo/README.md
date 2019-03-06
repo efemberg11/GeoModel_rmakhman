@@ -1,4 +1,3 @@
-
 # The 'helloGeo' GeoModel example
 
 The `helloGeo` example shows you how to read persistified GeoModel data in a standalone program.
@@ -58,16 +57,7 @@ cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../Geo
 make -j 4
 make install
 ```
-#### Build GeoModelG4 dependencies
 
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelG4.git
-mkdir build_gmg4
-cd build_gmg4
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelG4
-make -j 4
-make install
-```
 
 
 ## Build 'hellogeo'
@@ -103,47 +93,5 @@ The example program:
  3. builds the GeoModel tree, storing it in memory
  4. gets the RootVolume of the GeoModel tree and it prints out the number of its children
  5. loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them
-
-
-# The 'helloGeo2G4' GeoModel example
-
-## Build the dependencies
-
-### Install Qt5
-
-See above for instructions
-
-### Build GeoModel dependencies
-
-#### Build GeoModelCore
-
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelCore.git
-mkdir build_gmcore
-cd build_gmcore
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelCore
-make -j 4
-make install
-```
-#### Build GeoModelIO dependencies
-
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO.git
-mkdir build_gmio
-cd build_gmio
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelIO
-make -j 4
-make install
-```
-#### Build GeoModelG4 dependencies
-
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelG4.git
-mkdir build_gmg4
-cd build_gmg4
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelG4
-make -j 4
-make install
-```
 
 

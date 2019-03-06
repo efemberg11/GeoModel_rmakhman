@@ -69,7 +69,7 @@ cd ..
 From your work folder:
 
 ```bash
-git clone git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples.git
+git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples.git
 mkdir build_hellogeo
 cd build_hellogeo
 cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelExamples/HelloGeo/

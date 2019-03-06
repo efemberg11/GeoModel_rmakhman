@@ -2,7 +2,8 @@
 
 The `helloGeo` example shows you how to read persistified GeoModel data in a standalone program.
 
-This example program reads in GeoModel data from a `.db` file, it prints out data entries, it builds the GeoModel tree, it access the RootVolume, and it loops over all its child volumes, printing the name of the GeoLogVol associated with them.
+This example program reads in GeoModel data from a `.db` file, it prints out data entries, 
+it builds the GeoModel tree, it access the RootVolume, and it loops over all its child volumes, printing the name of the GeoLogVol associated with them.
 
 It uses many of the GeoModel packages.
 
@@ -10,31 +11,9 @@ It uses many of the GeoModel packages.
 
 ### Install Qt5
 
-See: <https://doc.qt.io/qt-5/gettingstarted.html>
+To build and run GeoModel libraries, you must have a working Qt5 installation on your computer. 
+If you are not sure how to install it, please take a look at [the notes on Qt5, below](notes-on-qt5).
 
-On Ubuntu 18, you can use the default Qt5 installation shipped with Ubuntu.
-
-On macOS, you can install Qt5 by using `brew`:
-
-```bash
-brew install qt5
-```
-
-After the installation, pay attention to add the Qt folder to your PATH (replace <path-to-qt> with your Qt installation folder and 'clang_64' with ):
-
-```bash
-PATHQT=/<path-to-qt>/Qt5.12.0/5.12.0/clang_64;
-export PATH=$PATHQT/bin:$PATH;
-```
-
-On some platforms, you might need to explicitly set the QMAKESPEC and the QT variables:
-
-```bash
-export QMAKESPEC=$PATHQT/mkspecs/macx-clang;
-export QTDIR=$PATHQT;
-export QTINC=$PATHQT/include;
-export QTLIB=$PATHQT/lib
-```
 
 
 ### Build dependencies
@@ -98,3 +77,34 @@ The example program:
  5. loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them
 
 
+----
+
+## Appendix
+
+### Notes on Qt5
+
+See: <https://doc.qt.io/qt-5/gettingstarted.html>
+
+**On Ubuntu 18**, you can use the default Qt5 installation shipped with Ubuntu.
+
+**On macOS**, you can install Qt5 by using `brew`:
+
+```bash
+brew install qt5
+```
+
+After the installation, pay attention to add the Qt folder to your PATH (replace <path-to-qt> with your Qt installation folder and 'clang_64' with ):
+
+```bash
+PATHQT=/<path-to-qt>/Qt5.12.0/5.12.0/clang_64;
+export PATH=$PATHQT/bin:$PATH;
+```
+
+On some platforms, you might need to explicitly set the QMAKESPEC and the QT variables:
+
+```bash
+export QMAKESPEC=$PATHQT/mkspecs/macx-clang;
+export QTDIR=$PATHQT;
+export QTINC=$PATHQT/include;
+export QTLIB=$PATHQT/lib
+```

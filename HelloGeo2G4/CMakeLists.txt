@@ -1,5 +1,5 @@
 ################################################################################
-# Package: HelloGeo
+# Package: HelloGeo2G4
 # author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - Nov, 2018
 ################################################################################
 
@@ -37,11 +37,11 @@ include(${Geant4_USE_FILE})
 # Populate a CMake variable with the sources
 set(SRCS main.cpp )
 
-# Tell CMake to create the helloworld executable
-add_executable( hellogeo ${SRCS} )
+# Tell CMake to create the hellogeo2g4 executable
+add_executable( hellogeo2g4 ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeo Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel GeoModelUtilities GeoModel2G4  ${Geant4_LIBRARIES})
+target_link_libraries( hellogeo2g4 Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel GeoModelUtilities GeoModel2G4  ${Geant4_LIBRARIES})
 
 # Set include directories
-target_include_directories( hellogeo SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${GeoModelUtilities_INCLUDE_DIRS} ${GeoModelG4_INCLUDE_DIRS} ${Geant4_INCLUDE_DIRS})
+target_include_directories( hellogeo2g4 SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${GeoModelUtilities_INCLUDE_DIRS} ${GeoModelG4_INCLUDE_DIRS} ${Geant4_INCLUDE_DIRS})

@@ -10,7 +10,6 @@ project( "GeoModel2G4" VERSION 1.0.0 LANGUAGES CXX )
 # External dependencies:
 find_package( Geant4 REQUIRED )
 find_package( CLHEP )
-find_package( ROOT COMPONENTS MathCore RIO Core Tree Hist pthread )
 find_package( XercesC )
 # GeoModel dependencies
 find_package( GeoModelCore REQUIRED )
@@ -45,9 +44,9 @@ include(${Geant4_USE_FILE})
 # Set target and properties
 add_library( GeoModel2G4 SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModel2G4
-  PUBLIC ${XERCESC_LIBRARIES} ${GEANT4_LIBRARIES} ${ROOT_LIBRARIES}
+  PUBLIC ${XERCESC_LIBRARIES} ${GEANT4_LIBRARIES}
   PRIVATE ${CLHEP_LIBRARIES} GeoMaterial2G4  GeoModelUtilities )
-target_include_directories( GeoModel2G4 SYSTEM PUBLIC ${XERCESC_INCLUDE_DIRS} ${GEANT4_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS} PRIVATE ${CLHEP_INCLUDE_DIRS} ${GeoModelCore_INCLUDE_DIRS} )
+target_include_directories( GeoModel2G4 SYSTEM PUBLIC ${XERCESC_INCLUDE_DIRS} ${GEANT4_INCLUDE_DIRS} PRIVATE ${CLHEP_INCLUDE_DIRS} ${GeoModelCore_INCLUDE_DIRS} )
 target_include_directories( GeoModel2G4 PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

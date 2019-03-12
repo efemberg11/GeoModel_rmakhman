@@ -1,3 +1,3 @@
-# GeoModelG4
+# GeoModelCore
 
-GeoModelG4 contains the packages needed to interface GeoModel to the [Geant4](https://geant4.web.cern.ch/) detector simulation kit.
+GeoModelCore contains the core packages of the GeoModel toolkit.

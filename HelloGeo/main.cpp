@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   //-----------------------------------------------------------------------------------//
   // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
-  std::cout << "Creating the 'world' volume, i.e. the root volume of the GeoModel tree" << std::endl;
+  std::cout << "Creating the 'world' volume, i.e. the root volume of the GeoModel tree..." << std::endl;
   const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
   const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
   const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   // --- Now, we test the newly created Geometry
 
   // get the 'world' GeoLogVol
-  std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;
+  std::cout << "\nGetting the GeoLogVol used by the 'world' volume..." << std::endl;
   const GeoLogVol* logVol = world->getLogVol();
   std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;
   std::cout << "'world' GeoMaterial name: " << logVol->getMaterial()->getName() << std::endl;

@@ -7,6 +7,11 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(HelloGeoRead2G4)
 
+# Compile with C++14
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -21,10 +26,6 @@ find_package( GeoModelG4 REQUIRED )
 ## External dependencies.
 find_package( Geant4 REQUIRED )
 
-# TODO: remove these dependencies by fixing the corresponding CMake setups
-# find_package( TFPersistification REQUIRED ) # Remove this dependency: it is brough in by some other package --> fix the CMake setup of that package
-# find_package( CLHEP ) # Remove this dependency: it is brough in by TFPersistification
-
 ### External Dependencies
 # Find the Qt5 libraries, used e.g. to interface with the SQlite DB
 find_package(Qt5 COMPONENTS Core Sql Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
@@ -37,7 +38,6 @@ include(${Geant4_USE_FILE})
 # Populate a CMake variable with the sources
 set(SRCS main.cpp )
 
-<<<<<<< HEAD:HelloGeoRead2G4/CMakeLists.txt
 # Tell CMake to create the helloworld executable
 add_executable( hellogeoRead2G4 ${SRCS} )
 
@@ -46,13 +46,3 @@ target_link_libraries( hellogeoRead2G4 Qt5::Core Qt5::Sql GeoModelDBManager GeoM
 
 # Set include directories
 target_include_directories( hellogeoRead2G4 SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${GeoModelUtilities_INCLUDE_DIRS} ${GeoModelG4_INCLUDE_DIRS} ${Geant4_INCLUDE_DIRS})
-=======
-# Tell CMake to create the hellogeo2g4 executable
-add_executable( hellogeo2g4 ${SRCS} )
-
-# Link all needed libraries
-target_link_libraries( hellogeo2g4 Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel GeoModelUtilities GeoModel2G4  ${Geant4_LIBRARIES})
-
-# Set include directories
-target_include_directories( hellogeo2g4 SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${GeoModelUtilities_INCLUDE_DIRS} ${GeoModelG4_INCLUDE_DIRS} ${Geant4_INCLUDE_DIRS})
->>>>>>> 0ab3586d8f3467d4b03584096eb2c4c4f8660bd2:HelloGeo2G4/CMakeLists.txt

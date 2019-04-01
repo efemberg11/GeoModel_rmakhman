@@ -7,18 +7,17 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(HelloGeo)
 
-# Find includes in corresponding build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
+# Compile with C++14
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 # Dependencies.
 ## GeoModel dependencies.
 find_package( GeoModelCore REQUIRED )
-## External Dependencies.
-# find_package(Qt5 COMPONENTS Core REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
 
 # Populate a CMake variable with the sources
 set(SRCS main.cpp )
@@ -28,6 +27,3 @@ add_executable( hellogeo ${SRCS} )
 
 # Link all needed libraries
 target_link_libraries( hellogeo GeoModelKernel)
-
-# Set include directories
-# target_include_directories( hellogeo SYSTEM PUBLIC )

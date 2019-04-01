@@ -2,9 +2,16 @@
 
 The `helloGeoRead` example shows you how to read persistified GeoModel data in a standalone program.
 
-This example program reads in GeoModel data from a `.db` file, it prints out data entries, it builds the GeoModel tree, it access the RootVolume, and it loops over all its child volumes, printing the name of the GeoLogVol associated with them.
+The example program:
 
-It uses many of the GeoModel packages.
+ 1. loads the geometry from the `.db` file
+ 2. prints all GeoMaterial entries found in the `.db`
+ 3. builds the GeoModel tree, storing it in memory
+ 4. gets the RootVolume of the GeoModel tree and it prints out the number of its children
+ 5. loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them
+
+ The example program uses many of the GeoModel packages.
+
 
 ## Dependencies
 
@@ -26,7 +33,7 @@ cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../Geo
 make -j 4
 make install
 ```
-#### Build GeoModelIO dependencies
+#### Build GeoModelIO
 
 ```bash
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO.git
@@ -66,16 +73,6 @@ Now, you can run the example by typing:
 ```bash
 ./hellogeoRead
 ```
-
-### Notes
-
-The example program:
-
- 1. loads the geometry from the `.db` file
- 2. prints all GeoMaterial entries found in the `.db`
- 3. builds the GeoModel tree, storing it in memory
- 4. gets the RootVolume of the GeoModel tree and it prints out the number of its children
- 5. loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them
 
 
  ----

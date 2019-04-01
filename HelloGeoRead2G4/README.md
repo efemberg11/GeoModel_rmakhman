@@ -6,6 +6,16 @@ The `hellogeoRead2G4` example shows you how to read persistified GeoModel data i
 
 This is built on top of the [`hellogeo` example program](https://gitlab.cern.ch/GeoModelDev/GeoModelExamples/helloGeo).
 
+The example program:
+
+ 1. loads the geometry from the `.db` file
+ 2. prints all GeoMaterial entries found in the `.db`
+ 3. builds the GeoModel tree, storing it in memory
+ 4. gets the RootVolume of the GeoModel tree and it prints out the number of its children
+ 5. loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them
+ 6. transforms the GeoModel tree to Geant4 geometry
+
+
 ## Dependencies
 
 ### Install Qt5
@@ -116,17 +126,6 @@ Now, you can run the example by typing:
 ```bash
 ./hellogeoRead2G4
 ```
-
-### Notes
-
-The example program:
-
- 1. loads the geometry from the `.db` file
- 2. prints all GeoMaterial entries found in the `.db`
- 3. builds the GeoModel tree, storing it in memory
- 4. gets the RootVolume of the GeoModel tree and it prints out the number of its children
- 5. loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them
- 6. transforms the GeoModel tree to Geant4 geometry
 
 
  ----

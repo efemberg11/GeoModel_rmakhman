@@ -1,6 +1,6 @@
-# The 'helloGeo' GeoModel example
+# The 'HelloToyDetectorFactory' GeoModel example
 
-The `helloGeo` example shows you how to create a simple geometry, by using GeoModel nodes.
+The `HelloToyDetectorFactory` example shows you how to create a complex geometry using the GeoModel DetectorFactory and Scrutinizers.
 
 ## Dependencies
 
@@ -26,7 +26,7 @@ From your work folder:
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples.git
 mkdir build_hellogeo
 cd build_hellogeo
-cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelExamples/HelloGeo/
+cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelExamples/HelloToyDetectorFactory/
 make -j4
 ```
 
@@ -35,17 +35,14 @@ make -j4
 Now, you can **run the example** by typing:
 
 ```bash
-./hellogeo
+./helloToyDetectorFactory
 ```
 
 ### Notes
 
 The example program:
 
- 1. Build an example geometry:
-   * creates some dummy materials
-   * builds a "world" volume
-   * builds two additional volumes and adds them to the GeoModel tree as world's children
+ 1. Build an example geometry, by using a DetectorFactory
  2. Access the geometry:
    * gets the RootVolume of the GeoModel tree and it prints out the number of its children
    * loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them

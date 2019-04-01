@@ -5,29 +5,29 @@
 
 cmake_minimum_required(VERSION 3.1.0)
 
-project(HelloGeo)
+project(HelloGeoRead)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+# Instruct CMake to run moc automatically when needed
+set(CMAKE_AUTOMOC ON)
 
 # Dependencies.
 ## GeoModel dependencies.
 find_package( GeoModelCore REQUIRED )
+find_package( GeoModelIO REQUIRED )
 ## External Dependencies.
-# find_package(Qt5 COMPONENTS Core REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
+find_package(Qt5 COMPONENTS Core Sql Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
 
 # Populate a CMake variable with the sources
 set(SRCS main.cpp )
 
 # Tell CMake to create the helloworld executable
-add_executable( hellogeo ${SRCS} )
+add_executable( hellogeoRead ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeo GeoModelKernel)
+target_link_libraries( hellogeoRead Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel)
 
 # Set include directories
-# target_include_directories( hellogeo SYSTEM PUBLIC )
+target_include_directories( hellogeoRead SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} )

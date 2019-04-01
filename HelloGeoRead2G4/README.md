@@ -1,8 +1,8 @@
 
 
-# The 'helloGeo2G4' GeoModel example
+# The 'hellogeoRead2G4' GeoModel example
 
-The `hellogeo2g4` example shows you how to read persistified GeoModel data in a standalone program and convert it to a Geant4 geometry.
+The `hellogeoRead2G4` example shows you how to read persistified GeoModel data in a standalone program and convert it to a Geant4 geometry.
 
 This is built on top of the [`hellogeo` example program](https://gitlab.cern.ch/GeoModelDev/GeoModelExamples/helloGeo).
 
@@ -114,17 +114,17 @@ From your work folder:
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples/hellogeo.git
 mkdir build_hellogeo
 cd build_hellogeo
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo  ../GeoModelG4/
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo  ../GeoModelExamples/HelloGeoRead2G4
 make -j4
 make install
 ```
-**Note:** If you installed Geant4 in a folder other than the `../install`, then you have to pass the path to Geant4 adding the -DGeant4_DIR option to cmake 
+**Note:** If you installed Geant4 in a folder other than the `../install`, then you have to pass the path to Geant4 adding the -DGeant4_DIR option to cmake
 
 ```bash
 cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo  ../GeoModelG4/ -DGeant4_DIR=<path-to-Geant4-install>/lib/Geant4-10.x.y/
 ```
 
-## Run `hellogeo2g4`
+## Run `hellogeoRead2G4`
 
 Get sample geometry data to play with:
 
@@ -136,7 +136,7 @@ ln -s $PWD/geometry-ATLAS-R2-2015-03-01-00.db ../geometry.db
 Now, you can run the example by typing:
 
 ```bash
-./hellogeo2g4
+./hellogeoRead2G4
 ```
 
 The example program:

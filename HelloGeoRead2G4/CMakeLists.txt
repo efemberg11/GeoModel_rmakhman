@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.1.0)
 
-project(HelloGeo2G4)
+project(HelloGeoRead2G4)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -38,10 +38,10 @@ include(${Geant4_USE_FILE})
 set(SRCS main.cpp )
 
 # Tell CMake to create the helloworld executable
-add_executable( hellogeo ${SRCS} )
+add_executable( hellogeoRead2G4 ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeo Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel GeoModelUtilities GeoModel2G4  ${Geant4_LIBRARIES})
+target_link_libraries( hellogeoRead2G4 Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel GeoModelUtilities GeoModel2G4  ${Geant4_LIBRARIES})
 
 # Set include directories
-target_include_directories( hellogeo SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${GeoModelUtilities_INCLUDE_DIRS} ${GeoModelG4_INCLUDE_DIRS} ${Geant4_INCLUDE_DIRS})
+target_include_directories( hellogeoRead2G4 SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${GeoModelUtilities_INCLUDE_DIRS} ${GeoModelG4_INCLUDE_DIRS} ${Geant4_INCLUDE_DIRS})

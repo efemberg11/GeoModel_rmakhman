@@ -26,4 +26,4 @@ FILE(GLOB SRCS src/main.cpp src/*.cxx )
 add_executable( helloToyDetectorFactory ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( helloToyDetectorFactory GeoModelKernel GeoModelUtilities)
+target_link_libraries( helloToyDetectorFactory GeoModelKernel )

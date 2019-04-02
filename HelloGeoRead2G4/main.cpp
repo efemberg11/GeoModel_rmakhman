@@ -10,7 +10,7 @@
 #include "GeoModel2G4/ExtParameterisedVolumeBuilder.h"
 #include "G4LogicalVolume.hh"
 
-#include "GeoModelUtilities/GeoModelExperiment.h"
+// #include "GeoModelUtilities/GeoModelExperiment.h"
 
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -29,21 +29,21 @@
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 
-GeoModelExperiment* createTheExperiment(GeoPhysVol* world)
-{
-  if (world == nullptr)
-  {
-    // Setup the 'World' volume from which everything else will be suspended
-    double densityOfAir=0.1;
-    const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
-    const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-    const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
-    world = new GeoPhysVol(worldLog);
-  }
-  // Setup the 'Experiment' manager
-  GeoModelExperiment* theExperiment = new GeoModelExperiment(world);
-  return theExperiment;
-}
+// GeoModelExperiment* createTheExperiment(GeoPhysVol* world)
+// {
+//   if (world == nullptr)
+//   {
+//     // Setup the 'World' volume from which everything else will be suspended
+//     double densityOfAir=0.1;
+//     const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
+//     const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+//     const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
+//     world = new GeoPhysVol(worldLog);
+//   }
+//   // Setup the 'Experiment' manager
+//   GeoModelExperiment* theExperiment = new GeoModelExperiment(world);
+//   return theExperiment;
+// }
 
 
 
@@ -86,21 +86,14 @@ int main(int argc, char *argv[])
 
 
   /* build the GeoModel geometry */
-  GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+  GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
   qDebug() << "ReadGeoModel::buildGeoModel() done.";
 
-  // create the world volume container and its manager
-  GeoModelExperiment* theExperiment = createTheExperiment(dbPhys);
-  qDebug() << "ATLAS Geometry is built.";
 
 
   // --- testing the imported ATLAS Geometry
 
-  // get the 'world' volume, i.e. the root volume of the GeoModel tree
-  std::cout << "Getting the 'world' GeoPhysVol, i.e. the root volume of the GeoModel tree" << std::endl;
-  GeoPhysVol* world = theExperiment->getPhysVol();
-
-  // get the 'world' GeoLogVol
+  // get the GeoLogVol used for the 'world' volume
   std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;
   const GeoLogVol* logVol = world->getLogVol();
   std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;
@@ -119,12 +112,12 @@ int main(int argc, char *argv[])
 		std::cout << "\t" << "the child n. " << idx << " ";
 		const GeoVPhysVol *childVolV = &(*( nodeLink ));
 		if ( dynamic_cast<const GeoPhysVol*>(childVolV) )
-        
+
         {
 			const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
 			std::cout << "is a GeoPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName() << std::endl;
             std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
-            
+
 		} else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
 			const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
 			std::cout << "is a GeoFullPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName() << std::endl;
@@ -137,11 +130,12 @@ int main(int argc, char *argv[])
         //std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
         }
   }
-    
+
+  // build the Geant4 geometry and get an hanlde to the world' volume
   ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
   std::cout << "Building G4 geometry."<<std::endl;
   G4LogicalVolume* g4World = builder->Build(world);
-  
+
   qDebug() << "Everything done.";
 
   return app.exec();

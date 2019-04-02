@@ -6,15 +6,13 @@
  */
 
 
+#include "GeoModelExperiment.h"
+#include "ToyDetectorFactory.h"
 
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
-
-#include "GeoModelUtilities/GeoModelExperiment.h"
-
-#include "ToyDetectorFactory.h"
 
 #include <iostream>
 

@@ -44,7 +44,7 @@ include(${Geant4_USE_FILE})
 add_library( GeoModel2G4 SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModel2G4
   PUBLIC  ${GEANT4_LIBRARIES}
-  PRIVATE ${CLHEP_LIBRARIES} GeoMaterial2G4  GeoModelUtilities )
+  PRIVATE ${CLHEP_LIBRARIES} GeoMaterial2G4 )
 target_include_directories( GeoModel2G4 SYSTEM PUBLIC ${GEANT4_INCLUDE_DIRS} PRIVATE ${CLHEP_INCLUDE_DIRS} ${GeoModelCore_INCLUDE_DIRS} )
 target_include_directories( GeoModel2G4 PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

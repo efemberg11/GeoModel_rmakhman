@@ -3,11 +3,12 @@
 */
 
 #include "GeoMaterial2G4/Geo2G4MatPropTableFactory.h"
+#include "GeoMaterial2G4/GeoMaterialPropertiesTable.h"
+#include "GeoMaterial2G4/GeoMaterialPropertyVector.h"
+
 #include "G4MaterialPropertiesTable.hh"
 #include "G4MaterialPropertyVector.hh"
 
-#include "GeoModelUtilities/GeoMaterialPropertiesTable.h"
-#include "GeoModelUtilities/GeoMaterialPropertyVector.h"
 
 Geo2G4MatPropTableFactory* Geo2G4MatPropTableFactory::m_instance = 0;
 

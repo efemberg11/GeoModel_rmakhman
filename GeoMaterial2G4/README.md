@@ -71,3 +71,10 @@ make install
 ```bash
 cmake -DGeant4_DIR=../install/lib/Geant4-10.5.0/ -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoMaterial2G4/
 ```
+
+Alternatively, you can source the Geant4 setup, before running cmake:
+
+```bash
+source <path_to_geant4_install>/bin/geant4.sh
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoMaterial2G4
+```

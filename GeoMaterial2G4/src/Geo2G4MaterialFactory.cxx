@@ -7,10 +7,12 @@
 #include "GeoMaterial2G4/Geo2G4MatPropTableFactory.h"
 
 #include "GeoModelKernel/GeoMaterial.h"
-#include "GeoModelUtilities/GeoExtendedMaterial.h"
-#include "GeoModelUtilities/GeoMaterialPropertiesTable.h"
+#include "GeoMaterial2G4/GeoExtendedMaterial.h"
+#include "GeoMaterial2G4/GeoMaterialPropertiesTable.h"
 
 #include "G4Material.hh"
+
+
 
 // Geo2G4MaterialFactory::Geo2G4MaterialFactory(): m_msg("Geo2G4MaterialFactory")
 Geo2G4MaterialFactory::Geo2G4MaterialFactory()

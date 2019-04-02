@@ -73,48 +73,9 @@ int main(int argc, char *argv[])
 
 
 
-  // --- Now, we test the newly created Geometry
-
-  // get the 'world' GeoLogVol
-  std::cout << "\nGetting the GeoLogVol used by the 'world' volume..." << std::endl;
-  const GeoLogVol* logVol = world->getLogVol();
-  std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;
-  std::cout << "'world' GeoMaterial name: " << logVol->getMaterial()->getName() << std::endl;
-
-  // get number of children volumes
-  unsigned int nChil = world->getNChildVols();
-  std:: cout << "'world' number of children: " << nChil << std::endl;
-
-  // loop over all child nodes
-  std::cout << "Looping over all world's 'volume' children (i.e., GeoPhysVol and GeoFullPhysVol)..." << std::endl;
-  for (unsigned int idx=0; idx<nChil; ++idx) {
-  	PVConstLink nodeLink = world->getChildVol(idx);
-
-  	if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) ) {
-  		std::cout << "\t" << "the child n. " << idx << " ";
-  		const GeoVPhysVol *childVolV = &(*( nodeLink ));
-  		if ( dynamic_cast<const GeoPhysVol*>(childVolV) ) {
-  			const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
-  			std::cout << "is a GeoPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName();
-  			std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
-  		} else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
-  			const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
-  			std::cout << "is a GeoFullPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName();
-  			std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
-  		}
-    } else if ( dynamic_cast<const GeoNameTag*>( &(*( nodeLink ))) ) {
-  		std::cout << "\t" << "the child n. " << idx << " is a GeoNameTag" << std::endl;
-  		const GeoNameTag *childVol = dynamic_cast<const GeoNameTag*>(&(*( nodeLink )));
-  		std::cout << "\t\tGeoNameTag's name: " << childVol->getName() << std::endl;
-    }
-  }
-  std::cout << "Done." << std::endl;
-
-
-
-  //---
+	//------------------------------------------------------------------------------------//
 	// Writing the geometry to file
-	//---
+	//------------------------------------------------------------------------------------//
 	QString path = "geometry.db";
 	// open the DB connection
   GMDBManager db(path);

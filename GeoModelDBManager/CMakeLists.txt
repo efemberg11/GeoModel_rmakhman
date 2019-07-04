@@ -48,22 +48,6 @@ set_property( TARGET GeoModelDBManager PROPERTY PUBLIC_HEADER ${HEADERS} )
 ### Installation ###
 ###################################################
 
-# # Install the library.
-# install( TARGETS GeoModelDBManager
-#    EXPORT GeoModelDBManager
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelDBManager )
-
-# Export library Config
-# install( TARGETS GeoModelDBManager
-#   EXPORT GeoModelDBManagerConfig
-#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelDBManager )
-
-# Install a CMake description of the project/library.
-# install( EXPORT GeoModelDBManager DESTINATION cmake )
-# install( EXPORT GeoModelDBManagerConfig DESTINATION cmake )
-
-# new test GeoModelIO
+# Export as part of GeoModelIO
 install( TARGETS GeoModelDBManager EXPORT GeoModelDBManager-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelDBManager )

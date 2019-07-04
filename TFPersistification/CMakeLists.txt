@@ -43,20 +43,6 @@ target_include_directories( TFPersistification PUBLIC
 
 target_link_libraries( TFPersistification PUBLIC GeoModelKernel )
 
-# # Install the library.
-# install( TARGETS TFPersistification
-#    EXPORT TFPersistification
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TFPersistification )
-#
-# install( TARGETS TFPersistification
-#    EXPORT TFPersistificationConfig
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TFPersistification )
-
-# Install a CMake description of the project/library.
-# install( EXPORT TFPersistificationConfig DESTINATION cmake )
-
-# new test GeoModelIO
+# Export as part of GeoModelIO
 install( TARGETS TFPersistification EXPORT TFPersistification-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TFPersistification )

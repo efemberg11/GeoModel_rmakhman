@@ -21,6 +21,6 @@ target_include_directories( GeoModelErrorHandler PUBLIC
 # Set installation of library headers
 set_property( TARGET GeoModelErrorHandler PROPERTY PUBLIC_HEADER ${HEADERS} )
 
-# new test GeoModelIO
+# Export as part of GeoModelIO
 install( TARGETS GeoModelErrorHandler EXPORT GeoModelErrorHandler-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelErrorHandler )

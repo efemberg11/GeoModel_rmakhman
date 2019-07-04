@@ -56,7 +56,6 @@ install( TARGETS GeoModelWrite
 # Install a CMake description of the project/library.
 install( EXPORT GeoModelWriteConfig DESTINATION cmake )
 
-
-# new test GeoModelIO
+# Export as part of GeoModelIO
 install( TARGETS GeoModelWrite EXPORT GeoModelWrite-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelWrite )

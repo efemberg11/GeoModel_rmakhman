@@ -56,6 +56,6 @@ install( TARGETS GeoModelRead
 # Install a CMake description of the project/library.
 install( EXPORT GeoModelReadConfig DESTINATION cmake )
 
-# new test GeoModelIO
+# Export as part of GeoModelIO
 install( TARGETS GeoModelRead EXPORT GeoModelRead-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelRead )

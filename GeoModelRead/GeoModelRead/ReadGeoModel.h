@@ -86,12 +86,19 @@ private:
 
 	void checkInputString(QString input);
 
+	void printTrf(GeoTrf::Transform3D t);
+	void printTransformationValues(QStringList t);
+	QList<double> convertQstringListToDouble(QStringList listin);
+
+
 	// input arguments
 	std::string _dbName;
 	GeoPhysVol* _root;
 	GMDBManager* m_dbManager;
-	unsigned long* m_progress;
 	bool m_deepDebug;
+
+	// callback handles
+	unsigned long* m_progress;
 
 	// data containers
 	QHash<QString, QMap<unsigned int, QStringList>> _allchildren; // key = "parentId:parentTable", item = list of children parameters, inserted by child position

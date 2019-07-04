@@ -52,6 +52,10 @@
 // Qt includes
 #include <QDebug>
 
+// C++ includes
+#include <stdlib.h>     /* exit, EXIT_FAILURE */
+
+
 
 using namespace GeoGenfun;
 using namespace GeoXF;
@@ -92,7 +96,6 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 	qDebug() << "ReadGeoModel::buildGeoModel()";
 
 	// return buildGeoModelByCalls();
-
 	GeoPhysVol* rootVolume = buildGeoModelOneGo();
 
 	if (m_unknown_shapes.size() > 0) {
@@ -206,7 +209,7 @@ GeoPhysVol* ReadGeoModel::loopOverAllChildren()
 			float done = ( (float)counter / nChildrenRecords) * 100;
 			std::cout << "\t" << std::fixed << counter << "children records processed [" << done << "%]" << std::endl;
 			if ( m_progress != nullptr  ) {
-			  //progress.setValue(counter); // This hould go in VP1Light
+			  //progress.setValue(counter); // This should go in VP1Light
 			  *m_progress = counter;
 			}
 		}
@@ -255,6 +258,10 @@ GeoPhysVol* ReadGeoModel::loopOverAllChildren()
 			if (m_deepDebug) qDebug() << "child:" << child;
 
 			// build or get child node
+			if (child.length() < 8) {
+				std::cout <<  "ERROR!!! Probably you are using an old geometry file..." << std::endl;
+				exit(EXIT_FAILURE);
+			}
 			QString childTableId = child[5];
 			QString childId = child[6];
 			QString childCopyN = child[7];
@@ -265,7 +272,7 @@ GeoPhysVol* ReadGeoModel::loopOverAllChildren()
 
 			if (childNodeType.isEmpty()) {
 				qWarning("ERROR!!! childNodeType is empty!!! Aborting...");
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 
 			if (childNodeType == "GeoPhysVol") {
@@ -907,6 +914,10 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		if (m_deepDebug) qDebug() << "child:" << transPars;
 		GeoTransform* transf = parseTransform(transPars);
 		const GeoTrf::Transform3D transfX = transf->getTransform();
+
+		// qWarning() << "GeoShift:";
+		// printTrf(transfX);
+
 		// build and return the GeoShapeShift instance
 		return new GeoShapeShift(shapeA, transfX);
 	}
@@ -1020,6 +1031,42 @@ GeoSerialDenominator* ReadGeoModel::parseSerialDenominator(QStringList values)
 	return new GeoSerialDenominator(baseName.toStdString());
 }
 
+
+void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
+	std::cout << "transformation: " << std::endl;
+	std::cout << "[[" << t(0, 0) << " , ";
+	std::cout <<         t(0, 1) << " , ";
+	std::cout <<         t(0, 2) << " ]";
+	std::cout << "["  << t(1, 0) << " , ";
+	std::cout <<         t(1, 1) << " , ";
+	std::cout <<         t(1, 2) << " ]";
+	std::cout << "["  << t(2, 0) << " , ";
+	std::cout <<         t(2, 1) << " , ";
+	std::cout <<         t(2, 2) << " ]";
+	std::cout << "["  << t(3, 0) << " , ";
+	std::cout <<         t(3, 1) << " , ";
+	std::cout <<         t(3, 2) << " ]]" << std::endl;
+}
+
+// TODO: should go in a QtUtils header-only class, to be used in other packages
+QList<double> ReadGeoModel::convertQstringListToDouble(QStringList listin) {
+	QList<double> listout;
+  foreach (const QString &s, listin) {
+      listout.append(s.toDouble());
+  }
+	return listout;
+}
+
+void ReadGeoModel::printTransformationValues(QStringList values) {
+	QList<double> t = convertQstringListToDouble(values);
+	std::cout << "transformation input values: " << std::endl;
+	qWarning() << "[[" << t[0] << "," << t[1] << "," << t[2] << "]["
+	                   << t[3] << "," << t[4] << "," << t[5] << "]["
+										 << t[6] << "," << t[7] << "," << t[8] << "]["
+										 << t[9] << "," << t[10] << "," << t[11] << "]]";
+}
+
+
 GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(QString id)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildAlignableTransform()";
@@ -1032,6 +1079,8 @@ GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 
 	QString id = values.takeFirst(); // it pops out the first element, leaving the other items in the list
 
+	// printTransformationValues(values); // DEBUG
+
 	// get the 12 matrix elements
 	double xx = values[0].toDouble();
 	double xy = values[1].toDouble();
@@ -1050,6 +1099,7 @@ GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 	double dz = values[11].toDouble();
 
 	GeoTrf::Transform3D txf;
+	// build the rotation matrix with the first 9 elements
 	txf(0,0)=xx;
 	txf(0,1)=xy;
 	txf(0,2)=xz;
@@ -1062,10 +1112,12 @@ GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 	txf(2,1)=zy;
 	txf(2,2)=zz;
 
-	txf(3,0)=dx;
-	txf(3,1)=dy;
-	txf(3,2)=dz;
+	// and the translation matrix with the last 3 elements
+	txf(0,3)=dx;
+	txf(1,3)=dy;
+	txf(2,3)=dz;
 
+	// printTrf(txf); // DEBUG
 	return new GeoAlignableTransform(txf);
 }
 
@@ -1075,12 +1127,15 @@ GeoTransform* ReadGeoModel::buildTransform(QString id)
 	return parseTransform( _transforms[id.toUInt()] );
 }
 
+
 GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseTransform()";
 	if (m_deepDebug) qDebug() << "values:" << values;
 
-	QString id = values.takeFirst(); // it pops out the first element, leaving the other items in the list
+	QString id = values.takeFirst(); // it pops out the first element, the 'id', leaving the other items in the list
+
+  // printTransformationValues(values); // DEBUG
 
 	// get the 12 matrix elements
 	double xx = values[0].toDouble();
@@ -1099,10 +1154,8 @@ GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 	double dy = values[10].toDouble();
 	double dz = values[11].toDouble();
 
-	// build a rotation matrix with the first 9 elements
-	// TODO: move to GeoModelKernel GeoTrf (Eigen)
-
 	GeoTrf::Transform3D txf;
+	// build the rotation matrix with the first 9 elements
 	txf(0,0)=xx;
 	txf(0,1)=xy;
 	txf(0,2)=xz;
@@ -1115,10 +1168,13 @@ GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 	txf(2,1)=zy;
 	txf(2,2)=zz;
 
-	txf(3,0)=dx;
-	txf(3,1)=dy;
-	txf(3,2)=dz;
-	return new GeoTransform(txf );
+	// and the translation matrix with the last 3 elements
+	txf(0,3) = dx;
+	txf(1,3) = dy;
+	txf(2,3) = dz;
+
+	// printTrf(txf); // DEBUG
+	return new GeoTransform(txf);
 }
 
 

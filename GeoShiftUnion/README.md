@@ -41,7 +41,10 @@ Then you can run the example program:
 
 When the program terminates, you will find a `geometry.db` file in the build folder. This is a SQLite file containing the dump of the geometry defined in the example C++ code.
 
-You can visualize it by opening it with VP1Light. If you do not have it installed yet, you can install it with `brew`, by following [these instructions](https://github.com/ric-bianchi/homebrew-vp1light).
+## Visualization
+
+You can visualize it by opening it with VP1Light. Please refer to the [Visualization documentation](docs/visualization.md).
+
 
 ----
 

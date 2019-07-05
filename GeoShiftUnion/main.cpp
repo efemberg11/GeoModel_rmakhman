@@ -17,6 +17,7 @@
 #include "GeoModelWrite/WriteGeoModel.h"
 
 #include <QDebug>
+#include <QFileInfo>
 
 #include <iostream>
 
@@ -27,28 +28,22 @@
 
 int main(int argc, char *argv[])
 {
-  //-----------------------------------------------------------------------------------//
-	// Get the materials that we shall use.                                              //
-	// ----------------------------------------------------------------------------------//
-
-
-	// Get the materials
-  // const GeoMaterial* matIron = theMaterialManager->getMaterial("std::Iron"); // Athena code
-	// Bogus densities.  Later: read from database.
-  double densityOfIron= 0.7;
-	double densityOfAir = 0.1;
-	const GeoMaterial *air     = new GeoMaterial("Air Toy",densityOfAir);
-  const GeoMaterial *matIron = new GeoMaterial("Iron Toy",densityOfIron);
-
-
 	//-----------------------------------------------------------------------------------//
   // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
   std::cout << "Creating the 'world' volume, i.e. the root volume of the GeoModel tree..." << std::endl;
+  double densityOfAir = 0.1;
   const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
   const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
   const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
   GeoPhysVol* world = new GeoPhysVol(worldLog);
+
+
+  // Get the materials
+  // const GeoMaterial* matIron = theMaterialManager->getMaterial("std::Iron"); // Athena code
+  // Bogus densities.  Later: read from database.
+  double densityOfIron= 0.7;
+  const GeoMaterial *matIron = new GeoMaterial("Iron Toy",densityOfIron);
 
 
 	//-----------------------------------------------------------------------------------//
@@ -108,6 +103,16 @@ int main(int argc, char *argv[])
 	// Writing the geometry to file
 	//------------------------------------------------------------------------------------//
 	QString path = "geometry.db";
+
+  // check if DB file exists. If not, return.
+  // TODO: this check should go in the 'GMDBManager' constructor.
+  if ( QFileInfo(path).exists() ) {
+        qWarning() << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove it before running this program.";
+        qWarning() << "\tReturning..." << "\n";
+        // return;
+        exit(1);
+  }
+
 	// open the DB connection
   GMDBManager db(path);
 
@@ -122,8 +127,8 @@ int main(int argc, char *argv[])
    std::cout << "Dumping the GeoModel geometry to the DB file..." << std::endl;
   // Dump the tree volumes into a DB
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db); // init the GeoModel node action
-  world->exec(&dumpGeoModelGraph); // visit all GeoModel nodes
-  dumpGeoModelGraph.saveToDB(); // save to the SQlite DB file
+  world->exec(&dumpGeoModelGraph); // visit all nodes in the GeoModel tree
+  dumpGeoModelGraph.saveToDB(); // save to the local SQlite DB file
   std::cout << "DONE. Geometry saved." <<std::endl;
 
   std::cout << "\nTest - list of all the GeoMaterial nodes in the persistified geometry:" << std::endl;

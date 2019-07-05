@@ -15,22 +15,17 @@ The example program:
 
 To quickly install everything, we use [Homebrew](). If you don't have installed it on your computer, please install it by following the [instructions on its website]().
 
-Install the dependencies:
+Install the dependencies, [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore) and [GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModelIO):
 
 ```
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
 brew install geomodelcore geomodelio
 ```
 
-After that, get the example code:
+After that, get the example code and compile the example:
 
 ```
-
-```
-
-Then, compile the example:
-
-```
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelExamples.git
 mkdir build_geoshiftunion
 cd build_geoshiftunion
 cmake ../GeoModelExamples/GeoShiftUnion
@@ -40,7 +35,13 @@ make
 Then you can run the example program:
 
 ```
-./
+./geoShiftUnion
+```
+
+When the program terminates, you will find a `geometry.db` file in the build folder. This is a SQLite file containing the dump of the geometry defined in the example C++ code.
+
+You can visualize it by opening it with VP1Light. If you do not have it installed yet, you can install it with `brew`, by following [these instructions](https://github.com/ric-bianchi/homebrew-vp1light).
+
 
 
 ## Dependencies

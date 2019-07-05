@@ -77,6 +77,16 @@ int main(int argc, char *argv[])
 	// Writing the geometry to file
 	//------------------------------------------------------------------------------------//
 	QString path = "geometry.db";
+
+	// check if DB file exists. If not, return.
+  // TODO: this check should go in the 'GMDBManager' constructor.
+  if ( QFileInfo(path).exists() ) {
+        qWarning() << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove it before running this program.";
+        qWarning() << "\tReturning..." << "\n";
+        // return;
+        exit(1);
+  }
+	
 	// open the DB connection
   GMDBManager db(path);
 

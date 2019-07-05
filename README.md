@@ -38,7 +38,7 @@ cmake ../GeoModelIO
 make
 ```
 
-## Local `install` path
+## Local 'install' path
 
 If you want to build a custom version of the library to be used to develop client code, 
 you can create a self-contained area by defining a local `install` path; 

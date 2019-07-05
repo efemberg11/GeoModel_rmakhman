@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
       return 1;
   }
 
-   std::cout << "Dumping the GeoModel geometry to the DB file..." << std::endl;
-  // Dump the tree volumes into a DB
+  // Dump the tree volumes to a local file
+	std::cout << "Dumping the GeoModel geometry to the DB file..." << std::endl;
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db); // init the GeoModel node action
   world->exec(&dumpGeoModelGraph); // visit all GeoModel nodes
   dumpGeoModelGraph.saveToDB(); // save to the SQlite DB file
@@ -97,8 +97,6 @@ int main(int argc, char *argv[])
 
   std::cout << "\nTest - list of all the GeoMaterial nodes in the persistified geometry:" << std::endl;
   db.printAllMaterials();
-
-
 
 
   return 0;

@@ -13,11 +13,17 @@ Launch VP1Light from the command line:
 vp1light
 ```
 
+When the program starts, you will get the splash screen. Please, click on `Geometry studies`:
 
 ![](assets/visualization-12dc3737.png)
+
+You will be prompted to choose a geometry file to load. Please, click on `Browse...`:
+
 ![](assets/visualization-44d3600f.png)
 
-You will see the main window of VP1Light, with the 3D content at the center.
+Now, choose the `geometry.db` file which we just created by running the `./geoShiftUnion` program and click on `Open`.
+
+Once the loading of the file is completed (less than 1 second), you will see the main window of VP1Light, with the 3D content at the center.
 
 ![](assets/visualization-836f5191.png)
 

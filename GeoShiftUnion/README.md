@@ -1,5 +1,6 @@
 # The 'GeoShiftUnion' GeoModel example
 
+![](docs/assets/visualization-3318dc3d.png)
 
 The `GeoShiftUnion` example shows you how to create a more complex geometry, by using the GeoShapeShift and GeoShiftUnion nodes.
 

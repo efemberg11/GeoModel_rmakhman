@@ -1,48 +1,61 @@
 # The 'HelloToyDetectorFactory' GeoModel example
 
+![](docs/assets/visualization-e7c35926.png)
+
 The `HelloToyDetectorFactory` example shows you how to create a complex geometry using the GeoModel DetectorFactory and Scrutinizers.
-
-## Dependencies
-
-#### GeoModelCore
-
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelCore.git
-mkdir build_gmcore
-cd build_gmcore
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelCore
-make -j 4
-make install
-cd ..
-```
-
-
-
-## Build
-
-From your work folder:
-
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples.git
-mkdir build_hellogeo
-cd build_hellogeo
-cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelExamples/HelloToyDetectorFactory/
-make -j4
-```
-
-## Run
-
-Now, you can **run the example** by typing:
-
-```bash
-./helloToyDetectorFactory
-```
-
-### Notes
 
 The example program:
 
- 1. Build an example geometry, by using a DetectorFactory
- 2. Access the geometry:
+ 1. Builds an example geometry, by using a DetectorFactory
+ 2. Accesses the in-memory geometry:
    * gets the RootVolume of the GeoModel tree and it prints out the number of its children
    * loops over all the RootVolume's children volumes (GeoPhysVol and GeoFullPhysVol instances), printing the name of the GeoLogVol associated to them
+ 3. Write the geometry to a local file
+
+
+
+
+## Quick Instructions
+
+### macOS Mojave
+
+To quickly install everything, we use [Homebrew](). If you don't have installed it on your computer, please install it by following the [instructions on its website]().
+
+Install the dependencies, [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore) and [GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModelIO):
+
+```
+brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
+brew install geomodelcore geomodelio
+```
+
+After that, get the example code and compile the example:
+
+```
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelExamples.git
+mkdir build_hellotoydetectorfactory
+cd build_hellotoydetectorfactory
+cmake ../GeoModelExamples/HelloToyDetectorFactory
+make
+```
+
+Then you can run the example program:
+
+```
+./helloToyDetectorFactory
+```
+
+When the program terminates, you will find a `geometry.db` file in the build folder. This is a SQLite file containing the dump of the geometry defined in the example C++ code.
+
+## Visualization
+
+You can visualize it by opening it with VP1Light. Please refer to the [Visualization documentation](docs/visualization.md).
+
+
+----
+
+## Dependencies
+
+### Install Qt5
+
+To build and run GeoModel libraries, you must have a working Qt5 installation on your computer.
+If you are not sure how to install it, please take a look at [the notes on Qt5, below](#notes-on-qt5).

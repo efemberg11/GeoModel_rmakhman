@@ -1,4 +1,6 @@
-# Visualizing the 'GeoShiftUnion' geometry with VP1Light
+# Visualizing the 'HelloToyDetectorFactory' geometry with VP1Light
+
+![](assets/visualization-e7c35926.png)
 
 
 If you don't have VP1Light installed on your computer:
@@ -21,7 +23,7 @@ You will be prompted to choose a geometry file to load. Please, click on `Browse
 
 ![](assets/visualization-44d3600f.png)
 
-Now, choose the `geometry.db` file which we just created by running the `./geoShiftUnion` program and click on `Open`.
+Now, choose the `geometry.db` file which we just created by running the `./helloToyDetectorFactory` program and click on `Open`.
 
 Once the loading of the file is completed (less than 1 second), you will see the main window of VP1Light, with the 3D content at the center.
 
@@ -34,15 +36,36 @@ Then, please click on the `Other unrecognized volumes` checkbox on the bottom of
 
 Once clicked on the checkbox, you will see the piece of geometry placed at the center of the 3D "world", at the position (0,0,0).
 
-As you can see, the dimensions of the piece of geometry we defined are very small compared to the default view, so you only see a little grey dot at around the center of the 3D window.  Let's zoom by clicking on the `IA` button in the column on the left of the 3D window. `IA` stands for "Inner Detector - side A" and it will set an enlarged view over the area occupied by the ATLAS Inner Detector subsystems. You can also use the `Zoom` wheel to enlarge the view.
 
-![](assets/visualization-43eeaa1b.png)
+![](assets/visualization-844c9839.png)
 
-You now have an enlarged view over the piece of geometry defined in the C++ code.
-![](assets/visualization-c7456603.png)
+What you see is the `ToyLog` volume, the box we set as the container of our piece of Geometry.
 
-You can rotate the view by clicking and dragging the mouse on the 3D window while in "hand mode" (the "hand" button on the right column). Also, you can pan by clicking `Cmd+click` and drag.
+If you `Ctrl+click` (or `Cmd+click`) on it, you open it to see the child volumes.
 
-![](assets/visualization-3318dc3d.png)
+[ _Note: on macOS Mojave there is an issue with the Cmd+click action. Please refer to [the Note below](#notes)_ ]
+
+Now, you can see the 100 ring elements at the center, plus the two "spirals" of plates defined with the `GeoSerialTransformer` node.
+
+
+![](assets/visualization-74b84651.png)
+
+
+
+You can rotate the view by clicking and dragging the mouse on the 3D window while in "hand mode" (the "hand" button on the right column).
+
+![](assets/visualization-6880997c.png)
 
 For any other instructions and tutorials on VP1/VP1Light, please refer to [the VP1 website](https://atlas-vp1.web.cern.ch/).
+
+----
+
+## Notes
+
+On macOS Mojave we observed an issue with the Cmd+click action. For the moment, you can open the container volume by using the "Expand volume" tool in VP1Light.
+
+While on the "Geo" tab, click on the "Misc." button.
+
+Then, write the name of the volume, "ToyLog", in the "Vols. named" field and click on "Expand". This will open up the container volume to show to you the inner, child volumes.
+
+![](assets/visualization-a498a9a6.png)

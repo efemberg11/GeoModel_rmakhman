@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
   GeoPhysVol* world = new GeoPhysVol(worldLog);
 
 
+  //----------------------------------------------------------------------------------//
   // Get the materials
   // const GeoMaterial* matIron = theMaterialManager->getMaterial("std::Iron"); // Athena code
   // Bogus densities.  Later: read from database.

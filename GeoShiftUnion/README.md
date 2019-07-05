@@ -42,7 +42,7 @@ When the program terminates, you will find a `geometry.db` file in the build fol
 
 You can visualize it by opening it with VP1Light. If you do not have it installed yet, you can install it with `brew`, by following [these instructions](https://github.com/ric-bianchi/homebrew-vp1light).
 
-
+----
 
 ## Dependencies
 
@@ -52,81 +52,38 @@ To build and run GeoModel libraries, you must have a working Qt5 installation on
 If you are not sure how to install it, please take a look at [the notes on Qt5, below](#notes-on-qt5).
 
 
-#### GeoModelCore
+----
+
+## Appendix
+
+### Notes on Qt5
+
+To build and run GeoModel libraries, you must have a working Qt5 installation on your computer. Qt5 classes are used for I/O operations with the underlying SQLite daemon, and to handle logging.
+
+If you are not sure how to install it, please take a look at [the notes on Qt5, below](#notes-on-qt5).
+
+See: <https://doc.qt.io/qt-5/gettingstarted.html>
+
+**On Ubuntu 18**, you can use the default Qt5 installation shipped with Ubuntu.
+
+**On macOS**, you can install Qt5 by using `brew`:
 
 ```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelCore.git
-mkdir build_gmcore
-cd build_gmcore
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelCore
-make -j 4
-make install
-cd ..
+brew install qt5
 ```
 
-#### GeoModelIO
+After the installation, pay attention to add the Qt folder to your PATH (replace <path-to-qt> with your Qt installation folder and 'clang_64' with ):
 
 ```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO.git
-mkdir build_gmio
-cd build_gmio
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelIO
-make -j 4
-make install
+PATHQT=/<path-to-qt>/Qt5.12.0/5.12.0/clang_64;
+export PATH=$PATHQT/bin:$PATH;
 ```
 
-
-
-## Build
-
-From your work folder:
+On some platforms, you might need to explicitly set the QMAKESPEC and the QT variables:
 
 ```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples.git
-mkdir build_hellogeo
-cd build_hellogeo
-cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelExamples/HelloGeoWrite/
-make -j4
+export QMAKESPEC=$PATHQT/mkspecs/macx-clang;
+export QTDIR=$PATHQT;
+export QTINC=$PATHQT/include;
+export QTLIB=$PATHQT/lib
 ```
-
-## Run
-
-Now, you can **run the example** by typing:
-
-```bash
-./hellogeoWrite
-```
-
-
-
-   ----
-
-   ## Appendix
-
-   ### Notes on Qt5
-
-   See: <https://doc.qt.io/qt-5/gettingstarted.html>
-
-   **On Ubuntu 18**, you can use the default Qt5 installation shipped with Ubuntu.
-
-   **On macOS**, you can install Qt5 by using `brew`:
-
-   ```bash
-   brew install qt5
-   ```
-
-   After the installation, pay attention to add the Qt folder to your PATH (replace <path-to-qt> with your Qt installation folder and 'clang_64' with ):
-
-   ```bash
-   PATHQT=/<path-to-qt>/Qt5.12.0/5.12.0/clang_64;
-   export PATH=$PATHQT/bin:$PATH;
-   ```
-
-   On some platforms, you might need to explicitly set the QMAKESPEC and the QT variables:
-
-   ```bash
-   export QMAKESPEC=$PATHQT/mkspecs/macx-clang;
-   export QTDIR=$PATHQT;
-   export QTINC=$PATHQT/include;
-   export QTLIB=$PATHQT/lib
-   ```

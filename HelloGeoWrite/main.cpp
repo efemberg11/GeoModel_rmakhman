@@ -15,6 +15,7 @@
 #include "GeoModelWrite/WriteGeoModel.h"
 
 #include <QDebug>
+#include <QFileInfo>
 
 #include <iostream>
 

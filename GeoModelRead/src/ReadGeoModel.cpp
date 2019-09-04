@@ -1061,21 +1061,25 @@ GeoSerialDenominator* ReadGeoModel::parseSerialDenominator(QStringList values)
 	return new GeoSerialDenominator(baseName.toStdString());
 }
 
-
+// TODO: this should be moved to an Utilities class!
 void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
 	std::cout << "transformation: " << std::endl;
 	std::cout << "[[" << t(0, 0) << " , ";
 	std::cout <<         t(0, 1) << " , ";
-	std::cout <<         t(0, 2) << " ]";
+	std::cout <<         t(0, 2) << " , ";
+	std::cout <<         t(0, 3) << " ]";
 	std::cout << "["  << t(1, 0) << " , ";
 	std::cout <<         t(1, 1) << " , ";
-	std::cout <<         t(1, 2) << " ]";
+	std::cout <<         t(1, 2) << " , ";
+	std::cout <<         t(1, 3) << " ]";
 	std::cout << "["  << t(2, 0) << " , ";
 	std::cout <<         t(2, 1) << " , ";
-	std::cout <<         t(2, 2) << " ]";
+	std::cout <<         t(2, 2) << " , ";
+	std::cout <<         t(2, 3) << " ]";
 	std::cout << "["  << t(3, 0) << " , ";
 	std::cout <<         t(3, 1) << " , ";
-	std::cout <<         t(3, 2) << " ]]" << std::endl;
+	std::cout <<         t(3, 2) << " , ";
+	std::cout <<         t(3, 3) << " ]]" << std::endl;
 }
 
 // TODO: should go in a QtUtils header-only class, to be used in other packages
@@ -1092,8 +1096,8 @@ void ReadGeoModel::printTransformationValues(QStringList values) {
 	std::cout << "transformation input values: " << std::endl;
 	qWarning() << "[[" << t[0] << "," << t[1] << "," << t[2] << "]["
 	                   << t[3] << "," << t[4] << "," << t[5] << "]["
-										 << t[6] << "," << t[7] << "," << t[8] << "]["
-										 << t[9] << "," << t[10] << "," << t[11] << "]]";
+	                   << t[6] << "," << t[7] << "," << t[8] << "]["
+	                   << t[9] << "," << t[10] << "," << t[11] << "]]";
 }
 
 
@@ -1142,7 +1146,7 @@ GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 	txf(2,1)=zy;
 	txf(2,2)=zz;
 
-	// and the translation matrix with the last 3 elements
+	// build the translation matrix with the last 3 elements
 	txf(0,3)=dx;
 	txf(1,3)=dy;
 	txf(2,3)=dz;
@@ -1198,7 +1202,7 @@ GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 	txf(2,1)=zy;
 	txf(2,2)=zz;
 
-	// and the translation matrix with the last 3 elements
+	// build the translation matrix with the last 3 elements
 	txf(0,3) = dx;
 	txf(1,3) = dy;
 	txf(2,3) = dz;

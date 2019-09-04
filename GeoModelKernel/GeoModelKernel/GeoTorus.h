@@ -8,7 +8,7 @@
 #include "GeoModelKernel/GeoShape.h"
 
 
-class GeoTorus : public GeoShape  
+class GeoTorus : public GeoShape
 {
  public:
   GeoTorus (double Rmin, double Rmax, double Rtor, double SPhi, double DPhi);

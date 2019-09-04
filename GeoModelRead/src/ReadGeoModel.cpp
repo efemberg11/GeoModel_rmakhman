@@ -36,6 +36,7 @@
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
+#include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoShapeIntersection.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
@@ -99,11 +100,11 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 	GeoPhysVol* rootVolume = buildGeoModelOneGo();
 
 	if (m_unknown_shapes.size() > 0) {
-		qWarning() << "WARNING!! There were unknwon shapes:";
+		qWarning() << "\tWARNING!! There were unknwon shapes:";
 		for ( auto it = m_unknown_shapes.begin(); it != m_unknown_shapes.end(); it++ ) {
-			std::cout << "---> " << *it << std::endl;
+			std::cout << "\t\t---> " << *it << std::endl;
 		}
-		std::cout << "Remember: unknown shapes are rendered with a dummy cube of 30cm side length." << std::endl;
+		std::cout << "\tRemember: unknown shapes are rendered with a dummy cube of 30cm side length.\n\n" << std::endl;
 		}
 
 	return rootVolume;
@@ -485,6 +486,35 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			if (varName == "DPhi") DPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 		}
 		return new GeoCons (RMin1, RMin2, RMax1, RMax2, DZ, SPhi, DPhi);
+	}
+	else if (type == "Torus") {
+		// Member Data:
+		// * Rmax - outside radius of the torus tube
+		// * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
+		// * Rtor - radius of the torus itself
+		// *
+		// * SPhi - starting angle of the segment in radians
+		// * DPhi - delta angle of the segment in radians
+		//
+		// shape parameters
+		double Rmin = 0.;
+		double Rmax = 0.;
+		double Rtor = 0.;
+		double SPhi = 0.;
+		double DPhi = 0.;
+		// get parameters from DB string
+		QStringList shapePars = parameters.split(";");
+		foreach( QString par, shapePars) {
+			QStringList vars = par.split("=");
+			QString varName = vars[0];
+			QString varValue = vars[1];
+			if (varName == "Rmin") Rmin = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+			if (varName == "Rmax") Rmax = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+			if (varName == "Rtor") Rtor = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+			if (varName == "SPhi") SPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+			if (varName == "DPhi") DPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+		}
+		return new GeoTorus (Rmin, Rmax, Rtor, SPhi, DPhi);
 	}
 	else if (type == "Para") {
 		// shape parameters

@@ -23,6 +23,7 @@
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
+#include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoShapeIntersection.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
@@ -700,7 +701,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 				tr(2,1)=zy;
 				tr(2,2)=zz;
 
-			 	// set translation
+			 	// set translation // TODO: CHECK!!!
 				tr(3,0)=dx;
 				tr(3,1)=dy;
 				tr(3,2)=dz;
@@ -722,7 +723,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 			qDebug() << "Transform stored. Id:" << trId.toString();
 		}
 		else {
-			qDebug() << "WARNING!!! - This type of transformation still needs to be persistified!!";
+			std::cout << "WARNING!!! - This type of transformation still needs to be persistified!!" << std::endl;
 		}
 
 	} else {
@@ -823,6 +824,23 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		pars << "RMax1=" + QString::number(shapeIn->getRMax1()) ;
 		pars << "RMax2=" + QString::number(shapeIn->getRMax2()) ;
 		pars << "DZ=" + QString::number(shapeIn->getDZ()) ;
+		pars << "SPhi=" + QString::number(shapeIn->getSPhi()) ;
+		pars << "DPhi=" + QString::number(shapeIn->getDPhi()) ;
+		shapePars = pars.join(";");
+	} else if (shapeType == "Torus") {
+		// Member Data:
+		// * Rmax - outside radius of the torus tube
+		// * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
+		// * Rtor - radius of the torus itself
+		// *
+		// * SPhi - starting angle of the segment in radians
+		// * DPhi - delta angle of the segment in radians
+		//
+		QStringList pars;
+		const GeoTorus* shapeIn = dynamic_cast<const GeoTorus*>(shape);
+		pars << "Rmin=" + QString::number(shapeIn->getRMin()) ;
+		pars << "Rmax=" + QString::number(shapeIn->getRMax()) ;
+		pars << "Rtor=" + QString::number(shapeIn->getRTor()) ;
 		pars << "SPhi=" + QString::number(shapeIn->getSPhi()) ;
 		pars << "DPhi=" + QString::number(shapeIn->getDPhi()) ;
 		shapePars = pars.join(";");
@@ -977,7 +995,8 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		shapePars = pars.join(";");
 	}
 	else {
-		qDebug() << "WARNING!!! - Shape '" << shapeType << "' needs to be customized!!";
+		std::cout << "\n\tWARNING!!! - Shape '" << shapeType.toStdString() << "' needs to be persistified!!\n\n";
+		_objectsNotPersistified << shapeType;
 	}
 
   return shapePars;
@@ -1514,6 +1533,10 @@ void WriteGeoModel::saveToDB()
 
 	m_dbManager->addListOfChildrenPositions(_childrenPositions);
 	m_dbManager->addRootVolume(_rootVolume);
+
+	if ( !_objectsNotPersistified.empty() ) {
+		qWarning() << "\n\tWARNING!! There are objects which need to be persistified! --> " << _objectsNotPersistified << "\n\n";
+	}
 
 	return;
 }

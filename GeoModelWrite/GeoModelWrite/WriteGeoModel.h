@@ -170,6 +170,8 @@ private:
 	std::vector<QStringList> _childrenPositions;
 	QStringList _rootVolume;
 
+	QStringList _objectsNotPersistified;
+
 };
 
 } /* namespace GeoModelIO */

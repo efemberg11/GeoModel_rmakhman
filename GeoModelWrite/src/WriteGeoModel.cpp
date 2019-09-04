@@ -1,4 +1,3 @@
-
 // author: Riccardo.Maria.Bianchi@cern.ch, 2017
 // major updates: Aug 2018, Feb 2019
 
@@ -701,10 +700,16 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 				tr(2,1)=zy;
 				tr(2,2)=zz;
 
-			 	// set translation // TODO: CHECK!!!
-				tr(3,0)=dx;
-				tr(3,1)=dy;
-				tr(3,2)=dz;
+			 	// set translation vector/column
+				tr(0,3)=dx;
+				tr(1,3)=dy;
+				tr(2,3)=dz;
+				
+				// explicitely set the last row: (0,0,0,1)
+				tr(3,0)=0;
+				tr(3,1)=0;
+				tr(3,2)=0;
+				tr(3,3)=1;
 
 		std::vector<double> params = getTransformParameters(tr);
 		qDebug() << "Transform parameters:" << QVector<double>::fromStdVector(params);
@@ -1008,37 +1013,23 @@ std::vector<double> WriteGeoModel::getTransformParameters(GeoTrf::Transform3D tr
 {
 	std::vector<double> vec;
 
-	// vec.push_back(tr.xx());
-	// vec.push_back(tr.xy());
-	// vec.push_back(tr.xz());
-	//
-	// vec.push_back(tr.yx());
-	// vec.push_back(tr.yy());
-	// vec.push_back(tr.yz());
-	//
-	// vec.push_back(tr.zx());
-	// vec.push_back(tr.zy());
-	// vec.push_back(tr.zz());
-	//
-	// vec.push_back(tr.dx());
-	// vec.push_back(tr.dy());
-	// vec.push_back(tr.dz());
+    // get the rotation matrix, the first 3x3 matrix
+	vec.push_back(tr(0,0)); // xx
+	vec.push_back(tr(0,1)); // xy
+	vec.push_back(tr(0,2)); // xz
 
-	vec.push_back(tr(0,0));
-	vec.push_back(tr(0,1));
-	vec.push_back(tr(0,2));
+	vec.push_back(tr(1,0)); // yx
+	vec.push_back(tr(1,1)); // yy
+	vec.push_back(tr(1,2)); // yz
 
-	vec.push_back(tr(1,0));
-	vec.push_back(tr(1,1));
-	vec.push_back(tr(1,2));
+	vec.push_back(tr(2,0)); // zx
+	vec.push_back(tr(2,1)); // zy
+	vec.push_back(tr(2,2)); // zz
 
-	vec.push_back(tr(2,0));
-	vec.push_back(tr(2,1));
-	vec.push_back(tr(2,2));
-
-	vec.push_back(tr(3,0));
-	vec.push_back(tr(3,1));
-	vec.push_back(tr(3,2));
+    // get the translation vector, i.e. the last column/3vector
+	vec.push_back(tr(0,3)); // dx
+	vec.push_back(tr(1,3)); // dy
+	vec.push_back(tr(2,3)); // dz
 
 	return vec;
 }

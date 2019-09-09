@@ -26,7 +26,13 @@ _coming soon_
 
 # Build
 
-If you want to work on the library code, you have to build it by yourself, by getting the source code and compile it:
+If you want to work on the library code, you have to build it by yourself, by getting the source code and compile it.
+
+## Dependencies
+
+- Eigen: http://eigen.tuxfamily.org/
+
+## Build instructions
 
 ```
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git

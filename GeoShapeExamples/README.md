@@ -1,13 +1,13 @@
-# The 'GeoShiftUnion' GeoModel example
+# The 'GeoShapeExamples' GeoModel example
 
 ![](docs/assets/visualization-3318dc3d.png)
 
-The `GeoShiftUnion` example shows you how to create a more complex geometry, by using the GeoShapeShift and GeoShiftUnion nodes.
+The `GeoShapeExamples` example shows you how to use different GeoShape nodes (GeoBox, GeoTorus, GeoTessellatedSolid, ...) and saves them to a local file.
 
 The example program:
 
- 1. Builds an example geometry:
- 2. Writes the geometry to an SQLite file
+ 1. Builds different example GeoModel shapes
+ 2. Writes the outcome geometry to an SQLite file
 
 
 ## Quick Instructions
@@ -27,16 +27,16 @@ After that, get the example code and compile the example:
 
 ```
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelExamples.git
-mkdir build_geoshiftunion
-cd build_geoshiftunion
-cmake ../GeoModelExamples/GeoShiftUnion
+mkdir build_geoshapes
+cd build_geoshapes
+cmake ../GeoModelExamples/GeoShapeExamples
 make
 ```
 
 Then you can run the example program:
 
 ```
-./geoShiftUnion
+./geoShapeExamples
 ```
 
 When the program terminates, you will find a `geometry.db` file in the build folder. This is a SQLite file containing the dump of the geometry defined in the example C++ code.

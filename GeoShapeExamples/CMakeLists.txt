@@ -25,8 +25,8 @@ set(SRCS main.cpp )
 add_executable( geoShapeExamples ${SRCS} )
 
 # Link all needed libraries
-# target_link_libraries( geoShapeExamples GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
-target_link_libraries( geoShapeExamples GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager /Users/rbianchi/code_work_local/atlas/geomodel_packages_tests_21Jun2019/install/lib/libGeoModelWrite.dylib )
+target_link_libraries( geoShapeExamples GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
+#target_link_libraries( geoShapeExamples GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager /Users/rbianchi/code_work_local/atlas/geomodel_packages_tests_21Jun2019/install/lib/libGeoModelWrite.dylib )
 
 # Set include directories
 target_include_directories( geoShapeExamples SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} )

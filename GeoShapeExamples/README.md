@@ -1,6 +1,6 @@
 # The 'GeoShapeExamples' GeoModel example
 
-![](docs/assets/visualization-3318dc3d.png)
+![](docs/Screen_Shot_2019-09-22_at_23.32.17.png)
 
 The `GeoShapeExamples` example shows you how to use different GeoShape nodes (GeoBox, GeoTorus, GeoTessellatedSolid, ...) and saves them to a local file.
 

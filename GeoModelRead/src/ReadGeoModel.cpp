@@ -32,6 +32,7 @@
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
+#include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
@@ -55,6 +56,7 @@
 
 // C++ includes
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
+#include <vector>     /* exit, EXIT_FAILURE */
 
 
 
@@ -729,8 +731,7 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		if(error) qFatal("GeoPgon shape error!!! Aborting...");
 		return pgon;
 	}
-	else if (type == "SimplePolygonBrep")
-	{
+	else if (type == "SimplePolygonBrep") {
 		//qInfo() << "Reading-in: SimplePolygonBrep: "; // debug
 		// shape parameters
 		double DZ = 0.;
@@ -809,6 +810,236 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			error = 1;
 		}
 		if(error) qFatal("GeoSimplePolygonBrep shape error!!! Aborting...");
+		return sh;
+
+	}
+	else if (type == "TessellatedSolid") {
+		// Tessellated pars example: "nFacets=1;TRI;vT=ABSOLUTE;nV=3;xV=0;yV=0;zV=1;xV=0;yV=1;zV=0;xV=1;yV=0;zV=0"
+		qInfo() << "Reading-in: TessellatedSolid: "; // debug
+		// Facet type
+		QString facetType = "";
+		// shape parameters
+		unsigned int nFacets = 0;
+
+		bool error = 0;
+		GeoTessellatedSolid* sh = nullptr;
+		QString par;
+		QStringList vars;
+		QString varName;
+		QString varValue;
+
+		// get parameters from DB string
+		QStringList shapePars = parameters.split(";");
+		qInfo() << "shapePars: " << shapePars; // debug
+
+		int sizePars = shapePars.size();
+		// check if we have at least 13 parameters,
+		// which is the minimum for a shape
+		// with a single triangular facet
+		if (sizePars >= 13) {
+
+			// get the first parameter
+			par = shapePars[0];
+			vars = par.split("=");
+			varName = vars[0];
+			varValue = vars[1];
+			if (varName == "nFacets") nFacets = varValue.toInt();
+			else {
+				qWarning("ERROR!! - GeoTessellatedSolid - nFacets is not defined!!");
+				error = true; // TODO: check "error.h" functionalities and replace with that if useful
+			}
+
+			// build the basic GeoTessellatedSolid shape
+			sh = new GeoTessellatedSolid();
+
+			// and now loop over the rest of the list,
+			// to get the parameters of the vertices of each facet
+			// and to build the full GeoTessellatedSolid with all the facets
+			for (int it=1; it < sizePars; it++)
+			{
+				// get facet type
+				par = shapePars[it];
+				vars = par.split("=");
+				varName = vars[0];
+				if (varName == "QUAD") {
+					facetType = "QUAD";
+				}
+				else if (varName == "TRI") {
+					facetType = "TRI";
+				}
+				else {
+					qWarning() << "ERROR!! - GeoTessellatedSolid - Facet type is not defined! [got: '" << varName << "']";
+					error = true;
+				}
+
+				it++; // advance to the next parameter
+
+				// get the type of the vertexes composing the facet
+				bool isAbsolute = true;
+				par = shapePars[it];
+				vars = par.split("=");
+				varName = vars[0];
+				varValue = vars[1];
+				if (varName == "vT") {
+					if (varValue == "ABSOLUTE") isAbsolute = true;
+					else if (varValue == "RELATIVE") isAbsolute = false;
+					else {
+						qWarning() << "ERROR! - GeoTessellatedSolid - Vertex type not defined!";
+						error=true;
+					}
+				}
+				else error = 1;
+
+				it++; // advance to the next parameter
+
+				unsigned int nVertexes = 0;
+				par = shapePars[it];
+				vars = par.split("=");
+				varName = vars[0];
+				varValue = vars[1];
+				if (varName == "nV") nVertexes = varValue.toUInt();
+				else {
+					qWarning() << "ERROR! - GeoTessellatedSolid - nVertices not defined!";
+					error=true;
+				}
+
+
+				qDebug() << "it:" << it;
+				// if we get a QUAD ==> GeoQuadrangularFacet
+				if (facetType=="QUAD") {
+
+					qDebug() << "Handling a QUAD facet...";
+					// to store the 4 vertices of the GeoQuadrangularFacet
+					auto vV = std::vector<std::unique_ptr<GeoFacetVertex>>{};
+
+					// we look for 4 vertices for QUAD;
+					// for each of them, we get 3 coordinates
+					//					vertStart = it;
+					for (unsigned int iV=0; iV<4; ++iV) {
+
+						it++; // advance to the first of the facet's vertices' coordinates
+
+						double xV=0.;
+						par = shapePars[it];
+						vars = par.split("=");
+						varName = vars[0];
+						varValue = vars[1];
+						if (varName == "xV") xV = varValue.toDouble();
+						else {
+							qWarning() << "ERROR! Got '" << varName << "' instead of 'xV'!";
+							error = 1;
+						}
+
+						it++; // go to the next coordinate
+
+						double yV=0.;
+						par = shapePars[it];
+						vars = par.split("=");
+						varName = vars[0];
+						varValue = vars[1];
+						if (varName == "yV") yV = varValue.toDouble();
+						else {
+							qWarning() << "ERROR! Got '" << varName << "' instead of 'yV'!";
+							error = 1;
+						}
+
+						it++; // go to the next coordinate
+
+						double zV=0.;
+						par = shapePars[it];
+						vars = par.split("=");
+						varName = vars[0];
+						varValue = vars[1];
+						if (varName == "zV") zV = varValue.toDouble();
+						else {
+							qWarning() << "ERROR! Got '" << varName << "' instead of 'zV'!";
+							error = 1;
+						}
+
+						if(error) qWarning() << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars;
+
+						// build the facet's vertex and store it
+						vV.push_back(std::make_unique<GeoFacetVertex>( GeoFacetVertex(xV,yV,zV)) );
+					}
+
+					// build the facet and add it to the GeoTessellatedSolid
+					GeoQuadrangularFacet* quadFacet = new GeoQuadrangularFacet(*vV[0], *vV[1], *vV[2], *vV[3], (isAbsolute ? GeoFacet::ABSOLUTE : GeoFacet::RELATIVE));
+					sh->addFacet(quadFacet);
+				}
+				// if we get a TRI ==> GeoTriangularFacet
+				else if (facetType=="TRI") {
+
+					qDebug() << "Handling a TRI facet...";
+//					std::vector<GeoFacetVertex*> vV(3, 0); // to store the 3 vertices of the GeoTriangularFacet
+					auto vV = std::vector<std::unique_ptr<GeoFacetVertex>>{};
+
+					// we look for 3 vertices for GeoTriangularFacet;
+					// for each of them, we get 3 coordinates
+//					vertStart = it;
+					for (unsigned int iV=0; iV<3; ++iV) {
+
+						it++; // advance to the first of the facet's vertices' coordinates
+
+						double xV=0.;
+						par = shapePars[it];
+						vars = par.split("=");
+						varName = vars[0];
+						varValue = vars[1];
+						if (varName == "xV") xV = varValue.toDouble();
+						else error = 1;
+
+						it++; // go to the next coordinate
+
+						double yV=0.;
+						par = shapePars[it];
+						vars = par.split("=");
+						varName = vars[0];
+						varValue = vars[1];
+						if (varName == "yV") yV = varValue.toDouble();
+						else error = 1;
+
+						it++; // go to the next coordinate
+
+						double zV=0.;
+						par = shapePars[it];
+						vars = par.split("=");
+						varName = vars[0];
+						varValue = vars[1];
+						if (varName == "zV") zV = varValue.toDouble();
+						else error = 1;
+
+						if(error) qWarning() << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars;
+
+						// build the facet's vertex and store it
+						vV.push_back(std::make_unique<GeoFacetVertex>( GeoFacetVertex(xV,yV,zV)) );
+					}
+
+					// build the facet and add it to the GeoTessellatedSolid
+					GeoTriangularFacet* triFacet = new GeoTriangularFacet(*vV[0], *vV[1], *vV[2], (isAbsolute ? GeoFacet::ABSOLUTE : GeoFacet::RELATIVE));
+					sh->addFacet(triFacet);
+				}
+
+
+			}
+
+			// sanity check on the resulting shape
+			if( sh->getNumberOfFacets() != nFacets) {
+				error = 1;
+				qWarning() << "ERROR! GeoTessellatedSolid number of facets: " << QString::number(sh->getNumberOfFacets()) << " is not equal to the original size! --> " << shapePars;
+			}
+			/*
+			 * TODO: uncomment it, when the isValid() method will be implemented for GeoTessellatedSolid
+			if(!sh->isValid()) {
+				error = 1;
+				qWarning() << "ERROR! GeoTessellatedSolid shape is not valid!! -- input: " << shapePars;
+			}
+			*/
+		} // END OF if (size>13)
+		else {
+			qWarning() << "ERROR!! GeoTessellatedSolid has no facets!! --> shape input parameters: " << shapePars;
+			error = 1;
+		}
+		if(error) qFatal("GeoTessellatedSolid shape error!!! Aborting...");
 		return sh;
 
 	}

@@ -18,6 +18,7 @@
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
+#include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
@@ -940,6 +941,34 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		pars << "SPhi=" + QString::number(shapeIn->getSPhi()) ;
 		pars << "DPhi=" + QString::number(shapeIn->getDPhi()) ;
 		shapePars = pars.join(";");
+	} else if (shapeType == "TessellatedSolid") {
+		QStringList pars;
+		const GeoTessellatedSolid* shapeIn = dynamic_cast<const GeoTessellatedSolid*>(shape);
+		// get number of facets
+		const size_t nFacets = shapeIn->getNumberOfFacets();
+		pars << "nFacets=" + QString::number(nFacets);
+		// loop over the facets
+		for (size_t i=0; i<nFacets; ++i) {
+			GeoFacet* facet = shapeIn->getFacet(i);
+			// get GeoFacet actual implementation
+			if (dynamic_cast<GeoTriangularFacet*>(facet))        pars << "TRI";
+			else if (dynamic_cast<GeoQuadrangularFacet*>(facet)) pars << "QUAD";
+			// get vertex type (ABSOLUTE/RELATIVE)
+			GeoFacet::GeoFacetVertexType facetVertexType = facet->getVertexType();
+			if (facetVertexType == GeoFacet::ABSOLUTE) pars << "vT=ABSOLUTE";
+			if (facetVertexType == GeoFacet::RELATIVE) pars << "vT=RELATIVE";
+			// get number of vertices and loop over them
+			const size_t nVertices = facet->getNumberOfVertices();
+			pars << "nV=" + QString::number(nVertices);
+			for (size_t i=0; i<nVertices; ++i) {
+				GeoFacetVertex facetVertex = facet->getVertex(i);
+				pars << "xV=" + QString::number( facetVertex[0] );
+				pars << "yV=" + QString::number( facetVertex[1] );
+				pars << "zV=" + QString::number( facetVertex[2] );
+			}
+		}
+		shapePars = pars.join(";");
+		//qDebug() << "Tessellated pars:" << shapePars; // debug
 	}
 	else if (shapeType == "Intersection") {
 		qDebug() << "get GeoShapeIntersection parameters";

@@ -1,5 +1,4 @@
 
-
 # The 'hellogeoRead2G4' GeoModel example
 
 The `hellogeoRead2G4` example shows you how to read persistified GeoModel data in a standalone program and convert it to a Geant4 geometry.

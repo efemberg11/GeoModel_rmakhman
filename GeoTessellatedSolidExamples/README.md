@@ -14,7 +14,7 @@ The example program:
 
 ### macOS Mojave
 
-To quickly install everything, we use [Homebrew](). If you don't have installed it on your computer, please install it by following the [instructions on its website](https://brew.sh/).
+To quickly install everything, we use [Homebrew](). If you don't have installed it on your computer, please install it by following the [instructions on its website]().
 
 Install the dependencies, [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore) and [GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModelIO):
 

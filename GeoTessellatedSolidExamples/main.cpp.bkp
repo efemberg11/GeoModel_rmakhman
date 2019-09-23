@@ -1,13 +1,12 @@
 /*
- * main.cpp
+ * HelloGeo.cpp
  *
- *  Created on: Aug, 2019
+ *  Created on: Apr, 2019
  *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
  */
 
 // GeoShape nodes
 #include "GeoModelKernel/GeoBox.h"
-#include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 
@@ -59,10 +58,7 @@ int main(int argc, char *argv[])
 	// Create the shapes:                            //
 
 	// A box
-	GeoBox* box = new GeoBox(50.*SYSTEM_OF_UNITS::cm, 50.*SYSTEM_OF_UNITS::cm, 50.*SYSTEM_OF_UNITS::cm);
-
-	// A cone
-	GeoCons* cons = new GeoCons(10.*SYSTEM_OF_UNITS::cm, 20.*SYSTEM_OF_UNITS::cm, 30.*SYSTEM_OF_UNITS::cm, 40.*SYSTEM_OF_UNITS::cm, 25.*SYSTEM_OF_UNITS::cm, 0.*SYSTEM_OF_UNITS::degree, 270.*SYSTEM_OF_UNITS::degree);
+	GeoBox* box = new GeoBox(50*SYSTEM_OF_UNITS::cm, 50*SYSTEM_OF_UNITS::cm, 50*SYSTEM_OF_UNITS::cm);
 
 	// A torus
 	GeoTorus* torus = new GeoTorus(10*SYSTEM_OF_UNITS::cm /*Rmin*/,  20*SYSTEM_OF_UNITS::cm /*Rmax*/, 50*SYSTEM_OF_UNITS::cm /*Rtor*/,  0*SYSTEM_OF_UNITS::degree/*SPhi*/,  270*SYSTEM_OF_UNITS::degree/*DPhi*/);
@@ -103,14 +99,14 @@ int main(int argc, char *argv[])
 	GeoTrf::Translate3D Tr1(-75*SYSTEM_OF_UNITS::cm, 0, 0); // cube
 	GeoTrf::Translate3D Tr2( 75*SYSTEM_OF_UNITS::cm, 0, 0); // torus
 	GeoTrf::Translate3D Tr3( -75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // tessellated solid quad
-	GeoTrf::Translate3D Tr4( 75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // tessellated solid tri
+//	GeoTrf::Translate3D Tr4( 75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // tessellated solid tri
 //	GeoTrf::Translate3D Tr5( -75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // tessellated solid triquad
 //	GeoTrf::Translate3D Tr6( 75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // tessellated solid pyramid
 
 	GeoTransform* tr1 = new GeoTransform(Tr1);
 	GeoTransform* tr2 = new GeoTransform(Tr2);
 	GeoTransform* tr3 = new GeoTransform(Tr3);
-	GeoTransform* tr4 = new GeoTransform(Tr4);
+//	GeoTransform* tr4 = new GeoTransform(Tr4);
 //	GeoTransform* tr5 = new GeoTransform(Tr5);
 //	GeoTransform* tr6 = new GeoTransform(Tr6);
 
@@ -122,9 +118,6 @@ int main(int argc, char *argv[])
 
 	GeoLogVol* torusLog = new GeoLogVol("Torus",torus,matIron);
 	GeoPhysVol* torusPhys = new GeoPhysVol(torusLog);
-
-	GeoLogVol* consLog = new GeoLogVol("Cons",cons,matIron);
-	GeoPhysVol* consPhys = new GeoPhysVol(consLog);
 
 	GeoLogVol* tessLog = new GeoLogVol("Tessellated Pyramid",tessPyramid,matIron);
 	GeoPhysVol* tessPhys = new GeoPhysVol(tessLog);
@@ -138,8 +131,6 @@ int main(int argc, char *argv[])
 	world->add(tr2);
 	world->add(torusPhys);
 	world->add(tr3);
-	world->add(consPhys);
-	world->add(tr4);
 	world->add(tessPhys);
 
 

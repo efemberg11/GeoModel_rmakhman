@@ -1,13 +1,12 @@
 /*
  * main.cpp
  *
- *  Created on: Aug, 2019
+ *  Created on: Sep, 2019
  *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
  */
 
 // GeoShape nodes
 #include "GeoModelKernel/GeoBox.h"
-#include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 
@@ -56,35 +55,48 @@ int main(int argc, char *argv[])
 
 
 	//-----------------------------------------------------------------------------------//
-	// Create the shapes:                            //
+	// Create the solids:
 
-	// A box
-	GeoBox* box = new GeoBox(50.*SYSTEM_OF_UNITS::cm, 50.*SYSTEM_OF_UNITS::cm, 50.*SYSTEM_OF_UNITS::cm);
+	// -- A tessellated solid made of a single 2D quad surface
+	GeoFacetVertex quadV1 = GeoFacetVertex(0.,0.,0.);
+	GeoFacetVertex quadV2 = GeoFacetVertex(0., 50.*SYSTEM_OF_UNITS::cm, 0.);
+	GeoFacetVertex quadV3 = GeoFacetVertex(50.*SYSTEM_OF_UNITS::cm, 50.*SYSTEM_OF_UNITS::cm, 0.);
+	GeoFacetVertex quadV4 = GeoFacetVertex(50.*SYSTEM_OF_UNITS::cm,0.,0.);
+	GeoQuadrangularFacet* quadFacet = new GeoQuadrangularFacet(quadV1, quadV2, quadV3, quadV4, GeoFacet::ABSOLUTE);
+	GeoTessellatedSolid* tessQuad = new GeoTessellatedSolid();
+	tessQuad->addFacet(quadFacet);
 
-	// A cone
-	GeoCons* cons = new GeoCons(10.*SYSTEM_OF_UNITS::cm, 20.*SYSTEM_OF_UNITS::cm, 30.*SYSTEM_OF_UNITS::cm, 40.*SYSTEM_OF_UNITS::cm, 25.*SYSTEM_OF_UNITS::cm, 0.*SYSTEM_OF_UNITS::degree, 270.*SYSTEM_OF_UNITS::degree);
+	// -- A tessellated solid made of a single 3D triangular surface
+	GeoFacetVertex triV1 = GeoFacetVertex(0,0,50*SYSTEM_OF_UNITS::cm);
+	GeoFacetVertex triV2 = GeoFacetVertex(0,50*SYSTEM_OF_UNITS::cm,0);
+	GeoFacetVertex triV3 = GeoFacetVertex(50*SYSTEM_OF_UNITS::cm,0,0);
+	GeoTriangularFacet* triFacet = new GeoTriangularFacet(triV1, triV2, triV3, GeoFacet::ABSOLUTE);
+	GeoTessellatedSolid* tessTri = new GeoTessellatedSolid();
+	tessTri->addFacet(triFacet);
 
-	// A torus
-	GeoTorus* torus = new GeoTorus(10*SYSTEM_OF_UNITS::cm /*Rmin*/,  20*SYSTEM_OF_UNITS::cm /*Rmax*/, 50*SYSTEM_OF_UNITS::cm /*Rtor*/,  0*SYSTEM_OF_UNITS::degree/*SPhi*/,  270*SYSTEM_OF_UNITS::degree/*DPhi*/);
+	// -- A tessellated solid made of a 3D triangular facet and a 2D quad facet
+	GeoTessellatedSolid* tessTriQuad = new GeoTessellatedSolid();
+	tessTriQuad->addFacet(triFacet);
+	tessTriQuad->addFacet(quadFacet);
 
-	// A Tessellated Solid :
-	// a triangle pyramid made out of 4 triangles
-	// Front facet
+	// - A tessellated solid example: a triangle pyramid made out of 4 triangles
+	// Render a pyramid consists of 4 triangles
+	// Front triangular facet
 	GeoFacetVertex v1P = GeoFacetVertex( 0.0f, 1.0f, 0.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoFacetVertex v2P = GeoFacetVertex(-1.0f, -1.0f, 1.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoFacetVertex v3P = GeoFacetVertex(1.0f, -1.0f, 1.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoTriangularFacet* triFacet1Pyr = new GeoTriangularFacet(v1P, v2P, v3P, GeoFacet::ABSOLUTE);
-	// Right facet
+	// Right triangular facet
 	GeoFacetVertex v4P = GeoFacetVertex(0.0f, 1.0f, 0.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoFacetVertex v5P = GeoFacetVertex(1.0f, -1.0f, 1.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoFacetVertex v6P = GeoFacetVertex(1.0f, -1.0f, -1.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoTriangularFacet* triFacet2Pyr = new GeoTriangularFacet(v4P, v5P, v6P, GeoFacet::ABSOLUTE);
-	// Back facet
+	// Back triangular facet
 	GeoFacetVertex v7P = GeoFacetVertex(0.0f, 1.0f, 0.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoFacetVertex v8P = GeoFacetVertex(1.0f, -1.0f, -1.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoFacetVertex v9P = GeoFacetVertex(-1.0f, -1.0f, -1.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoTriangularFacet* triFacet3Pyr = new GeoTriangularFacet(v7P, v8P, v9P, GeoFacet::ABSOLUTE);
-	// Left facet
+	// Left triangular facet
 	GeoFacetVertex v10P = GeoFacetVertex( 0.0f, 1.0f, 0.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoFacetVertex v11P = GeoFacetVertex(-1.0f,-1.0f,-1.0f)*(50*SYSTEM_OF_UNITS::cm);
 	GeoFacetVertex v12P = GeoFacetVertex(-1.0f,-1.0f, 1.0f)*(50*SYSTEM_OF_UNITS::cm);
@@ -96,6 +108,54 @@ int main(int argc, char *argv[])
 	tessPyramid->addFacet(triFacet3Pyr);
 	tessPyramid->addFacet(triFacet4Pyr);
 
+	// -- A cube can be represented with 8 points, a triangulated_surface_set with pnmax= 24, 24 normals, and a list of 12 triangles.
+		// TODO:
+//	// Render a color-cube consisting of 6 quads with different colors
+//	   glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
+//	      // Top face (y = 1.0f)
+//	      // Define vertices in counter-clockwise (CCW) order with normal pointing out
+//	      glColor3f(0.0f, 1.0f, 0.0f);     // Green
+//	      glVertex3f( 1.0f, 1.0f, -1.0f);
+//	      glVertex3f(-1.0f, 1.0f, -1.0f);
+//	      glVertex3f(-1.0f, 1.0f,  1.0f);
+//	      glVertex3f( 1.0f, 1.0f,  1.0f);
+//
+//	      // Bottom face (y = -1.0f)
+//	      glColor3f(1.0f, 0.5f, 0.0f);     // Orange
+//	      glVertex3f( 1.0f, -1.0f,  1.0f);
+//	      glVertex3f(-1.0f, -1.0f,  1.0f);
+//	      glVertex3f(-1.0f, -1.0f, -1.0f);
+//	      glVertex3f( 1.0f, -1.0f, -1.0f);
+//
+//	      // Front face  (z = 1.0f)
+//	      glColor3f(1.0f, 0.0f, 0.0f);     // Red
+//	      glVertex3f( 1.0f,  1.0f, 1.0f);
+//	      glVertex3f(-1.0f,  1.0f, 1.0f);
+//	      glVertex3f(-1.0f, -1.0f, 1.0f);
+//	      glVertex3f( 1.0f, -1.0f, 1.0f);
+//
+//	      // Back face (z = -1.0f)
+//	      glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
+//	      glVertex3f( 1.0f, -1.0f, -1.0f);
+//	      glVertex3f(-1.0f, -1.0f, -1.0f);
+//	      glVertex3f(-1.0f,  1.0f, -1.0f);
+//	      glVertex3f( 1.0f,  1.0f, -1.0f);
+//
+//	      // Left face (x = -1.0f)
+//	      glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+//	      glVertex3f(-1.0f,  1.0f,  1.0f);
+//	      glVertex3f(-1.0f,  1.0f, -1.0f);
+//	      glVertex3f(-1.0f, -1.0f, -1.0f);
+//	      glVertex3f(-1.0f, -1.0f,  1.0f);
+//
+//	      // Right face (x = 1.0f)
+//	      glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
+//	      glVertex3f(1.0f,  1.0f, -1.0f);
+//	      glVertex3f(1.0f,  1.0f,  1.0f);
+//	      glVertex3f(1.0f, -1.0f,  1.0f);
+//	      glVertex3f(1.0f, -1.0f, -1.0f);
+//	   glEnd();  // End of drawing color-cube
+
 
 
 	//------------------------------------//
@@ -104,43 +164,46 @@ int main(int argc, char *argv[])
 	GeoTrf::Translate3D Tr2( 75*SYSTEM_OF_UNITS::cm, 0, 0); // torus
 	GeoTrf::Translate3D Tr3( -75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // tessellated solid quad
 	GeoTrf::Translate3D Tr4( 75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // tessellated solid tri
-//	GeoTrf::Translate3D Tr5( -75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // tessellated solid triquad
-//	GeoTrf::Translate3D Tr6( 75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // tessellated solid pyramid
+	GeoTrf::Translate3D Tr5( -75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // tessellated solid triquad
+	GeoTrf::Translate3D Tr6( 75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // tessellated solid pyramid
 
 	GeoTransform* tr1 = new GeoTransform(Tr1);
 	GeoTransform* tr2 = new GeoTransform(Tr2);
 	GeoTransform* tr3 = new GeoTransform(Tr3);
 	GeoTransform* tr4 = new GeoTransform(Tr4);
-//	GeoTransform* tr5 = new GeoTransform(Tr5);
-//	GeoTransform* tr6 = new GeoTransform(Tr6);
+	GeoTransform* tr5 = new GeoTransform(Tr5);
+	GeoTransform* tr6 = new GeoTransform(Tr6);
 
 
 	//------------------------------------//
 	// Bundle the resulting compound object with a material into a logical volume, and create a physical volume with that:
-	GeoLogVol* boxLog = new GeoLogVol("Box",box,matIron);
-	GeoPhysVol* boxPhys = new GeoPhysVol(boxLog);
+	GeoLogVol* tess1Log = new GeoLogVol("Tessellated Quad",tessQuad,matIron);
+	GeoPhysVol* tess1Phys = new GeoPhysVol(tess1Log);
 
-	GeoLogVol* torusLog = new GeoLogVol("Torus",torus,matIron);
-	GeoPhysVol* torusPhys = new GeoPhysVol(torusLog);
+	GeoLogVol* tess2Log = new GeoLogVol("Tessellated Tri",tessTri,matIron);
+	GeoPhysVol* tess2Phys = new GeoPhysVol(tess2Log);
 
-	GeoLogVol* consLog = new GeoLogVol("Cons",cons,matIron);
-	GeoPhysVol* consPhys = new GeoPhysVol(consLog);
+	GeoLogVol* tess3Log = new GeoLogVol("Tessellated TriQuad",tessTriQuad,matIron);
+	GeoPhysVol* tess3Phys = new GeoPhysVol(tess3Log);
 
-	GeoLogVol* tessLog = new GeoLogVol("Tessellated Pyramid",tessPyramid,matIron);
-	GeoPhysVol* tessPhys = new GeoPhysVol(tessLog);
+	GeoLogVol* tess4Log = new GeoLogVol("Tessellated Pyramid",tessPyramid,matIron);
+	GeoPhysVol* tess4Phys = new GeoPhysVol(tess4Log);
 
 
 
 	//------------------------------------//
 	// Now insert all of this into the world...                                           //
 	world->add(tr1);
-	world->add(boxPhys);
+	world->add(tess1Phys);
 	world->add(tr2);
-	world->add(torusPhys);
+	world->add(tess2Phys);
 	world->add(tr3);
-	world->add(consPhys);
+	world->add(tess3Phys);
 	world->add(tr4);
-	world->add(tessPhys);
+	world->add(tess4Phys);
+	world->add(tr5);
+	world->add(tr6);
+
 
 
 	//------------------------------------//

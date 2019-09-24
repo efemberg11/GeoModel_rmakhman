@@ -672,7 +672,7 @@ QVariant WriteGeoModel::storeMaterial(const GeoMaterial* mat)
 
 		qDebug() << "\t--> element ID: " << elementId.toString() << " - getFraction:" << elementFraction;
 
-		matElementsList << elementId.toString() << elementFraction;
+		matElementsList << elementId.toString() + ":" + elementFraction;
 	}
 	matElements = matElementsList.join(";");
 

@@ -19,6 +19,7 @@
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoMaterial.h"
+#include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -66,12 +67,13 @@ using namespace GeoXF;
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false)
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(true)
 {
-	qDebug() << "DumpGeoModelAction: constructor";
+	qDebug() << "===> DumpGeoModelAction: constructor";
 
 	#ifdef GEOMODELREAD_DEEP_DEBUG
 	  m_deepDebug = true;
+	  std::cout << "You defined the GEOMODELREAD_DEEP_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
 
         if ( progress != nullptr) {
@@ -118,43 +120,45 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 	qDebug() << "ReadGeoModel::buildGeoModelOneGo()";
 
 	// get all objects from the DB
-	_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
-	std::cout << "GeoPhysVol, read in." << std::endl;
-	_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
-	std::cout << "GeoFullPhysVol, read in." << std::endl;
-	_logVols = m_dbManager->getTableFromNodeType("GeoLogVol");
-	std::cout << "GeoLogVol, read in." << std::endl;
-	_shapes = m_dbManager->getTableFromNodeType("GeoShape");
-	std::cout << "GeoShape, read in." << std::endl;
-	_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
-	std::cout << "GeoMaterial, read in." << std::endl;
-	_functions = m_dbManager->getTableFromNodeType("Function");
-	std::cout << "Function, read in." << std::endl;
-	_serialDenominators = m_dbManager->getTableFromNodeType("GeoSerialDenominator");
-	std::cout << "GeoSerialDenominator, read in." << std::endl;
-	_serialTransformers = m_dbManager->getTableFromNodeType("GeoSerialTransformer");
-	std::cout << "GeoSerialTransformer, read in." << std::endl;
-	_alignableTransforms = m_dbManager->getTableFromNodeType("GeoAlignableTransform");
-	std::cout << "GeoAlignableTransform, read in." << std::endl;
-	_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
-	std::cout << "GeoTransform, read in." << std::endl;
-	_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
-	std::cout << "GeoNameTag, read in." << std::endl;
+	m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
+	std::cout << "GeoPhysVol, loaded." << std::endl;
+	m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
+	std::cout << "GeoFullPhysVol, loaded." << std::endl;
+	m_logVols = m_dbManager->getTableFromNodeType("GeoLogVol");
+	std::cout << "GeoLogVol, loaded." << std::endl;
+	m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
+	std::cout << "GeoShape, loaded." << std::endl;
+	m_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
+	std::cout << "GeoMaterial, loaded." << std::endl;
+	m_elements = m_dbManager->getTableFromNodeType("GeoElement");
+	std::cout << "GeoElement, loaded." << std::endl;
+	m_functions = m_dbManager->getTableFromNodeType("Function");
+	std::cout << "Function, loaded." << std::endl;
+	m_serialDenominators = m_dbManager->getTableFromNodeType("GeoSerialDenominator");
+	std::cout << "GeoSerialDenominator, loaded." << std::endl;
+	m_serialTransformers = m_dbManager->getTableFromNodeType("GeoSerialTransformer");
+	std::cout << "GeoSerialTransformer, loaded." << std::endl;
+	m_alignableTransforms = m_dbManager->getTableFromNodeType("GeoAlignableTransform");
+	std::cout << "GeoAlignableTransform, loaded." << std::endl;
+	m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
+	std::cout << "GeoTransform, loaded." << std::endl;
+	m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
+	std::cout << "GeoNameTag, loaded." << std::endl;
 	// qDebug() << "physVols: " << _physVols;
 	// qDebug() << "fullPhysVols: " << _fullPhysVols;
 
 	// get DB metadata
-	_tableid_tableName = m_dbManager->getAll_TableIDsNodeTypes();
-	std::cout << "DB metadata, read in." << std::endl;
+	m_tableid_tableName = m_dbManager->getAll_TableIDsNodeTypes();
+	std::cout << "DB metadata, loaded." << std::endl;
 
 	// get the children table from DB
-	_allchildren = m_dbManager->getChildrenTable();
+	m_allchildren = m_dbManager->getChildrenTable();
 	// qDebug() << "all children from DB:" << _allchildren;
-	std::cout << "children positions, read in." << std::endl;
+	std::cout << "children positions, loaded." << std::endl;
 
 	// get the root volume data
-	_root_vol_data = m_dbManager->getRootPhysVol();
-	std::cout << "root volume data, read in." << std::endl;
+	m_root_vol_data = m_dbManager->getRootPhysVol();
+	std::cout << "root volume data, loaded." << std::endl;
 
 	return loopOverAllChildren();
 }
@@ -166,7 +170,7 @@ GeoPhysVol* ReadGeoModel::loopOverAllChildren()
 
 	std::cout << "Looping over all children to build the GeoModel tree..." << std::endl;
 
-	int nChildrenRecords = _allchildren.size();
+	int nChildrenRecords = m_allchildren.size();
 
 	// This should go in VP1Light, not in this library. The library could be used by standalone apps without a GUI
         /*
@@ -177,7 +181,7 @@ GeoPhysVol* ReadGeoModel::loopOverAllChildren()
 
 	// loop over parents' keys
 	int counter = 0;
-	foreach (const QString &parentKey, _allchildren.keys() ) {
+	foreach (const QString &parentKey, m_allchildren.keys() ) {
 
 		 /* //This should go in VP1Light as well!
 		  if (progress.wasCanceled()) {
@@ -224,7 +228,7 @@ GeoPhysVol* ReadGeoModel::loopOverAllChildren()
 			  *m_progress = counter;
 			}
 		}
-		if (m_deepDebug) qDebug() << "\nparent: " << parentKey << ':' << _allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]";
+		if (m_deepDebug) qDebug() << "\nparent: " << parentKey << ':' << m_allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]";
 
 		// get the parent's details
 		QStringList parentKeyItems = parentKey.split(":");
@@ -249,7 +253,7 @@ GeoPhysVol* ReadGeoModel::loopOverAllChildren()
 
 
 		// get the parent's children
-		QMap<unsigned int, QStringList> children = _allchildren.value(parentKey);
+		QMap<unsigned int, QStringList> children = m_allchildren.value(parentKey);
 
 
 
@@ -269,7 +273,7 @@ GeoPhysVol* ReadGeoModel::loopOverAllChildren()
 			QString childId = child[6];
 			QString childCopyN = child[7];
 
-			QString childNodeType = _tableid_tableName[childTableId.toUInt()];
+			QString childNodeType = m_tableid_tableName[childTableId.toUInt()];
 
 			if (m_deepDebug) qDebug() << "childTableId:" << childTableId << ", type:" << childNodeType << ", childId:" << childId;
 
@@ -363,15 +367,15 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString co
 	if (m_deepDebug) qDebug() << "building a new volume...";
 
 	// QString nodeType = m_dbManager->getNodeTypeFromTableId(tableId.toUInt());
-	QString nodeType = _tableid_tableName[tableId.toUInt()];
+	QString nodeType = m_tableid_tableName[tableId.toUInt()];
 
 	// get the parent volume parameters
 	// here we do not need to use copyN, since the actual volume is the same for all instances
 	QStringList values;
 	if (nodeType == "GeoPhysVol")
-		 values = _physVols[id.toUInt()];
+		 values = m_physVols[id.toUInt()];
 	else if (nodeType == "GeoFullPhysVol")
-		 values = _fullPhysVols[id.toUInt()];
+		 values = m_fullPhysVols[id.toUInt()];
 
 
 
@@ -411,8 +415,8 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString co
 GeoPhysVol* ReadGeoModel::getRootVolume()
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::getRootVolume()";
-	QString id = _root_vol_data[1];
-	QString tableId = _root_vol_data[2];
+	QString id = m_root_vol_data[1];
+	QString tableId = m_root_vol_data[2];
 	QString copyNumber = "1"; // the Root volume has only one copy by definition
 	return dynamic_cast<GeoPhysVol*>(buildVPhysVol(id, tableId, copyNumber));
 }
@@ -421,25 +425,70 @@ GeoPhysVol* ReadGeoModel::getRootVolume()
 GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildMaterial()";
-	QStringList values = _materials[id.toUInt()];
+	QStringList values = m_materials[id.toUInt()];
 
+	qDebug() << "mat values=" << values;
 	QString matId = values[0];
 	QString matName = values[1];
+	double matDensity = values[2].toDouble();
+	QString matElements = values[3];
 
-	if (m_deepDebug) qDebug() << "\tMaterial-ID:" << matId << ", Material-name:" << matName;
+	if (m_deepDebug) qDebug() << "\tMaterial - ID:" << matId
+			<< ", name:" << matName
+			<< ", density:" << matDensity
+			<< " ( " << matDensity / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3) << "[g/cm3] )"
+			<< ", elements:" << matElements;
 
-	// TODO: Bogus densities.  Later: read from database.
-	double densityOfAir=0.1;
+	GeoMaterial* mat = new GeoMaterial(matName.toStdString(), matDensity);
 
-	return new GeoMaterial(matName.toStdString(),densityOfAir);
+	if (matElements.size() > 0) {
+		// get parameters from DB string
+		QStringList elements = matElements.split(";");
+		foreach( QString par, elements) {
 
+			qDebug() << "par:" << par;
+			QStringList vars = par.split(":");
+			QString elId = vars[0];
+			double elFraction = vars[1].toDouble();
+
+			GeoElement* el = buildElement(elId);
+
+			mat->add(el, elFraction);
+		}
+	}
+	return mat;
+}
+
+GeoElement* ReadGeoModel::buildElement(QString id)
+{
+	if (m_deepDebug) qDebug() << "ReadGeoModel::buildElement()";
+
+	if (m_elements.size() == 0)
+		qFatal("ERROR! 'm_elements' is empty! Did you load the 'Elements' table? \n\t ==> Aborting...");
+
+	QStringList values = m_elements[id.toUInt()];
+
+	QString elId = values[0];
+	QString elName = values[1];
+	QString elSymbol = values[2];
+	double elZ = values[3].toDouble();
+	double elA = values[4].toDouble();
+
+	if (m_deepDebug) qDebug() << "\tElement - ID:" << elId
+			<< ", name:" << elName
+			<< ", symbol:" << elSymbol
+			<< ", Z:" << elZ
+			<< ", A:" << elA
+			<< " ( " << elA / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole) << "[g/mole] )";
+
+	return new GeoElement(elName.toStdString(), elSymbol.toStdString(), elZ, elA);
 }
 
 
 GeoShape* ReadGeoModel::buildShape(QString shapeId)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildShape()";
-	QStringList paramsShape = _shapes[ shapeId.toUInt() ];
+	QStringList paramsShape = m_shapes[ shapeId.toUInt() ];
 
 	QString id = paramsShape[0];
 	QString type = paramsShape[1];
@@ -1257,7 +1306,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildLogVol()";
 
 	// get logVol properties from the DB
-	QStringList values = _logVols[logVolId.toUInt()];
+	QStringList values = m_logVols[logVolId.toUInt()];
 	if (m_deepDebug) qDebug() << "params:" << values;
 
 	// build the LogVol
@@ -1280,7 +1329,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 GeoSerialDenominator* ReadGeoModel::buildSerialDenominator(QString id)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildSerialDenominator()";
-	return parseSerialDenominator( _serialDenominators[id.toUInt()] );
+	return parseSerialDenominator( m_serialDenominators[id.toUInt()] );
 }
 
 GeoSerialDenominator* ReadGeoModel::parseSerialDenominator(QStringList values)
@@ -1335,7 +1384,7 @@ void ReadGeoModel::printTransformationValues(QStringList values) {
 GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(QString id)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildAlignableTransform()";
-	return parseAlignableTransform( _alignableTransforms[id.toUInt()] );
+	return parseAlignableTransform( m_alignableTransforms[id.toUInt()] );
 }
 
 GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
@@ -1389,7 +1438,7 @@ GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 GeoTransform* ReadGeoModel::buildTransform(QString id)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildTransform()";
-	return parseTransform( _transforms[id.toUInt()] );
+	return parseTransform( m_transforms[id.toUInt()] );
 }
 
 
@@ -1447,7 +1496,7 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildSerialTransformer()";
 
-	QStringList values = _serialTransformers[nodeId.toUInt()];
+	QStringList values = m_serialTransformers[nodeId.toUInt()];
 	if (m_deepDebug) qDebug() << "values:" << values;
 
 	// std::cout <<"ST * " << values[0].toStdString() << " " << values[1].toStdString() << " " << values[2].toStdString() << std::endl;
@@ -1461,7 +1510,7 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 
 	unsigned int physVolTableId = physVolTableIdStr.toUInt();
 
-	QString physVolType = _tableid_tableName[physVolTableId];
+	QString physVolType = m_tableid_tableName[physVolTableId];
 
 	if (m_deepDebug) qDebug() << "\tID:" << id << ", functionId:" << functionId << ", physVolId:" << physVolId << ", physVolTableId:" << physVolTableId << ", copies:" << copies;
 
@@ -1492,7 +1541,7 @@ TRANSFUNCTION ReadGeoModel::buildFunction(QString id)
 
 	// return parseFunction( _functions[id.toUInt()] );
 
-	QStringList values = _functions[id.toUInt()];
+	QStringList values = m_functions[id.toUInt()];
 	// return parseFunction( values[0].toUInt(), values[1].toStdString() );
 	return parseFunction( values[1].toStdString() );
 
@@ -1520,7 +1569,7 @@ TRANSFUNCTION ReadGeoModel::parseFunction(const std::string& expr)
 GeoNameTag* ReadGeoModel::buildNameTag(QString id)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildNameTag()";
-	return parseNameTag( _nameTags[id.toUInt()] );
+	return parseNameTag( m_nameTags[id.toUInt()] );
 }
 
 GeoNameTag* ReadGeoModel::parseNameTag(QStringList values)
@@ -1537,7 +1586,7 @@ bool ReadGeoModel::isNodeBuilt(const QString id, const QString tableId, const QS
 {
 	// qDebug() << "ReadGeoModel::isNodeBuilt(): " << id << tableId << copyNumber;
 	QString key = id + ":" + tableId + ":" + copyNumber;
-	return _memMap.contains(key);
+	return m_memMap.contains(key);
 }
 
 
@@ -1545,14 +1594,14 @@ GeoGraphNode* ReadGeoModel::getNode(const QString id, const QString tableId, con
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::getNode(): " << id << tableId << copyN;
 	QString key = id + ":" + tableId + ":" + copyN;
-	return _memMap[key];
+	return m_memMap[key];
 }
 
 void ReadGeoModel::storeNode(const QString id, const QString tableId, const QString copyN, GeoGraphNode* node)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::storeNode(): " << id << tableId << copyN << node;
 	QString key = id + ":" + tableId + ":" + copyN;
-	_memMap[key] = node;
+	m_memMap[key] = node;
 }
 
 

@@ -31,9 +31,9 @@ int main(int argc, char *argv[])
 	// ----------------------------------------------------------------------------------//
 
 	// Define the units
-	#define gr   GeoModelKernelUnits::gram
-	#define mole GeoModelKernelUnits::mole
-	#define cm3  GeoModelKernelUnits::cm3
+	#define gr   SYSTEM_OF_UNITS::gram
+	#define mole SYSTEM_OF_UNITS::mole
+	#define cm3  SYSTEM_OF_UNITS::cm3
 
 	// Define the chemical elements
 	GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);

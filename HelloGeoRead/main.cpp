@@ -73,10 +73,12 @@ int main(int argc, char *argv[])
   // -- testing the input database
   std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
   db->printAllMaterials();
+  std::cout << "Printing the list of all GeoElement nodes" << std::endl;
+  db->printAllElements();
 
   /* setup the GeoModel reader */
   GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-  qDebug() << "ReadGeoModel set.";
+  qDebug() << "OK! ReadGeoModel is set.";
 
 
   /* build the GeoModel geometry */
@@ -87,15 +89,13 @@ int main(int argc, char *argv[])
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
   std::cout << "Getting the 'world' GeoPhysVol, i.e. the root volume of the GeoModel tree" << std::endl;
   GeoPhysVol* world = createTheExperiment(dbPhys);
-
-
-  // --- testing the imported Geometry
-
-  // get the 'world' GeoLogVol
   std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;
   const GeoLogVol* logVol = world->getLogVol();
   std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;
   std::cout << "'world' GeoMaterial name: " << logVol->getMaterial()->getName() << std::endl;
+
+
+  // --- testing the imported Geometry
 
   // get number of children volumes
   unsigned int nChil = world->getNChildVols();
@@ -104,25 +104,35 @@ int main(int argc, char *argv[])
   // loop over all children nodes
   std::cout << "Looping over all 'volume' children (i.e., GeoPhysVol and GeoFullPhysVol)..." << std::endl;
   for (unsigned int idx=0; idx<nChil; ++idx) {
-	PVConstLink nodeLink = world->getChildVol(idx);
+	  PVConstLink nodeLink = world->getChildVol(idx);
 
-	if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) ) {
-		std::cout << "\t" << "the child n. " << idx << " ";
-		const GeoVPhysVol *childVolV = &(*( nodeLink ));
-		if ( dynamic_cast<const GeoPhysVol*>(childVolV) ) {
-			const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
-			std::cout << "is a GeoPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName();
-			std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
-		} else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
-			const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
-			std::cout << "is a GeoFullPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName();
-			std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
-		}
-        } else if ( dynamic_cast<const GeoNameTag*>( &(*( nodeLink ))) ) {
-		qDebug() << "\t" << "the child n. " << idx << " is a GeoNameTag";
-		const GeoNameTag *childVol = dynamic_cast<const GeoNameTag*>(&(*( nodeLink )));
-		std::cout << "\t\tGeoNameTag's name: " << childVol->getName() << std::endl;
-        }
+	  if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) ) {
+
+		  std::cout << "\t" << "the child n. " << idx << " ";
+		  const GeoVPhysVol *childVolV = &(*( nodeLink ));
+
+		  if ( dynamic_cast<const GeoPhysVol*>(childVolV) ) {
+			  const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
+			  std::cout << "is a GeoPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName();
+			  std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
+		  }
+		  else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
+			  const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
+			  std::cout << "is a GeoFullPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName();
+			  std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
+		  }
+	  }
+	  else if ( dynamic_cast<const GeoNameTag*>( &(*( nodeLink ))) ) {
+		  qDebug() << "\t" << "the child n. " << idx << " is a GeoNameTag";
+		  const GeoNameTag *childVol = dynamic_cast<const GeoNameTag*>(&(*( nodeLink )));
+		  std::cout << "\t\t GeoNameTag's name: " << childVol->getName() << std::endl;
+	  }
+	  else if ( dynamic_cast<const GeoMaterial*>( &(*( nodeLink ))) ) {
+		  qDebug() << "\t" << "the child n. " << idx << " is a GeoMaterial";
+		  const GeoMaterial *childVol = dynamic_cast<const GeoMaterial*>(&(*( nodeLink )));
+		  std::cout << "\t\t GeoMaterial's name: " << childVol->getName() << std::endl;
+		  std::cout << "\t\t GeoMaterial's number of elements: " << childVol->getNumElements() << std::endl;
+	  }
   }
 
   qDebug() << "Everything done.";

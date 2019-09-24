@@ -11,7 +11,7 @@
 #include <QDebug>
 
 
-static std::string dbversion = "0.2.0";
+static std::string dbversion = "0.3.0"; // added GeoElement support (Sep 2019)
 
 
 GMDBManager::GMDBManager(const QString &path) : m_dbpath(path), m_dbIsOK(false),  m_deepDebug(false)
@@ -75,6 +75,12 @@ void GMDBManager::printAllMaterials() const
 	qDebug() << "printAllMaterials()";
 	printAllRecords("Materials");
 }
+void GMDBManager::printAllElements() const
+{
+	qDebug() << "printAllElements()";
+	printAllRecords("Elements");
+}
+
 void GMDBManager::printAllShapes() const
 {
 	qDebug() << "printAllShapes()";
@@ -281,17 +287,36 @@ QVariant GMDBManager::addLogVol(const QString &name, const QVariant &shapeId, co
 	return q.lastInsertId();
 }
 
-QVariant GMDBManager::addMaterial(const QString &name)
+QVariant GMDBManager::addMaterial(const QString &name, const QString &density, const QString &elements)
 {
 	if (m_deepDebug) qDebug() << "GMDBManager::addMaterial()";
 
 	QSqlQuery q;
-	if (!q.prepare(QLatin1String("insert into Materials(name) values(?)"))) {
+	if (!q.prepare(QLatin1String("insert into Materials(name, density, elements) values(?, ?, ?)"))) {
 		showError(q.lastError());
 		return QVariant();
 	}
-
 	q.addBindValue(name);
+	q.addBindValue(density);
+	q.addBindValue(elements);
+	q.exec();
+	return q.lastInsertId();
+}
+
+
+QVariant GMDBManager::addElement(const QString &name, const QString &symbol, const QString &elZ, const QString &elA)
+{
+	if (m_deepDebug) qDebug() << "GMDBManager::addElement()";
+
+	QSqlQuery q;
+	if (!q.prepare(QLatin1String("insert into Elements(name, symbol, Z, A) values(?, ?, ?, ?)"))) {
+		showError(q.lastError());
+		return QVariant();
+	}
+	q.addBindValue(name);
+	q.addBindValue(symbol);
+	q.addBindValue(elZ);
+	q.addBindValue(elA);
 	q.exec();
 	return q.lastInsertId();
 }
@@ -1094,10 +1119,11 @@ bool GMDBManager::initDB()
 	qDebug() << "checking existing tables...";
 	QSqlDatabase db = QSqlDatabase::database();
 	QStringList tables = db.tables();
-	if (tables.contains("LogVols", Qt::CaseInsensitive)
-			&& tables.contains("PhysVols", Qt::CaseInsensitive)
+	if (tables.contains(       "LogVols",   Qt::CaseInsensitive)
+			&& tables.contains("PhysVols",  Qt::CaseInsensitive)
 			&& tables.contains("Materials", Qt::CaseInsensitive)
-			&& tables.contains("Shapes", Qt::CaseInsensitive)
+			&& tables.contains("Elements",  Qt::CaseInsensitive)
+			&& tables.contains("Shapes",    Qt::CaseInsensitive)
 	) {
 		qDebug() << "tables are present already. Skipping tables creation. Loading tables...";
 		loadTableNamesFromDB();
@@ -1228,11 +1254,26 @@ bool GMDBManager::createTables()
 	// Materials table
 	geoNode = "GeoMaterial";
 	tableName = "Materials";
-	tab << tableName << "id" << "name";
+	tab << tableName << "id" << "name" << "density" << "elements";
 	storeTableColumnNames(tab);
 	tab.clear();
 	m_childType_tableName[geoNode] = tableName; // store type-table relation
-	if (!q.exec(QLatin1String("create table Materials(id integer primary key, name varchar)"))) {
+	if (!q.exec(QLatin1String("create table Materials(id integer primary key, name varchar, density varchar, elements varchar)"))) {
+		showError(q.lastError());
+		return false;
+	} else {
+		storeNodeType(geoNode, tableName);
+	}
+
+	// Elements table
+	geoNode = "GeoElement";
+	tableName = "Elements";
+	tab << tableName << "id" << "name" << "symbol" << "Z" << "A";
+
+	storeTableColumnNames(tab);
+	tab.clear();
+	m_childType_tableName[geoNode] = tableName; // store type-table relation
+	if (!q.exec(QLatin1String("create table Elements(id integer primary key, name varchar, symbol varchar, Z varchar, A varchar)"))) {
 		showError(q.lastError());
 		return false;
 	} else {
@@ -1415,10 +1456,13 @@ void GMDBManager::loadTestData()
 	QVariant coneId   = addShape(QLatin1String("Cone"), "");
 	QVariant sphereId = addShape(QLatin1String("Sphere"), "");
 
+	qDebug() << "Loading Elements...";
+	qWarning() << "Sample GeoElement data --> to be implemented!";
+
 	qDebug() << "Loading Materials...";
-	QVariant airId  = addMaterial(QLatin1String("Air"));
-	QVariant ironId = addMaterial(QLatin1String("Iron"));
-	QVariant leadId = addMaterial(QLatin1String("Lead"));
+	QVariant airId  = addMaterial(QLatin1String("Air"),QLatin1String("density"),QLatin1String("elements"));
+	QVariant ironId = addMaterial(QLatin1String("Iron"),QLatin1String("density"),QLatin1String("elements"));
+	QVariant leadId = addMaterial(QLatin1String("Lead"),QLatin1String("density"),QLatin1String("elements"));
 
 	qDebug() << "Loading LogVols...";
 	QVariant worldLogId = addLogVol(QLatin1String("WorldLog"), boxId, airId);

@@ -638,11 +638,70 @@ QVariant WriteGeoModel::storeShape(const GeoShape* shape)
 //______________________________________________________________________
 QVariant WriteGeoModel::storeMaterial(const GeoMaterial* mat)
 {
-	const QString matName = QString::fromStdString(mat->getName());
-	qDebug() << "storeMaterial() - material name:" << matName << ", address:" << mat;
+	const QString matName = QString::fromStdString(mat->getName());   //The name of the material.
+	const QString matID = QString::number(mat->getID());              //Gives an integral identifier for the material.For convenience.
+	const QString matDensity = QString::number(mat->getDensity());	  //The density of the material.
+	const unsigned int numElements = mat->getNumElements();
+
+	const QString matNumElements = QString::number(numElements);
+	qDebug() << "storeMaterial() - material name:" << matName
+			<< ", address:" << mat
+			<< ", matID:" << matID
+			<< ", matDensity:" << matDensity
+			<< ", matNumElements:" << matNumElements;
+
+	// loop over the elements composing the material
+	QString matElements;
+	QStringList matElementsList;
+	for (unsigned int i=0; i < numElements; i++) {
+
+		//Gets the i-th element.
+		const GeoElement* element = mat->getElement(i);
+		std::string elName = element->getName();
+		/*
+		  std::cout << "\t element n. " << i << std::endl;
+		  std::cout << "\t element address: " << element << std::endl;
+		  std::cout << "\t element name: " << elName << std::endl;
+		 */
+
+		// Store the element and get its DataBase ID
+		QVariant elementId = storeElement(element);
+
+		//Gets the fraction by weight of the i-th element
+		const QString elementFraction = QString::number( mat->getFraction(i) );
+
+		qDebug() << "\t--> element ID: " << elementId.toString() << " - getFraction:" << elementFraction;
+
+		matElementsList << elementId.toString() << elementFraction;
+	}
+	matElements = matElementsList.join(";");
+
+	qDebug() << "\t==> material's elements:" << matElements;
+
 	// store the material in the DB and returns the ID
-	return storeObj(mat, matName);
+	return storeObj(mat, matName, matDensity, matElements);
 }
+
+
+//_______________________________________________________________________
+QVariant WriteGeoModel::storeElement(const GeoElement* el)
+{
+	//	The name of the element, e.g. "Carbon".
+	const QString elName = QString::fromStdString(el->getName());
+
+	//	The chemical symbol for the element, e.g. C, O, S, Na....
+	const QString elSymbol = QString::fromStdString(el->getSymbol());
+
+	//	The atomic number Z for the material.
+	const QString elZ = QString::number(el->getZ());
+
+	//	The average atomic mass for the element.
+	const QString elA = QString::number(el->getA());
+
+	// store the material in the DB and returns the ID
+	return storeObj(el, elName, elSymbol, elZ, elA);
+}
+
 
 //_______________________________________________________________________
 QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
@@ -1110,9 +1169,9 @@ void WriteGeoModel::showMemoryMap()
 
 
 
-QVariant WriteGeoModel::storeObj(const GeoMaterial* pointer, const QString name)
+QVariant WriteGeoModel::storeObj(const GeoMaterial* pointer, const QString name, const QString density, const QString elements)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoMaterial*) - name:" << name << "address:" << pointer;
+	qDebug() << "WriteGeoModel::storeObj(GeoMaterial*) - name:" << name << "- address:" << pointer << "- density:" << density << "- elements:" << elements;
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant materialId;
@@ -1120,8 +1179,7 @@ QVariant WriteGeoModel::storeObj(const GeoMaterial* pointer, const QString name)
 	if (! isAddressStored(address)) {
 		qDebug() << "New Material! Storing it...";
 
-		// materialId = m_dbManager->addMaterial(name);
-		materialId = addMaterial(name);
+		materialId = addMaterial(name, density, elements);
 
 		storeAddress( address, materialId );
 	}
@@ -1131,6 +1189,29 @@ QVariant WriteGeoModel::storeObj(const GeoMaterial* pointer, const QString name)
 	}
 	qDebug() << "materialId:" << materialId;
 	return materialId;
+}
+
+
+QVariant WriteGeoModel::storeObj(const GeoElement* pointer, const QString name, const QString symbol, const QString elZ, const QString elA)
+{
+	qDebug() << "WriteGeoModel::storeObj(GeoElement*) - name:" << name << "address:" << pointer << " - symbol: " << symbol << " - elZ: " << elZ << " - elA: " << elA;
+
+	QString address = getAddressStringFromPointer( pointer );
+	QVariant elementId;
+
+	if (! isAddressStored(address)) {
+		qDebug() << "New Element! Storing it...";
+
+		elementId = addElement(name, symbol, elZ, elA);
+
+		storeAddress( address, elementId );
+	}
+	else {
+		qDebug() << "Element node stored already. Getting ID from the memory map...";
+		elementId = getStoredIdFromAddress(address);
+	}
+	qDebug() << "elementId:" << elementId;
+	return elementId;
 }
 
 
@@ -1384,14 +1465,25 @@ unsigned int WriteGeoModel::addRecord(std::vector<QStringList>* container, const
 	return idx;
 }
 
-QVariant WriteGeoModel::addMaterial(const QString name)
+QVariant WriteGeoModel::addMaterial(const QString name, const QString density, const QString elements)
 {
-	qDebug() << "WriteGeoModel::addMaterial(QString*) - name:" << name;
+	qDebug() << "WriteGeoModel::addMaterial(QString*) - name:" << name << "- density:" << density << "- elements:" << elements;
 	std::vector<QStringList>* container = &_materials;
 	QStringList values;
-	values << name;
+	values << name << density << elements;
 	return QVariant( addRecord(container, values) );
 }
+
+
+QVariant WriteGeoModel::addElement(const QString name, const QString symbol, const QString elZ, const QString elA)
+{
+	qDebug() << "WriteGeoModel::addElement(QString*) - name:" << name << "- symbol: " << symbol << "- elZ:" << elZ << "- elA:" << elA;
+	std::vector<QStringList>* container = &m_elements;
+	QStringList values;
+	values << name << symbol << elZ << elA;
+	return QVariant( addRecord(container, values) );
+}
+
 
 QVariant WriteGeoModel::addNameTag(const QString name)
 {
@@ -1540,6 +1632,7 @@ void WriteGeoModel::saveToDB()
     std::cout << "saving to file: " << m_dbpath.toStdString() << std::endl;
 
 	m_dbManager->addListOfRecords("GeoMaterial", _materials);
+	m_dbManager->addListOfRecords("GeoElement", m_elements);
 	m_dbManager->addListOfRecords("GeoNameTag", _nameTags);
 	m_dbManager->addListOfRecords("GeoAlignableTransform", _alignableTransforms);
 	m_dbManager->addListOfRecords("GeoTransform", _transforms);
@@ -1586,6 +1679,14 @@ QVariant WriteGeoModel::getStoredIdFromAddress(QString address)
 QString WriteGeoModel::getAddressStringFromPointer(const GeoMaterial* pointer)
 {
 	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoMaterial*)";
+	std::ostringstream oss;
+	oss << pointer;
+	return getQStringFromOss(oss);
+}
+// get pointer string
+QString WriteGeoModel::getAddressStringFromPointer(const GeoElement* pointer)
+{
+	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoElement*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);

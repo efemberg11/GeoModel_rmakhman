@@ -44,37 +44,70 @@ public:
 	~GMDBManager();
 
 
+	/**
+	 * @brief Returns true if the DB is correctly open
+	 */
 	bool isOpen() const;
 
 	/**
-	 * @brief Print names of all PhysVol objects in db
+	 * @brief Print names of all GeoPhysVol objects in db
 	 */
 	void printAllPhysVols() const;
+
+	/**
+	 * @brief Print names of all GeoFullPhysVol objects in db
+	 */
 	void printAllFullPhysVols() const;
 
 	/**
-	 * @brief Print names of all PhysVol objects in db
+	 * @brief Print names of all GeoLogVol objects in db
 	 */
 	void printAllLogVols() const;
 
 	/**
-	 * @brief Print names of all PhysVol objects in db
+	 * @brief Print names of all GeoMaterial objects in db
 	 */
 	void printAllMaterials() const;
 
 	/**
-	 * @brief Print names of all PhysVol objects in db
+	 * @brief Print names of all GeoElement objects in db
+	 */
+	void printAllElements() const;
+
+	/**
+	 * @brief Print names of all GeoShape objects in db
 	 */
 	void printAllShapes() const;
 
 	/**
-	 * @brief Print names of all PhysVol objects in db
+	 * @brief Print names of all GeoSerialDenominators objects in db
 	 */
 	void printAllSerialDenominators() const;
+
+
+	/**
+	 * @brief Print names of all GeoSerialDenominators objects in db
+	 */
 	void printAllSerialTransformers() const;
+
+	/**
+	 * @brief Print names of all Function objects in db
+	 */
 	void printAllFunctions() const;
+
+	/**
+	 * @brief Print names of all GeoTransform objects in db
+	 */
 	void printAllTransforms() const;
+
+	/**
+	 * @brief Print names of all GeoAlignableTransform objects in db
+	 */
 	void printAllAlignableTransforms() const;
+
+	/**
+	 * @brief Print names of all GeoNameTag objects in db
+	 */
 	void printAllNameTags() const;
 
 	/**
@@ -92,11 +125,15 @@ public:
 	 */
 	void printRootVolumeId() const;
 
+	/**
+	 * @brief Print the current version number of the DB schema
+	 */
 	void printDBVersion() const;
 
 	// ADD methods
 	QVariant addShape(const QString &type, const QString &parameters);
-	QVariant addMaterial(const QString &name);
+	QVariant addMaterial(const QString &name, const QString &density, const QString &elements);
+	QVariant addElement(const QString &name, const QString &symbol, const QString &elZ, const QString &elA);
 	QVariant addLogVol(const QString &name, const QVariant &shapeId, const QVariant &materialId);
 	QVariant addPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);
 	QVariant addFullPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);

@@ -15,6 +15,7 @@
 #include "GeoModelKernel/GeoNodeAction.h"
 #include "GeoModelKernel/GeoGraphNode.h"
 #include "GeoModelKernel/GeoShape.h"
+#include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoXF.h"
@@ -80,9 +81,11 @@ private:
 
 	QVariant storeShape(const GeoShape* shape);
 	QVariant storeMaterial(const GeoMaterial* mat);
+	QVariant storeElement(const GeoElement* el);
 	QVariant storeTranform(const GeoTransform* node);
 
-	QVariant storeObj(const GeoMaterial* pointer, const QString nam);
+	QVariant storeObj(const GeoMaterial* pointer, const QString name, const QString density, const QString elements);
+	QVariant storeObj(const GeoElement* pointer, const QString name, const QString symbol, const QString elZ, const QString elA);
 	QVariant storeObj(const GeoShape* pointer, const QString type, const QString parameters);
 	QVariant storeObj(const GeoLogVol* pointer, const QString name, const QVariant shapeId, const QVariant materialId);
 	QVariant storeObj(const GeoPhysVol* pointer, const QVariant logvolId, const QVariant parentId = QVariant(), bool isRootVolume = false );
@@ -95,7 +98,8 @@ private:
 	QVariant storeObj(const GeoNameTag* pointer, const QString name);
 
 	unsigned int addRecord(std::vector<QStringList>* container, const QStringList values) const;
-	QVariant addMaterial(const QString name);
+	QVariant addMaterial(const QString name, const QString density, const QString elements);
+	QVariant addElement(const QString name, const QString symbol, const QString elZ, const QString elA);
 	QVariant addNameTag(const QString name);
 	QVariant addAlignableTransform(const std::vector<double> params);
 	QVariant addTransform(const std::vector<double> params);
@@ -121,6 +125,7 @@ private:
 	QVariant getStoredIdFromAddress(QString address);
 
 	QString getAddressStringFromPointer(const GeoMaterial* pointer);
+	QString getAddressStringFromPointer(const GeoElement* pointer);
 	QString getAddressStringFromPointer(const GeoShape* pointer);
 	QString getAddressStringFromPointer(const GeoLogVol* pointer);
 	QString getAddressStringFromPointer(const GeoPhysVol* pointer);
@@ -160,6 +165,7 @@ private:
 	std::vector<QStringList> _fullPhysVols;
 	std::vector<QStringList> _shapes;
 	std::vector<QStringList> _materials;
+	std::vector<QStringList> m_elements;
 	std::vector<QStringList> _transforms;
 	std::vector<QStringList> _alignableTransforms;
 	std::vector<QStringList> _serialDenominators;

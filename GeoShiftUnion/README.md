@@ -10,6 +10,14 @@ The example program:
  2. Writes the geometry to an SQLite file
 
 
+## Dependencies
+
+### Install Qt5
+
+To build and run GeoModel I/O libraries, you must have a working Qt5 installation on your computer.
+If you are not sure how to install it, please take a look at the Appendix, below.
+
+
 ## Quick Instructions
 
 ### macOS Mojave

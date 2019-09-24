@@ -15,9 +15,12 @@ The example program:
 
 ## Dependencies
 
-See also the Appendix.
+### Install Qt5
 
-#### GeoModelCore
+To build and run GeoModel I/O libraries, you must have a working Qt5 installation on your computer.
+If you are not sure how to install it, please take a look at the Appendix, below.
+
+### GeoModelCore
 
 ```bash
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelCore.git

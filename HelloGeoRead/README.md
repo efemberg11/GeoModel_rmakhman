@@ -20,10 +20,7 @@ The example program:
 To build and run GeoModel libraries, you must have a working Qt5 installation on your computer.
 If you are not sure how to install it, please take a look at the Appendix on Qt5, below.
 
-
-### Build dependencies
-
-#### Build GeoModelCore
+### Build GeoModelCore
 
 ```bash
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelCore.git
@@ -33,7 +30,8 @@ cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../Geo
 make -j 4
 make install
 ```
-#### Build GeoModelIO
+
+### Build GeoModelIO
 
 ```bash
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO.git
@@ -43,8 +41,6 @@ cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../Geo
 make -j 4
 make install
 ```
-
-
 
 ## Build
 

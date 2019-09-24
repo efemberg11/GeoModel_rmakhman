@@ -19,29 +19,11 @@ The example program:
 
 ### Install Qt5
 
-To build and run GeoModel libraries, you must have a working Qt5 installation on your computer.
-If you are not sure how to install it, please take a look at [the notes on Qt5, below](#notes-on-qt5).
-
-### Build external dependencies
-
-#### Geant4
+To build and run GeoModel I/O libraries, you must have a working Qt5 installation on your computer.
+If you are not sure how to install it, please take a look at the Appendix, below.
 
 
-We checkout and build the latest release of Geant4:
-
-```bash
-git clone https://gitlab.cern.ch/geant4/geant4.git
-cd geant4
-git checkout v10.5.0
-cd ../
-mkdir build_geant4
-cd build_geant4
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../geant4/
-make -j 4
-make install
-```
-
-#### CLHEP
+### CLHEP
 
 Geant4 needs [CLHEP](https://gitlab.cern.ch/CLHEP).
 
@@ -56,6 +38,22 @@ mkdir CLHEP_build
 cd CLHEP_build
 cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../CLHEP/
 make -j4
+make install
+```
+
+### Geant4
+
+We checkout and build the latest release of Geant4:
+
+```bash
+git clone https://gitlab.cern.ch/geant4/geant4.git
+cd geant4
+git checkout v10.5.0
+cd ../
+mkdir build_geant4
+cd build_geant4
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../geant4/
+make -j 4
 make install
 ```
 

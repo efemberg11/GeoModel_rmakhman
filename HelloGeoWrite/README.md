@@ -13,8 +13,8 @@ The example program:
 
 ### Install Qt5
 
-To build and run GeoModel libraries, you must have a working Qt5 installation on your computer.
-If you are not sure how to install it, please take a look at [the notes on Qt5, below](#notes-on-qt5).
+To build and run GeoModel I/O libraries, you must have a working Qt5 installation on your computer.
+If you are not sure how to install it, please take a look at the Appendix, below.
 
 
 #### GeoModelCore

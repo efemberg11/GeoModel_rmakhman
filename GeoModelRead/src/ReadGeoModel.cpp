@@ -455,6 +455,7 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 
 			mat->add(el, elFraction);
 		}
+		mat->lock();
 	}
 	return mat;
 }

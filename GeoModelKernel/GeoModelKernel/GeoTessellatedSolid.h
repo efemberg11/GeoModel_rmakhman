@@ -27,6 +27,9 @@ class GeoTessellatedSolid : public GeoShape
   GeoFacet* getFacet(size_t) const;
   size_t getNumberOfFacets() const;
 
+  //!	True if the polygon has at least two facets. False otherwise.
+  //  bool isValid () const; // TODO: implement, like, e.g., in GeoPgon
+
  protected:
   virtual ~GeoTessellatedSolid();
 
@@ -49,5 +52,11 @@ inline ShapeType GeoTessellatedSolid::getClassTypeID()
 {
   return s_classTypeID;
 }
+
+// TODO: implement, like, e.g., in GeoPgon
+//inline bool GeoPgon::isValid () const
+//{
+//  return m_zPlane.size () >= 2;
+//}
 
 #endif

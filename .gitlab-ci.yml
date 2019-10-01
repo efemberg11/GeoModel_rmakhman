@@ -15,9 +15,9 @@ geomodelcore-build:
   script:
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
     - mkdir geomodelcore-build geomodelcore-install
-    - cmake -Bgeomodel-build -HGeoModelCore
+    - cmake -DCMAKE_INSTALL_PREFIX=../install -Bgeomodelcore-build -HGeoModelCore
     - make -j$(nproc) -C geomodelcore-build
-    - make -C geomodelcore-build install DESTDIR=../geomodelcore-install
+    - make -C geomodelcore-build install
     
     
 .build_template: &build_template

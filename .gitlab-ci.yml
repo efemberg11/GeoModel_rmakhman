@@ -13,7 +13,7 @@ variables:
 geomodelcore-build:
   stage: dependencies
   script:
-    - 
+    - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
     - mkdir geomodelcore-build
     - cd geomodelcore-build

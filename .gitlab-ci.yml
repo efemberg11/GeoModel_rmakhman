@@ -1,5 +1,6 @@
 stages:
-  - dependencies
+  - dependencies-core
+  - dependencies-io
   - build
 
 before_script:
@@ -11,7 +12,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 geomodelcore-build:
-  stage: dependencies
+  stage: dependencies-core
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
@@ -25,7 +26,7 @@ geomodelcore-build:
       - install
 
 geomodelio-build:
-  stage: dependencies
+  stage: dependencies-io
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git

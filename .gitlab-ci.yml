@@ -20,6 +20,9 @@ geomodelcore-build:
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
     - make -j$(nproc)
     - make install
+  artifacts: 
+    paths:
+      - ../install
     
     
 .build_template: &build_template

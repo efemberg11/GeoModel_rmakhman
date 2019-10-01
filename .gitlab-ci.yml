@@ -26,7 +26,6 @@ geomodelcore-build:
     - cvmfs
   script:
     - mkdir build
-    - mkdir install
     - cd build
     - echo "${CMAKE_ARGS}"
     - cmake ${CMAKE_ARGS}  ..

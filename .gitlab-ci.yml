@@ -14,10 +14,11 @@ geomodelcore-build:
   stage: dependencies
   script:
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
-    - mkdir geomodelcore-build geomodelcore-install
-    - cmake -DCMAKE_INSTALL_PREFIX=install -Bgeomodelcore-build -HGeoModelCore
-    - make -j$(nproc) -C geomodelcore-build
-    - make -C geomodelcore-build install
+    - mkdir geomodelcore-build
+    - cd geomodelcore-build
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
+    - make -j$(nproc)
+    - make install
     
     
 .build_template: &build_template
@@ -28,7 +29,7 @@ geomodelcore-build:
     - mkdir build
     - cd build
     - echo "${CMAKE_ARGS}"
-    - cmake ${CMAKE_ARGS}  ..
+    - cmake ${CMAKE_ARGS}  ../GeoModelIO
     - cmake --build . -- -j$(nproc)
     - cmake --build . -- install
 

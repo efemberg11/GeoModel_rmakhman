@@ -3,7 +3,7 @@ stages:
 
 before_script:
   - yum -y install cmake glibc-devel which
-  - set +e && source CI/setup_lcg89.sh; set -e
+  - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
   CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install

@@ -22,7 +22,7 @@ geomodelcore-build:
     - make install
   artifacts: 
     paths:
-      - ../install
+      - install
     
     
 .build_template: &build_template

@@ -1,4 +1,5 @@
 stages:
+  - dependencies
   - build
 
 before_script:
@@ -9,6 +10,16 @@ variables:
   CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
+geomodelcore-build:
+  stage: dependencies
+  script:
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - mkdir geomodelcore-build geomodelcore-install
+    - cmake -Bgeomodel-build -HGeoModelCore
+    - make -j$(nproc) -C geomodelcore-build
+    - make -C geomodelcore-build install DESTDIR=../geomodelcore-install
+    
+    
 .build_template: &build_template
   stage: build
   tags: 

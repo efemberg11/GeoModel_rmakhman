@@ -27,6 +27,8 @@ geomodelcore-build:
   tags: 
     - cvmfs
   script:
+    - echo "PWD; LS"
+    - pwd; ls
     - mkdir build
     - cd build
     - echo "${CMAKE_ARGS}"

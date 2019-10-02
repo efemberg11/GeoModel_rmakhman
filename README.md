@@ -1,8 +1,9 @@
+[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/badges/master/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/commits/master)
+
 # GeoModelIO
 
 GeoModelIO contains all tools needed to read and write the persistent GeoModel tree data from and to file.
 
-[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/badges/master/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/commits/master)
 
 
 # Quick Installation

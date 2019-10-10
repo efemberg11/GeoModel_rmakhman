@@ -1,3 +1,4 @@
+[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelExamples/badges/master/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelExamples/commits/master)
 
 # GeoModelExamples
 

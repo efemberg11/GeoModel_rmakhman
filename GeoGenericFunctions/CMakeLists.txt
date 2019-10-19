@@ -38,3 +38,12 @@ source_group( "src" FILES ${SOURCES} )
 # new test GeoModelCore
 install( TARGETS GeoGenericFunctions EXPORT GeoGenericFunctions-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoGenericFunctions )
+#
+# Version the shared library. (Please update when cutting a new release!)
+#
+set(MYLIB_VERSION_MAJOR 1)
+set(MYLIB_VERSION_MINOR 1)
+set(MYLIB_VERSION_PATCH 0)
+set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
+
+set_target_properties(GeoGenericFunctions PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})

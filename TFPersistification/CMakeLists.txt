@@ -46,3 +46,13 @@ target_link_libraries( TFPersistification PUBLIC GeoModelKernel )
 # Export as part of GeoModelIO
 install( TARGETS TFPersistification EXPORT TFPersistification-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TFPersistification )
+
+#
+# Version the shared library. (Please update when cutting a new release!)
+#
+set(MYLIB_VERSION_MAJOR 1)
+set(MYLIB_VERSION_MINOR 3)
+set(MYLIB_VERSION_PATCH 0)
+set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
+
+set_target_properties(TFPersistification PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})

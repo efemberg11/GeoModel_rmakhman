@@ -41,7 +41,7 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
   bool serialExists = false;                       // flag for existence of ST among childs
   std::string nameChild;
 
-  if(m_getMatEther) getMatEther(); //TODO this is not implemented
+  if(m_getMatEther) getMatEther();
 
   static Geo2G4LVFactory LVFactory;
 
@@ -128,7 +128,7 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
           Query<int> Qint =  av.getId();
           if(Qint.isValid()) id = Qint;
 
-          if(m_matEther == theGeoPhysChild->getLogVol()->getMaterial())
+          if(m_matEther->getName()  == theGeoPhysChild->getLogVol()->getMaterial()->getName() )
             {
               Geo2G4AssemblyVolume* assembly = BuildAssembly(theGeoPhysChild);
 
@@ -137,7 +137,7 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
               else
                 assembly->MakeImprint(theG4LogVolume,theG4Position);
             }
-          else if(m_matHypUr == theGeoPhysChild->getLogVol()->getMaterial())
+          else if(m_matHypUr->getName()  == theGeoPhysChild->getLogVol()->getMaterial()->getName() )
             {
               Geo2G4AssemblyVolume* assembly = BuildAssembly(theGeoPhysChild);
 
@@ -202,8 +202,8 @@ Geo2G4AssemblyVolume* ExtParameterisedVolumeBuilder::BuildAssembly(PVConstLink p
         + theGeoPhysChild->getLogVol()->getName() + ")";
 
       // Check if it is an assembly
-      if(m_matEther == theGeoPhysChild->getLogVol()->getMaterial() || 
-         m_matHypUr == theGeoPhysChild->getLogVol()->getMaterial() )
+      if(m_matEther->getName() == theGeoPhysChild->getLogVol()->getMaterial()->getName() ||
+         m_matHypUr->getName() == theGeoPhysChild->getLogVol()->getMaterial()->getName() )
         {
           // Build the child assembly
           if(!(theG4AssemblyChild = BuildAssembly(theGeoPhysChild))) return 0;
@@ -254,22 +254,14 @@ void ExtParameterisedVolumeBuilder::PrintSTInfo(std::string volume) const
 
 void ExtParameterisedVolumeBuilder::getMatEther() const
 {
-    //TODO: add handling of ETHER
-//  StoreGateSvc* pDetStore=0;
-//  ISvcLocator* svcLocator = Gaudi::svcLocator();
-//  if(svcLocator->service("DetectorStore",pDetStore).isFailure()) {
-//      std::error<< "ExtParameterisedVolumeBuilder: Unable to access Detector Store" << std::endl;
-//  }
-//  else
-//    {
-//      const StoredMaterialManager* theMaterialManager = nullptr;
-//      if(pDetStore->retrieve(theMaterialManager, "MATERIALS").isFailure()) {
-//        std::error<< "ExtParameterisedVolumeBuilder: Unable to access Material Manager" << std::endl;
-//      }
-//      else {
-//        m_matEther = theMaterialManager->getMaterial("special::Ether");
-//        m_matHypUr = theMaterialManager->getMaterial("special::HyperUranium");
-//      }
-//    }
-//  m_getMatEther = false;
+    GeoElement* ethElement = new GeoElement("EtherEl","ET",500.0,0.0);
+    ethElement->ref();
+    GeoMaterial* ether = new GeoMaterial("Ether",0.0);
+    ether->add(ethElement,1.);
+    // "Alternative" assembly material
+    GeoMaterial* hyperUranium = new GeoMaterial("HyperUranium",0.0);
+    hyperUranium->add(ethElement,1.);
+    m_matEther = ether;
+    m_matHypUr = hyperUranium;
+    m_getMatEther = false;
 }

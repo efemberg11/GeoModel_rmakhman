@@ -10,6 +10,7 @@
 
 class Geo2G4AssemblyVolume;
 class GeoMaterial;
+class GeoElement;
 
 class ExtParameterisedVolumeBuilder: public VolumeBuilder
 {

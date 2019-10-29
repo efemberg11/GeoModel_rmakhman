@@ -307,11 +307,14 @@ void GeoMaterial::lock ()
 
   { // ===============Renormalization================================
     double wSum=std::accumulate(m_fraction.begin(),m_fraction.end(),0.0);
-    if (fabs(wSum-1.0)>FLT_EPSILON) { 
-      std::cerr << "Warning in material " 
-		<< m_name 
-		<< ". Mass fractions sum to "      
-	        << wSum << "; renormalizing to 1.0" << std::endl;
+    if (fabs(wSum-1.0)>FLT_EPSILON) // 'FLT_EPSILON' defined in <cfloat>
+    {
+    	if(const char* env_p = std::getenv("GEOMODELKERNEL_VERBOSE")) {
+    		std::cerr << "Warning in material "
+    				<< m_name
+					<< ". Mass fractions sum to "
+					<< wSum << "; renormalizing to 1.0" << std::endl;
+    	}
     }
     double inv_wSum = 1. / wSum;
     for (size_t e=0;e<getNumElements();e++) {m_fraction[e]*=inv_wSum;}

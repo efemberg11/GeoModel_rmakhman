@@ -11,8 +11,8 @@
 #include <map>
 #include <string>
 
-typedef std::map<const GeoMaterial* , G4Material*, std::less<const GeoMaterial*> > matList;
-typedef std::map<std::string, const GeoMaterial*, std::less<std::string> > matNames;
+typedef std::map<std::string , G4Material*, std::less<std::string> > matList;
+typedef std::map<std::string , std::string, std::less<std::string> > matNames;
 
 class Geo2G4MaterialFactory {
 public:

@@ -20,7 +20,6 @@ class Geo2G4LVFactory
   G4LogicalVolume* Build(const PVConstLink,
 			 bool&) const;
     
-  GeoMaterial* Air;
 };
 
 #endif

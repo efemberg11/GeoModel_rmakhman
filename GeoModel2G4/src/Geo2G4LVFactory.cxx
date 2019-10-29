@@ -21,15 +21,7 @@ typedef std::map<const GeoVPhysVol*, G4LogicalVolume*, std::less<const GeoVPhysV
 typedef std::map<const GeoFullPhysVol*, G4LogicalVolume*, std::less<const GeoFullPhysVol*> > fullPVMap;
 
 Geo2G4LVFactory::Geo2G4LVFactory()
-{
-    Air=new GeoMaterial("Air", 1.290*SYSTEM_OF_UNITS::mg/SYSTEM_OF_UNITS::cm3);
-    GeoElement* Oxigen = new GeoElement("Oxygen",  "O", 8.0, 16.0*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
-    GeoElement* Nitrogen = new GeoElement("Nitrogen", "N", 7., 14.0067*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
-    Air->add(Nitrogen, .8);
-    Air->add(Oxigen, .2);
-    Air->lock();
-    
-}
+{}
 
 G4LogicalVolume* Geo2G4LVFactory::Build(const PVConstLink thePhys,
                                         bool& descend) const
@@ -92,8 +84,8 @@ G4LogicalVolume* Geo2G4LVFactory::Build(const PVConstLink thePhys,
         }
     }
   // Actually build the G4Log
-  if (G4VERBOSE > 1) std::cout<<"    ----->Actually build the G4Mat: AIR"<<std::endl;
-  theG4Mat=theMaterialFactory.Build(Air);
+  if (G4VERBOSE > 1) std::cout<<"    ----->Actually build the G4Mat: "<<theLog->getMaterial()->getName()<<std::endl;
+  theG4Mat=theMaterialFactory.Build(theLog->getMaterial());
   if (G4VERBOSE > 1) std::cout<<"    ----->Actually build the G4Solid"<<std::endl;
   theG4Solid = theSolidFactory.Build(theLog->getShape(),theLog->getName());
   if (G4VERBOSE > 1) std::cout<<"    ----->Actually build the G4Log: "<<theLog->getName()<<std::endl;

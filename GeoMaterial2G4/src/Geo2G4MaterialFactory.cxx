@@ -28,18 +28,17 @@ G4Material* Geo2G4MaterialFactory::Build(const GeoMaterial* theMat)
   // Check if this material has already been defined.
   //
   std::string nam = theMat->getName();
-
-  if(m_definedMaterials.find(theMat) != m_definedMaterials.end())
-    return m_definedMaterials[theMat];
-
+  
+  if(m_definedMaterials.find(nam) != m_definedMaterials.end())
+    return m_definedMaterials[nam];
   int nelements = theMat->getNumElements();
-
+    
   // Different actions depending whether we are dealing with
   // standard or extended materials
 
   const GeoExtendedMaterial* extMat = dynamic_cast<const GeoExtendedMaterial*>(theMat);
   G4Material* newmaterial = 0;
-
+  
   if(extMat) {
     G4State state = kStateUndefined;
 
@@ -84,20 +83,31 @@ G4Material* Geo2G4MaterialFactory::Build(const GeoMaterial* theMat)
     newmaterial= new G4Material(nam,
                                 theMat->getDensity(),
                                 nelements);
-
+      
+  
   for (int ii = 0; ii< nelements; ii++)  {
     G4Element* theG4Ele = eFactory.Build(theMat->getElement(ii));
     newmaterial->AddElement(theG4Ele, theMat->getFraction(ii));
   }
 
-  m_definedMaterials[theMat]=newmaterial;
+  m_definedMaterials[theMat->getName()]=newmaterial;
+    
+  if(G4VERBOSE>1) {
+     std::cout <<" ...... DEBUG of m_definedMaterials --- START ---" <<std::endl;
+     for (auto& t : m_definedMaterials)
+        std::cout <<"GeoModelMaterialName: "<< t.first << " ---  G4MaterialName: "
+        << t.second->GetName() << std::endl;
+    
+     std::cout <<" ...... DEBUG of m_definedMaterials --- END ---" <<std::endl;
+    }
+  
 
   // Check if we have the situation when on GeoModel side two different
   // materials share the same name.
   // Print an INFO message if so.
   if(m_definedMatNames.find(nam)==m_definedMatNames.end())
-    m_definedMatNames[nam] = theMat;
-  else if(m_definedMatNames[nam] != theMat)
+    m_definedMatNames[nam] = theMat->getName();
+  else if(m_definedMatNames[nam] != theMat->getName())
     std::cout << "!!! On GeoModel side two different materials share the name: " << std::endl;
   return newmaterial;
 }

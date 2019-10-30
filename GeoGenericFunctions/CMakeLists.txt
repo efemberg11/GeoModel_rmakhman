@@ -6,8 +6,6 @@ file( GLOB HEADERS GeoGenericFunctions/*.h GeoGenericFunctions/*.icc )
 
 # Create the library.
 add_library( GeoGenericFunctions SHARED ${HEADERS} ${SOURCES} )
-set_property( TARGET GeoGenericFunctions
-   PROPERTY PUBLIC_HEADER ${HEADERS} )
 target_include_directories( GeoGenericFunctions PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

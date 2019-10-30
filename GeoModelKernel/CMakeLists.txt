@@ -6,8 +6,6 @@ file( GLOB HEADERS GeoModelKernel/*.h )
 
 # Create the library.
 add_library( GeoModelKernel SHARED ${HEADERS} ${SOURCES} )
-set_property( TARGET GeoModelKernel
-   PROPERTY PUBLIC_HEADER ${HEADERS} )
 target_link_libraries( GeoModelKernel PUBLIC GeoGenericFunctions )
 target_include_directories( GeoModelKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} )
 target_include_directories( GeoModelKernel PUBLIC

@@ -22,12 +22,12 @@ set_target_properties( GeoModelKernel PROPERTIES
 
 # Install the library.
 install( TARGETS GeoModelKernel
-   EXPORT GeoModelCore-export
+   EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    COMPONENT Runtime
    NAMELINK_SKIP )
 install( TARGETS GeoModelKernel
-   EXPORT GeoModelCore-export
+   EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    COMPONENT Development
    NAMELINK_ONLY )

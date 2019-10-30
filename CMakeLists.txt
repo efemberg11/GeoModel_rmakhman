@@ -25,19 +25,19 @@ add_subdirectory( GeoModelKernel )
 # Create and install the version description of the project.
 include( WriteBasicConfigVersionFile )
 write_basic_config_version_file(
-   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/GeoModelCoreVersion.cmake
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Version.cmake
    VERSION ${PROJECT_VERSION}
    COMPATIBILITY SameMajorVersion )
 install(
-   FILES ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/GeoModelCoreVersion.cmake
+   FILES ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Version.cmake
    COMPONENT Development
-   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake )
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 
 # Create and install the description of the libraries.
 install( EXPORT GeoModelCore-export
-   FILE GeoModelCoreConfig.cmake
+   FILE ${PROJECT_NAME}Config.cmake
    COMPONENT Development
-   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake )
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 
 # Set up the packaging of the project using CPack.
 include( GeoModelCorePackaging )

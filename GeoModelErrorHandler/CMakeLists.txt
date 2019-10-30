@@ -1,36 +1,31 @@
-################################################################################
-# Package: GeoModelErrorHandler
-################################################################################
+# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 
-cmake_minimum_required(VERSION 3.10)
+# Set up how CMake should handle file names given to target_sources().
+if( POLICY CMP0076 )
+   cmake_policy( SET CMP0076 OLD )
+endif()
 
-# Declare the package name
-project( "GeoModelErrorHandler" VERSION 1.0.0 LANGUAGES CXX )
-
-# External dependencies:
-find_package( Qt5 COMPONENTS Core )
-
+# Find the header files.
 file( GLOB HEADERS GeoModelErrorHandler/*.h )
 
-# Set targets and properties
-add_library( GeoModelErrorHandler SHARED ${HEADERS} ${SOURCES} )
-target_include_directories( GeoModelErrorHandler PUBLIC
+# Set up the library.
+add_library( GeoModelErrorHandler INTERFACE )
+source_group( "GeoModelErrorHandler" FILES ${HEADERS} )
+target_include_directories( GeoModelErrorHandler INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include>
-)
-# Set installation of library headers
-set_property( TARGET GeoModelErrorHandler PROPERTY PUBLIC_HEADER ${HEADERS} )
+   $<INSTALL_INTERFACE:include> )
+target_link_libraries( GeoModelErrorHandler INTERFACE Qt5::Core )
+if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
+   "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
+   target_compile_definitions( GeoModelErrorHandler INTERFACE
+      -DQT_NO_DEBUG_OUTPUT )
+endif()
 
-# Export as part of GeoModelIO
-install( TARGETS GeoModelErrorHandler EXPORT GeoModelErrorHandler-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
- PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelErrorHandler )
-
-#
-# Version the shared library. (Please update when cutting a new release!)
-#
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 3)
-set(MYLIB_VERSION_PATCH 0)
-set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
-
-set_target_properties(GeoModelErrorHandler PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
+# Install the library.
+install( TARGETS GeoModelErrorHandler
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   COMPONENT Development )
+install( FILES ${HEADERS}
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelErrorHandler
+   COMPONENT Development )

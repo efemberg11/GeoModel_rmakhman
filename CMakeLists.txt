@@ -34,7 +34,7 @@ install(
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 
 # Create and install the description of the libraries.
-install( EXPORT GeoModelCore-export
+install( EXPORT ${PROJECT_NAME}-export
    FILE ${PROJECT_NAME}Config.cmake
    COMPONENT Development
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )

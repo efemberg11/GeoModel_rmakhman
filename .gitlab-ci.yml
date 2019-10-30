@@ -38,10 +38,10 @@ build_slc6_builtin_eigen3:
   <<: *build_template
   image: cern/slc6-base
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DBUILTIN_EIGEN3=TRUE
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
 
 build_cc7_builtin_eigen3:
   <<: *build_template
   image: cern/cc7-base
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DBUILTIN_EIGEN3=TRUE
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE

@@ -11,6 +11,9 @@ set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
    "Require the specified C++ standard for the build" )
 
+# Make the module directory visible to CMake.
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+
 # Project's dependencies.
 find_package( GeoModelCore REQUIRED )
 find_package( Qt5 COMPONENTS Core Sql REQUIRED )
@@ -53,3 +56,6 @@ install(
    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
    COMPONENT Development
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
+
+# Set up the packaging of the project using CPack.
+include( GeoModelIOPackaging )

@@ -25,11 +25,12 @@ add_subdirectory( GeoModelKernel )
 # Create and install the version description of the project.
 include( WriteBasicConfigVersionFile )
 write_basic_config_version_file(
-   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Version.cmake
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}ConfigVersion.cmake
    VERSION ${PROJECT_VERSION}
    COMPATIBILITY SameMajorVersion )
 install(
-   FILES ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Version.cmake
+   FILES
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}ConfigVersion.cmake
    COMPONENT Development
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 
@@ -37,6 +38,7 @@ install(
 install( EXPORT ${PROJECT_NAME}-export
    FILE ${PROJECT_NAME}Targets.cmake
    COMPONENT Development
+   NAMESPACE "${PROJECT_NAME}::"
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 
 # Install the hand-written project configuration.

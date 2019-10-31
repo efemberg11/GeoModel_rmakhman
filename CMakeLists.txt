@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelCore" VERSION 1.1.1 LANGUAGES CXX )
+project( "GeoModelCore" VERSION 1.2.1 LANGUAGES CXX )
 
 # Set default build options.
 set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
@@ -35,7 +35,17 @@ install(
 
 # Create and install the description of the libraries.
 install( EXPORT ${PROJECT_NAME}-export
-   FILE ${PROJECT_NAME}Config.cmake
+   FILE ${PROJECT_NAME}Targets.cmake
+   COMPONENT Development
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
+
+# Install the hand-written project configuration.
+configure_file( ${CMAKE_SOURCE_DIR}/cmake/GeoModelCoreConfig.cmake.in
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+   @ONLY )
+install(
+   FILES
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
    COMPONENT Development
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 

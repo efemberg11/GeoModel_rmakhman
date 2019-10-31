@@ -7,7 +7,7 @@ file( GLOB HEADERS TFPersistification/*.h )
 # Set up the library.
 add_library( TFPersistification SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( TFPersistification PUBLIC
-   GeoGenericFunctions GeoModelKernel )
+   GeoModelCore::GeoGenericFunctions GeoModelCore::GeoModelKernel )
 target_include_directories( TFPersistification PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
@@ -18,7 +18,7 @@ set_target_properties( TFPersistification PROPERTIES
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
    "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-    target_compile_definitions( TFPersistification PUBLIC
+   target_compile_definitions( TFPersistification PUBLIC
       -DQT_NO_DEBUG_OUTPUT )
 endif()
 

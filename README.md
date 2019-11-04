@@ -6,7 +6,7 @@ This package is still under ferocious development; we are not releasing pre-buil
 
 # Installation instructions (Ubuntu Bionic, Disco, or Eoan)
 
-These instructions will install to /usr/local
+**These instructions will install to /usr/local**
 
 sudo add-apt-repository ppa:kaktusjoe/geomodel
 
@@ -16,7 +16,7 @@ sudo apt install geomodel-io-dev
 
 sudo apt install soqt
 
-Then, checkout the source code (git clone or download)
+**Then, checkout the source code (git clone or download)**
 
 cd geomodelvisualization
 

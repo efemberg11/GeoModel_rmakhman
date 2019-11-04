@@ -20,9 +20,11 @@ brew install geomodelcore
 on macOS Mojave, the command above will install pre-compiled binaries, so the installation is quick. On other macOS versions, `brew` will build the library from its source code.
 
 
-## Ubuntu
+## Ubuntu (Bionic, Disco, or Eoan)
 
-_coming soon_
+sudo add-apt-repository ppa:kaktusjoe/geomodel
+sudo apt-get update
+sudo apt install geomodel-core-dev
 
 ----
 

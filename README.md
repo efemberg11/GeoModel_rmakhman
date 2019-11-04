@@ -23,8 +23,11 @@ on macOS Mojave, the command above will install pre-compiled binaries, so the in
 ## Ubuntu (Bionic, Disco, or Eoan)
 
 sudo add-apt-repository ppa:kaktusjoe/geomodel
+
 sudo apt-get update
+
 sudo apt install geomodel-core-dev
+
 
 ----
 

@@ -12,6 +12,13 @@ sudo apt-get update
 
 sudo apt install geomodel-explorer
 
+# Running GeoModelExplorer:
+
+You just have to execute the following command;( database files can be downloaded from ....? )
+
+gmex [-d myGeoFile.db]
+
+
 # Build from source (Ubuntu Bionic, Disco, or Eoan)
 
 
@@ -38,13 +45,6 @@ cmake ..
 make -j
 
 sudo make install
-
-
-# Running GeoModelExplorer:
-
-You just have to execute the following command;( database files can be downloaded from ....? )
-
-gmex [-d myGeoFile.db]
 
 
 

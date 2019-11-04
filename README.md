@@ -22,7 +22,11 @@ on macOS Mojave, the command above will install pre-compiled binaries, so the in
 
 ## Ubuntu
 
-_coming soon_
+sudo add-apt-repository ppa:kaktusjoe/geomodel
+
+sudo apt-get update
+
+sudo apt install geomodel-io-dev
 
 ----
 

@@ -4,7 +4,16 @@ Visualization of GeoModel geometry.  This project contains the code for the GeoM
 
 This package is still under ferocious development; we are not releasing pre-build code at this point.  We estimate binary distribution kits for Macintosh and Ubuntu platforms by January 2020. 
 
-# Installation instructions (Ubuntu Bionic, Disco, or Eoan)
+# Quick installation instructions (Ubuntu Bionic, Disco, or Eoan)
+
+sudo add-apt-repository ppa:kaktusjoe/geomodel
+
+sudo apt-get update
+
+sudo apt install geomodel-explorer
+
+# Build from source (Ubuntu Bionic, Disco, or Eoan)
+
 
 **These instructions will install to /usr/local**
 
@@ -32,4 +41,11 @@ sudo make install
 
 
 # Running GeoModelExplorer:
+
+You just have to execute the following command;( database files can be downloaded from ....? )
+
+gmex [-d myGeoFile.db]
+
+
+
 

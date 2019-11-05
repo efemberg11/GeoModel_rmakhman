@@ -8,4 +8,4 @@
 
 ### Geometry DB
 
-- Original ATLAS Geometry DB presentation: Boudreau J, Tsulaia V, Hawkings R, Valassi A, Schaffer A, “Software Solutions for Variable ATLAS Detector Description", CHEP 2006, https://indico.cern.ch/event/408139/timetable/?view=standard#67-software-solutions-for-a-va
+- Original ATLAS Geometry DB presentation: Boudreau J, Tsulaia V, Hawkings R, Valassi A, Schaffer A, “Software Solutions for Variable ATLAS Detector Description", CHEP 2006, <https://indico.cern.ch/event/408139/timetable/?view=standard#67-software-solutions-for-a-va>

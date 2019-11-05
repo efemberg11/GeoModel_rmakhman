@@ -1,0 +1,32 @@
+site_name: GeoModel - A Detector Description Toolkit for HEP
+site_description: GeoModel - An experiment-agnostic Detector Description Toolkit for HEP
+site_author: ATLAS Collaboration & Contributors
+site_url: https://cern.ch/geomodel
+repo_name: GitLab
+repo_url: https://gitlab.cern.ch/GeoModelDev/Documentation
+theme:
+    name: material
+nav:
+    - Home: 'index.md'
+    - Papers & Presentations:
+        'Public': 'papers/public.md'
+        'Internal': 'papers/internal.md'
+    - Getting Started:
+        'Install the Libraries': 'start/start_install.md'
+        'The Basic Concepts': 'start/start_basic_concepts.md'
+        'The Basic Building Blocks': 'start/start_basic_building_blocks.md'
+    - How To:
+        'How to Build a basic geometry programmatically': 'how/how_basic_geo_cpp.md'
+        'How to Build a simple detector programmatically': 'how/how_simple_detector_cpp.md'
+        'How to Persistify the detector description to a file': 'how/how_dump_geo.md'
+        'How to Load a detector description from a file': 'how/how_load_geo.md'
+        'How to describe a detector description within a file': 'how/how_describe_geo_file.md'
+    - For Developers:
+        'Build the Libraries': 'dev/build.md'
+extra_css:
+    - material_nested_lists_rendering.css
+markdown_extensions:
+    - admonition
+    - pymdownx.superfences
+    - toc:
+        permalink: true

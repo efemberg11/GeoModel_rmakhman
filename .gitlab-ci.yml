@@ -7,7 +7,7 @@ building:
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
     script:
         - mkdocs build --clean --site-dir public
-        # - cp .htaccess public/papers/internal/
+        - cp .htaccess public/papers/internal/
     artifacts:
         paths:
             - public

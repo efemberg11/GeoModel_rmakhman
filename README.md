@@ -28,7 +28,7 @@ sudo add-apt-repository ppa:kaktusjoe/geomodel
 
 sudo apt-get update
 
-sudo apt install geomodel-io-dev libsoqt-dev** [on disco and eoan]**
+sudo apt install geomodel-io-dev libsoqt-dev ** [on disco and eoan]**
 
 sudo apt install libsoqt5-dev, geomodel-io-dev, qt5-default, qtbase5-dev, libqt5opengl5-dev **[on bionic]**
 

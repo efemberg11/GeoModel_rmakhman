@@ -28,7 +28,7 @@ sudo add-apt-repository ppa:kaktusjoe/geomodel
 
 sudo apt-get update
 
-sudo apt install geomodel-io-dev
+sudo apt install geomodel-io-dev libsoqt-dev
 
 sudo apt install soqt
 

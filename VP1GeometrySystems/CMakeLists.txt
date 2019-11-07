@@ -3,7 +3,7 @@
 # Package: VP1GeometryPlugin
 ################################################################################
 
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 
 set(CMAKE_BUILD_TYPE RELEASE)
 #set(CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")

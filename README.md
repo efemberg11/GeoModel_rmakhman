@@ -14,10 +14,13 @@ sudo apt install geomodel-explorer
 
 # Running GeoModelExplorer:
 
-You just have to execute the following command;( database files can be downloaded from ....? )
+You just have to execute the following command:
 
 gmex [-d myGeoFile.db]
 
+Database files can be downloaded from:
+
+https://gitlab.cern.ch/GeoModelDev/geometry-data
 
 # Build from source (Ubuntu Bionic, Disco, or Eoan)
 

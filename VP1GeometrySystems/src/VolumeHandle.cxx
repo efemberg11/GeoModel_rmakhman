@@ -297,6 +297,7 @@ void VolumeHandle::ensureBuildNodeSep()
 		  mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),
 		  mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
     SoTransform *xf=new SoTransform();
+    m_d->nodesep->addChild(xf);
     xf->setMatrix(matr);
   }
   //Add shape child(ren) and get the separator (helper) where we attach the nodesep when volume is visible:

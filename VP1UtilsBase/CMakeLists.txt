@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)

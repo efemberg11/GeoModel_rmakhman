@@ -31,7 +31,6 @@ public:
   VP1Gui(StoreGateSvc* sg, StoreGateSvc* detstore,
 	 ISvcLocator* svclocator,IToolSvc*toolSvc,
 	 const std::vector<std::string>& initialvp1files=std::vector<std::string>(),
-	 const std::string& initialCruiseMode = "NONE", unsigned initialCruiseSeconds = 10,
 	 const std::string& singleEventSource = "", const std::string& singleEventLocalTmpDir = "",
 	 unsigned localFileCacheLimit = 10,
 	 const std::vector<std::string>& availableLocalInputDirectories = std::vector<std::string>() );

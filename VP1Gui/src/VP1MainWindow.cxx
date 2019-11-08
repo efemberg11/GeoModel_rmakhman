@@ -1339,24 +1339,7 @@ void VP1MainWindow::receivedExternalRequest(VP1ExternalRequest request)
 
 //_________________________________________________________________________________
 void VP1MainWindow::request_cruisemodechange()
-{
-  if (0) {//pushButton_cruise->isChecked()) {
-		// if (radioButton_cruise_event->isChecked()) {
-		// 	m_scheduler->setCruiseMode(VP1ExecutionScheduler::EVENT);
-		// 	groupBox_cruise->setTitle("Cruise Mode [event]");
-		// } else if (radioButton_cruise_tab->isChecked()) {
-		// 	m_scheduler->setCruiseMode(VP1ExecutionScheduler::TAB);
-		// 	groupBox_cruise->setTitle("Cruise Mode [tab]");
-		// }
-		//else if (radioButton_cruise_both->isChecked()) {
-		//	m_scheduler->setCruiseMode(VP1ExecutionScheduler::BOTH);
-		//		groupBox_cruise->setTitle("Cruise Mode [event && tab]");
-		//		}
-		//else { assert(0); }
-  } else {
-    m_scheduler->setCruiseMode(VP1ExecutionScheduler::NONE);
-    //groupBox_cruise->setTitle("Cruise Mode [off]");
-  }
+{ 
 }
 
 //_________________________________________________________________________________

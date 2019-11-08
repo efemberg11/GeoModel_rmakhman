@@ -72,8 +72,6 @@ int main(int argc, char** argv)
 
  VP1Gui *vp1gui = new VP1Gui( nullptr, nullptr,nullptr,nullptr, // Storegate to get rid of. 
 			      std::vector<std::string>(),
-			      "NONE", // initial cruise mode
-			      0,      //m_initialCruiseSeconds,
 			      "",     // sourcedir
 			      "",     // local copy dir
 			      0,      // file limit

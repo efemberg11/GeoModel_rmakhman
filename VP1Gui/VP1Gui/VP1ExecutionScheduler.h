@@ -45,26 +45,16 @@ class VP1ExecutionScheduler : public QObject {
 
 public:
 
-   //Cruise mode:
-  enum CruiseMode { NONE,
-		    TAB, //Cycles to a new tab at a fixed interval (when it is loaded - gives soonvisible bonus)
- 		    EVENT,//Proceeds to a new event at a fixed interval (counting from when all visible channels are refreshed)
- 		    BOTH };//Cycles through all tabs and loads next event when they have all been shown.
 
 
-  void setCruiseMode(const CruiseMode&);
-
-  //Fixme: Need shortcut keys for the cruise modes as well as next/prev. tab (for full screen).
 
 
   //init/cleanup:
   static VP1ExecutionScheduler* init(StoreGateSvc* eventStore,
-		             StoreGateSvc* detStore,
+				     StoreGateSvc* detStore,
 				     ISvcLocator* svcLocator,
-					 IToolSvc*toolSvc,
+				     IToolSvc*toolSvc,
 				     QStringList joboptions,
-				     QString initialCruiseMode = "NONE",
-					 unsigned initialCruiseSeconds = 10,
 				     QString singleEventSource = "",
 				     QString singleEventLocalTmpDir = "",
 				     unsigned localFileCacheLimit = 10,
@@ -137,9 +127,6 @@ private slots:
   void startRefreshQueueIfAppropriate();
   void systemNeedErase();
 
-  void performCruise();
-  //OPVASK: void abortCruise();
-  //Start
 
   #if defined BUILDVP1LIGHT
     void passEvent(IVP1System*);

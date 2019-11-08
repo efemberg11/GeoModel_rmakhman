@@ -19,14 +19,11 @@
 //
 //  * Save sys2time data in .vp1 file
 //  * Disable custom controllers between events!
-//  * Integrate with cruise modes (tab and event)
-//  * In tab cruise mode, dont go to next tab until it is ready. Thus,
 //    we need to be able to ask the scheduler if a given tab is ready.
 //  * "Soon to be visible" priority
 //  * General performance optimisation (inline internal methods +
 //    cache iterators).
 //  * Take care of accumulators.
-//  * Accumulate cruise mode (with ETA if it is a given number of events).
 
 /* this to fix the 'ptrdiff_t' does not name a type error with Qt:
  * refs:
@@ -161,13 +158,8 @@ public:
 	bool eraseJustAfterRefresh;
 	IVP1ChannelWidget* postponedUncreateAndDeleteCW;
 
-	CruiseMode cruisemode;
-	QTimer * cruisetimer;
 	bool allVisibleRefreshed() const;
 	bool allSoonVisibleRefreshed() const;
-	void initCruise();
-	void performPostRefreshCruiseActions(IVP1ChannelWidget*cw);
-	bool cruisetab_waitingtoproceed;
 
 	static void warnIfWidgetsAlive();
 
@@ -343,10 +335,6 @@ VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent,
 	m_d->calctimethisevent=0;
 	m_d->currentrefreshsystemestimate=0;
 
-	m_d->cruisemode = NONE;
-	m_d->cruisetimer = new QTimer(this);
-	connect(m_d->cruisetimer, SIGNAL(timeout()), this, SLOT(performCruise()));
-	m_d->cruisetab_waitingtoproceed=false;
 
 	// TODO: VP1Light should work both with env vars and the "settings" file. Env vars discovered at the start of the application, should be converted to settings.
 	#if defined BUILDVP1LIGHT
@@ -395,8 +383,6 @@ VP1ExecutionScheduler* VP1ExecutionScheduler::init( StoreGateSvc* eventStore,
 		ISvcLocator* svcLocator,
 		IToolSvc*toolSvc,
 		QStringList joboptions,
-		QString initialCruiseMode,
-		unsigned initialCruiseSeconds,
 		QString singleEventSource,
 		QString singleEventLocalTmpDir,
 		unsigned localFileCacheLimit,
@@ -497,41 +483,6 @@ VP1ExecutionScheduler* VP1ExecutionScheduler::init( StoreGateSvc* eventStore,
 	}
 
 
-	if (scheduler->m_d->mainwindow->tabWidget_central->count()<=1) {
-		if (initialCruiseMode=="TAB") {
-			VP1Msg::message("ERROR: Can not start in cruisemode TAB unless there are at least 2 tabs loaded from initial .vp1 files. Reverting to cruise mode NONE.");
-			initialCruiseMode="NONE";
-		} else if (initialCruiseMode=="BOTH") {
-			VP1Msg::message("ERROR: Can not start in cruisemode BOTH unless there are at least 2 tabs loaded from initial .vp1 files. Reverting to cruise mode EVENT.");
-			initialCruiseMode="EVENT";
-		}
-	}
-
-	//Set default value of cruisemode (dont use setCruiseMode() since it starts timers):
-	if (initialCruiseMode=="EVENT") {
-		scheduler->m_d->cruisemode=EVENT;
-		//	scheduler->m_d->mainwindow->radioButton_cruise_event->setChecked(true);
-		//		scheduler->m_d->mainwindow->pushButton_cruise->setChecked(true);
-
-	} else if (initialCruiseMode=="TAB") {
-		scheduler->m_d->cruisemode=TAB;
-		//scheduler->m_d->mainwindow->radioButton_cruise_tab->setChecked(true);
-		//scheduler->m_d->mainwindow->pushButton_cruise->setChecked(true);
-	} else if (initialCruiseMode=="BOTH") {
-		scheduler->m_d->cruisemode=BOTH;
-		//scheduler->m_d->mainwindow->radioButton_cruise_both->setChecked(true);
-		//scheduler->m_d->mainwindow->pushButton_cruise->setChecked(true);
-	} else {
-		if (initialCruiseMode!="NONE")
-			VP1Msg::message("ERROR: unknown initial cruise mode "+initialCruiseMode+" (valid are NONE/EVENT/TAB/BOTH). Assuming NONE.");
-		scheduler->m_d->cruisemode=NONE;
-		//scheduler->m_d->mainwindow->radioButton_cruise_event->setChecked(true);
-		//scheduler->m_d->mainwindow->pushButton_cruise->setChecked(false);
-	}
-
-	scheduler->m_d->mainwindow->request_cruisemodechange();
-
-	int cruisesecs = 10;
 
 
 	return scheduler;
@@ -665,9 +616,6 @@ bool VP1ExecutionScheduler::executeNewEvent(const int& runnumber, const unsigned
 	VP1Msg::messageDebug("calling refreshtimer->start()...");
 	m_d->refreshtimer->start();
 
-	VP1Msg::messageDebug("calling initCruise...");
-	m_d->initCruise();
-	VP1Msg::messageDebug("initCruise called.");
 
 	//Flush event queue before reenabling controllers, etc.:
 	qApp->processEvents();
@@ -675,8 +623,6 @@ bool VP1ExecutionScheduler::executeNewEvent(const int& runnumber, const unsigned
 
 	//Enable various user input:
 	m_d->mainwindow->groupBox_channelcontrols->setEnabled(true);
-	//m_d->mainwindow->groupBox_cruise->setEnabled(true);
-	//m_d->mainwindow->groupBox_event->setEnabled(true);
 
 
 	VP1Msg::messageDebug("batch mode: " + QString::number(m_d->batchMode));
@@ -700,8 +646,6 @@ bool VP1ExecutionScheduler::executeNewEvent(const int& runnumber, const unsigned
 	VP1Msg::messageDebug("Disabling user inputs...");
 	//Disable various user input:
 	m_d->mainwindow->groupBox_channelcontrols->setEnabled(false);
-	//m_d->mainwindow->groupBox_cruise->setEnabled(false);
-	//m_d->mainwindow->groupBox_event->setEnabled(false);
 
 	m_d->goingtonextevent = true;
 
@@ -875,7 +819,6 @@ void VP1ExecutionScheduler::refreshSystem(IVP1System*s)
 
 	} // end of hasAllActiveSystemsRefreshed()
 
-	m_d->performPostRefreshCruiseActions(s->channel());
 
 	if (m_d->eraseJustAfterRefresh) {
 		//Someone asked to erase the system while it was refreshing!
@@ -1248,144 +1191,7 @@ bool VP1ExecutionScheduler::Imp::allSoonVisibleRefreshed() const
 	return true;
 }
 
-//___________________________________________________________________
-void VP1ExecutionScheduler::Imp::performPostRefreshCruiseActions(IVP1ChannelWidget*cw) {
 
-	//Abort if not in cruise mode, or if the system just refreshed did
-	//not make cw fully refreshed:
-	if (cruisemode==NONE||!scheduler->hasAllActiveSystemsRefreshed(cw))
-		return;
-
-	if (cruisemode==EVENT) {
-		//Abort if this refresh did not make all visible channels refreshed:
-		if (!mainwindow->tabManager()->isVisible(cw)||!allVisibleRefreshed())
-			return;
-		//Start the countdown for the next event:
-		assert(!cruisetimer->isActive());
-		cruisetimer->start(10*1000);
-		return;
-	} else if (cruisemode==TAB) {
-		if (cruisetab_waitingtoproceed) {
-			//We are waiting for channels in the next tab to refresh before
-			//we can move on, so we should check if this channel refresh
-			//made all soonvisible channels refreshed. If so: move on.
-			if (allSoonVisibleRefreshed()) {
-				mainwindow->tabManager()->showNextTab();
-				cruisetab_waitingtoproceed=false;
-				//If now all visible are refreshed, we start the timer again.
-				if (allVisibleRefreshed())
-					cruisetimer->start(10*1000);
-			}
-		} else {
-			//Same as in the EVENT case: Check if it is time to start the countdown:
-			//Abort if this refresh did not make all visible channels refreshed:
-			if (!mainwindow->tabManager()->isVisible(cw)||!allVisibleRefreshed())
-				return;
-			//Start the countdown for the next event:
-			assert(!cruisetimer->isActive());
-			cruisetimer->start(10*1000);
-			return;
-		}
-
-		return;
-	} else {
-		assert(cruisemode==BOTH);
-		assert(0&&"not implemented");
-	}
-}
-
-//___________________________________________________________________
-void VP1ExecutionScheduler::Imp::initCruise()
-{
-	//No matter what we stop the timer when changing mode or starting a new event.
-	if (cruisetimer->isActive())
-		cruisetimer->stop();
-	cruisetab_waitingtoproceed=false;
-
-	//FIXME: DO STUFF HERE
-
-	switch (cruisemode) {
-	case NONE:
-		VP1Msg::messageVerbose("initCruise NONE");
-		break;
-	case TAB:
-		if (allVisibleRefreshed())
-			cruisetimer->start(10*1000);
-		VP1Msg::messageVerbose("initCruise TAB");
-		break;
-	case EVENT:
-		//Start cruise countdown if all visible refreshed:
-		if (allVisibleRefreshed())
-			cruisetimer->start(10*1000);
-		VP1Msg::messageVerbose("initCruise EVENT");
-		break;
-	case BOTH:
-		VP1Msg::messageVerbose("initCruise BOTH");
-		break;
-	default:
-		assert(0&&"UNKNOWN CRUISE MODE");
-		break;
-	}
-}
-
-//___________________________________________________________________
-void VP1ExecutionScheduler::setCruiseMode(const CruiseMode& m)
-{
-	if (m_d->cruisemode == m)
-		return;
-	m_d->cruisemode = m;
-
-	m_d->mainwindow->tabManager()->setTabCruiseMode(m==TAB||m==BOTH);
-
-	m_d->initCruise();
-
-}
-
-//Fixme: abort cruise when this and that... (or, sometimes just reset timer).
-
-//___________________________________________________________________
-void VP1ExecutionScheduler::performCruise()
-{
-	//In any case, we should stop the timer (fixme: What if there are 0 visible channels - when will the timer get started again?):
-	m_d->cruisetimer->stop();
-
-	if (!m_d->mainwindow->okToProceedToNextEvent()) {
-		//Hmm. Would like to cruise, but that is not ok. Check back in a few seconds.
-		m_d->cruisetimer->start(3000);
-		return;
-	}
-
-	assert(!m_d->goingtonextevent);//Otherwise it is a bit silly?
-
-	switch (m_d->cruisemode) {
-	case NONE:
-		assert(0&&"should never happen");
-		break;
-	case TAB:
-		assert(m_d->cruisetab_waitingtoproceed==false);
-		if (m_d->allSoonVisibleRefreshed()) {
-			m_d->mainwindow->tabManager()->showNextTab();
-			//If now all visible are refreshed, we start the timer again.
-			if (m_d->allVisibleRefreshed())
-				m_d->cruisetimer->start(10*1000);
-		} else {
-			m_d->cruisetab_waitingtoproceed=true;
-		}
-		break;
-	case EVENT:
-		m_d->mainwindow->goToNextEvent();
-		VP1Msg::messageDebug("Crusing to next event");
-		break;
-	case BOTH:
-		assert(0&&"Not implemented");
-		VP1Msg::messageDebug("ERROR: BOTH cruise mode not implemented");
-		break;
-	default:
-		assert(0&&"UNKNOWN CRUISE MODE");
-		VP1Msg::messageDebug("ERROR: Unknown cruise mode");
-		break;
-	}
-}
 
 //___________________________________________________________________
 QStringList VP1ExecutionScheduler::userRequestedFiles()
@@ -1394,16 +1200,6 @@ QStringList VP1ExecutionScheduler::userRequestedFiles()
 }
 
 
-//When in tabcruise mode:
-//  1) We know that we are not in single-channel FS mode.
-//  2) Soonvisible next
-
-//FS tab mode: What about floating dock widgets? Rather high priority, but those in next tab should get next...
-
-//Actually: Floating widgets from other tabs should get docked anyway when going FS-tab when in cruise-TAB mode...
-
-
-//___________________________________________________________________
 #ifdef BUILDVP1LIGHT
 void VP1ExecutionScheduler::loadEvent(){
   // Get the name of the application:

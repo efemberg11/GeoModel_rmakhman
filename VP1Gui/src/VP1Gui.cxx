@@ -31,7 +31,6 @@ public:
   Imp() : the_scheduler(nullptr), sg(nullptr), detstore(nullptr),
     svclocator(nullptr), toolSvc(nullptr),
     initialvp1files{},
-    initialCruiseSeconds{},
     localFileCacheLimit{}{
     //nop
   }
@@ -43,8 +42,6 @@ public:
   ISvcLocator * svclocator;
   IToolSvc * toolSvc;
   QStringList initialvp1files;
-  QString initialCruiseMode;
-  unsigned initialCruiseSeconds;
   QString singleEventSource;
   QString singleEventLocalTmpDir;
   unsigned localFileCacheLimit;
@@ -56,7 +53,6 @@ public:
 VP1Gui::VP1Gui(StoreGateSvc* sg,StoreGateSvc* detstore,
 	       ISvcLocator* svclocator,IToolSvc*toolSvc,
 	       const std::vector<std::string>& initialvp1files,
-	       const std::string& initialCruiseMode, unsigned initialCruiseSeconds,
 	       const std::string& singleEventSource, const std::string& singleEventLocalTmpDir,
 	       unsigned localFileCacheLimit,
 	       const std::vector<std::string>& availableLocalInputDirectories )
@@ -66,8 +62,6 @@ VP1Gui::VP1Gui(StoreGateSvc* sg,StoreGateSvc* detstore,
   m_d->detstore = detstore;
   m_d->svclocator = svclocator;
   m_d->toolSvc = toolSvc;
-  m_d->initialCruiseMode = QString(initialCruiseMode.c_str()).simplified();
-  m_d->initialCruiseSeconds = initialCruiseSeconds;
   m_d->singleEventSource = singleEventSource.c_str();
   m_d->singleEventLocalTmpDir = singleEventLocalTmpDir.c_str();
   m_d->localFileCacheLimit = localFileCacheLimit;
@@ -113,12 +107,6 @@ bool VP1Gui::argumentsAreValid() const
   //Initial files:
 
   // ...no checks...
-
-  //Cruise mode:
-  if (m_d->initialCruiseMode!="NONE"&&m_d->initialCruiseMode!="EVENT"&&m_d->initialCruiseMode!="TAB"&&m_d->initialCruiseMode!="BOTH") {
-      VP1Msg::message("WARNING: unknown initial cruise mode "+m_d->initialCruiseMode+" (valid are NONE/EVENT/TAB/BOTH). Assuming NONE.");
-      m_d->initialCruiseMode = "NONE";
-  }
 
   //Single-Event-Per-File modes:
   if (!m_d->singleEventSource.isEmpty()&&!m_d->singleEventLocalTmpDir.isEmpty()) {
@@ -189,7 +177,6 @@ void VP1Gui::init()
 						 m_d->svclocator,
 						 m_d->toolSvc,
 						 m_d->initialvp1files,
-						 m_d->initialCruiseMode,m_d->initialCruiseSeconds,
 						 m_d->singleEventSource,m_d->singleEventLocalTmpDir,
 						 m_d->localFileCacheLimit,
 						 m_d->availableLocalInputDirectories);

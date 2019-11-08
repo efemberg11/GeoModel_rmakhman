@@ -26,8 +26,6 @@ file( GLOB HEADERS RunVP1Light/*.h )
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/src")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1UtilsBase")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Gui")
 add_executable ( gmex ${SOURCES} ${HEADERS}  )
 
@@ -41,7 +39,6 @@ include_directories(${Qt5Network_INCLUDE_DIRS} )
 
 include_directories(${Coin3D_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
-include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 
 add_definitions (${Qt5Core_DEFINITIONS})
 add_definitions (${Qt5Gui_DEFINITIONS})
@@ -49,7 +46,7 @@ add_definitions (${Qt5OpenGL_DEFINITIONS})
 add_definitions (${Qt5Widgets_DEFINITIONS})
 add_definitions (${Qt5PrintSupport_DEFINITIONS})
 add_definitions (${Qt5Network_DEFINITIONS})
-target_link_libraries( gmex GXGui GXBase GXHEPVis GXUtilsBase SoQt Coin Qt5Gui Qt5Core Qt5Widgets Qt5Network Qt5PrintSupport )
+target_link_libraries( gmex GXGui GXBase GXHEPVis SoQt Coin Qt5Gui Qt5Core Qt5Widgets Qt5Network Qt5PrintSupport )
 install(TARGETS gmex DESTINATION bin)
 
 

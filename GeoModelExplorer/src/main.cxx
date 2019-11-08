@@ -5,8 +5,6 @@
 // Author: Riccardo.Maria.Bianchi@cern.ch, Apr 2017
 // Update: Apr 2019
 
-#include "RunVP1Light/VP1LightRun.h"
-
 // Qt includes
 #include <QSettings>
 #include <QString>
@@ -14,6 +12,7 @@
 #include <QDebug>
 // #include <QCoreApplication>
 #include <QCommandLineParser>
+#include "VP1Gui/VP1Gui.h"
 
 // C++ includes
 #include <iostream>
@@ -69,8 +68,17 @@ int main(int argc, char** argv)
   }
 
 
-  VP1LightRun vp1light("my first VP1Light test");
 
-  vp1light.initialize();
-  while ( vp1light.execute());
+ VP1Gui *vp1gui = new VP1Gui( nullptr, nullptr,nullptr,nullptr, // Storegate to get rid of. 
+			      std::vector<std::string>(),
+			      "NONE", // initial cruise mode
+			      0,      //m_initialCruiseSeconds,
+			      "",     // sourcedir
+			      "",     // local copy dir
+			      0,      // file limit
+			      std::vector<std::string>());
+ vp1gui->init();
+ while (  vp1gui->executeNewEvent(0,0,0,0));
+ vp1gui->cleanup();
+ delete vp1gui;
 }

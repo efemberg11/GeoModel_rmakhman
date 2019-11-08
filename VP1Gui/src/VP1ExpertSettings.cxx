@@ -42,7 +42,7 @@ VP1ExpertSettings::VP1ExpertSettings(QWidget *parent) : QDialog(parent)
     connect(generalTab, &GeneralTab::signalScreenshotDirChanged, this, &VP1ExpertSettings::setScreenshotDir);
 
     #if defined BUILDVP1LIGHT
-        QString pluginPath=VP1QtUtils::expertSettingValue("expert","ExpertSettings/VP1PLUGINPATH");
+        QString pluginPath=VP1QtUtils::expertSettingValue("expert","ExpertSettings/GXPLUGINPATH");
         QString fileSelectDir=VP1QtUtils::expertSettingValue("expert","ExpertSettings/VP1_FILESELECTDIR");
         QString screenshotDir=VP1QtUtils::expertSettingValue("general","ExpertSettings/VP1_SCREENSHOTS_DIR");
         QString authLog=VP1QtUtils::expertSettingValue("expert","ExpertSettings/VP1_AUTH_ENABLELOG");
@@ -54,7 +54,7 @@ VP1ExpertSettings::VP1ExpertSettings(QWidget *parent) : QDialog(parent)
             connect(advancedTab, &AdvancedTab::signalAuthLogChanged, this, &VP1ExpertSettings::setAuthLog);
         }
     #else
-        QString pluginPath=VP1QtUtils::environmentVariableValue("VP1PLUGINPATH");
+        QString pluginPath=VP1QtUtils::environmentVariableValue("GXPLUGINPATH");
         QString fileSelectDir=VP1QtUtils::environmentVariableValue("VP1_FILESELECTDIR");
         QString screenshotDir=VP1QtUtils::environmentVariableValue("VP1_SCREENSHOTS_DIR");
         QString authLog=VP1QtUtils::environmentVariableValue("VP1_AUTH_ENABLELOG");
@@ -94,12 +94,12 @@ void VP1ExpertSettings::closeEvent(QCloseEvent *event)
 
     // if(QDir(pluginPath).exists()||pluginPath==""){
         #if defined BUILDVP1LIGHT
-            VP1QtUtils::setExpertSetting("expert","ExpertSettings/VP1PLUGINPATH", m_pluginPath);
+            VP1QtUtils::setExpertSetting("expert","ExpertSettings/GXPLUGINPATH", m_pluginPath);
             VP1QtUtils::setExpertSetting("expert","ExpertSettings/VP1_FILESELECTDIR", m_fileSelectDir);
             VP1QtUtils::setExpertSetting("expert","ExpertSettings/VP1_AUTH_ENABLELOG", m_authLog);
             VP1QtUtils::setExpertSetting("general","ExpertSettings/VP1_SCREENSHOTS_DIR", m_screenshotDir);
         #else
-            VP1QtUtils::setEnvironmentVariable("VP1PLUGINPATH", m_pluginPath);
+            VP1QtUtils::setEnvironmentVariable("GXPLUGINPATH", m_pluginPath);
             VP1QtUtils::setEnvironmentVariable("VP1_FILESELECTDIR", m_fileSelectDir);
             VP1QtUtils::setEnvironmentVariable("VP1_AUTH_ENABLELOG", m_authLog);
             VP1QtUtils::setEnvironmentVariable("VP1_SCREENSHOTS_DIR", m_screenshotDir);
@@ -422,20 +422,20 @@ AdvancedTab::AdvancedTab(QWidget *parent)
     m_lineEdit1 = new QLineEdit("", this);
 
     #if defined BUILDVP1LIGHT
-    if(VP1QtUtils::expertSettingValue("expert","ExpertSettings/VP1PLUGINPATH")==""){
+    if(VP1QtUtils::expertSettingValue("expert","ExpertSettings/GXPLUGINPATH")==""){
         #ifdef MACBUNDLE
             m_lineEdit1->setText(QCoreApplication::applicationDirPath()+"/../Frameworks");
         #else
            m_lineEdit1->setText(QCoreApplication::applicationDirPath()+"/../lib");
         #endif
     } else {
-        m_lineEdit1->setText(VP1QtUtils::expertSettingValue("expert","ExpertSettings/VP1PLUGINPATH"));
+        m_lineEdit1->setText(VP1QtUtils::expertSettingValue("expert","ExpertSettings/GXPLUGINPATH"));
     }
     #else
-    if(VP1QtUtils::environmentVariableValue("VP1PLUGINPATH")==""){
+    if(VP1QtUtils::environmentVariableValue("GXPLUGINPATH")==""){
         m_lineEdit1->setText(QCoreApplication::applicationDirPath()+"/../lib");
     } else {
-        m_lineEdit1->setText(VP1QtUtils::environmentVariableValue("VP1PLUGINPATH"));
+        m_lineEdit1->setText(VP1QtUtils::environmentVariableValue("GXPLUGINPATH"));
     }
     #endif
     m_lineEdit1->setToolTip( QApplication::translate(__FUNCTION__, "    <html>\n"

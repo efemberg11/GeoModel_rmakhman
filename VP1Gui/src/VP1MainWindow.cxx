@@ -34,7 +34,6 @@
     #include "VP1Gui/VP1SelectEvent.h"
 #endif
 
-#include "VP1UtilsBase/VP1FileUtilities.h"
 
 #include "VP1Base/IVP1ChannelWidget.h"
 #include "VP1Base/IVP1System.h"
@@ -666,7 +665,7 @@ QMap<QString,QString> VP1MainWindow::availableFiles(const QString& extension,
  	qDebug() << "extension:" << extension << "pathvar:" << pathvar << "instareasubdir:" << instareasubdir << "extradirenvvar:" << extradirenvvar << "currentdir:" << currentdir;
 
 
-	//Add directories from extradirenvvar (e.g. $VP1PLUGINPATH)
+	//Add directories from extradirenvvar (e.g. $GXPLUGINPATH)
 	QStringList vp1pluginpath = extradirenvvar.isEmpty() ? QStringList() : QString(::getenv(extradirenvvar.toStdString().c_str())).split(":",QString::SkipEmptyParts);
     if(VP1Msg::debug()){
       qDebug() << "extradirenvvar:" << extradirenvvar;
@@ -675,10 +674,10 @@ QMap<QString,QString> VP1MainWindow::availableFiles(const QString& extension,
 
     #ifdef BUILDVP1LIGHT
 		//Add dir from Expert Settings
-		if(VP1QtUtils::expertSettingValue("expert","ExpertSettings/VP1PLUGINPATH")==""){
+		if(VP1QtUtils::expertSettingValue("expert","ExpertSettings/GXPLUGINPATH")==""){
 			vp1pluginpath<<QCoreApplication::applicationDirPath()+"/../lib";
 		} else{
-			vp1pluginpath<<VP1QtUtils::expertSettingValue("expert","ExpertSettings/VP1PLUGINPATH");
+			vp1pluginpath<<VP1QtUtils::expertSettingValue("expert","ExpertSettings/GXPLUGINPATH");
 		}
 	#endif
 
@@ -735,7 +734,7 @@ VP1Msg::messageDebug("VP1MainWindow::availablePluginFiles()");
 	QString sharedlibsuffix = "so";
 #endif
 
-	return availableFiles( "."+sharedlibsuffix, "LD_LIBRARY_PATH", "vp1plugins", "VP1PLUGINPATH" );
+	return availableFiles( "."+sharedlibsuffix, "LD_LIBRARY_PATH", "gxplugins", "GXPLUGINPATH" );
 
 }
 

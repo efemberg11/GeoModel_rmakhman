@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.12)
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
 set(MYLIB_VERSION_PATCH 0)
-set (CMAKE_BUILD_TYPE RELEASE)
-#set (CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
+set (CMAKE_BUILD_TYPE DEBUG)
+set (CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
 
 project ( "GXGui" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
@@ -38,7 +38,6 @@ QT5_ADD_RESOURCES(UI_RESOURCES_RCC ${UI_RESOURCES})
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1UtilsBase")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 add_library ( GXGui SHARED ${SOURCES} ${HEADERS} ${UI_HDRS} ${UI_RESOURCES_RCC}  )
 
@@ -52,7 +51,7 @@ include_directories(${Qt5Network_INCLUDE_DIRS} )
 include_directories(${Coin3D_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGui ${Qt5Core_LIBRARIES})
+target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt Coin Qt5Gui Qt5Core Qt5Widgets Qt5Network Qt5PrintSupport )
 add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGui

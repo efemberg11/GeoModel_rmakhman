@@ -56,7 +56,6 @@
 #include "VP1Base/VP1AthenaPtrs.h"
 #include "VP1Base/VP1Settings.h"
 
-#include "VP1UtilsBase/VP1BatchUtilities.h"
 
 #include <QApplication>
 #include <QProgressBar>
@@ -143,7 +142,6 @@ public:
 	bool batchModeAllEvents;
 	int batchModeNEvents;
 	bool batchModeRandomConfig;
-	VP1BatchUtilities* batchUtilities;
 
 	VP1AvailEvents * availEvents;
 
@@ -294,7 +292,6 @@ VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent,
 	m_d->mainwindow = new VP1MainWindow(this,availEvents);//mainwindow takes ownership of available events
 	
     m_d->batchMode = false;
-	m_d->batchUtilities = nullptr;
 	m_d->batchModeAllEvents = false;
 	m_d->batchModeNEvents = 0;
     m_d->batchModeRandomConfig = false;
@@ -386,7 +383,6 @@ VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent,
 VP1ExecutionScheduler::~VP1ExecutionScheduler()
 {
 	m_d->refreshtimer->stop();
-	delete m_d->batchUtilities;
 	delete m_d->mainwindow;
 	delete m_d->prioritiser;
 	delete m_d->globalEventFilter;
@@ -492,9 +488,6 @@ VP1ExecutionScheduler* VP1ExecutionScheduler::init( StoreGateSvc* eventStore,
 
 		if ( scheduler->m_d->batchMode ) {
 			if (scheduler->m_d->batchModeRandomConfig ) {
-                if (joboptions.size() != 0 ) {
-				    scheduler->m_d->batchUtilities = new VP1BatchUtilities( qstringlistToVecString(joboptions) );
-                }
 			}
 			QString batchNevents = VP1QtUtils::environmentVariableValue("VP1_BATCHMODE_NEVENTS");
 			if (batchNevents > 0 ) {
@@ -688,11 +681,6 @@ bool VP1ExecutionScheduler::executeNewEvent(const int& runnumber, const unsigned
 
 	VP1Msg::messageDebug("batch mode: " + QString::number(m_d->batchMode));
 
-	if (m_d->batchModeRandomConfig) {
-		VP1Msg::messageDebug("User chose 'batch' and 'batch-random-config'. So we now replace the configuration with a random one from the input set...");
-		QString randomConfigFile = QString::fromStdString( m_d->batchUtilities->getRandomConfigFile() );
-		m_d->mainwindow->replaceConfigurationFile(randomConfigFile);
-	}
 
 	if ( m_d->batchMode && m_d->allVisibleRefreshed() ) { // or m_d->allSystemsRefreshed ???
 			VP1Msg::messageDebug("We're in batch mode, skipping the execution of the GUI...");

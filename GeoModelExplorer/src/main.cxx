@@ -1,17 +1,18 @@
 /*
   Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 */
-
-// Author: Riccardo.Maria.Bianchi@cern.ch, Apr 2017
-// Update: Apr 2019
-
+// Author: Joe Boudreau, repurposed from orginal work from 
+//              Riccardo.Maria.Bianchi@cern.ch, Apr 2017
+// Update: Nov 2019
+//
 // Qt includes
 #include <QSettings>
 #include <QString>
 #include <QDir>
 #include <QDebug>
-// #include <QCoreApplication>
 #include <QCommandLineParser>
+
+//
 #include "VP1Gui/VP1Gui.h"
 
 // C++ includes

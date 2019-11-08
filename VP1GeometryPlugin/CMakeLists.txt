@@ -42,8 +42,6 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1UtilsBase")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1Utils")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1GeometrySystems")
 add_library ( GXGeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 
@@ -58,7 +56,7 @@ include_directories(${Qt5Sql_INCLUDE_DIRS} )
 include_directories(${Coin3D_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGeometryPlugin ${Qt5Core_LIBRARIES} GXGeometrySystems GXGui GXBase GXHEPVis GXUtilsBase SoQt Coin Qt5Gui Qt5Core Qt5Widgets Qt5Network Qt5PrintSupport GeoModelKernel GeoGenericFunctions GeoModelRead TFPersistification GeoModelDBManager )
+target_link_libraries (GXGeometryPlugin ${Qt5Core_LIBRARIES} GXGeometrySystems GXGui GXBase GXHEPVis SoQt Coin Qt5Gui Qt5Core Qt5Widgets Qt5Network Qt5PrintSupport GeoModelKernel GeoGenericFunctions GeoModelRead TFPersistification GeoModelDBManager )
 add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGeometryPlugin

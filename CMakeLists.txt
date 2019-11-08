@@ -13,5 +13,4 @@ add_subdirectory(GeoModelExplorer)
 add_subdirectory(VP1Gui)
 add_subdirectory(VP1Base)
 add_subdirectory(VP1HEPVis)
-add_subdirectory(VP1UtilsBase)
 

@@ -50,12 +50,7 @@ public:
 
 
   //init/cleanup:
-  static VP1ExecutionScheduler* init(
-				     QStringList joboptions,
-				     QString singleEventSource = "",
-				     QString singleEventLocalTmpDir = "",
-				     unsigned localFileCacheLimit = 10,
-				     QStringList availableLocalInputDirectories = QStringList() );
+  static VP1ExecutionScheduler* init();
   static void cleanup(VP1ExecutionScheduler*);
 
   //Call when new event data are available (returns false when the user closes the program)

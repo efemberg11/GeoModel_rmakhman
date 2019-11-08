@@ -373,12 +373,7 @@ VP1ExecutionScheduler::~VP1ExecutionScheduler()
 }
 
 //___________________________________________________________________
-VP1ExecutionScheduler* VP1ExecutionScheduler::init(
-		QStringList joboptions,
-		QString singleEventSource,
-		QString singleEventLocalTmpDir,
-		unsigned localFileCacheLimit,
-		QStringList availableLocalInputDirectories )
+VP1ExecutionScheduler* VP1ExecutionScheduler::init()
 {
 	//First we make sure the DISPLAY variable is set (importing ROOT in
 	//athena.py might cause it to be unset!).
@@ -437,46 +432,7 @@ VP1ExecutionScheduler* VP1ExecutionScheduler::init(
 	}
 
 	VP1AvailEvents * availEvents(0);
-	if (!singleEventSource.isEmpty()&&!singleEventLocalTmpDir.isEmpty()) {
-		const bool httpmode = singleEventSource.startsWith("http://");
-		const bool httpsmode = singleEventSource.startsWith("https://");
-		//Create appropriate instance:
-		if (httpmode) {
-			availEvents = new VP1AvailEvtsHttp(singleEventSource, 60/*update interval*/, 30*60/*time cut for new*/, singleEventLocalTmpDir,localFileCacheLimit);
-		} else if(httpsmode) {
-			availEvents = new VP1AvailEvtsHttps(singleEventSource, 1000/*update interval*/, 30*60/*time cut for new*/, singleEventLocalTmpDir,localFileCacheLimit);
-		} else {
-			availEvents = new VP1AvailEvtsLocalDir(5*60/*time cut for new*/, singleEventSource,
-					singleEventLocalTmpDir,localFileCacheLimit);
-			static_cast<VP1AvailEvtsLocalDir*>(availEvents)->setAvailableSourceDirectories(availableLocalInputDirectories);
-
-		}
-
-	}
-
 	VP1ExecutionScheduler*scheduler = new VP1ExecutionScheduler(0,availEvents);
-
-	//Pass on "joboptions"
-	if (joboptions.empty()) {
-		//scheduler->m_d->mainwindow->tabManager()->addNewTab("My Tab");
-	} else {
-        qDebug() << "config files: " << joboptions; // DEBUG
-		foreach(QString opt,joboptions)
-    		  scheduler->m_d->mainwindow->loadConfigurationFromFile(opt);
-
-		if ( scheduler->m_d->batchMode ) {
-			if (scheduler->m_d->batchModeRandomConfig ) {
-			}
-			QString batchNevents = VP1QtUtils::environmentVariableValue("VP1_BATCHMODE_NEVENTS");
-			if (batchNevents > 0 ) {
-				scheduler->m_d->batchModeNEvents = batchNevents.toInt();
-			}
-		}
-	}
-
-
-
-
 	return scheduler;
 }
 

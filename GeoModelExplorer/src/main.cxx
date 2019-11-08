@@ -70,13 +70,8 @@ int main(int argc, char** argv)
 
 
 
- VP1Gui *vp1gui = new VP1Gui( std::vector<std::string>(),
-			      "",     // sourcedir
-			      "",     // local copy dir
-			      0,      // file limit
-			      std::vector<std::string>());
- vp1gui->init();
- while (  vp1gui->executeNewEvent(0,0,0,0));
- vp1gui->cleanup();
- delete vp1gui;
+  VP1Gui gui;
+  gui.init();
+  while (  gui.executeNewEvent(0,0,0,0));
+  gui.cleanup();
 }

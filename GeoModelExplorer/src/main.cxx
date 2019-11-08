@@ -70,8 +70,7 @@ int main(int argc, char** argv)
 
 
 
- VP1Gui *vp1gui = new VP1Gui( nullptr, nullptr,nullptr,nullptr, // Storegate to get rid of. 
-			      std::vector<std::string>(),
+ VP1Gui *vp1gui = new VP1Gui( std::vector<std::string>(),
 			      "",     // sourcedir
 			      "",     // local copy dir
 			      0,      // file limit

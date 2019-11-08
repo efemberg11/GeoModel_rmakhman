@@ -268,15 +268,10 @@ private:
 
 //___________________________________________________________________
 VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent,
-		StoreGateSvc* eventStore,
-		StoreGateSvc* detStore,
-		ISvcLocator* svcLocator,
-		IToolSvc*toolSvc,
 		VP1AvailEvents * availEvents)
 : QObject(parent), m_d(new Imp)
 {
 	m_d->availEvents = availEvents;
-	VP1AthenaPtrs::setPointers(eventStore,detStore,svcLocator,toolSvc);
 	m_d->eventsProcessed = 0;
 
 	m_d->scheduler = this;
@@ -378,10 +373,7 @@ VP1ExecutionScheduler::~VP1ExecutionScheduler()
 }
 
 //___________________________________________________________________
-VP1ExecutionScheduler* VP1ExecutionScheduler::init( StoreGateSvc* eventStore,
-		StoreGateSvc* detStore,
-		ISvcLocator* svcLocator,
-		IToolSvc*toolSvc,
+VP1ExecutionScheduler* VP1ExecutionScheduler::init(
 		QStringList joboptions,
 		QString singleEventSource,
 		QString singleEventLocalTmpDir,
@@ -462,7 +454,7 @@ VP1ExecutionScheduler* VP1ExecutionScheduler::init( StoreGateSvc* eventStore,
 
 	}
 
-	VP1ExecutionScheduler*scheduler = new VP1ExecutionScheduler(0,eventStore,detStore,svcLocator,toolSvc,availEvents);
+	VP1ExecutionScheduler*scheduler = new VP1ExecutionScheduler(0,availEvents);
 
 	//Pass on "joboptions"
 	if (joboptions.empty()) {

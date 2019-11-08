@@ -28,8 +28,7 @@
 //____________________________________________________________________
 class VP1Gui::Imp {
 public:
-  Imp() : the_scheduler(nullptr), sg(nullptr), detstore(nullptr),
-    svclocator(nullptr), toolSvc(nullptr),
+  Imp() : the_scheduler(nullptr),
     initialvp1files{},
     localFileCacheLimit{}{
     //nop
@@ -37,10 +36,6 @@ public:
   VP1ExecutionScheduler * the_scheduler;
 
   //We hold the arguments here until init is called:
-  StoreGateSvc * sg;
-  StoreGateSvc * detstore;
-  ISvcLocator * svclocator;
-  IToolSvc * toolSvc;
   QStringList initialvp1files;
   QString singleEventSource;
   QString singleEventLocalTmpDir;
@@ -50,18 +45,12 @@ public:
 
 
 //____________________________________________________________________
-VP1Gui::VP1Gui(StoreGateSvc* sg,StoreGateSvc* detstore,
-	       ISvcLocator* svclocator,IToolSvc*toolSvc,
-	       const std::vector<std::string>& initialvp1files,
+VP1Gui::VP1Gui(const std::vector<std::string>& initialvp1files,
 	       const std::string& singleEventSource, const std::string& singleEventLocalTmpDir,
 	       unsigned localFileCacheLimit,
 	       const std::vector<std::string>& availableLocalInputDirectories )
  : m_d(new Imp)
 {
-  m_d->sg = sg;
-  m_d->detstore = detstore;
-  m_d->svclocator = svclocator;
-  m_d->toolSvc = toolSvc;
   m_d->singleEventSource = singleEventSource.c_str();
   m_d->singleEventLocalTmpDir = singleEventLocalTmpDir.c_str();
   m_d->localFileCacheLimit = localFileCacheLimit;
@@ -86,27 +75,6 @@ VP1Gui::~VP1Gui()
 bool VP1Gui::argumentsAreValid() const
 {
   //Athena pointers:
-
-  if (!m_d->sg) {
-    VP1Msg::message("ERROR: Null pointer to event store.");
-    return false;
-  }
-  if (!m_d->detstore) {
-    VP1Msg::message("ERROR: Null pointer to detector store.");
-    return false;
-  }
-  if (!m_d->svclocator) {
-    VP1Msg::message("ERROR: Null pointer to service locator.");
-    return false;
-  }
-  if (!m_d->toolSvc) {
-    VP1Msg::message("ERROR: Null pointer to tool service.");
-    return false;
-  }
-
-  //Initial files:
-
-  // ...no checks...
 
   //Single-Event-Per-File modes:
   if (!m_d->singleEventSource.isEmpty()&&!m_d->singleEventLocalTmpDir.isEmpty()) {
@@ -172,10 +140,7 @@ void VP1Gui::init()
   VP1Msg::message("               Launching the VP1 GUI");
   VP1Msg::message("===================================================");
   VP1Msg::message("");
-  m_d->the_scheduler = VP1ExecutionScheduler::init(m_d->sg,
-		                 m_d->detstore,
-						 m_d->svclocator,
-						 m_d->toolSvc,
+  m_d->the_scheduler = VP1ExecutionScheduler::init(
 						 m_d->initialvp1files,
 						 m_d->singleEventSource,m_d->singleEventLocalTmpDir,
 						 m_d->localFileCacheLimit,

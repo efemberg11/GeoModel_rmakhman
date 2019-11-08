@@ -50,10 +50,7 @@ public:
 
 
   //init/cleanup:
-  static VP1ExecutionScheduler* init(StoreGateSvc* eventStore,
-				     StoreGateSvc* detStore,
-				     ISvcLocator* svcLocator,
-				     IToolSvc*toolSvc,
+  static VP1ExecutionScheduler* init(
 				     QStringList joboptions,
 				     QString singleEventSource = "",
 				     QString singleEventLocalTmpDir = "",
@@ -65,8 +62,6 @@ public:
   bool executeNewEvent(const int& runnumber, const unsigned long long& eventnumber, const unsigned& triggerType = 0, const unsigned& time = 0);//
 
   VP1ExecutionScheduler(QObject * parent,
-			StoreGateSvc*eventStore,StoreGateSvc*detStore,
-			ISvcLocator* svcLocator,IToolSvc*toolSvc,
 			VP1AvailEvents * availEvents);
   virtual ~VP1ExecutionScheduler();
 

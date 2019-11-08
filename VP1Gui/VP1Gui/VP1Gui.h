@@ -28,8 +28,7 @@ class ISvcLocator;
 class VP1Gui {
 public:
 
-  VP1Gui(StoreGateSvc* sg, StoreGateSvc* detstore,
-	 ISvcLocator* svclocator,IToolSvc*toolSvc,
+  VP1Gui(
 	 const std::vector<std::string>& initialvp1files=std::vector<std::string>(),
 	 const std::string& singleEventSource = "", const std::string& singleEventLocalTmpDir = "",
 	 unsigned localFileCacheLimit = 10,

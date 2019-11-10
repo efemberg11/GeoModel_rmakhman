@@ -1189,6 +1189,7 @@ QString VP1MainWindow::request_saveChannelSnapshot(QString xLabel)
 
 	pm.save(filename);
 	return filename;
+
 }
 
 //_________________________________________________________________________________

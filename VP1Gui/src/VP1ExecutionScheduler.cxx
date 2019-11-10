@@ -135,11 +135,6 @@ public:
 
 	long int eventsProcessed;
 
-	bool batchMode;
-	bool batchModeAllEvents;
-	int batchModeNEvents;
-	bool batchModeRandomConfig;
-
 	VP1AvailEvents * availEvents;
 
 	QTimer * refreshtimer;
@@ -278,10 +273,6 @@ VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent,
 	m_d->prioritiser = new VP1Prioritiser(this);
 	m_d->mainwindow = new VP1MainWindow(this,availEvents);//mainwindow takes ownership of available events
 	
-    m_d->batchMode = false;
-	m_d->batchModeAllEvents = false;
-	m_d->batchModeNEvents = 0;
-    m_d->batchModeRandomConfig = false;
 
 	m_d->allSystemsRefreshed = false;
 	m_d->goingtonextevent=true;
@@ -304,24 +295,8 @@ VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent,
 	// Init and show the main window of VP1
 	SoQt::init( m_d->mainwindow );// SoQt::init( "VP1" );
 
-	// check if 'batch mode'
-	bool batchMode = VP1QtUtils::environmentVariableIsSet("VP1_BATCHMODE"); // ::getenv("VP1_BATCHMODE");
-    if(VP1Msg::debug()){
-		qDebug() << "VP1ExecutionScheduler:: Do we run in 'batch' mode?" << batchMode;
-	}
-	if (batchMode) {
-		VP1Msg::messageWarningAllRed("User has run VP1 in 'batch-mode', so the main window of the program will not be shown.");
-		m_d->batchMode = true;
 
-		// check if the user set the "all events" option as well
-		m_d->batchModeAllEvents = VP1QtUtils::environmentVariableIsSet("VP1_BATCHMODE_ALLEVENTS");
-
-		// check if the user set the "random configuration file" option as well
-		m_d->batchModeRandomConfig = VP1QtUtils::environmentVariableIsSet("VP1_BATCHMODE_RANDOMCONFIG");
-	}
-	else {
-		m_d->mainwindow->show();
-	}
+	m_d->mainwindow->show();
 
 
 	m_d->pb = m_d->mainwindow->progressbar;
@@ -538,22 +513,17 @@ bool VP1ExecutionScheduler::interact()
 	m_d->mainwindow->groupBox_channelcontrols->setEnabled(true);
 
 
-	VP1Msg::messageDebug("batch mode: " + QString::number(m_d->batchMode));
-
-
-	if ( m_d->batchMode && m_d->allVisibleRefreshed() ) { // or m_d->allSystemsRefreshed ???
-			VP1Msg::messageDebug("We're in batch mode, skipping the execution of the GUI...");
-	} else {
-		VP1Msg::messageDebug("skipEvent: " + QString::number(m_d->skipEvent));
-		if(m_d->skipEvent) {
-			VP1Msg::messageDebug("skipEvent");
-			m_d->skipEvent=false;
-			//			m_d->mainwindow->nextEvent();
-		}
-		else {
-			VP1Msg::messageDebug("calling qApp->exec()...");
-			qApp->exec();//NOTE!!! We then exit the exec() when someone pushes the "next event" button.
-		}
+	{
+	  VP1Msg::messageDebug("skipEvent: " + QString::number(m_d->skipEvent));
+	  if(m_d->skipEvent) {
+	    VP1Msg::messageDebug("skipEvent");
+	    m_d->skipEvent=false;
+	    //			m_d->mainwindow->nextEvent();
+	  }
+	  else {
+	    VP1Msg::messageDebug("calling qApp->exec()...");
+	    qApp->exec();//NOTE!!! We then exit the exec() when someone pushes the "next event" button.
+	  }
 	}
 
 	VP1Msg::messageDebug("Disabling user inputs...");
@@ -747,79 +717,6 @@ void VP1ExecutionScheduler::refreshSystem(IVP1System*s)
 
 	VP1Msg::messageDebug("end of refreshing the system: " + sysname);
 
-//	// if in "batch mode", now exit from VP1
-//	if (m_d->batchMode) {
-//
-////		if (hasAllActiveSystemsRefreshed(s->channel())) {
-////			VP1Msg::messageWarningRed("All systems refreshed!");
-//
-//		VP1Msg::messageWarningRed("'batch mode'. Now exiting VP1");
-//
-//		// N.B. calling QApplication::quit() here it makes move to the next event;
-//		// NOTE!!!! It can be useful for a batch mode on all events of one single file!!
-//		// TODO: An additional switch to the command line batch option should be implemented
-//		//QApplication::quit();
-//
-//		//for the moment, we only quit VP1.
-//		//To quit the application completely, we have to call "MainWindow::close()"
-//		m_d->mainwindow->close();
-////		}
-//
-//	}
-
-	// ***************************
-	// we now run all the things
-	// that need to be done
-	// after all tabs are drawn...
-	// ***************************
-	if ( hasAllActiveSystemsRefreshed(s->channel()) ) {
-
-
-		if (m_d->batchMode) {
-
-			VP1Msg::messageDebug("we are in 'batch-mode'...");
-			VP1Msg::messageDebug("batchModeNEvents: " + QString::number(m_d->batchModeNEvents) + " - m_d->eventsProcessed: " + QString::number(m_d->eventsProcessed) );
-
-			// saving the snapshot of the 3D window to a file
-			QString save_ok = saveSnaphsotToFile(s, true);
-			if (save_ok == "") {
-				VP1Msg::messageWarningAllRed("FAILED! The snapshot for the channel '" + s->channel()->name() + "' has not been saved!");
-			} else {
-				VP1Msg::message("OK! Snapshot saved to file: " + save_ok);
-			}
-
-
-			if (m_d->batchModeAllEvents) {
-				VP1Msg::messageWarningAllRed("******************************************************************");
-				VP1Msg::messageWarningAllRed("'batch mode' with 'all events' option. Moving to the next event...");
-				VP1Msg::messageWarningAllRed("******************************************************************");
-				// N.B. calling QApplication::quit() here it makes VP1 move to the next event;
-				QApplication::quit();
-				// Now, VP1ExecutionScheduler::executeNewEvent() will end, then VP1Gui::executeNewEvent() will end, then they will start again: first VP1Gui then VP1ExecutionScheduler.
-			} else if ( m_d->batchModeNEvents > 0 ) {
-			    if ( m_d->batchModeNEvents == m_d->eventsProcessed+1) { // here we use +1 because this is performed after the creation of the event snapshot. //TODO: maybe we can move this to a more natural place, at the beginning or at the end of an event
-			    	VP1Msg::messageWarningAllRed("******************************************************************");
-			    	VP1Msg::messageWarningAllRed("'batch mode' with 'batch-n-events' option. Processed the " + QString::number(m_d->eventsProcessed+1) + " events set by the user. Now exiting VP1");
-			    	VP1Msg::messageWarningAllRed("******************************************************************");
-			    	m_d->mainwindow->close();
-			    } else {
-			    	VP1Msg::messageWarningAllRed("'batch mode' with 'batch-n-events' option. Moving to the next event...");
-			    	// N.B. calling QApplication::quit() here it makes VP1 move to the next event;
-			    	QApplication::quit();
-			    	// Now, VP1ExecutionScheduler::executeNewEvent() will end, then VP1Gui::executeNewEvent() will end, then they will start again: first VP1Gui then VP1ExecutionScheduler.
-			    }
-			}
-			else {
-				// We come here if the user did not choose to run batch mode on all events.
-				// Thus, we want to close VP1 completely.
-				// So, in order to do that, we have to call "MainWindow::close()"
-				VP1Msg::messageWarningRed("'batch mode'. Done. Now exiting VP1");
-				m_d->mainwindow->close();
-			}
-
-
-		}
-	}
 }
 
 //___________________________________________________________________
@@ -1113,118 +1010,3 @@ QStringList VP1ExecutionScheduler::userRequestedFiles()
 }
 
 
-#ifdef BUILDVP1LIGHT
-void VP1ExecutionScheduler::loadEvent(){
-  // Get the name of the application:
-  const char* appName = "VP1Light";
-
-  // Initialize the environment:
-  if( !xAOD::Init( appName ).isSuccess() ) {
-	  ::Error( appName, XAOD_MESSAGE( "Failed to execute xAOD::Init" ) );
-     return;
-  }
-
-  m_event = new xAOD::TEvent( xAOD::TEvent::kAthenaAccess );
-
-  // Get local xAOD and set valid xAOD path
-  QSettings settings("ATLAS", "VP1Light");
-  std::string path = settings.value("aod/path").toString().toStdString();
-
-  // Open xAOD file and read it in
-  m_ifile = ::TFile::Open( path.c_str(), "READ" );
-  if( ! m_ifile ) {
-     ::Error( appName, XAOD_MESSAGE( "File %s couldn't be opened..." ),
-              path.c_str() );
-     return;
-  }
-  if( !m_event->readFrom( m_ifile ).isSuccess() ) {
-	  ::Error( appName, XAOD_MESSAGE( "Failed to read from xAOD file %s" ),
-	       path.c_str() );
-     return;
-  }
-
-  // Check if file is empty:
-  if( m_event->getEntry( 0 ) < 0 ) {
-     ::Error( appName, XAOD_MESSAGE( "Couldn't load entry 0 from file %s" ),
-              path.c_str() );
-     return;
-  }
-
-  //Load the current event
-  m_event->getEntry( m_evtNr );
-
-  // List for available collections
-  QStringList jetList;
-  QStringList vertexList;
-  QStringList otherList;
-  QStringList caloClusterList;
-  QStringList trackParticleList;
-  QStringList muonList;
-  QStringList electronList;
-
-
-  // // Loop over all entries in the CollectionTree
-  TTree* ct = (TTree*)m_ifile->Get("CollectionTree");
-  m_totEvtNr = ct->GetEntriesFast();
-  for (int i = 0; i<ct->GetListOfBranches()->GetEntries();i++){
-    std::string className = ct->GetBranch(ct->GetListOfBranches()->At(i)->GetName())->GetClassName();
-
-    // Store collections in their respective QStringList
-    if(split(className,"_v[1-9]")=="DataVector<xAOD::Vertex>"){
-      vertexList << ct->GetListOfBranches()->At(i)->GetName();
-    }
-    if(split(className,"_v[1-9]")=="xAOD::MissingETContainer"){
-      otherList << ct->GetListOfBranches()->At(i)->GetName();
-    }
-    if(split(className,"_v[1-9]")=="DataVector<xAOD::Jet>"){
-      jetList << ct->GetListOfBranches()->At(i)->GetName();
-    }
-    if(split(className,"_v[1-9]")=="DataVector<xAOD::CaloCluster>"){
-      caloClusterList << ct->GetListOfBranches()->At(i)->GetName();
-    }
-    if(split(className,"_v[1-9]")=="DataVector<xAOD::TrackParticle>"){
-      trackParticleList << ct->GetListOfBranches()->At(i)->GetName();
-    }
-    if(split(className,"_v[1-9]")=="DataVector<xAOD::Muon>"){
-      muonList << ct->GetListOfBranches()->At(i)->GetName();
-    }
-    if(split(className,"_v[1-9]")=="DataVector<xAOD::Electron>"){
-      electronList << ct->GetListOfBranches()->At(i)->GetName();
-    }
-  }
-
-  //Fill the collection lists
-  m_list.append(vertexList);
-  m_list.append(otherList);
-  m_list.append(jetList);
-  m_list.append(caloClusterList);
-  m_list.append(trackParticleList);
-  m_list.append(muonList);
-  m_list.append(electronList);
-
-  // Get the event info:
-  const xAOD::EventInfo *eventInfo = nullptr;
-	if( !m_event->retrieve (eventInfo, "EventInfo").isSuccess() ) {
-  	VP1Msg::messageWarningRed("Failed to retrieve EventInfo");
-     return;
-  }
-}
-
-//____________________________________________________________________
-void VP1ExecutionScheduler::passEvent(IVP1System* sys){
-	sys->setEvent(m_event);
-	sys->setObjectList(m_list);
-}
-
-//____________________________________________________________________
-QString VP1ExecutionScheduler::split(const std::string& input, const std::string& regex) {
-  std::regex re(regex);
-  std::sregex_token_iterator first{input.begin(), input.end(), re, -1}, last;
-  std::vector<std::string> vec = {first, last};
-  QStringList list;
-  for (unsigned int i=0;i<vec.size();i++){
-    list << QString::fromStdString(vec[i]);
-  }
-  return list.join("");
-}
-#endif // BUILDVP1LIGHT

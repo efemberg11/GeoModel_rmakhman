@@ -68,14 +68,6 @@ public:
   QString saveSnaphsotToFile(IVP1System* s, bool batch = false);
 
 
-  #if defined BUILDVP1LIGHT
-    void loadEvent();
-    QString split(const std::string& input, const std::string& regex);
-    int getEvtNr(){ return m_evtNr; };
-    void setEvtNr(int evtNr){ m_evtNr = evtNr; };
-    int getTotEvtNr(){ return m_totEvtNr; };
-  #endif // BUILDVP1LIGHT
-
 signals:
   void refreshingStatusChanged(bool);
 

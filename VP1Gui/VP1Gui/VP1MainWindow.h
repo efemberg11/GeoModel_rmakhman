@@ -103,7 +103,6 @@ public slots:
   void request_channelInformation();
   void request_printChannel();
   QString request_saveChannelSnapshot(QString xLabel="");
-  void request_cruisemodechange();
   void request_saveasConfig();
   void request_saveConfig();
   void request_loadConfig();
@@ -185,8 +184,6 @@ protected:
 public:
   QProgressBar*progressbar;
 protected slots:
-  void receivedExternalRequest(VP1ExternalRequest);
-  void processEnqueuedRequests();
   void finishedIncomingDialog();
   void updateTcpIcon();
   void postInitUpdates();

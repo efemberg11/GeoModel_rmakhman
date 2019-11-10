@@ -20,7 +20,6 @@
 #include "VP1Gui/VP1ChannelManager.h"
 #include "VP1Gui/VP1TabManager.h"
 #include "VP1Gui/VP1ExecutionScheduler.h"
-#include "VP1Gui/VP1IncomingMessageDialog.h"
 #include "VP1Gui/VP1PluginDialog.h"
 #include "VP1Gui/VP1DockWidget.h"
 #include "VP1StreamMenuUpdater.h"
@@ -1148,43 +1147,7 @@ void VP1MainWindow::finishedIncomingDialog()
 }
 
 
-//_________________________________________________________________________________
-void VP1MainWindow::processEnqueuedRequests()
-{
-	if (!m_requestqueue.empty())
-		receivedExternalRequest(m_requestqueue.dequeue());
-}
 
-//_________________________________________________________________________________
-void VP1MainWindow::receivedExternalRequest(VP1ExternalRequest request)
-{
-	if (m_blockallmessages)
-		return;
-	if (m_messages_blockedsenders.contains(request.sender()))
-		return;
-	if (m_messages_blockedexactmessages.contains(request))
-		return;
-	if (m_currentincomingdialog) {
-		//Fixme: store TIME of incoming request (to show the user).
-		if (m_requestqueue.count()<999) {
-			m_requestqueue.enqueue(request);
-			m_currentincomingdialog->updatependinginfo();
-		}
-		return;
-	}
-	VP1IncomingMessageDialog * md = new VP1IncomingMessageDialog(request,&m_requestqueue,&m_blockallmessages,
-			&m_messages_blockedsenders,&m_messages_blockedexactmessages,
-			m_tabmanager,m_channelmanager,this);
-	m_currentincomingdialog=md;
-	connect(md,SIGNAL(finished(int)),this,SLOT(finishedIncomingDialog()));
-	m_tabmanager->dropOutOfFullScreen();
-	md->show();
-}
-
-//_________________________________________________________________________________
-void VP1MainWindow::request_cruisemodechange()
-{ 
-}
 
 //_________________________________________________________________________________
 void VP1MainWindow::showMenu_loadPlugin()

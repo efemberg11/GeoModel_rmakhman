@@ -13,12 +13,11 @@
 #include <QCommandLineParser>
 
 //
-#include "VP1Gui/VP1Gui.h"
+#include "VP1Gui/VP1ExecutionScheduler.h"
 
 // C++ includes
 #include <iostream>
 #include <stdlib.h>
-#include <fstream>
 
 int main(int argc, char** argv)
 {
@@ -68,10 +67,8 @@ int main(int argc, char** argv)
     settings.setValue("ExpertSettings/enableExpertSettings","");
   }
 
-
-
-  VP1Gui gui;
-  gui.init();
-  while (  gui.executeNewEvent(0,0,0,0));
-  gui.cleanup();
+  VP1ExecutionScheduler *scheduler=VP1ExecutionScheduler::init();
+  while (scheduler->executeNewEvent(0,0,0,0))
+  VP1ExecutionScheduler::cleanup(scheduler);
+  
 }

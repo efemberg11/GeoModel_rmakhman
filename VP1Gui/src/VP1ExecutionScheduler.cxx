@@ -508,50 +508,15 @@ void VP1ExecutionScheduler::updateProgressBarDuringRefresh()
 }
 
 
-//___________________________________________________________________
-QString VP1ExecutionScheduler::nextRequestedEventFile() const
-{
-	return m_d->nextRequestedEvent;
-}
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::setNextRequestedEventFile(const QString& f)
-{
-	m_d->nextRequestedEvent = f;
-}
-
-//___________________________________________________________________
-bool VP1ExecutionScheduler::executeNewEvent(const int& runnumber, const unsigned long long& eventnumber, const unsigned& triggerType, const unsigned& time)
+bool VP1ExecutionScheduler::interact()
 {
 	VP1Msg::messageDebug("VP1ExecutionScheduler::executeNewEvent()");
 
 	m_d->nextRequestedEvent="";
 
-#if defined BUILDVP1LIGHT
-	unused(runnumber,eventnumber,triggerType,time); // silences the "unused parameter" warnings when building VP1Light. In this case, in fact, those variables will be used later in loadEvent().
-	if ( !firstlaunch ) {
-		if ( (getEvtNr() >= 0) && (getEvtNr() < m_totEvtNr) ) {	// If selected event number is available in file
-			loadEvent();
-			//Pass the event to the AOD System
-			std::set<IVP1System *>::iterator itsys, itsysE = m_d->mainwindow->tabManager()->selectedChannelWidget()->systems().end();
-			for (itsys = m_d->mainwindow->tabManager()->selectedChannelWidget()->systems().begin();itsys!=itsysE;++itsys) {
-				if((*itsys)->name()=="Analysis"){
-					passEvent(*itsys);
-				}
-			}
-		}
-		else if ( (getEvtNr() < 0) && (getEvtNr() >= m_totEvtNr) ) {
-			QMessageBox msgBox;
-			msgBox.setWindowTitle("No more events");
-			msgBox.setText("There are no more events in this file. Returning to previous event.");
-			msgBox.setIcon(QMessageBox::Icon::Information);
-			msgBox.exec();
-		}
-	}
-	else{
-		firstlaunch = false;
-	}
-#endif
+
 
 	m_d->goingtonextevent = false;
 	m_d->calctimethisevent=0;
@@ -583,7 +548,7 @@ bool VP1ExecutionScheduler::executeNewEvent(const int& runnumber, const unsigned
 		if(m_d->skipEvent) {
 			VP1Msg::messageDebug("skipEvent");
 			m_d->skipEvent=false;
-			m_d->mainwindow->nextEvent();
+			//			m_d->mainwindow->nextEvent();
 		}
 		else {
 			VP1Msg::messageDebug("calling qApp->exec()...");

@@ -27,13 +27,6 @@
 #include "VP1Gui/VP1AvailEvtsLocalDir.h"
 #include "VP1StreamMenuUpdater.h"
 
-#ifdef BUILDVP1LIGHT
-    #include "VP1Gui/VP1ExpertSettings.h"
-    #include "VP1Gui/VP1GeoDBSelection.h"
-    #include "VP1Gui/VP1AODSelection.h"
-    #include "VP1Gui/VP1SelectEvent.h"
-#endif
-
 
 #include "VP1Base/IVP1ChannelWidget.h"
 #include "VP1Base/IVP1System.h"
@@ -787,60 +780,6 @@ bool VP1MainWindow::okToProceedToNextEvent() const
 }
 
 
-//_________________________________________________________________________________
-void VP1MainWindow::nextEvent() {
-	m_betweenevents=true;
-    if (m_availEvents) {
-        QList<VP1EventFile>  evts = m_availEvents->freshEvents();
-		if (evts.empty()) {
-			addToMessageBox("ERROR: Going to next event, but one is not available!");
-			m_scheduler->setNextRequestedEventFile("");
-		} else {
-			m_scheduler->setNextRequestedEventFile(evts.front().fileName());
-		}
-	}
-	updateEventControls();
-}
-
-//_________________________________________________________________________________
-void VP1MainWindow::goToNextEvent() {
-	#if defined BUILDVP1LIGHT
-			std::cout << "goToNextEvent: \n"
-					 << "m_scheduler->getEvtNr()+2: " << m_scheduler->getEvtNr()+2
-					 << "\nm_scheduler->getTotEvtNr(): " << m_scheduler->getTotEvtNr() << std::endl;
-		if ( m_scheduler->getEvtNr()+2 < m_scheduler->getTotEvtNr() ) {
-			std::cout << "First case" << std::endl;
-			m_scheduler->setEvtNr(m_scheduler->getEvtNr()+1);
-			nextEvent();
-		  qApp->quit();
-		}
-		else if( m_scheduler->getEvtNr()+2 == m_scheduler->getTotEvtNr() ) {
-			std::cout << "Second case" << std::endl;
-			m_scheduler->setEvtNr(m_scheduler->getEvtNr()+1);
-			nextEvent();
-		  qApp->quit();
-		}
-	#else
-	nextEvent();
-  qApp->quit();
-  #endif
-}
-
-#if defined BUILDVP1LIGHT
-//_________________________________________________________________________________
-void VP1MainWindow::goToPreviousEvent() {
-	if ( m_scheduler->getEvtNr()-1 > 0 ) {
-		m_scheduler->setEvtNr(m_scheduler->getEvtNr()-1);
-		nextEvent();
-	  qApp->quit();
-	}
-	else if( m_scheduler->getEvtNr()-1 == 0 ) {
-		m_scheduler->setEvtNr(m_scheduler->getEvtNr()-1);
-		nextEvent();
-	  qApp->quit();
-	}
-}
-#endif
 
 //_________________________________________________________________________________
 void VP1MainWindow::closeEvent(QCloseEvent * event)

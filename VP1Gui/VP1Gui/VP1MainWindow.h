@@ -132,12 +132,7 @@ public slots:
   void helperAddToMessageBox( const QString& );
   void changeFontSize(int);
 
-  //For use when going to a new event (this updates system lists and quit()'s the app):
-  void goToNextEvent();
-  #if defined BUILDVP1LIGHT
-    void goToPreviousEvent();
-    void chooseEvent();
-  #endif
+
 public:
   bool mustQuit() const;
 

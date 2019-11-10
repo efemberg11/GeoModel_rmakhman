@@ -68,7 +68,7 @@ int main(int argc, char** argv)
   }
 
   VP1ExecutionScheduler *scheduler=VP1ExecutionScheduler::init();
-  while (scheduler->executeNewEvent(0,0,0,0))
+  while (scheduler->interact())
   VP1ExecutionScheduler::cleanup(scheduler);
   
 }

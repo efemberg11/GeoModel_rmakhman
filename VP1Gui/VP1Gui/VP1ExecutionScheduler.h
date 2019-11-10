@@ -25,11 +25,6 @@
 #include <QObject>
 #include <QStringList>
 
-#ifdef BUILDVP1LIGHT
-  #include <TTree.h>
-  #include "xAODBase/IParticle.h"
-#endif //  BUILDVP1LIGHT
-
 
 class IVP1System;
 class IVP1ChannelWidget;
@@ -54,7 +49,7 @@ public:
   static void cleanup(VP1ExecutionScheduler*);
 
   //Call when new event data are available (returns false when the user closes the program)
-  bool executeNewEvent(const int& runnumber, const unsigned long long& eventnumber, const unsigned& triggerType = 0, const unsigned& time = 0);//
+  bool interact();//
 
   VP1ExecutionScheduler(QObject * parent,
 			VP1AvailEvents * availEvents);
@@ -67,12 +62,6 @@ public:
 
   bool hasAllActiveSystemsRefreshed(IVP1ChannelWidget*) const;
 
-  //For VP1Gui:
-  QString nextRequestedEventFile() const;
-
-  //For use by whatever logic wants to determine the next event file
-  //(probably VP1MainWindow):
-  void setNextRequestedEventFile(const QString&);
 
   QStringList userRequestedFiles();
 

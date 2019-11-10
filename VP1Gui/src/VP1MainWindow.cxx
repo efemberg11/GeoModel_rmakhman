@@ -23,8 +23,6 @@
 #include "VP1Gui/VP1IncomingMessageDialog.h"
 #include "VP1Gui/VP1PluginDialog.h"
 #include "VP1Gui/VP1DockWidget.h"
-#include "VP1Gui/VP1AvailEvents.h"
-#include "VP1Gui/VP1AvailEvtsLocalDir.h"
 #include "VP1StreamMenuUpdater.h"
 
 
@@ -79,7 +77,7 @@
 
 
 //_________________________________________________________________________________
-VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,VP1AvailEvents * ae,QWidget * parent)
+VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,QWidget * parent)
 : QMainWindow(parent),
   m_runnumber(-1),
   m_eventnumber(-1),
@@ -87,7 +85,6 @@ VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,VP1AvailEvents * ae,QWi
   m_mustquit(false),
   m_dummyemptycontroller(new QWidget(0)),
   m_scheduler(sched),
-  m_availEvents(ae),
   m_settingsfile(QDir::homePath()+QDir::separator()+".atlasvp1"),
   m_userRequestedExit(false),
   m_streamMenuUpdater(0),
@@ -103,90 +100,6 @@ VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,VP1AvailEvents * ae,QWi
 
 	setupStatusBar();
 	//
-	#if defined BUILDVP1LIGHT
-		bool checkShowAllCruiseAndEventControls = VP1QtUtils::expertSettingIsSet("expert","ExpertSettings/VP1_DEVEL_SHOW_ALL_CRUISE_AND_EVENT_CONTROLS");
-	#else
-		bool checkShowAllCruiseAndEventControls = VP1QtUtils::environmentVariableIsOn("VP1_DEVEL_SHOW_ALL_CRUISE_AND_EVENT_CONTROLS");
-	#endif
-
-	if (!checkShowAllCruiseAndEventControls) {
-	  //		pushButton_eventseek->setVisible(false);
-	  //groupBox_cruise->setVisible(false);
-	}
-
-	if (m_availEvents) {
-		connect(m_availEvents,SIGNAL(message(const QString&)),this,SLOT(helperAddToMessageBox(const QString&)));
-		connect(m_availEvents,SIGNAL(freshEventsChanged()),this,SLOT(updateEventControls()));
-	}
-
-	//pushButton_eventselect->setVisible(true);
-	//pushButton_eventselect->setText("Event: 0/0");
-	//pushButton_eventselect->setEnabled(false);
-	//	pushButton_previousevent->setEnabled(false);
-
-	////////////////////////////////////////////////////
-	//Do we need a menu for multiple input directories?
-
-	VP1AvailEvtsLocalDir* availLocal = dynamic_cast<VP1AvailEvtsLocalDir*>(m_availEvents);
-
-	QStringList inputdirs;
-	if (availLocal)
-		inputdirs = availLocal->availableSourceDirectories();
-
-	if (availLocal&&!inputdirs.isEmpty()) {
-
-		QString currentdir = availLocal->currentSourceDir();
-		if (currentdir.endsWith("/"))
-			currentdir.chop(1);
-		m_currentStream = QDir(currentdir).dirName();
-		QMenu * menu_inputdir = new QMenu(menubar);
-		menu_inputdir->setObjectName("menu_inputdir");
-		menu_inputdir->setTitle("&Stream");
-
-		menubar->addAction(menu_inputdir->menuAction());
-
-		QActionGroup * inputdir_actiongroup = new QActionGroup(menu_inputdir);
-		QAction*action_inputdir_current(0);
-		foreach (QString inputdir, inputdirs) {
-			if (inputdir.endsWith("/"))
-				inputdir.chop(1);
-			QString dirname = QDir(inputdir).dirName();
-			QAction * action_inputdir = new QAction(this);
-			action_inputdir->setObjectName("action_inputdir_"+dirname);
-			action_inputdir->setData(inputdir);
-			action_inputdir->setStatusTip("Get input files from: "+inputdir);
-			action_inputdir->setCheckable(true);
-
-			if (currentdir==inputdir)
-				action_inputdir_current = action_inputdir;
-			menu_inputdir->addAction(action_inputdir);
-			inputdir_actiongroup->addAction(action_inputdir);
-			m_inputdiractions << action_inputdir;
-			connect(action_inputdir,SIGNAL(triggered(bool)),this,SLOT(inputDirectoryActionTriggered()));
-		}
-		if (action_inputdir_current) {
-			action_inputdir_current->blockSignals(true);
-			action_inputdir_current->setChecked(true);
-			action_inputdir_current->blockSignals(false);
-		}
-
-		// Populate inputdirstatuses
-		foreach(QAction* action, m_inputdiractions)
-		m_inputdirstatuses[action] = VP1DirStatusData(action->data().toString(),
-				QString(),
-				true,
-				false);
-
-		m_streamMenuUpdater = new VP1StreamMenuUpdater(m_inputdirstatuses,m_mutex);
-		m_streamMenuUpdater->start();
-
-		//Fixme: start timer which every minute checks the status of these directories
-		QTimer *timer = new QTimer(this);
-		connect(timer, SIGNAL(timeout()), this, SLOT(updateInputDirectoriesStatus()));
-		timer->start(5000);//update this menu rather often (this is only for P1 anyway)
-	}
-
-	//.......
 
 	m_channelmanager = new VP1ChannelManager(m_scheduler,this);
 	m_tabmanager = new VP1TabManager(this,tabWidget_central,m_channelmanager);
@@ -439,8 +352,6 @@ void VP1MainWindow::postInitUpdates(){
 	widget_controlsContainer->setMaximumWidth(50+prefwidths);
 	//   int h1(textBrowser_intro1->viewport()->sizeHint().height());
 	//   textBrowser_intro1->setMaximumHeight(h1+2);
-	if (m_availEvents)
-		m_availEvents->init();
 	updateEventControls();
 }
 
@@ -469,8 +380,6 @@ VP1MainWindow::~VP1MainWindow()
 	delete m_tabmanager;
 	VP1Msg::messageDebug("deleting the channel manager");
 	delete m_channelmanager;
-	VP1Msg::messageDebug("deleting the events");
-	delete m_availEvents;
 
 	if(m_streamMenuUpdater) {
 		VP1Msg::messageDebug("deleting the streamupdater");
@@ -773,11 +682,6 @@ void VP1MainWindow::unloadPlugin_continue()
 	m_currentunloadpluginfiles.clear();
 }
 
-//_________________________________________________________________________________
-bool VP1MainWindow::okToProceedToNextEvent() const
-{
-	return ! (m_betweenevents || (m_availEvents&&m_availEvents->freshEvents().isEmpty()));
-}
 
 
 
@@ -1577,23 +1481,6 @@ void VP1MainWindow::updateInputDirectoriesStatus()
 //_________________________________________________________________________________
 void VP1MainWindow::inputDirectoryActionTriggered()
 {
-	QAction * act = dynamic_cast<QAction*>(sender());
-	if (!act)
-		return;
-	VP1AvailEvtsLocalDir* availLocal = dynamic_cast<VP1AvailEvtsLocalDir*>(m_availEvents);
-	if (!availLocal)
-		return;
-	QString inputdir(act->data().toString());
-	QFileInfo fi(inputdir);
-	if (fi.exists()&&fi.isDir()) {
-		availLocal->setSourceDir(inputdir);
-		std::cout<<VP1Msg::prefix_msg()<<": "
-				<<"VP1Message: inputdirectory changed to "
-				<<availLocal->currentSourceDir().toStdString()<<std::endl;
-		m_currentStream = QDir(availLocal->currentSourceDir()).dirName();
-	}
-
-
 }
 
 //________________________________________________________________________________

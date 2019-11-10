@@ -34,10 +34,6 @@
 
 
 #include "VP1Gui/VP1ExecutionScheduler.h"
-#include "VP1Gui/VP1AvailEvents.h"
-#include "VP1Gui/VP1AvailEvtsHttp.h"
-#include "VP1Gui/VP1AvailEvtsHttps.h"
-#include "VP1Gui/VP1AvailEvtsLocalDir.h"
 #include "VP1Gui/VP1Authenticator.h"
 #include "VP1Gui/VP1Prioritiser.h"
 #include "VP1Gui/VP1MainWindow.h"
@@ -135,7 +131,6 @@ public:
 
 	long int eventsProcessed;
 
-	VP1AvailEvents * availEvents;
 
 	QTimer * refreshtimer;
 	IVP1System* currentsystemrefreshing;
@@ -262,16 +257,14 @@ private:
 };
 
 //___________________________________________________________________
-VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent,
-		VP1AvailEvents * availEvents)
+VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent)
 : QObject(parent), m_d(new Imp)
 {
-	m_d->availEvents = availEvents;
 	m_d->eventsProcessed = 0;
 
 	m_d->scheduler = this;
 	m_d->prioritiser = new VP1Prioritiser(this);
-	m_d->mainwindow = new VP1MainWindow(this,availEvents);//mainwindow takes ownership of available events
+	m_d->mainwindow = new VP1MainWindow(this);
 	
 
 	m_d->allSystemsRefreshed = false;
@@ -319,22 +312,8 @@ VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent,
 		m_d->globalEventFilter = 0;
 	}
 
-	VP1AvailEvtsHttps* availEvtsHttps = dynamic_cast<VP1AvailEvtsHttps*>(availEvents);
-	if(availEvtsHttps) {
-		m_d->skipEvent = true;
-		VP1Authenticator* auth = new VP1Authenticator(m_d->mainwindow,availEvtsHttps->fileinfoLocation());
 
-		connect(auth,SIGNAL(authenticationSuccessful(QNetworkAccessManager*)),
-				availEvtsHttps,SLOT(start(QNetworkAccessManager*)));
-		connect(availEvtsHttps,SIGNAL(freshEventsChanged()),
-				auth,SLOT(accept()));
-
-		SoQt::init(auth);
-		auth->exec();
-		delete auth;
-	}
-	else
-		m_d->skipEvent = false;
+	m_d->skipEvent = false;
 }
 
 //___________________________________________________________________
@@ -406,8 +385,7 @@ VP1ExecutionScheduler* VP1ExecutionScheduler::init()
 		new VP1QtApplication(argc, argv);
 	}
 
-	VP1AvailEvents * availEvents(0);
-	VP1ExecutionScheduler*scheduler = new VP1ExecutionScheduler(0,availEvents);
+	VP1ExecutionScheduler*scheduler = new VP1ExecutionScheduler(0);
 	return scheduler;
 }
 

@@ -29,11 +29,6 @@
 class IVP1System;
 class IVP1ChannelWidget;
 
-class StoreGateSvc;
-class IToolSvc;
-class ISvcLocator;
-class VP1AvailEvents;
-
 class VP1ExecutionScheduler : public QObject {
 
   Q_OBJECT
@@ -51,8 +46,8 @@ public:
   //Call when new event data are available (returns false when the user closes the program)
   bool interact();//
 
-  VP1ExecutionScheduler(QObject * parent,
-			VP1AvailEvents * availEvents);
+  VP1ExecutionScheduler(QObject * parent);
+
   virtual ~VP1ExecutionScheduler();
 
   void bringFromConstructedToReady(IVP1ChannelWidget*);
@@ -80,16 +75,6 @@ private:
   void eraseSystem(IVP1System*);
   void actualUncreateAndDelete(IVP1ChannelWidget*);
 
-  #if defined BUILDVP1LIGHT
-    xAOD::TEvent* m_event;
-    ::TFile* m_ifile;
-    QList<QStringList> m_list;
-    int m_evtNr = 0;
-    int m_totEvtNr = -1;
-    bool m_goBackFlag = false;
-    bool firstlaunch = true;
-  #endif // BUILDVP1LIGHT
-
 private slots:
   void processSystemForRefresh();
   void updateProgressBarDuringRefresh();
@@ -98,10 +83,6 @@ private slots:
   void startRefreshQueueIfAppropriate();
   void systemNeedErase();
 
-
-  #if defined BUILDVP1LIGHT
-    void passEvent(IVP1System*);
-  #endif // BUILDVP1LIGHT
 };
 
 #endif

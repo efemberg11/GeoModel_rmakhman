@@ -33,7 +33,6 @@ class QStringList;
 class IVP1ChannelWidget;
 //class VP1ConfigForm;
 class VP1ExecutionScheduler;
-class VP1AvailEvents;
 class VP1IncomingMessageDialog;
 class VP1PluginDialog;
 class QProgressBar;
@@ -83,10 +82,9 @@ class VP1MainWindow : public QMainWindow, public Ui::VP1MainWindow
   Q_OBJECT
 
 public:
-  VP1MainWindow(VP1ExecutionScheduler*,VP1AvailEvents * availEvents,QWidget *parent = 0);
+  VP1MainWindow(VP1ExecutionScheduler*,QWidget *parent = 0);
   ~VP1MainWindow();
 
-  bool okToProceedToNextEvent() const;
 
   // Set next event to the execution scheduler and updates event controls
   // We needed to separate this method from goToNextEvent() in order to be able
@@ -159,7 +157,6 @@ protected:
 
   QWidget* m_dummyemptycontroller;
   VP1ExecutionScheduler*m_scheduler;
-  VP1AvailEvents * m_availEvents;
 
   VP1TcpServer m_tcpserver;
   void listenOnTcp();

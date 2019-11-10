@@ -19,7 +19,6 @@
 #include "ui_vp1mainwindow.h"
 
 // include VP1
-#include "VP1Gui/VP1TcpServer.h"
 #include "VP1Gui/VP1EventDisplayEditor.h"
 
 // include Qt
@@ -157,14 +156,6 @@ protected:
   QWidget* m_dummyemptycontroller;
   VP1ExecutionScheduler*m_scheduler;
 
-  VP1TcpServer m_tcpserver;
-  void listenOnTcp();
-
-  VP1IncomingMessageDialog* m_currentincomingdialog;
-  QQueue<VP1ExternalRequest> m_requestqueue;
-  bool m_blockallmessages;
-  QList<QString> m_messages_blockedsenders;
-  QList<VP1ExternalRequest> m_messages_blockedexactmessages;
 
   void addChannelIconsToComboBox(QComboBox* cb, const bool& isbasenames);
 
@@ -184,8 +175,6 @@ protected:
 public:
   QProgressBar*progressbar;
 protected slots:
-  void finishedIncomingDialog();
-  void updateTcpIcon();
   void postInitUpdates();
   void showMenu_loadPlugin();
   void showMenu_loadPluginItemSelected();

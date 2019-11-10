@@ -240,29 +240,6 @@ VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,QWidget * parent)
 	    connect(m_actionEnableExpertSettings, &QAction::triggered, this, &VP1MainWindow::request_expertSettings);
 	#endif
 
-	//Event navigation:
-	    //	connect(pushButton_nextevent,SIGNAL(clicked()),this,SLOT(goToNextEvent()));
-	#ifdef BUILDVP1LIGHT
-		connect(pushButton_previousevent,SIGNAL(clicked()),this,SLOT(goToPreviousEvent()));
-		//		connect(pushButton_eventselect,SIGNAL(clicked()),this,SLOT(chooseEvent()));
-	#endif
-
-	//Listen for external requests:
-	connect(&m_tcpserver,SIGNAL(receivedExternalRequest(VP1ExternalRequest)),this,SLOT(receivedExternalRequest(VP1ExternalRequest)));
-	listenOnTcp();
-	//  updateTcpIcon();
-	connect(&m_tcpserver,SIGNAL(listenStateChanged(bool)),this,SLOT(updateTcpIcon()));
-	updateTcpIcon();
-	m_currentincomingdialog=0;
-	m_blockallmessages=false;
-	m_plugindialog=0;
-
-	//Cruise:
-	//connect(pushButton_cruise,SIGNAL(clicked()),this,SLOT(request_cruisemodechange()));
-	//connect(radioButton_cruise_event,SIGNAL(clicked()),this,SLOT(request_cruisemodechange()));
-	//connect(radioButton_cruise_tab,SIGNAL(clicked()),this,SLOT(request_cruisemodechange()));
-	//connect(radioButton_cruise_both,SIGNAL(clicked()),this,SLOT(request_cruisemodechange()));
-
 	// Help menu
 	QMenu* menu_help = new QMenu(menubar);
 	menu_help->setObjectName("menu_help");
@@ -399,17 +376,6 @@ bool VP1MainWindow::mustQuit() const {
 	return m_mustquit;
 }
 
-
-//_________________________________________________________________________________
-void VP1MainWindow::updateTcpIcon()
-{
-	bool l = m_tcpserver.isListening();
-	m_statusbarlabel->setPixmap(QIcon(l?":/vp1/icons/icons/network_64x64.png":":/vp1/icons/icons/network_disconnect_64x64.png")
-			.pixmap(progressbar->height(),progressbar->height(),QIcon::Normal,QIcon::On));
-	m_statusbarlabel->setToolTip(l?"Listening on port "+QString::number(m_tcpserver.port())+" for incoming messsages"
-			:"VP1 is presently NOT listening for incoming messages");
-
-}
 
 //_________________________________________________________________________________
 void VP1MainWindow::loadPluginFile(QString filename)
@@ -1127,25 +1093,6 @@ void VP1MainWindow::replaceConfigurationFile(QString file)
 	m_tabmanager->removeAllTabs();
 	m_tabmanager->loadConfigurationFromFile(file,availablePluginFiles());
 }
-
-//_________________________________________________________________________________
-void VP1MainWindow::listenOnTcp()
-{
-	QString err;
-	if (!m_tcpserver.listen(err)) {
-		qDebug("%s", err.toStdString().c_str());
-	}
-}
-
-
-//_________________________________________________________________________________
-void VP1MainWindow::finishedIncomingDialog()
-{
-	m_currentincomingdialog=0;
-	if (!m_requestqueue.empty())
-		QTimer::singleShot(0, this, SLOT(processEnqueuedRequests()));
-}
-
 
 
 

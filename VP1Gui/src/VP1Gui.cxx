@@ -74,9 +74,6 @@ void VP1Gui::cleanup()
 //____________________________________________________________________
 bool VP1Gui::executeNewEvent( const int& run, const uint64_t& event, const unsigned& triggerType, const unsigned& time )
 {
-  VP1Msg::messageDebug("Examining new event ( run# "+QString::number(run)+", event# "+QString::number(event)+" )");
-
   return m_d->the_scheduler->executeNewEvent(run,event,triggerType,time);
-
 }
 

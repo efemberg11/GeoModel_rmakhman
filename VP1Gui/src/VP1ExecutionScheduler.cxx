@@ -34,7 +34,6 @@
 
 
 #include "VP1Gui/VP1ExecutionScheduler.h"
-#include "VP1Gui/VP1Authenticator.h"
 #include "VP1Gui/VP1Prioritiser.h"
 #include "VP1Gui/VP1MainWindow.h"
 #include "VP1Gui/VP1ChannelManager.h"

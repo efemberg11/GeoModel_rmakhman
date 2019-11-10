@@ -739,21 +739,19 @@ QString VP1ExecutionScheduler::saveSnaphsotToFile(IVP1System* s, bool batch)
 
 		// EVENT INFO AND TIMESTAMP
 
-		QString runnumb = QString::number(m_d->mainwindow->getRunNumber());
-		QString evnumb = QString::number(m_d->mainwindow->getEventNumber());
-		QString evtimestamp = QString::number(m_d->mainwindow->getEventTimestamp());
+		//QString evtimestamp = QString::number(m_d->mainwindow->getEventTimestamp());
 
-		time_t t_evttimestamp = m_d->mainwindow->getEventTimestamp();
-		tm * human_evtimestamp = localtime(&t_evttimestamp);
+		//time_t t_evttimestamp = m_d->mainwindow->getEventTimestamp();
+		//tm * human_evtimestamp = localtime(&t_evttimestamp);
 
-		std::ostringstream h_evtimestamp_ostri;
-		h_evtimestamp_ostri  << 1900 + human_evtimestamp->tm_year
-				       << "-" << 1 + human_evtimestamp->tm_mon  // tm_mon is in the range [0, 11], so 1 must be added to get real months
-				       << "-" << human_evtimestamp->tm_mday
-				       << "T" << human_evtimestamp->tm_hour << "-" << human_evtimestamp->tm_min << "-" << human_evtimestamp->tm_sec << "CEST";
+		//std::ostringstream h_evtimestamp_ostri;
+		//h_evtimestamp_ostri  << 1900 + human_evtimestamp->tm_year
+		//		       << "-" << 1 + human_evtimestamp->tm_mon  // tm_mon is in the range [0, 11], so 1 must be added to get real months
+		//		       << "-" << human_evtimestamp->tm_mday
+		//		       << "T" << human_evtimestamp->tm_hour << "-" << human_evtimestamp->tm_min << "-" << human_evtimestamp->tm_sec << "CEST";
 
-		std::string h_evtimestamp_str = h_evtimestamp_ostri.str();
-		QString h_evtimestamp = QString::fromStdString(h_evtimestamp_str);
+		//std::string h_evtimestamp_str = h_evtimestamp_ostri.str();
+		//QString h_evtimestamp = QString::fromStdString(h_evtimestamp_str);
 
 		// IMAGE TIMESTAMP
 
@@ -788,7 +786,7 @@ QString VP1ExecutionScheduler::saveSnaphsotToFile(IVP1System* s, bool batch)
 		 * because it could be misleading.
 		 */
 		//QString filename = currentsaveimagepath + "vp1_" + chnlname + "_snapshot_" + q_humanTimestamp + ".png";
-		QString filename = folder + "vp1_batch_snapshot_r" + runnumb + "_ev" + evnumb + "_evtime_H" + h_evtimestamp + "_U" + evtimestamp + "___imgtime_H" + q_humanTimestamp + "_U" + q_unixTimestamp + ".png";
+		QString filename = folder + "gmex_batch_snapshotimgtime_H" + q_humanTimestamp + "_U" + q_unixTimestamp + ".png";
 
 		// taking the actual snapshot
 		QPixmap pm = s->channel()->getSnapshot();

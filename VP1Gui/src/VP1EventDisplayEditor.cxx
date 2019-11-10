@@ -143,9 +143,9 @@ VP1EventDisplayEditor::VP1EventDisplayEditor(VP1MainWindow* mainWindow, QList<un
 {
 	m_mainWindow = mainWindow;
 
-	m_runNumber = listRunEventNumberTimestamp[0];
-	m_eventNumber = listRunEventNumberTimestamp[1];
-	m_eventTimestamp = listRunEventNumberTimestamp[2];
+	m_runNumber      =  listRunEventNumberTimestamp.size()>0 ? listRunEventNumberTimestamp[0]:0;
+	m_eventNumber    =  listRunEventNumberTimestamp.size()>1 ? listRunEventNumberTimestamp[1]:0;
+	m_eventTimestamp =  listRunEventNumberTimestamp.size()>2 ? listRunEventNumberTimestamp[2]:0;
 
 
 	m_d->theclass = this;

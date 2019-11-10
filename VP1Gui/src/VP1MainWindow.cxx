@@ -22,7 +22,6 @@
 #include "VP1Gui/VP1ExecutionScheduler.h"
 #include "VP1Gui/VP1PluginDialog.h"
 #include "VP1Gui/VP1DockWidget.h"
-#include "VP1StreamMenuUpdater.h"
 
 
 #include "VP1Base/IVP1ChannelWidget.h"
@@ -78,21 +77,12 @@
 //_________________________________________________________________________________
 VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,QWidget * parent)
 : QMainWindow(parent),
-  m_runnumber(-1),
-  m_eventnumber(-1),
-  m_betweenevents(true),
   m_mustquit(false),
   m_dummyemptycontroller(new QWidget(0)),
   m_scheduler(sched),
   m_settingsfile(QDir::homePath()+QDir::separator()+".atlasvp1"),
   m_userRequestedExit(false),
-  m_streamMenuUpdater(0),
   m_mutex(new QMutex()),
-//  #if QT_VERSION > QT_VERSION_CHECK(5, 5, 0)
-//    m_view(new QWebEngineView(0)),
-//  #else
-//    m_view(new QWebView(0)),
-//  #endif
   m_edEditor(0)
 {
 	setupUi(this); // this sets up the GUI
@@ -357,18 +347,8 @@ VP1MainWindow::~VP1MainWindow()
 	VP1Msg::messageDebug("deleting the channel manager");
 	delete m_channelmanager;
 
-	if(m_streamMenuUpdater) {
-		VP1Msg::messageDebug("deleting the streamupdater");
-		m_streamMenuUpdater->quit();
-		m_streamMenuUpdater->deleteLater();
-	}
-
-	VP1Msg::messageDebug("deleting the mutex");
 	delete m_mutex;
 
-	VP1Msg::messageDebug("deleting the view");
-//	delete m_view; // TODO: Qt5
-//	m_view = 0;// TODO: Qt5
 }
 
 //_________________________________________________________________________________
@@ -770,10 +750,6 @@ void VP1MainWindow::makeAllChannelsEventDisplay()
 
 	getAllChannelsIntoSnapshots(list, listNames);
 
-	listRunEventNumberTimestamp << m_runnumber;
-	listRunEventNumberTimestamp << m_eventnumber;
-	listRunEventNumberTimestamp << m_timestamp;
-
 	// create a new editor window
 	m_edEditor = new VP1EventDisplayEditor(this, listRunEventNumberTimestamp);
 
@@ -912,9 +888,7 @@ void VP1MainWindow::saveAllCurrentChannels()
 //	QString chnlname = m_tabmanager->selectedChannelWidget()->name().toLower();
 //	chnlname.replace(' ','_');
 
-	QString base=m_currentsaveimagepath+QDir::separator()+"vp1"
-			+ "_run"+QString::number(m_runnumber)+"_evt"+QString::number(m_eventnumber)
-			+ QString(m_timestamp>0 ? "_"+QDateTime::fromTime_t(m_timestamp).toString(Qt::ISODate).replace(':','-') : "");
+	QString base=m_currentsaveimagepath+QDir::separator()+"gmex";
 
 
 	// check for existing files
@@ -1019,9 +993,7 @@ QString VP1MainWindow::request_saveChannelSnapshot(QString xLabel)
 	QString chnlname = m_tabmanager->selectedChannelWidget()->name().toLower();
 	chnlname.replace(' ','_');
 
-	QString base=m_currentsaveimagepath+QDir::separator()+"vp1_"+chnlname
-			+"_run"+QString::number(m_runnumber)+"_evt"+QString::number(m_eventnumber)
-			+ QString(m_timestamp>0 ? "_"+QDateTime::fromTime_t(m_timestamp).toString(Qt::ISODate).replace(':','-') : "");
+	QString base=m_currentsaveimagepath+QDir::separator()+"gmex_"+chnlname;
 
 
 	// check for existing files
@@ -1367,31 +1339,6 @@ void VP1MainWindow::updateEventControls()
 	#endif
 }
 
-//_________________________________________________________________________________
-void VP1MainWindow::updateInputDirectoriesStatus()
-{
-	if(!m_mutex->tryLock()) return;
-
-	QFont f;
-	QFont fb;
-	fb.setBold(true);
-
-	foreach (QAction * act,m_inputdiractions) {
-		VP1DirStatusData& dirstatus = m_inputdirstatuses[act];
-		QString inputdir(act->data().toString());
-		QString dirname = QDir(inputdir).dirName();
-		act->setEnabled(dirstatus.enabled);
-		act->setFont(dirstatus.bold?fb:f);
-		act->setText(dirname+" ["+dirstatus.dirStatus+"]");
-	}
-
-	m_mutex->unlock();
-}
-
-//_________________________________________________________________________________
-void VP1MainWindow::inputDirectoryActionTriggered()
-{
-}
 
 //________________________________________________________________________________
 QStringList VP1MainWindow::userRequestedFiles()
@@ -1408,16 +1355,4 @@ void VP1MainWindow::request_expertSettings(){
         	es.exec();
 }
 
-void VP1MainWindow::chooseEvent(){
-	//Open event selection dialog for VP1Light
-	VP1SelectEvent selectEvent(m_scheduler->getTotEvtNr(), m_scheduler->getEvtNr());
-	selectEvent.exec();
-	int newEvtNr = selectEvent.result()-1;
-
-	if( (newEvtNr >= 0) && (newEvtNr <= m_scheduler->getTotEvtNr()-1) ){
-		m_scheduler->setEvtNr(newEvtNr);
-		nextEvent();
-  	qApp->quit();
-	}
-}
 #endif // BUILDVP1LIGHT

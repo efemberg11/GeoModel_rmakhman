@@ -30,50 +30,13 @@ class VP1ChannelManager;
 class VP1TabManager;
 class QStringList;
 class IVP1ChannelWidget;
-//class VP1ConfigForm;
 class VP1ExecutionScheduler;
-class VP1IncomingMessageDialog;
 class VP1PluginDialog;
 class QProgressBar;
 class QLabel;
 class QComboBox;
 class VP1StreamMenuUpdater;
 class QMutex;
-
-//#include <QtGlobal>
-//#if QT_VERSION > QT_VERSION_CHECK(5, 5, 0)
-//  class QWebEngineView; // Qt 5.6
-//#else
-//  class QWebView;
-//#endif
-
-
-struct VP1DirStatusData
-{
-  VP1DirStatusData()
-    : inputDir()
-    , dirStatus()
-    , enabled(true)
-    , bold(false)
-  {};
-
-  VP1DirStatusData(QString the_inputDir
-		   , QString the_dirStatus
-		   , bool the_enabled
-		   , bool the_bold)
-    : inputDir(the_inputDir)
-    , dirStatus(the_dirStatus)
-    , enabled(the_enabled)
-    , bold(the_bold)
-  {};
-
-  QString inputDir;
-  QString dirStatus;
-  bool enabled;
-  bool bold;
-};
-
-typedef QMap<QAction*,VP1DirStatusData> VP1DirStatuses;
 
 
 class VP1MainWindow : public QMainWindow, public Ui::VP1MainWindow
@@ -136,19 +99,14 @@ public:
   VP1TabManager * tabManager() const { return m_tabmanager; }
 
   bool userRequestedExit() { return m_userRequestedExit; }
-
-  int getRunNumber() { return m_runnumber; }
-  unsigned long long getEventNumber() { return m_eventnumber; }
-  int getEventTimestamp() { return m_timestamp; }
+  //  int getEventTimestamp() { return m_timestamp; }
 
 protected:
   VP1ChannelManager * m_channelmanager;
   VP1TabManager * m_tabmanager;
   QString m_currentconfigfile;
-  int m_runnumber;
-  unsigned long long m_eventnumber;
-  unsigned m_timestamp;
-  bool m_betweenevents;
+  //unsigned m_timestamp;
+  //  bool m_betweenevents;
 
   void closeEvent(QCloseEvent *event);
   bool m_mustquit;
@@ -188,9 +146,6 @@ protected slots:
   void help_openGMWebSite();
   void help_openAbout();
 
-  void updateInputDirectoriesStatus();
-  void inputDirectoryActionTriggered();
-
   void launch3DstereoEditor();
 
 
@@ -208,8 +163,6 @@ protected:
   QAction* m_action_openGMSite;
   QAction* m_action_openAbout;
 
-  QList<QAction*> m_inputdiractions;
-  VP1DirStatuses m_inputdirstatuses;
   QString m_currentsaveimagepath;
   QString m_currentloadpluginpath;
   QString m_currentStream;
@@ -224,15 +177,7 @@ protected:
 
   QStringList m_userRequestedFiles;
 
-  VP1StreamMenuUpdater* m_streamMenuUpdater;
   QMutex* m_mutex;
-
-//  // Web broser instance to show VP1 documentation
-//  #if QT_VERSION > QT_VERSION_CHECK(5, 5, 0)
-//    QWebEngineView *m_view; // Qt 5
-//  #else
-//    QWebView *m_view;
-//  #endif
 
   // Event display editor
   VP1EventDisplayEditor* m_edEditor;

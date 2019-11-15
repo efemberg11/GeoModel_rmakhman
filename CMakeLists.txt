@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelIO" VERSION 1.3.0 LANGUAGES CXX )
+project( "GeoModelIO" VERSION 1.3.1 LANGUAGES CXX )
 
 # Set default build options.
 set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )

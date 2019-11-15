@@ -12,7 +12,7 @@ file( GLOB HEADERS GeoModelRead/*.h )
 # Set up the library.
 add_library( GeoModelRead SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModelRead PUBLIC Qt5::Core
-   GeoModelCore::GeoModelKernel GeoModelDBManager TFPersistification )
+   GeoModelKernel GeoModelDBManager TFPersistification )
 target_include_directories( GeoModelRead PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

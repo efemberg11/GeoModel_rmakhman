@@ -7,7 +7,7 @@ file( GLOB HEADERS TFPersistification/*.h )
 # Set up the library.
 add_library( TFPersistification SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( TFPersistification PUBLIC
-   GeoModelCore::GeoGenericFunctions GeoModelCore::GeoModelKernel )
+   GeoGenericFunctions GeoModelKernel )
 target_include_directories( TFPersistification PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

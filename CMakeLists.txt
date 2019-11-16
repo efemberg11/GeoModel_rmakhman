@@ -4,4 +4,5 @@
 cmake_minimum_required( VERSION 3.1 )
 project( "GeoModelExamples" VERSION 1.2.1 LANGUAGES CXX )
 add_subdirectory( HelloGeoWrite )
+add_subdirectory( HelloGeoRead )
 add_subdirectory( GeoTessellatedSolidExamples )

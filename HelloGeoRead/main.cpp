@@ -29,12 +29,33 @@ GeoPhysVol* createTheExperiment(GeoPhysVol* world)
 {
   if (world == nullptr)
   {
-    // Setup the 'World' volume from which everything else will be suspended
-    double densityOfAir=0.1;
-    const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
-    const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-    const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
-    world = new GeoPhysVol(worldLog);
+  	//-----------------------------------------------------------------------------------//
+        // Define the materials that we shall use.                                              //
+        // ----------------------------------------------------------------------------------//
+
+        // Define the units
+        #define gr   SYSTEM_OF_UNITS::gram
+        #define mole SYSTEM_OF_UNITS::mole
+        #define cm3  SYSTEM_OF_UNITS::cm3
+
+        // Define the chemical elements
+        GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
+        GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
+        GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
+        GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
+
+        // Define the materials
+
+        double densityOfAir=0.001214 *gr/cm3;
+        GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
+        air->add(Nitrogen  , 0.7494);
+	air->add(Oxygen, 0.2369);
+        air->add(Argon, 0.0129);
+        air->add(Hydrogen, 0.0008);
+        air->lock();
+    	const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+    	const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
+    	world = new GeoPhysVol(worldLog);
   }
   return world;
 }

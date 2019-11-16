@@ -23,6 +23,7 @@ set(CMAKE_AUTOMOC ON)
 ## GeoModel dependencies.
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
+find_package( Eigen3 REQUIRED )
 ## External Dependencies.
 find_package(Qt5 COMPONENTS Core Sql Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
 
@@ -36,4 +37,4 @@ add_executable( hellogeoRead ${SRCS} )
 target_link_libraries( hellogeoRead Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel)
 
 # Set include directories
-target_include_directories( hellogeoRead SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} )
+target_include_directories( hellogeoRead SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} )

@@ -1119,17 +1119,20 @@ bool GMDBManager::initDB()
 	qDebug() << "checking existing tables...";
 	QSqlDatabase db = QSqlDatabase::database();
 	QStringList tables = db.tables();
-	if (tables.contains(       "LogVols",   Qt::CaseInsensitive)
-			&& tables.contains("PhysVols",  Qt::CaseInsensitive)
-			&& tables.contains("Materials", Qt::CaseInsensitive)
-			&& tables.contains("Elements",  Qt::CaseInsensitive)
-			&& tables.contains("Shapes",    Qt::CaseInsensitive)
+	if (   tables.contains("LogVols",   Qt::CaseInsensitive)
+			|| tables.contains("PhysVols",  Qt::CaseInsensitive)
+			|| tables.contains("Materials", Qt::CaseInsensitive)
+			|| tables.contains("Elements",  Qt::CaseInsensitive)
+			|| tables.contains("Shapes",    Qt::CaseInsensitive)
 	) {
 		qDebug() << "tables are present already. Skipping tables creation. Loading tables...";
 		loadTableNamesFromDB();
 		return true;
 	}
 
+  // TODO: we should check if all needed tables are present; if not throw an error message and exit.
+
+  // TODO: we should create tables only if the DB is really completely empty!
 	// if DB is empty, then create tables
 	qDebug() << "DB file is empty. Creating tables...";
 	bool tablesOK = createTables();

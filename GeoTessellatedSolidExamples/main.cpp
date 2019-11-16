@@ -35,23 +35,49 @@
 
 int main(int argc, char *argv[])
 {
+
+
+  	//-----------------------------------------------------------------------------------//
+        // Define the materials that we shall use.                                              //
+        // ----------------------------------------------------------------------------------//
+
+        // Define the units
+        #define gr   SYSTEM_OF_UNITS::gram
+        #define mole SYSTEM_OF_UNITS::mole
+        #define cm3  SYSTEM_OF_UNITS::cm3
+
+        // Define the chemical elements
+        GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
+        GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
+        GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
+        GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
+        GeoElement*  Iron     = new GeoElement ("Iron"     ,"Fe" , 26.0 ,  55.847  *gr/mole);
+        GeoElement*  Carbon   = new GeoElement ("Carbon"   ,"C"  ,  6.0 ,  12.0107 *gr/mole);
+        GeoElement*  Sillicon = new GeoElement ("Silicon"  ,"Si" , 14.0 ,  28.085  *gr/mole);
+
+        // Define the materials
+
+        double densityOfAir=0.001214 *gr/cm3;
+        GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
+        air->add(Nitrogen  , 0.7494);
+	air->add(Oxygen, 0.2369);
+        air->add(Argon, 0.0129);
+        air->add(Hydrogen, 0.0008);
+        air->lock();
+
+        GeoMaterial* steel  = new GeoMaterial("Steel", 7.9 *gr/cm3);
+        steel->add(Iron  , 0.98);
+        steel->add(Carbon, 0.02);
+        steel->lock();
+
+
 	//-----------------------------------------------------------------------------------//
 	// create the world volume container and
 	// get the 'world' volume, i.e. the root volume of the GeoModel tree
 	std::cout << "Creating the 'world' volume, i.e. the root volume of the GeoModel tree..." << std::endl;
-	double densityOfAir = 0.1;
-	const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
 	const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-	const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
+	const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
 	GeoPhysVol* world = new GeoPhysVol(worldLog);
-
-
-	//----------------------------------------------------------------------------------//
-	// Get the materials
-	// const GeoMaterial* matIron = theMaterialManager->getMaterial("std::Iron"); // Athena code
-	// Bogus densities.  Later: read from database.
-	double densityOfIron= 0.7;
-	const GeoMaterial *matIron = new GeoMaterial("Iron Toy",densityOfIron);
 
 
 	//-----------------------------------------------------------------------------------//
@@ -177,16 +203,16 @@ int main(int argc, char *argv[])
 
 	//------------------------------------//
 	// Bundle the resulting compound object with a material into a logical volume, and create a physical volume with that:
-	GeoLogVol* tess1Log = new GeoLogVol("Tessellated Quad",tessQuad,matIron);
+	GeoLogVol* tess1Log = new GeoLogVol("Tessellated Quad",tessQuad,steel);
 	GeoPhysVol* tess1Phys = new GeoPhysVol(tess1Log);
 
-	GeoLogVol* tess2Log = new GeoLogVol("Tessellated Tri",tessTri,matIron);
+	GeoLogVol* tess2Log = new GeoLogVol("Tessellated Tri",tessTri,steel);
 	GeoPhysVol* tess2Phys = new GeoPhysVol(tess2Log);
 
-	GeoLogVol* tess3Log = new GeoLogVol("Tessellated TriQuad",tessTriQuad,matIron);
+	GeoLogVol* tess3Log = new GeoLogVol("Tessellated TriQuad",tessTriQuad,steel);
 	GeoPhysVol* tess3Phys = new GeoPhysVol(tess3Log);
 
-	GeoLogVol* tess4Log = new GeoLogVol("Tessellated Pyramid",tessPyramid,matIron);
+	GeoLogVol* tess4Log = new GeoLogVol("Tessellated Pyramid",tessPyramid,steel);
 	GeoPhysVol* tess4Phys = new GeoPhysVol(tess4Log);
 
 

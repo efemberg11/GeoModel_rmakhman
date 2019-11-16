@@ -109,7 +109,6 @@ private:
 
 private slots:
   void possibleChange_transparency();
-  void possibleChange_muonChamberAdaptionStyle();
   void possibleChange_showVolumeOutLines();
   void updatePickStyle();
   void saveMaterialsRequested();

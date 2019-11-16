@@ -45,8 +45,7 @@ add_definitions (${Qt5Gui_DEFINITIONS})
 add_definitions (${Qt5OpenGL_DEFINITIONS})
 add_definitions (${Qt5Widgets_DEFINITIONS})
 add_definitions (${Qt5PrintSupport_DEFINITIONS})
-add_definitions (${Qt5Network_DEFINITIONS})
-target_link_libraries( gmex GXGui GXBase GXHEPVis SoQt Coin Qt5Gui Qt5Core Qt5Widgets Qt5Network Qt5PrintSupport )
+target_link_libraries( gmex GXGui GXBase GXHEPVis ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 install(TARGETS gmex DESTINATION bin)
 
 

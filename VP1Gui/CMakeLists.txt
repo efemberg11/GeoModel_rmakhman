@@ -47,13 +47,12 @@ include_directories(${Qt5Gui_INCLUDE_DIRS} )
 include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
 include_directories(${Qt5Widgets_INCLUDE_DIRS} )
 include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Network_INCLUDE_DIRS} )
+#include_directories(${Qt5Network_INCLUDE_DIRS} )
 include_directories(${Coin3D_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt Coin Qt5Gui Qt5Core Qt5Widgets Qt5Network Qt5PrintSupport )
+target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt Coin ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 add_definitions (${Qt5Core_DEFINITIONS})
-
 install(TARGETS GXGui
   LIBRARY
   DESTINATION lib

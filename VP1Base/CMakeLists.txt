@@ -44,7 +44,14 @@ include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
 include_directories(${Coin3D_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXBase ${Qt5Core_LIBRARIES})
+if ( APPLE ) 
+  target_link_libraries (GXBase ${Qt5Core_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5OpenGL_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GXHEPVis ${SoQt_LIBRARIES} ${Coin_LIBRARIES} ${OPENGL_LIBRARIES} )
+  target_link_directories (GXBase PUBLIC ${Coin_LIB_DIR} )
+else()
+  target_link_libraries (GXBase ${Qt5Core_LIBRARIES} )
+endif()
+
+target_link_libraries (GXBase ${Qt5Core_LIBRARIES} )
 add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXBase

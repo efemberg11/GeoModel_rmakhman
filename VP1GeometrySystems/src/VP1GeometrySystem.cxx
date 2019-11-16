@@ -584,9 +584,18 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
     path=pEnv;
   }
   else {
+
+#ifdef __APPLE__
+    char buffer[1024];
+    char *wd=getcwd(buffer,1024);
+    path = QFileDialog::getOpenFileName(nullptr, tr("Open Geometry File"),
+					wd,
+					tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
+#else
     path = QFileDialog::getOpenFileName(nullptr, tr("Open Geometry File"),
 					get_current_dir_name(),
 					tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
+#endif
   }
   if (path=="") return nullptr;
   

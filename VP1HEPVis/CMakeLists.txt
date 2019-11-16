@@ -6,11 +6,10 @@ set(MYLIB_VERSION_PATCH 0)
 
 project ( "GXHEPVis" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-find_package( Coin3D  )
+find_package( Coin  )
 if ( APPLE )
 	find_package(OpenGL REQUIRED)
 endif()
-
 
 
 
@@ -27,9 +26,15 @@ add_library ( GXHEPVis SHARED ${SOURCES} ${HEADERS}  )
 # External dependencies:
 find_package( Qt5 COMPONENTS Core )
 include_directories(${Qt5Core__INCLUDE_DIRS} )
-include_directories(${Coin3D__INCLUDE_DIRS} )
-target_link_libraries (GXHEPVis ${Qt5Core_LIBRARIES})
+include_directories(${Coin_INCLUDE_DIR} )
+if ( APPLE ) 
+  target_link_libraries (GXHEPVis ${Qt5Core_LIBRARIES} ${Coin_LIBRARIES} ${OPENGL_LIBRARIES} )
+  target_link_directories (GXHEPVis PUBLIC ${Coin_LIB_DIR} )
+else()
+  target_link_libraries (GXHEPVis ${Qt5Core_LIBRARIES} )
+endif()
 add_definitions (${Qt5Core_DEFINITIONS})
+
 
 install(TARGETS GXHEPVis
   LIBRARY

@@ -16,10 +16,10 @@ project ( "GXGeometrySystems" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MIN
 if ( APPLE )
 	find_package(OpenGL REQUIRED)
 endif()
-#find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
+find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
 
-find_package( Coin3D )
-find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
+find_package( Coin )
+#find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
 find_package( Eigen3 REQUIRED )
@@ -54,12 +54,20 @@ include_directories(${Qt5Gui_INCLUDE_DIRS} )
 include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
 include_directories(${Qt5Widgets_INCLUDE_DIRS} )
 include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Network_INCLUDE_DIRS} )
 include_directories(${Qt5Sql_INCLUDE_DIRS} )
-include_directories(${Coin3D_INCLUDE_DIRS} )
+include_directories(${Coin_INCLUDE_DIR} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGeometrySystems ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis SoQt Coin Qt5Gui Qt5Core Qt5Widgets Qt5Network Qt5PrintSupport)
+
+if ( APPLE )
+  target_link_directories (GXGeometrySystems PUBLIC ${Coin_LIB_DIR} )
+  target_link_libraries (GXGeometrySystems ${SoQt_LIBRARIES} ${Coin_LIBRARIES} GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  else()
+  target_link_libraries (GXGeometrySystems ${SoQt_LIBRARIES} ${Coin_LIBRARIES} GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+endif()
+
+
+
 add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGeometrySystems

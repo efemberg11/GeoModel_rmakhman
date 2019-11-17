@@ -121,40 +121,41 @@ std::vector<std::string> qstringlistToVecString(QStringList list)
 //___________________________________________________________________
 class GXExecutionScheduler::Imp {
 public:
-	class GlobalEventFilter;//Used to animate mouse clicks (for screencasts);
-	GlobalEventFilter * globalEventFilter;
-
-	GXExecutionScheduler * scheduler;
-	VP1Prioritiser * prioritiser;
-	VP1MainWindow* mainwindow;
-
-	long int eventsProcessed;
-
-
-	QTimer * refreshtimer;
-	IVP1System* currentsystemrefreshing;
-	bool allSystemsRefreshed;
-	bool goingtonextevent;
-
-	//Statusbar:
-	QProgressBar * pb;
-	double calctimethisevent;
-	double currentrefreshsystemestimate;
-	void updateProgressBar();
-	QTimer * pbtimer;
-
-	//When receiving erase requests for a system that is currently refreshing, we use this:
-	bool eraseJustAfterRefresh;
-	IVP1ChannelWidget* postponedUncreateAndDeleteCW;
-
-	bool allVisibleRefreshed() const;
-	bool allSoonVisibleRefreshed() const;
-
-	static void warnIfWidgetsAlive();
-
-	QString nextRequestedEvent;
-
-	bool skipEvent;
+  class GlobalEventFilter;//Used to animate mouse clicks (for screencasts);
+  GlobalEventFilter * globalEventFilter;
+  
+  GXExecutionScheduler * scheduler;
+  VP1Prioritiser * prioritiser;
+  VP1MainWindow* mainwindow;
+  
+  long int eventsProcessed;
+  
+  
+  QTimer * refreshtimer;
+  QTimer * splashScreenTimer;
+  IVP1System* currentsystemrefreshing;
+  bool allSystemsRefreshed;
+  bool goingtonextevent;
+  
+  //Statusbar:
+  QProgressBar * pb;
+  double calctimethisevent;
+  double currentrefreshsystemestimate;
+  void updateProgressBar();
+  QTimer * pbtimer;
+  
+  //When receiving erase requests for a system that is currently refreshing, we use this:
+  bool eraseJustAfterRefresh;
+  IVP1ChannelWidget* postponedUncreateAndDeleteCW;
+  
+  bool allVisibleRefreshed() const;
+  bool allSoonVisibleRefreshed() const;
+  
+  static void warnIfWidgetsAlive();
+  
+  QString nextRequestedEvent;
+  
+  bool skipEvent;
 };
 
 // NOTE: Before arriving here, events are intercepted by the SoCooperativeSelection class,
@@ -272,8 +273,13 @@ GXExecutionScheduler::GXExecutionScheduler( QObject * parent)
 	m_d->eraseJustAfterRefresh=false;
 	m_d->postponedUncreateAndDeleteCW=0;
 	m_d->refreshtimer = new QTimer(this);
+	m_d->splashScreenTimer = new QTimer(this);
+	m_d->splashScreenTimer->setSingleShot(true);
+	m_d->splashScreenTimer->setInterval(2500);
+	
 	connect(m_d->refreshtimer, SIGNAL(timeout()), this, SLOT(processSystemForRefresh()));
 
+	connect(m_d->splashScreenTimer, SIGNAL(timeout()), m_d->mainwindow, SLOT(quickSetupTriggered()));
 	//Connect signals to ensure that prioritiser knows about present channels and their visibility:
 	connect(m_d->mainwindow->channelManager(),SIGNAL(newChannelCreated(IVP1ChannelWidget*)),m_d->prioritiser, SLOT(channelCreated(IVP1ChannelWidget*)));
 	connect(m_d->mainwindow->channelManager(),SIGNAL(channelUncreated(IVP1ChannelWidget*)),m_d->prioritiser, SLOT(channelUncreated(IVP1ChannelWidget*)));
@@ -480,6 +486,7 @@ bool GXExecutionScheduler::interact()
 
 	VP1Msg::messageDebug("calling refreshtimer->start()...");
 	m_d->refreshtimer->start();
+	m_d->splashScreenTimer->start();
 
 
 	//Flush event queue before reenabling controllers, etc.:

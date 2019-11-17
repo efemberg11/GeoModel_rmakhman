@@ -5,8 +5,8 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-set(CMAKE_BUILD_TYPE RELEASE)
-#set(CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
+set(CMAKE_BUILD_TYPE DEBUG)
+set(CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
 
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)

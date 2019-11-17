@@ -121,7 +121,7 @@ private:
 
   void setCloneID(unsigned id);
   const std::set<IVP1System *>& systems();
-  friend class VP1ExecutionScheduler;
+  friend class GXExecutionScheduler;
   friend class VP1Prioritiser;
   friend class VP1ChannelManager;
   friend class VP1TabManager;

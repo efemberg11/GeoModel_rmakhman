@@ -13,7 +13,7 @@
 #include <QCommandLineParser>
 
 //
-#include "VP1Gui/VP1ExecutionScheduler.h"
+#include "VP1Gui/GXExecutionScheduler.h"
 
 // C++ includes
 #include <iostream>
@@ -67,8 +67,8 @@ int main(int argc, char** argv)
     settings.setValue("ExpertSettings/enableExpertSettings","");
   }
 
-  VP1ExecutionScheduler *scheduler=VP1ExecutionScheduler::init();
+  GXExecutionScheduler *scheduler=GXExecutionScheduler::init();
   while (scheduler->interact())
-  VP1ExecutionScheduler::cleanup(scheduler);
+  GXExecutionScheduler::cleanup(scheduler);
   
 }

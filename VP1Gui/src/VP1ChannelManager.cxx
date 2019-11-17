@@ -53,7 +53,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "VP1Gui/VP1ChannelManager.h"
-#include "VP1Gui/VP1ExecutionScheduler.h"
+#include "VP1Gui/GXExecutionScheduler.h"
 #include "VP1Gui/VP1MainWindow.h"
 
 #include "VP1Base/IVP1ChannelWidgetFactory.h"
@@ -75,7 +75,7 @@ class VP1ChannelManager::Imp {
 public:
 
 	VP1ChannelManager*channelmanager;
-	VP1ExecutionScheduler*scheduler;
+	GXExecutionScheduler*scheduler;
 	VP1MainWindow*mainwindow;
 
 	//Actual created channels:
@@ -105,7 +105,7 @@ public:
 };
 
 //___________________________________________________________________________________
-VP1ChannelManager::VP1ChannelManager(VP1ExecutionScheduler*sched,VP1MainWindow*mw) : m_d(new Imp)
+VP1ChannelManager::VP1ChannelManager(GXExecutionScheduler*sched,VP1MainWindow*mw) : m_d(new Imp)
 {
 	m_d->channelmanager=this;
 	m_d->scheduler=sched;

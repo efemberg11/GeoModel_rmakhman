@@ -677,7 +677,7 @@ void VP1GeometrySystem::checkboxChanged()
 }
 
 // NOTE: before arriving here, events are intercepted by VP1Base/SoCooperativeSelection
-// and VP1Gui/VP1ExecutionScheduler, in this order.
+// and VP1Gui/GXExecutionScheduler, in this order.
 //_____________________________________________________________________________________
 void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 {

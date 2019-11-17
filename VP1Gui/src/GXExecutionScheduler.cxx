@@ -4,7 +4,7 @@
 
 /////////////////////////////////////////////////////////////
 //                                                         //
-//  Implementation of class VP1ExecutionScheduler          //
+//  Implementation of class GXExecutionScheduler          //
 //                                                         //
 //  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>  //
 //                                                         //
@@ -33,7 +33,7 @@
 // #include <stddef.h>
 
 
-#include "VP1Gui/VP1ExecutionScheduler.h"
+#include "VP1Gui/GXExecutionScheduler.h"
 #include "VP1Gui/VP1Prioritiser.h"
 #include "VP1Gui/VP1MainWindow.h"
 #include "VP1Gui/VP1ChannelManager.h"
@@ -119,12 +119,12 @@ std::vector<std::string> qstringlistToVecString(QStringList list)
 
 
 //___________________________________________________________________
-class VP1ExecutionScheduler::Imp {
+class GXExecutionScheduler::Imp {
 public:
 	class GlobalEventFilter;//Used to animate mouse clicks (for screencasts);
 	GlobalEventFilter * globalEventFilter;
 
-	VP1ExecutionScheduler * scheduler;
+	GXExecutionScheduler * scheduler;
 	VP1Prioritiser * prioritiser;
 	VP1MainWindow* mainwindow;
 
@@ -160,13 +160,13 @@ public:
 // NOTE: Before arriving here, events are intercepted by the SoCooperativeSelection class,
 //       grabbed directly from the SoQt windowing system
 //___________________________________________________________________
-class VP1ExecutionScheduler::Imp::GlobalEventFilter : public QObject {
+class GXExecutionScheduler::Imp::GlobalEventFilter : public QObject {
 public:
 	GlobalEventFilter():m_lastPopup(QTime::currentTime()),
 	m_lastPopupWasQMenu(false){}
 
 	bool eventFilter ( QObject * watched, QEvent * event ) {
-		//		std::cout << "VP1ExecutionScheduler::Imp::GlobalEventFilter::eventFilter()\n";
+		//		std::cout << "GXExecutionScheduler::Imp::GlobalEventFilter::eventFilter()\n";
 
 		if (event->type()==QEvent::MouseButtonPress
 				||event->type()==QEvent::MouseButtonDblClick
@@ -256,7 +256,7 @@ private:
 };
 
 //___________________________________________________________________
-VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent)
+GXExecutionScheduler::GXExecutionScheduler( QObject * parent)
 : QObject(parent), m_d(new Imp)
 {
 	m_d->eventsProcessed = 0;
@@ -316,7 +316,7 @@ VP1ExecutionScheduler::VP1ExecutionScheduler( QObject * parent)
 }
 
 //___________________________________________________________________
-VP1ExecutionScheduler::~VP1ExecutionScheduler()
+GXExecutionScheduler::~GXExecutionScheduler()
 {
 	m_d->refreshtimer->stop();
 	delete m_d->mainwindow;
@@ -326,7 +326,7 @@ VP1ExecutionScheduler::~VP1ExecutionScheduler()
 }
 
 //___________________________________________________________________
-VP1ExecutionScheduler* VP1ExecutionScheduler::init()
+GXExecutionScheduler* GXExecutionScheduler::init()
 {
 	//First we make sure the DISPLAY variable is set (importing ROOT in
 	//athena.py might cause it to be unset!).
@@ -366,7 +366,7 @@ VP1ExecutionScheduler* VP1ExecutionScheduler::init()
 
 	// here we check if the main (and unique!) Qt application has been initialized already. If not we initialize it.
 	if (qApp) {
-		VP1Msg::message("VP1ExecutionScheduler::init ERROR: QApplication already initialized. Expect problems!!!");
+		VP1Msg::message("GXExecutionScheduler::init ERROR: QApplication already initialized. Expect problems!!!");
 	} else {
 		//NB: Static to avoid scope-problems:
 		static int argc=1;
@@ -384,12 +384,12 @@ VP1ExecutionScheduler* VP1ExecutionScheduler::init()
 		new VP1QtApplication(argc, argv);
 	}
 
-	VP1ExecutionScheduler*scheduler = new VP1ExecutionScheduler(0);
+	GXExecutionScheduler*scheduler = new GXExecutionScheduler(0);
 	return scheduler;
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::cleanup(VP1ExecutionScheduler*scheduler)
+void GXExecutionScheduler::cleanup(GXExecutionScheduler*scheduler)
 {
 	#if defined BUILDVP1LIGHT
 	bool checkEnableInformOnEndOfJob = VP1QtUtils::expertSettingIsOn("expert","ExpertSettings/VP1_ENABLE_INFORM_ON_END_OF_JOB");
@@ -432,7 +432,7 @@ void VP1ExecutionScheduler::cleanup(VP1ExecutionScheduler*scheduler)
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::Imp::updateProgressBar()
+void GXExecutionScheduler::Imp::updateProgressBar()
 {
 	double remaining = prioritiser->estimateRemainingCalcTime();
 	if (remaining>0.0) {
@@ -449,7 +449,7 @@ void VP1ExecutionScheduler::Imp::updateProgressBar()
 	}
 }
 //___________________________________________________________________
-void VP1ExecutionScheduler::updateProgressBarDuringRefresh()
+void GXExecutionScheduler::updateProgressBarDuringRefresh()
 {
 	if (m_d->currentrefreshsystemestimate<1.0)
 		return;
@@ -462,9 +462,9 @@ void VP1ExecutionScheduler::updateProgressBarDuringRefresh()
 
 
 //___________________________________________________________________
-bool VP1ExecutionScheduler::interact()
+bool GXExecutionScheduler::interact()
 {
-	VP1Msg::messageDebug("VP1ExecutionScheduler::executeNewEvent()");
+	VP1Msg::messageDebug("GXExecutionScheduler::executeNewEvent()");
 
 	m_d->nextRequestedEvent="";
 
@@ -542,9 +542,9 @@ bool VP1ExecutionScheduler::interact()
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::eraseSystem(IVP1System*s) {
+void GXExecutionScheduler::eraseSystem(IVP1System*s) {
 
-	VP1Msg::messageDebug("VP1ExecutionScheduler::eraseSystem()");
+	VP1Msg::messageDebug("GXExecutionScheduler::eraseSystem()");
 
 	assert(s->state()==IVP1System::REFRESHED);
 	assert(!s->isRefreshing());
@@ -562,7 +562,7 @@ void VP1ExecutionScheduler::eraseSystem(IVP1System*s) {
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::systemNeedErase() {
+void GXExecutionScheduler::systemNeedErase() {
 	IVP1System*s = static_cast<IVP1System*>(sender());
 	assert(s);
 	if (m_d->currentsystemrefreshing!=s) {
@@ -574,7 +574,7 @@ void VP1ExecutionScheduler::systemNeedErase() {
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::processSystemForRefresh()
+void GXExecutionScheduler::processSystemForRefresh()
 {
 	assert(!m_d->goingtonextevent);
 	if (m_d->currentsystemrefreshing)
@@ -594,7 +594,7 @@ void VP1ExecutionScheduler::processSystemForRefresh()
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::channelCreated(IVP1ChannelWidget* cw)
+void GXExecutionScheduler::channelCreated(IVP1ChannelWidget* cw)
 {
 	std::set<IVP1System*>::const_iterator it, itE = cw->systems().end();
 	for (it=cw->systems().begin();it!=itE;++it) {
@@ -610,7 +610,7 @@ void VP1ExecutionScheduler::channelCreated(IVP1ChannelWidget* cw)
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::channelUncreated(IVP1ChannelWidget* cw)
+void GXExecutionScheduler::channelUncreated(IVP1ChannelWidget* cw)
 {
 	std::set<IVP1System*>::const_iterator it, itE = cw->systems().end();
 	for (it=cw->systems().begin();it!=itE;++it)
@@ -618,23 +618,23 @@ void VP1ExecutionScheduler::channelUncreated(IVP1ChannelWidget* cw)
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::startRefreshQueueIfAppropriate()
+void GXExecutionScheduler::startRefreshQueueIfAppropriate()
 {
 	if (!m_d->goingtonextevent&&!m_d->refreshtimer->isActive())
 		m_d->refreshtimer->start();
 }
 
 //___________________________________________________________________
-bool VP1ExecutionScheduler::isRefreshing() const
+bool GXExecutionScheduler::isRefreshing() const
 {
 	return m_d->currentsystemrefreshing;
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::refreshSystem(IVP1System*s)
+void GXExecutionScheduler::refreshSystem(IVP1System*s)
 {
 	QString sysname = s->name();
-	VP1Msg::messageDebug("VP1ExecutionScheduler::refreshSystem() - system: " + sysname);
+	VP1Msg::messageDebug("GXExecutionScheduler::refreshSystem() - system: " + sysname);
 
 	m_d->updateProgressBar();
 
@@ -697,10 +697,10 @@ void VP1ExecutionScheduler::refreshSystem(IVP1System*s)
 }
 
 //___________________________________________________________________
-QString VP1ExecutionScheduler::saveSnaphsotToFile(IVP1System* s, bool batch)
+QString GXExecutionScheduler::saveSnaphsotToFile(IVP1System* s, bool batch)
 {
 	QString chnlname = s->name().toLower();
-	VP1Msg::messageDebug("VP1ExecutionScheduler::saveSnaphsotToFile() - taking the snapshot of the channel " + chnlname );
+	VP1Msg::messageDebug("GXExecutionScheduler::saveSnaphsotToFile() - taking the snapshot of the channel " + chnlname );
 
 	QString currentsaveimagepath = VP1Settings::defaultFileSelectDirectory() + QDir::separator();
 
@@ -820,7 +820,7 @@ QString VP1ExecutionScheduler::saveSnaphsotToFile(IVP1System* s, bool batch)
 
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::bringFromConstructedToReady(IVP1ChannelWidget*cw)
+void GXExecutionScheduler::bringFromConstructedToReady(IVP1ChannelWidget*cw)
 {
 	assert(cw->state()==IVP1ChannelWidget::CONSTRUCTED);
 
@@ -849,7 +849,7 @@ void VP1ExecutionScheduler::bringFromConstructedToReady(IVP1ChannelWidget*cw)
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::uncreateAndDelete(IVP1ChannelWidget*cw)
+void GXExecutionScheduler::uncreateAndDelete(IVP1ChannelWidget*cw)
 {
 	assert(cw->state()==IVP1ChannelWidget::READY);
 	if (m_d->currentsystemrefreshing&&cw->systems().find(m_d->currentsystemrefreshing)!=cw->systems().end()) {
@@ -861,7 +861,7 @@ void VP1ExecutionScheduler::uncreateAndDelete(IVP1ChannelWidget*cw)
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::actualUncreateAndDelete(IVP1ChannelWidget*cw)
+void GXExecutionScheduler::actualUncreateAndDelete(IVP1ChannelWidget*cw)
 {
 	assert(cw->state()==IVP1ChannelWidget::READY);
 	cw->setUpdatesEnabled(false);//Just because...
@@ -904,7 +904,7 @@ void VP1ExecutionScheduler::actualUncreateAndDelete(IVP1ChannelWidget*cw)
 }
 
 //___________________________________________________________________
-void VP1ExecutionScheduler::Imp::warnIfWidgetsAlive()
+void GXExecutionScheduler::Imp::warnIfWidgetsAlive()
 {
 	QSet<QWidget*> w_ignore, wl = QApplication::allWidgets().toSet();
 	w_ignore<<qApp->desktop();
@@ -931,9 +931,9 @@ void VP1ExecutionScheduler::Imp::warnIfWidgetsAlive()
 }
 
 //___________________________________________________________________
-bool VP1ExecutionScheduler::hasAllActiveSystemsRefreshed( IVP1ChannelWidget* cw ) const
+bool GXExecutionScheduler::hasAllActiveSystemsRefreshed( IVP1ChannelWidget* cw ) const
 {
-	VP1Msg::messageDebug("VP1ExecutionScheduler::hasAllActiveSystemsRefreshed() - channelWidget: " + cw->name());
+	VP1Msg::messageDebug("GXExecutionScheduler::hasAllActiveSystemsRefreshed() - channelWidget: " + cw->name());
 
 	std::set<IVP1System*>::const_iterator it, itE = cw->systems().end();
 	int i=0;
@@ -959,7 +959,7 @@ bool VP1ExecutionScheduler::hasAllActiveSystemsRefreshed( IVP1ChannelWidget* cw 
 }
 
 //___________________________________________________________________
-bool VP1ExecutionScheduler::Imp::allVisibleRefreshed() const
+bool GXExecutionScheduler::Imp::allVisibleRefreshed() const
 {
 	foreach(IVP1ChannelWidget*cw,mainwindow->tabManager()->visibleChannels())
     		if (!scheduler->hasAllActiveSystemsRefreshed(cw))
@@ -968,7 +968,7 @@ bool VP1ExecutionScheduler::Imp::allVisibleRefreshed() const
 }
 
 //___________________________________________________________________
-bool VP1ExecutionScheduler::Imp::allSoonVisibleRefreshed() const
+bool GXExecutionScheduler::Imp::allSoonVisibleRefreshed() const
 {
 	foreach(IVP1ChannelWidget*cw,mainwindow->tabManager()->soonVisibleChannels())
     		if (!scheduler->hasAllActiveSystemsRefreshed(cw))
@@ -979,7 +979,7 @@ bool VP1ExecutionScheduler::Imp::allSoonVisibleRefreshed() const
 
 
 //___________________________________________________________________
-QStringList VP1ExecutionScheduler::userRequestedFiles()
+QStringList GXExecutionScheduler::userRequestedFiles()
 {
 	return m_d->mainwindow->userRequestedFiles();
 }

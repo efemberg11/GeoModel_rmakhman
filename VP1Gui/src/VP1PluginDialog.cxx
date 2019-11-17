@@ -15,7 +15,7 @@
 #include "VP1Gui/VP1PluginDialog.h"
 #include "ui_vp1plugindialog.h"
 #include "VP1Gui/VP1ChannelManager.h"
-#include "VP1Gui/VP1ExecutionScheduler.h"
+#include "VP1Gui/GXExecutionScheduler.h"
 #include "VP1Base/IVP1ChannelWidget.h"
 #include <QFileInfo>
 #include <cassert>
@@ -25,7 +25,7 @@ class VP1PluginDialog::Imp {
 public:
   VP1PluginDialog*pd;
   VP1ChannelManager* channelmanager;
-  VP1ExecutionScheduler* scheduler;
+  GXExecutionScheduler* scheduler;
   void setInfo();
   QLabel * label_selectplugin;
   QComboBox * comboBox_plugins;
@@ -39,7 +39,7 @@ public:
 };
 
 //____________________________________________________________________
-VP1PluginDialog::VP1PluginDialog(QWidget*parent, VP1ChannelManager*cm,VP1ExecutionScheduler*scheduler)
+VP1PluginDialog::VP1PluginDialog(QWidget*parent, VP1ChannelManager*cm,GXExecutionScheduler*scheduler)
   : QDialog(parent), m_d(new Imp)
 {
   m_d->pd = this;

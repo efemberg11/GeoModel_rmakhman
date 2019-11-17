@@ -19,7 +19,7 @@
 
 #include "VP1Gui/VP1ChannelManager.h"
 #include "VP1Gui/VP1TabManager.h"
-#include "VP1Gui/VP1ExecutionScheduler.h"
+#include "VP1Gui/GXExecutionScheduler.h"
 #include "VP1Gui/VP1PluginDialog.h"
 #include "VP1Gui/VP1DockWidget.h"
 
@@ -75,7 +75,7 @@
 
 
 //_________________________________________________________________________________
-VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,QWidget * parent)
+VP1MainWindow::VP1MainWindow(GXExecutionScheduler*sched,QWidget * parent)
 : QMainWindow(parent),
   m_mustquit(false),
   m_dummyemptycontroller(new QWidget(0)),

@@ -47,7 +47,7 @@ public:
   std::map<VP1GeoFlags::SubSystemFlag,QCheckBox*> subSysCheckBoxMap;
   float last_transparency;
   bool last_showVolumeOutLines;
-  VP1GeoFlags::MuonChamberAdaptionStyleFlags last_muonChamberAdaptionStyle;
+  //  VP1GeoFlags::MuonChamberAdaptionStyleFlags last_muonChamberAdaptionStyle;
   int last_labels; //!< needed for POSSIBLECHANGE_IMP macro.
   QList<int> last_labelPosOffset; //!< needed for  POSSIBLECHANGE_IMP macro.
   SoPickStyle * pickStyle;

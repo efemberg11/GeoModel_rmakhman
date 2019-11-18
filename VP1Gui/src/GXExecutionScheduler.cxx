@@ -275,7 +275,7 @@ GXExecutionScheduler::GXExecutionScheduler( QObject * parent)
 	m_d->refreshtimer = new QTimer(this);
 	m_d->splashScreenTimer = new QTimer(this);
 	m_d->splashScreenTimer->setSingleShot(true);
-	m_d->splashScreenTimer->setInterval(2500);
+	m_d->splashScreenTimer->setInterval(1000);
 	
 	connect(m_d->refreshtimer, SIGNAL(timeout()), this, SLOT(processSystemForRefresh()));
 

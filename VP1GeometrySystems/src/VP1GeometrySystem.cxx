@@ -47,6 +47,7 @@
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelKernel/GeoPrintGraphAction.h"
 #include "GeoModelKernel/GeoMaterial.h"
+#include "GeoModelKernel/GeoElement.h"
 
 
 #include "GeoModelKernel/GeoBox.h"
@@ -54,7 +55,7 @@
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
-
+#include "GeoModelWrite/WriteGeoModel.h"
 
 #include <QStack>
 #include <QString>
@@ -71,6 +72,7 @@
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QFileDialog>
+#include <QPushButton>
 #include <map>
 #include <unistd.h>
 
@@ -324,7 +326,7 @@ QWidget * VP1GeometrySystem::buildController()
   connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
   connect(m_d->controller,SIGNAL(actionOnAllNonStandardVolumes(bool)),this,SLOT(actionOnAllNonStandardVolumes(bool)));
   connect(m_d->controller,SIGNAL(resetSubSystems(VP1GeoFlags::SubSystemFlags)),this,SLOT(resetSubSystems(VP1GeoFlags::SubSystemFlags)));
-
+  connect(m_d->controller->requestOutputButton(), SIGNAL(clicked()), this, SLOT(saveTrees()));
 
   /* This is where we define the available different subsystems and their location in the geomodel tree.
    *
@@ -411,11 +413,11 @@ void VP1GeometrySystem::Imp::catchKbdState(void *address, SoEventCallback *CB) {
 void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSeparator *root)
 {
   m_d->sceneroot = root;
-
-
+  
+  
   PVConstLink world(m_d->getGeometry());
   if (!world) return;
-
+  
   
   if (!m_d->m_textSep) {
     // FIXME!
@@ -431,92 +433,92 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   myFont->name.setValue("Arial");
   myFont->size.setValue(12.0);
   m_d->m_textSep->addChild(myFont);
-
+  
   bool save = root->enableNotify(false);
-
+  
   //Catch keyboard events:
   SoEventCallback *catchEvents = new SoEventCallback();
   catchEvents->addEventCallback(SoKeyboardEvent::getClassTypeId(),Imp::catchKbdState, m_d);
   root->addChild(catchEvents);
-
+  
   root->addChild(m_d->controller->drawOptions());
   root->addChild(m_d->controller->pickStyle());
-
+  
   if(VP1Msg::debug()){
     qDebug() << "Configuring the default systems... - subsysInfoList len:" << (m_d->subsysInfoList).length();
   }
   // we switch on the systems flagged to be turned on at start
   foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList)
-  {
-	VP1Msg::messageDebug("Switching on this system: " + QString::fromStdString(subsys->matname) + " - " + subsys->flag);
-    bool on(m_d->initialSubSystemsTurnedOn & subsys->flag);
-    subsys->checkbox->setChecked( on );
-    subsys->checkbox->setEnabled(false);
-    subsys->checkbox->setToolTip("This sub-system is not available");
-    connect(subsys->checkbox,SIGNAL(toggled(bool)),this,SLOT(checkboxChanged()));
-   }
-
+    {
+      VP1Msg::messageDebug("Switching on this system: " + QString::fromStdString(subsys->matname) + " - " + subsys->flag);
+      bool on(m_d->initialSubSystemsTurnedOn & subsys->flag);
+      subsys->checkbox->setChecked( on );
+      subsys->checkbox->setEnabled(false);
+      subsys->checkbox->setToolTip("This sub-system is not available");
+      connect(subsys->checkbox,SIGNAL(toggled(bool)),this,SLOT(checkboxChanged()));
+    }
+  
   //Locate geometry info for the various subsystems, and add the info as appropriate:
-
+  
   QCheckBox * checkBoxOther = m_d->controller->subSystemCheckBox(VP1GeoFlags::AllUnrecognisedVolumes);
-
+  
   if(VP1Msg::debug()){
     qDebug() << "Looping on volumes from the input GeoModel...";
   }
   GeoVolumeCursor av(world);
   while (!av.atEnd()) {
-
-	  std::string name = av.getName();
+    
+    std::string name = av.getName();
     if(VP1Msg::debug()){
       qDebug() << "volume name:" << QString::fromStdString(name);
     }
 
-	  // DEBUG
-	  VP1Msg::messageDebug("DEBUG: Found GeoModel treetop: "+QString(name.c_str()));
-
-	  //Let us see if we recognize this volume:
-	  bool found = false;
-	  foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
-		  if (subsys->negatetreetopregexp!=subsys->geomodeltreetopregexp.exactMatch(name.c_str()))
-		  {
-			  if (subsys->checkbox==checkBoxOther&&found) {
-				  continue;//The "other" subsystem has a wildcard which matches everything - but we only want stuff that is nowhere else.
-			  }
-
-              if(VP1Msg::debug()){
-                qDebug() << (subsys->geomodeltreetopregexp).pattern() << subsys->geomodeltreetopregexp.exactMatch(name.c_str()) << subsys->negatetreetopregexp;
-                qDebug() << "setting 'found' to TRUE for pattern:" << (subsys->geomodeltreetopregexp).pattern();
-              }
-              found = true;
-			  //We did... now, time to extract info:
-			  subsys->treetopinfo.resize(subsys->treetopinfo.size()+1);
-			  subsys->treetopinfo.back().pV = av.getVolume();
-			  subsys->treetopinfo.back().xf = av.getTransform();
-			  subsys->treetopinfo.back().volname = av.getName();
-
-			  //Add a switch for this system (turned off for now):
-			  SoSwitch * sw = new SoSwitch();
-			  //But add a separator on top of it (for caching):
-			  subsys->soswitch = sw;
-			  if (sw->whichChild.getValue() != SO_SWITCH_NONE)
-				  sw->whichChild = SO_SWITCH_NONE;
-			  SoSeparator * sep = new SoSeparator;
-			  sep->addChild(sw);
-			  root->addChild(sep);
-			  //Enable the corresponding checkbox:
-			  subsys->checkbox->setEnabled(true);
-			  subsys->checkbox->setToolTip("Toggle the display of the "+subsys->checkbox->text()+" sub system");
-			  //NB: Dont break here - several systems might share same treetop!
-			  //	break;
-		  }
+    // DEBUG
+    VP1Msg::messageDebug("DEBUG: Found GeoModel treetop: "+QString(name.c_str()));
+    
+    //Let us see if we recognize this volume:
+    bool found = false;
+    foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
+      if (subsys->negatetreetopregexp!=subsys->geomodeltreetopregexp.exactMatch(name.c_str()))
+	{
+	  if (subsys->checkbox==checkBoxOther&&found) {
+	    continue;//The "other" subsystem has a wildcard which matches everything - but we only want stuff that is nowhere else.
 	  }
-	  if (!found) {
-		  message("Warning: Found unexpected GeoModel treetop: "+QString(name.c_str()));
+	  
+	  if(VP1Msg::debug()){
+	    qDebug() << (subsys->geomodeltreetopregexp).pattern() << subsys->geomodeltreetopregexp.exactMatch(name.c_str()) << subsys->negatetreetopregexp;
+	    qDebug() << "setting 'found' to TRUE for pattern:" << (subsys->geomodeltreetopregexp).pattern();
 	  }
-
-	  av.next(); // increment volume cursor.
+	  found = true;
+	  //We did... now, time to extract info:
+	  subsys->treetopinfo.resize(subsys->treetopinfo.size()+1);
+	  subsys->treetopinfo.back().pV = av.getVolume();
+	  subsys->treetopinfo.back().xf = av.getTransform();
+	  subsys->treetopinfo.back().volname = av.getName();
+	  
+	  //Add a switch for this system (turned off for now):
+	  SoSwitch * sw = new SoSwitch();
+	  //But add a separator on top of it (for caching):
+	  subsys->soswitch = sw;
+	  if (sw->whichChild.getValue() != SO_SWITCH_NONE)
+	    sw->whichChild = SO_SWITCH_NONE;
+	  SoSeparator * sep = new SoSeparator;
+	  sep->addChild(sw);
+	  root->addChild(sep);
+	  //Enable the corresponding checkbox:
+	  subsys->checkbox->setEnabled(true);
+	  subsys->checkbox->setToolTip("Toggle the display of the "+subsys->checkbox->text()+" sub system");
+	  //NB: Dont break here - several systems might share same treetop!
+	  //	break;
+	}
+    }
+    if (!found) {
+      message("Warning: Found unexpected GeoModel treetop: "+QString(name.c_str()));
+    }
+    
+    av.next(); // increment volume cursor.
   }
-
+  
   //Hide other cb if not needed:
   if (!checkBoxOther->isEnabled())
     checkBoxOther->setVisible(false);
@@ -1604,4 +1606,71 @@ void VP1GeometrySystem::loadMaterialsFromFile(QString filename)
   m_d->controller->setLastSelectedVolume(lastsel);
 }
 
+#include <iostream>
+void VP1GeometrySystem::saveTrees() {
+#ifdef __APPLE__
+  char buffer[1024];
+  char *wd=getcwd(buffer,1024);
+  
+  QString path = QFileDialog::getSaveFileName(nullptr, tr("Save Geometry File"),
+					      wd,
+					      tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
+#else
+  QString path = QFileDialog::getSaveFileName(nullptr, tr("Save Geometry File"),
+					      get_current_dir_name(),
+					      tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
+#endif
+  if (path.isEmpty()) return;
+  
+  GMDBManager db(path);
+  
+  // check the DB connection
+  if (db.isOpen())
+    qDebug() << "OK! Database is open!";
+  else {
+    qDebug() << "Database ERROR!! Exiting...";
+    return;
+  }
+  GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
 
+
+  const double  gr =   SYSTEM_OF_UNITS::gram;
+  const double  mole = SYSTEM_OF_UNITS::mole;
+  const double  cm3 =  SYSTEM_OF_UNITS::cm3;
+
+  // Define the chemical elements
+  GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
+  GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
+  GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
+  GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
+  
+  double densityOfAir=0.001214 *gr/cm3;
+  GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
+  air->add(Nitrogen  , 0.7494);
+  air->add(Oxygen, 0.2369);
+  air->add(Argon, 0.0129);
+  air->add(Hydrogen, 0.0008);
+  air->lock();
+  
+  const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+  const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
+  GeoPhysVol* world = new GeoPhysVol(worldLog);
+
+  
+  foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
+    if (subsys->checkbox->isChecked()){
+      std::vector<Imp::SubSystemInfo::TreetopInfo> & ttInfo=subsys->treetopinfo;
+      foreach (const Imp::SubSystemInfo::TreetopInfo & treeTop, ttInfo) {
+	
+	GeoTransform *transform=new GeoTransform(treeTop.xf);
+	world->add(transform);
+	GeoPhysVol *pV=(GeoPhysVol *) &*treeTop.pV;
+	world->add(pV);
+	pV->unref();
+      }
+    }
+  } 
+  world->exec(&dumpGeoModelGraph);
+
+  dumpGeoModelGraph.saveToDB();
+}

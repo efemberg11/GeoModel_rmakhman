@@ -70,15 +70,6 @@ public:
   };
   Q_DECLARE_FLAGS(SubSystemFlags, SubSystemFlag)
 
-  enum MuonChamberAdaptionStyleFlag {
-    OpenMDTChambers = 0x000001,
-    OpenCSCChambers = 0x000010,
-    OpenTGCChambers = 0x000100,
-    HideMDTTubes    = 0x001000,
-    HideRPCVolumes  = 0x010000
-  };
-  Q_DECLARE_FLAGS(MuonChamberAdaptionStyleFlags, MuonChamberAdaptionStyleFlag)
-
   //VolumeState:
   enum VOLSTATE { CONTRACTED,//Show volume if parent is EXPANDED, never show children.
 		  EXPANDED,//Dont show volume ( => show all un-zapped children or their children as appropriate).
@@ -91,7 +82,6 @@ private:
   ~VP1GeoFlags();
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(VP1GeoFlags::SubSystemFlags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(VP1GeoFlags::MuonChamberAdaptionStyleFlags)
+//Q_DECLARE_OPERATORS_FOR_FLAGS(VP1GeoFlags::SubSystemFlags)
 
 #endif

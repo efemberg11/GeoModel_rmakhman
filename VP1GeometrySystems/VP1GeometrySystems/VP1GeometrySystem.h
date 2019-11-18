@@ -33,7 +33,7 @@ class VP1GeometrySystem : public IVP13DSystemSimple {
 public:
 
 
-  VP1GeometrySystem( const VP1GeoFlags::SubSystemFlags& SubSystemsTurnedOn = VP1GeoFlags::None,
+  VP1GeometrySystem( const VP1GeoFlags::SubSystemFlags& SubSystemsTurnedOn = {"VP1GeoFlags::None"},
 		     QString name = "Geo" );
   virtual ~VP1GeometrySystem();
 

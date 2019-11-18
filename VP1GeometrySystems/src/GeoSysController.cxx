@@ -126,38 +126,38 @@ GeoSysController::GeoSysController(IVP1System * sys)
   setLastSelectedVolume(0);
 
   // INNER DETECTOR
-  m_d->subSysCheckBoxMap[VP1GeoFlags::Pixel] = m_d->ui.checkBox_Pixel;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::SCT] = m_d->ui.checkBox_SCT;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::TRT] = m_d->ui.checkBox_TRT;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::InDetServMat] = m_d->ui.checkBox_InDetServMat;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::Pixel"] = m_d->ui.checkBox_Pixel;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::SCT"] = m_d->ui.checkBox_SCT;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::TRT"] = m_d->ui.checkBox_TRT;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::InDetServMat"] = m_d->ui.checkBox_InDetServMat;
 
   // CALO
-  m_d->subSysCheckBoxMap[VP1GeoFlags::LAr] = m_d->ui.checkBox_LAr;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::Tile] = m_d->ui.checkBox_Tile;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::LAr"] = m_d->ui.checkBox_LAr;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::Tile"] = m_d->ui.checkBox_Tile;
 
   // MUON TOROID
-  m_d->subSysCheckBoxMap[VP1GeoFlags::BarrelToroid] = m_d->ui.checkBox_MuonBarrelToroid;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::ToroidECA] = m_d->ui.checkBox_MuonECAToroid;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::BarrelToroid"] = m_d->ui.checkBox_MuonBarrelToroid;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::ToroidECA"] = m_d->ui.checkBox_MuonECAToroid;
   // m_d->subSysCheckBoxMap[VP1GeoFlags::ToroidECC] = m_d->ui.checkBox_MuonECCToroid;
   // MUON MISC
   // MUON CHAMBERS
-  m_d->subSysCheckBoxMap[VP1GeoFlags::MuonEndcapStationCSC] = m_d->ui.checkBox_MuonEndcapStationCSC;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::MuonEndcapStationTGC] = m_d->ui.checkBox_MuonEndcapStationTGC;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::MuonEndcapStationMDT] = m_d->ui.checkBox_MuonEndcapStationMDT;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::MuonEndcapStationNSW] = m_d->ui.checkBox_NSW;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::MuonBarrelStationInner] = m_d->ui.checkBox_MuonBarrelStationInner;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::MuonBarrelStationMiddle] = m_d->ui.checkBox_MuonBarrelStationMiddle;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::MuonBarrelStationOuter] = m_d->ui.checkBox_MuonBarrelStationOuter;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::MuonEndcapStationCSC"] = m_d->ui.checkBox_MuonEndcapStationCSC;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::MuonEndcapStationTGC"] = m_d->ui.checkBox_MuonEndcapStationTGC;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::MuonEndcapStationMDT"] = m_d->ui.checkBox_MuonEndcapStationMDT;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::MuonEndcapStationNSW"] = m_d->ui.checkBox_NSW;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::MuonBarrelStationInner"] = m_d->ui.checkBox_MuonBarrelStationInner;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::MuonBarrelStationMiddle"] = m_d->ui.checkBox_MuonBarrelStationMiddle;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::MuonBarrelStationOuter"] = m_d->ui.checkBox_MuonBarrelStationOuter;
 
   // MISCELLANEOUS
-  m_d->subSysCheckBoxMap[VP1GeoFlags::CavernInfra] = m_d->ui.checkBox_CavernInfra;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::BeamPipe] = m_d->ui.checkBox_BeamPipe;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::LUCID] = m_d->ui.checkBox_LUCID;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::ZDC] = m_d->ui.checkBox_ZDC;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::ALFA] = m_d->ui.checkBox_ALFA;
-  m_d->subSysCheckBoxMap[VP1GeoFlags::ForwardRegion] = m_d->ui.checkBox_ForwardRegion;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::CavernInfra"] = m_d->ui.checkBox_CavernInfra;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::BeamPipe"] = m_d->ui.checkBox_BeamPipe;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::LUCID"] = m_d->ui.checkBox_LUCID;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::ZDC"] = m_d->ui.checkBox_ZDC;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::ALFA"] = m_d->ui.checkBox_ALFA;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::ForwardRegion"] = m_d->ui.checkBox_ForwardRegion;
   // OTHER
-  m_d->subSysCheckBoxMap[VP1GeoFlags::AllUnrecognisedVolumes] = m_d->ui.checkBox_other;
+  m_d->subSysCheckBoxMap["VP1GeoFlags::AllUnrecognisedVolumes"] = m_d->ui.checkBox_other;
 
   // -> labels
   addUpdateSlot(SLOT(possibleChange_labels()));

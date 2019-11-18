@@ -94,7 +94,7 @@ signals:
   void labelPosOffsetChanged(QList<int>);
 
   //Signals without state:
-  void resetSubSystems(VP1GeoFlags::SubSystemFlags);
+  void resetSubSystems(VP1GeoFlags::SubSystemFlag);
   void autoExpandByVolumeOrMaterialName(bool,QString);//volname: (false,namestr), matname: (true,namestr)
   void actionOnAllNonStandardVolumes(bool);//true: zap, false: expand.
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);//Might not be used atm.

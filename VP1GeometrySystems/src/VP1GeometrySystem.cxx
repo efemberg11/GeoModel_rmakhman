@@ -290,11 +290,11 @@ void VP1GeometrySystem::Imp::addSubSystem(const VP1GeoFlags::SubSystemFlag& f,
 					  const std::string& matname, bool negatetreetopregexp, bool negatechildrenregexp,
 					  const QString& grandchildrenregexp, bool negategrandchildrenregexp)
 {
-  theclass->message("VP1GeometrySystem::Imp::addSubSystem - flag: '" + QString(f) + "' - matName: '" + str(matname.c_str()) + "'." );
+  theclass->message("VP1GeometrySystem::Imp::addSubSystem - flag: '" + QString(f.c_str()) + "' - matName: '" + str(matname.c_str()) + "'." );
 
   QCheckBox * cb = controller->subSystemCheckBox(f);
   if (!cb) {
-    theclass->message("Error: Problems retrieving checkbox for subsystem "+str(f));
+    theclass->message(("Error: Problems retrieving checkbox for subsystem "+f).c_str());
     return;
   }
   subsysInfoList << new SubSystemInfo(cb,QRegExp(treetopregexp),negatetreetopregexp,
@@ -342,48 +342,48 @@ QWidget * VP1GeometrySystem::buildController()
                           bool negategrandchildrenregexp = false // wheter we want to negate teh granchildren regex
    */
 
-  m_d->addSubSystem( VP1GeoFlags::Pixel,"Pixel");
-  m_d->addSubSystem( VP1GeoFlags::SCT,"SCT");
-  m_d->addSubSystem( VP1GeoFlags::TRT,"TRT");
-  m_d->addSubSystem( VP1GeoFlags::InDetServMat,"InDetServMat");
-  m_d->addSubSystem( VP1GeoFlags::LAr, ".*LAr.*");
-  m_d->addSubSystem( VP1GeoFlags::Tile,"Tile");
-  m_d->addSubSystem( VP1GeoFlags::CavernInfra,"CavernInfra");
-  m_d->addSubSystem( VP1GeoFlags::BeamPipe,"BeamPipe");
-  m_d->addSubSystem( VP1GeoFlags::LUCID,".*Lucid.*");
-  m_d->addSubSystem( VP1GeoFlags::ZDC,".*ZDC.*");
-  m_d->addSubSystem( VP1GeoFlags::ALFA,".*ALFA.*");
-  m_d->addSubSystem( VP1GeoFlags::ForwardRegion,".*ForwardRegion.*");
+  m_d->addSubSystem( "VP1GeoFlags::Pixel","Pixel");
+  m_d->addSubSystem( "VP1GeoFlags::SCT","SCT");
+  m_d->addSubSystem( "VP1GeoFlags::TRT","TRT");
+  m_d->addSubSystem( "VP1GeoFlags::InDetServMat","InDetServMat");
+  m_d->addSubSystem( "VP1GeoFlags::LAr", ".*LAr.*");
+  m_d->addSubSystem( "VP1GeoFlags::Tile","Tile");
+  m_d->addSubSystem( "VP1GeoFlags::CavernInfra","CavernInfra");
+  m_d->addSubSystem( "VP1GeoFlags::BeamPipe","BeamPipe");
+  m_d->addSubSystem( "VP1GeoFlags::LUCID",".*Lucid.*");
+  m_d->addSubSystem( "VP1GeoFlags::ZDC",".*ZDC.*");
+  m_d->addSubSystem( "VP1GeoFlags::ALFA",".*ALFA.*");
+  m_d->addSubSystem( "VP1GeoFlags::ForwardRegion",".*ForwardRegion.*");
 
   //The muon systems require special treatment, since we want to
   //cherrypick below the treetop (this is the main reason for a lot
   //of the ugly stuff in this class):
-  m_d->addSubSystem( VP1GeoFlags::MuonEndcapStationCSC,"Muon","CS.*","CSC");
-  m_d->addSubSystem( VP1GeoFlags::MuonEndcapStationTGC,"Muon","T(1|2|3|4).*","TGC");
-  m_d->addSubSystem( VP1GeoFlags::MuonEndcapStationMDT,"Muon","(EI|EM|EO|EE).*","EndcapMdt");
-  m_d->addSubSystem( VP1GeoFlags::MuonEndcapStationNSW,"Muon",".*ANON.*","MuonNSW",false, false, "NewSmallWheel.*");
+  m_d->addSubSystem( "VP1GeoFlags::MuonEndcapStationCSC","Muon","CS.*","CSC");
+  m_d->addSubSystem( "VP1GeoFlags::MuonEndcapStationTGC","Muon","T(1|2|3|4).*","TGC");
+  m_d->addSubSystem( "VP1GeoFlags::MuonEndcapStationMDT","Muon","(EI|EM|EO|EE).*","EndcapMdt");
+  m_d->addSubSystem( "VP1GeoFlags::MuonEndcapStationNSW","Muon",".*ANON.*","MuonNSW",false, false, "NewSmallWheel.*");
 
-  m_d->addSubSystem( VP1GeoFlags::MuonBarrelStationInner,"Muon","(BI|BEE).*","BarrelInner");
-  m_d->addSubSystem( VP1GeoFlags::MuonBarrelStationMiddle,"Muon","BM.*","BarrelMiddle");
-  m_d->addSubSystem( VP1GeoFlags::MuonBarrelStationOuter,"Muon","BO.*","BarrelOuter");
+  m_d->addSubSystem( "VP1GeoFlags::MuonBarrelStationInner","Muon","(BI|BEE).*","BarrelInner");
+  m_d->addSubSystem( "VP1GeoFlags::MuonBarrelStationMiddle","Muon","BM.*","BarrelMiddle");
+  m_d->addSubSystem( "VP1GeoFlags::MuonBarrelStationOuter","Muon","BO.*","BarrelOuter");
 
 
   // Toroid
-  m_d->addSubSystem( VP1GeoFlags::BarrelToroid,"Muon",".*ANON.*","BarrelToroid", false, false, "BAR_Toroid.*");
-  m_d->addSubSystem( VP1GeoFlags::ToroidECA,"Muon",".*ANON.*","ToroidECA", false, false, "ECT_Toroids.*");
+  m_d->addSubSystem( "VP1GeoFlags::BarrelToroid","Muon",".*ANON.*","BarrelToroid", false, false, "BAR_Toroid.*");
+  m_d->addSubSystem( "VP1GeoFlags::ToroidECA","Muon",".*ANON.*","ToroidECA", false, false, "ECT_Toroids.*");
 
   // Muon Feet
-  m_d->addSubSystem( VP1GeoFlags::MuonFeet,"Muon",".*ANON.*","MuonFeet", false, false, "Feet.*");
+  m_d->addSubSystem( "VP1GeoFlags::MuonFeet","Muon",".*ANON.*","MuonFeet", false, false, "Feet.*");
 
   // Muon shielding
-  m_d->addSubSystem( VP1GeoFlags::MuonShielding,"Muon",".*ANON.*","Shielding", false, false, "(JDSH|JTSH|JFSH).*");
+  m_d->addSubSystem( "VP1GeoFlags::MuonShielding","Muon",".*ANON.*","Shielding", false, false, "(JDSH|JTSH|JFSH).*");
 
 
   // All muon stuff --> this will be linked to the "Services" checkbox in the GUI
-  m_d->addSubSystem( VP1GeoFlags::MuonToroidsEtc,"Muon",".*(CS|T1|T2|T3|T4|EI|EM|EO|EE|BI|BEE|BM|BO).*","MuonEtc",false,true,"(ECT_Toroids|BAR_Toroid|Feet|NewSmallWheel|JDSH|JTSH|JFSH).*",true);
+  m_d->addSubSystem( "VP1GeoFlags::MuonToroidsEtc","Muon",".*(CS|T1|T2|T3|T4|EI|EM|EO|EE|BI|BEE|BM|BO).*","MuonEtc",false,true,"(ECT_Toroids|BAR_Toroid|Feet|NewSmallWheel|JDSH|JTSH|JFSH).*",true);
 
   //This one MUST be added last. It will get slightly special treatment in various places!
-  m_d->addSubSystem( VP1GeoFlags::AllUnrecognisedVolumes,".*");
+  m_d->addSubSystem( "VP1GeoFlags::AllUnrecognisedVolumes",".*");
 
 
   //Setup models/views for volume tree browser and zapped volumes list:
@@ -450,8 +450,9 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   // we switch on the systems flagged to be turned on at start
   foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList)
     {
-      VP1Msg::messageDebug("Switching on this system: " + QString::fromStdString(subsys->matname) + " - " + subsys->flag);
-      bool on(m_d->initialSubSystemsTurnedOn & subsys->flag);
+      bool on(std::find(m_d->initialSubSystemsTurnedOn.begin(),
+			m_d->initialSubSystemsTurnedOn.end(),subsys->flag)!=
+	      m_d->initialSubSystemsTurnedOn.end());
       subsys->checkbox->setChecked( on );
       subsys->checkbox->setEnabled(false);
       subsys->checkbox->setToolTip("This sub-system is not available");
@@ -460,7 +461,7 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   
   //Locate geometry info for the various subsystems, and add the info as appropriate:
   
-  QCheckBox * checkBoxOther = m_d->controller->subSystemCheckBox(VP1GeoFlags::AllUnrecognisedVolumes);
+  QCheckBox * checkBoxOther = m_d->controller->subSystemCheckBox("VP1GeoFlags::AllUnrecognisedVolumes");
   
   if(VP1Msg::debug()){
     qDebug() << "Looping on volumes from the input GeoModel...";
@@ -1188,7 +1189,7 @@ void VP1GeometrySystem::restoreFromState(QByteArray ba) {
   foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
     state.widgetHandled(subsys->checkbox);
     if (subsysstate.contains(subsys->checkbox->text())&&subsysstate[subsys->checkbox->text()])
-      flags |= subsys->flag;
+      flags.push_back(subsys->flag);
   }
   m_d->initialSubSystemsTurnedOn = flags;
 
@@ -1234,76 +1235,33 @@ void VP1GeometrySystem::Imp::applyTopVolStates(const QMap<quint32,QByteArray>&to
 //_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::createPathExtras(const VolumeHandle* volhandle, QString& prefix, QStack<QString>& entries)
 {
-  switch(volhandle->subsystem()){
-  case VP1GeoFlags::Pixel: {
-    prefix = QString("Pixel::");
-    entries.push("IDET::IDET");
-    entries.push("Pixel::Pixel");
-    return;
-  }
-  case VP1GeoFlags::SCT:{
-    prefix = QString("SCT::");
-    entries.push("IDET::IDET");
-    entries.push("SCT::SCT");
-    return;
-  }
-  case VP1GeoFlags::TRT:{
-    prefix = QString("TRT::");
-    entries.push("IDET::IDET");
-    entries.push("TRT::TRT");
-    return;
-  }
-  case VP1GeoFlags::InDetServMat:{
-    prefix = QString("InDetServMat::");
-    entries.push("IDET::IDET");
-    return;
-  }
-  case VP1GeoFlags::LAr:{
-    prefix = QString("LArMgr::");
-    entries.push("CALO::CALO");
-    entries.push("LArMgr::LArMgr");
-    return;
-  }
-  case VP1GeoFlags::Tile:{
-    prefix = QString("Tile::");
-    entries.push("CALO::CALO");
-    entries.push("Tile::Tile");
-    return;
-  }
-  case VP1GeoFlags::MuonToroidsEtc:
-  case VP1GeoFlags::BarrelToroid:
-  case VP1GeoFlags::ToroidECA:
-  case VP1GeoFlags::ToroidECC:
-  case VP1GeoFlags::MuonFeet:
-  case VP1GeoFlags::MuonShielding:
-  case VP1GeoFlags::MuonBarrelStationInner:
-  case VP1GeoFlags::MuonBarrelStationMiddle:
-  case VP1GeoFlags::MuonBarrelStationOuter:
-  case VP1GeoFlags::MuonEndcapStationCSC:
-  case VP1GeoFlags::MuonEndcapStationTGC:
-  case VP1GeoFlags::MuonEndcapStationMDT:
-  case VP1GeoFlags::AllMuonChambers:{
-    prefix = QString("Muon::");
-    entries.push("MUONQ02::MUONQ02");
-    entries.push("Muon::MuonSys");
-    return;
-  }
-  case VP1GeoFlags::BeamPipe:{
-    prefix = QString("BeamPipe::");
-    entries.push("BeamPipe::BeamPipe");
-    return;
-  }
-  case VP1GeoFlags::None:
-  case VP1GeoFlags::CavernInfra:
-  case VP1GeoFlags::LUCID:
-  case VP1GeoFlags::ZDC:
-  case VP1GeoFlags::ALFA:
-  case VP1GeoFlags::ForwardRegion:
-  case VP1GeoFlags::AllUnrecognisedVolumes:
-  default:{
-    return;
-  }
-  }
+  std::map<std::string, QString> pMap = {{"VP1GeoFlags::Pixel","Pixel::"},
+					 {"VP1GeoFlags::SCT","SCT::"},
+					 {"VP1GeoFlags::TRT","TRT::"},
+					 {"VP1GeoFlags::InDetServMat","InDetServMat::"},
+					 {"VP1GeoFlags::LAr","LArMgr::"},
+					 {"VP1GeoFlags::Tile","Tile::"},
+					 {"VP1GeoFlags::AllMuonChambers","Muon::"},
+					 {"VP1GeoFlags::BeamPipe","BeamPipe::"}};
+  std::map<std::string, std::vector<QString>> eMap= {{"VP1GeoFlags::Pixel",{"IDET::IDET","Pixel::Pixel"}},
+						     {"VP1GeoFlags::SCT",{"IDET::IDET","SCT::SCT"}},
+						     {"VP1GeoFlags::TRT",{"IDET::IDET","TRT::TRT"}},
+						     {"VP1GeoFlags::InDetServMat",{"IDET::IDET"}},
+						     {"VP1GeoFlags::LAr",{"CALO::CALO","LArMgr::LArMgr"}},
+						     {"VP1GeoFlags::Tile",{"CALO::CALO","Tile::Tile"}},
+						     {"VP1GeoFlags::AllMuonChambers",{"MUONQ02::MUONQ02","Muon::MuonSys"}},
+						     {"VP1GeoFlags::BeamPipe",{"BeamPipe::","BeamPipe::BeamPipe"}}};
+; 
+
+ auto pIt=pMap.find(volhandle->subsystem());
+ auto eIt=eMap.find(volhandle->subsystem());
+ if (pIt!=pMap.end()) {
+   prefix=pIt->second;
+ }
+ if (eIt!=eMap.end()) {
+   for (int i=0;i<eIt->second.size();i++) entries.push((eIt->second)[i]);
+ }
+ 
 }
 
 //_____________________________________________________________________________________
@@ -1338,13 +1296,13 @@ void VP1GeometrySystem::updateTransparency()
 //_____________________________________________________________________________________
 void VP1GeometrySystem::resetSubSystems(VP1GeoFlags::SubSystemFlags f)
 {
-  if (!f) {
+  if (f.empty()) {
     return; 
   }
 
   deselectAll();
   foreach(Imp::SubSystemInfo*si,m_d->subsysInfoList) {
-    if (si->flag & f) {
+    if (std::find(f.begin(),f.end(),si->flag)!=f.end()) {
         if (!si->isbuilt) {
 	        continue;
         }

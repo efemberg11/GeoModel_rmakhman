@@ -18,7 +18,7 @@
 #include <QDialog>
 
 class VP1ChannelManager;
-class VP1ExecutionScheduler;
+class GXExecutionScheduler;
 
 class VP1PluginDialog : public QDialog {
 
@@ -26,7 +26,7 @@ class VP1PluginDialog : public QDialog {
 
 public:
 
-  VP1PluginDialog( QWidget*parent, VP1ChannelManager*,VP1ExecutionScheduler*);
+  VP1PluginDialog( QWidget*parent, VP1ChannelManager*,GXExecutionScheduler*);
   virtual ~VP1PluginDialog();
 
   QString unloadfile();

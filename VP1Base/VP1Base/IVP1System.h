@@ -125,7 +125,7 @@ private:
 
   class Imp;
   Imp * m_d;
-  friend class VP1ExecutionScheduler;
+  friend class GXExecutionScheduler;
   friend class VP1Prioritiser;
   friend class IVP1ChannelWidget;
   friend class VP1MainWindow;

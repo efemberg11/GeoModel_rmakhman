@@ -112,12 +112,12 @@
          </widget>
         </item>
         <item row="1" column="2">
-         <widget class="QPushButton" name="pushButton_settings_muonchambers">
+         <widget class="QPushButton" name="pushButton_settings_persistify">
           <property name="toolTip">
-           <string>Configure if, and how, muon chambers should adapt themselves to displayed event data.</string>
+           <string>Save enabled systems to output file.</string>
           </property>
           <property name="text">
-           <string>Chambers</string>
+           <string>Save</string>
           </property>
          </widget>
         </item>

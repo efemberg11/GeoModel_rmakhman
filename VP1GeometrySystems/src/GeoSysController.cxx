@@ -294,6 +294,9 @@ VP1GeoTreeView * GeoSysController::volumeTreeBrowser() const
   return m_d->ui_treebrowser.treeView_volumebrowser;
 }
 
+QPushButton * GeoSysController::requestOutputButton () const {
+  return m_d->ui.pushButton_settings_persistify;
+}
 //____________________________________________________________________
 PhiSectionWidget * GeoSysController::phiSectionWidget() const
 {

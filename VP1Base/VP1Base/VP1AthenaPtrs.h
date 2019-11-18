@@ -36,7 +36,7 @@ private:
   static StoreGateSvc * m_detectorStore;
   static ISvcLocator * m_serviceLocator;
   static IToolSvc * m_toolSvc;
-  friend class VP1ExecutionScheduler;
+  friend class GXExecutionScheduler;
   static void setPointers( StoreGateSvc * eventStore,
 			   StoreGateSvc * detectorStore,
 			   ISvcLocator * , IToolSvc *);

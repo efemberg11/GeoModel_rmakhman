@@ -30,7 +30,7 @@ class VP1ChannelManager;
 class VP1TabManager;
 class QStringList;
 class IVP1ChannelWidget;
-class VP1ExecutionScheduler;
+class GXExecutionScheduler;
 class VP1PluginDialog;
 class QProgressBar;
 class QLabel;
@@ -44,7 +44,7 @@ class VP1MainWindow : public QMainWindow, public Ui::VP1MainWindow
   Q_OBJECT
 
 public:
-  VP1MainWindow(VP1ExecutionScheduler*,QWidget *parent = 0);
+  VP1MainWindow(GXExecutionScheduler*,QWidget *parent = 0);
   ~VP1MainWindow();
 
 
@@ -112,7 +112,7 @@ protected:
   bool m_mustquit;
 
   QWidget* m_dummyemptycontroller;
-  VP1ExecutionScheduler*m_scheduler;
+  GXExecutionScheduler*m_scheduler;
 
 
   void addChannelIconsToComboBox(QComboBox* cb, const bool& isbasenames);

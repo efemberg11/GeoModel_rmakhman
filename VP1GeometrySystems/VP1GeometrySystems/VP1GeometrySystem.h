@@ -71,6 +71,8 @@ protected slots:
 
   void saveMaterialsToFile(QString,bool);//(filename,onlyChangedMaterials)
   void loadMaterialsFromFile(QString);//filename
+
+  void saveTrees();
   
 protected:
   class Imp;

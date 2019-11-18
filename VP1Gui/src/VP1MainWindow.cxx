@@ -19,7 +19,7 @@
 
 #include "VP1Gui/VP1ChannelManager.h"
 #include "VP1Gui/VP1TabManager.h"
-#include "VP1Gui/VP1ExecutionScheduler.h"
+#include "VP1Gui/GXExecutionScheduler.h"
 #include "VP1Gui/VP1PluginDialog.h"
 #include "VP1Gui/VP1DockWidget.h"
 
@@ -75,7 +75,7 @@
 
 
 //_________________________________________________________________________________
-VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,QWidget * parent)
+VP1MainWindow::VP1MainWindow(GXExecutionScheduler*sched,QWidget * parent)
 : QMainWindow(parent),
   m_mustquit(false),
   m_dummyemptycontroller(new QWidget(0)),
@@ -105,7 +105,7 @@ VP1MainWindow::VP1MainWindow(VP1ExecutionScheduler*sched,QWidget * parent)
 	frame_instructions->setFrameShape(QFrame::StyledPanel);
 	//   textBrowser_intro1->setStyleSheet("QTextBrowser#textBrowser_intro1 { background-color: rgba(0, 0, 0, 0%) } ");
 	//   textBrowser_intro2->setStyleSheet("QTextBrowser#textBrowser_intro2 { background-color: rgba(0, 0, 0, 0%) } ");
-	connect(pushButton_quicksetup_geometrystudies,SIGNAL(clicked()),this,SLOT(quickSetupTriggered()));
+	//connect(pushButton_quicksetup_geometrystudies,SIGNAL(clicked()),this,SLOT(quickSetupTriggered()));
 
 	//Default application font:
 	m_defaultfont = QApplication::font();
@@ -1236,9 +1236,7 @@ void VP1MainWindow::quickSetupTriggered()
 
   QString plugfile, channelname, tabname;
 
-  if (sender()==pushButton_quicksetup_geometrystudies||sender()==action_quicklaunch_Geometry_studies) {
-
-    //Open geometry database selection dialog for VP1Light
+  {
 #ifdef BUILDVP1LIGHT
     if(settings.value("db/dbByEnv").toString().isEmpty()){
       VP1GeoDBSelection dbSelection;
@@ -1251,10 +1249,7 @@ void VP1MainWindow::quickSetupTriggered()
     plugfile="libGXGeometryPlugin.so";
     channelname="Geometry";
     tabname = "Geometry";
-  } else {
-    addToMessageBox("quickSetupTriggered() Error: Unknown sender");
-    return;
-  }
+  } 
 
 #ifdef __APPLE__
   if (plugfile.endsWith(".so"))

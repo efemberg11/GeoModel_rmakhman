@@ -19,7 +19,7 @@
 // available. (also creates/deletes/clones channels, + manages channels ids.)
 
 class IVP1ChannelWidget;
-class VP1ExecutionScheduler;
+class GXExecutionScheduler;
 class VP1MainWindow;
 #include <QObject>
 #include <QStringList>
@@ -29,7 +29,7 @@ class VP1ChannelManager : public QObject {
   Q_OBJECT
 
 public:
-  VP1ChannelManager(VP1ExecutionScheduler*,VP1MainWindow*);
+  VP1ChannelManager(GXExecutionScheduler*,VP1MainWindow*);
   ~VP1ChannelManager();
 
   QString loadPluginFile(QString filename);

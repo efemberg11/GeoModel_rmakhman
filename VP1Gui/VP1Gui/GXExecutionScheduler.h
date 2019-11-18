@@ -4,7 +4,7 @@
 
 /////////////////////////////////////////////////////////////
 //                                                         //
-//  Header file for class VP1ExecutionScheduler            //
+//  Header file for class GXExecutionScheduler            //
 //                                                         //
 //  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>  //
 //                                                         //
@@ -29,7 +29,7 @@
 class IVP1System;
 class IVP1ChannelWidget;
 
-class VP1ExecutionScheduler : public QObject {
+class GXExecutionScheduler : public QObject {
 
   Q_OBJECT
 
@@ -40,15 +40,15 @@ public:
 
 
   //init/cleanup:
-  static VP1ExecutionScheduler* init();
-  static void cleanup(VP1ExecutionScheduler*);
+  static GXExecutionScheduler* init();
+  static void cleanup(GXExecutionScheduler*);
 
   //Call when new event data are available (returns false when the user closes the program)
   bool interact();//
 
-  VP1ExecutionScheduler(QObject * parent);
+  GXExecutionScheduler(QObject * parent);
 
-  virtual ~VP1ExecutionScheduler();
+  virtual ~GXExecutionScheduler();
 
   void bringFromConstructedToReady(IVP1ChannelWidget*);
   void uncreateAndDelete(IVP1ChannelWidget*);

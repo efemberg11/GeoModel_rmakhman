@@ -58,6 +58,7 @@ public:
   SoGroup * drawOptions() const;
   SoPickStyle * pickStyle() const;
   VP1GeoTreeView * volumeTreeBrowser() const;
+  QPushButton * requestOutputButton () const;
   PhiSectionWidget * phiSectionWidget() const;
   ZappedVolumeListModel * zappedVolumeListModel() const;
 
@@ -109,7 +110,6 @@ private:
 
 private slots:
   void possibleChange_transparency();
-  void possibleChange_muonChamberAdaptionStyle();
   void possibleChange_showVolumeOutLines();
   void updatePickStyle();
   void saveMaterialsRequested();

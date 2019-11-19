@@ -268,12 +268,20 @@ void GeoSysController::loadMaterialsRequested()
   messageVerbose("Emitting loadMaterialsFromFile(\""+filename+"\")");
   emit loadMaterialsFromFile(filename);
 }
-
+#include <iostream>
 //____________________________________________________________________
 QCheckBox * GeoSysController::subSystemCheckBox(VP1GeoFlags::SubSystemFlag f) const
 {
   std::map<VP1GeoFlags::SubSystemFlag,QCheckBox*>::const_iterator it = m_d->subSysCheckBoxMap.find(f);
-  return it==m_d->subSysCheckBoxMap.end() ? 0 : it->second;
+  if (it==m_d->subSysCheckBoxMap.end()) {
+    std::cout << "Adding " << f << std::endl;
+    QCheckBox *checkBox=new QCheckBox(m_d->ui.groupBox_Subsystems);
+    checkBox->setText(f.c_str());
+    m_d->ui.groupBox_Subsystems->layout()->addWidget(checkBox);
+    it=m_d->subSysCheckBoxMap.insert(it,std::make_pair(f,checkBox));
+    checkBox->adjustSize();
+  }
+  return  it!= m_d->subSysCheckBoxMap.end() ?  it->second : nullptr;
 }
 
 //____________________________________________________________________

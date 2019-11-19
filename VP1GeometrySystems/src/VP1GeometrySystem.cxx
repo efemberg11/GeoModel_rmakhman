@@ -342,6 +342,7 @@ QWidget * VP1GeometrySystem::buildController()
                           bool negategrandchildrenregexp = false // wheter we want to negate teh granchildren regex
    */
 
+  m_d->addSubSystem( "VP1GeoFlags::PittStuff","Pittsburgh");
   m_d->addSubSystem( "VP1GeoFlags::Pixel","Pixel");
   m_d->addSubSystem( "VP1GeoFlags::SCT","SCT");
   m_d->addSubSystem( "VP1GeoFlags::TRT","TRT");
@@ -462,6 +463,7 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   //Locate geometry info for the various subsystems, and add the info as appropriate:
   
   QCheckBox * checkBoxOther = m_d->controller->subSystemCheckBox("VP1GeoFlags::AllUnrecognisedVolumes");
+  QCheckBox * pittsburghCheckBox = m_d->controller->subSystemCheckBox("VP1GeoFlags::PittStuff");
   
   if(VP1Msg::debug()){
     qDebug() << "Looping on volumes from the input GeoModel...";

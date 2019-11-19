@@ -19,7 +19,8 @@
 
 #include <QFlags>
 #include <QString>
-
+#include <vector>
+#include <string>
 class VP1GeoFlags {
 public:
 

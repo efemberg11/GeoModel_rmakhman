@@ -3,6 +3,9 @@
 */
 
 #include "VP1GeometrySystems/VolumeTreeModel.h"
+
+#include "GeoModelKernel/GeoMaterial.h"
+
 #include <cassert>
 #include <iostream>
 #include <QColor>
@@ -103,11 +106,11 @@ VolumeTreeModel::VolumeTreeModel( QObject * parent )
   : QAbstractItemModel(parent), m_d(new Imp())
 {
   if (Imp::section2string.empty()) {
-    Imp::section2string[Imp::UNKNOWN] = "Unknown";
-    Imp::section2string[Imp::INDET] = "Inner Detector";
-    Imp::section2string[Imp::CALO] = "Calorimeters";
-    Imp::section2string[Imp::MUON] = "Muon Spectrometer";
-    Imp::section2string[Imp::MISC] = "Miscellaneous";
+    Imp::section2string[Imp::UNKNOWN] = "Unknown section";
+    Imp::section2string[Imp::INDET]   = "Inner Detector";
+    Imp::section2string[Imp::CALO]    = "Calorimeters";
+    Imp::section2string[Imp::MUON]    = "Muon Spectrometer";
+    Imp::section2string[Imp::MISC]    = "Miscellaneous";
   }
   if (Imp::subsysflag2section.empty()) {
     Imp::defineSubSystem("VP1GeoFlags::None","None",Imp::UNKNOWN);
@@ -192,7 +195,7 @@ void VolumeTreeModel::addSubSystem( VP1GeoFlags::SubSystemFlag flag,
   //Determine section flag:
   Imp::SECTION sectionflag;
   if (Imp::subsysflag2section.find(flag)==Imp::subsysflag2section.end()) {
-    std::cout<<"VolumeTreeModel::addSubSystem Error: Unknown system flag! Please update the code!"<<std::endl;
+    std::cout<<"VolumeTreeModel::addSubSystem - Warning: Unknown system flag!"<<std::endl;
     sectionflag=Imp::UNKNOWN;
   } else {
     sectionflag=Imp::subsysflag2section[flag];
@@ -227,10 +230,14 @@ void VolumeTreeModel::addSubSystem( VP1GeoFlags::SubSystemFlag flag,
   Imp::SubSystem * subsys = new Imp::SubSystem(section,flag);
   //subsys->section = section;
   //subsys->subsysflag = flag;
-  if (Imp::subsysflag2string.find(flag)==Imp::subsysflag2string.end())
+  if (Imp::subsysflag2string.find(flag)==Imp::subsysflag2string.end()) {
     subsys->name = "Unknown subsystem flag";
-  else
+    // subsys->material = "Unknown material";
+  }
+  else {
     subsys->name = Imp::subsysflag2string[flag];
+    // subsys->material = "Subsystem material";
+  }
   subsys->volhandlelist = roothandles;
 
   //Add the subsystem pointer to the relevant maps:
@@ -455,9 +462,9 @@ QVariant VolumeTreeModel::data(const QModelIndex& index, int role) const
     }
     //DisplayRole:
     if (volumeHandle->nChildren()>1)
-      return volumeHandle->getName()+" ["+QString::number(volumeHandle->nChildren())+"]";
+      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") [" + QString::number(volumeHandle->nChildren())+"]";
     else
-      return volumeHandle->getName();
+      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ")";
   }
 
   if (role==Qt::TextColorRole)

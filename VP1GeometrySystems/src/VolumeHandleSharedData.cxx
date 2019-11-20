@@ -41,8 +41,10 @@ public:
 
 //____________________________________________________________________
 VolumeHandleSharedData::VolumeHandleSharedData(GeoSysController * controller,
-					       VP1GeoFlags::SubSystemFlag flag,std::map<SoSeparator*,VolumeHandle*>* sonodesep2volhandle,
-					       const GeoPVConstLink& motherpV,PhiSectorManager*psm, SoMaterial * topMaterial,
+					       VP1GeoFlags::SubSystemFlag flag,
+                 std::map<SoSeparator*,VolumeHandle*>* sonodesep2volhandle,
+					       const GeoPVConstLink& motherpV, PhiSectorManager*psm,
+                 SoMaterial * topMaterial,
 					       MatVisAttributes *matVisAttributes,VolVisAttributes *volVisAttributes,
 					       ZappedVolumeListModel * zappedvolumelistmodel, VP1GeoTreeView * volbrowser, SoSeparator* textSep )
   : m_d(new Imp), m_volumebrowser(volbrowser), m_textSep(textSep)
@@ -144,7 +146,7 @@ void VolumeHandleSharedData::setShowVolumeOutlines(SoGroup*nodegroup,bool showvo
     } else if (n->getTypeId().isDerivedFrom(SoTubs::getClassTypeId())) {
       if (static_cast<SoTubs*>(n)->drawEdgeLines.getValue()!=showvol){
 	static_cast<SoTubs*>(n)->drawEdgeLines.setValue(showvol);
-      } 
+      }
     } else if (n->getTypeId().isDerivedFrom(SoPcons::getClassTypeId())) {
       if (static_cast<SoPcons*>(n)->drawEdgeLines.getValue()!=showvol){
         static_cast<SoPcons*>(n)->drawEdgeLines.setValue(showvol);
@@ -172,7 +174,7 @@ SoNode * VolumeHandleSharedData::toShapeNode(const GeoPVConstLink& pV)
   }
 
   const GeoShape * geoshape = logVolume->getShape();
-    
+
   m_d->visaction.reset();
   if (geoshape->typeID()==GeoShapeShift::getClassTypeID()) {
     dynamic_cast<const GeoShapeShift*>(geoshape)->getOp()->exec(&(m_d->visaction));

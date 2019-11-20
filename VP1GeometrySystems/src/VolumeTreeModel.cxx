@@ -31,11 +31,9 @@
 class VolumeTreeModel::Imp {
 public:
   //Static definitions of sections and which subsystems goes in which sections:
-  enum SECTION { UNKNOWN, INDET, CALO, MUON, MISC};
-  static std::map<SECTION,QString> section2string;
-  static std::map<VP1GeoFlags::SubSystemFlag,SECTION> subsysflag2section;
+  enum SECTION { UNKNOWN};
   static std::map<VP1GeoFlags::SubSystemFlag,QString> subsysflag2string;
-  static void defineSubSystem(VP1GeoFlags::SubSystemFlag,QString,SECTION);
+  static void defineSubSystem(VP1GeoFlags::SubSystemFlag,QString);
 
   //Class for the dynamic information of a given subsystem:
   class SectionInfo;
@@ -63,9 +61,8 @@ public:
   //Class for the dynamic information about sections and their daughter subsystems:
   class SectionInfo: public VolumeHandle {
   public:
-    SectionInfo(SECTION sf): VolumeHandle(0,0, GeoPVConstLink(), -2),sectionflag(sf) {}
+    SectionInfo(): VolumeHandle(0,0, GeoPVConstLink(), -2) {}
     //
-    SECTION sectionflag;
     QList<SubSystem*> enabledSubSystems;
     QList<SubSystem*> disabledSubSystems;
     QString name;
@@ -87,14 +84,11 @@ public:
 };
 
 //Static variables:
-std::map<VolumeTreeModel::Imp::SECTION,QString> VolumeTreeModel::Imp::section2string;
-std::map<VP1GeoFlags::SubSystemFlag,VolumeTreeModel::Imp::SECTION> VolumeTreeModel::Imp::subsysflag2section;
 std::map<VP1GeoFlags::SubSystemFlag,QString> VolumeTreeModel::Imp::subsysflag2string;
 
 //____________________________________________________________________
-void VolumeTreeModel::Imp::defineSubSystem(VP1GeoFlags::SubSystemFlag subsysflag, QString subsysname, SECTION section)
+void VolumeTreeModel::Imp::defineSubSystem(VP1GeoFlags::SubSystemFlag subsysflag, QString subsysname)
 {
-  Imp::subsysflag2section[subsysflag] = section;
   Imp::subsysflag2string[subsysflag] = subsysname;
 }
 
@@ -102,47 +96,40 @@ void VolumeTreeModel::Imp::defineSubSystem(VP1GeoFlags::SubSystemFlag subsysflag
 VolumeTreeModel::VolumeTreeModel( QObject * parent )
   : QAbstractItemModel(parent), m_d(new Imp())
 {
-  if (Imp::section2string.empty()) {
-    Imp::section2string[Imp::UNKNOWN] = "Unknown";
-    Imp::section2string[Imp::INDET] = "Inner Detector";
-    Imp::section2string[Imp::CALO] = "Calorimeters";
-    Imp::section2string[Imp::MUON] = "Muon Spectrometer";
-    Imp::section2string[Imp::MISC] = "Miscellaneous";
-  }
-  if (Imp::subsysflag2section.empty()) {
-    Imp::defineSubSystem("VP1GeoFlags::None","None",Imp::UNKNOWN);
+  if (Imp::subsysflag2string.empty()) {
+    Imp::defineSubSystem("VP1GeoFlags::None","None");
     // Inner Detector
-    Imp::defineSubSystem("Pixel","Pixel",Imp::INDET);
-    Imp::defineSubSystem("SCT","SCT",Imp::INDET);
-    Imp::defineSubSystem("TRT","TRT",Imp::INDET);
-    Imp::defineSubSystem("InDetServMat","Services",Imp::INDET);
+    Imp::defineSubSystem("Pixel","Pixel");
+    Imp::defineSubSystem("SCT","SCT");
+    Imp::defineSubSystem("TRT","TRT");
+    Imp::defineSubSystem("InDetServMat","Services");
     // Calorimeters
-    Imp::defineSubSystem("LAr","LAr",Imp::CALO);
-    Imp::defineSubSystem("Tile","Tile",Imp::CALO);
+    Imp::defineSubSystem("LAr","LAr");
+    Imp::defineSubSystem("Tile","Tile");
     //Toroids
-    Imp::defineSubSystem("BarrelToroid","Toroid Barrel",Imp::MUON);
-    Imp::defineSubSystem("ToroidECA","Toroid EndCap side A",Imp::MUON);
-    Imp::defineSubSystem("VP1GeoFlags::ToroidECC","Toroid EndCap side C",Imp::MUON);
+    Imp::defineSubSystem("BarrelToroid","Toroid Barrel");
+    Imp::defineSubSystem("ToroidECA","Toroid EndCap side A");
+    Imp::defineSubSystem("VP1GeoFlags::ToroidECC","Toroid EndCap side C");
     // Structure
-    Imp::defineSubSystem("MuonFeet","Feets",Imp::MUON);
-    Imp::defineSubSystem("MuonShielding","Shields, etc.",Imp::MUON);
-    Imp::defineSubSystem("MuonToroidsEtc","Muon etc.",Imp::MUON);
+    Imp::defineSubSystem("MuonFeet","Feets");
+    Imp::defineSubSystem("MuonShielding","Shields, etc.");
+    Imp::defineSubSystem("MuonToroidsEtc","Muon etc.");
     // Muon chambers
-    Imp::defineSubSystem("MuonBarrelStationInner","Inner Barrel Stations",Imp::MUON);
-    Imp::defineSubSystem("MuonBarrelStationMiddle","Middle Barrel Stations",Imp::MUON);
-    Imp::defineSubSystem("MuonBarrelStationOuter","Outer Barrel Stations",Imp::MUON);
-    Imp::defineSubSystem("MuonEndcapStationCSC","Endcap CSC",Imp::MUON);
-    Imp::defineSubSystem("MuonEndcapStationTGC","Endcap TGC",Imp::MUON);
-    Imp::defineSubSystem("MuonEndcapStationMDT","Endcap MDT",Imp::MUON);
-    Imp::defineSubSystem("MuonEndcapStationNSW","Endcap NSW",Imp::MUON);
+    Imp::defineSubSystem("MuonBarrelStationInner","Inner Barrel Stations");
+    Imp::defineSubSystem("MuonBarrelStationMiddle","Middle Barrel Stations");
+    Imp::defineSubSystem("MuonBarrelStationOuter","Outer Barrel Stations");
+    Imp::defineSubSystem("MuonEndcapStationCSC","Endcap CSC");
+    Imp::defineSubSystem("MuonEndcapStationTGC","Endcap TGC");
+    Imp::defineSubSystem("MuonEndcapStationMDT","Endcap MDT");
+    Imp::defineSubSystem("MuonEndcapStationNSW","Endcap NSW");
     // Beam Pipe
-    Imp::defineSubSystem("BeamPipe","Beam Pipe",Imp::MISC);
+    Imp::defineSubSystem("BeamPipe","Beam Pipe");
     // FWD detectors
-    Imp::defineSubSystem("LUCID","LUCID",Imp::MISC);
-    Imp::defineSubSystem("ZDC","ZDC",Imp::MISC);
-    Imp::defineSubSystem("ForwardRegion","ForwardRegion",Imp::MISC);
+    Imp::defineSubSystem("LUCID","LUCID");
+    Imp::defineSubSystem("ZDC","ZDC");
+    Imp::defineSubSystem("ForwardRegion","ForwardRegion");
     // Cavern
-    Imp::defineSubSystem("CavernInfra","Cavern Infrastructure",Imp::MISC);
+    Imp::defineSubSystem("CavernInfra","Cavern Infrastructure");
   }
 }
 
@@ -172,7 +159,7 @@ void VolumeTreeModel::addSubSystem( VP1GeoFlags::SubSystemFlag flag,
   //NB: This method does not need to be super-fast, thus we do a lot
   //of not-so-fast iterations over maps/lists rather than keep extra
   //maps/lists around.
-
+  
   //Check whether we added this subsystem already:
   bool found(false);
   foreach(Imp::SectionInfo* section, m_d->allSections) {
@@ -189,34 +176,18 @@ void VolumeTreeModel::addSubSystem( VP1GeoFlags::SubSystemFlag flag,
     return;
   }
 
-  //Determine section flag:
-  Imp::SECTION sectionflag;
-  if (Imp::subsysflag2section.find(flag)==Imp::subsysflag2section.end()) {
-    std::cout<<"VolumeTreeModel::addSubSystem Error: Unknown system flag! Please update the code!"<<std::endl;
-    sectionflag=Imp::UNKNOWN;
-  } else {
-    sectionflag=Imp::subsysflag2section[flag];
-  }
-
   //Find the section belonging to the system (create a new one if
   //needed - i.e. if this is the first subsystem in a given section):
   Imp::SectionInfo* section(0);
   found = false;
   foreach(Imp::SectionInfo* sec, m_d->allSections) {
-	  if (sec->sectionflag==sectionflag) {
-		  //std::cout << "added section: " << sec->sectionflag << std::endl;
-		  section = sec;
-		  break;
-	  }
+    section=sec;
+    break;
   }
 
   if (!section) {
-    section = new Imp::SectionInfo(sectionflag);
-    //section->sectionflag = sectionflag;
-    if (Imp::section2string.find(sectionflag)==Imp::section2string.end())
-      section->name = "Unknown Section Flag";
-    else
-      section->name = Imp::section2string[sectionflag];
+    section = new Imp::SectionInfo;
+    section->name="UNKNOWN";
     m_d->allSections<<section;
     //We dont add it to m_d->activeSections since the subsystem (and
     //thus the section since it has no other subsystems) is considered

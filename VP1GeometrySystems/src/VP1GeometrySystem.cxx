@@ -1564,7 +1564,6 @@ void VP1GeometrySystem::loadMaterialsFromFile(QString filename)
   m_d->controller->setLastSelectedVolume(lastsel);
 }
 
-#include <iostream>
 void VP1GeometrySystem::saveTrees() {
 #ifdef __APPLE__
   char buffer[1024];

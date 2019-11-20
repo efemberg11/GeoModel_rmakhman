@@ -342,7 +342,6 @@ QWidget * VP1GeometrySystem::buildController()
                           bool negategrandchildrenregexp = false // wheter we want to negate teh granchildren regex
    */
 
-  m_d->addSubSystem( "VP1GeoFlags::PittStuff","Pittsburgh");
   m_d->addSubSystem( "VP1GeoFlags::Pixel","Pixel");
   m_d->addSubSystem( "VP1GeoFlags::SCT","SCT");
   m_d->addSubSystem( "VP1GeoFlags::TRT","TRT");
@@ -384,7 +383,7 @@ QWidget * VP1GeometrySystem::buildController()
   m_d->addSubSystem( "VP1GeoFlags::MuonToroidsEtc","Muon",".*(CS|T1|T2|T3|T4|EI|EM|EO|EE|BI|BEE|BM|BO).*","MuonEtc",false,true,"(ECT_Toroids|BAR_Toroid|Feet|NewSmallWheel|JDSH|JTSH|JFSH).*",true);
 
   //This one MUST be added last. It will get slightly special treatment in various places!
-  m_d->addSubSystem( "VP1GeoFlags::AllUnrecognisedVolumes",".*");
+  m_d->addSubSystem( "VP1GeoFlags::Undifferentiated",".*");
 
 
   //Setup models/views for volume tree browser and zapped volumes list:
@@ -462,8 +461,7 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   
   //Locate geometry info for the various subsystems, and add the info as appropriate:
   
-  QCheckBox * checkBoxOther = m_d->controller->subSystemCheckBox("VP1GeoFlags::AllUnrecognisedVolumes");
-  QCheckBox * pittsburghCheckBox = m_d->controller->subSystemCheckBox("VP1GeoFlags::PittStuff");
+  QCheckBox * checkBoxOther = m_d->controller->subSystemCheckBox("VP1GeoFlags::Undifferentiated");
   
   if(VP1Msg::debug()){
     qDebug() << "Looping on volumes from the input GeoModel...";

@@ -140,7 +140,7 @@ void VolumeHandle::initialiseChildren()
   unsigned ichild(0);
   GeoVolumeCursor av(m_d->pV);
   while (!av.atEnd()) {
-    
+
     //Add transformation between parent and child to find the complete transformation of the child:
     const GeoTrf::Transform3D::MatrixType & mtx=av.getTransform().matrix();
     SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, conventions
@@ -185,17 +185,22 @@ bool VolumeHandle::hasName(const std::string& n) const
 //____________________________________________________________________
 SoMaterial * VolumeHandle::material()
 {
+  VP1Msg::messageDebug("VolumeHandle::material() - LogVol name: " + QString::fromStdString(m_d->pV->getLogVol()->getName()));
+  // if it's not the first time here and
+  // the material has been assigned already, then return that
   if (m_d->material)
     return m_d->material;
 
-  //First see if the "databases" of volumes/material know about this volume:
+  // if it's the first timne here, the material has not been assigned yet, then...
 
+  //Then, see if the "databases" of defined volumes/material know about this volume:
   SoMaterial * mat = m_d->commondata->volVisAttributes()->get(m_d->pV->getLogVol()->getName());
   if (mat) {
     m_d->material = mat;
     m_d->material->ref();
     return m_d->material;
   }
+  //Then, see if the "databases" of defined material know about this volume:
   mat = m_d->commondata->matVisAttributes()->get(m_d->pV->getLogVol()->getMaterial()->getName());
   if (mat) {
     m_d->material = mat;
@@ -203,7 +208,8 @@ SoMaterial * VolumeHandle::material()
     return m_d->material;
   }
 
-  //Apparently not. We now have two ways of finding a material: We can
+  //Apparently not. Thus, we have to define it.
+  // We now have two ways of finding a material: We can
   //take a system dependent fallback material, or we can take the
   //material of the parent.
 
@@ -254,7 +260,7 @@ void VolumeHandle::ensureBuildNodeSep()
     xf->setMatrix(m_d->accumTrans);
     m_d->nodesep->addChild(xf);
   }
-  
+
 
   //VP1Msg::messageDebug("calling toShapeNode()...");
   SoNode * shape = m_d->commondata->toShapeNode(m_d->pV);//NB: Ignore contained transformation of GeoShapeShifts.
@@ -272,14 +278,14 @@ void VolumeHandle::ensureBuildNodeSep()
     //Substitute shapes that are essentially cylinders with such. This
     //can be done safely since this tube won't need
     //phi-slicing and is done to gain render performance.
-    if ( m_d->pV->getLogVol()->getShape()->typeID()==GeoTube::getClassTypeID() ) 
+    if ( m_d->pV->getLogVol()->getShape()->typeID()==GeoTube::getClassTypeID() )
     {
       //VP1Msg::messageDebug("GeoTube...");
       const GeoTube * geotube = static_cast<const GeoTube*>(m_d->pV->getLogVol()->getShape());
       if (geotube->getRMin()==0.0)
         shape = m_d->commondata->getSoCylinderOrientedLikeGeoTube(geotube->getRMax(),geotube->getZHalfLength());
-    } 
-    else if ( m_d->pV->getLogVol()->getShape()->typeID()==GeoTubs::getClassTypeID() ) 
+    }
+    else if ( m_d->pV->getLogVol()->getShape()->typeID()==GeoTubs::getClassTypeID() )
     {
       //VP1Msg::messageDebug("GeoTubs...");
       const GeoTubs * geotubs = static_cast<const GeoTubs*>(m_d->pV->getLogVol()->getShape());
@@ -331,11 +337,11 @@ void VolumeHandle::Imp::attach(VolumeHandle*vh)
   if (!isattached) {
     vh->ensureBuildNodeSep();
     if (attachsepHelper) {
-      VP1Msg::messageDebug("adding node..."); 
+      VP1Msg::messageDebug("adding node...");
       attachsepHelper->addNodeUnderMaterial(nodesep,vh->material());
     }
     if (attachlabelSepHelper) {
-      VP1Msg::messageDebug("adding label..."); 
+      VP1Msg::messageDebug("adding label...");
       attachlabelSepHelper->addNode(label_sep);
     }
     isattached=true;
@@ -528,7 +534,7 @@ bool VolumeHandle::isEther() const
 //____________________________________________________________________
 void VolumeHandle::expandMothersRecursivelyToNonEther() {
   //std::cout<<"VolumeHandle::expandMothersRecursivelyToNonEther() for "<<this->getNameStdString() << " [" <<this<< "]" << " - n. children: " << nChildren() << std::endl;
-  
+
   if (!nChildren()||!isEther()) {
     //VP1Msg::messageDebug("====> no children or not 'Ether' material. Skipping & returning.");
     return;
@@ -543,7 +549,7 @@ void VolumeHandle::expandMothersRecursivelyToNonEther() {
   }
   setState(VP1GeoFlags::EXPANDED);
   //std::cout<<"VolumeHandle::expandMothersRecursivelyToNonEther() for "<<this->getNameStdString() << " [" <<this<< "]" <<" DONE.\n\n"<<std::endl;
-  
+
 }
 
 //____________________________________________________________________
@@ -728,7 +734,7 @@ void VolumeHandle::updateLabels() {
       labelText->string.set1Value(row++,array.data());
     }
 
-    
+
     SoTransform *labelTranslate =new SoTransform;
     labelTranslate->setMatrix(m_d->accumTrans);
     assert(labelTranslate!=0);
@@ -745,4 +751,3 @@ void VolumeHandle::updateLabels() {
 
   m_d->attachlabelSepHelper->largeChangesEnd();
 }
-

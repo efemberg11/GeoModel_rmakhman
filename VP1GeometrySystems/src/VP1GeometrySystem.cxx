@@ -36,6 +36,8 @@
 #include "VP1Base/VP1Msg.h"
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
+#include <Inventor/nodes/SoMaterial.h>
+#include <Inventor/nodes/SoTexture2.h>
 #include <Inventor/events/SoKeyboardEvent.h>
 #include <Inventor/nodes/SoPickStyle.h>
 #include <Inventor/nodes/SoEventCallback.h>
@@ -106,6 +108,8 @@ public:
   GeoPhysVol* createTheWorld(GeoPhysVol* world = nullptr);
   GeoPhysVol* getGeometryFromLocalDB();
 
+  SoTexture2* getDummyTexture();
+  SoMaterial* getDummyMaterial();
 
   class SubSystemInfo {
   public:
@@ -936,12 +940,36 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 }
 
 //_____________________________________________________________________________________
+SoTexture2* VP1GeometrySystem::Imp::getDummyTexture()
+{
+  SoTexture2* texture = new SoTexture2;
+  // texture->diffuseColor.setValue(0.40,0.60,0.40);
+  // texture->ambientColor.setValue(0.57,0.57,0.57);
+  // texture->specularColor.setValue(0.27,0.27,0.27);
+  // texture->shininess.setValue(.80);
+  return texture;
+}
+//_____________________________________________________________________________________
+SoMaterial* VP1GeometrySystem::Imp::getDummyMaterial()
+{
+  SoMaterial* material = new SoMaterial;
+  material->diffuseColor.setValue(0.40,0.60,0.40);
+  material->ambientColor.setValue(0.57,0.57,0.57);
+  material->specularColor.setValue(0.27,0.27,0.27);
+  material->shininess.setValue(.80);
+  return material;
+}
+
+
+//_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 {
   VP1Msg::messageDebug("VP1GeometrySystem::Imp::buildSystem()" );
 
-  if (!si||si->isbuilt)
+  if (!si||si->isbuilt) {
+    VP1Msg::messageDebug("Not or Built. Returning...");
     return;
+  }
   si->isbuilt = true;
   int ichild(0);
 
@@ -963,18 +991,31 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 	  //Loop over the treetop's that we previously selected:
 
 	  std::vector<SubSystemInfo::TreetopInfo>::const_iterator it, itE = si->treetopinfo.end();
-	  for (it=si->treetopinfo.begin();it!=itE;++it)
+	  for (it=si->treetopinfo.begin(); it!=itE; ++it)
 	  {
-		  VP1Msg::messageDebug("toptree vol: " + QString(it->volname.c_str()) );
+		  VP1Msg::messageDebug("-- toptree vol: " + QString(it->volname.c_str()) );
 
-		  //Find material:
-		  SoMaterial*m = detVisAttributes->get(it->volname);
-		  if (!m) {
+		  // Get the material name from the top volume and search for it
+      // in the lsit of "default" materials for the sub-detectors:
+      QString topMaterialName = QString::fromStdString(it->pV->getLogVol()->getMaterial()->getName());
+      VP1Msg::messageDebug("topMaterial: " + topMaterialName);
+		  SoMaterial* topMaterial = detVisAttributes->get(it->volname);
+		  if (!topMaterial) {
 			  theclass->message("Warning: Did not find a predefined material for volume: "+QString(it->volname.c_str()));
 		  }
-		  VolumeHandleSharedData* volhandle_subsysdata = new VolumeHandleSharedData(controller,si->flag,&sonodesep2volhandle,it->pV,phisectormanager,
-				  m,matVisAttributes,volVisAttributes,
-				  controller->zappedVolumeListModel(),controller->volumeTreeBrowser(), m_textSep);
+
+      // replace with special Dummy material if user uses this
+      if (topMaterialName == "Dummy") {
+        VP1Msg::messageWarning("the volume uses the 'Dummy' material!");
+        topMaterial = getDummyMaterial();
+      }
+
+		  VolumeHandleSharedData* volhandle_subsysdata = new VolumeHandleSharedData(controller,
+          si->flag, &sonodesep2volhandle, it->pV, phisectormanager,
+				  topMaterial, matVisAttributes, volVisAttributes,
+				  controller->zappedVolumeListModel(),
+          controller->volumeTreeBrowser(),
+          m_textSep);
 		  const GeoTrf::Transform3D::MatrixType & mtx=it->xf.matrix();
 		  SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, Eigen and SoQt have different conventions 
 				mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // For the matrix of homogenous transformations. 
@@ -1062,6 +1103,7 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
   }
 
 
+  theclass->message("Dumping the subsystem's info:");
   si->dump();
 
   VP1Msg::messageDebug("volumetreemodel->addSubSystem...");
@@ -1074,11 +1116,11 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 
   //Perform auto expansion of all ether volumes (needed for muon dead material):
   VolumeHandle::VolumeHandleListItr it, itE(si->vollist.end());
-  //int idx=0; // for debug
+  // int idx=0; // for debug
   for (it = si->vollist.begin(); it!=itE; ++it){
-    //VP1Msg::messageDebug("\nexpanding idx: " + QString::number(++idx));
+    // VP1Msg::messageDebug("\nexpanding idx: " + QString::number(++idx));
     (*it)->expandMothersRecursivelyToNonEther();
-    //VP1Msg::messageDebug("expand DONE.");
+    // VP1Msg::messageDebug("expand DONE.");
   }
 
 

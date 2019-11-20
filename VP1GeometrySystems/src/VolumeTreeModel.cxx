@@ -3,6 +3,9 @@
 */
 
 #include "VP1GeometrySystems/VolumeTreeModel.h"
+
+#include "GeoModelKernel/GeoMaterial.h"
+
 #include <cassert>
 #include <iostream>
 #include <QColor>
@@ -156,7 +159,6 @@ VolumeTreeModel::~VolumeTreeModel()
 void VolumeTreeModel::addSubSystem( VP1GeoFlags::SubSystemFlag flag,
 				    const VolumeHandle::VolumeHandleList& roothandles )
 {
-
   if (!m_d->theSection) {
     m_d->theSection = new Imp::SectionInfo;
     m_d->theSection->name="UNKNOWN";
@@ -165,10 +167,14 @@ void VolumeTreeModel::addSubSystem( VP1GeoFlags::SubSystemFlag flag,
   //Create SubSystem instance for this subsystem and give it the roothandles:
   Imp::SubSystem * subsys = new Imp::SubSystem(m_d->theSection,flag);
 
-  if (Imp::subsysflag2string.find(flag)==Imp::subsysflag2string.end())
+  if (Imp::subsysflag2string.find(flag)==Imp::subsysflag2string.end()){
     subsys->name = "Unknown subsystem flag";
-  else
+    // subsys->material = "Unknown material";
+  }
+  else {
     subsys->name = Imp::subsysflag2string[flag];
+    // subsys->material = "Subsystem material";
+  }
   subsys->volhandlelist = roothandles;
 
   //Add the subsystem pointer to the relevant maps:
@@ -390,9 +396,9 @@ QVariant VolumeTreeModel::data(const QModelIndex& index, int role) const
     }
     //DisplayRole:
     if (volumeHandle->nChildren()>1)
-      return volumeHandle->getName()+" ["+QString::number(volumeHandle->nChildren())+"]";
+      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") [" + QString::number(volumeHandle->nChildren())+"]";
     else
-      return volumeHandle->getName();
+      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ")";
   }
 
   if (role==Qt::TextColorRole)

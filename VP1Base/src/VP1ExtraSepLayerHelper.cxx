@@ -211,6 +211,31 @@ void VP1ExtraSepLayerHelper::addNodeUnderMaterial( SoNode * node, SoMaterial * m
 		it->second.second->addNode(node);
 	}
 }
+// //____________________________________________________________________
+// void VP1ExtraSepLayerHelper::addNodeUnderTexture( SoNode * node, SoTexture2 * mat )
+// {
+// 	VP1Msg::messageVerbose("VP1ExtraSepLayerHelper::addNodeUnderTexture()");
+//
+// 	std::map<SoMaterial*,std::pair<SoSeparator*,VP1ExtraSepLayerHelper*> >::iterator it = m_d->mat2sepandhelper.find(mat);
+// 	if (it==m_d->mat2sepandhelper.end()) {
+//
+// 		SoSeparator * matsep = new SoSeparator;
+// 		if (VP1Msg::verbose())
+// 			matsep->setName("SepHelperInternalSep_MatSep");
+// 		matsep->ref();
+// 		matsep->addChild(mat);
+// 		SoSeparator * sep = new SoSeparator;
+// 		if (VP1Msg::verbose())
+// 			sep->setName("SepHelperInternalSep_InternalSepHelperTop");
+// 		matsep->addChild(sep);
+// 		VP1ExtraSepLayerHelper * mathelper = new VP1ExtraSepLayerHelper(sep,m_d->limitpersep);
+// 		m_d->mat2sepandhelper[mat] = std::pair<SoSeparator*,VP1ExtraSepLayerHelper*>(matsep,mathelper);
+// 		mathelper->addNode(node);
+// 		addNode(matsep);
+// 	} else {
+// 		it->second.second->addNode(node);
+// 	}
+// }
 
 //____________________________________________________________________
 void VP1ExtraSepLayerHelper::removeNodeUnderMaterial(SoNode*node,SoMaterial*mat)

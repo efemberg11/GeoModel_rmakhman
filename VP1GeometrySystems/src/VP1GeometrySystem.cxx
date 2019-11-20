@@ -342,45 +342,45 @@ QWidget * VP1GeometrySystem::buildController()
                           bool negategrandchildrenregexp = false // wheter we want to negate teh granchildren regex
    */
 
-  m_d->addSubSystem( "VP1GeoFlags::Pixel","Pixel");
-  m_d->addSubSystem( "VP1GeoFlags::SCT","SCT");
-  m_d->addSubSystem( "VP1GeoFlags::TRT","TRT");
-  m_d->addSubSystem( "VP1GeoFlags::InDetServMat","InDetServMat");
-  m_d->addSubSystem( "VP1GeoFlags::LAr", ".*LAr.*");
-  m_d->addSubSystem( "VP1GeoFlags::Tile","Tile");
-  m_d->addSubSystem( "VP1GeoFlags::CavernInfra","CavernInfra");
-  m_d->addSubSystem( "VP1GeoFlags::BeamPipe","BeamPipe");
-  m_d->addSubSystem( "VP1GeoFlags::LUCID",".*Lucid.*");
-  m_d->addSubSystem( "VP1GeoFlags::ZDC",".*ZDC.*");
-  m_d->addSubSystem( "VP1GeoFlags::ALFA",".*ALFA.*");
-  m_d->addSubSystem( "VP1GeoFlags::ForwardRegion",".*ForwardRegion.*");
+  m_d->addSubSystem( "Pixel","Pixel");
+  m_d->addSubSystem( "SCT","SCT");
+  m_d->addSubSystem( "TRT","TRT");
+  m_d->addSubSystem( "InDetServMat","InDetServMat");
+  m_d->addSubSystem( "LAr", ".*LAr.*");
+  m_d->addSubSystem( "Tile","Tile");
+  m_d->addSubSystem( "CavernInfra","CavernInfra");
+  m_d->addSubSystem( "BeamPipe","BeamPipe");
+  m_d->addSubSystem( "LUCID",".*Lucid.*");
+  m_d->addSubSystem( "ZDC",".*ZDC.*");
+  m_d->addSubSystem( "ALFA",".*ALFA.*");
+  m_d->addSubSystem( "ForwardRegion",".*ForwardRegion.*");
 
   //The muon systems require special treatment, since we want to
   //cherrypick below the treetop (this is the main reason for a lot
   //of the ugly stuff in this class):
-  m_d->addSubSystem( "VP1GeoFlags::MuonEndcapStationCSC","Muon","CS.*","CSC");
-  m_d->addSubSystem( "VP1GeoFlags::MuonEndcapStationTGC","Muon","T(1|2|3|4).*","TGC");
-  m_d->addSubSystem( "VP1GeoFlags::MuonEndcapStationMDT","Muon","(EI|EM|EO|EE).*","EndcapMdt");
-  m_d->addSubSystem( "VP1GeoFlags::MuonEndcapStationNSW","Muon",".*ANON.*","MuonNSW",false, false, "NewSmallWheel.*");
+  m_d->addSubSystem( "MuonEndcapStationCSC","Muon","CS.*","CSC");
+  m_d->addSubSystem( "MuonEndcapStationTGC","Muon","T(1|2|3|4).*","TGC");
+  m_d->addSubSystem( "MuonEndcapStationMDT","Muon","(EI|EM|EO|EE).*","EndcapMdt");
+  m_d->addSubSystem( "MuonEndcapStationNSW","Muon",".*ANON.*","MuonNSW",false, false, "NewSmallWheel.*");
 
-  m_d->addSubSystem( "VP1GeoFlags::MuonBarrelStationInner","Muon","(BI|BEE).*","BarrelInner");
-  m_d->addSubSystem( "VP1GeoFlags::MuonBarrelStationMiddle","Muon","BM.*","BarrelMiddle");
-  m_d->addSubSystem( "VP1GeoFlags::MuonBarrelStationOuter","Muon","BO.*","BarrelOuter");
+  m_d->addSubSystem( "MuonBarrelStationInner","Muon","(BI|BEE).*","BarrelInner");
+  m_d->addSubSystem( "MuonBarrelStationMiddle","Muon","BM.*","BarrelMiddle");
+  m_d->addSubSystem( "MuonBarrelStationOuter","Muon","BO.*","BarrelOuter");
 
 
   // Toroid
-  m_d->addSubSystem( "VP1GeoFlags::BarrelToroid","Muon",".*ANON.*","BarrelToroid", false, false, "BAR_Toroid.*");
-  m_d->addSubSystem( "VP1GeoFlags::ToroidECA","Muon",".*ANON.*","ToroidECA", false, false, "ECT_Toroids.*");
+  m_d->addSubSystem( "BarrelToroid","Muon",".*ANON.*","BarrelToroid", false, false, "BAR_Toroid.*");
+  m_d->addSubSystem( "ToroidECA","Muon",".*ANON.*","ToroidECA", false, false, "ECT_Toroids.*");
 
   // Muon Feet
-  m_d->addSubSystem( "VP1GeoFlags::MuonFeet","Muon",".*ANON.*","MuonFeet", false, false, "Feet.*");
+  m_d->addSubSystem( "MuonFeet","Muon",".*ANON.*","MuonFeet", false, false, "Feet.*");
 
   // Muon shielding
-  m_d->addSubSystem( "VP1GeoFlags::MuonShielding","Muon",".*ANON.*","Shielding", false, false, "(JDSH|JTSH|JFSH).*");
+  m_d->addSubSystem( "MuonShielding","Muon",".*ANON.*","Shielding", false, false, "(JDSH|JTSH|JFSH).*");
 
 
   // All muon stuff --> this will be linked to the "Services" checkbox in the GUI
-  m_d->addSubSystem( "VP1GeoFlags::MuonToroidsEtc","Muon",".*(CS|T1|T2|T3|T4|EI|EM|EO|EE|BI|BEE|BM|BO).*","MuonEtc",false,true,"(ECT_Toroids|BAR_Toroid|Feet|NewSmallWheel|JDSH|JTSH|JFSH).*",true);
+  m_d->addSubSystem( "MuonToroidsEtc","Muon",".*(CS|T1|T2|T3|T4|EI|EM|EO|EE|BI|BEE|BM|BO).*","MuonEtc",false,true,"(ECT_Toroids|BAR_Toroid|Feet|NewSmallWheel|JDSH|JTSH|JFSH).*",true);
 
   //This one MUST be added last. It will get slightly special treatment in various places!
   m_d->addSubSystem( "VP1GeoFlags::Undifferentiated",".*");
@@ -1235,22 +1235,22 @@ void VP1GeometrySystem::Imp::applyTopVolStates(const QMap<quint32,QByteArray>&to
 //_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::createPathExtras(const VolumeHandle* volhandle, QString& prefix, QStack<QString>& entries)
 {
-  std::map<std::string, QString> pMap = {{"VP1GeoFlags::Pixel","Pixel::"},
-					 {"VP1GeoFlags::SCT","SCT::"},
-					 {"VP1GeoFlags::TRT","TRT::"},
-					 {"VP1GeoFlags::InDetServMat","InDetServMat::"},
-					 {"VP1GeoFlags::LAr","LArMgr::"},
-					 {"VP1GeoFlags::Tile","Tile::"},
+  std::map<std::string, QString> pMap = {{"Pixel","Pixel::"},
+					 {"SCT","SCT::"},
+					 {"TRT","TRT::"},
+					 {"InDetServMat","InDetServMat::"},
+					 {"LAr","LArMgr::"},
+					 {"Tile","Tile::"},
 					 {"VP1GeoFlags::AllMuonChambers","Muon::"},
-					 {"VP1GeoFlags::BeamPipe","BeamPipe::"}};
-  std::map<std::string, std::vector<QString>> eMap= {{"VP1GeoFlags::Pixel",{"IDET::IDET","Pixel::Pixel"}},
-						     {"VP1GeoFlags::SCT",{"IDET::IDET","SCT::SCT"}},
-						     {"VP1GeoFlags::TRT",{"IDET::IDET","TRT::TRT"}},
-						     {"VP1GeoFlags::InDetServMat",{"IDET::IDET"}},
-						     {"VP1GeoFlags::LAr",{"CALO::CALO","LArMgr::LArMgr"}},
-						     {"VP1GeoFlags::Tile",{"CALO::CALO","Tile::Tile"}},
+					 {"BeamPipe","BeamPipe::"}};
+  std::map<std::string, std::vector<QString>> eMap= {{"Pixel",{"IDET::IDET","Pixel::Pixel"}},
+						     {"SCT",{"IDET::IDET","SCT::SCT"}},
+						     {"TRT",{"IDET::IDET","TRT::TRT"}},
+						     {"InDetServMat",{"IDET::IDET"}},
+						     {"LAr",{"CALO::CALO","LArMgr::LArMgr"}},
+						     {"Tile",{"CALO::CALO","Tile::Tile"}},
 						     {"VP1GeoFlags::AllMuonChambers",{"MUONQ02::MUONQ02","Muon::MuonSys"}},
-						     {"VP1GeoFlags::BeamPipe",{"BeamPipe::","BeamPipe::BeamPipe"}}};
+						     {"BeamPipe",{"BeamPipe::","BeamPipe::BeamPipe"}}};
 ; 
 
  auto pIt=pMap.find(volhandle->subsystem());

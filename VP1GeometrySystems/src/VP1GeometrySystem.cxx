@@ -90,13 +90,8 @@ public:
     : theclass(gs), sceneroot(0),
       detVisAttributes(0), matVisAttributes(0), volVisAttributes(0),
       initialSubSystemsTurnedOn(ssf),controller(0),phisectormanager(0),
-      volumetreemodel(0),kbEvent(0),m_textSep(0)
+      volumetreemodel(0),kbEvent(0),m_textSep(0) {}
 
-  {
-    const unsigned n_chamber_t0_sources=2;
-    for (unsigned i=0;i<n_chamber_t0_sources;++i)
-      chamberT0s.append(0);
-  }
 
   VP1GeometrySystem * theclass;
   SoSeparator * sceneroot;
@@ -235,12 +230,6 @@ public:
   QMap<quint32,QByteArray> restoredTopvolstates;
   void applyTopVolStates(const QMap<quint32,QByteArray>&, bool disablenotif = false);
 
-  // Helper function for emiting a signal to the PartSpect system
-  // This function creates path entry prefixes (=Detector Factory name in G4) and extra
-  // path entries (top level volumes, python envelopes) depending on the subsystem of the selected volume
-  void createPathExtras(const VolumeHandle*, QString&, QStack<QString>&);
-
-  QList<const std::map<GeoPVConstLink, float>*> chamberT0s;
 };
 
 //_____________________________________________________________________________________
@@ -1272,38 +1261,6 @@ void VP1GeometrySystem::Imp::applyTopVolStates(const QMap<quint32,QByteArray>&to
     phisectormanager->updateRepresentationsOfVolsAroundZAxis();
     phisectormanager->largeChangesEnd();
   }
-}
-
-//_____________________________________________________________________________________
-void VP1GeometrySystem::Imp::createPathExtras(const VolumeHandle* volhandle, QString& prefix, QStack<QString>& entries)
-{
-  std::map<std::string, QString> pMap = {{"Pixel","Pixel::"},
-					 {"SCT","SCT::"},
-					 {"TRT","TRT::"},
-					 {"InDetServMat","InDetServMat::"},
-					 {"LAr","LArMgr::"},
-					 {"Tile","Tile::"},
-					 {"VP1GeoFlags::AllMuonChambers","Muon::"},
-					 {"BeamPipe","BeamPipe::"}};
-  std::map<std::string, std::vector<QString>> eMap= {{"Pixel",{"IDET::IDET","Pixel::Pixel"}},
-						     {"SCT",{"IDET::IDET","SCT::SCT"}},
-						     {"TRT",{"IDET::IDET","TRT::TRT"}},
-						     {"InDetServMat",{"IDET::IDET"}},
-						     {"LAr",{"CALO::CALO","LArMgr::LArMgr"}},
-						     {"Tile",{"CALO::CALO","Tile::Tile"}},
-						     {"VP1GeoFlags::AllMuonChambers",{"MUONQ02::MUONQ02","Muon::MuonSys"}},
-						     {"BeamPipe",{"BeamPipe::","BeamPipe::BeamPipe"}}};
-; 
-
- auto pIt=pMap.find(volhandle->subsystem());
- auto eIt=eMap.find(volhandle->subsystem());
- if (pIt!=pMap.end()) {
-   prefix=pIt->second;
- }
- if (eIt!=eMap.end()) {
-   for (int i=0;i<eIt->second.size();i++) entries.push((eIt->second)[i]);
- }
- 
 }
 
 //_____________________________________________________________________________________

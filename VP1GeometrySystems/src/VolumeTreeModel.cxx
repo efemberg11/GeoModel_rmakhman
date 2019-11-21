@@ -33,9 +33,6 @@
 //____________________________________________________________________
 class VolumeTreeModel::Imp {
 public:
-  //Static definitions of sections and which subsystems goes in which sections:
-  static std::map<VP1GeoFlags::SubSystemFlag,QString> subsysflag2string;
-  static void defineSubSystem(VP1GeoFlags::SubSystemFlag,QString);
 
   //Class for the dynamic information of a given subsystem:
   class SectionInfo;
@@ -67,7 +64,6 @@ public:
     //
     QList<SubSystem*> enabledSubSystems;
     QList<SubSystem*> disabledSubSystems;
-    QString name;
   };
   //Lists of these sections:
   SectionInfo *theSection;
@@ -85,56 +81,12 @@ public:
 
 };
 
-//Static variables:
-std::map<VP1GeoFlags::SubSystemFlag,QString> VolumeTreeModel::Imp::subsysflag2string;
-
-//____________________________________________________________________
-void VolumeTreeModel::Imp::defineSubSystem(VP1GeoFlags::SubSystemFlag subsysflag, QString subsysname)
-{
-  Imp::subsysflag2string[subsysflag] = subsysname;
-}
-
 //____________________________________________________________________
 VolumeTreeModel::VolumeTreeModel( QObject * parent )
   : QAbstractItemModel(parent), m_d(new Imp())
 {
   m_d->theSection=nullptr;
   m_d->activeSection=nullptr;
-  if (Imp::subsysflag2string.empty()) {
-    Imp::defineSubSystem("VP1GeoFlags::None","None");
-    // Inner Detector
-    Imp::defineSubSystem("Pixel","Pixel");
-    Imp::defineSubSystem("SCT","SCT");
-    Imp::defineSubSystem("TRT","TRT");
-    Imp::defineSubSystem("InDetServMat","Services");
-    // Calorimeters
-    Imp::defineSubSystem("LAr","LAr");
-    Imp::defineSubSystem("Tile","Tile");
-    //Toroids
-    Imp::defineSubSystem("BarrelToroid","Toroid Barrel");
-    Imp::defineSubSystem("ToroidECA","Toroid EndCap side A");
-    Imp::defineSubSystem("VP1GeoFlags::ToroidECC","Toroid EndCap side C");
-    // Structure
-    Imp::defineSubSystem("MuonFeet","Feets");
-    Imp::defineSubSystem("MuonShielding","Shields, etc.");
-    Imp::defineSubSystem("MuonToroidsEtc","Muon etc.");
-    // Muon chambers
-    Imp::defineSubSystem("MuonBarrelStationInner","Inner Barrel Stations");
-    Imp::defineSubSystem("MuonBarrelStationMiddle","Middle Barrel Stations");
-    Imp::defineSubSystem("MuonBarrelStationOuter","Outer Barrel Stations");
-    Imp::defineSubSystem("MuonEndcapStationCSC","Endcap CSC");
-    Imp::defineSubSystem("MuonEndcapStationTGC","Endcap TGC");
-    Imp::defineSubSystem("MuonEndcapStationMDT","Endcap MDT");
-    Imp::defineSubSystem("MuonEndcapStationNSW","Endcap NSW");
-    // Beam Pipe
-    Imp::defineSubSystem("BeamPipe","Beam Pipe");
-    // FWD detectors
-    Imp::defineSubSystem("LUCID","LUCID");
-    Imp::defineSubSystem("ZDC","ZDC");
-    Imp::defineSubSystem("ForwardRegion","ForwardRegion");
-    // Cavern
-    Imp::defineSubSystem("CavernInfra","Cavern Infrastructure");
-  }
 }
 
 //____________________________________________________________________
@@ -161,20 +113,11 @@ void VolumeTreeModel::addSubSystem( VP1GeoFlags::SubSystemFlag flag,
 {
   if (!m_d->theSection) {
     m_d->theSection = new Imp::SectionInfo;
-    m_d->theSection->name="UNKNOWN";
   }
 
   //Create SubSystem instance for this subsystem and give it the roothandles:
   Imp::SubSystem * subsys = new Imp::SubSystem(m_d->theSection,flag);
-
-  if (Imp::subsysflag2string.find(flag)==Imp::subsysflag2string.end()){
-    subsys->name = "Unknown subsystem flag";
-    // subsys->material = "Unknown material";
-  }
-  else {
-    subsys->name = Imp::subsysflag2string[flag];
-    // subsys->material = "Subsystem material";
-  }
+  subsys->name=flag.c_str();
   subsys->volhandlelist = roothandles;
 
   //Add the subsystem pointer to the relevant maps:
@@ -408,7 +351,7 @@ QVariant VolumeTreeModel::data(const QModelIndex& index, int role) const
     return Imp::subSystemPointer(volumeHandle)->name;
 
   Q_ASSERT(Imp::isSectionInfoPointer(volumeHandle));
-  return Imp::sectionInfoPointer(volumeHandle)->name;
+  return "GEOMETRY";
 }
 
 

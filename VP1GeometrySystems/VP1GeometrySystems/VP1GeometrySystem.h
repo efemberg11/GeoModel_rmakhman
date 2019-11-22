@@ -33,8 +33,7 @@ class VP1GeometrySystem : public IVP13DSystemSimple {
 public:
 
 
-  VP1GeometrySystem( const VP1GeoFlags::SubSystemFlags& SubSystemsTurnedOn = {"VP1GeoFlags::None"},
-		     QString name = "Geo" );
+  VP1GeometrySystem(QString name = "Geo" );
   virtual ~VP1GeometrySystem();
 
   //Method that channel can use to override defaults:

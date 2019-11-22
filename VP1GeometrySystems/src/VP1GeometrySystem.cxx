@@ -55,6 +55,7 @@
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
+#include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -86,10 +87,10 @@
 #include "GeoModelKernel/GeoNameTag.h"
 class VP1GeometrySystem::Imp {
 public:
-  Imp (VP1GeometrySystem*gs, const VP1GeoFlags::SubSystemFlags& ssf)
+  Imp (VP1GeometrySystem*gs)
     : theclass(gs), sceneroot(0),
       detVisAttributes(0), matVisAttributes(0), volVisAttributes(0),
-      initialSubSystemsTurnedOn(ssf),controller(0),phisectormanager(0),
+      controller(0),phisectormanager(0),
       volumetreemodel(0),kbEvent(0),m_textSep(0) {}
 
 
@@ -206,7 +207,7 @@ public:
     if (!volVisAttributes) volVisAttributes = new VolVisAttributes();
   }
 
-  VP1GeoFlags::SubSystemFlags initialSubSystemsTurnedOn;
+
   void buildSystem(SubSystemInfo*);
   GeoSysController * controller;
   PhiSectorManager * phisectormanager;
@@ -233,11 +234,11 @@ public:
 };
 
 //_____________________________________________________________________________________
-VP1GeometrySystem::VP1GeometrySystem( const VP1GeoFlags::SubSystemFlags& SubSystemsTurnedOn, QString name )
+VP1GeometrySystem::VP1GeometrySystem(QString name )
   : IVP13DSystemSimple(name,
 		   "This system displays the geometry as defined in the GeoModel tree.",
            "Riccardo.Maria.Bianchi@cern.ch"),
-    m_d(new Imp(this,SubSystemsTurnedOn))
+    m_d(new Imp(this))
 {
 }
 
@@ -321,64 +322,6 @@ QWidget * VP1GeometrySystem::buildController()
   connect(m_d->controller,SIGNAL(resetSubSystems(VP1GeoFlags::SubSystemFlags)),this,SLOT(resetSubSystems(VP1GeoFlags::SubSystemFlags)));
   connect(m_d->controller->requestOutputButton(), SIGNAL(clicked()), this, SLOT(saveTrees()));
 
-  /* This is where we define the available different subsystems and their location in the geomodel tree.
-   *
-   * if the reg expr does not match any volume, the corresponding subsystem checkbox in the Geo GUI gets disabled.
-   *
-   * syntax: addSubSystem(VP1GeoFlags::SubSystemFlag&, // the associated system flag
-		                  QString& treetopregexp,                // the regular expr for the top/root name of the main sub-detector system
-		                  QString& childrenregexp="",            // the reg expr for the children of the main sub-detector
-		                  std::string& matname="",               // a name we choose for displaying in VP1
-		                  bool negatetreetopregexp = false,      // if we want to negate the top reg expr
-		                  bool negatechildrenregexp = false);    // if we want to negate the children reg expr
-                          const QString& grandchildrenregexp="", // the regex for granchildren of the main sub-detector
-                          bool negategrandchildrenregexp = false // wheter we want to negate teh granchildren regex
-   */
-
-  m_d->addSubSystem( "Pixel","Pixel");
-  m_d->addSubSystem( "SCT","SCT");
-  m_d->addSubSystem( "TRT","TRT");
-  m_d->addSubSystem( "InDetServMat","InDetServMat");
-  m_d->addSubSystem( "LAr", ".*LAr.*");
-  m_d->addSubSystem( "Tile","Tile");
-  m_d->addSubSystem( "CavernInfra","CavernInfra");
-  m_d->addSubSystem( "BeamPipe","BeamPipe");
-  m_d->addSubSystem( "LUCID",".*Lucid.*");
-  m_d->addSubSystem( "ZDC",".*ZDC.*");
-  m_d->addSubSystem( "ALFA",".*ALFA.*");
-  m_d->addSubSystem( "ForwardRegion",".*ForwardRegion.*");
-
-  //The muon systems require special treatment, since we want to
-  //cherrypick below the treetop (this is the main reason for a lot
-  //of the ugly stuff in this class):
-  m_d->addSubSystem( "MuonEndcapStationCSC","Muon","CS.*","CSC");
-  m_d->addSubSystem( "MuonEndcapStationTGC","Muon","T(1|2|3|4).*","TGC");
-  m_d->addSubSystem( "MuonEndcapStationMDT","Muon","(EI|EM|EO|EE).*","EndcapMdt");
-  m_d->addSubSystem( "MuonEndcapStationNSW","Muon",".*ANON.*","MuonNSW",false, false, "NewSmallWheel.*");
-
-  m_d->addSubSystem( "MuonBarrelStationInner","Muon","(BI|BEE).*","BarrelInner");
-  m_d->addSubSystem( "MuonBarrelStationMiddle","Muon","BM.*","BarrelMiddle");
-  m_d->addSubSystem( "MuonBarrelStationOuter","Muon","BO.*","BarrelOuter");
-
-
-  // Toroid
-  m_d->addSubSystem( "BarrelToroid","Muon",".*ANON.*","BarrelToroid", false, false, "BAR_Toroid.*");
-  m_d->addSubSystem( "ToroidECA","Muon",".*ANON.*","ToroidECA", false, false, "ECT_Toroids.*");
-
-  // Muon Feet
-  m_d->addSubSystem( "MuonFeet","Muon",".*ANON.*","MuonFeet", false, false, "Feet.*");
-
-  // Muon shielding
-  m_d->addSubSystem( "MuonShielding","Muon",".*ANON.*","Shielding", false, false, "(JDSH|JTSH|JFSH).*");
-
-
-  // All muon stuff --> this will be linked to the "Services" checkbox in the GUI
-  m_d->addSubSystem( "MuonToroidsEtc","Muon",".*(CS|T1|T2|T3|T4|EI|EM|EO|EE|BI|BEE|BM|BO).*","MuonEtc",false,true,"(ECT_Toroids|BAR_Toroid|Feet|NewSmallWheel|JDSH|JTSH|JFSH).*",true);
-
-  //This one MUST be added last. It will get slightly special treatment in various places!
-  m_d->addSubSystem( "VP1GeoFlags::Undifferentiated",".*");
-
-
   //Setup models/views for volume tree browser and zapped volumes list:
   m_d->volumetreemodel = new VolumeTreeModel(m_d->controller->volumeTreeBrowser());
   m_d->controller->volumeTreeBrowser()->header()->hide();
@@ -440,21 +383,18 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   if(VP1Msg::debug()){
     qDebug() << "Configuring the default systems... - subsysInfoList len:" << (m_d->subsysInfoList).length();
   }
-  // we switch on the systems flagged to be turned on at start
-  foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList)
-    {
-      bool on(std::find(m_d->initialSubSystemsTurnedOn.begin(),
-			m_d->initialSubSystemsTurnedOn.end(),subsys->flag)!=
-	      m_d->initialSubSystemsTurnedOn.end());
-      subsys->checkbox->setChecked( on );
-      subsys->checkbox->setEnabled(false);
-      subsys->checkbox->setToolTip("This sub-system is not available");
-      connect(subsys->checkbox,SIGNAL(toggled(bool)),this,SLOT(checkboxChanged()));
+  {
+    GeoVolumeCursor av(world);
+    while (!av.atEnd()) {
+      m_d->addSubSystem(av.getName(), av.getName().c_str());
+      av.next();
     }
-  
-  //Locate geometry info for the various subsystems, and add the info as appropriate:
-  
-  QCheckBox * checkBoxOther = m_d->controller->subSystemCheckBox("VP1GeoFlags::Undifferentiated");
+  }
+
+  foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
+    connect(subsys->checkbox,SIGNAL(toggled(bool)),this,SLOT(checkboxChanged()));
+  }
+
   
   if(VP1Msg::debug()){
     qDebug() << "Looping on volumes from the input GeoModel...";
@@ -475,9 +415,6 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
     foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
       if (subsys->negatetreetopregexp!=subsys->geomodeltreetopregexp.exactMatch(name.c_str()))
 	{
-	  if (subsys->checkbox==checkBoxOther&&found) {
-	    continue;//The "other" subsystem has a wildcard which matches everything - but we only want stuff that is nowhere else.
-	  }
 	  
 	  if(VP1Msg::debug()){
 	    qDebug() << (subsys->geomodeltreetopregexp).pattern() << subsys->geomodeltreetopregexp.exactMatch(name.c_str()) << subsys->negatetreetopregexp;
@@ -513,9 +450,6 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
     av.next(); // increment volume cursor.
   }
   
-  //Hide other cb if not needed:
-  if (!checkBoxOther->isEnabled())
-    checkBoxOther->setVisible(false);
 
   //Build the geometry for those (available) subsystems that starts out being turned on:
   foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
@@ -1215,7 +1149,6 @@ void VP1GeometrySystem::restoreFromState(QByteArray ba) {
     if (subsysstate.contains(subsys->checkbox->text())&&subsysstate[subsys->checkbox->text()])
       flags.push_back(subsys->flag);
   }
-  m_d->initialSubSystemsTurnedOn = flags;
 
   //Volume states:
   QMap<quint32,QByteArray> topvolstates;
@@ -1610,9 +1543,11 @@ void VP1GeometrySystem::saveTrees() {
     if (subsys->checkbox->isChecked()){
       std::vector<Imp::SubSystemInfo::TreetopInfo> & ttInfo=subsys->treetopinfo;
       foreach (const Imp::SubSystemInfo::TreetopInfo & treeTop, ttInfo) {
-	
+
+	GeoNameTag   *nameTag = new GeoNameTag(treeTop.volname);
 	GeoTransform *transform=new GeoTransform(treeTop.xf);
 	world->add(transform);
+	world->add(nameTag);
 	GeoPhysVol *pV=(GeoPhysVol *) &*treeTop.pV;
 	world->add(pV);
 	pV->unref();

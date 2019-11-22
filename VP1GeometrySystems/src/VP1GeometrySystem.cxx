@@ -953,21 +953,14 @@ SoMaterial* VP1GeometrySystem::Imp::getDummyMaterial()
 //_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 {
-  VP1Msg::messageDebug("VP1GeometrySystem::Imp::buildSystem()" );
 
   if (!si||si->isbuilt) {
-    VP1Msg::messageDebug("Not or Built. Returning...");
     return;
   }
   si->isbuilt = true;
   int ichild(0);
 
   ensureInitVisAttributes();
-
-//  // DEBUG
-//  foreach(Imp::SubSystemInfo*si,m_d->subsysInfoList) {
-//	  VP1Msg::messageDebug("vol: " + QString((si->flag).str_c()) );
-//	}
 
   assert(si->soswitch);
   SoSeparator * subsystemsep = new SoSeparator;
@@ -977,125 +970,125 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
   SbBool save = si->soswitch->enableNotify(false);
 
   if (si->geomodelchildrenregexp.isEmpty()) {
-	  //Loop over the treetop's that we previously selected:
+    //Loop over the treetop's that we previously selected:
 
-	  std::vector<SubSystemInfo::TreetopInfo>::const_iterator it, itE = si->treetopinfo.end();
-	  for (it=si->treetopinfo.begin(); it!=itE; ++it)
-	  {
-		  VP1Msg::messageDebug("-- toptree vol: " + QString(it->volname.c_str()) );
+    std::vector<SubSystemInfo::TreetopInfo>::const_iterator it, itE = si->treetopinfo.end();
+    for (it=si->treetopinfo.begin(); it!=itE; ++it)
+      {
+	VP1Msg::messageDebug("-- toptree vol: " + QString(it->volname.c_str()) );
 
-		  // Get the material name from the top volume and search for it
-      // in the lsit of "default" materials for the sub-detectors:
-      QString topMaterialName = QString::fromStdString(it->pV->getLogVol()->getMaterial()->getName());
-      VP1Msg::messageDebug("topMaterial: " + topMaterialName);
-		  SoMaterial* topMaterial = detVisAttributes->get(it->volname);
-		  if (!topMaterial) {
-			  theclass->message("Warning: Did not find a predefined material for volume: "+QString(it->volname.c_str()));
-		  }
+	// Get the material name from the top volume and search for it
+	// in the lsit of "default" materials for the sub-detectors:
+	QString topMaterialName = QString::fromStdString(it->pV->getLogVol()->getMaterial()->getName());
+	VP1Msg::messageDebug("topMaterial: " + topMaterialName);
+	SoMaterial* topMaterial = detVisAttributes->get(it->volname);
+	if (!topMaterial) {
+	  theclass->message("Warning: Did not find a predefined material for volume: "+QString(it->volname.c_str()));
+	}
 
-      // replace with special Dummy material if user uses this
-      if (topMaterialName == "Dummy") {
-        VP1Msg::messageWarning("the volume uses the 'Dummy' material!");
-        topMaterial = getDummyMaterial();
-      }
+	// replace with special Dummy material if user uses this
+	if (topMaterialName == "Dummy") {
+	  VP1Msg::messageWarning("the volume uses the 'Dummy' material!");
+	  topMaterial = getDummyMaterial();
+	}
 
-		  VolumeHandleSharedData* volhandle_subsysdata = new VolumeHandleSharedData(controller,
-          si->flag, &sonodesep2volhandle, it->pV, phisectormanager,
-				  topMaterial, matVisAttributes, volVisAttributes,
-				  controller->zappedVolumeListModel(),
-          controller->volumeTreeBrowser(),
-          m_textSep);
-		  const GeoTrf::Transform3D::MatrixType & mtx=it->xf.matrix();
-		  SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, Eigen and SoQt have different conventions 
-				mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // For the matrix of homogenous transformations. 
-				mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),
-				mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
+	VolumeHandleSharedData* volhandle_subsysdata = new VolumeHandleSharedData(controller,
+										  si->flag, &sonodesep2volhandle, it->pV, phisectormanager,
+										  topMaterial, matVisAttributes, volVisAttributes,
+										  controller->zappedVolumeListModel(),
+										  controller->volumeTreeBrowser(),
+										  m_textSep);
+	const GeoTrf::Transform3D::MatrixType & mtx=it->xf.matrix();
+	SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, Eigen and SoQt have different conventions 
+		      mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // For the matrix of homogenous transformations. 
+		      mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),
+		      mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
 				
-		  VolumeHandle * vh = new VolumeHandle(volhandle_subsysdata,0,it->pV,ichild++,VolumeHandle::NONMUONCHAMBER,matr);
-		  si->vollist.push_back(vh);
-      // std::cout<<"Non muon chamber VH="<<vh<<std::endl;
-	  }
+	VolumeHandle * vh = new VolumeHandle(volhandle_subsysdata,0,it->pV,ichild++,VolumeHandle::NONMUONCHAMBER,matr);
+	si->vollist.push_back(vh);
+	// std::cout<<"Non muon chamber VH="<<vh<<std::endl;
+      }
   } else {
-	  //Loop over the children of the physical volumes of the treetops that we previously selected:
-	  std::vector<SubSystemInfo::TreetopInfo>::const_iterator it, itE = si->treetopinfo.end();
-	  for (it=si->treetopinfo.begin();it!=itE;++it) {
+    //Loop over the children of the physical volumes of the treetops that we previously selected:
+    std::vector<SubSystemInfo::TreetopInfo>::const_iterator it, itE = si->treetopinfo.end();
+    for (it=si->treetopinfo.begin();it!=itE;++it) {
 
-		  VP1Msg::messageDebug("group name: " + QString(si->matname.c_str()) );
+      VP1Msg::messageDebug("group name: " + QString(si->matname.c_str()) );
 
-		  //NB: Here we use the si->matname. Above we use the si->volname. Historical reasons!
+      //NB: Here we use the si->matname. Above we use the si->volname. Historical reasons!
 
-		  //Find material for top-nodes:
-		  SoMaterial*mat_top(0);
-		  if (si->matname!="")
-			  mat_top = detVisAttributes->get(si->matname);
+      //Find material for top-nodes:
+      SoMaterial*mat_top(0);
+      if (si->matname!="")
+	mat_top = detVisAttributes->get(si->matname);
 
-		  VolumeHandleSharedData* volhandle_subsysdata = new VolumeHandleSharedData(controller,si->flag,&sonodesep2volhandle,it->pV,phisectormanager,
-				  mat_top,matVisAttributes,volVisAttributes,
-				  controller->zappedVolumeListModel(),controller->volumeTreeBrowser(),m_textSep);
-		  volhandle_subsysdata->ref();
+      VolumeHandleSharedData* volhandle_subsysdata = new VolumeHandleSharedData(controller,si->flag,&sonodesep2volhandle,it->pV,phisectormanager,
+										mat_top,matVisAttributes,volVisAttributes,
+										controller->zappedVolumeListModel(),controller->volumeTreeBrowser(),m_textSep);
+      volhandle_subsysdata->ref();
 
 
-		  GeoVolumeCursor av(it->pV);
+      GeoVolumeCursor av(it->pV);
       //unsigned int count=0;
-		  while (!av.atEnd()) {
+      while (!av.atEnd()) {
 
-			  // DEBUG
-//			  VP1Msg::messageDebug("child vol: " + QString(av.getName().c_str()) );
+	// DEBUG
+	//			  VP1Msg::messageDebug("child vol: " + QString(av.getName().c_str()) );
 
-			  //Use the childrenregexp to select the correct child volumes:
-			  if (si->childrenRegExpNameCompatible(av.getName().c_str())) {
-				  PVConstLink pVD = av.getVolume();
+	//Use the childrenregexp to select the correct child volumes:
+	if (si->childrenRegExpNameCompatible(av.getName().c_str())) {
+	  PVConstLink pVD = av.getVolume();
 
-				  const GeoTrf::Transform3D::MatrixType & mtx=av.getTransform().matrix();
-				  SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware of different
-						mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // conventions between
-						mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),  // Eigen and Inventor.
-						mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
+	  const GeoTrf::Transform3D::MatrixType & mtx=av.getTransform().matrix();
+	  SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware of different
+			mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // conventions between
+			mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),  // Eigen and Inventor.
+			mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
 				  
-				  VolumeHandle * vh=0;
+	  VolumeHandle * vh=0;
           // std::cout<<count++<<": dump SubSystemInfo\n"<<"---"<<std::endl;
           // si->dump();
           // std::cout<<"---"<<std::endl;
 				    
-				  {
+	  {
 				    
-				    vh = new VolumeHandle(volhandle_subsysdata,0,pVD,ichild++,VolumeHandle::NONMUONCHAMBER,matr);
-				    // std::cout<<"Does not have muon chamber (weird one) VH="<<vh<<std::endl;
-				  }
+	    vh = new VolumeHandle(volhandle_subsysdata,0,pVD,ichild++,VolumeHandle::NONMUONCHAMBER,matr);
+	    // std::cout<<"Does not have muon chamber (weird one) VH="<<vh<<std::endl;
+	  }
 
-				  // DEBUG
-//				  VP1Msg::messageDebug("granchild vol: " + vh->getName() + " - " + vh->getDescriptiveName() );
+	  // DEBUG
+	  //				  VP1Msg::messageDebug("granchild vol: " + vh->getName() + " - " + vh->getDescriptiveName() );
 
-				  if (si->geomodelgrandchildrenregexp.isEmpty()) {
-					  // append the volume to the current list
-					  theclass->messageDebug("grandchild inserted : " + vh->getDescriptiveName() + " - " + vh->getName() );
-					  si->vollist.push_back(vh);
+	  if (si->geomodelgrandchildrenregexp.isEmpty()) {
+	    // append the volume to the current list
+	    theclass->messageDebug("grandchild inserted : " + vh->getDescriptiveName() + " - " + vh->getName() );
+	    si->vollist.push_back(vh);
 
-				  } else {
-					  VP1Msg::messageDebug("filtering at grandchild level...");
-					  if (si->grandchildrenRegExpNameCompatible(vh->getName().toStdString() ) ) {
-						  VP1Msg::messageDebug("filtered grandchild inserted : " + vh->getDescriptiveName() + " - " + vh->getName() );
-						  // append the volume to the current list
-						  si->vollist.push_back(vh);
-					  } else {
+	  } else {
+	    VP1Msg::messageDebug("filtering at grandchild level...");
+	    if (si->grandchildrenRegExpNameCompatible(vh->getName().toStdString() ) ) {
+	      VP1Msg::messageDebug("filtered grandchild inserted : " + vh->getDescriptiveName() + " - " + vh->getName() );
+	      // append the volume to the current list
+	      si->vollist.push_back(vh);
+	    } else {
               theclass->message("Zapping this volumehandle because it's probably junk."+vh->getDescriptiveName() + " - " + vh->getName());
               vh->setState(VP1GeoFlags::ZAPPED); // FIXME - better solution for this? Maybe just don't create them?
 
               // std::cout<<"Not adding "<<vh->getName().toStdString()<<"["<<vh<<"] to vollist"<<std::endl;
-					  }
-				  }
-			  }
-			  av.next(); // increment volume cursor.
-		  }
-		  volhandle_subsysdata->unref();//To ensure it is deleted if it was not used.
+	    }
 	  }
+	}
+	av.next(); // increment volume cursor.
+      }
+      volhandle_subsysdata->unref();//To ensure it is deleted if it was not used.
+    }
   }
 
 
   theclass->message("Dumping the subsystem's info:");
   si->dump();
 
-  VP1Msg::messageDebug("volumetreemodel->addSubSystem...");
+
   volumetreemodel->addSubSystem( si->flag, si->vollist );
 
   //NB: We let the destructor of volumetreemodel take care of deleting

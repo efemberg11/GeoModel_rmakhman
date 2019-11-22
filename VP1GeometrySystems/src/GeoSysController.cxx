@@ -128,20 +128,6 @@ GeoSysController::GeoSysController(IVP1System * sys)
  
  
 
-  // -> labels
-  addUpdateSlot(SLOT(possibleChange_labels()));
-  connectToLastUpdateSlot(m_d->ui_disp.groupBox_labels);
-  connectToLastUpdateSlot(m_d->ui_disp.checkBox_labels_names);
-  connectToLastUpdateSlot(m_d->ui_disp.checkBox_labels_mooret0s);
-  connectToLastUpdateSlot(m_d->ui_disp.checkBox_labels_mboyt0s);
-  connectToLastUpdateSlot(m_d->ui_disp.checkBox_labels_hits);
-  
-  addUpdateSlot(SLOT(possibleChange_labelPosOffset()));
-  connectToLastUpdateSlot(m_d->ui_disp.horizontalSlider_labels_xOffset);
-  connectToLastUpdateSlot(m_d->ui_disp.horizontalSlider_labels_yOffset);
-  connectToLastUpdateSlot(m_d->ui_disp.horizontalSlider_labels_zOffset);
-  
-  m_d->last_labels=0;
 }
 
 //____________________________________________________________________
@@ -348,48 +334,6 @@ bool GeoSysController::showVolumeOutLines() const
   return m_d->ui_disp.checkBox_showVolumeOutLines->isChecked();
 }
 
-void GeoSysController::setLabelsEnabled(bool t0s, bool hits){
-  // make sure that when labels are enabled, only the systems which we have are enabled too
-  if (t0s) {
-    connect(m_d->ui_disp.groupBox_labels,SIGNAL(toggled(bool)),
-                   m_d->ui_disp.checkBox_labels_mooret0s,SLOT(setEnabled(bool)));
-    connect(m_d->ui_disp.groupBox_labels,SIGNAL(toggled(bool)),
-            m_d->ui_disp.checkBox_labels_mboyt0s,SLOT(setEnabled(bool)));
-  } else {
-    m_d->ui_disp.checkBox_labels_mooret0s->setEnabled(false);
-    m_d->ui_disp.checkBox_labels_mboyt0s->setEnabled(false);
-  }
-  if (hits) {
-    connect(m_d->ui_disp.groupBox_labels,SIGNAL(toggled(bool)),
-                   m_d->ui_disp.checkBox_labels_hits,SLOT(setEnabled(bool)));
-  } else {
-    m_d->ui_disp.checkBox_labels_hits->setEnabled(false);
-  }
-
-  messageVerbose("setLabelsEnabled() t0s="+str(t0s)+", hits="+str(hits));
-}
-
-
-int GeoSysController::labels() const {
-  if (!m_d->ui_disp.groupBox_labels->isChecked()) return 0;
-  int labels=0;
-  if (m_d->ui_disp.checkBox_labels_names->isChecked())    labels|=0x1;
-  if (m_d->ui_disp.checkBox_labels_mooret0s->isChecked()) labels|=0x2;
-  if (m_d->ui_disp.checkBox_labels_mboyt0s->isChecked())  labels|=0x4;
-  // leaving space for another t0 type, if necessary
-  if (m_d->ui_disp.checkBox_labels_hits->isChecked())     labels|=0x10;
-  return labels;
-}
-
-QList<int> GeoSysController::labelPosOffset() 
-{
-  QList<int> values;
-  values << m_d->ui_disp.horizontalSlider_labels_xOffset->value();
-  values << m_d->ui_disp.horizontalSlider_labels_yOffset->value();
-  values << m_d->ui_disp.horizontalSlider_labels_zOffset->value();
-  return values;
-}
-
 
 //____________________________________________________________________
 void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
@@ -436,17 +380,6 @@ void GeoSysController::actualSaveSettings(VP1Serialise&s) const
   s.save(m_d->ui_int.checkBox_zoomToVolumes);
   s.save(m_d->ui_disp.checkBox_showVolumeOutLines);//version 1+
 
-  // labels - version 4+
-  s.save(m_d->ui_disp.groupBox_labels);
-  s.save(m_d->ui_disp.horizontalSlider_labels_xOffset);
-  s.save(m_d->ui_disp.horizontalSlider_labels_yOffset);
-  s.save(m_d->ui_disp.horizontalSlider_labels_zOffset);
-  s.save(m_d->ui_disp.checkBox_labels_names);
-  //version 5+
-  s.save(m_d->ui_disp.checkBox_labels_mboyt0s);
-  s.save(m_d->ui_disp.checkBox_labels_mooret0s);
-  s.save(m_d->ui_disp.checkBox_labels_hits); 
-  
   
   s.ignoreWidget(m_d->ui_disp.matButton_lastSel);
   std::map<VP1GeoFlags::SubSystemFlag,QCheckBox*>::const_iterator it,itE(m_d->subSysCheckBoxMap.end());
@@ -483,20 +416,6 @@ void GeoSysController::actualRestoreSettings(VP1Deserialise& s)
   if (s.version()>=1)
     s.restore(m_d->ui_disp.checkBox_showVolumeOutLines);
 
-  // labels
-  if (s.version()>=4){
-    s.restore(m_d->ui_disp.groupBox_labels);
-    s.restore(m_d->ui_disp.horizontalSlider_labels_xOffset);
-    s.restore(m_d->ui_disp.horizontalSlider_labels_yOffset);
-    s.restore(m_d->ui_disp.horizontalSlider_labels_zOffset);
-    s.restore(m_d->ui_disp.checkBox_labels_names);
-  }  
-  if (s.version()>=5){
-    s.restore(m_d->ui_disp.checkBox_labels_mboyt0s);
-    s.restore(m_d->ui_disp.checkBox_labels_mooret0s);
-    s.restore(m_d->ui_disp.checkBox_labels_hits);
-  }
-
   s.ignoreWidget(m_d->ui_disp.matButton_lastSel);
   std::map<VP1GeoFlags::SubSystemFlag,QCheckBox*>::const_iterator it,itE(m_d->subSysCheckBoxMap.end());
   for (it=m_d->subSysCheckBoxMap.begin();it!=itE;++it)
@@ -514,8 +433,6 @@ void GeoSysController::actualRestoreSettings(VP1Deserialise& s)
 #include "VP1Base/VP1ControllerMacros.h"
 POSSIBLECHANGE_IMP(transparency)
 POSSIBLECHANGE_IMP(showVolumeOutLines)
-POSSIBLECHANGE_IMP(labels)
-POSSIBLECHANGE_IMP(labelPosOffset)
 
 
 

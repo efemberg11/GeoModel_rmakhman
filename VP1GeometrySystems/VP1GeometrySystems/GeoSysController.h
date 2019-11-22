@@ -40,10 +40,6 @@ public:
   void setZoomToVolumeOnClick(bool);
   void setComplexity(double);
   
-  // Labels
-//  void setAvailableLabels(IVP1System* sys, QStringList providedLabels);
-  void setLabelsEnabled(bool t0s, bool hits); //!< controls whether the checkboxes are enabled or not. Set in e.g. VP1SysConf.cxx, via VP1GeometrySystem
-
   void actualRestoreSettings(VP1Deserialise&);
   int  currentSettingsVersion() const;
   void actualSaveSettings(VP1Serialise&) const;
@@ -90,8 +86,6 @@ signals:
   //Change signals:
   void transparencyChanged(float);
   void showVolumeOutLinesChanged(bool);
-  void labelsChanged(int);
-  void labelPosOffsetChanged(QList<int>);
 
   //Signals without state:
   void resetSubSystems(VP1GeoFlags::SubSystemFlag);
@@ -116,8 +110,6 @@ private slots:
   void loadMaterialsRequested();
   void emit_autoExpandByVolumeOrMaterialName();
   void emit_actionOnAllNonStandardVolumes();
-  void possibleChange_labels();
-  void possibleChange_labelPosOffset();
 };
 
 #endif

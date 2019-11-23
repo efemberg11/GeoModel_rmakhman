@@ -1,7 +1,7 @@
 site_name: GeoModel - A Detector Description Toolkit for HEP
 site_description: GeoModel - An experiment-agnostic Detector Description Toolkit for HEP
 site_author: ATLAS Collaboration & Contributors
-site_url: https://cern.ch/geomodel
+site_url: https://cern.ch/geomodel/home
 repo_name: GitLab
 repo_url: https://gitlab.cern.ch/GeoModelDev/Documentation
 theme:

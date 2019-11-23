@@ -6,6 +6,11 @@ stages:
 #   - yum -y install cmake glibc-devel which
 #   - set +e && source CI/setup_lcg.sh; set -e
 
+.before_script_template: &build_setup-build
+  before_script:
+    - yum -y install cmake glibc-devel which
+    - set +e && source CI/setup_lcg.sh; set -e
+
 
 variables:
   CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
@@ -13,6 +18,7 @@ variables:
 
 .build_template: &build_template
   stage: build
+  <<: *build_setup-build
   tags:
     - cvmfs
   script:

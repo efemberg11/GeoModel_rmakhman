@@ -2,10 +2,8 @@ stages:
   - build
   - deploy
 
-# before_script:
-#   - yum -y install cmake glibc-devel which
-#   - set +e && source CI/setup_lcg.sh; set -e
-
+# we want this to be used only in the build stage, not deploy, 
+# so we make it part of the build template
 .before_script_template: &build_setup-build
   before_script:
     - yum -y install cmake glibc-devel which
@@ -33,27 +31,14 @@ variables:
     - cp -r doc_doxygen/html ../public
   
 
+build_slc6:
+  <<: *build_template
+  image: cern/slc6-base
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 
-# .build_template: &build_template
-#   stage: doc
-#   tags:
-#     - cvmfs
-#   script:
-#     - mkdir build
-#     - mkdir install
-#     - cd build
-#     - echo "${CMAKE_ARGS}"
-#     - cmake ${CMAKE_ARGS}  ..
-#     - cmake --build . -- -j$(nproc)
-#     - cmake --build . -- doc
-
-
-# build_slc6:
-#   <<: *build_template
-#   image: cern/slc6-base
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-
+# For this, we store the doxygen output folder as artifact,
+# to deploy it online
 build_cc7:
   <<: *build_template
   image: cern/cc7-base
@@ -64,17 +49,17 @@ build_cc7:
       - public
     expire_in: 1 hour
 
-# build_slc6_builtin_eigen3:
-#   <<: *build_template
-#   image: cern/slc6-base
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
+build_slc6_builtin_eigen3:
+  <<: *build_template
+  image: cern/slc6-base
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
 
-# build_cc7_builtin_eigen3:
-#   <<: *build_template
-#   image: cern/cc7-base
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
+build_cc7_builtin_eigen3:
+  <<: *build_template
+  image: cern/cc7-base
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
 
 
 deploying:

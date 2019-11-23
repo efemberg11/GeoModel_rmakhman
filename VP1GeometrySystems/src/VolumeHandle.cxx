@@ -150,7 +150,7 @@ void VolumeHandle::initialiseChildren()
 
     matr.multRight(m_d->accumTrans);
     m_children.push_back(new VolumeHandle(m_d->commondata,this,av.getVolume(),ichild++,NONMUONCHAMBER,matr));
-    //std::cout << "initialised: " << av.getName() << " - " << m_children.back()->getName().toStdString() << " - " << m_children.back() << std::endl;
+    m_children.back()->expandMothersRecursivelyToNonEther();
     av.next();
   }
 

@@ -112,17 +112,12 @@ public:
   public:
     // "geomodellocation" contains name of tree tops, 
     // or possible a bit more complex info in case of muons.
-    SubSystemInfo( QCheckBox* cb,const QRegExp& the_geomodeltreetopregexp, bool the_negatetreetopregexp,
-		  const QRegExp& the_geomodelchildrenregexp, bool the_negatechildrenregexp, VP1GeoFlags::SubSystemFlag the_flag,
-		  const std::string& the_matname,
-		  const QRegExp& the_geomodelgrandchildrenregexp, bool the_negategrandchildrenregexp=false)
+    SubSystemInfo( QCheckBox* cb,const QRegExp& the_geomodeltreetopregexp, 
+		  VP1GeoFlags::SubSystemFlag the_flag,
+		   const std::string& the_matname)
+
       : isbuilt(false), checkbox(cb),
         geomodeltreetopregexp(the_geomodeltreetopregexp),
-        geomodelchildrenregexp(the_geomodelchildrenregexp),
-        geomodelgrandchildrenregexp(the_geomodelgrandchildrenregexp),
-        negatetreetopregexp(the_negatetreetopregexp),
-        negatechildrenregexp(the_negatechildrenregexp),
-        negategrandchildrenregexp(the_negategrandchildrenregexp),
         matname(the_matname), flag(the_flag), soswitch(0)
     {
     }
@@ -132,22 +127,7 @@ public:
     VolumeHandle::VolumeHandleList vollist;
     QCheckBox* checkbox;
 
-    /* Regular Expressions for three levels of filtering: treetop, children, and grandchildren
-     *
-     * For example:
-     *
-     * - Muon                --> treetop volume
-     * -    ANON             --> child volume
-     * -        BAR_Toroid   --> granchild volume
-     *
-     */
     QRegExp geomodeltreetopregexp;      //For picking the geomodel treetops
-    QRegExp geomodelchildrenregexp;     //If instead of the treetops, this system consists of volumes below the treetop, this is non-empty.
-    QRegExp geomodelgrandchildrenregexp;//If instead of the treetops, this system consists of volumes below the child of a treetop, this is non-empty.
-    bool negatetreetopregexp;
-    bool negatechildrenregexp;
-    bool negategrandchildrenregexp;
-
 
     std::string matname; //if nonempty, use this from detvisattr instead of the top volname.
     VP1GeoFlags::SubSystemFlag flag;
@@ -166,17 +146,6 @@ public:
     SoSwitch * soswitch;
 
 
-    bool childrenRegExpNameCompatible(const std::string& volname) const {
-      return negatechildrenregexp!=geomodelchildrenregexp.exactMatch(volname.c_str());
-    }
-
-    bool grandchildrenRegExpNameCompatible(const std::string& volname) const {
-        if(VP1Msg::debug()){
-            std::cout << "volname: " << volname << " - regexpr: " << geomodelgrandchildrenregexp.pattern().toStdString() << std::endl;
-            std::cout << "negategrandchildrenregexp: " << negategrandchildrenregexp << std::endl;
-        }
-        return negategrandchildrenregexp!=geomodelgrandchildrenregexp.exactMatch(volname.c_str());
-    }
 
     void dump() const {
       std::cout<<" SubSystemInfo @ "<<this<<"\n"
@@ -194,10 +163,7 @@ public:
   };
 
   QList<SubSystemInfo*> subsysInfoList;//We need to keep and ordered version also (since wildcards in regexp might match more than one subsystem info).
-  void addSubSystem(const VP1GeoFlags::SubSystemFlag&,
-		    const QString& treetopregexp, const QString& childrenregexp="",
-		    const std::string& matname="", bool negatetreetopregexp = false, bool negatechildrenregexp = false,
-		    const QString& grandchildrenregexp="", bool negategrandchildrenregexp = false);
+  void addSubSystem(const VP1GeoFlags::SubSystemFlag&, const QString& treetopregexp, const std::string& matname="");
 
   DetVisAttributes *detVisAttributes;
   MatVisAttributes *matVisAttributes;
@@ -281,20 +247,15 @@ void VP1GeometrySystem::setZoomToVolumeOnClick(bool b) {
 
 //_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::addSubSystem(const VP1GeoFlags::SubSystemFlag& f,
-					  const QString& treetopregexp, const QString& childrenregexp,
-					  const std::string& matname, bool negatetreetopregexp, bool negatechildrenregexp,
-					  const QString& grandchildrenregexp, bool negategrandchildrenregexp)
+					  const QString& treetopregexp, 
+					  const std::string& matname)
 {
-  theclass->message("VP1GeometrySystem::Imp::addSubSystem - flag: '" + QString(f.c_str()) + "' - matName: '" + str(matname.c_str()) + "'." );
-
   QCheckBox * cb = controller->subSystemCheckBox(f);
   if (!cb) {
     theclass->message(("Error: Problems retrieving checkbox for subsystem "+f).c_str());
     return;
   }
-  subsysInfoList << new SubSystemInfo(cb,QRegExp(treetopregexp),negatetreetopregexp,
-				      QRegExp(childrenregexp),negatechildrenregexp,f,matname,
-				      QRegExp(grandchildrenregexp), negategrandchildrenregexp);
+  subsysInfoList << new SubSystemInfo(cb,QRegExp(treetopregexp),f,matname);
   //FIXME: DELETE!!!
 }
 
@@ -381,9 +342,6 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   root->addChild(m_d->controller->drawOptions());
   root->addChild(m_d->controller->pickStyle());
   
-  if(VP1Msg::debug()){
-    qDebug() << "Configuring the default systems... - subsysInfoList len:" << (m_d->subsysInfoList).length();
-  }
   {
     GeoVolumeCursor av(world);
     while (!av.atEnd()) {
@@ -391,11 +349,11 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
       av.next();
     }
   }
-
+  
   foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
     connect(subsys->checkbox,SIGNAL(toggled(bool)),this,SLOT(checkboxChanged()));
   }
-
+  
   
   if(VP1Msg::debug()){
     qDebug() << "Looping on volumes from the input GeoModel...";
@@ -404,23 +362,17 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   while (!av.atEnd()) {
     
     std::string name = av.getName();
-    if(VP1Msg::debug()){
-      qDebug() << "volume name:" << QString::fromStdString(name);
-    }
-
+    std::cout << "++volume name:" << name << std::endl;
+    
     // DEBUG
     VP1Msg::messageDebug("DEBUG: Found GeoModel treetop: "+QString(name.c_str()));
     
     //Let us see if we recognize this volume:
     bool found = false;
     foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
-      if (subsys->negatetreetopregexp!=subsys->geomodeltreetopregexp.exactMatch(name.c_str()))
+      if (subsys->geomodeltreetopregexp.exactMatch(name.c_str())){
 	{
 	  
-	  if(VP1Msg::debug()){
-	    qDebug() << (subsys->geomodeltreetopregexp).pattern() << subsys->geomodeltreetopregexp.exactMatch(name.c_str()) << subsys->negatetreetopregexp;
-	    qDebug() << "setting 'found' to TRUE for pattern:" << (subsys->geomodeltreetopregexp).pattern();
-	  }
 	  found = true;
 	  //We did... now, time to extract info:
 	  subsys->treetopinfo.resize(subsys->treetopinfo.size()+1);
@@ -440,18 +392,11 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
 	  //Enable the corresponding checkbox:
 	  subsys->checkbox->setEnabled(true);
 	  subsys->checkbox->setToolTip("Toggle the display of the "+subsys->checkbox->text()+" sub system");
-	  //NB: Dont break here - several systems might share same treetop!
-	  //	break;
 	}
+      }
     }
-    if (!found) {
-      message("Warning: Found unexpected GeoModel treetop: "+QString(name.c_str()));
-    }
-    
     av.next(); // increment volume cursor.
   }
-  
-
   //Build the geometry for those (available) subsystems that starts out being turned on:
   foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
     if (!subsys->soswitch||!subsys->checkbox->isChecked())
@@ -940,7 +885,7 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 
   SbBool save = si->soswitch->enableNotify(false);
 
-  if (si->geomodelchildrenregexp.isEmpty()) {
+  {
     //Loop over the treetop's that we previously selected:
 
     std::vector<SubSystemInfo::TreetopInfo>::const_iterator it, itE = si->treetopinfo.end();

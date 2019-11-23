@@ -1,11 +1,14 @@
 stages:
   - build
-  - doc
   - deploy
 
-before_script:
-  - yum -y install cmake glibc-devel which
-  - set +e && source CI/setup_lcg.sh; set -e
+# we want this to be used only in the build stage, not deploy, 
+# so we make it part of the build template
+.before_script_template: &build_setup-build
+  before_script:
+    - yum -y install cmake glibc-devel which
+    - set +e && source CI/setup_lcg.sh; set -e
+
 
 variables:
   CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
@@ -13,6 +16,7 @@ variables:
 
 .build_template: &build_template
   stage: build
+  <<: *build_setup-build
   tags:
     - cvmfs
   script:
@@ -24,44 +28,8 @@ variables:
     - cmake --build . -- -j$(nproc)
     - cmake --build . -- install
     - cmake --build . -- doc
-  artifacts:
-    paths:
-      - build/doc_doxygen
-
-
-# .build_template: &build_template
-#   stage: doc
-#   tags:
-#     - cvmfs
-#   script:
-#     - mkdir build
-#     - mkdir install
-#     - cd build
-#     - echo "${CMAKE_ARGS}"
-#     - cmake ${CMAKE_ARGS}  ..
-#     - cmake --build . -- -j$(nproc)
-#     - cmake --build . -- doc
-
-# documentation:
-#   stage: doc
-#   script:
-#     - cd build
-#     - make doc
-#   artifacts:
-#     paths:
-#       - build/doc_doxygen
-
-
-deploying:
-    stage: deploy
-    variables:
-      "EOS_PATH": "/eos/project/g/geomodel/www/doxygen"
-    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
-    only:
-        - master
-    script:
-        - deploy-eos
-
+    - cp -r doc_doxygen/html ../public
+  
 
 build_slc6:
   <<: *build_template
@@ -69,11 +37,17 @@ build_slc6:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 
+# For this, we store the doxygen output folder as artifact,
+# to deploy it online
 build_cc7:
   <<: *build_template
   image: cern/cc7-base
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 hour
 
 build_slc6_builtin_eigen3:
   <<: *build_template
@@ -86,3 +60,14 @@ build_cc7_builtin_eigen3:
   image: cern/cc7-base
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
+
+
+deploying:
+    stage: deploy
+    variables:
+      "EOS_PATH": "/eos/project/g/geomodel/www/doxygen"
+    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer
+    only:
+        - master
+    script:
+        - deploy-eos

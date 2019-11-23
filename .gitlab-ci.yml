@@ -26,7 +26,7 @@ variables:
     - cmake --build . -- doc
   artifacts:
     paths:
-      - build/
+      - build/doc_doxygen
 
 
 # .build_template: &build_template
@@ -42,13 +42,14 @@ variables:
 #     - cmake --build . -- -j$(nproc)
 #     - cmake --build . -- doc
 
-documentation:
-  stage: doc
-  script:
-    - cd build
-    - make doc
-  artifacts:
-    - build/doc_doxygen
+# documentation:
+#   stage: doc
+#   script:
+#     - cd build
+#     - make doc
+#   artifacts:
+#     paths:
+#       - build/doc_doxygen
 
 
 deploying:

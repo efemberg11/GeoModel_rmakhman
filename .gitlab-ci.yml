@@ -2,11 +2,10 @@ stages:
   - build
   - deploy
 
-before_script:
-  stage: build
-  script:
-    - yum -y install cmake glibc-devel which
-    - set +e && source CI/setup_lcg.sh; set -e
+# before_script:
+#   - yum -y install cmake glibc-devel which
+#   - set +e && source CI/setup_lcg.sh; set -e
+
 
 variables:
   CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install

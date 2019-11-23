@@ -20,7 +20,7 @@
 
 class IVP1ChannelWidget;
 class GXExecutionScheduler;
-class VP1MainWindow;
+class GXMainWindow;
 #include <QObject>
 #include <QStringList>
 
@@ -29,7 +29,7 @@ class VP1ChannelManager : public QObject {
   Q_OBJECT
 
 public:
-  VP1ChannelManager(GXExecutionScheduler*,VP1MainWindow*);
+  VP1ChannelManager(GXExecutionScheduler*,GXMainWindow*);
   ~VP1ChannelManager();
 
   QString loadPluginFile(QString filename);

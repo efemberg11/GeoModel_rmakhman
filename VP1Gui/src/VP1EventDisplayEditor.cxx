@@ -21,7 +21,7 @@
 #include "VP1Base/VP1QtInventorUtils.h"
 #include "VP1Base/VP1Serialise.h"
 #include "VP1Base/VP1Deserialise.h"
-#include "VP1Gui/VP1MainWindow.h"
+#include "VP1Gui/GXMainWindow.h"
 
 #include <QRectF>
 #include <QShortcut>
@@ -137,7 +137,7 @@ public:
  * new version
  */
 //____________________________________________________________________
-VP1EventDisplayEditor::VP1EventDisplayEditor(VP1MainWindow* mainWindow, QList<unsigned long long> listRunEventNumberTimestamp)
+VP1EventDisplayEditor::VP1EventDisplayEditor(GXMainWindow* mainWindow, QList<unsigned long long> listRunEventNumberTimestamp)
 //: QWidget(0,Qt::WindowStaysOnTopHint), d(new Imp)
 : QWidget(0), m_d(new Imp)
 {

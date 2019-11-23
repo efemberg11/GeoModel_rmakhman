@@ -4,7 +4,7 @@
 
 /////////////////////////////////////////////////////////////
 //                                                         //
-//  Header file for class VP1MainWindow                    //
+//  Header file for class GXMainWindow                    //
 //                                                         //
 //  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>  //
 //                                                         //
@@ -12,11 +12,11 @@
 //                                                         //
 /////////////////////////////////////////////////////////////
 
-#ifndef VP1MainWindow_H
-#define VP1MainWindow_H
+#ifndef GXMainWindow_H
+#define GXMainWindow_H
 
 // include the related GUI
-#include "ui_vp1mainwindow.h"
+#include "ui_gxmainwindow.h"
 
 // include VP1
 #include "VP1Gui/VP1EventDisplayEditor.h"
@@ -39,13 +39,13 @@ class VP1StreamMenuUpdater;
 class QMutex;
 
 
-class VP1MainWindow : public QMainWindow, public Ui::VP1MainWindow
+class GXMainWindow : public QMainWindow, public Ui::GXMainWindow
 {
   Q_OBJECT
 
 public:
-  VP1MainWindow(GXExecutionScheduler*,QWidget *parent = 0);
-  ~VP1MainWindow();
+  GXMainWindow(GXExecutionScheduler*,QWidget *parent = 0);
+  ~GXMainWindow();
 
 
   // Set next event to the execution scheduler and updates event controls

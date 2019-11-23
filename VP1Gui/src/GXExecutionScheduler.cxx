@@ -35,7 +35,7 @@
 
 #include "VP1Gui/GXExecutionScheduler.h"
 #include "VP1Gui/VP1Prioritiser.h"
-#include "VP1Gui/VP1MainWindow.h"
+#include "VP1Gui/GXMainWindow.h"
 #include "VP1Gui/VP1ChannelManager.h"
 #include "VP1Gui/VP1TabManager.h"
 
@@ -126,7 +126,7 @@ public:
   
   GXExecutionScheduler * scheduler;
   VP1Prioritiser * prioritiser;
-  VP1MainWindow* mainwindow;
+  GXMainWindow* mainwindow;
   
   long int eventsProcessed;
   
@@ -264,7 +264,7 @@ GXExecutionScheduler::GXExecutionScheduler( QObject * parent)
 
 	m_d->scheduler = this;
 	m_d->prioritiser = new VP1Prioritiser(this);
-	m_d->mainwindow = new VP1MainWindow(this);
+	m_d->mainwindow = new GXMainWindow(this);
 	
 
 	m_d->allSystemsRefreshed = false;

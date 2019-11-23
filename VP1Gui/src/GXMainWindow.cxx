@@ -4,7 +4,7 @@
 
 /////////////////////////////////////////////////////////////
 //                                                         //
-//  Implementation of class VP1MainWindow                  //
+//  Implementation of class GXMainWindow                  //
 //                                                         //
 //  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>  //
 //                                                         //
@@ -15,7 +15,7 @@
 //                                                         //
 /////////////////////////////////////////////////////////////
 
-#include "VP1Gui/VP1MainWindow.h"
+#include "VP1Gui/GXMainWindow.h"
 
 #include "VP1Gui/VP1ChannelManager.h"
 #include "VP1Gui/VP1TabManager.h"
@@ -75,7 +75,7 @@
 
 
 //_________________________________________________________________________________
-VP1MainWindow::VP1MainWindow(GXExecutionScheduler*sched,QWidget * parent)
+GXMainWindow::GXMainWindow(GXExecutionScheduler*sched,QWidget * parent)
 : QMainWindow(parent),
   m_mustquit(false),
   m_dummyemptycontroller(new QWidget(0)),
@@ -227,7 +227,7 @@ VP1MainWindow::VP1MainWindow(GXExecutionScheduler*sched,QWidget * parent)
 	    menuConfiguration->addSeparator();
 	    m_actionEnableExpertSettings = menuConfiguration->addAction ( "&Settings" );
 	    m_actionEnableExpertSettings->setStatusTip("Open additional settings");
-	    connect(m_actionEnableExpertSettings, &QAction::triggered, this, &VP1MainWindow::request_expertSettings);
+	    connect(m_actionEnableExpertSettings, &QAction::triggered, this, &GXMainWindow::request_expertSettings);
 	#endif
 
 	// Help menu
@@ -253,15 +253,15 @@ VP1MainWindow::VP1MainWindow(GXExecutionScheduler*sched,QWidget * parent)
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::launch3DstereoEditor()
+void GXMainWindow::launch3DstereoEditor()
 {
-	VP1Msg::messageDebug("VP1MainWindow::launch3DstereoEditor()");
+	VP1Msg::messageDebug("GXMainWindow::launch3DstereoEditor()");
 	m_tabmanager->launchStereoEditorCurrentTab();
 
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::help_openGMWebSite() {
+void GXMainWindow::help_openGMWebSite() {
 	/*
 	 * Open the online help from a web url location
 	 * with the default system web browser
@@ -272,7 +272,7 @@ void VP1MainWindow::help_openGMWebSite() {
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::help_openAbout() {
+void GXMainWindow::help_openAbout() {
   /*
    * open the online help with the internal web browser
    */
@@ -286,7 +286,7 @@ void VP1MainWindow::help_openAbout() {
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::postInitUpdates(){
+void GXMainWindow::postInitUpdates(){
 
 	//Make sure that the splitters give maximum space for the tab area.
 
@@ -322,7 +322,7 @@ void VP1MainWindow::postInitUpdates(){
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::setupStatusBar()  {
+void GXMainWindow::setupStatusBar()  {
 	progressbar = new QProgressBar();
 	progressbar->setMinimum(0);
 	progressbar->reset();
@@ -336,7 +336,7 @@ void VP1MainWindow::setupStatusBar()  {
 }
 
 //_________________________________________________________________________________
-VP1MainWindow::~VP1MainWindow()
+GXMainWindow::~GXMainWindow()
 {
 	if (m_edEditor) {
 		VP1Msg::messageDebug("deleting the editor");
@@ -352,13 +352,13 @@ VP1MainWindow::~VP1MainWindow()
 }
 
 //_________________________________________________________________________________
-bool VP1MainWindow::mustQuit() const {
+bool GXMainWindow::mustQuit() const {
 	return m_mustquit;
 }
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::loadPluginFile(QString filename)
+void GXMainWindow::loadPluginFile(QString filename)
 {
 	VP1Msg::messageDebug("loadPluginFile()");
 
@@ -373,7 +373,7 @@ void VP1MainWindow::loadPluginFile(QString filename)
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::request_addEmptyTab() {
+void GXMainWindow::request_addEmptyTab() {
 	bool ok;
 	QString newtabname = QInputDialog::getText( 0, "New Tab Name","New tab name:",
 			QLineEdit::Normal, m_tabmanager->suggestNewTabName("My Tab"), &ok );
@@ -383,7 +383,7 @@ void VP1MainWindow::request_addEmptyTab() {
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::tabListChanged(QStringList l) {
+void GXMainWindow::tabListChanged(QStringList l) {
 	updateCentralStackWidget();
 	if (l.count()) {
 		m_actionSave_current_tabs->setEnabled(true);
@@ -404,7 +404,7 @@ void VP1MainWindow::tabListChanged(QStringList l) {
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::addChannelIconsToComboBox(QComboBox* cb, const bool& isbasenames) {
+void GXMainWindow::addChannelIconsToComboBox(QComboBox* cb, const bool& isbasenames) {
 	int n= cb->count();
 	for (int i = 0; i<n; ++i) {
 		QString icontext = m_channelmanager->getIconLocation(cb->itemText(i), isbasenames);
@@ -414,9 +414,9 @@ void VP1MainWindow::addChannelIconsToComboBox(QComboBox* cb, const bool& isbasen
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::selectedChannelChanged(IVP1ChannelWidget* cw)
+void GXMainWindow::selectedChannelChanged(IVP1ChannelWidget* cw)
 {
-	VP1Msg::messageDebug("VP1MainWindow::selectedChannelChanged()");
+	VP1Msg::messageDebug("GXMainWindow::selectedChannelChanged()");
 
 	//Controls box:
 	if (cw) {
@@ -444,7 +444,7 @@ void VP1MainWindow::selectedChannelChanged(IVP1ChannelWidget* cw)
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::request_saveasConfig() {
+void GXMainWindow::request_saveasConfig() {
 
 	QString filename = QFileDialog::getSaveFileName(this, "Select configuration file to save",
 			(m_currentconfigfile.isEmpty()?VP1Settings::defaultFileSelectDirectory():m_currentconfigfile),
@@ -460,7 +460,7 @@ void VP1MainWindow::request_saveasConfig() {
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::request_saveConfig()
+void GXMainWindow::request_saveConfig()
 {
 	if (m_currentconfigfile.isEmpty()) {
 		request_saveasConfig();
@@ -470,7 +470,7 @@ void VP1MainWindow::request_saveConfig()
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::request_loadConfig()
+void GXMainWindow::request_loadConfig()
 {
 	QString filename = QFileDialog::getOpenFileName(this, "Select configuration file to load",
 			(m_currentconfigfile.isEmpty()?VP1Settings::defaultFileSelectDirectory():m_currentconfigfile),
@@ -482,14 +482,14 @@ void VP1MainWindow::request_loadConfig()
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::request_loadPlugin()
+void GXMainWindow::request_loadPlugin()
 {
 #ifdef __APPLE__
 	QString sharedlibsuffix = "dylib";
 #else
 	QString sharedlibsuffix = "so";
 #endif
-  qDebug() << "VP1MainWindow::request_loadPlugin()"<<m_currentloadpluginpath;
+  qDebug() << "GXMainWindow::request_loadPlugin()"<<m_currentloadpluginpath;
 
 	QString filename = QFileDialog::getOpenFileName(this, "Select plugin file to load",
 			m_currentloadpluginpath,
@@ -501,14 +501,14 @@ void VP1MainWindow::request_loadPlugin()
 }
 
 //_________________________________________________________________________________
-QMap<QString,QString> VP1MainWindow::availableFiles(const QString& extension,
+QMap<QString,QString> GXMainWindow::availableFiles(const QString& extension,
 		const QString& pathvar,//LD_LIBRARY_PATH or DATAPATH
 		const QString& instareasubdir,
 		const QString& extradirenvvar,
 		bool currentdir ) const
 {
 
-  qDebug() << "VP1MainWindow::availableFiles()";
+  qDebug() << "GXMainWindow::availableFiles()";
  	qDebug() << "extension:" << extension << "pathvar:" << pathvar << "instareasubdir:" << instareasubdir << "extradirenvvar:" << extradirenvvar << "currentdir:" << currentdir;
 
 
@@ -571,9 +571,9 @@ QMap<QString,QString> VP1MainWindow::availableFiles(const QString& extension,
 }
 
 //_________________________________________________________________________________
-QMap<QString,QString> VP1MainWindow::availablePluginFiles() const
+QMap<QString,QString> GXMainWindow::availablePluginFiles() const
 {
-VP1Msg::messageDebug("VP1MainWindow::availablePluginFiles()");
+VP1Msg::messageDebug("GXMainWindow::availablePluginFiles()");
 
 #ifdef __APPLE__
 	QString sharedlibsuffix = "dylib";
@@ -586,7 +586,7 @@ VP1Msg::messageDebug("VP1MainWindow::availablePluginFiles()");
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::pluginDialogClosed() {
+void GXMainWindow::pluginDialogClosed() {
 	if (!m_plugindialog)
 		return;
 
@@ -616,7 +616,7 @@ void VP1MainWindow::pluginDialogClosed() {
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::unloadPlugin_continue()
+void GXMainWindow::unloadPlugin_continue()
 {
 	foreach (QString filename, m_currentunloadpluginfiles) {
 		bool success = m_channelmanager->unloadPluginFile(filename);
@@ -631,9 +631,9 @@ void VP1MainWindow::unloadPlugin_continue()
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::closeEvent(QCloseEvent * event)
+void GXMainWindow::closeEvent(QCloseEvent * event)
 {
-	VP1Msg::messageDebug("VP1MainWindow::closeEvent()");
+	VP1Msg::messageDebug("GXMainWindow::closeEvent()");
 
 	bool checkEnableAskOnClose;
 	#if defined BUILDVP1LIGHT
@@ -668,7 +668,7 @@ void VP1MainWindow::closeEvent(QCloseEvent * event)
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::addToMessageBox( const QString& m, const QString& extrastyleopts,
+void GXMainWindow::addToMessageBox( const QString& m, const QString& extrastyleopts,
 		const QString& title, const QString& titleextrastyleopts )
 {
 
@@ -688,39 +688,39 @@ void VP1MainWindow::addToMessageBox( const QString& m, const QString& extrastyle
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::systemAddToMessageBox( const QString& m )
+void GXMainWindow::systemAddToMessageBox( const QString& m )
 {
 	IVP1System*sys = static_cast<IVP1System*>(sender());
 	if (!sys) {
-		addToMessageBox("VP1MainWindow::systemAddToMessageBox Error: Only prints system messages!");
+		addToMessageBox("GXMainWindow::systemAddToMessageBox Error: Only prints system messages!");
 		return;
 	}
 	if (!sys->channel()) {
-		addToMessageBox("VP1MainWindow::systemAddToMessageBox Error: System does not know its channel!");
+		addToMessageBox("GXMainWindow::systemAddToMessageBox Error: System does not know its channel!");
 		return;
 	}
 	addToMessageBox( m, "color:#000000",sys->channel()->unique_name()+"/"+sys->name(),"color:#0000ff" );
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::channelAddToMessageBox( const QString& m )
+void GXMainWindow::channelAddToMessageBox( const QString& m )
 {
 	IVP1ChannelWidget*cw = static_cast<IVP1ChannelWidget*>(sender());
 	if (!cw) {
-		addToMessageBox("VP1MainWindow::channelAddToMessageBox Error: Only prints channelwidget messages!");
+		addToMessageBox("GXMainWindow::channelAddToMessageBox Error: Only prints channelwidget messages!");
 		return;
 	}
 	addToMessageBox(m,"color:#000000", cw->unique_name(),"color:#0000ff");
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::helperAddToMessageBox( const QString& m )
+void GXMainWindow::helperAddToMessageBox( const QString& m )
 {
 	addToMessageBox(m);
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::request_channelInformation() {
+void GXMainWindow::request_channelInformation() {
 	if(!m_tabmanager->selectedChannelWidget())
 		return;
 
@@ -740,9 +740,9 @@ void VP1MainWindow::request_channelInformation() {
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::makeAllChannelsEventDisplay()
+void GXMainWindow::makeAllChannelsEventDisplay()
 {
-	VP1Msg::messageVerbose("VP1MainWindow::makeAllChannelsEventDisplay()");
+	VP1Msg::messageVerbose("GXMainWindow::makeAllChannelsEventDisplay()");
 
 	QList<QPixmap> list;
 	QStringList listNames;
@@ -766,9 +766,9 @@ void VP1MainWindow::makeAllChannelsEventDisplay()
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::getAllChannelsIntoSnapshots(QList<QPixmap>& list, QStringList& listNames)
+void GXMainWindow::getAllChannelsIntoSnapshots(QList<QPixmap>& list, QStringList& listNames)
 {
-	VP1Msg::messageDebug("VP1MainWindow::getAllChannelsIntoSnapshots()");
+	VP1Msg::messageDebug("GXMainWindow::getAllChannelsIntoSnapshots()");
 
 //	int nTabs = m_tabmanager->nTabs();
 	QList<IVP1ChannelWidget*> allTabs = m_tabmanager->allChannels();
@@ -809,9 +809,9 @@ void VP1MainWindow::getAllChannelsIntoSnapshots(QList<QPixmap>& list, QStringLis
 }
 
 //_________________________________________________________________________________
-QPixmap VP1MainWindow::getSingleChannelCustomSnapshot(IVP1ChannelWidget* tab, int width)
+QPixmap GXMainWindow::getSingleChannelCustomSnapshot(IVP1ChannelWidget* tab, int width)
 {
-	VP1Msg::messageDebug("VP1MainWindow::getSingleChannelCustomSnapshot()");
+	VP1Msg::messageDebug("GXMainWindow::getSingleChannelCustomSnapshot()");
 
 	std::cout << "tab: " << tab << std::endl;
 
@@ -839,7 +839,7 @@ QPixmap VP1MainWindow::getSingleChannelCustomSnapshot(IVP1ChannelWidget* tab, in
 	return snap;
 }
 //_________________________________________________________________________________
-QPixmap VP1MainWindow::getSingleChannelCustomSnapshot(QString tabName, int width)
+QPixmap GXMainWindow::getSingleChannelCustomSnapshot(QString tabName, int width)
 {
 	QList<IVP1ChannelWidget*> allTabs = m_tabmanager->allChannels();
 
@@ -868,9 +868,9 @@ QPixmap VP1MainWindow::getSingleChannelCustomSnapshot(QString tabName, int width
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::saveAllCurrentChannels()
+void GXMainWindow::saveAllCurrentChannels()
 {
-	VP1Msg::messageDebug("VP1MainWindow::saveAllCurrentChannels()");
+	VP1Msg::messageDebug("GXMainWindow::saveAllCurrentChannels()");
 
 	int nTabs = m_tabmanager->nTabs();
 
@@ -980,10 +980,10 @@ void VP1MainWindow::saveAllCurrentChannels()
  * nsnap is an optional parameter: it's an extra label being added
  * to the output filename.
  */
-QString VP1MainWindow::request_saveChannelSnapshot(QString xLabel)
+QString GXMainWindow::request_saveChannelSnapshot(QString xLabel)
 {
 
-	VP1Msg::messageDebug("VP1MainWindow::request_saveChannelSnapshot()");
+	VP1Msg::messageDebug("GXMainWindow::request_saveChannelSnapshot()");
 
 	if(!m_tabmanager->selectedChannelWidget()) {
 		return QString();
@@ -1034,7 +1034,7 @@ QString VP1MainWindow::request_saveChannelSnapshot(QString xLabel)
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::request_printChannel() {
+void GXMainWindow::request_printChannel() {
 	if(!m_tabmanager->selectedChannelWidget())
 		return;
 
@@ -1054,14 +1054,14 @@ void VP1MainWindow::request_printChannel() {
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::loadConfigurationFromFile(QString file) {
+void GXMainWindow::loadConfigurationFromFile(QString file) {
 	m_tabmanager->loadConfigurationFromFile(file,availablePluginFiles());
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::replaceConfigurationFile(QString file)
+void GXMainWindow::replaceConfigurationFile(QString file)
 {
-	VP1Msg::messageDebug("VP1MainWindow::replaceConfigurationFile() : " + file);
+	VP1Msg::messageDebug("GXMainWindow::replaceConfigurationFile() : " + file);
 	m_tabmanager->removeAllTabs();
 	m_tabmanager->loadConfigurationFromFile(file,availablePluginFiles());
 }
@@ -1069,7 +1069,7 @@ void VP1MainWindow::replaceConfigurationFile(QString file)
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::showMenu_loadPlugin()
+void GXMainWindow::showMenu_loadPlugin()
 {
 	m_menu_loadPlugin->clear();
 
@@ -1105,7 +1105,7 @@ void VP1MainWindow::showMenu_loadPlugin()
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::showMenu_loadPluginItemSelected()
+void GXMainWindow::showMenu_loadPluginItemSelected()
 {
 	QAction * act = static_cast<QAction*>(sender());
 	assert(act);
@@ -1116,7 +1116,7 @@ void VP1MainWindow::showMenu_loadPluginItemSelected()
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::showMenu_loadConfFile()
+void GXMainWindow::showMenu_loadConfFile()
 {
 	m_menu_loadConfFile->clear();
 
@@ -1150,7 +1150,7 @@ void VP1MainWindow::showMenu_loadConfFile()
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::showMenu_loadConfFileItemSelected()
+void GXMainWindow::showMenu_loadConfFileItemSelected()
 {
 	QAction * act = static_cast<QAction*>(sender());
 	assert(act);
@@ -1160,7 +1160,7 @@ void VP1MainWindow::showMenu_loadConfFileItemSelected()
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::changeStyleActionTriggered()
+void GXMainWindow::changeStyleActionTriggered()
 {
 	QAction * act = static_cast<QAction*>(sender());
 	assert(act);
@@ -1176,7 +1176,7 @@ void VP1MainWindow::changeStyleActionTriggered()
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::changeFontSizeActionTriggered()
+void GXMainWindow::changeFontSizeActionTriggered()
 {
 	QAction * act = static_cast<QAction*>(sender());
 	assert(act);
@@ -1191,7 +1191,7 @@ void VP1MainWindow::changeFontSizeActionTriggered()
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::changeFontSize(int goal)
+void GXMainWindow::changeFontSize(int goal)
 {
 	QFont newfont = m_defaultfont;
 	QSettings s(m_settingsfile,QSettings::IniFormat);
@@ -1220,7 +1220,7 @@ void VP1MainWindow::changeFontSize(int goal)
 
 
 //_________________________________________________________________________________
-void VP1MainWindow::updateCentralStackWidget()
+void GXMainWindow::updateCentralStackWidget()
 {
 	QWidget * targetpage = tabWidget_central->count() ? page_tabwidget : page_instructions;
 	if (stackedWidget_central->currentWidget() != targetpage)
@@ -1228,9 +1228,9 @@ void VP1MainWindow::updateCentralStackWidget()
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::quickSetupTriggered()
+void GXMainWindow::quickSetupTriggered()
 {
-  VP1Msg::messageVerbose("VP1MainWindow::quickSetupTriggered()");
+  VP1Msg::messageVerbose("GXMainWindow::quickSetupTriggered()");
 
   QSettings settings("ATLAS", "VP1Light");
 
@@ -1326,7 +1326,7 @@ void VP1MainWindow::quickSetupTriggered()
 }
 
 //_________________________________________________________________________________
-void VP1MainWindow::updateEventControls()
+void GXMainWindow::updateEventControls()
 {
   //	pushButton_nextevent->setEnabled(okToProceedToNextEvent());
 	#if defined BUILDVP1LIGHT
@@ -1336,7 +1336,7 @@ void VP1MainWindow::updateEventControls()
 
 
 //________________________________________________________________________________
-QStringList VP1MainWindow::userRequestedFiles()
+QStringList GXMainWindow::userRequestedFiles()
 {
 	QStringList returnval(m_userRequestedFiles);
 	m_userRequestedFiles.clear();
@@ -1345,7 +1345,7 @@ QStringList VP1MainWindow::userRequestedFiles()
 
 //_________________________________________________________________________________
 #ifdef BUILDVP1LIGHT
-void VP1MainWindow::request_expertSettings(){
+void GXMainWindow::request_expertSettings(){
         	VP1ExpertSettings es;
         	es.exec();
 }

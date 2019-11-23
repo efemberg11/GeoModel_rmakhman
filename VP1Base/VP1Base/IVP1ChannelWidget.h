@@ -125,7 +125,7 @@ private:
   friend class VP1Prioritiser;
   friend class VP1ChannelManager;
   friend class VP1TabManager;
-  friend class VP1MainWindow;
+  friend class GXMainWindow;
   friend class IVP1System;
   enum State { CONSTRUCTED=0, READY, UNCREATED };
   void deleteControllers();

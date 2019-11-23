@@ -215,7 +215,7 @@ void VP1Controller::toggleDialogState(QObject* widget)
       di->neverShown = false;
       //do stuff
       // 	  QSize size(955, 717);
-      // 	  size = size.expandedTo(VP1MainWindow->minimumSizeHint());
+      // 	  size = size.expandedTo(GXMainWindow->minimumSizeHint());
       // di->dialogWidget->resize(di->dialogWidget->minimumSizeHint());
     }
   }

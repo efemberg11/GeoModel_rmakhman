@@ -128,7 +128,7 @@ private:
   friend class GXExecutionScheduler;
   friend class VP1Prioritiser;
   friend class IVP1ChannelWidget;
-  friend class VP1MainWindow;
+  friend class GXMainWindow;
   void disallowUpdateGUI();
   void allowUpdateGUI();
   void setChannel(IVP1ChannelWidget*);

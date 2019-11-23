@@ -54,7 +54,7 @@
 
 #include "VP1Gui/VP1ChannelManager.h"
 #include "VP1Gui/GXExecutionScheduler.h"
-#include "VP1Gui/VP1MainWindow.h"
+#include "VP1Gui/GXMainWindow.h"
 
 #include "VP1Base/IVP1ChannelWidgetFactory.h"
 #include "VP1Base/IVP1ChannelWidget.h"
@@ -76,7 +76,7 @@ public:
 
 	VP1ChannelManager*channelmanager;
 	GXExecutionScheduler*scheduler;
-	VP1MainWindow*mainwindow;
+	GXMainWindow*mainwindow;
 
 	//Actual created channels:
 	std::map<QString,std::set<IVP1ChannelWidget*> > basename_2_channels;
@@ -105,7 +105,7 @@ public:
 };
 
 //___________________________________________________________________________________
-VP1ChannelManager::VP1ChannelManager(GXExecutionScheduler*sched,VP1MainWindow*mw) : m_d(new Imp)
+VP1ChannelManager::VP1ChannelManager(GXExecutionScheduler*sched,GXMainWindow*mw) : m_d(new Imp)
 {
 	m_d->channelmanager=this;
 	m_d->scheduler=sched;

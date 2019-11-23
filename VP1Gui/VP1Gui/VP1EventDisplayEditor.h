@@ -28,7 +28,7 @@
 #include <QGraphicsPixmapItem>
 #include <QSplitter>
 
-class VP1MainWindow;
+class GXMainWindow;
 
 
 class VP1EventDisplayEditor : public QWidget {
@@ -37,7 +37,7 @@ class VP1EventDisplayEditor : public QWidget {
 
 public:
 
-	VP1EventDisplayEditor(VP1MainWindow* mainWindow, QList<unsigned long long> listRunEventNumberTimestamp);
+	VP1EventDisplayEditor(GXMainWindow* mainWindow, QList<unsigned long long> listRunEventNumberTimestamp);
 	virtual ~VP1EventDisplayEditor();
 
 //	QGraphicsView* getView();
@@ -80,7 +80,7 @@ private:
 	QStringList m_listTabNames;
 	QList<IVP1ChannelWidget*> m_allTabs;
 
-	VP1MainWindow* m_mainWindow;
+	GXMainWindow* m_mainWindow;
 
 	int m_runNumber;
 	unsigned long long m_eventNumber;

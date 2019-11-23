@@ -149,7 +149,7 @@ void VolumeHandle::initialiseChildren()
 		  mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
 
     matr.multRight(m_d->accumTrans);
-    m_children.push_back(new VolumeHandle(m_d->commondata,this,av.getVolume(),ichild++,(isInMuonChamber()?MUONCHAMBERCHILD:NONMUONCHAMBER),matr));
+    m_children.push_back(new VolumeHandle(m_d->commondata,this,av.getVolume(),ichild++,NONMUONCHAMBER,matr));
     //std::cout << "initialised: " << av.getName() << " - " << m_children.back()->getName().toStdString() << " - " << m_children.back() << std::endl;
     av.next();
   }
@@ -369,13 +369,6 @@ void VolumeHandle::setState( const VP1GeoFlags::VOLSTATE& state )
   if (m_state==state)
     return;
 
-  //Mark muon chamber as dirty.
-  if (isInMuonChamber()) {
-    VolumeHandle *tp = topLevelParent();
-    if (tp->m_muonChamberState == MUONCHAMBER)
-      tp->m_muonChamberState = MUONCHAMBER_DIRTY;
-  }
-
   //Update state flag and presence in GUI lists:
   VP1GeoFlags::VOLSTATE oldstate = m_state;
   m_state = state;
@@ -528,7 +521,7 @@ const GeoMaterial * VolumeHandle::geoMaterial() const {
 //____________________________________________________________________
 bool VolumeHandle::isEther() const
 {
-  return !isMuonChamber() && QString(geoMaterial()->getName().c_str()).endsWith("Ether");
+  return QString(geoMaterial()->getName().c_str()).endsWith("Ether");
 }
 
 //____________________________________________________________________
@@ -686,68 +679,3 @@ bool VolumeHandle::isPositiveZ() const
   return z>0;
 }
 
-void VolumeHandle::updateLabels() {
-  int labels = m_d->commondata->controller()->labels();
-  QList<int> offsets = m_d->commondata->controller()->labelPosOffset();
-
-  m_d->attachlabelSepHelper->largeChangesBegin();
-
-  if ( m_d->labels != labels || m_d->labelsPosOffsets != offsets){
-    m_d->labels = labels;
-    m_d->labelsPosOffsets = offsets;
-    m_d->label_sep->removeAllChildren ();
-
-    SoText2 *labelText = new SoText2;
-    labelText->ref();
-    QStringList text;
-    if (labels&0x1){
-      QString name = getDescriptiveName();
-      text << name;
-    }
-
-    // only one label selected - must be better way to do this!
-    bool singleLabel = (labels&0x2 && !(labels&0x4) && !(labels&0x8))
-    || (labels&0x4 && !(labels&0x2) && !(labels&0x8))
-    || (labels&0x8 && !(labels&0x2) && !(labels&0x4));
-    if (isInMuonChamber() && labels&0xE){
-      for (unsigned int i=0; i<3 ;++i){
-        // Check to see which label we use.
-        unsigned int mask=1<<(i+1);
-        if (!(labels&mask)) continue; // bits 1,2,3 are used for labels
-
-        QString output;
-        if ( singleLabel ) {
-          output+="t0=";
-        } else {
-          if (i==0) output+="Moore t0=";
-          if (i==1) output+="Mboy t0=";
-          if (i==2) output+="<unknown>=";
-        }
-        output += muonChamberT0(i);
-        text << output;
-      }
-    }
-
-    unsigned int row=0;
-    foreach(QString str, text){
-      QByteArray array = str.toLatin1();
-      labelText->string.set1Value(row++,array.data());
-    }
-
-
-    SoTransform *labelTranslate =new SoTransform;
-    labelTranslate->setMatrix(m_d->accumTrans);
-    assert(labelTranslate!=0);
-    float offScale=10.0;
-    float labx,laby,labz;
-    labelTranslate->translation.getValue().getValue(labx,laby,labz);
-//    std::cout <<getNameStdString()<<" offsets (x,y,z)=("<<offsets[0]<<","<<offsets[1]<<","<<offsets[2]<<")"<<std::endl;
-
-    labelTranslate->translation.setValue(labx+(offsets[0]*offScale),laby+(offsets[1]*offScale),labz+(offsets[2]*offScale));
-
-    m_d->label_sep->addChild(labelTranslate);
-    m_d->label_sep->addChild(labelText);
-  }
-
-  m_d->attachlabelSepHelper->largeChangesEnd();
-}

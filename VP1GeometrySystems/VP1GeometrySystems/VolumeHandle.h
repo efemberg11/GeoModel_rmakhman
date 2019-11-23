@@ -26,11 +26,6 @@ public:
 			  MUONCHAMBERCHILD,//Top-level parent is muon chamber
 			  MUONCHAMBER,//Muon chamber, adjusted to event data
 			  MUONCHAMBER_DIRTY };//Muon chamber, not adjusted to event data
-  inline bool isInMuonChamber() const;//Muon chamber volume or muon chamber offspring
-  inline bool isMuonChamber() const;//Muon chamber volume (top-level volume)
-  inline void setMuonChamberDirty(bool);//Don't call unless isMuonChamber()
-  inline bool muonChamberDirty() const;//if is a muon chamber volume which is dirty
-  inline MuonChamberState muonChamberState() const;
 
   VolumeHandle(VolumeHandleSharedData * ,VolumeHandle * parent, const GeoPVConstLink&,int childNumber,
 	       const MuonChamberState& mcs = NONMUONCHAMBER, const SbMatrix& accumTrans = SbMatrix() );
@@ -101,17 +96,12 @@ public:
   // ...
   // Get SoNodes, pvconstlink, ...
   
-  void updateLabels();
 
   QByteArray getPersistifiableState() const;
   void applyPersistifiableState(QByteArray);
 
   // Which subsystem I'm in?
   VP1GeoFlags::SubSystemFlag subsystem() const;
-
-  // For labels
-  virtual QString getDescriptiveName() const;
-  virtual QString muonChamberT0(unsigned int=0) const;
 
 public:
   class Imp;//For once this is declared public. This is to avoid
@@ -151,23 +141,9 @@ inline unsigned VolumeHandle::nChildren() const { return m_nchildren; }
 inline VolumeHandle * VolumeHandle::child(int index) const { return m_children.at(index); }
 inline int VolumeHandle::childNumber() const { return m_childNumber; }
 inline VP1GeoFlags::VOLSTATE VolumeHandle::state() const { return m_state; }
-inline bool VolumeHandle::isInMuonChamber() const { return m_muonChamberState!=NONMUONCHAMBER; }
-inline bool VolumeHandle::isMuonChamber() const { return m_muonChamberState==MUONCHAMBER || m_muonChamberState==MUONCHAMBER_DIRTY; }
-inline VolumeHandle::MuonChamberState VolumeHandle::muonChamberState() const { return m_muonChamberState; }
-inline void VolumeHandle::setMuonChamberDirty(bool b) {  if (isMuonChamber()) m_muonChamberState = b?MUONCHAMBER_DIRTY:MUONCHAMBER; }
-inline bool VolumeHandle::muonChamberDirty() const { return m_muonChamberState==MUONCHAMBER_DIRTY; }
 inline void VolumeHandle::reset() {
   setState( VP1GeoFlags::CONTRACTED );
   contractDaughtersRecursively();
-}
-inline QString VolumeHandle::getDescriptiveName() const { 
-  QString name = getName();
-  name.remove("_Station");
-  return name;
-}
-
-inline QString VolumeHandle::muonChamberT0(unsigned int /**i*/) const { 
-  return QString();
 }
 
 

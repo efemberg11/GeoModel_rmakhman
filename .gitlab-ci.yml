@@ -1,5 +1,7 @@
 stages:
   - build
+  - doc
+  - deploy
 
 before_script:
   - yum -y install cmake glibc-devel which
@@ -11,7 +13,7 @@ variables:
 
 .build_template: &build_template
   stage: build
-  tags: 
+  tags:
     - cvmfs
   script:
     - mkdir build
@@ -21,6 +23,44 @@ variables:
     - cmake ${CMAKE_ARGS}  ..
     - cmake --build . -- -j$(nproc)
     - cmake --build . -- install
+    - cmake --build . -- doc
+  artifacts:
+    paths:
+      - build/
+
+
+# .build_template: &build_template
+#   stage: doc
+#   tags:
+#     - cvmfs
+#   script:
+#     - mkdir build
+#     - mkdir install
+#     - cd build
+#     - echo "${CMAKE_ARGS}"
+#     - cmake ${CMAKE_ARGS}  ..
+#     - cmake --build . -- -j$(nproc)
+#     - cmake --build . -- doc
+
+documentation:
+  stage: doc
+  script:
+    - cd build
+    - make doc
+  artifacts:
+    - build/doc_doxygen
+
+
+deploying:
+    stage: deploy
+    variables:
+      "EOS_PATH": "/eos/project/g/geomodel/www/doxygen"
+    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+    only:
+        - master
+    script:
+        - deploy-eos
+
 
 build_slc6:
   <<: *build_template

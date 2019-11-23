@@ -48,7 +48,8 @@ documentation:
     - cd build
     - make doc
   artifacts:
-    - build/doc_doxygen
+    paths:
+      - build/doc_doxygen
 
 
 deploying:

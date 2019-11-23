@@ -23,7 +23,7 @@ variables:
     # - cmake --build . -- -j$(nproc)
     # - cmake --build . -- install
     - cmake --build . -- doc
-    - cp -r doc_doxygen ../public
+    - cp -r doc_doxygen/html ../public
   
 
 

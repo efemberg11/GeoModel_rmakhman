@@ -24,10 +24,7 @@ variables:
     - cmake --build . -- -j$(nproc)
     - cmake --build . -- install
     - cmake --build . -- doc
-  artifacts:
-    paths:
-      - build/doc_doxygen/html
-    expire_in: 1 hour
+  
 
 
 # .build_template: &build_template
@@ -67,6 +64,10 @@ build_cc7:
   image: cern/cc7-base
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  artifacts:
+    paths:
+      - build/doc_doxygen/html
+    expire_in: 1 hour
 
 build_slc6_builtin_eigen3:
   <<: *build_template

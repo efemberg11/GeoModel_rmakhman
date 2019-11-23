@@ -42,14 +42,6 @@ variables:
 #     - cmake --build . -- -j$(nproc)
 #     - cmake --build . -- doc
 
-# documentation:
-#   stage: doc
-#   script:
-#     - cd build
-#     - make doc
-#   artifacts:
-#     paths:
-#       - build/doc_doxygen
 
 
 deploying:

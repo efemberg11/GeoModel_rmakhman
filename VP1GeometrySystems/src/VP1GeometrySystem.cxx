@@ -50,6 +50,7 @@
 #include "GeoModelKernel/GeoPrintGraphAction.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoElement.h"
+#include "GeoModelKernel/GeoPVLink.h"
 
 
 #include "GeoModelKernel/GeoBox.h"
@@ -726,6 +727,42 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
     return;
   }
 
+  bool s_isdown =  m_d->kbEvent && SO_KEY_PRESS_EVENT(m_d->kbEvent,SoKeyboardEvent::S);
+  if (s_isdown) {
+#ifdef __APPLE__
+    char buffer[1024];
+    char *wd=getcwd(buffer,1024);
+    
+    QString path = QFileDialog::getSaveFileName(nullptr, tr("Save Geometry File"),
+						wd,
+						tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
+#else
+    QString path = QFileDialog::getSaveFileName(nullptr, tr("Save Geometry File"),
+						get_current_dir_name(),
+						tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
+#endif
+    if (path.isEmpty()) return;
+    
+    GMDBManager db(path);
+    
+    // check the DB connection
+    if (!db.isOpen())
+      qDebug() << "OK! Database is open!";
+  
+    GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
+    PVConstLink pV=volhandle->geoPVConstLink();
+
+    GeoPhysVol *world=newWorld();
+    GeoNameTag   *nameTag = new GeoNameTag(volhandle->getName().toStdString());
+    world->add(nameTag);
+    GeoPhysVol *pVMutable=(GeoPhysVol *) &*pV;
+    world->add(pVMutable);
+    world->exec(&dumpGeoModelGraph);
+    dumpGeoModelGraph.saveToDB();
+    world->unref();
+    return;
+
+  }
   //////////////////////////////////////////////////////////////////
   //  Depending on settings, we are to realign the camera if the  //
   //  clicked volume is (daughter of) a muon chamber              //
@@ -1516,10 +1553,32 @@ void VP1GeometrySystem::saveTrees() {
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
 
 
+  GeoPhysVol *world=newWorld();
+
+  foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
+    if (subsys->checkbox->isChecked()){
+      std::vector<Imp::SubSystemInfo::TreetopInfo> & ttInfo=subsys->treetopinfo;
+      foreach (const Imp::SubSystemInfo::TreetopInfo & treeTop, ttInfo) {
+
+	GeoNameTag   *nameTag = new GeoNameTag(treeTop.volname);
+	GeoTransform *transform=new GeoTransform(treeTop.xf);
+	world->add(transform);
+	world->add(nameTag);
+	GeoPhysVol *pV=(GeoPhysVol *) &*treeTop.pV;
+	world->add(pV);
+      }
+    }
+  } 
+  world->exec(&dumpGeoModelGraph);
+  dumpGeoModelGraph.saveToDB();
+  world->unref();
+}
+
+GeoPhysVol *VP1GeometrySystem::newWorld()  const {
   const double  gr =   SYSTEM_OF_UNITS::gram;
   const double  mole = SYSTEM_OF_UNITS::mole;
   const double  cm3 =  SYSTEM_OF_UNITS::cm3;
-
+  
   // Define the chemical elements
   GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
   GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
@@ -1537,24 +1596,5 @@ void VP1GeometrySystem::saveTrees() {
   const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
   const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
   GeoPhysVol* world = new GeoPhysVol(worldLog);
-
-  
-  foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
-    if (subsys->checkbox->isChecked()){
-      std::vector<Imp::SubSystemInfo::TreetopInfo> & ttInfo=subsys->treetopinfo;
-      foreach (const Imp::SubSystemInfo::TreetopInfo & treeTop, ttInfo) {
-
-	GeoNameTag   *nameTag = new GeoNameTag(treeTop.volname);
-	GeoTransform *transform=new GeoTransform(treeTop.xf);
-	world->add(transform);
-	world->add(nameTag);
-	GeoPhysVol *pV=(GeoPhysVol *) &*treeTop.pV;
-	world->add(pV);
-	pV->unref();
-      }
-    }
-  } 
-  world->exec(&dumpGeoModelGraph);
-
-  dumpGeoModelGraph.saveToDB();
+  return world;
 }

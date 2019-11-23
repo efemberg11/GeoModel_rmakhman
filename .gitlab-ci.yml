@@ -27,7 +27,7 @@ variables:
   artifacts:
     paths:
       - build/doc_doxygen/html
-      expire_in: 1 hour
+    expire_in: 1 hour
 
 
 # .build_template: &build_template

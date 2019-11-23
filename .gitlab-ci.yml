@@ -23,6 +23,7 @@ variables:
     # - cmake --build . -- -j$(nproc)
     # - cmake --build . -- install
     - cmake --build . -- doc
+    - cp -r doc_doxygen ../public
   
 
 
@@ -53,7 +54,7 @@ build_cc7:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   artifacts:
     paths:
-      - build/doc_doxygen/html
+      - public
     expire_in: 1 hour
 
 # build_slc6_builtin_eigen3:

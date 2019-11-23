@@ -41,23 +41,11 @@ variables:
 #     - cmake --build . -- doc
 
 
-
-deploying:
-    stage: deploy
-    variables:
-      "EOS_PATH": "/eos/project/g/geomodel/www/doxygen"
-    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer
-    only:
-        - master
-    script:
-        - deploy-eos
-
-
-build_slc6:
-  <<: *build_template
-  image: cern/slc6-base
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+# build_slc6:
+#   <<: *build_template
+#   image: cern/slc6-base
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 
 build_cc7:
   <<: *build_template
@@ -69,14 +57,25 @@ build_cc7:
       - build/doc_doxygen/html
     expire_in: 1 hour
 
-build_slc6_builtin_eigen3:
-  <<: *build_template
-  image: cern/slc6-base
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
+# build_slc6_builtin_eigen3:
+#   <<: *build_template
+#   image: cern/slc6-base
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
 
-build_cc7_builtin_eigen3:
-  <<: *build_template
-  image: cern/cc7-base
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
+# build_cc7_builtin_eigen3:
+#   <<: *build_template
+#   image: cern/cc7-base
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS} -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
+
+
+deploying:
+    stage: deploy
+    variables:
+      "EOS_PATH": "/eos/project/g/geomodel/www/doxygen"
+    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer
+    only:
+        - master
+    script:
+        - deploy-eos

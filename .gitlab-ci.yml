@@ -26,7 +26,8 @@ variables:
     - cmake --build . -- doc
   artifacts:
     paths:
-      - build/doc_doxygen
+      - build/doc_doxygen/html
+      expire_in: 1 hour
 
 
 # .build_template: &build_template
@@ -48,7 +49,7 @@ deploying:
     stage: deploy
     variables:
       "EOS_PATH": "/eos/project/g/geomodel/www/doxygen"
-    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer
     only:
         - master
     script:

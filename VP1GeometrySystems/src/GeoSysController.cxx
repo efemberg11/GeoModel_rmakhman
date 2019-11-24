@@ -113,10 +113,6 @@ GeoSysController::GeoSysController(IVP1System * sys)
   connect(m_d->ui_disp.pushButton_saveChangedMaterials,SIGNAL(clicked()),this,SLOT(saveMaterialsRequested()));
   connect(m_d->ui_disp.pushButton_loadMaterials,SIGNAL(clicked()),this,SLOT(loadMaterialsRequested()));
 
-  connect(m_d->ui_misc.pushButton_nonStandardShapes_Iconify,SIGNAL(clicked()),
-	  this,SLOT(emit_actionOnAllNonStandardVolumes()));
-  connect(m_d->ui_misc.pushButton_nonStandardShapes_Expand,SIGNAL(clicked()),
-	  this,SLOT(emit_actionOnAllNonStandardVolumes()));
 
   connect(m_d->ui_misc.lineEdit_expand_vols_matname,SIGNAL(returnPressed()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
   connect(m_d->ui_misc.pushButton_expand_vols_matname,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
@@ -348,14 +344,6 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
   messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+")");
   emit autoExpandByVolumeOrMaterialName(!volname,name);
 }
-
-//____________________________________________________________________
-void GeoSysController::emit_actionOnAllNonStandardVolumes() {
-  bool zap(sender()==m_d->ui_misc.pushButton_nonStandardShapes_Iconify);
-  messageVerbose("emitting actionOnAllNonStandardVolumes("+str(zap)+")");
-  emit actionOnAllNonStandardVolumes(zap);
-}
-
 
 //____________________________________________________________________
 int GeoSysController::currentSettingsVersion() const

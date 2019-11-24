@@ -189,7 +189,6 @@ public:
   static void catchKbdState(void *userData, SoEventCallback *CB);
   const SoKeyboardEvent *kbEvent;
 
-  void changeStateOfVisibleNonStandardVolumesRecursively(VolumeHandle*,VP1GeoFlags::VOLSTATE);
   void expandVisibleVolumesRecursively(VolumeHandle*,const QRegExp&,bool bymatname);
 
   SoSeparator* m_textSep;//!< Separator used to hold all visible labels.
@@ -280,7 +279,6 @@ QWidget * VP1GeometrySystem::buildController()
   connect (m_d->controller,SIGNAL(volumeResetRequested(VolumeHandle*)),
 	   this,SLOT(volumeResetRequested(VolumeHandle*)));
   connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
-  connect(m_d->controller,SIGNAL(actionOnAllNonStandardVolumes(bool)),this,SLOT(actionOnAllNonStandardVolumes(bool)));
   connect(m_d->controller,SIGNAL(resetSubSystems(VP1GeoFlags::SubSystemFlags)),this,SLOT(resetSubSystems(VP1GeoFlags::SubSystemFlags)));
   connect(m_d->controller->requestOutputButton(), SIGNAL(clicked()), this, SLOT(saveTrees()));
 
@@ -362,10 +360,6 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   while (!av.atEnd()) {
     
     std::string name = av.getName();
-    std::cout << "++volume name:" << name << std::endl;
-    
-    // DEBUG
-    VP1Msg::messageDebug("DEBUG: Found GeoModel treetop: "+QString(name.c_str()));
     
     //Let us see if we recognize this volume:
     bool found = false;
@@ -642,8 +636,12 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   if (shift_isdown) {
     //Parent of volume should be put in CONTRACTED state.
     deselectAll();
-    if (volhandle->parent())
-      volhandle->parent()->setState(VP1GeoFlags::CONTRACTED);
+    
+    VolumeHandle * parent=volhandle->parent();
+    while (parent) {
+      parent->setState(VP1GeoFlags::CONTRACTED);
+      parent = parent->isEther() ? parent->parent():NULL;
+    }
     m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
     return;
   }
@@ -668,7 +666,6 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
     deselectAll();
     volhandle->setState(VP1GeoFlags::ZAPPED);
     message("===> Zapping Node: "+volhandle->getName());
-    // std::cout<<"Zapped VH="<<volhandle<<std::endl;
     return;
   }
 
@@ -742,7 +739,6 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   /////////////////////////////////////////////////////////
 
   message("===> Selected Node: "+volhandle->getName());
-  // std::cout<<"VolHandle = "<<volhandle<<std::endl;
   if (m_d->controller->printInfoOnClick_Shape()) {
     foreach (QString str, DumpShape::shapeToStringList(volhandle->geoPVConstLink()->getLogVol()->getShape()))
       message(str);
@@ -922,7 +918,6 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 				
 	VolumeHandle * vh = new VolumeHandle(volhandle_subsysdata,0,it->pV,ichild++,VolumeHandle::NONMUONCHAMBER,matr);
 	si->vollist.push_back(vh);
-	// std::cout<<"Non muon chamber VH="<<vh<<std::endl;
       }
   }
 
@@ -1144,64 +1139,6 @@ void VP1GeometrySystem::resetSubSystems(VP1GeoFlags::SubSystemFlags f)
 	        (*it)->reset();
         }
     }
-  }
-}
-
-
-
-
-
-
-//_____________________________________________________________________________________
-void VP1GeometrySystem::Imp::changeStateOfVisibleNonStandardVolumesRecursively(VolumeHandle*handle,VP1GeoFlags::VOLSTATE target)
-{
-  assert(target!=VP1GeoFlags::CONTRACTED);
-  if (handle->isAttached()) {
-    //The volume is visible, so ignore daughters
-    if (handle->isInitialisedAndHasNonStandardShape()) {
-      if (target!=VP1GeoFlags::EXPANDED||handle->nChildren()>0)
-	handle->setState(target);
-    }
-    return;
-  } else if (handle->state()==VP1GeoFlags::ZAPPED)
-    return;
-  //Must be expanded: Let us call on any (initialised) children instead.
-  if (handle->nChildren()==0||!handle->childrenAreInitialised())
-    return;
-  VolumeHandle::VolumeHandleListItr it(handle->childrenBegin()), itE(handle->childrenEnd());
-  for(;it!=itE;++it)
-    changeStateOfVisibleNonStandardVolumesRecursively(*it,target);
-
-}
-
-//_____________________________________________________________________________________
-void VP1GeometrySystem::actionOnAllNonStandardVolumes(bool zap)
-{
-  VP1GeoFlags::VOLSTATE target = zap ? VP1GeoFlags::ZAPPED : VP1GeoFlags::EXPANDED;
-  messageVerbose("Action on volumes with non-standard VRML representations. Target state is "+VP1GeoFlags::toString(target));
-
-  std::vector<std::pair<VolumeHandle::VolumeHandleListItr,VolumeHandle::VolumeHandleListItr> > roothandles;
-  m_d->volumetreemodel->getRootHandles(roothandles);
-  VolumeHandle::VolumeHandleListItr it, itE;
-
-  bool save = m_d->sceneroot->enableNotify(false);
-  m_d->phisectormanager->largeChangesBegin();
-
-  deselectAll();
-
-  for (unsigned i = 0; i<roothandles.size();++i) {
-    it = roothandles.at(i).first;
-    itE = roothandles.at(i).second;
-    for(;it!=itE;++it) {
-      m_d->changeStateOfVisibleNonStandardVolumesRecursively(*it,target);
-    }
-  }
-
-  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
-  m_d->phisectormanager->largeChangesEnd();
-  if (save) {
-    m_d->sceneroot->enableNotify(true);
-    m_d->sceneroot->touch();
   }
 }
 

@@ -35,10 +35,10 @@
       <property name="horizontalSpacing">
        <number>2</number>
       </property>
-      <item row="0" column="0" colspan="2">
-       <widget class="QLabel" name="label_7">
+      <item row="0" column="3">
+       <widget class="QPushButton" name="pushButton_expand_vols_matname">
         <property name="text">
-         <string>Vols. with mat:</string>
+         <string>Expand</string>
         </property>
        </widget>
       </item>
@@ -61,20 +61,6 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QPushButton" name="pushButton_expand_vols_matname">
-        <property name="text">
-         <string>Expand</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Vols. named:</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="1" colspan="2">
        <widget class="QLineEdit" name="lineEdit_expand_vols_volname">
         <property name="toolTip">
@@ -88,46 +74,26 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Vols. with mat:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Vols. named:</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="3">
        <widget class="QPushButton" name="pushButton_expand_vols_volname">
         <property name="text">
          <string>Expand</string>
         </property>
        </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label">
-        <property name="toolTip">
-         <string>Actions on all shapes with 3D representations that are not standard VRML. Useful if you intend to dump the scene to a portable file.</string>
-        </property>
-        <property name="text">
-         <string>Non-standard shapes:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" colspan="2">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QPushButton" name="pushButton_nonStandardShapes_Iconify">
-          <property name="toolTip">
-           <string>Actions on all shapes with 3D representations that are not standard VRML. Useful if you intend to dump the scene to a portable file.</string>
-          </property>
-          <property name="text">
-           <string>Iconify</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_nonStandardShapes_Expand">
-          <property name="toolTip">
-           <string>Actions on all shapes with 3D representations that are not standard VRML. Useful if you intend to dump the scene to a portable file.</string>
-          </property>
-          <property name="text">
-           <string>Expand</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </item>
      </layout>
     </widget>

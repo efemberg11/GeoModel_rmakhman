@@ -663,13 +663,6 @@ bool VolumeHandle::Imp::hasNonStandardShapeChildren(const SoGroup*g)
 }
 
 //____________________________________________________________________
-bool VolumeHandle::isInitialisedAndHasNonStandardShape() const
-{
-  VP1HEPVisUtils::initAllCustomClasses();
-  return m_d->nodesep ? Imp::hasNonStandardShapeChildren(m_d->nodesep) : false;
-}
-
-//____________________________________________________________________
 bool VolumeHandle::isPositiveZ() const
 {
   SbVec3f dir;

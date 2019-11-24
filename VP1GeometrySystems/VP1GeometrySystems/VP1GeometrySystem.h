@@ -61,7 +61,6 @@ protected slots:
 
   void resetSubSystems(VP1GeoFlags::SubSystemFlags);
   void autoExpandByVolumeOrMaterialName(bool,QString);//volname: (false,namestr), matname: (true,namestr)
-  void actionOnAllNonStandardVolumes(bool);//true: zap, false: expand.
 
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);
   void volumeResetRequested(VolumeHandle*);

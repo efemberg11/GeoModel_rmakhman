@@ -22,13 +22,9 @@ class GeoMaterial;
 class VolumeHandle {
 public:
 
-  enum MuonChamberState { NONMUONCHAMBER,//Default
-			  MUONCHAMBERCHILD,//Top-level parent is muon chamber
-			  MUONCHAMBER,//Muon chamber, adjusted to event data
-			  MUONCHAMBER_DIRTY };//Muon chamber, not adjusted to event data
 
   VolumeHandle(VolumeHandleSharedData * ,VolumeHandle * parent, const GeoPVConstLink&,int childNumber,
-	       const MuonChamberState& mcs = NONMUONCHAMBER, const SbMatrix& accumTrans = SbMatrix() );
+	       const SbMatrix& accumTrans = SbMatrix() );
 
   virtual ~VolumeHandle();//lots of stuff to do here!
   //Used (recursively) upon deletion (never delete before children are deleted).
@@ -116,7 +112,6 @@ private:
   //Here for inline methods:
   const int m_childNumber;//0 if the first child of parent, 1 if the second, etc.
   const unsigned m_nchildren;//cached for efficiency.
-  MuonChamberState m_muonChamberState;
 
   VolumeHandle * m_parent;
   VolumeHandleList m_children;

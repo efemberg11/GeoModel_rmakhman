@@ -89,8 +89,8 @@ QDataStream & operator>> ( QDataStream & in, VolumeHandle::Imp::VolState & vs ) 
 }
 
 //____________________________________________________________________
-VolumeHandle::VolumeHandle(VolumeHandleSharedData * cd,VolumeHandle * parent, const GeoPVConstLink& pV, int childNumber, const MuonChamberState& mcs, const SbMatrix& accumTrans)
-  : m_d(new Imp(cd,pV,accumTrans)), m_childNumber(childNumber), m_nchildren(childNumber>=0?pV->getNChildVols():0), m_muonChamberState(mcs), m_parent(parent),
+VolumeHandle::VolumeHandle(VolumeHandleSharedData * cd,VolumeHandle * parent, const GeoPVConstLink& pV, int childNumber, const SbMatrix& accumTrans)
+  : m_d(new Imp(cd,pV,accumTrans)), m_childNumber(childNumber), m_nchildren(childNumber>=0?pV->getNChildVols():0), m_parent(parent),
     m_state(VP1GeoFlags::CONTRACTED)
 {
   // std::cout<<"VolumeHandle ctor for "<<this<<" with parent="<<parent<<" and GeoPVConstLink @"<<&pV<<std::endl;
@@ -149,7 +149,7 @@ void VolumeHandle::initialiseChildren()
 		  mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
 
     matr.multRight(m_d->accumTrans);
-    m_children.push_back(new VolumeHandle(m_d->commondata,this,av.getVolume(),ichild++,NONMUONCHAMBER,matr));
+    m_children.push_back(new VolumeHandle(m_d->commondata,this,av.getVolume(),ichild++,matr));
     m_children.back()->expandMothersRecursivelyToNonEther();
     av.next();
   }

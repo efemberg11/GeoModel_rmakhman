@@ -916,7 +916,7 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 		      mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),
 		      mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
 				
-	VolumeHandle * vh = new VolumeHandle(volhandle_subsysdata,0,it->pV,ichild++,VolumeHandle::NONMUONCHAMBER,matr);
+	VolumeHandle * vh = new VolumeHandle(volhandle_subsysdata,0,it->pV,ichild++,matr);
 	si->vollist.push_back(vh);
       }
   }

@@ -72,7 +72,6 @@ public:
 
   static VolState getChildStates(const VolumeHandle*theclass );
   static void applyChildStates(const VolState&,VolumeHandle*theclass);
-  static bool hasNonStandardShapeChildren(const SoGroup*g);
 
 };
 
@@ -361,8 +360,9 @@ void VolumeHandle::Imp::detach()
 //____________________________________________________________________
 void VolumeHandle::setState( const VP1GeoFlags::VOLSTATE& state )
 {
-  if (m_state==state)
+  if (m_state==state) {
     return;
+  }
 
   //Update state flag and presence in GUI lists:
   VP1GeoFlags::VOLSTATE oldstate = m_state;
@@ -374,26 +374,56 @@ void VolumeHandle::setState( const VP1GeoFlags::VOLSTATE& state )
 
   //Only thing left is visibility updates (i.e. attachment to 3D scenegraph).
 
-  if (haveParentsNotExpanded()) {
-    //No visibility updates necessary
-    assert(!m_d->isattached);
-    return;
-  }
+  // if (haveParentsNotExpanded()) {
+  //   //No visibility updates necessary
+  //   assert(!m_d->isattached);
+  //   return;
+  // }
 
   //We might need visibility updates. Which ones depend on the
   //particular change of state:
 
   if (state==VP1GeoFlags::CONTRACTED) {
-    // VP1GeoFlags::EXPANDED/VP1GeoFlags::ZAPPED -> VP1GeoFlags::CONTRACTED: Show this and hide all children.
-    m_d->attach(this);
-    detachAllContractedChildren();
-  } else if (state==VP1GeoFlags::EXPANDED) {
-    // VP1GeoFlags::CONTRACTED -> VP1GeoFlags::EXPANDED: Hide this. Allow children to be shown.
-    // VP1GeoFlags::ZAPPED -> VP1GeoFlags::EXPANDED: Allow children to be shown.
+    {
+      for (auto d=childrenBegin();d!=childrenEnd();d++) {
+	if ((*d)->isEther()) (*d)->setState(VP1GeoFlags::CONTRACTED);
+      }
+      if (!isEther()) {
+	m_d->attach(this);
+	detachAllContractedChildren();
+      }
+      else {
+	bool otherThanEther=false;
+	VolumeHandle *p=parent();
+	while (p) {
+	  if (!p->isEther()) {
+	    otherThanEther=true;
+	    break;
+	  }
+	  p=p->parent();
+	}
+	if (!otherThanEther) {
+	  return; // Nothing but ether, up there. Return;
+	}
+	m_d->attach(this);
+	detachAllContractedChildren();
+	{
+	  VolumeHandle *p=parent();
+	  if (p) p->setState(VP1GeoFlags::CONTRACTED);
+	}
+      }
+    }
+
+  }
+  else if (state==VP1GeoFlags::EXPANDED) {
     if (oldstate==VP1GeoFlags::CONTRACTED)
       m_d->detach();
     attachAllContractedChildren();
-  } else {
+    for (auto d=childrenBegin();d!=childrenEnd();d++) {
+      if ((*d)->isEther()) (*d)->setState(VP1GeoFlags::EXPANDED);
+    }
+  }
+  else {
     assert(state==VP1GeoFlags::ZAPPED);
     // VP1GeoFlags::CONTRACTED -> VP1GeoFlags::ZAPPED: Hide this.
     // VP1GeoFlags::EXPANDED -> VP1GeoFlags::ZAPPED: Hide all children.
@@ -633,24 +663,6 @@ void VolumeHandle::Imp::applyChildStates(const VolState& vs,VolumeHandle*theclas
   }
 }
 
-//____________________________________________________________________
-bool VolumeHandle::Imp::hasNonStandardShapeChildren(const SoGroup*g)
-{
-  const int n(g->getNumChildren());
-  for (int i=0; i < n; ++i) {
-    const SoNode*c = g->getChild(i);
-    if (c->getTypeId().isDerivedFrom(SoShape::getClassTypeId())) {
-      if (c->getTypeId().isDerivedFrom(SoPcons::getClassTypeId())
-	  ||c->getTypeId().isDerivedFrom(SoPolyhedron::getClassTypeId())
-	  ||c->getTypeId().isDerivedFrom(SoTransparency::getClassTypeId()))
-	return true;
-    } else if (c->getTypeId().isDerivedFrom(SoGroup::getClassTypeId())) {
-      if (hasNonStandardShapeChildren(static_cast<const SoGroup*>(c)))
-	return true;
-    }
-  }
-  return false;
-}
 
 //____________________________________________________________________
 bool VolumeHandle::isPositiveZ() const

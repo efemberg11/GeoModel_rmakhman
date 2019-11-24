@@ -618,10 +618,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
     deselectAll();
     
     VolumeHandle * parent=volhandle->parent();
-    while (parent) {
-      parent->setState(VP1GeoFlags::CONTRACTED);
-      parent = parent->isEther() ? parent->parent():NULL;
-    }
+    if (parent) parent->setState(VP1GeoFlags::CONTRACTED);
     m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
     return;
   }

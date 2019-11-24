@@ -93,10 +93,6 @@ VolumeHandle::VolumeHandle(VolumeHandleSharedData * cd,VolumeHandle * parent, co
   : m_d(new Imp(cd,pV,accumTrans)), m_childNumber(childNumber), m_nchildren(childNumber>=0?pV->getNChildVols():0), m_parent(parent),
     m_state(VP1GeoFlags::CONTRACTED)
 {
-  // std::cout<<"VolumeHandle ctor for "<<this<<" with parent="<<parent<<" and GeoPVConstLink @"<<&pV<<std::endl;
-  //commondata might be 0 in the special case where VolumeHandle is
-  //used as a base class for other reasons inside
-  //VolumeTreeModel. Just make sure we dont crash in that case.
   if (cd) {
     cd->ref();
     if (!haveParentsNotExpanded())
@@ -266,7 +262,6 @@ void VolumeHandle::ensureBuildNodeSep()
   SoNode * shape = m_d->commondata->toShapeNode(m_d->pV);//NB: Ignore contained transformation of GeoShapeShifts.
   if (!shape) {
     m_d->nodesep->removeAllChildren();
-    std::cout << "Geomsys/VolumeHandle Error: Null shape!!!"<<std::endl;
     return;
   }
 
@@ -526,10 +521,8 @@ bool VolumeHandle::isEther() const
 
 //____________________________________________________________________
 void VolumeHandle::expandMothersRecursivelyToNonEther() {
-  //std::cout<<"VolumeHandle::expandMothersRecursivelyToNonEther() for "<<this->getNameStdString() << " [" <<this<< "]" << " - n. children: " << nChildren() << std::endl;
 
   if (!nChildren()||!isEther()) {
-    //VP1Msg::messageDebug("====> no children or not 'Ether' material. Skipping & returning.");
     return;
   }
 
@@ -537,12 +530,9 @@ void VolumeHandle::expandMothersRecursivelyToNonEther() {
   initialiseChildren();
   VolumeHandleListItr childItrE = m_children.end();
   for (VolumeHandleListItr childItr = m_children.begin(); childItr!=childItrE; ++childItr) {
-    //std::cout << "\t-->expanding child " << (*childItr)->getNameStdString() << " - " << (*childItr) << std::endl ;
     (*childItr)->expandMothersRecursivelyToNonEther();
   }
   setState(VP1GeoFlags::EXPANDED);
-  //std::cout<<"VolumeHandle::expandMothersRecursivelyToNonEther() for "<<this->getNameStdString() << " [" <<this<< "]" <<" DONE.\n\n"<<std::endl;
-
 }
 
 //____________________________________________________________________

@@ -145,21 +145,6 @@ public:
     //Switch associated with the system - it is initialised only if the system has info available:
     SoSwitch * soswitch;
 
-
-
-    void dump() const {
-      std::cout<<" SubSystemInfo @ "<<this<<"\n"
-               <<(isbuilt?"Is built.\n":"Is not built.\n");
-      std::cout<<"Contains following volhandles: [";
-      for (auto vol : vollist) std::cout<<&vol<<",";
-      std::cout<<"]"<<std::endl;
-      std::cout<<"Matname = "<<matname<<std::endl;
-      std::cout<<"Contains following TreetopInfo: [";
-      for (auto tt : treetopinfo) std::cout<<tt.volname<<",";
-      std::cout<<"]"<<std::endl;
-
-    }
-
   };
 
   QList<SubSystemInfo*> subsysInfoList;//We need to keep and ordered version also (since wildcards in regexp might match more than one subsystem info).
@@ -274,12 +259,7 @@ QWidget * VP1GeometrySystem::buildController()
   connect(m_d->controller,SIGNAL(loadMaterialsFromFile(QString)),this,SLOT(loadMaterialsFromFile(QString)));
  
   connect(m_d->controller,SIGNAL(transparencyChanged(float)),this,SLOT(updateTransparency()));
-  connect (m_d->controller,SIGNAL(volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE)),
-	   this,SLOT(volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE)));
-  connect (m_d->controller,SIGNAL(volumeResetRequested(VolumeHandle*)),
-	   this,SLOT(volumeResetRequested(VolumeHandle*)));
   connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
-  connect(m_d->controller,SIGNAL(resetSubSystems(VP1GeoFlags::SubSystemFlags)),this,SLOT(resetSubSystems(VP1GeoFlags::SubSystemFlags)));
   connect(m_d->controller->requestOutputButton(), SIGNAL(clicked()), this, SLOT(saveTrees()));
 
   //Setup models/views for volume tree browser and zapped volumes list:
@@ -921,9 +901,6 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
       }
   }
 
-  theclass->message("Dumping the subsystem's info:");
-  si->dump();
-
 
   volumetreemodel->addSubSystem( si->flag, si->vollist );
 
@@ -936,13 +913,10 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
   VolumeHandle::VolumeHandleListItr it, itE(si->vollist.end());
   // int idx=0; // for debug
   for (it = si->vollist.begin(); it!=itE; ++it){
-    // VP1Msg::messageDebug("\nexpanding idx: " + QString::number(++idx));
     (*it)->expandMothersRecursivelyToNonEther();
-    // VP1Msg::messageDebug("expand DONE.");
   }
 
 
-  VP1Msg::messageDebug("addChild...");
   phisectormanager->updateRepresentationsOfVolsAroundZAxis();
   phisectormanager->largeChangesEnd();
   si->soswitch->addChild(subsystemsep);
@@ -1206,26 +1180,6 @@ void VP1GeometrySystem::Imp::expandVisibleVolumesRecursively(VolumeHandle* handl
 
 
 
-//_____________________________________________________________________________________
-void VP1GeometrySystem::volumeStateChangeRequested(VolumeHandle*vh,VP1GeoFlags::VOLSTATE state)
-{
-  //might not use this slot presently...
-  if (!vh)
-    return;
-  deselectAll();
-  vh->setState(state);
-  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
-}
-
-//_____________________________________________________________________________________
-void VP1GeometrySystem::volumeResetRequested(VolumeHandle*vh)
-{
-  if (!vh)
-    return;
-  deselectAll();
-  vh->reset();
-  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
-}
 
 //_____________________________________________________________________________________
 void VP1GeometrySystem::setShowVolumeOutLines(bool b)

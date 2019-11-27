@@ -39,7 +39,5 @@ set( SRCS main.cpp )
 add_executable( hellogeoRead2G4 ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoRead2G4 Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4  ${Geant4_LIBRARIES})
+target_link_libraries( hellogeoRead2G4 Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4  ${Geant4_LIBRARIES})
 
-# Set include directories
-target_include_directories( hellogeoRead2G4 SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${GeoModelG4_INCLUDE_DIRS} ${Geant4_INCLUDE_DIRS})

@@ -26,4 +26,4 @@ set(SRCS main.cpp )
 add_executable( hellogeo ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeo GeoModelKernel)
+target_link_libraries( hellogeo GeoModelCore::GeoModelKernel)

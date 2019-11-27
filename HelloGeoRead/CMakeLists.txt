@@ -34,7 +34,5 @@ set(SRCS main.cpp )
 add_executable( hellogeoRead ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoRead Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel)
+target_link_libraries( hellogeoRead Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel)
 
-# Set include directories
-target_include_directories( hellogeoRead SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} )

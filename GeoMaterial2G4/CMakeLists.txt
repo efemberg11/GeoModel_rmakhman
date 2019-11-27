@@ -28,8 +28,7 @@ include(${Geant4_USE_FILE})
 
 # Set target and properties
 add_library( GeoMaterial2G4 SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoMaterial2G4 PUBLIC ${Geant4_LIBRARIES} GeoModelKernel )
-target_include_directories( GeoMaterial2G4 SYSTEM PUBLIC ${GeoModelCore_INCLUDE_DIRS} )
+target_link_libraries( GeoMaterial2G4 PUBLIC ${Geant4_LIBRARIES} GeoModelCore::GeoModelKernel )
 target_include_directories( GeoMaterial2G4 PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

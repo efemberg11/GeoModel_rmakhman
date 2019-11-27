@@ -6,7 +6,7 @@ The example program:
 
  1. Builds an example geometry:
  2. Writes the geometry to an SQLite file
- 3. It acess the persistent copy of the geometry, as a test
+ 3. It accesses the persistent copy of the geometry, as a test
 
 
 ## Dependencies

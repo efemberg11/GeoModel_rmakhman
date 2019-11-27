@@ -30,7 +30,5 @@ set(SRCS main.cpp )
 add_executable( hellogeoWrite ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoWrite GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
+target_link_libraries( hellogeoWrite GeoModelCore::GeoModelKernel Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite )
 
-# Set include directories
-target_include_directories( hellogeoWrite SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} )

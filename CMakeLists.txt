@@ -53,11 +53,8 @@ add_executable(fullSimLight fullSimLight.cc ${sources} ${headers})
 
 #----------------------------------------------------------------------------
 # Link all needed libraries
-target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES})
+target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES})
 
-#----------------------------------------------------------------------------
-# Set include directories
-target_include_directories( fullSimLight SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DIRS} ${GeoModelG4_INCLUDE_DIRS} ${Geant4_INCLUDE_DIRS})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build/OUTPUT directory. This is so that, after
@@ -67,7 +64,7 @@ target_include_directories( fullSimLight SYSTEM PUBLIC ${GeoModelRead_INCLUDE_DI
 set(FULLSIMLIGHT_SCRIPTS
   bench.g4
   atlas2018.gdml
-  geometry-ATLAS-R2-2015-03-01-00.db
+  geometry.db
   README
   )
 

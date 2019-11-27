@@ -39,7 +39,7 @@ G4double MyDetectorConstruction::gFieldValue = 0.0;
 MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
   fGDMLFileName             = "atlas2018.gdml";
-  fGeometryDatabaseFileName = "geometry-ATLAS-R2-2015-03-01-00.db";
+  fGeometryDatabaseFileName = "geometry.db";
   fFieldValue        = 0.0;
   fDetectorMessenger = new MyDetectorMessenger(this);
 }
@@ -62,47 +62,47 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         // return;
         throw;
     }
-    
+
     // -- testing the input database
     std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
     db->printAllMaterials();
     /* setup the GeoModel reader */
     GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
     qDebug() << "ReadGeoModel set.";
-    
-    
+
+
     /* build the GeoModel geometry */
     GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
     qDebug() << "ReadGeoModel::buildGeoModel() done.";
-    
-    
+
+
     // --- testing the imported ATLAS Geometry
-    
+
 //    // get the GeoLogVol used for the 'world' volume
 //    std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;
 //    const GeoLogVol* logVol = world->getLogVol();
 //    std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;
 //    std::cout << "'world' GeoMaterial name: " << logVol->getMaterial()->getName() << std::endl;
-//    
+//
 //    // get number of children volumes
 //    unsigned int nChil = world->getNChildVols();
 //    std:: cout << "'world' number of children: " << nChil << std::endl;
-//    
+//
 //    // loop over all children nodes
 //    std::cout << "Looping over all 'volume' children (i.e., GeoPhysVol and GeoFullPhysVol)..." << std::endl;
 //    for (unsigned int idx=0; idx<nChil; ++idx) {
 //        PVConstLink nodeLink = world->getChildVol(idx);
-//        
+//
 //        if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) ) {
 //            std::cout << "\t" << "the child n. " << idx << " ";
 //            const GeoVPhysVol *childVolV = &(*( nodeLink ));
 //            if ( dynamic_cast<const GeoPhysVol*>(childVolV) )
-//                
+//
 //            {
 //                const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
 //                std::cout << "is a GeoPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName() << std::endl;
 //                std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
-//                
+//
 //            } else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
 //                const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
 //                std::cout << "is a GeoFullPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName() << std::endl;
@@ -115,7 +115,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
 //            //std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
 //        }
 //    }
-    
+
     // build the Geant4 geometry and get an hanlde to the world' volume
     ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
     std::cout << "Building G4 geometry."<<std::endl;

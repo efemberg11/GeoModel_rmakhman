@@ -24,4 +24,4 @@ FILE(GLOB SRCS src/main.cpp src/*.cxx )
 add_executable( helloToyDetectorFactory ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( helloToyDetectorFactory GeoModelKernel GeoModelDBManager GeoModelWrite Qt5::Core Qt5::Sql)
+target_link_libraries( helloToyDetectorFactory GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite Qt5::Core Qt5::Sql)

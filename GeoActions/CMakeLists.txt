@@ -30,7 +30,7 @@ set(SRCS main.cpp MyVolAction.cxx MyVolActionFilter.cxx )
 add_executable( geoActions ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( geoActions GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
+target_link_libraries( geoActions GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite Qt5::Core Qt5::Sql )
 
 # Set include directories
-target_include_directories( geoActions SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} )
+# target_include_directories( geoActions SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} )

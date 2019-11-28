@@ -25,7 +25,7 @@ set(SRCS main.cpp )
 add_executable( geoShiftUnion ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( geoShiftUnion GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
+target_link_libraries( geoShiftUnion GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite Qt5::Core Qt5::Sql )
 
 # Set include directories
-target_include_directories( geoShiftUnion SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} )
+# target_include_directories( geoShiftUnion SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} )

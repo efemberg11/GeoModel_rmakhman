@@ -26,7 +26,7 @@ set(SRCS main.cpp )
 add_executable( geoTessellatedExample ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( geoTessellatedExample GeoModelCore::GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
+target_link_libraries( geoTessellatedExample GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite Qt5::Core Qt5::Sql )
 
 # Set include directories
 #target_include_directories( geoTessellatedExample SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} ${GeoModelKernel_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} )

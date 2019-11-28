@@ -7,6 +7,7 @@ stages:
 
 before_script:
   - yum -y install cmake glibc-devel freeglut-devel which
+  - setupATLAS; asetup none,gcc8,cmakesetup
   #- set +e && source CI/setup_lcg.sh; set -e
 
 variables:

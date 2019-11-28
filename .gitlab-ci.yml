@@ -53,7 +53,7 @@ geomodelio-build:
     - echo "${CMAKE_ARGS}"
     - cmake ${CMAKE_ARGS}  ..
     - cmake --build . -- -j$(nproc)
-    - cmake --build . -- install
+    #- cmake --build . -- install #TODO: re-enable when 'install' will be set in sub-packages
 
 build_slc6:
   <<: *build_template

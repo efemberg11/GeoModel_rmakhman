@@ -3,7 +3,6 @@
 # Package: VP1GeometryPlugin
 ################################################################################
 
-cmake_minimum_required(VERSION 3.12)
 
 set(CMAKE_BUILD_TYPE DEBUG)
 set(CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
@@ -79,6 +78,3 @@ install(TARGETS GXGeometrySystems
 set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
 
 set_target_properties(GXGeometrySystems PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
-
-
-

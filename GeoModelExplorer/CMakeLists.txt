@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
 
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
@@ -47,6 +46,3 @@ add_definitions (${Qt5Widgets_DEFINITIONS})
 add_definitions (${Qt5PrintSupport_DEFINITIONS})
 target_link_libraries( gmex GXGui GXBase GXHEPVis ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 install(TARGETS gmex DESTINATION bin)
-
-
-

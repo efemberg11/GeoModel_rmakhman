@@ -1,7 +1,6 @@
 ################################################################################
 # Package: GXGeometryPlugin
 ################################################################################
-cmake_minimum_required(VERSION 3.12)
 
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
@@ -68,5 +67,3 @@ install(TARGETS GXGeometryPlugin
 set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
 
 set_target_properties(GXGeometryPlugin PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
-
-

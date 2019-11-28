@@ -1,5 +1,10 @@
 stages:
-  - dependencies
+  - dependencies-core
+  - dependencies-io
+  - dependencies-CLHEP
+  - dependencies-geant4
+  - build
+
   - build
 
 before_script:
@@ -11,7 +16,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 geomodelcore-build:
-  stage: dependencies
+  stage: dependencies-core
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
@@ -26,7 +31,7 @@ geomodelcore-build:
       - install
 
 geomodelio-build:
-  stage: dependencies
+  stage: dependencies-io
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
@@ -41,10 +46,11 @@ geomodelio-build:
       - install
 
 CLHEP-build:
-  stage: dependencies
+  stage: dependencies-CLHEP
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
+    - cd CLHEP
     - git checkout CLHEP_2_4_1_0
     - cd CLHEP
     - mkdir build
@@ -58,7 +64,7 @@ CLHEP-build:
 
 
 geant4-build:
-  stage: dependencies
+  stage: dependencies-geant4
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/geant4/geant4.git

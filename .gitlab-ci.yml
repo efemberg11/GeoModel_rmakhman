@@ -55,11 +55,11 @@ geomodelio-build:
     - cmake --build . -- -j$(nproc)
     #- cmake --build . -- install #TODO: re-enable when 'install' will be set in sub-packages
 
-build_slc6:
-  <<: *build_template
-  image: cern/slc6-base
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+# build_slc6:
+#   <<: *build_template
+#   image: cern/slc6-base
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 
 build_cc7:
   <<: *build_template

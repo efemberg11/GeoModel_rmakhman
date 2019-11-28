@@ -1,4 +1,3 @@
-
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
 set(MYLIB_VERSION_PATCH 0)
@@ -7,8 +6,8 @@ set (CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
 
 project ( "GXGui" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-find_package( Coin3D  )
-find_package( SoQt  )
+find_package( Coin3D REQUIRED )
+find_package( SoQt REQUIRED )
 if ( APPLE )
 	find_package(OpenGL REQUIRED)
 endif()

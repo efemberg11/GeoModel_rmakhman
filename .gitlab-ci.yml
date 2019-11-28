@@ -1,16 +1,52 @@
 stages:
+  - dependencies-coin
+  - dependencies-soqt
   - dependencies-core
   - dependencies-io
   - build
 
 before_script:
-  - yum -y install cmake glibc-devel which
+  - yum -y install cmake glibc-devel freeglut-devel which
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
   CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
+
+coin-build:
+  stage: dependencies-coin
+  script:
+    - pwd; ls
+    - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
+    - unzip coin-4.0.0-src.zip -d coin-sources
+    - mv coin-sources/* coin
+    - mkdir build_coin
+    - cd build_coin
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
+    - make -j$(nproc)
+    - make install
+  artifacts: 
+    paths:
+      - install
+      
+      
+soqt-build:
+  stage: dependencies-soqt
+  script:
+    - pwd; ls
+    - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
+    - unzip soqt-1b4fe9d-macos-mojave-fix.zip
+    - mkdir build_soqt
+    - cd build_soqt
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
+    - make -j$(nproc)
+    - make install
+  artifacts: 
+    paths:
+      - install
+      
+      
 geomodelcore-build:
   stage: dependencies-core
   script:
@@ -24,6 +60,7 @@ geomodelcore-build:
   artifacts: 
     paths:
       - install
+      
 
 geomodelio-build:
   stage: dependencies-io

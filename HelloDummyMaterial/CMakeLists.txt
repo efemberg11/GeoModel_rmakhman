@@ -1,6 +1,6 @@
 ################################################################################
-# Package: HelloGeo
-# author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - Nov, 2018
+# Package: HelloDummyMaterial
+# author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - Nov, 2019
 ################################################################################
 
 cmake_minimum_required(VERSION 3.1.0)
@@ -30,7 +30,7 @@ set(SRCS main.cpp )
 add_executable( helloDummyMaterial ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( helloDummyMaterial GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
+target_link_libraries( helloDummyMaterial GeoModelCore::GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
 
 # Set include directories
-target_include_directories( helloDummyMaterial SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} )
+#target_include_directories( helloDummyMaterial SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} )

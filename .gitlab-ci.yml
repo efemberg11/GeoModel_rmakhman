@@ -52,7 +52,6 @@ CLHEP-build:
     - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
     - cd CLHEP
     - git checkout CLHEP_2_4_1_0
-    - cd CLHEP
     - mkdir build
     - cd build
     - cmake -DCMAKE_INSTALL_PREFIX=../../install ../

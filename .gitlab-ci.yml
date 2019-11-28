@@ -12,6 +12,24 @@ variables:
   CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
+
+coin-build:
+  stage: dependencies-coin
+  script:
+    - pwd; ls
+    - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
+    - unzip coin-4.0.0-src.zip -d coin-sources
+    - mv coin-sources/* coin
+    - mkdir build_coin
+    - cd build_coin
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
+    - make -j$(nproc)
+    - make install
+  artifacts: 
+    paths:
+      - install
+      
+      
 geomodelcore-build:
   stage: dependencies-core
   script:
@@ -26,20 +44,6 @@ geomodelcore-build:
     paths:
       - install
       
-coin-build:
-  stage: dependencies-coin
-  script:
-    - pwd; ls
-    - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
-    - unzip coin-4.0.0-src.zip coin
-    - mkdir build_coin
-    - cd build_coin
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
-    - make -j$(nproc)
-    - make install
-  artifacts: 
-    paths:
-      - install
 
 geomodelio-build:
   stage: dependencies-io

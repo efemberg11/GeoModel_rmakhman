@@ -11,7 +11,7 @@ class ForwardScrutinizer : public GeoVDetectorElement
 {
  public:
   ForwardScrutinizer(const GeoVFullPhysVol *fullPhysVol);
-  virtual ~ForwardScrutinizer() override final;
+  virtual ~ForwardScrutinizer() override final {};
 
   int identify() const;
 

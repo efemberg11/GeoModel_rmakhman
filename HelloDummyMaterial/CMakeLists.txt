@@ -30,7 +30,7 @@ set(SRCS main.cpp )
 add_executable( helloDummyMaterial ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( helloDummyMaterial GeoModelCore::GeoModelKernel Qt5::Core Qt5::Sql GeoModelDBManager GeoModelWrite )
+target_link_libraries( helloDummyMaterial GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite Qt5::Core Qt5::Sql )
 
 # Set include directories
 #target_include_directories( helloDummyMaterial SYSTEM PUBLIC ${GeoModelWrite_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} )

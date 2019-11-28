@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
 
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
@@ -44,7 +43,7 @@ include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
 include_directories(${Coin3D_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-if ( APPLE ) 
+if ( APPLE )
   target_link_libraries (GXBase ${Qt5Core_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5OpenGL_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GXHEPVis ${SoQt_LIBRARIES} ${Coin_LIBRARIES} ${OPENGL_LIBRARIES} )
   target_link_directories (GXBase PUBLIC ${Coin_LIB_DIR} )
 else()
@@ -66,4 +65,3 @@ set_target_properties(GXBase PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSIO
 
 target_compile_definitions( GXBase PUBLIC -DQT_NO_DEBUG_OUTPUT )
 target_compile_definitions( GXBase PUBLIC -DQT_NO_INFO_OUTPUT )
-

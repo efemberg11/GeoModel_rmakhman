@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.12)
 
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
@@ -27,7 +26,7 @@ add_library ( GXHEPVis SHARED ${SOURCES} ${HEADERS}  )
 find_package( Qt5 COMPONENTS Core )
 include_directories(${Qt5Core__INCLUDE_DIRS} )
 include_directories(${Coin_INCLUDE_DIR} )
-if ( APPLE ) 
+if ( APPLE )
   target_link_libraries (GXHEPVis ${Qt5Core_LIBRARIES} ${Coin_LIBRARIES} ${OPENGL_LIBRARIES} )
   target_link_directories (GXHEPVis PUBLIC ${Coin_LIB_DIR} )
 else()
@@ -45,6 +44,3 @@ install(TARGETS GXHEPVis
 set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
 
 set_target_properties(GXHEPVis PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
-
-
-

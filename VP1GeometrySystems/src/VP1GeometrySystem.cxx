@@ -423,15 +423,11 @@ GeoPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoPhysVol* world)
 GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 {
 
-  // GET GEOMETRY FROM LOCAL DB
-  // Set valid db path before first run
-  // static const QString path = "../../local/data/geometry.db";
-  //QSettings settings("ATLAS", "VP1Light");
-  //  QString path = settings.value("db/path").toString();
   char *pEnv=getenv("GX_GEOMETRY_FILE");
   QString path;
   if (pEnv) {
     path=pEnv;
+    unsetenv("GX_GEOMETRY_FILE");
   }
   else {
 

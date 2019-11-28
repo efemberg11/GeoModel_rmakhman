@@ -68,7 +68,7 @@ geant4-build:
     - cmake -DCMAKE_INSTALL_PREFIX=../../install ../ -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../../install/xerces-c
     - make -j$(nproc)
     - make install
-  artifacts
+  artifacts:
     paths:
      - install
 

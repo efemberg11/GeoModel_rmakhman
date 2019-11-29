@@ -14,13 +14,13 @@ else
   exit 1
 fi
 
-release=LCG_95
-platform=x86_64-${os}-${compiler}
-lcg=/cvmfs/sft.cern.ch/lcg/views/${release}/${platform}
+# release=LCG_95
+# platform=x86_64-${os}-${compiler}
+# lcg=/cvmfs/sft.cern.ch/lcg/views/${release}/${platform}
 
-source ${lcg}/setup.sh
+# source ${lcg}/setup.sh
 
 ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
 source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
-setupATLAS; asetup none,gcc8,cmakesetup
+asetup none,gcc8,cmakesetup
 

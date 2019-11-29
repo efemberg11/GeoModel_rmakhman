@@ -64,6 +64,8 @@ soqt-build:
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
     - make -j$(nproc)
     - make install
+  dependencies:
+    - coin-build
   artifacts:
     paths:
       - install

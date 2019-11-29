@@ -3,12 +3,29 @@
 # GitLab CI configuration for this repository.
 #
 
+
 # image: ubuntu:18.04
 image: atlas/centos7-atlasos:latest
 
+# Set the "global" behaviour of the CI build.
 variables:
   CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
+  CMAKE_EXECUTABLE: /cvmfs/sft.cern.ch/lcg/contrib/CMake/3.14.2/Linux-x86_64/bin/cmake
+
+# variables:
+#   GIT_STRATEGY: clone
+#   GIT_SUBMODULE_STRATEGY: recursive
+#   CTEST_EXECUTABLE: /cvmfs/sft.cern.ch/lcg/contrib/CMake/3.14.2/Linux-x86_64/bin/ctest
+#   CPACK_EXECUTABLE: /cvmfs/sft.cern.ch/lcg/contrib/CMake/3.14.2/Linux-x86_64/bin/cpack
+
+before_script:
+    - yum install -y make redhat-lsb-core libuuid-devel which glibc-devel git autoconf automake ruby
+    - source /cvmfs/sft.cern.ch/lcg/contrib/gcc/8.3.0binutils/x86_64-centos7/setup.sh
+    # - export MAKEFLAGS="-j`nproc` -l`nproc`"
+
+
+
 
 # List all the build stages.
 stages:

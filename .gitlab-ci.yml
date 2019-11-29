@@ -45,7 +45,7 @@ coin-build:
     - mv coin-sources/* coin
     - mkdir build_coin
     - cd build_coin
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
+    - cmake ../coin
     - make -j$(nproc)
     - make install
   artifacts:
@@ -62,7 +62,7 @@ soqt-build:
     - unzip soqt-1b4fe9d-macos-mojave-fix.zip
     - mkdir build_soqt
     - cd build_soqt
-    - cmake -DCMAKE_CXX_FLAGS=-I\ ../install/include -DCMAKE_INSTALL_PREFIX=../install ../soqt
+    - cmake ../soqt
     - make -j$(nproc)
     - make install
   dependencies:

@@ -8,7 +8,7 @@ stages:
 before_script:
   - yum -y install cmake glibc-devel freeglut-devel which
 #   - export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
-  - source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
+  - source $ATLAS_LOCAL_ROOT_BASE/user/atlasLocalSetup.sh
   - asetup none,gcc8,cmakesetup
 #   - set +e && source CI/setup_lcg.sh; set -e
 

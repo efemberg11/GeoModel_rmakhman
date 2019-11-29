@@ -1,7 +1,7 @@
 image: ubuntu:18.04
-    
+
 before_script:
-  - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev
+  - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev
 
 
 stages:
@@ -20,8 +20,8 @@ stages:
 #         - cd build
 #         - cmake .. -DBUILD_DEMO=OFF -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
 #         - make
-        
-        
+
+
 # before_script:
 #   - yum -y install cmake glibc-devel freeglut-devel which
 #   - alias cmake='/cvmfs/sft.cern.ch/lcg/contrib/CMake/3.11.1/Linux-x86_64/bin/cmake'
@@ -49,11 +49,11 @@ coin-build:
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
     - make -j$(nproc)
     - make install
-  artifacts: 
+  artifacts:
     paths:
       - install
-      
-      
+
+
 soqt-build:
   stage: dependencies-soqt
   script:
@@ -65,11 +65,11 @@ soqt-build:
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
     - make -j$(nproc)
     - make install
-  artifacts: 
+  artifacts:
     paths:
       - install
-      
-      
+
+
 geomodelcore-build:
   stage: dependencies-core
   script:
@@ -80,10 +80,10 @@ geomodelcore-build:
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
     - make -j$(nproc)
     - make install
-  artifacts: 
+  artifacts:
     paths:
       - install
-      
+
 
 geomodelio-build:
   stage: dependencies-io
@@ -95,15 +95,15 @@ geomodelio-build:
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
     - make -j$(nproc)
     - make install
-  artifacts: 
+  artifacts:
     paths:
       - install
-    
-    
-    
+
+
+
 .build_template: &build_template
   stage: build
-  tags: 
+  tags:
     - cvmfs
   script:
     - echo "PWD; LS"
@@ -120,7 +120,7 @@ build_new:
 #   image: cern/slc6-base
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    
+
 # build_slc6:
 #   <<: *build_template
 #   image: cern/slc6-base

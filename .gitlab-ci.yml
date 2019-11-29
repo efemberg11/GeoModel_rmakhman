@@ -3,7 +3,6 @@
 # GitLab CI configuration for this repository.
 #
 
-
 # image: ubuntu:18.04
 image: atlas/centos7-atlasos:latest
 

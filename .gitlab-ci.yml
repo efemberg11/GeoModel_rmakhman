@@ -20,7 +20,7 @@ variables:
 #   CPACK_EXECUTABLE: /cvmfs/sft.cern.ch/lcg/contrib/CMake/3.14.2/Linux-x86_64/bin/cpack
 
 before_script:
-    - yum install -y make redhat-lsb-core libuuid-devel which glibc-devel git autoconf automake ruby
+    - yum install -y make redhat-lsb-core libuuid-devel which glibc-devel git autoconf automake ruby freeglut-devel
     - source /cvmfs/sft.cern.ch/lcg/contrib/gcc/8.3.0binutils/x86_64-centos7/setup.sh
     # - export MAKEFLAGS="-j`nproc` -l`nproc`"
 

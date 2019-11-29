@@ -20,3 +20,7 @@ lcg=/cvmfs/sft.cern.ch/lcg/views/${release}/${platform}
 
 source ${lcg}/setup.sh
 
+ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
+setupATLAS; asetup none,gcc8,cmakesetup
+

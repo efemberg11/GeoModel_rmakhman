@@ -30,10 +30,11 @@ before_script:
 # List all the build stages.
 stages:
   - dependencies-coin
-  - dependencies-soqt
   - dependencies-core
   - dependencies-io
   - build
+
+# - dependencies-soqt
 
 
 coin-build:
@@ -45,30 +46,39 @@ coin-build:
     - mv coin-sources/* coin
     - mkdir build_coin
     - cd build_coin
-    - cmake ../coin
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
     - make -j$(nproc)
     - make install
-  artifacts:
-    paths:
-      - install
-
-
-soqt-build:
-  stage: dependencies-soqt
-  script:
-    - pwd; ls
+    - cd ..
     - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
     - unzip soqt-1b4fe9d-macos-mojave-fix.zip
     - mkdir build_soqt
     - cd build_soqt
-    - cmake ../soqt
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
     - make -j$(nproc)
     - make install
-  dependencies:
-    - coin-build
+    - cd ..
   artifacts:
     paths:
       - install
+
+
+# soqt-build:
+#   stage: dependencies-soqt
+#   script:
+#     - pwd; ls
+#     - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
+#     - unzip soqt-1b4fe9d-macos-mojave-fix.zip
+#     - mkdir build_soqt
+#     - cd build_soqt
+#     - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
+#     - make -j$(nproc)
+#     - make install
+#   dependencies:
+#     - coin-build
+#   artifacts:
+#     paths:
+#       - install
 
 
 geomodelcore-build:

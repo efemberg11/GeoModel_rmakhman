@@ -573,14 +573,14 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
   sharedShapes[geoShape] = theSolid;
   return theSolid;
 }
-//TODO createLArWheelSolid
+//createLArWheelSolid
 G4VSolid* Geo2G4SolidFactory::createLArWheelSolid(const std::string& name, const LArWheelSolidDef_t & lwsdef) const { // LArWheelSolid_t wheelType, int zside
         LArWheelSolid_t wheelType = lwsdef.first;
         int zside = lwsdef.second;
 
         LArWheelSolid * theLWS = new LArWheelSolid(name, wheelType, zside);
 
-        LArWheelSolidDDProxy * theLWS_p = new LArWheelSolidDDProxy(theLWS);
+        //LArWheelSolidDDProxy * theLWS_p = new LArWheelSolidDDProxy(theLWS);
         // ownership is passed to detStore
         //if ( detStore()->record(theLWS_p,  name).isFailure() ) {
         //  std::cout<<"Can't store proxy for LArWheelSolid to the DetectorStore"<<std::endl;

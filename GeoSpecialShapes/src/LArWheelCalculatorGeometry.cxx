@@ -9,6 +9,9 @@
 #include <iostream>
 
 //#include "GaudiKernel/PhysicalConstants.h"
+// Physical constants
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits
 
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 #include "./LArWheelCalculator_Impl/IDistanceCalculator.h"
@@ -80,8 +83,7 @@ double LArWheelCalculator::parameterized_slant_angle(double r) const
                         r2*m_slant_parametrization[2] +
                         r3*m_slant_parametrization[3] +
                         r4*m_slant_parametrization[4];
-  //return result*deg; // TO DO
-  return result;
+  return result*SYSTEM_OF_UNITS::deg;
 }
 
 // Determines the nearest to the input point fan.

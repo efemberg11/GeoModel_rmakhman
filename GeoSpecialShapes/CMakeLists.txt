@@ -20,6 +20,7 @@ project( "GeoSpecialShapes" VERSION 1.0.0 LANGUAGES CXX )
 
 # External dependencies:
 find_package ( GeoModelCore REQUIRED)
+find_package ( CLHEP REQUIRED)
 
 # Project's Settings
 set(CMAKE_CXX_STANDARD 17)
@@ -36,15 +37,18 @@ file( GLOB HEADERS GeoSpecialShapes/*.h src/LArWheelCalculator_Impl/*.h)
 # Set target and properties
 add_library( GeoSpecialShapes SHARED ${HEADERS} ${SOURCES} )
 
-target_link_libraries( GeoSpecialShapes PUBLIC
-PRIVATE GeoMaterial2G4 GeoModel2G4
+#target_link_libraries( GeoSpecialShapes PUBLIC
+#PRIVATE GeoMaterial2G4 GeoModel2G4
+#GeoModelCore::GeoModelKernel )
+target_link_libraries( GeoSpecialShapes PUBLIC ${CLHEP_LIBRARIES}
+PRIVATE 
 GeoModelCore::GeoModelKernel )
 
 #target_include_directories( GeoSpecialShapes PUBLIC  ${GeoModelCore_INCLUDE_DIRS}
 #   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 #   $<INSTALL_INTERFACE:include> )
 
-target_include_directories( GeoSpecialShapes SYSTEM PUBLIC  PRIVATE ${GeoModelCore_INCLUDE_DIRS} )
+target_include_directories( GeoSpecialShapes SYSTEM PUBLIC ${CLHEP_INCLUDE_DIRS} PRIVATE ${GeoModelCore_INCLUDE_DIRS} )
 target_include_directories( GeoSpecialShapes PUBLIC ${GeoModelCore_INCLUDE_DIRS}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

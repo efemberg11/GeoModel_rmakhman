@@ -11,5 +11,5 @@ add_subdirectory(GeoSpecialShapes)
 
 install(EXPORT GeoMaterial2G4-export FILE GeoModelG4-GeoMaterial2G4.cmake DESTINATION lib/GeoModelG4)
 install(EXPORT GeoModel2G4-export FILE GeoModelG4-GeoModel2G4.cmake DESTINATION lib/GeoModelG4)
-install(EXPORT GeoSpecialShapes-export FILE GeoSpecialShapes-GeoModel2G4.cmake DESTINATION lib/GeoModelG4)
+install(EXPORT GeoSpecialShapes-export FILE GeoModelG4-GeoSpecialShapes.cmake DESTINATION lib/GeoModelG4)
 install(FILES cmake/GeoModelG4Config.cmake DESTINATION lib/GeoModelG4)

@@ -61,9 +61,9 @@ include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 
 if ( APPLE )
   target_link_directories (GXGeometrySystems PUBLIC ${Coin_LIB_DIR} )
-  target_link_libraries (GXGeometrySystems ${SoQt_LIBRARIES} ${Coin_LIBRARIES} GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
   else()
-  target_link_libraries (GXGeometrySystems ${SoQt_LIBRARIES} ${Coin_LIBRARIES} GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 endif()
 
 

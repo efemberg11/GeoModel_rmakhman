@@ -59,8 +59,10 @@ soqt-build:
   script:
     - pwd; ls
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
-    - wget https://bitbucket.org/rmbianchi/soqt/get/tip.zip
-    - unzip soqt-1b4fe9d-macos-mojave-fix.zip
+    # - unzip soqt-1b4fe9d-macos-mojave-fix.zip
+    - wget https://bitbucket.org/rmbianchi/soqt/get/CI-fix-25692a8.zip
+    - unzip CI-fix-25692a8.zip
+    - mv rmbianchi-soqt-25692a805a2c soqt
     - mkdir build_soqt
     - cd build_soqt
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt

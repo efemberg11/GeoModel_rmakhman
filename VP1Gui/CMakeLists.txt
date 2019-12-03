@@ -49,7 +49,7 @@ include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
 include_directories(${Coin_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt::SoQt Coin::Coin ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt Coin::Coin ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 add_definitions (${Qt5Core_DEFINITIONS})
 install(TARGETS GXGui
   LIBRARY

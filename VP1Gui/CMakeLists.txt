@@ -6,7 +6,7 @@ set (CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
 
 project ( "GXGui" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-find_package( Coin3D REQUIRED )
+find_package( Coin REQUIRED )
 find_package( SoQt REQUIRED )
 if ( APPLE )
 	find_package(OpenGL REQUIRED)
@@ -46,10 +46,10 @@ include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
 include_directories(${Qt5Widgets_INCLUDE_DIRS} )
 include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
 #include_directories(${Qt5Network_INCLUDE_DIRS} )
-include_directories(${Coin3D_INCLUDE_DIRS} )
+include_directories(${Coin_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt::SoQt Coin ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt::SoQt Coin::Coin ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 add_definitions (${Qt5Core_DEFINITIONS})
 install(TARGETS GXGui
   LIBRARY

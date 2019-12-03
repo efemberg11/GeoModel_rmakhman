@@ -1,4 +1,4 @@
-# Contributing to the ATLAS Machine Learning Forum pages
+# Contributing to the GeoModel Toolkit
 
 
 ## Issues
@@ -8,15 +8,15 @@ Issues help a lot in both guiding what work gets done and documenting what impro
 
 If you have more time read on to see how to make a Merge Request to address your Issue.
 
-[1]: https://gitlab.cern.ch/atlasml/information-and-resources/issues/new?issue
+[1]: https://gitlab.cern.ch/GeoModelDev/documentation/issues/new?issue
 
 
 ## Merge Requests
 
-We are happy to accept contributions to the AML Forum via Merge Requests to the GitLab repo.
+We are happy to accept contributions to the GeoModel Toolkit documentation via Merge Requests to the GitLab repo.
 **To get started [fork this repo][2].**
 
-[2]: https://gitlab.cern.ch/atlasml/information-and-resources/forks/new
+[2]: https://gitlab.cern.ch/GeoModelDev/documentation/forks/new
 
 
 ### One Line Merge Requests

@@ -22,9 +22,9 @@ nav:
         'How to Load a detector description from a file': 'how/how_load_geo.md'
         'How to describe a detector description within a file': 'how/how_describe_geo_file.md'
     - Reference:  'reference/reference.md'
-    - Doxygen docs: https://cern.ch/geomodel/doxygen
     - For Developers:
         'Build the Libraries': 'dev/build.md'
+        'Doxygen documentation': https://cern.ch/geomodel/doxygen
 extra_css:
     - material_nested_lists_rendering.css
 markdown_extensions:
@@ -33,3 +33,5 @@ markdown_extensions:
     - pymdownx.superfences
     - toc:
         permalink: true
+    - markdown_include.include:
+        base_path: docs

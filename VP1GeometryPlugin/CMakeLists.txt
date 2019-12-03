@@ -56,7 +56,7 @@ include_directories(${Qt5Sql_INCLUDE_DIRS} )
 include_directories(${Coin_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGeometryPlugin ${Qt5Core_LIBRARIES} GXGeometrySystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GeoModelKernel GeoGenericFunctions GeoModelRead TFPersistification GeoModelDBManager )
+target_link_libraries (GXGeometryPlugin ${Qt5Core_LIBRARIES} GXGeometrySystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GeoModelCore::GeoModelKernel GeoModelCore::GeoGenericFunctions GeoModelIO::GeoModelRead GeoModelIO::TFPersistification GeoModelIO::GeoModelDBManager )
 add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGeometryPlugin

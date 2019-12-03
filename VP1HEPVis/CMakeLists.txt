@@ -5,7 +5,7 @@ set(MYLIB_VERSION_PATCH 0)
 
 project ( "GXHEPVis" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-find_package( Coin  )
+find_package( Coin REQUIRED )
 # if ( APPLE )
 	find_package(OpenGL REQUIRED)
 # endif()

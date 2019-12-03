@@ -32,7 +32,8 @@ stages:
 # #   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
-  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  # CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 #   ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
 

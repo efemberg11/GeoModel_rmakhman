@@ -39,7 +39,7 @@ public:
   void setGeometrySelectable(bool);
   void setZoomToVolumeOnClick(bool);
   void setComplexity(double);
-  
+
   void actualRestoreSettings(VP1Deserialise&);
   int  currentSettingsVersion() const;
   void actualSaveSettings(VP1Serialise&) const;
@@ -108,7 +108,7 @@ private slots:
   void saveMaterialsRequested();
   void loadMaterialsRequested();
   void emit_autoExpandByVolumeOrMaterialName();
-  void emit_actionOnAllNonStandardVolumes();
+  // void emit_actionOnAllNonStandardVolumes(); // not used anymore?
 };
 
 #endif

@@ -62,17 +62,17 @@ protected slots:
   void resetSubSystems(VP1GeoFlags::SubSystemFlags);
   void autoExpandByVolumeOrMaterialName(bool,QString);//volname: (false,namestr), matname: (true,namestr)
 
-  void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);
-  void volumeResetRequested(VolumeHandle*);
+  // void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE); // not used anymore?
+  // void volumeResetRequested(VolumeHandle*); // not used anymore?
 
   void setShowVolumeOutLines(bool);
 
   void saveMaterialsToFile(QString,bool);//(filename,onlyChangedMaterials)
   void loadMaterialsFromFile(QString);//filename
 
-  GeoPhysVol *newWorld()  const; 
+  GeoPhysVol *newWorld()  const;
   void saveTrees();
-  
+
 protected:
   class Imp;
   Imp * m_d;

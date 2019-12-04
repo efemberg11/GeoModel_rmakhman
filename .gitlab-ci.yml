@@ -5,6 +5,8 @@ stages:
 building:
     stage: build
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
+    before_script:
+        - pip install markdown-include
     script:
         - mkdocs build --clean --site-dir public
         - cp .htaccess public/papers/internal/

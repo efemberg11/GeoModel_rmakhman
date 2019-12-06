@@ -53,7 +53,7 @@ coin-build:
     - mkdir build_coin
     - cd build_coin
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
-    - make -j$(nproc)
+    - make -j2
     - make install
   artifacts:
     paths:
@@ -74,7 +74,7 @@ soqt-build:
     - mkdir build_soqt
     - cd build_soqt
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
-    - make -j$(nproc)
+    - make -j2
     - make install
   artifacts:
     paths:
@@ -90,7 +90,7 @@ geomodelcore-build:
     - mkdir geomodelcore-build
     - cd geomodelcore-build
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
-    - make -j$(nproc)
+    - make -j2
     - make install
   artifacts:
     paths:
@@ -106,7 +106,7 @@ geomodelio-build:
     - mkdir geomodelio-build
     - cd geomodelio-build
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
-    - make -j$(nproc)
+    - make -j2
     - make install
   artifacts:
     paths:
@@ -126,7 +126,7 @@ geomodelio-build:
     - cd build
     - echo "${CMAKE_ARGS}"
     - cmake ${CMAKE_ARGS}  ..
-    - cmake --build . -- -j$(nproc)
+    - cmake --build . -- -j2
     - cmake --build . -- install
 
 build_new:

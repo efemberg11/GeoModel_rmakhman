@@ -116,8 +116,6 @@ geomodelio-build:
 .build_template: &build_template
   <<: *macos-job
   stage: build
-  tags:
-    - cvmfs
   script:
     - echo "PWD; LS"
     - pwd; ls

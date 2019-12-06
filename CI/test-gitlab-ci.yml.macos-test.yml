@@ -126,7 +126,7 @@ geomodelio-build:
     - cd build
     - echo "${CMAKE_ARGS}"
     - cmake ${CMAKE_ARGS}  ..
-    - cmake --build . -- -j$(nproc)
+    - cmake --build . -- -j2
     - cmake --build . -- install
 
 build_new:

@@ -1,7 +1,6 @@
 
 before_script:
-  - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev
-
+  - setupQt5Homebrew # please NOTE: this is specific to my private machine, Qt5 should be configured in another way for a general macOS runner
 
 stages:
   - dependencies-coin

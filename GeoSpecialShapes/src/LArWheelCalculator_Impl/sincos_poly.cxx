@@ -4,7 +4,7 @@
 
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 #include "GeoSpecialShapes/sincos.h"
-#include "CLHEP/Units/SystemOfUnits.h"
+//#include "CLHEP/Units/SystemOfUnits.h"
 
 /// TO DO : Dependencies from fROOT :D
 //#include "TMath.h"
@@ -15,9 +15,7 @@
 //#include "TDecompSVD.h"
 
 #include <Eigen/Dense>
-
 #include <vector>
-
 #include <sys/time.h>
 #include <iostream>
 #include <iomanip>
@@ -27,8 +25,9 @@
 // Physical constants
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
-
 #define DEBUGPRINT 0
+
+using namespace Eigen;
 
 //template<typename T>
 //std::ostream & operator << (std::ostream & ostr, const TVectorT<T> & v)
@@ -45,19 +44,19 @@
 //  return ostr;
 //}
 
-typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector1D;
-typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 
 // find best approximation of y values using linear combination of basis functions in bf
+
 //static std::vector<double>
-static Vector1D findLinearApproximation(
+static RowVectorXd
+findLinearApproximation(
     const int dataLen, const int nBasisFuntions,
-    const std::vector<double> &y, const MatrixXd & bf)
+    const RowVectorXd &y, const MatrixXd & bf)
 {
   //TMatrixDSym A(nBasisFuntions);
   MatrixXd A (nBasisFuntions, nBasisFuntions);
   //TVectorD vY(nBasisFuntions);
-  Vector1D vY(nBasisFuntions);
+  RowVectorXd vY(nBasisFuntions);
   
   for(int j = 0; j < nBasisFuntions; ++ j){
     for(int k = 0; k < nBasisFuntions; ++ k){
@@ -115,7 +114,7 @@ void LArWheelCalculator::fill_sincos_parameterization()
 
   //const Double_t Rmin = m_isInner? 290.*mm: 600.*mm;
   //const Double_t Rmax = m_isInner? 710.*mm: 2050.*mm;
-    const double Rmin = m_isInner? 250.*SYSTEM_OF_UNITS::mm: 560.*SYSTEM_OF_UNITS::mm;
+  const double Rmin = m_isInner? 250.*SYSTEM_OF_UNITS::mm: 560.*SYSTEM_OF_UNITS::mm;
   const double Rmax = m_isInner? 750.*SYSTEM_OF_UNITS::mm: 2090.*SYSTEM_OF_UNITS::mm;
   //const Double_t Rmin = m_isInner? 220.*mm: 530.*mm;
   //const Double_t Rmax = m_isInner? 780.*mm: 2120.*mm;
@@ -126,9 +125,9 @@ void LArWheelCalculator::fill_sincos_parameterization()
 //  TVectorD x(dataLen);  // angle points
 //  TVectorD ysin(dataLen);  // to be approximated function values at angle points - sin
 //  TVectorD ycos(dataLen);  // to be approximated function values at angle points - cos
-  std::vector<double> x(dataLen);    // angle points
-  std::vector<double> ysin(dataLen); // to be approximated function values at angle points - sin
-  std::vector<double> ycos(dataLen); // to be approximated function values at angle points - cos
+  RowVectorXd x(dataLen);    // angle points
+  RowVectorXd ysin(dataLen); // to be approximated function values at angle points - sin
+  RowVectorXd ycos(dataLen); // to be approximated function values at angle points - cos
     
   //TMatrixD bf(nBasisFunctions, dataLen); // Matrix of values of basis functions at angle points
   MatrixXd bf (nBasisFunctions, dataLen);
@@ -145,10 +144,12 @@ void LArWheelCalculator::fill_sincos_parameterization()
   }
 
   //std::vector<double>
-    Vector1D params_sin =
+    RowVectorXd
+ params_sin =
     findLinearApproximation(dataLen, nBasisFunctions, ysin, bf);
   //std::vector<double>
-    Vector1D params_cos =
+    RowVectorXd
+ params_cos =
     findLinearApproximation(dataLen, nBasisFunctions, ycos, bf);
 
   for(int i = 0; i < nBasisFunctions; ++ i){

@@ -21,6 +21,8 @@
 //#define LOCAL_DEBUG 1
 #include<stdlib.h>
 
+#include "Randomize.hh"
+
 static double IntPrecision = 0.0001;
 
 EInside LArWheelSolid::Inside_accordion(const G4ThreeVector &p) const
@@ -60,14 +62,16 @@ static void get_r(const G4VSolid *p, G4double z,
 }
 
 //static TRandom *rnd = 0;
-double static rnd = 0;
+static G4double rnd = 0;
 G4ThreeVector LArWheelSolid::GetPointOnSurface(void) const
 {
   if(rnd == 0){
-      rnd = 1;// TO DO = new TRandom3(0);
+      //rnd = new TRandom3(0);
+      rnd = G4UniformRand();
   }
 
-    G4double r = 1;//TO DO rnd->Uniform();
+  //G4double r = rnd->Uniform();
+  G4double r = G4UniformRand();
 
   G4ThreeVector p(0., 0., 0.);
 
@@ -98,14 +102,17 @@ void LArWheelSolid::get_point_on_accordion_surface(G4ThreeVector &p) const
 {
   p[0] = 0.;
   p[1] = 0.;
-    p[2] = 1; // TO DO rnd->Uniform(m_Zmin, m_Zmax);
+  //p[2] = rnd->Uniform(m_Zmin, m_Zmax);
+  p[2] = G4RandFlat::shoot(m_Zmin, m_Zmax);
 
   G4double rmin, rmax;
   get_r(m_BoundingShape, p[2], rmin, rmax);
 
-    p[1] = 1; //TO DO rnd->Uniform(rmin, rmax);
+  //p[1] = rnd->Uniform(rmin, rmax);
+  p[1] = G4RandFlat::shoot(rmin, rmax);
     
-  //TO DO  p.setPhi(rnd->Uniform(m_MinPhi, m_MaxPhi));
+  //p.setPhi(rnd->Uniform(m_MinPhi, m_MaxPhi));
+  p.setPhi(G4RandFlat::shoot(m_MinPhi, m_MaxPhi));
   G4double dphi = p.phi();
   int p_fan = 0;
   G4double d = GetCalculator()->DistanceToTheNearestFan(p, p_fan);
@@ -163,13 +170,16 @@ void LArWheelSolid::get_point_on_accordion_surface(G4ThreeVector &p) const
 
 void LArWheelSolid::get_point_on_polycone_surface(G4ThreeVector &p) const
 {
-    const G4double z = 1; //TO DO rnd->Uniform(m_Zmin, m_Zmax);
+  //const G4double z = rnd->Uniform(m_Zmin, m_Zmax);
+    const G4double z = G4RandFlat::shoot(m_Zmin, m_Zmax);
   G4double rmin, rmax;
   get_r(m_BoundingShape, z, rmin, rmax);
-    const bool inner = 1 ; //TO DO  rnd->Uniform() > 0.5? true: false;
-
+  //const bool inner = rnd->Uniform() > 0.5? true: false;
+  const bool inner = G4UniformRand() > 0.5? true: false;
+    
   p[0] = 0.; p[1] = inner? rmin: rmax; p[2] = z;
-  //TO DO  p.setPhi(rnd->Uniform(m_MinPhi, m_MaxPhi));
+  //p.setPhi(rnd->Uniform(m_MinPhi, m_MaxPhi));
+  p.setPhi(G4RandFlat::shoot(m_MinPhi, m_MaxPhi));
   G4double dphi = p.phi();
   int p_fan = 0;
   GetCalculator()->DistanceToTheNearestFan(p, p_fan);
@@ -273,7 +283,8 @@ void LArWheelSolid::get_point_on_polycone_surface(G4ThreeVector &p) const
   G4double phi1 = X1.phi(), phi2 = X2.phi();
   // X1 corresponds to side = -, X2 to side = +
   if(phi1 > 0. && phi2 < 0.) phi2 += CLHEP::twopi;
-    G4double phiX = 1; //TO DO  rnd->Uniform(phi1, phi2);
+  //G4double phiX = rnd->Uniform(phi1, phi2);
+  G4double phiX = G4RandFlat::shoot(phi1, phi2);
   if(phiX > CLHEP::pi) phiX -= CLHEP::twopi;
   X.setPhi(phiX);
 
@@ -288,23 +299,29 @@ void LArWheelSolid::get_point_on_flat_surface(G4ThreeVector &p) const
 {
   p[0] = 0.;
   p[1] = 0.;
-    p[2] = 1; //TO DO rnd->Uniform() > 0.5? m_Zmin: m_Zmax;
-
+  //p[2] = rnd->Uniform() > 0.5? m_Zmin: m_Zmax;
+  p[2] = G4UniformRand() > 0.5? m_Zmin: m_Zmax;
+    
   G4double rmin, rmax;
   get_r(m_BoundingShape, p[2], rmin, rmax);
 
-    p[1] = 1; //rnd->Uniform(rmin, rmax);
-  //TO DO  p.setPhi(rnd->Uniform(m_MinPhi, m_MaxPhi));
+  //p[1] = rnd->Uniform(rmin, rmax);
+  p[1] = G4RandFlat::shoot(rmin, rmax);
+  //p.setPhi(rnd->Uniform(m_MinPhi, m_MaxPhi));
+  p.setPhi(G4RandFlat::shoot(m_MinPhi, m_MaxPhi));
   G4double dphi = p.phi();
   int p_fan = 0;
   GetCalculator()->DistanceToTheNearestFan(p, p_fan);
   dphi -= p.phi();
 
-    p[0] = 1; //TO DO rnd->Uniform(
-              //        GetCalculator()->AmplitudeOfSurface(p, -1, p_fan),
-              //        GetCalculator()->AmplitudeOfSurface(p, 1, p_fan)
-              //        );
-
+//  p[0] = rnd->Uniform(
+//                   GetCalculator()->AmplitudeOfSurface(p, -1, p_fan),
+//                   GetCalculator()->AmplitudeOfSurface(p, 1, p_fan)
+//                   );
+  p[0] = G4RandFlat::shoot(
+                        GetCalculator()->AmplitudeOfSurface(p, -1, p_fan),
+                        GetCalculator()->AmplitudeOfSurface(p, 1, p_fan)
+                        );
   p.rotateZ(dphi);
 
   if(m_BoundingShape->Inside(p) != kSurface){
@@ -358,7 +375,7 @@ G4double LArWheelSolid::get_length_at_r(G4double r) const
                                                G4ThreeVector(0., r, m_Zmax), G4ThreeVector(0., 0., -1.)
                                                );
   zmax = m_Zmax - zmax;
-    double result = 1; //TO DO  m_f_length->Integral(zmin, zmax);
+  double result = 1; //TO DO  m_f_length->Integral(zmin, zmax);
   return result;
 }
 

@@ -18,6 +18,7 @@
 #include "GeoModel2G4/LArWheelSliceSolid.h"
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "CLHEP/Units/PhysicalConstants.h"
+#include "Randomize.hh"
 //#define LOCAL_DEBUG 1
 #include<stdlib.h>
 
@@ -62,12 +63,14 @@ static void get_r(const G4VSolid *p, G4double z,
     rmin = p->DistanceToIn(from, G4ThreeVector(1., 0., 0.));
 }
 
-//TO DO static TRandom *rnd = 0;
-        double static rnd = 0;
+//static TRandom *rnd = 0;
+static G4double rnd = 0;
 G4ThreeVector LArWheelSliceSolid::GetPointOnSurface(void) const
 {
-    if(rnd == 0) rnd = 1.; //TO DO new TRandom3(0);
-    G4double r = 1;//TO DO  rnd->Uniform();
+    //if(rnd == 0) rnd = new TRandom3(0);
+    if(rnd == 0) rnd = G4UniformRand();
+    //G4double r = rnd->Uniform();
+    G4double r = G4UniformRand();
     G4ThreeVector p(0., 0., 0.);
 
     G4double level1 = .980;
@@ -98,13 +101,16 @@ G4ThreeVector LArWheelSliceSolid::GetPointOnSurface(void) const
 
 void LArWheelSliceSolid::get_point_on_accordion_surface(G4ThreeVector &p) const
 {
-    p[0] = 0.;  p[1] = 0.; p[2] = 1 ; // TO DO rnd->Uniform(m_Zmin, m_Zmax);
+    p[0] = 0.;  p[1] = 0.; p[2] = G4RandFlat::shoot(m_Zmin, m_Zmax);
+    //p[2] = rnd->Uniform(m_Zmin, m_Zmax);
 
     G4double rmin, rmax;
     get_r(m_BoundingShape, p[2], rmin, rmax);
 
-    p[1] = 1; //rnd->Uniform(rmin, rmax);
+    //p[1] = rnd->Uniform(rmin, rmax);
+    p[1] = G4RandFlat::shoot(rmin, rmax);
     //p.setPhi(rnd->Uniform(0., CLHEP::twopi));
+    p.setPhi(G4RandFlat::shoot(0., CLHEP::twopi));
     G4double dphi = p.phi();
     int p_fan = 0;
     G4double d = GetCalculator()->DistanceToTheNearestFan(p, p_fan);
@@ -162,13 +168,16 @@ void LArWheelSliceSolid::get_point_on_accordion_surface(G4ThreeVector &p) const
 
 void LArWheelSliceSolid::get_point_on_polycone_surface(G4ThreeVector &p) const
 {
-    const G4double z = 1; //rnd->Uniform(m_Zmin, m_Zmax);
+    //const G4double z = rnd->Uniform(m_Zmin, m_Zmax);
+    const G4double z = G4RandFlat::shoot(m_Zmin, m_Zmax);
+    
     G4double rmin, rmax;
     get_r(m_BoundingShape, z, rmin, rmax);
     const bool inner = true; //rnd->Uniform() > 0.5? true: false;
 
     p[0] = 0.; p[1] = inner? rmin: rmax; p[2] = z;
     //p.setPhi(rnd->Uniform(0., CLHEP::twopi));
+    p.setPhi(G4RandFlat::shoot(0., CLHEP::twopi));
     G4double dphi = p.phi();
     int p_fan = 0;
     GetCalculator()->DistanceToTheNearestFan(p, p_fan);
@@ -287,22 +296,30 @@ void LArWheelSliceSolid::get_point_on_flat_surface(G4ThreeVector &p) const
 {
     p[0] = 0.;
     p[1] = 0.;
-    p[2] = 1; //rnd->Uniform() > 0.5? m_Zmin: m_Zmax;
+    //p[2] = rnd->Uniform() > 0.5? m_Zmin: m_Zmax;
+    p[2] = G4UniformRand() > 0.5? m_Zmin: m_Zmax;
 
     G4double rmin, rmax;
     get_r(m_BoundingShape, p[2], rmin, rmax);
 
-    p[1] = 1; //rnd->Uniform(rmin, rmax);
+    //p[1] = rnd->Uniform(rmin, rmax);
+    p[1] = G4RandFlat::shoot(rmin, rmax);
     //p.setPhi(rnd->Uniform(0., CLHEP::twopi));
+    p.setPhi(G4RandFlat::shoot(0., CLHEP::twopi));
     G4double dphi = p.phi();
     int p_fan = 0;
     GetCalculator()->DistanceToTheNearestFan(p, p_fan);
     dphi -= p.phi();
 
-    p[0] = 1; //rnd->Uniform(
-        //GetCalculator()->AmplitudeOfSurface(p, -1, p_fan),
-        //GetCalculator()->AmplitudeOfSurface(p, 1, p_fan)
-    //);
+//    p[0] = rnd->Uniform(
+//        GetCalculator()->AmplitudeOfSurface(p, -1, p_fan),
+//        GetCalculator()->AmplitudeOfSurface(p, 1, p_fan)
+//    );
+    
+    p[0] = G4RandFlat::shoot(
+                        GetCalculator()->AmplitudeOfSurface(p, -1, p_fan),
+                        GetCalculator()->AmplitudeOfSurface(p, 1, p_fan)
+                        );
 
     p.rotateZ(dphi);
 
@@ -318,14 +335,16 @@ G4double LArWheelSliceSolid::GetCubicVolume(void)
 //    double result =
 //        f_vol->Integral(m_Rmin, Rmax, (const Double_t *)0, IntPrecision)
 //#else
-    double result = 1;
-        //m_f_vol->Integral(m_Rmin, m_Rmax, IntPrecision)
+//    double result = m_f_vol->Integral(m_Rmin, m_Rmax, IntPrecision)
 //#endif
-
+//
 //#ifndef LOCAL_DEBUG
-       // * GetCalculator()->GetNumberOfFans()
+//        * GetCalculator()->GetNumberOfFans()
 //#endif
-    //;
+//    ;
+    double result = 1;
+    //TO DO : see how to replace m_f_vol->Integral
+    //m_f_vol->Integral(m_Rmin, Rmax, (const Double_t *)0, IntPrecision);
     return result;
 }
 

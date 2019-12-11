@@ -6,6 +6,7 @@
 
 #include "G4GDMLParser.hh"
 #include "G4String.hh"
+#include "G4Timer.hh"
 
 class G4VPhysicalVolume;
 class G4FieldManager;
@@ -27,13 +28,17 @@ public:
     fFieldValue = fieldValue;
     gFieldValue = fFieldValue;
   }
+  void SetBuildFromGDML(const G4bool b) {fBuildFromGDML=b;}
 
   static G4double GetFieldValue() { return gFieldValue; }
 
+protected:
+  G4Timer fTimer;
+    
 private:
   // this static member is for the print out
   static G4double gFieldValue;
-
+  G4bool   fBuildFromGDML;
   G4String fGDMLFileName;
   G4String fGeometryDatabaseFileName;
   G4double fFieldValue;

@@ -30,6 +30,8 @@
 #include <iomanip>
 
 static bool         parIsPerformance = false;
+static bool         parBuildGDML = false;
+static std::string  parGDMLFileName = "";
 static std::string  parMacroFileName = "";
 static std::string  parPhysListName  = "GV";
 
@@ -46,19 +48,20 @@ int main(int argc, char** argv) {
   G4cout<< " ========== Running fullSimLight ========================= " << G4endl
         << "   Physics list name   =  " << parPhysListName           << G4endl
         << "   Geant4 macro        =  " << parMacroFileName          << G4endl
+        << "   Build from GDML     =  " << parBuildGDML              << G4endl
         << "   Performance mode    =  " << parIsPerformance          << G4endl
         << " ===================================================== " << G4endl;
   //
   //choose the Random engine: set to MixMax explicitely (default form 10.4)
   G4Random::setTheEngine(new CLHEP::MixMaxRng);
   // set seed and print info
-    G4Random::setTheSeed(12345678);
-    G4cout << G4endl
-    << " ===================================================== " << G4endl
-    << " Random engine = " << G4Random::getTheEngine()->name()   << G4endl
-    << " Initial seed  = " << G4Random::getTheSeed()             << G4endl
-    << " ===================================================== " << G4endl
-    << G4endl;
+  G4Random::setTheSeed(12345678);
+  G4cout << G4endl
+  << " ===================================================== " << G4endl
+  << " Random engine = " << G4Random::getTheEngine()->name()   << G4endl
+  << " Initial seed  = " << G4Random::getTheSeed()             << G4endl
+  << " ===================================================== " << G4endl
+  << G4endl;
     //
     // Construct the default run manager
 #ifdef G4MULTITHREADED
@@ -74,6 +77,10 @@ int main(int argc, char** argv) {
   //
   // 1. Detector construction
   MyDetectorConstruction* detector = new MyDetectorConstruction;
+  if (parBuildGDML){
+     detector->SetGDMLFileName(parGDMLFileName);
+     detector->SetBuildFromGDML(true);
+  }
   runManager->SetUserInitialization(detector);
   //
   // 2. Physics list
@@ -116,6 +123,8 @@ static struct option options[] = {
   {"standard Geant4 macro file (REQUIRED)"                           , required_argument, 0, 'm'},
   {"physics list name (default GV)"                                  , required_argument, 0, 'f'},
   {"flag to run the application in performance mode (default FALSE)" , no_argument      , 0, 'p'},
+  {"flag to build the detector from GDML file(default FALSE)"        , no_argument      , 0, 'g'},
+  {"GDML file name" , required_argument, 0, 'd'},
   {0, 0, 0, 0}
 };
 
@@ -125,10 +134,12 @@ void Help() {
   std::cout <<"  FullSimLight Geant4 application.    \n"
             << std::endl
             <<"  **** Parameters: \n"
-            <<"      -m :   REQUIRED : the standard Geant4 macro file \n"
+            <<"      -m :   REQUIRED : the standard Geant4 macro file name \n"
             <<"      -f :   physics list name (default: GV) \n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
+            <<"      -g :   flag  ==> build the detector from a GDML file (default: false - build from SQLite geometry.db file - )\n"
+            <<"      -d :   the GDML file name \n"
             << std::endl;
   std::cout <<"\nUsage: fullSimLight [OPTIONS] INPUT_FILE\n\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -146,7 +157,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "pm:f:", options, &optidx);
+   c = getopt_long(argc, argv, "pm:f:gd:", options, &optidx);
    if (c == -1)
      break;
    //
@@ -163,6 +174,12 @@ void GetInputArguments(int argc, char** argv) {
    case 'f':
      parPhysListName  = optarg;
      break;
+   case 'g':
+     parBuildGDML     = true;
+     break;
+   case 'd':
+     parGDMLFileName  = optarg;
+     break;
    default:
      Help();
      errx(1, "unknown option %c", c);
@@ -174,4 +191,10 @@ void GetInputArguments(int argc, char** argv) {
     Help();
     exit(-1);
   }
+  // check if build from GDML file flag is set that a GDML file was provided
+  if (parBuildGDML && parGDMLFileName=="") {
+        G4cout << "  *** ERROR : GDML file is required. " << G4endl;
+        Help();
+        exit(-1);
+    }
 }

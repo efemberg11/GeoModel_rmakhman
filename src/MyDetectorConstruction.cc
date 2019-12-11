@@ -39,6 +39,7 @@ G4double MyDetectorConstruction::gFieldValue = 0.0;
 MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
   fGDMLFileName             = "atlas2018.gdml";
+  fBuildFromGDML            = false;
   fGeometryDatabaseFileName = "geometry.db";
   fFieldValue        = 0.0;
   fDetectorMessenger = new MyDetectorMessenger(this);
@@ -51,29 +52,34 @@ MyDetectorConstruction::~MyDetectorConstruction()
 
 G4VPhysicalVolume *MyDetectorConstruction::Construct()
 {
-    // open the DB
-    GMDBManager* db = new GMDBManager(fGeometryDatabaseFileName.data());
-    /* Open database */
-    if (db->isOpen()) {
-        qDebug() << "OK! Database is open!";
-    }
-    else {
-        qDebug() << "Database is not open!";
-        // return;
-        throw;
-    }
+    fTimer.Start();
+    G4cout << "MyDetectorConstruction::Construct() :: starting the timer"<<G4endl;
+    if(!fBuildFromGDML)
+    {
+        G4cout << "Building the detector from a SQLite file"<<G4endl;
+        // open the DB
+        GMDBManager* db = new GMDBManager(fGeometryDatabaseFileName.data());
+        /* Open database */
+        if (db->isOpen()) {
+            qDebug() << "OK! Database is open!";
+        }
+        else {
+            qDebug() << "Database is not open!";
+            // return;
+            throw;
+        }
 
-    // -- testing the input database
-    std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
-    db->printAllMaterials();
-    /* setup the GeoModel reader */
-    GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-    qDebug() << "ReadGeoModel set.";
+        // -- testing the input database
+        //std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
+        //db->printAllMaterials();
+        /* setup the GeoModel reader */
+        GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
+        qDebug() << "ReadGeoModel set.";
 
 
-    /* build the GeoModel geometry */
-    GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
-    qDebug() << "ReadGeoModel::buildGeoModel() done.";
+        /* build the GeoModel geometry */
+        GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
+        qDebug() << "ReadGeoModel::buildGeoModel() done.";
 
 
     // --- testing the imported ATLAS Geometry
@@ -115,37 +121,52 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
 //            //std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
 //        }
 //    }
-
-    // build the Geant4 geometry and get an hanlde to the world' volume
-    ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
-    std::cout << "Building G4 geometry."<<std::endl;
-    G4LogicalVolume* envelope = builder->Build(world);
-    G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
-    //fWorld = builder->Build(world);
-    fWorld = physWorld;
-    fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
-    if (fWorld == 0) {
-        G4ExceptionDescription ed;
-        ed << "World volume not set properly check your setup selection criteria or GDML input!" << G4endl;
-        G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
+        fTimer.Stop();
+        G4cout << "First step done. GeoModelTree built from the SQLite file "<<G4endl;
+        G4cout << "*** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
+        G4cout << "*** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
+        G4cout << "*** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
+        
+        fTimer.Start();
+        // build the Geant4 geometry and get an hanlde to the world' volume
+        ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
+        
+        std::cout << "Building G4 geometry."<<std::endl;
+        G4LogicalVolume* envelope = builder->Build(world);
+        G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
+        //fWorld = builder->Build(world);
+        fWorld = physWorld;
+        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+        if (fWorld == 0) {
+            G4ExceptionDescription ed;
+            ed << "World volume not set properly check your setup selection criteria or GDML input!" << G4endl;
+            G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
+        }
+        G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
+        G4cout << "Detector Construction from the SQLite file " << fGeometryDatabaseFileName.data() <<", done!"<<G4endl;
     }
+    else
+    {
+        G4cout << "Building the detector from a GDML file"<<G4endl;
+        //  parser.SetOverlapCheck(true);
+        fParser.Read(fGDMLFileName, false); // turn off schema checker
+        fWorld = (G4VPhysicalVolume *)fParser.GetWorldVolume();
+        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+        if (fWorld == 0) {
+            G4ExceptionDescription ed;
+            ed << "World volume not set properly! Check your setup selection criteria or the GDML input!" << G4endl;
+            G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0001", FatalException, ed);
+        }
+        G4cout << "Detector Construction from the GDML file " << fGDMLFileName <<", done!"<<G4endl;
+        // ConstructSDandField();
+    }
+    fTimer.Stop();
+    
+    G4cout << "**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
+    G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
+    G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
     return fWorld;
 }
-
-//G4VPhysicalVolume *MyDetectorConstruction::Construct()
-//{
-//  //  parser.SetOverlapCheck(true);
-//  fParser.Read(fGDMLFileName, false); // turn off schema checker
-//  fWorld = (G4VPhysicalVolume *)fParser.GetWorldVolume();
-//  fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
-//  if (fWorld == 0) {
-//    G4ExceptionDescription ed;
-//    ed << "World volume not set properly check your setup selection criteria or GDML input!" << G4endl;
-//    G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
-//  }
-//  // ConstructSDandField();
-//  return fWorld;
-//}
 
 void MyDetectorConstruction::ConstructSDandField()
 {

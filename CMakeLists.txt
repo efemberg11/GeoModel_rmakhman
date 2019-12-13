@@ -62,9 +62,7 @@ target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBMana
 # scripts being in the current working directory.
 #
 set(FULLSIMLIGHT_SCRIPTS
-  bench.g4
-  atlas2018.gdml
-  geometry.db
+  macro.g4
   README
   )
 

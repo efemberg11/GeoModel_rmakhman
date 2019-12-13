@@ -6,7 +6,10 @@
 #include "GeoSpecialShapes/sincos.h"
 //#include "CLHEP/Units/SystemOfUnits.h"
 
-/// TO DO : Dependencies from fROOT :D
+/// TO DO        : Dependencies from fROOT - gone
+/// TO BE TESTED : RowVectorXd equivalent of TVectorD
+///                MatrixXd    equivalent of TMatrixD
+
 //#include "TMath.h"
 //#include "TMatrixD.h"
 //#include "TVectorD.h"

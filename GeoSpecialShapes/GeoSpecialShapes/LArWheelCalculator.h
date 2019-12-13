@@ -13,12 +13,15 @@
 //#endif // XAOD_STANDALONE
 
 #include "GeoSpecialShapes/LArWheelCalculatorEnums.h"
+// Physical constants
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits
 
 #define LARWC_SINCOS_POLY 5
 #define LARWC_DTNF_NEW
 
 class IRDBRecordset;
-class RDBParamRecords;
+//class RDBParamRecords;
 
 //#define HARDDEBUG
 
@@ -125,7 +128,7 @@ class LArWheelCalculator
 
   private:
     LArG4::LArWheelCalculator_t m_type;
-
+    
     int m_AtlasZside;
     bool m_SaggingOn; // !
     bool m_phiRotation;
@@ -134,22 +137,31 @@ class LArWheelCalculator
     double m_sin_parametrization[7]; // up to pol6
     double m_cos_parametrization[7];
     std::vector<std::vector<double> > m_sagging_parameter; // !
-    double m_WheelThickness;
-    double m_HalfWheelThickness;
-    double m_ActiveLength;
-    double m_StraightStartSection;
-    double m_dWRPtoFrontFace;
-
-
-    double m_zWheelFrontFace, m_zWheelBackFace;
-    double m_HalfGapBetweenWheels;
-    double m_zWheelRefPoint;
-    double m_dMechFocaltoWRP;
-    double m_dElecFocaltoWRP;
-    double m_rOuterCutoff;
-    double m_eta_hi, m_eta_mid, m_eta_low;
-
-    double m_zShift;
+    //double m_WheelThickness;
+    // double m_HalfWheelThickness;
+    //double m_zWheelFrontFace, m_zWheelBackFace;
+    
+    // N.B. all const values copied from the DB@
+    // https://atlas-geometry-db.web.cern.ch/atlas-geometry-db/
+    const double m_ActiveLength         = 510   * SYSTEM_OF_UNITS::mm;   //mm
+    const double m_StraightStartSection = 2     * SYSTEM_OF_UNITS::mm;   //mm
+    const double m_dWRPtoFrontFace      = 11    * SYSTEM_OF_UNITS::mm;   //mm
+    const double m_HalfGapBetweenWheels = .15   * SYSTEM_OF_UNITS::cm;   //cm
+    const double m_zWheelRefPoint       = 368.95* SYSTEM_OF_UNITS::cm;   //cm
+    const double m_dMechFocaltoWRP      = 369.1 * SYSTEM_OF_UNITS::cm;   //cm
+    const double m_dElecFocaltoWRP      = 368.9 * SYSTEM_OF_UNITS::cm;   //cm
+    const double m_rOuterCutoff         = 203.4 * SYSTEM_OF_UNITS::cm;   //cm
+    const double m_eta_hi               = 3.2   * SYSTEM_OF_UNITS::cm;   //cm 3.2 ----> (1 is 2.5)
+    const double m_eta_mid              = 2.5   * SYSTEM_OF_UNITS::cm;   //cm 2.5 ----> (1 is 1.375)
+    const double m_eta_low              = 1.375   * SYSTEM_OF_UNITS::cm;   //cm 2.5 ----> (1 is 1.375)
+    const double m_zShift               = 4.5   * SYSTEM_OF_UNITS::cm;   //cm
+    
+    const double m_WheelThickness = m_ActiveLength + 2.*m_StraightStartSection;
+    const double m_HalfWheelThickness = m_WheelThickness * 0.5;
+    const double m_zWheelFrontFace = m_dMechFocaltoWRP + m_dWRPtoFrontFace;
+    const double m_zWheelBackFace = m_zWheelFrontFace + m_WheelThickness;
+    
+    /////
     double m_QuarterWaveLength;
     double m_HalfWaveLength;
     double m_FanFoldRadius;
@@ -173,8 +185,8 @@ class LArWheelCalculator
 
     // int m_fan_number; // break thread-safety -> removed DM 2015-07-30
 
-    void outer_wheel_init(const RDBParamRecords &);
-    void inner_wheel_init(const RDBParamRecords &);
+    void outer_wheel_init();
+    void inner_wheel_init();
     void module_init();
 
   public:

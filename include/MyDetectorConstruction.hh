@@ -22,7 +22,9 @@ public:
   G4VPhysicalVolume *Construct();
   void ConstructSDandField();
 
-  void SetGDMLFileName(const G4String &gdmlfile) { fGDMLFileName = gdmlfile; }
+  void SetGDMLFileName  (const G4String &gdmlfile)   { fGDMLFileName = gdmlfile; }
+  void SetSQLiteFileName(const G4String &sqlitefile) { fSQLiteFileName = sqlitefile; }
+
   void SetMagFieldValue(const G4double fieldValue)
   {
     fFieldValue = fieldValue;
@@ -40,7 +42,7 @@ private:
   static G4double gFieldValue;
   G4bool   fBuildFromGDML;
   G4String fGDMLFileName;
-  G4String fGeometryDatabaseFileName;
+  G4String fSQLiteFileName;
   G4double fFieldValue;
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;

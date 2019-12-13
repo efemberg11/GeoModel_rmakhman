@@ -31,7 +31,8 @@
 
 static bool         parIsPerformance = false;
 static bool         parBuildGDML = false;
-static std::string  parGDMLFileName = "";
+static std::string  parGDMLFileName = "ATLAS-R2-2016-01-00-01.gdml";
+static std::string  parSQLiteFileName = "ATLAS-R2-2016-01-00-01.db";
 static std::string  parMacroFileName = "";
 static std::string  parPhysListName  = "GV";
 
@@ -39,17 +40,18 @@ void GetInputArguments(int argc, char** argv);
 void Help();
 
 
-
-
 int main(int argc, char** argv) {
-  //
   // get input arguments
   GetInputArguments(argc, argv);
-  G4cout<< " ========== Running fullSimLight ========================= " << G4endl
+  G4cout<< " ========== Running FullSimLight ========================= " << G4endl
         << "   Physics list name   =  " << parPhysListName           << G4endl
         << "   Geant4 macro        =  " << parMacroFileName          << G4endl
-        << "   Build from GDML     =  " << parBuildGDML              << G4endl
-        << "   Performance mode    =  " << parIsPerformance          << G4endl
+        << "   Build from GDML     =  " << parBuildGDML              << G4endl;
+  if(parBuildGDML)
+      G4cout<< "   Geometry File       =  " << parGDMLFileName           << G4endl;
+  else
+      G4cout<< "   Geometry File       =  " << parSQLiteFileName         << G4endl;
+  G4cout<< "   Performance mode    =  " << parIsPerformance  << G4endl
         << " ===================================================== " << G4endl;
   //
   //choose the Random engine: set to MixMax explicitely (default form 10.4)
@@ -81,6 +83,8 @@ int main(int argc, char** argv) {
      detector->SetGDMLFileName(parGDMLFileName);
      detector->SetBuildFromGDML(true);
   }
+  else
+     detector->SetSQLiteFileName(parSQLiteFileName);
   runManager->SetUserInitialization(detector);
   //
   // 2. Physics list
@@ -124,7 +128,7 @@ static struct option options[] = {
   {"physics list name (default GV)"                                  , required_argument, 0, 'f'},
   {"flag to run the application in performance mode (default FALSE)" , no_argument      , 0, 'p'},
   {"flag to build the detector from GDML file(default FALSE)"        , no_argument      , 0, 'g'},
-  {"GDML file name" , required_argument, 0, 'd'},
+  {"GDML or SQLite file name" , required_argument, 0, 'd'},
   {0, 0, 0, 0}
 };
 
@@ -138,8 +142,8 @@ void Help() {
             <<"      -f :   physics list name (default: GV) \n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
-            <<"      -g :   flag  ==> build the detector from a GDML file (default: false - build from SQLite geometry.db file - )\n"
-            <<"      -d :   the GDML file name \n"
+            <<"      -g :   flag  ==> build the detector from a GDML file (default: false -> build from SQLite file)\n"
+            <<"      -d :   the GDML/SQLite file name (default: ATLAS-R2-2016-01-00-01)\n"
             << std::endl;
   std::cout <<"\nUsage: fullSimLight [OPTIONS] INPUT_FILE\n\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -178,7 +182,10 @@ void GetInputArguments(int argc, char** argv) {
      parBuildGDML     = true;
      break;
    case 'd':
-     parGDMLFileName  = optarg;
+     if(parBuildGDML)
+         parGDMLFileName  = optarg;
+     else
+         parSQLiteFileName  = optarg;
      break;
    default:
      Help();

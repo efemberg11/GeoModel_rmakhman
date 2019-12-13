@@ -38,9 +38,9 @@ G4double MyDetectorConstruction::gFieldValue = 0.0;
 
 MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
-  fGDMLFileName             = "atlas2018.gdml";
-  fBuildFromGDML            = false;
-  fGeometryDatabaseFileName = "geometry.db";
+  fGDMLFileName      = "ATLAS-R2-2016-01-00-01.gdml";
+  fBuildFromGDML     = false;
+  fSQLiteFileName    = "ATLAS-R2-2016-01-00-01.db";
   fFieldValue        = 0.0;
   fDetectorMessenger = new MyDetectorMessenger(this);
 }
@@ -58,7 +58,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     {
         G4cout << "Building the detector from a SQLite file"<<G4endl;
         // open the DB
-        GMDBManager* db = new GMDBManager(fGeometryDatabaseFileName.data());
+        GMDBManager* db = new GMDBManager(fSQLiteFileName.data());
         /* Open database */
         if (db->isOpen()) {
             qDebug() << "OK! Database is open!";
@@ -143,12 +143,12 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
             G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
         }
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
-        G4cout << "Detector Construction from the SQLite file " << fGeometryDatabaseFileName.data() <<", done!"<<G4endl;
+        G4cout << "Detector Construction from the SQLite file " << fSQLiteFileName.data() <<", done!"<<G4endl;
     }
     else
     {
         G4cout << "Building the detector from a GDML file"<<G4endl;
-        //  parser.SetOverlapCheck(true);
+        //fParser.SetOverlapCheck(true);
         fParser.Read(fGDMLFileName, false); // turn off schema checker
         fWorld = (G4VPhysicalVolume *)fParser.GetWorldVolume();
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);

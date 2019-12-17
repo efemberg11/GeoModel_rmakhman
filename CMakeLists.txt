@@ -63,7 +63,7 @@ target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBMana
 #
 set(FULLSIMLIGHT_SCRIPTS
   macro.g4
-  README
+  README.md
   )
 
 foreach(_script ${FULLSIMLIGHT_SCRIPTS})

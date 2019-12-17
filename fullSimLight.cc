@@ -34,7 +34,7 @@ static bool         parBuildGDML = false;
 static std::string  parGDMLFileName = "ATLAS-R2-2016-01-00-01.gdml";
 static std::string  parSQLiteFileName = "ATLAS-R2-2016-01-00-01.db";
 static std::string  parMacroFileName = "";
-static std::string  parPhysListName  = "GV";
+static std::string  parPhysListName  = "FTFP_BERT";
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 
 static struct option options[] = {
   {"standard Geant4 macro file (REQUIRED)"                           , required_argument, 0, 'm'},
-  {"physics list name (default GV)"                                  , required_argument, 0, 'f'},
+  {"physics list name (default FTFP_BERT)"                                  , required_argument, 0, 'f'},
   {"flag to run the application in performance mode (default FALSE)" , no_argument      , 0, 'p'},
   {"flag to build the detector from GDML file(default FALSE)"        , no_argument      , 0, 'g'},
   {"GDML or SQLite file name" , required_argument, 0, 'd'},
@@ -139,7 +139,7 @@ void Help() {
             << std::endl
             <<"  **** Parameters: \n"
             <<"      -m :   REQUIRED : the standard Geant4 macro file name \n"
-            <<"      -f :   physics list name (default: GV) \n"
+            <<"      -f :   physics list name (default: FTFP_BERT) \n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
             <<"      -g :   flag  ==> build the detector from a GDML file (default: false -> build from SQLite file)\n"

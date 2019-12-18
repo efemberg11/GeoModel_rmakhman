@@ -32,7 +32,7 @@ G4LogicalVolume* Geo2G4LVFactory::Build(const PVConstLink thePhys,
   static leafVMap sharedLeafLV;
   static branchVMap sharedBranchLV;
   static fullPVMap clonedLV;
-  if(G4VERBOSE>1) std::cout<<"    ----->Geo2G4LVFactory::Build"<<std::endl;
+  //std::cout<<"    ----->Geo2G4LVFactory::Build"<<std::endl;
   const GeoFullPhysVol* fullPV = dynamic_cast<const GeoFullPhysVol*>(&(*thePhys));
   const GeoFullPhysVol* clonePV=0;
 
@@ -49,7 +49,7 @@ G4LogicalVolume* Geo2G4LVFactory::Build(const PVConstLink thePhys,
   // Check if it is a leaf node of Geo tree
   if(thePhys->getNChildVols() == 0)
     {
-      if(G4VERBOSE>1) std::cout<<"    ----->NChildVols() == 0"<<std::endl;
+      //std::cout<<"    ----->NChildVols() == 0"<<std::endl;
       descend=false;
 
       if(sharedLeafLV.find(theLog) != sharedLeafLV.end())
@@ -60,7 +60,7 @@ G4LogicalVolume* Geo2G4LVFactory::Build(const PVConstLink thePhys,
   // Work with the Full Physical Volumes
   else if(fullPV)
     {
-      if(G4VERBOSE>1) std::cout<<"    ----->Full Physical Volume"<<std::endl;
+      //std::cout<<"    ----->Full Physical Volume"<<std::endl;
       clonePV = fullPV->cloneOrigin();
       if (clonedLV.find(clonePV)==clonedLV.end())
         {
@@ -74,7 +74,7 @@ G4LogicalVolume* Geo2G4LVFactory::Build(const PVConstLink thePhys,
     }
   else
     {
-      if(G4VERBOSE>1) std::cout<<"    ----->else"<<std::endl;
+      //std::cout<<"    ----->else"<<std::endl;
       if(sharedBranchLV.find(&(*thePhys)) == sharedBranchLV.end())
         putBranch = true;
       else
@@ -84,16 +84,16 @@ G4LogicalVolume* Geo2G4LVFactory::Build(const PVConstLink thePhys,
         }
     }
   // Actually build the G4Log
-  if (G4VERBOSE > 1) std::cout<<"    ----->Actually build the G4Mat: "<<theLog->getMaterial()->getName()<<std::endl;
+  //std::cout<<"    ----->Actually build the G4Mat: "<<theLog->getMaterial()->getName()<<std::endl;
   theG4Mat=theMaterialFactory.Build(theLog->getMaterial());
-  if (G4VERBOSE > 1) std::cout<<"    ----->Actually build the G4Solid"<<std::endl;
+  //std::cout<<"    ----->Actually build the G4Solid"<<std::endl;
   theG4Solid = theSolidFactory.Build(theLog->getShape(),theLog->getName());
-  if (G4VERBOSE > 1) std::cout<<"    ----->Actually build the G4Log: "<<theLog->getName()<<std::endl;
+  //std::cout<<"    ----->Actually build the G4Log: "<<theLog->getName()<<std::endl;
   theG4Log = new G4LogicalVolume(theG4Solid,
                                  theG4Mat,
                                  theLog->getName(),
                                  0,0,0);
-  if (G4VERBOSE > 1) std::cout<<"    ----->G4Log successfully built!!!"<<std::endl;
+  //std::cout<<"    ----->G4Log successfully built!!!"<<std::endl;
 
   if(putLeaf) sharedLeafLV[theLog] = theG4Log;
   if(putBranch) sharedBranchLV[&(*thePhys)] = theG4Log;

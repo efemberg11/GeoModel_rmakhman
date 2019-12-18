@@ -13,7 +13,6 @@
 #include "G4Material.hh"
 
 
-
 // Geo2G4MaterialFactory::Geo2G4MaterialFactory(): m_msg("Geo2G4MaterialFactory")
 Geo2G4MaterialFactory::Geo2G4MaterialFactory()
 {
@@ -92,15 +91,11 @@ G4Material* Geo2G4MaterialFactory::Build(const GeoMaterial* theMat)
 
   m_definedMaterials[theMat->getName()]=newmaterial;
     
-  if(G4VERBOSE>1) {
-     std::cout <<" ...... DEBUG of m_definedMaterials --- START ---" <<std::endl;
-     for (auto& t : m_definedMaterials)
-        std::cout <<"GeoModelMaterialName: "<< t.first << " ---  G4MaterialName: "
-        << t.second->GetName() << std::endl;
-    
-     std::cout <<" ...... DEBUG of m_definedMaterials --- END ---" <<std::endl;
-    }
-  
+//  std::cout <<" ...... DEBUG of m_definedMaterials --- START ---" <<std::endl;
+//  for (auto& t : m_definedMaterials)
+//     std::cout <<"GeoModelMaterialName: "<< t.first << " ---  G4MaterialName: "
+//        << t.second->GetName() << std::endl;
+//  std::cout <<" ...... DEBUG of m_definedMaterials --- END ---" <<std::endl;
 
   // Check if we have the situation when on GeoModel side two different
   // materials share the same name.

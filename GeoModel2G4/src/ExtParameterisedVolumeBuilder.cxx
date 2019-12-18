@@ -44,14 +44,13 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
   if(m_getMatEther) getMatEther();
 
   static Geo2G4LVFactory LVFactory;
-  if(G4VERBOSE>1) std::cout<<"    ----->ExtParameterisedVolumeBuilder::Build()"<<std::endl;
+  //std::cout<<"    ----->ExtParameterisedVolumeBuilder::Build()"<<std::endl;
   G4LogicalVolume* theG4LogVolume = LVFactory.Build(theGeoPhysVolume,descend);
-  if(G4VERBOSE>1) std::cout<<"    ----->LVFactory built"<<std::endl;
+  //std::cout<<"    ----->LVFactory built"<<std::endl;
   if(!descend) return theG4LogVolume;
 
   numChildNodes = theGeoPhysVolume->getNChildVolAndST();
-    
-  if(G4VERBOSE>1) std::cout<<"    ----->numChildNodes"<<numChildNodes<<std::endl;
+  //std::cout<<"    ----->numChildNodes"<<numChildNodes<<std::endl;
 
   // *****************************************************************
   // **
@@ -73,7 +72,7 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
             break;
           }
       }
-  if(G4VERBOSE>1) std::cout<<"    -----> Next steps:"<<std::endl;
+  //if(G4VERBOSE>1) std::cout<<"    -----> Next steps:"<<std::endl;
   // ***************************************************************************
   // **                Next steps:
   // **

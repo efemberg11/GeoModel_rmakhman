@@ -3,7 +3,7 @@
 // fullSimLight application: 17 September 2019 (README)
 //--------------------------------------------------------
 
-
+#include "G4Types.hh"
 #ifdef G4MULTITHREADED
   #include "G4MTRunManager.hh"
 #else

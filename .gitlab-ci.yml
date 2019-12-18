@@ -12,7 +12,7 @@ before_script:
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
-  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install
+  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
 geomodelcore-build:
@@ -20,10 +20,9 @@ geomodelcore-build:
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
-    - cd GeoModelCore
-    - mkdir build
-    - cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../
+    - mkdir build_GeoModelCore
+    - cd  build_GeoModelCore
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
     - make -j$(nproc)
     - make install
   artifacts:
@@ -35,10 +34,9 @@ geomodelio-build:
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-    - cd GeoModelIO
-    - mkdir build
-    - cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install  ../
+    - mkdir build_GeoModelIO
+    - cd build_GeoModelIO
+    - cmake -DCMAKE_INSTALL_PREFIX=../install  ../GeoModelIO
     - make -j$(nproc)
     - make install
   artifacts:
@@ -52,9 +50,9 @@ CLHEP-build:
     - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
     - cd CLHEP
     - git checkout CLHEP_2_4_1_0
-    - mkdir build
-    - cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../
+    - cd ../ ; mkdir build_CLHEP
+    - cd build_CLHEP
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../CLHEP
     - make -j$(nproc)
     - make install
   artifacts:
@@ -67,10 +65,9 @@ geant4-build:
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/geant4/geant4.git
-    - cd geant4
-    - mkdir build
-    - cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../ -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../../install/xerces-c
+    - mkdir build_geant4
+    - cd build_geant4
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../geant4 -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../../install/xerces-c
     - make -j$(nproc)
     - make install
   artifacts:

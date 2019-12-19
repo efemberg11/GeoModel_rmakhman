@@ -5,9 +5,7 @@ stages:
   - dependencies-geant4
   - build
 
-  - build
-
-nstall cmake glibc-devel whichbefore_script:
+before_script:
   - yum -y install cmake glibc-devel which
   - yum install motif, motif-devel
   - set +e && source CI/setup_lcg.sh; set -e

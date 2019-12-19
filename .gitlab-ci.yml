@@ -80,8 +80,9 @@ geant4-build:
   script:
     - echo "PWD; LS"
     - pwd; ls
-    - mkdir build
-    - cd build
+    - cd ../
+    - mkdir build_GeoModelG4
+    - cd build_GeoModelG4
     - echo "${CMAKE_ARGS}"
     - cmake ${CMAKE_ARGS}  ..
     - cmake --build . -- -j$(nproc)

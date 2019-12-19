@@ -7,8 +7,9 @@ stages:
 
   - build
 
-before_script:
+nstall cmake glibc-devel whichbefore_script:
   - yum -y install cmake glibc-devel which
+  - yum install motif, motif-devel
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:

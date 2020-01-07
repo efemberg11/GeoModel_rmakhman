@@ -34,17 +34,17 @@ namespace GeoGenfun {
     virtual ~FunctionDirectProduct();
 
     // Retreive function value
-    virtual double operator ()(double argument) const;    // Gives an error.
-    virtual double operator ()(const Argument & a) const; // Must use this one
+    virtual double operator ()(double argument) const override;    // Gives an error.
+    virtual double operator ()(const Argument & a) const override; // Must use this one
 
     // Dimensionality
-    virtual unsigned int dimensionality() const;
+    virtual unsigned int dimensionality() const override;
 
     // Derivative.  
-    Derivative partial (unsigned int) const;
+    virtual Derivative partial (unsigned int) const override;
 
     // Does this function have an analytic derivative?
-    virtual bool hasAnalyticDerivative() const {return true;}
+    virtual bool hasAnalyticDerivative() const override {return true;}
 
   private:
 

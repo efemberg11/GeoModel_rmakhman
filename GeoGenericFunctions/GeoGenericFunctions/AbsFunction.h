@@ -126,7 +126,7 @@ typedef const AbsFunction & GENFUNCTION;
 #define FUNCTION_OBJECT_DEF(classname) \
 public:                                \
  using AbsFunction::operator();		       \
-  virtual classname *clone() const;            \
+  virtual classname *clone() const override;   \
 private:                               
 
 //----------------------------------------------------------------------------

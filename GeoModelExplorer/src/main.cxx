@@ -29,10 +29,6 @@ int main(int argc, char** argv)
 
   QCommandLineParser parser;
 
-  // An database directory option
-  QCommandLineOption databaseDirectoryOption(QStringList() << "d" << "database", "Use geometry database <file>.","default");
-  parser.addOption(databaseDirectoryOption);
-
   // Print help
   QCommandLineOption helpOption(QStringList() << "h" << "help", "Show help.");
   parser.addOption(helpOption);
@@ -41,21 +37,31 @@ int main(int argc, char** argv)
   parser.process(arguments);
 
   bool helpIsSet = parser.isSet(helpOption);
-  bool dbIsSet = parser.isSet(databaseDirectoryOption);
-  QString dbDir = parser.value(databaseDirectoryOption);
-  if (dbDir!="") setenv("GX_GEOMETRY_FILE",dbDir.toStdString().c_str(), true);
+
+  QStringList inputList=parser.positionalArguments();
   
+  int NGeomFiles=0;
+  for (int i=0;i<inputList.size()-1;i++) {
+    std::string input=inputList[i].toStdString();
+    if (input.find(".db")!=std::string::npos) {
+      setenv((std::string("GX_GEOMETRY_FILE")+std::to_string(NGeomFiles++)).c_str(),inputList[i].toStdString().c_str(), true);
+    }
+    else {
+      qWarning() << "Warning, file " << input.c_str() << " type not recognized";
+      return 0;
+    }
+  }
+  
+  
+
+
   //If help option is set, display help and exit VP1Light
   if(helpIsSet){
     qInfo() << "Usage";
     qInfo() << " ";
-    qInfo() << "  vp1light [options]";
-    qInfo() << " ";
-    qInfo() << "Add path to geometry database file as options. Alternatively it can be set inside VP1Light.";
-    qInfo() << " ";
+    qInfo() << "  vp1light [options] [dbfile1] [dbfile2]... [sharedlib1] [sharedlib2] [sharedlib3]...";
     qInfo() << "Options:";
     qInfo() << "  -h, --help                   = Show help.";
-    qInfo() << "  -d, --database <path-to-DB>  = Specify geometry database file.";
     return 0;
   }
 

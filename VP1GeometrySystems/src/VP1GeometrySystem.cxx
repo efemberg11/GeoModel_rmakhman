@@ -79,8 +79,7 @@
 #include <QPushButton>
 #include <map>
 #include <unistd.h>
-
-// for the dummy test geometry
+#include <stdexcept>
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 #include "GeoModelKernel/GeoShapeUnion.h"
@@ -108,6 +107,8 @@ public:
   SoTexture2* getDummyTexture();
   SoMaterial* getDummyMaterial();
 
+  QString selectGeometryFile();
+  
   class SubSystemInfo {
   public:
     // "geomodellocation" contains name of tree tops, 
@@ -418,68 +419,81 @@ GeoPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoPhysVol* world)
 }
 
 
+QString VP1GeometrySystem::Imp::selectGeometryFile() {
+  QString path;
+  char buffer[1024];
+  char *wd=getcwd(buffer,1024);
+  path = QFileDialog::getOpenFileName(nullptr, tr("Open Geometry File"),
+				      wd,
+				      tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
+  return path;
+}
 
 //_____________________________________________________________________________________
 GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 {
-
-  char *pEnv=getenv("GX_GEOMETRY_FILE");
   QString path;
+  
+  char *pEnv=getenv("GX_GEOMETRY_FILE0");
   if (pEnv) {
     path=pEnv;
-    unsetenv("GX_GEOMETRY_FILE");
+    unsetenv("GX_GEOMETRY_FILE0");
   }
   else {
-
-#ifdef __APPLE__
-    char buffer[1024];
-    char *wd=getcwd(buffer,1024);
-    path = QFileDialog::getOpenFileName(nullptr, tr("Open Geometry File"),
-					wd,
-					tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
-#else
-    path = QFileDialog::getOpenFileName(nullptr, tr("Open Geometry File"),
-					get_current_dir_name(),
-					tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
-#endif
+    path=selectGeometryFile();
   }
   if (path=="") return nullptr;
-  
-  // check if DB file exists. If not, return
-  if (! QFileInfo(path).exists() ) {
-    QMessageBox::warning(0, "Error!","Warning, geometry database file does not exist. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
-    exit(0);
-  }
-  // open the DB
-  GMDBManager* db = new GMDBManager(path);
-  /* Open database */
-  if (db->isOpen()) {
-    if(VP1Msg::debug()){
-      qDebug() << "OK! Database is open!";
-    }
-  }
-  else {
-    if(VP1Msg::debug()){
-      qDebug() << "Database is not open!";
-    }
-    // return;
-    throw;
-  }
 
-  /* set the GeoModel reader */
-  GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-  if(VP1Msg::debug()){
-    qDebug() << "ReadGeoModel set.";
-  }
+  GeoPhysVol *world=getenv("GX_GEOMETRY_FILE1") ? createTheWorld(nullptr) : nullptr;
 
-  /* build the GeoModel geometry */
+  int g=0;
+
+  while (path!="") {
+    // check if DB file exists. If not, return
+    if (! QFileInfo(path).exists() ) {
+      QMessageBox::warning(0, "Error!","Warning, geometry database file does not exist. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
+      exit(0);
+    }
+    // open the DB
+    GMDBManager* db = new GMDBManager(path);
+    if (!db->isOpen()) throw std::runtime_error ("Error, database is not open ");
+    
+    /* set the GeoModel reader */
+    GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
+    
+    /* build the GeoModel geometry */
     GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
-    // GeoPhysVol* worldPhys = readInGeo.getGeoModelHandle(); // get only the root volume and its first-level children
-      if(VP1Msg::debug()){
-        qDebug() << "GReadIn::buildGeoModel() done.";
+    
+    
+    if (world) {
+      
+      //world->add(dbPhys);
+      GeoVolumeCursor aV(dbPhys);
+
+      while (!aV.atEnd()) {
+	GeoNameTag *nameTag=new GeoNameTag(aV.getName());
+	GeoTransform *transform= new GeoTransform(aV.getTransform());
+	world->add(nameTag);
+	world->add(transform);
+	world->add((GeoVPhysVol *) &*aV.getVolume());
+	aV.next();
       }
-  // create the world volume container and its manager
-  GeoPhysVol* world = createTheWorld(dbPhys);
+      
+    }
+    else {
+      world = createTheWorld(dbPhys);
+    }
+    g++;
+    char *pEnv=getenv((std::string("GX_GEOMETRY_FILE")+std::to_string(g)).c_str());
+    if (pEnv) {
+      path=pEnv;
+      unsetenv((std::string("GX_GEOMETRY_FILE")+std::to_string(g)).c_str());
+    }
+    else {
+      path="";
+    }
+  }
+  
   return world;
 
 }

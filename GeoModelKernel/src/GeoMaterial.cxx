@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoMaterial.h"
@@ -309,7 +309,7 @@ void GeoMaterial::lock ()
     double wSum=std::accumulate(m_fraction.begin(),m_fraction.end(),0.0);
     if (fabs(wSum-1.0)>FLT_EPSILON) // 'FLT_EPSILON' defined in <cfloat>
     {
-    	if(const char* env_p = std::getenv("GEOMODELKERNEL_VERBOSE")) {
+    	if(std::getenv("GEOMODELKERNEL_VERBOSE")) {
     		std::cerr << "Warning in material "
     				<< m_name
 					<< ". Mass fractions sum to "

@@ -451,7 +451,6 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
   GeoPhysVol *world=getenv("GX_GEOMETRY_FILE1") ? createTheWorld(nullptr) : nullptr;
 
   int g=0;
-  GeoPhysVol *phys=nullptr;
   while (path!="") {
     // check if DB file exists. If not, return
     if (! QFileInfo(path).exists() ) {
@@ -468,10 +467,30 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       
       /* build the GeoModel geometry */
       GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
-      phys=dbPhys;
+
+      if (world) {
+	
+	//world->add(dbPhys);
+	GeoVolumeCursor aV(dbPhys);
+	
+	while (!aV.atEnd()) {
+	  GeoNameTag *nameTag=new GeoNameTag(aV.getName());
+	  GeoTransform *transform= new GeoTransform(aV.getTransform());
+	  world->add(nameTag);
+	  world->add(transform);
+	  world->add((GeoVPhysVol *) &*aV.getVolume());
+	  aV.next();
+	}
+	
+      }
+      else {
+	world = createTheWorld(dbPhys);
+      }
+
     }
     else if (path.contains(".dylib") || path.contains(".so")) {
 
+      std::cout << "path=" << path.toStdString() << std::endl;
       std::string pString=path.toStdString();
       std::string bNameString=basename ((char *) pString.c_str());       // Strip off the directory
       bNameString=bNameString.substr(3);                        // Strip off leading "lib"
@@ -504,24 +523,6 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       factory->create(world);
     }
     
-    if (world) {
-      
-      //world->add(dbPhys);
-      GeoVolumeCursor aV(phys);
-
-      while (!aV.atEnd()) {
-	GeoNameTag *nameTag=new GeoNameTag(aV.getName());
-	GeoTransform *transform= new GeoTransform(aV.getTransform());
-	world->add(nameTag);
-	world->add(transform);
-	world->add((GeoVPhysVol *) &*aV.getVolume());
-	aV.next();
-      }
-      
-    }
-    else {
-      world = createTheWorld(phys);
-    }
     g++;
     char *pEnv=getenv((std::string("GX_GEOMETRY_FILE")+std::to_string(g)).c_str());
     if (pEnv) {

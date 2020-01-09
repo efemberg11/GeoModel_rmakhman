@@ -87,6 +87,7 @@
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include <dlfcn.h>
+#include <libgen.h>
 
 class VP1GeometrySystem::Imp {
 public:
@@ -472,7 +473,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
     else if (path.contains(".dylib") || path.contains(".so")) {
 
       std::string pString=path.toStdString();
-      std::string bNameString=basename (pString.c_str());       // Strip off the directory
+      std::string bNameString=basename ((char *) pString.c_str());       // Strip off the directory
       bNameString=bNameString.substr(3);                        // Strip off leading "lib"
       bNameString=bNameString.substr(0,bNameString.find("."));  // Strip off extensions
 

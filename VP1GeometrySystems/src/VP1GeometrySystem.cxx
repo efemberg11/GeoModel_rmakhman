@@ -57,6 +57,7 @@
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelKernel/GeoNameTag.h"
+#include "GeoModelKernel/GeoVDetectorFactory.h"
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -85,6 +86,8 @@
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoNameTag.h"
+#include <dlfcn.h>
+
 class VP1GeometrySystem::Imp {
 public:
   Imp (VP1GeometrySystem*gs)
@@ -425,7 +428,7 @@ QString VP1GeometrySystem::Imp::selectGeometryFile() {
   char *wd=getcwd(buffer,1024);
   path = QFileDialog::getOpenFileName(nullptr, tr("Open Geometry File"),
 				      wd,
-				      tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
+				      tr("Geometry files (*.db *.so* *.dylib)"),0,QFileDialog::DontUseNativeDialog);
   return path;
 }
 
@@ -447,28 +450,63 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
   GeoPhysVol *world=getenv("GX_GEOMETRY_FILE1") ? createTheWorld(nullptr) : nullptr;
 
   int g=0;
-
+  GeoPhysVol *phys=nullptr;
   while (path!="") {
     // check if DB file exists. If not, return
     if (! QFileInfo(path).exists() ) {
-      QMessageBox::warning(0, "Error!","Warning, geometry database file does not exist. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
+      QMessageBox::warning(0, "Error!","Warning, geometry input does not exist. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
       exit(0);
     }
-    // open the DB
-    GMDBManager* db = new GMDBManager(path);
-    if (!db->isOpen()) throw std::runtime_error ("Error, database is not open ");
+    if (path.contains(".db")) {
+      // open the DB
+      GMDBManager* db = new GMDBManager(path);
+      if (!db->isOpen()) throw std::runtime_error ("Error, database is not open ");
+      
+      /* set the GeoModel reader */
+      GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
+      
+      /* build the GeoModel geometry */
+      GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+      phys=dbPhys;
+    }
+    else if (path.contains(".dylib") || path.contains(".so")) {
+
+      std::string pString=path.toStdString();
+      std::string bNameString=basename (pString.c_str());       // Strip off the directory
+      bNameString=bNameString.substr(3);                        // Strip off leading "lib"
+      bNameString=bNameString.substr(0,bNameString.find("."));  // Strip off extensions
+
+      std::string createFunctionName = std::string("create")+bNameString;
+
+      //
+      // Loads the library:
+      //
+      void *handle = dlopen(pString.c_str(),RTLD_NOW);
+      if (!handle) std::cout << dlerror() << std::endl;
+      
+
+      //
+      // Gets the function
+      //
+      void *f = dlsym(handle,createFunctionName.c_str());
+      if (!f) std::cerr << dlerror() << std::endl;
+      
+      typedef void * (*CreationMethod) ();
+      CreationMethod F = (CreationMethod) f;
     
-    /* set the GeoModel reader */
-    GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-    
-    /* build the GeoModel geometry */
-    GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
-    
+      //
+      // 
+      //
+      GeoVDetectorFactory * factory = (GeoVDetectorFactory *) F();
+      
+      if (!world) world=createTheWorld(nullptr);
+      factory->create(world);
+    }
     
     if (world) {
       
       //world->add(dbPhys);
-      GeoVolumeCursor aV(dbPhys);
+      GeoVolumeCursor aV(phys);
 
       while (!aV.atEnd()) {
 	GeoNameTag *nameTag=new GeoNameTag(aV.getName());
@@ -481,7 +519,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       
     }
     else {
-      world = createTheWorld(dbPhys);
+      world = createTheWorld(phys);
     }
     g++;
     char *pEnv=getenv((std::string("GX_GEOMETRY_FILE")+std::to_string(g)).c_str());

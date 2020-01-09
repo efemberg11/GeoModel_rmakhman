@@ -43,7 +43,10 @@ int main(int argc, char** argv)
   int NGeomFiles=0;
   for (int i=0;i<inputList.size()-1;i++) {
     std::string input=inputList[i].toStdString();
-    if (input.find(".db")!=std::string::npos) {
+    if (input.find(".db")!=std::string::npos ||
+	input.find(".so")!=std::string::npos ||
+	input.find(".dylib")!=std::string::npos)
+      {
       setenv((std::string("GX_GEOMETRY_FILE")+std::to_string(NGeomFiles++)).c_str(),inputList[i].toStdString().c_str(), true);
     }
     else {

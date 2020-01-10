@@ -6,9 +6,12 @@ This package is still under ferocious development; we are not releasing pre-buil
 
 # Quick installation instructions (Mac)
 
+```bash
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
-
-brew install geomodelvisualization 
+brew install geomodelexplorer
+export GXPLUGINPATH=/usr/local/lib/gxplugins # this is a temporary fix
+gmex [-d inputFile]
+```
 
 # Quick installation instructions (Ubuntu Bionic, Disco, or Eoan)
 

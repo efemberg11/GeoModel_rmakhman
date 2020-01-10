@@ -41,14 +41,16 @@ Database files can be downloaded from:
 
 **These instructions will install to /usr/local**
 
-First, install the dependencies:
+First, set the package manager to install the GeoModel software:
 
 ```bash
 sudo add-apt-repository ppa:kaktusjoe/geomodel
 sudo apt-get update
-sudo apt install geomodel-io-dev libsoqt-dev **[on disco and eoan]**
-sudo apt install libsoqt5-dev, geomodel-io-dev, qt5-default, qtbase5-dev, libqt5opengl5-dev **[on bionic]**
 ```
+
+Then, install all the dependencies. You run one of the two lines listed below, according to the Ubuntu version you are running: 
+- `sudo apt install geomodel-io-dev libsoqt-dev` **on disco and eoan**
+- `sudo apt install libsoqt5-dev, geomodel-io-dev, qt5-default, qtbase5-dev, libqt5opengl5-dev` **on bionic**
 
 Then, checkout the source code (git clone or download) of this package and compile it:
 

@@ -1,5 +1,3 @@
-#before_script:
-#  - setupQt5Homebrew # please NOTE: this is specific to my private machine, Qt5 should be configured in another way for a general macOS runner
 
 stages:
   - dependencies-coin

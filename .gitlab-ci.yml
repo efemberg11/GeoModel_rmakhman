@@ -1,4 +1,3 @@
-
 stages:
   - dependencies-coin
   - dependencies-soqt
@@ -61,6 +60,7 @@ soqt-build:
   stage: dependencies-soqt
   script:
     - pwd; ls
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
     # - unzip soqt-1b4fe9d-macos-mojave-fix.zip
     # - wget https://bitbucket.org/rmbianchi/soqt/get/CI-fix-25692a8.zip

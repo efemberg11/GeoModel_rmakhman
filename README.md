@@ -10,7 +10,7 @@ This package is still under ferocious development; we are not releasing pre-buil
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
 brew install geomodelexplorer
 export GXPLUGINPATH=/usr/local/lib/gxplugins # this is a temporary fix
-gmex [-d inputFile]
+gmex # or, `gmex -d inputFile.db`
 ```
 
 ## Quick installation instructions (Ubuntu Bionic, Disco, or Eoan)

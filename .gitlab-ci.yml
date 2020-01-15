@@ -32,15 +32,15 @@ variables:
 #   ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
 
 
+# TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
 .macos-template-job: &macos-job
   tags:
     - macos
   before_script:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
 
-
-coin-build:
-  <<: *macos-job
+# TEMPLATES FOR PACKAGES
+.coin-build-template-job: &coin-job
   stage: dependencies-coin
   script:
     - pwd; ls
@@ -56,13 +56,10 @@ coin-build:
     paths:
       - install
 
-
-soqt-build:
-  <<: *macos-job
+soqt-build-template-job: &soqt-job
   stage: dependencies-soqt
   script:
     - pwd; ls
-    #- export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
     # - unzip soqt-1b4fe9d-macos-mojave-fix.zip
     # - wget https://bitbucket.org/rmbianchi/soqt/get/CI-fix-25692a8.zip
@@ -79,7 +76,18 @@ soqt-build:
       - install
 
 
-geomodelcore-build:
+# ACTUAL JOBS
+coin-build-mac:
+  <<: *macos-job
+  <<: *coin-job
+
+
+soqt-build-mac:
+  <<: *macos-job
+  <<: *soqt-job
+  
+
+geomodelcore-build-mac:
   <<: *macos-job
   stage: dependencies-core
   script:
@@ -95,7 +103,7 @@ geomodelcore-build:
       - install
 
 
-geomodelio-build:
+geomodelio-build-mac:
   <<: *macos-job
   stage: dependencies-io
   script:
@@ -112,8 +120,7 @@ geomodelio-build:
 
 
 
-.build_template: &build_template
-  <<: *macos-job
+.geomodelvisualization_build_template: &build_template
   stage: build
   script:
     - echo "PWD; LS"
@@ -125,11 +132,14 @@ geomodelio-build:
     - cmake --build . -- -j2
     - cmake --build . -- install
 
-build_new:
+geomodelvisualization-build-mac:
+  <<: *macos-job
   <<: *build_template
-#   image: cern/slc6-base
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+
+
+
 
 # build_slc6:
 #   <<: *build_template

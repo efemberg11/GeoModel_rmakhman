@@ -56,7 +56,7 @@ variables:
     paths:
       - install
 
-soqt-build-template-job: &soqt-job
+.soqt-build-template-job: &soqt-job
   stage: dependencies-soqt
   script:
     - pwd; ls

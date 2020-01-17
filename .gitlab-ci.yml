@@ -155,6 +155,21 @@ coin-build-ubuntu:
   <<: *ubuntu-job
   <<: *coin-job
 
+soqt-build-ubuntu:
+  <<: *ubuntu-job
+  <<: *soqt-job
+
+geomodelcore-build-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelcore-job
+
+geomodelio-build-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelio-job
+
+geomodelvisualization-build-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelvisualization-job
 
 
 # build_slc6:

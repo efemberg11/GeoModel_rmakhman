@@ -89,52 +89,52 @@ variables:
     paths:
       - install
 
-# .geomodelcore-build-template-job: &geomodelcore-job
-#   stage: deps-core
-#   script:
-#     - pwd; ls
-#     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
-#     - mkdir geomodelcore-build
-#     - cd geomodelcore-build
-#     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
-#     - make -j2
-#     - make install
-#   artifacts:
-#     paths:
-#       - install
-#
-# .geomodelio-build-template-job: &geomodelio-job
-#   stage: deps-io
-#   script:
-#     - pwd; ls
-#     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-#     - mkdir geomodelio-build
-#     - cd geomodelio-build
-#     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
-#     - make -j2
-#     - make install
-#   artifacts:
-#     paths:
-#       - install
-#
-# .geomodelvisualization-build-template: &geomodelvisualization-job
-#   # stage: build
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#   script:
-#     - echo "PWD; LS"
-#     - pwd; ls
-#     - mkdir build
-#     - cd build
-#     - echo "${CMAKE_ARGS}"
-#     - cmake ${CMAKE_ARGS}  ..
-#     - cmake --build . -- -j2
-#     - cmake --build . -- install
+.geomodelcore-build-template-job: &geomodelcore-job
+  stage: deps-core
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - mkdir geomodelcore-build
+    - cd geomodelcore-build
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodelio-build-template-job: &geomodelio-job
+  stage: deps-io
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - mkdir geomodelio-build
+    - cd geomodelio-build
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodelvisualization-build-template: &geomodelvisualization-job
+  # stage: build
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - echo "PWD; LS"
+    - pwd; ls
+    - mkdir build
+    - cd build
+    - echo "${CMAKE_ARGS}"
+    - cmake ${CMAKE_ARGS}  ..
+    - cmake --build . -- -j2
+    - cmake --build . -- install
 
 
 # ACTUAL JOBS
 
-### MACOS JOBS
+### MACOS PATH
 coin-build-mac:
   <<: *macos-job
   <<: *coin-job
@@ -144,26 +144,22 @@ soqt-build-mac:
   <<: *soqt-job
   needs: ["coin-build-mac"]
 
-# geomodelcore-build-mac:
-#   <<: *macos-job
-#   <<: *geomodelcore-job
-#
-# geomodelio-build-mac:
-#   <<: *macos-job
-#   <<: *geomodelio-job
-#   dependencies:
-#     - geomodelcore-build-mac
-#
-# geomodelvisualization-build-mac:
-#   <<: *macos-job
-#   <<: *geomodelvisualization-job
-#   dependencies:
-#     - coin-build-mac
-#     - soqt-build-mac
-#     - geomodelcore-build-mac
-#     - geomodelio-build-mac
+geomodelcore-build-mac:
+  <<: *macos-job
+  <<: *geomodelcore-job
 
-### UBUNTU JOBS
+geomodelio-build-mac:
+  <<: *macos-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-build-mac"]
+
+geomodelvisualization-build-mac:
+  <<: *macos-job
+  <<: *geomodelvisualization-job
+  needs: ["coin-build-mac", "soqt-build-mac", "geomodelcore-build-mac", "geomodelio-build-mac"]
+
+
+### UBUNTU PATH
 coin-build-ubuntu:
   <<: *ubuntu-job
   <<: *coin-job
@@ -172,27 +168,20 @@ soqt-build-ubuntu:
   <<: *ubuntu-job
   <<: *soqt-job
   needs: ["coin-build-ubuntu"]
-  # dependencies:
-    # - coin-build-ubuntu
 
-# geomodelcore-build-ubuntu:
-#   <<: *ubuntu-job
-#   <<: *geomodelcore-job
-#
-# geomodelio-build-ubuntu:
-#   <<: *ubuntu-job
-#   <<: *geomodelio-job
-#   dependencies:
-#     - geomodelcore-build-ubuntu
-#
-# geomodelvisualization-build-ubuntu:
-#   <<: *ubuntu-job
-#   <<: *geomodelvisualization-job
-#   dependencies:
-#     - coin-build-ubuntu
-#     - soqt-build-ubuntu
-#     - geomodelcore-build-ubuntu
-#     - geomodelio-build-ubuntu
+geomodelcore-build-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelcore-job
+
+geomodelio-build-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-build-ubuntu"]
+
+geomodelvisualization-build-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelvisualization-job
+  needs: ["coin-build-ubuntu", "soqt-build-ubuntu", "geomodelcore-build-ubuntu", "geomodelio-build-ubuntu"]
 
 
 # build_slc6:

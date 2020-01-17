@@ -1,38 +1,14 @@
 stages:
   - deps-coin
   - deps-soqt
-  # - deps-core
-  # - deps-io
-  # - build
-# stages:
-#   - dependencies
-#   - build
+  - deps-core
+  - deps-io
+  - build
 
-# Build (Ubuntu 16.04 / CMake / clang):
-#     stage: build
-#     image: ubuntu:16.04
-#     script:
-#         - apt-get update -qq && apt-get install -y -qq git cmake clang
-#         - mkdir build
-#         - cd build
-#         - cmake .. -DBUILD_DEMO=OFF -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
-#         - make
-
-
-# before_script:
-#   - yum -y install cmake glibc-devel freeglut-devel which
-#   - alias cmake='/cvmfs/sft.cern.ch/lcg/contrib/CMake/3.11.1/Linux-x86_64/bin/cmake'
-# #   - ps -p $$
-# #   - source $ATLAS_LOCAL_ROOT_BASE/user/atlasLocalSetup.sh
-# #   - asetup none,gcc8,cmakesetup
-# #   - export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
-# #   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
-  # CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
-#   ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
 
 
 # TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
@@ -135,63 +111,50 @@ variables:
 # ACTUAL JOBS
 
 ### MACOS PATH
-coin-build-mac:
+coin-mac:
   <<: *macos-job
   <<: *coin-job
 
-soqt-build-mac:
+soqt-mac:
   <<: *macos-job
   <<: *soqt-job
   needs: ["coin-build-mac"]
 
-geomodelcore-build-mac:
+geomodelcore-mac:
   <<: *macos-job
   <<: *geomodelcore-job
 
-geomodelio-build-mac:
+geomodelio-mac:
   <<: *macos-job
   <<: *geomodelio-job
   needs: ["geomodelcore-build-mac"]
 
-geomodelvisualization-build-mac:
+geomodelvisualization-mac:
   <<: *macos-job
   <<: *geomodelvisualization-job
   needs: ["coin-build-mac", "soqt-build-mac", "geomodelcore-build-mac", "geomodelio-build-mac"]
 
 
 ### UBUNTU PATH
-coin-build-ubuntu:
+coin-ubuntu:
   <<: *ubuntu-job
   <<: *coin-job
 
-soqt-build-ubuntu:
+soqt-ubuntu:
   <<: *ubuntu-job
   <<: *soqt-job
   needs: ["coin-build-ubuntu"]
 
-geomodelcore-build-ubuntu:
+geomodelcore-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelcore-job
 
-geomodelio-build-ubuntu:
+geomodelio-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelio-job
   needs: ["geomodelcore-build-ubuntu"]
 
-geomodelvisualization-build-ubuntu:
+geomodelvisualization-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelvisualization-job
   needs: ["coin-build-ubuntu", "soqt-build-ubuntu", "geomodelcore-build-ubuntu", "geomodelio-build-ubuntu"]
-
-
-# build_slc6:
-#   <<: *build_template
-#   image: cern/slc6-base
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-
-# build_cc7:
-#   <<: *build_template
-#   image: cern/cc7-base
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}

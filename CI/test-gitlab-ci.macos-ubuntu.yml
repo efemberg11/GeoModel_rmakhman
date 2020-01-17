@@ -53,7 +53,8 @@ variables:
 
 # TEMPLATES FOR PACKAGES
 .coin-build-template-job: &coin-job
-  # stage: dependencies-coin
+  stage: dependencies-coin
+  # stage: dependencies
   script:
     - pwd; ls
     - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
@@ -69,7 +70,8 @@ variables:
       - install
 
 .soqt-build-template-job: &soqt-job
-  # stage: dependencies-soqt
+  stage: dependencies-soqt
+  # stage: dependencies
   script:
     - pwd; ls
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
@@ -87,47 +89,47 @@ variables:
     paths:
       - install
 
-.geomodelcore-build-template-job: &geomodelcore-job
-  stage: dependencies-core
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
-    - mkdir geomodelcore-build
-    - cd geomodelcore-build
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
-    - make -j2
-    - make install
-  artifacts:
-    paths:
-      - install
-
-.geomodelio-build-template-job: &geomodelio-job
-  stage: dependencies-io
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-    - mkdir geomodelio-build
-    - cd geomodelio-build
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
-    - make -j2
-    - make install
-  artifacts:
-    paths:
-      - install
-
-.geomodelvisualization-build-template: &geomodelvisualization-job
-  # stage: build
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - echo "PWD; LS"
-    - pwd; ls
-    - mkdir build
-    - cd build
-    - echo "${CMAKE_ARGS}"
-    - cmake ${CMAKE_ARGS}  ..
-    - cmake --build . -- -j2
-    - cmake --build . -- install
+# .geomodelcore-build-template-job: &geomodelcore-job
+#   stage: dependencies-core
+#   script:
+#     - pwd; ls
+#     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+#     - mkdir geomodelcore-build
+#     - cd geomodelcore-build
+#     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
+#     - make -j2
+#     - make install
+#   artifacts:
+#     paths:
+#       - install
+#
+# .geomodelio-build-template-job: &geomodelio-job
+#   stage: dependencies-io
+#   script:
+#     - pwd; ls
+#     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+#     - mkdir geomodelio-build
+#     - cd geomodelio-build
+#     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
+#     - make -j2
+#     - make install
+#   artifacts:
+#     paths:
+#       - install
+#
+# .geomodelvisualization-build-template: &geomodelvisualization-job
+#   # stage: build
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#   script:
+#     - echo "PWD; LS"
+#     - pwd; ls
+#     - mkdir build
+#     - cd build
+#     - echo "${CMAKE_ARGS}"
+#     - cmake ${CMAKE_ARGS}  ..
+#     - cmake --build . -- -j2
+#     - cmake --build . -- install
 
 
 # ACTUAL JOBS

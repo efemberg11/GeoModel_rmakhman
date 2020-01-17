@@ -1,8 +1,6 @@
 stages:
-  - deps-coin
-  - deps-soqt
-  - deps-core
-  - deps-io
+  - deps-A
+  - deps-B
   - build
 
 
@@ -29,7 +27,7 @@ variables:
 
 # TEMPLATES FOR PACKAGES
 .coin-build-template-job: &coin-job
-  stage: deps-coin
+  stage: deps-A
   script:
     - pwd; ls
     - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
@@ -45,7 +43,7 @@ variables:
       - install
 
 .soqt-build-template-job: &soqt-job
-  stage: deps-soqt
+  stage: deps-B
   script:
     - pwd; ls
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
@@ -64,7 +62,7 @@ variables:
       - install
 
 .geomodelcore-build-template-job: &geomodelcore-job
-  stage: deps-core
+  stage: deps-A
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
@@ -78,7 +76,7 @@ variables:
       - install
 
 .geomodelio-build-template-job: &geomodelio-job
-  stage: deps-io
+  stage: deps-B
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git

@@ -151,7 +151,7 @@ geomodelio-build-mac:
 geomodelvisualization-build-mac:
   <<: *macos-job
   <<: *geomodelvisualization-job
-  needs: ["coin-build-mac", "soqt-build-mac", "geomodelcore-build-mac", "geomodelio-build-mac"
+  needs: ["coin-build-mac", "soqt-build-mac", "geomodelcore-build-mac", "geomodelio-build-mac"]
 
 ### UBUNTU JOBS
 coin-build-ubuntu:
@@ -175,7 +175,7 @@ geomodelio-build-ubuntu:
 geomodelvisualization-build-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelvisualization-job
-  needs: ["coin-build-ubuntu", "soqt-build-ubuntu", "geomodelcore-build-ubuntu", "geomodelio-build-ubuntu"
+  needs: ["coin-build-ubuntu", "soqt-build-ubuntu", "geomodelcore-build-ubuntu", "geomodelio-build-ubuntu"]
 
 
 # build_slc6:

@@ -1,9 +1,9 @@
 stages:
-  - dependencies-coin
-  - dependencies-soqt
-  - dependencies-core
-  - dependencies-io
-  - build
+  - deps-coin
+  - deps-soqt
+  # - deps-core
+  # - deps-io
+  # - build
 # stages:
 #   - dependencies
 #   - build
@@ -53,7 +53,7 @@ variables:
 
 # TEMPLATES FOR PACKAGES
 .coin-build-template-job: &coin-job
-  stage: dependencies-coin
+  stage: deps-coin
   # stage: dependencies
   script:
     - pwd; ls
@@ -70,7 +70,7 @@ variables:
       - install
 
 .soqt-build-template-job: &soqt-job
-  stage: dependencies-soqt
+  stage: deps-soqt
   # stage: dependencies
   script:
     - pwd; ls
@@ -90,7 +90,7 @@ variables:
       - install
 
 # .geomodelcore-build-template-job: &geomodelcore-job
-#   stage: dependencies-core
+#   stage: deps-core
 #   script:
 #     - pwd; ls
 #     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
@@ -104,7 +104,7 @@ variables:
 #       - install
 #
 # .geomodelio-build-template-job: &geomodelio-job
-#   stage: dependencies-io
+#   stage: deps-io
 #   script:
 #     - pwd; ls
 #     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git

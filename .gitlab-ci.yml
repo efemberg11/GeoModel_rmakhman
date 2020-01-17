@@ -4,6 +4,9 @@
 #   - dependencies-core
 #   - dependencies-io
 #   - build
+stages:
+  - dependencies
+  - build
 
 # Build (Ubuntu 16.04 / CMake / clang):
 #     stage: build
@@ -66,7 +69,7 @@ variables:
       - install
 
 .soqt-build-template-job: &soqt-job
-  # stage: dependencies-soqt
+  stage: dependencies
   script:
     - pwd; ls
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
@@ -85,7 +88,7 @@ variables:
       - install
 
 .geomodelcore-build-template-job: &geomodelcore-job
-  # stage: dependencies-core
+  stage: dependencies
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
@@ -99,7 +102,7 @@ variables:
       - install
 
 .geomodelio-build-template-job: &geomodelio-job
-  # stage: dependencies-io
+  stage: dependencies
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
@@ -113,7 +116,7 @@ variables:
       - install
 
 .geomodelvisualization-build-template: &geomodelvisualization-job
-  # stage: build
+  stage: build
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:

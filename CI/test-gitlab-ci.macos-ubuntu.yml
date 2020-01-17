@@ -1,7 +1,3 @@
-
-before_script:
-  - setupQt5Homebrew # please NOTE: this is specific to my private machine, Qt5 should be configured in another way for a general macOS runner
-
 stages:
   - dependencies-coin
   - dependencies-soqt
@@ -36,13 +32,25 @@ variables:
 #   ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
 
 
+# TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
 .macos-template-job: &macos-job
   tags:
     - macos
+  before_script:
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+
+.ubuntu-template-job: &ubuntu-job
+  image:
+    - image: ubuntu:18.04
+  tags:
+    - docker
+  before_script:
+  - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev
 
 
-coin-build:
-  <<: *macos-job
+
+# TEMPLATES FOR PACKAGES
+.coin-build-template-job: &coin-job
   stage: dependencies-coin
   script:
     - pwd; ls
@@ -58,9 +66,7 @@ coin-build:
     paths:
       - install
 
-
-soqt-build:
-  <<: *macos-job
+.soqt-build-template-job: &soqt-job
   stage: dependencies-soqt
   script:
     - pwd; ls
@@ -79,9 +85,7 @@ soqt-build:
     paths:
       - install
 
-
-geomodelcore-build:
-  <<: *macos-job
+.geomodelcore-build-template-job: &geomodelcore-job
   stage: dependencies-core
   script:
     - pwd; ls
@@ -95,9 +99,7 @@ geomodelcore-build:
     paths:
       - install
 
-
-geomodelio-build:
-  <<: *macos-job
+.geomodelio-build-template-job: &geomodelio-job
   stage: dependencies-io
   script:
     - pwd; ls
@@ -111,11 +113,10 @@ geomodelio-build:
     paths:
       - install
 
-
-
-.build_template: &build_template
-  <<: *macos-job
+.geomodelvisualization-build-template: &geomodelvisualization-job
   stage: build
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - echo "PWD; LS"
     - pwd; ls
@@ -126,11 +127,36 @@ geomodelio-build:
     - cmake --build . -- -j2
     - cmake --build . -- install
 
-build_new:
-  <<: *build_template
-#   image: cern/slc6-base
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+
+# ACTUAL JOBS
+
+### MACOS JOBS
+coin-build-mac:
+  <<: *macos-job
+  <<: *coin-job
+
+soqt-build-mac:
+  <<: *macos-job
+  <<: *soqt-job
+
+geomodelcore-build-mac:
+  <<: *macos-job
+  <<: *geomodelcore-job
+
+geomodelio-build-mac:
+  <<: *macos-job
+  <<: *geomodelio-job
+
+geomodelvisualization-build-mac:
+  <<: *macos-job
+  <<: *geomodelvisualization
+
+### UBUNTU JOBS
+coin-build-mac:
+  <<: *macos-job
+  <<: *coin-job
+
+
 
 # build_slc6:
 #   <<: *build_template

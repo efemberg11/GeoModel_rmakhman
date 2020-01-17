@@ -152,8 +152,8 @@ geomodelvisualization-build-mac:
   <<: *geomodelvisualization-job
 
 ### UBUNTU JOBS
-coin-build-mac:
-  <<: *macos-job
+coin-build-ubuntu:
+  <<: *ubuntu-job
   <<: *coin-job
 
 

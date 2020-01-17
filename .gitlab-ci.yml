@@ -135,14 +135,14 @@ variables:
 # ACTUAL JOBS
 
 ### MACOS JOBS
-coin-build-mac:
-  <<: *macos-job
-  <<: *coin-job
-
-soqt-build-mac:
-  <<: *macos-job
-  <<: *soqt-job
-  needs: ["coin-build-mac"]
+# coin-build-mac:
+#   <<: *macos-job
+#   <<: *coin-job
+#
+# soqt-build-mac:
+#   <<: *macos-job
+#   <<: *soqt-job
+#   needs: ["coin-build-mac"]
 
 # geomodelcore-build-mac:
 #   <<: *macos-job

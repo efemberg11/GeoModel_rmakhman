@@ -116,7 +116,7 @@ coin-mac:
 soqt-mac:
   <<: *macos-job
   <<: *soqt-job
-  needs: ["coin-build-mac"]
+  needs: ["coin-mac"]
 
 geomodelcore-mac:
   <<: *macos-job
@@ -125,12 +125,12 @@ geomodelcore-mac:
 geomodelio-mac:
   <<: *macos-job
   <<: *geomodelio-job
-  needs: ["geomodelcore-build-mac"]
+  needs: ["geomodelcore-mac"]
 
 geomodelvisualization-mac:
   <<: *macos-job
   <<: *geomodelvisualization-job
-  needs: ["coin-build-mac", "soqt-build-mac", "geomodelcore-build-mac", "geomodelio-build-mac"]
+  needs: ["coin-mac", "soqt-mac", "geomodelcore-mac", "geomodelio-mac"]
 
 
 ### UBUNTU PATH
@@ -141,7 +141,7 @@ coin-ubuntu:
 soqt-ubuntu:
   <<: *ubuntu-job
   <<: *soqt-job
-  needs: ["coin-build-ubuntu"]
+  needs: ["coin-ubuntu"]
 
 geomodelcore-ubuntu:
   <<: *ubuntu-job
@@ -150,9 +150,9 @@ geomodelcore-ubuntu:
 geomodelio-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelio-job
-  needs: ["geomodelcore-build-ubuntu"]
+  needs: ["geomodelcore-ubuntu"]
 
 geomodelvisualization-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelvisualization-job
-  needs: ["coin-build-ubuntu", "soqt-build-ubuntu", "geomodelcore-build-ubuntu", "geomodelio-build-ubuntu"]
+  needs: ["coin-ubuntu", "soqt-ubuntu", "geomodelcore-ubuntu", "geomodelio-ubuntu"]

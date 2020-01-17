@@ -30,7 +30,6 @@ variables:
 # TEMPLATES FOR PACKAGES
 .coin-build-template-job: &coin-job
   stage: deps-coin
-  # stage: dependencies
   script:
     - pwd; ls
     - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
@@ -47,7 +46,6 @@ variables:
 
 .soqt-build-template-job: &soqt-job
   stage: deps-soqt
-  # stage: dependencies
   script:
     - pwd; ls
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
@@ -94,7 +92,7 @@ variables:
       - install
 
 .geomodelvisualization-build-template: &geomodelvisualization-job
-  # stage: build
+  stage: build
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:

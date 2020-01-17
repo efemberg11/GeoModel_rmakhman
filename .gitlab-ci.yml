@@ -5,8 +5,8 @@
 #   - dependencies-io
 #   - build
 stages:
-  - dependencies-mac
-  - build-mac
+  - dependencies
+  - build
 
 # Build (Ubuntu 16.04 / CMake / clang):
 #     stage: build

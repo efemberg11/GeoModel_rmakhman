@@ -53,7 +53,7 @@ variables:
 
 # TEMPLATES FOR PACKAGES
 .coin-build-template-job: &coin-job
-  # stage: dependencies-coin
+  stage: dependencies
   script:
     - pwd; ls
     - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip

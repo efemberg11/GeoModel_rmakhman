@@ -140,8 +140,7 @@ coin-build-mac:
 soqt-build-mac:
   <<: *macos-job
   <<: *soqt-job
-  dependencies:
-    - coin-build-mac
+  needs: ["coin-build-mac"]
 
 geomodelcore-build-mac:
   <<: *macos-job
@@ -170,8 +169,9 @@ coin-build-ubuntu:
 soqt-build-ubuntu:
   <<: *ubuntu-job
   <<: *soqt-job
-  dependencies:
-    - coin-build-ubuntu
+  needs: ["coin-build-ubuntu"]
+  # dependencies:
+    # - coin-build-ubuntu
 
 geomodelcore-build-ubuntu:
   <<: *ubuntu-job

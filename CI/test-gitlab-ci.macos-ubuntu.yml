@@ -1,12 +1,12 @@
-# stages:
-#   - dependencies-coin
-#   - dependencies-soqt
-#   - dependencies-core
-#   - dependencies-io
-#   - build
 stages:
-  - dependencies
+  - dependencies-coin
+  - dependencies-soqt
+  - dependencies-core
+  - dependencies-io
   - build
+# stages:
+#   - dependencies
+#   - build
 
 # Build (Ubuntu 16.04 / CMake / clang):
 #     stage: build
@@ -53,7 +53,7 @@ variables:
 
 # TEMPLATES FOR PACKAGES
 .coin-build-template-job: &coin-job
-  stage: dependencies
+  stage: dependencies-coin
   script:
     - pwd; ls
     - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
@@ -69,7 +69,7 @@ variables:
       - install
 
 .soqt-build-template-job: &soqt-job
-  stage: dependencies
+  stage: dependencies-soqt
   script:
     - pwd; ls
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
@@ -88,7 +88,7 @@ variables:
       - install
 
 .geomodelcore-build-template-job: &geomodelcore-job
-  stage: dependencies
+  stage: dependencies-core
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
@@ -102,7 +102,7 @@ variables:
       - install
 
 .geomodelio-build-template-job: &geomodelio-job
-  stage: dependencies
+  stage: dependencies-io
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
@@ -140,8 +140,7 @@ coin-build-mac:
 soqt-build-mac:
   <<: *macos-job
   <<: *soqt-job
-  dependencies:
-    - coin-build-mac
+  needs: ["coin-build-mac"]
 
 geomodelcore-build-mac:
   <<: *macos-job
@@ -170,8 +169,9 @@ coin-build-ubuntu:
 soqt-build-ubuntu:
   <<: *ubuntu-job
   <<: *soqt-job
-  dependencies:
-    - coin-build-ubuntu
+  needs: ["coin-build-ubuntu"]
+  # dependencies:
+    # - coin-build-ubuntu
 
 geomodelcore-build-ubuntu:
   <<: *ubuntu-job

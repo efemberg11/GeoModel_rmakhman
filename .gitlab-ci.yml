@@ -13,6 +13,7 @@ variables:
 .macos-template-job: &macos-job
   tags:
     - macos
+  allow_failure: true
   before_script:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
 

@@ -149,7 +149,7 @@ geomodelio-build-mac:
 
 geomodelvisualization-build-mac:
   <<: *macos-job
-  <<: *geomodelvisualization
+  <<: *geomodelvisualization-job
 
 ### UBUNTU JOBS
 coin-build-mac:

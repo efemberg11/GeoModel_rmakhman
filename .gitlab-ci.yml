@@ -5,8 +5,8 @@
 #   - dependencies-io
 #   - build
 stages:
-  - dependencies
-  - build
+  - dependencies-mac
+  - build-mac
 
 # Build (Ubuntu 16.04 / CMake / clang):
 #     stage: build
@@ -140,7 +140,8 @@ coin-build-mac:
 soqt-build-mac:
   <<: *macos-job
   <<: *soqt-job
-  needs: ["coin-build-mac"]
+  dependencies:
+    - coin-build-mac
 
 geomodelcore-build-mac:
   <<: *macos-job
@@ -149,12 +150,17 @@ geomodelcore-build-mac:
 geomodelio-build-mac:
   <<: *macos-job
   <<: *geomodelio-job
-  needs: ["geomodelcore-build-mac"]
+  dependencies:
+    - geomodelcore-build-mac
 
 geomodelvisualization-build-mac:
   <<: *macos-job
   <<: *geomodelvisualization-job
-  needs: ["coin-build-mac", "soqt-build-mac", "geomodelcore-build-mac", "geomodelio-build-mac"]
+  dependencies:
+    - coin-build-mac
+    - soqt-build-mac
+    - geomodelcore-build-mac
+    - geomodelio-build-mac
 
 ### UBUNTU JOBS
 coin-build-ubuntu:
@@ -164,7 +170,8 @@ coin-build-ubuntu:
 soqt-build-ubuntu:
   <<: *ubuntu-job
   <<: *soqt-job
-  needs: ["coin-build-ubuntu"]
+  dependencies:
+    - coin-build-ubuntu
 
 geomodelcore-build-ubuntu:
   <<: *ubuntu-job
@@ -173,12 +180,17 @@ geomodelcore-build-ubuntu:
 geomodelio-build-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelio-job
-  needs: ["geomodelcore-build-ubuntu"]
+  dependencies:
+    - geomodelcore-build-ubuntu
 
 geomodelvisualization-build-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelvisualization-job
-  needs: ["coin-build-ubuntu", "soqt-build-ubuntu", "geomodelcore-build-ubuntu", "geomodelio-build-ubuntu"]
+  dependencies:
+    - coin-build-ubuntu
+    - soqt-build-ubuntu
+    - geomodelcore-build-ubuntu
+    - geomodelio-build-ubuntu
 
 
 # build_slc6:

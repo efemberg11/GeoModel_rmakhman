@@ -40,8 +40,7 @@ variables:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
 
 .ubuntu-template-job: &ubuntu-job
-  image:
-    - ubuntu:18.04
+  image: ubuntu:18.04
   tags:
     - docker
   before_script:

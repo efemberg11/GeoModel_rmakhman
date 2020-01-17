@@ -41,7 +41,7 @@ variables:
 
 .ubuntu-template-job: &ubuntu-job
   image:
-    - image: ubuntu:18.04
+    - ubuntu:18.04
   tags:
     - docker
   before_script:
@@ -149,11 +149,11 @@ geomodelio-build-mac:
 
 geomodelvisualization-build-mac:
   <<: *macos-job
-  <<: *geomodelvisualization
+  <<: *geomodelvisualization-job
 
 ### UBUNTU JOBS
-coin-build-mac:
-  <<: *macos-job
+coin-build-ubuntu:
+  <<: *ubuntu-job
   <<: *coin-job
 
 

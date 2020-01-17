@@ -41,7 +41,7 @@ variables:
 
 .ubuntu-template-job: &ubuntu-job
   image:
-    - image: ubuntu:18.04
+    - ubuntu:18.04
   tags:
     - docker
   before_script:

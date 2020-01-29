@@ -80,7 +80,7 @@ sudo make install
 ```
 You can build plugins for gmex! 
 
-- see <https://gitlab.cern.ch/GeoModelATLAS>
+- see <https://gitlab.cern.ch/GeoModelATLAS/DualUsePlugins>
     
     
 ### macOS

@@ -78,7 +78,10 @@ cmake ..
 make -j
 sudo make install
 ```
+You can build plugins for gmex! 
 
+    - see <https://gitlab.cern.ch/GeoModelATLAS/README> 
+    
 ### macOS
 
 _Coming soon_

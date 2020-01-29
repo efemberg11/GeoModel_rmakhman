@@ -1,7 +1,7 @@
 #include "TFPersistification/TransFunctionPersistifier.h"
 #include "TFPersistification/TransFunctionRecorder.h"
 #include "GeoModelKernel/GeoXF.h"
-
+#include <iomanip>
 const GenFunctionPersistifier * TransFunctionPersistifier::getGenFunctionPersistifier() const {
   return &fPersistifier;
 }
@@ -33,7 +33,10 @@ void TransFunctionPersistifier::add(const std::type_info & tInfo, const TransFun
 }
 
 std::ostringstream & TransFunctionPersistifier::getStream() const {
-  if (!stream) stream = new std::ostringstream();
+  if (!stream) {
+    stream = new std::ostringstream();
+    (*stream) << std::setprecision(16);
+  }
   return *stream;
 }
 

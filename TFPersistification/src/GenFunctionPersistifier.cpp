@@ -19,6 +19,7 @@
 
 
 #include <sstream>
+#include <iomanip>
 const std::string & GenFunctionPersistifier::getCodedString() const {
   codedString=getStream().str();
   delete stream;
@@ -66,7 +67,10 @@ void GenFunctionPersistifier::add(const std::type_info & tInfo, const GenFunctio
 }
 
 std::ostringstream & GenFunctionPersistifier::getStream() const {
-  if (!stream) stream = new std::ostringstream();
+  if (!stream) {
+    stream = new std::ostringstream();
+    (*stream) << std::setprecision(16);
+  }
   return *stream;
 }
 

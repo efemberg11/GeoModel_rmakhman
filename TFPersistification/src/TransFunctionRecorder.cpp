@@ -3,9 +3,7 @@
 #include "TFPersistification/TransFunctionRecorder.h"
 
 // This is a data recorder. It breaks encapsulation. Normal. ==========//
-#define private public
 #include "GeoModelKernel/GeoXF.h"
-#undef private
 //=====================================================================//
 
 
@@ -21,9 +19,7 @@ const TransFunctionPersistifier *TransFunctionRecorder::getPersistifier() const 
 
 TransFunctionRecorder::~TransFunctionRecorder () {}
 
-#define private public                                     //
 #include "GeoModelKernel/GeoXF.h"                          //
-#undef private                                             //
 
 #include "GeoModelKernel/GeoDefinitions.h"
 
@@ -43,9 +39,9 @@ void ProductRecorder::execute( const GeoXF::Function & function) const {
   std::ostringstream & stream = getPersistifier()->getStream();
 
   stream << "GeoXF::Product" << "{";
-  getPersistifier()->persistify(*ptr->m_arg1);
+  getPersistifier()->persistify(*ptr->arg1());
   stream << "|";
-  getPersistifier()->persistify(*ptr->m_arg2);
+  getPersistifier()->persistify(*ptr->arg2());
   stream << "}";
   return;
 }
@@ -57,12 +53,12 @@ void PreMultRecorder::execute( const GeoXF::Function & function) const {
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "GeoXF::PreMult" << "{";
   stream << "Transform["
-	 << ptr->m_arg1(0,0) << ";" << ptr->m_arg1(0,1) << ";" << ptr->m_arg1(0,2) << ";"
-	 << ptr->m_arg1(1,0) << ";" << ptr->m_arg1(1,1) << ";" << ptr->m_arg1(1,2) << ";"
-	 << ptr->m_arg1(2,0) << ";" << ptr->m_arg1(2,1) << ";" << ptr->m_arg1(2,2) << ";"
-	 << ptr->m_arg1(0,3) << ";" << ptr->m_arg1(1,3) << ";" << ptr->m_arg1(2,3) << "]";
+	 << ptr->arg1()(0,0) << ";" << ptr->arg1()(0,1) << ";" << ptr->arg1()(0,2) << ";"
+	 << ptr->arg1()(1,0) << ";" << ptr->arg1()(1,1) << ";" << ptr->arg1()(1,2) << ";"
+	 << ptr->arg1()(2,0) << ";" << ptr->arg1()(2,1) << ";" << ptr->arg1()(2,2) << ";"
+	 << ptr->arg1()(0,3) << ";" << ptr->arg1()(1,3) << ";" << ptr->arg1()(2,3) << "]";
   stream << "|";
-  getPersistifier()->persistify(*ptr->m_arg2);
+  getPersistifier()->persistify(*ptr->arg2());
   stream << "}";
   return;
 }
@@ -73,13 +69,13 @@ void PostMultRecorder::execute( const GeoXF::Function & function) const {
   if (!ptr) throw std::runtime_error("Error in PostMultRecorder:  wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "GeoXF::PostMult" << "{";
-  getPersistifier()->persistify(*ptr->m_arg1);
+  getPersistifier()->persistify(*ptr->arg1());
   stream << "|";
   stream << "Transform["
-	 << ptr->m_arg2(0,0) << ";" << ptr->m_arg2(0,1) << ";" << ptr->m_arg2(0,2) << ";"
-	 << ptr->m_arg2(1,0) << ";" << ptr->m_arg2(1,1) << ";" << ptr->m_arg2(1,2) << ";"
-	 << ptr->m_arg2(2,0) << ";" << ptr->m_arg2(2,1) << ";" << ptr->m_arg2(2,2) << ";"
-	 << ptr->m_arg2(0,3) << ";" << ptr->m_arg2(1,3) << ";" << ptr->m_arg2(2,3) << "]";
+	 << ptr->arg2()(0,0) << ";" << ptr->arg2()(0,1) << ";" << ptr->arg2()(0,2) << ";"
+	 << ptr->arg2()(1,0) << ";" << ptr->arg2()(1,1) << ";" << ptr->arg2()(1,2) << ";"
+	 << ptr->arg2()(2,0) << ";" << ptr->arg2()(2,1) << ";" << ptr->arg2()(2,2) << ";"
+	 << ptr->arg2()(0,3) << ";" << ptr->arg2()(1,3) << ";" << ptr->arg2()(2,3) << "]";
   stream << "}";
   return;
 }
@@ -92,12 +88,12 @@ void PowRecorder::execute( const GeoXF::Function & function) const {
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "GeoXF::Pow" << "{";
   stream << "Transform["
-	 << ptr->m_xf(0,0) << ";" << ptr->m_xf(0,1) << ";" << ptr->m_xf(0,2) << ";"
-	 << ptr->m_xf(1,0) << ";" << ptr->m_xf(1,1) << ";" << ptr->m_xf(1,2) << ";"
-	 << ptr->m_xf(2,0) << ";" << ptr->m_xf(2,1) << ";" << ptr->m_xf(2,2) << ";"
-	 << ptr->m_xf(0,3) << ";" << ptr->m_xf(1,3) << ";" << ptr->m_xf(2,3) << "]";
+	 << ptr->transform()(0,0) << ";" << ptr->transform()(0,1) << ";" << ptr->transform()(0,2) << ";"
+	 << ptr->transform()(1,0) << ";" << ptr->transform()(1,1) << ";" << ptr->transform()(1,2) << ";"
+	 << ptr->transform()(2,0) << ";" << ptr->transform()(2,1) << ";" << ptr->transform()(2,2) << ";"
+	 << ptr->transform()(0,3) << ";" << ptr->transform()(1,3) << ";" << ptr->transform()(2,3) << "]";
   stream << "|";
-  getPersistifier()->getGenFunctionPersistifier()->persistify(*ptr->m_function);
+  getPersistifier()->getGenFunctionPersistifier()->persistify(*ptr->function());
   stream << getPersistifier()->getGenFunctionPersistifier()->getCodedString();
   stream << "}";
   return;

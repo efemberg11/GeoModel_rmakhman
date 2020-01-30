@@ -1,7 +1,4 @@
-#define private public
 #include "GeoGenericFunctions/ArrayFunction.h"
-#undef private
-
 #include "TFPersistification/GenFunctionPersistifier.h"
 #include "TFPersistification/GenFunctionInterpreter.h"
 #include "TFPersistification/ArrayFunctionIO.h"
@@ -40,9 +37,9 @@ void ArrayFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const {
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "ArrayFunction";
   stream << "(";
-  for (size_t i=0;i<ptr->_values.size();i++){
-    stream<<ptr->_values[i];
-    if (i!=ptr->_values.size()-1) stream << ",";
+  for (size_t i=0;i<ptr->values().size();i++){
+    stream<<ptr->values()[i];
+    if (i!=ptr->values().size()-1) stream << ",";
   }
   stream << ")";
 }

@@ -1,7 +1,4 @@
-#define private public
 #include "GeoGenericFunctions/Mod.h"
-#undef private
-
 #include "TFPersistification/GenFunctionPersistifier.h"
 #include "TFPersistification/GenFunctionInterpreter.h"
 #include "TFPersistification/ModIO.h"
@@ -27,6 +24,6 @@ void ModRecorder::execute(const GeoGenfun::AbsFunction & F) const {
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "Mod";
   stream << "(";
-  stream<<ptr->_y;
+  stream<<ptr->modulus();
   stream << ")";
 }

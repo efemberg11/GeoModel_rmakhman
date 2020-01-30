@@ -86,8 +86,7 @@
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoNameTag.h"
-#include <dlfcn.h>
-#include <libgen.h>
+#include "GeoModelKernel/GeoGeometryPluginLoader.h"
 
 class VP1GeometrySystem::Imp {
 public:
@@ -491,33 +490,12 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
     else if (path.contains(".dylib") || path.contains(".so")) {
 
       std::cout << "path=" << path.toStdString() << std::endl;
-      std::string pString=path.toStdString();
-      std::string bNameString=basename ((char *) pString.c_str());       // Strip off the directory
-      bNameString=bNameString.substr(3);                        // Strip off leading "lib"
-      bNameString=bNameString.substr(0,bNameString.find("."));  // Strip off extensions
-
-      std::string createFunctionName = std::string("create")+bNameString;
-
-      //
-      // Loads the library:
-      //
-      void *handle = dlopen(pString.c_str(),RTLD_NOW);
-      if (!handle) std::cout << dlerror() << std::endl;
-      
-
-      //
-      // Gets the function
-      //
-      void *f = dlsym(handle,createFunctionName.c_str());
-      if (!f) std::cerr << dlerror() << std::endl;
-      
-      typedef void * (*CreationMethod) ();
-      CreationMethod F = (CreationMethod) f;
-    
-      //
-      // 
-      //
-      GeoVGeometryPlugin * factory = (GeoVGeometryPlugin *) F();
+      GeoGeometryPluginLoader loader;
+      GeoVGeometryPlugin *factory=loader.load(path.toStdString());
+      if (!factory) {
+	QMessageBox::warning(0, "Error!","Cannot load geometry from factory. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
+	exit(0);
+      }
       
       if (!world) world=createTheWorld(nullptr);
       factory->create(world);

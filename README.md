@@ -55,7 +55,7 @@ sudo apt-get update
 ```
 
 Then, install all the dependencies. You run the lines listed below, according to the Ubuntu version you are running: 
-- 
+
 - `sudo apt install libsoqt-dev` **on disco and eoan**
 - `sudo apt install libsoqt5-dev, qt5-default, qtbase5-dev, libqt5opengl5-dev` **on bionic**
  

@@ -78,6 +78,7 @@ cmake ..
 make -j
 sudo make install
 ```
+
 You can build plugins for gmex! 
 
 - see <https://gitlab.cern.ch/GeoModelATLAS/DualUsePlugins>
@@ -85,5 +86,78 @@ You can build plugins for gmex!
     
 ### macOS
 
-_Coming soon_
+Here below you will find the instructions to build GeoModelVisualization and all GeoModel dependencies from source, on macOS.
+
+#### Install the dependencies
+
+For the external dependencies, we will install them by using the package manager Homebrew.
+
+```bash
+# install external dependencies
+brew install cmake eigen doxygen wget boost hg 
+
+# install Qt
+brew install qt5
+echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
+```
+
+Then, we install the grpahics libraries. First, set the package manager to install a custom version of them:
+
+```bash
+brew tap ric-bianchi/vp1light
+```
+
+Then, install the Coin and SoQt graphics libraries:
+
+```
+brew install simage coin-bb soqt-bb
+```
+
+#### Build GeoModelVisualization and the GeoModel software stack
+
+**Note:** These instructions will install everything in a local folder. 
+Feel free to remove the string `-DCMAKE_INSTALL_PREFIX=../install` from the CMake commands here below
+if you want to install everything into `/usr/local`. 
+If you do that, please remember that you might need to run `sudo make install` instead of `make install`,
+otherwise you will not have the correct rights to write under the path `/usr/local`.
+
+
+```bash
+# build GeoModelCore
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+mkdir build_geomodelcore
+cd build_geomodelcore
+cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
+make -j4
+make install
+
+# build GeoModelIO
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+mkdir build_geomodelio
+cd build_geomodelio
+cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
+make -j4
+make install
+
+# build GeoModelVisualization
+git clone https://gitlab.cern.ch/GeoModelDev/geomodelvisualization.git
+mkdir build_geomodelvis
+cd build_geomodelvis
+cmake -DCMAKE_INSTALL_PREFIX=../install ../geomodelvisualization
+make -j4
+make install
+```
+
+After compilation, you should apply a temporary fix:
+
+```
+export GXPLUGINPATH=/usr/local/lib/gxplugins # this is a temporary fix
+```
+
+Then, you can run your local copy of `gmex` with:
+
+```
+../install/bin/gmex
+```
+
 

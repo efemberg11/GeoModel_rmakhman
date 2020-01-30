@@ -26,7 +26,10 @@ namespace GeoGenfun {
 
     virtual double operator ()(double argument) const override; 
     virtual double operator ()(const Argument & a) const override {return operator() (a[0]);}
-  
+
+    // Retrieve the modulus:
+    double modulus() const {return _y;}
+    
   private:
 
     // It is illegal to assign a fixed constant

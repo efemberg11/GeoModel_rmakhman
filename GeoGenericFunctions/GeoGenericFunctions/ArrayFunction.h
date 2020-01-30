@@ -43,7 +43,10 @@ class ArrayFunction : public AbsFunction  {
   
   // Does this function have an analytic derivative?
   virtual bool hasAnalyticDerivative() const override {return true;}
-    
+
+  // Access to the array of values
+  const std::vector<double>  & values() const { return _values;}
+  
  private:
   
   // It is illegal to assign a ArrayFunction

@@ -82,8 +82,18 @@ namespace GeoXF
     Pow *clone () const;
 
     // Copy constructor:
-      Pow (const Pow & right);
+    Pow (const Pow & right);
 
+    // For persistency:
+    const GeoTrf::Transform3D & transform() const {
+      return m_xf;
+    }
+
+    // For persistency:
+    const GeoGenfun::AbsFunction *function() const {
+      return m_function;
+    }
+    
   private:
 
     // Assignment operator
@@ -129,6 +139,9 @@ namespace GeoXF
 
     Product& operator= (const Product & right) = delete;
 
+    const Function *arg1() const { return m_arg1;}
+    const Function *arg2() const { return m_arg2;}
+    
   private:
 
     const Function *m_arg1;
@@ -161,6 +174,10 @@ namespace GeoXF
     PreMult (const PreMult & right);
 
     PreMult& operator= (const PreMult & right) = delete;
+
+    const GeoTrf::Transform3D & arg1() const { return m_arg1;}
+    const Function *arg2() const { return m_arg2;}
+
 
   private:
 
@@ -195,6 +212,10 @@ namespace GeoXF
 
     PostMult& operator= (const PostMult & right) = delete;
 
+    const Function *arg1() const { return m_arg1;}
+    const GeoTrf::Transform3D & arg2() const { return m_arg2;}
+
+    
   private:
 
     const Function *m_arg1;

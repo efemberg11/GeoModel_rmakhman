@@ -14,6 +14,9 @@
 #define FunctionComposition_h 1
 #include "GeoGenericFunctions/AbsFunction.h"
 
+// For persistification:
+class FunctionCompositionRecorder;
+
 namespace GeoGenfun {
 
   class FunctionComposition : public AbsFunction {
@@ -51,6 +54,10 @@ namespace GeoGenfun {
 
     const AbsFunction *_arg1;
     const AbsFunction *_arg2;  
+
+    // For persistification:
+    friend class ::FunctionCompositionRecorder;
+
   };
 } // namespace GeoGenfun
 #endif

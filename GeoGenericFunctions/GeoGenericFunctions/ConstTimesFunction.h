@@ -13,6 +13,10 @@
 #ifndef ConstTimesFunction_hh
 #define ConstTimesFunction_hh
 #include "GeoGenericFunctions/AbsFunction.h"
+
+// For persistification:
+class ConstTimesFunctionRecorder;
+
 namespace GeoGenfun {
 
   class ConstTimesFunction : public AbsFunction  {
@@ -50,6 +54,10 @@ namespace GeoGenfun {
 
     double             _constant;
     const AbsFunction *_arg;
+
+    // For persistification
+    friend class ::ConstTimesFunctionRecorder;
+    
   };
 } // namespace GeoGenfun
 #endif

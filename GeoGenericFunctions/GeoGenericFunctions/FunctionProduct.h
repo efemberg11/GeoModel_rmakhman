@@ -13,6 +13,10 @@
 #ifndef FunctionProduct_h
 #define FunctionProduct_h 1
 #include "GeoGenericFunctions/AbsFunction.h"
+
+// For persistification:
+class FunctionProductRecorder;
+
 namespace GeoGenfun {
 
   class FunctionProduct : public AbsFunction {
@@ -50,6 +54,10 @@ namespace GeoGenfun {
 
     const AbsFunction *_arg1;
     const AbsFunction *_arg2;  
+
+    // For persistification:
+    friend class ::FunctionProductRecorder;
+
   };
 } // namespace GeoGenfun
 

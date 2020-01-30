@@ -13,6 +13,10 @@
 #define FunctionNoop_h 1
 #include "GeoGenericFunctions/AbsFunction.h"
 
+// For persistification:
+class FunctionNoopRecorder;
+
+
 namespace GeoGenfun {
 
  class FunctionNoop : public AbsFunction {
@@ -51,6 +55,10 @@ namespace GeoGenfun {
     // The function we're negating.  
     const AbsFunction *_arg1;
 
+   // For persistification:
+   friend class ::FunctionNoopRecorder;
+   
+   
  };
 } // namespace GeoGenfun
 #endif

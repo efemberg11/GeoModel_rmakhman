@@ -15,6 +15,9 @@
 #define FunctionDifference_h 1
 #include "GeoGenericFunctions/AbsFunction.h"
 
+// For persistification:
+class FunctionDifferenceRecorder;
+    
 namespace GeoGenfun {
 
   class FunctionDifference : public AbsFunction {
@@ -53,6 +56,9 @@ namespace GeoGenfun {
     const AbsFunction *_arg1;
     const AbsFunction *_arg2;
 
+    // For persistification:
+    friend class ::FunctionDifferenceRecorder;
+    
   };
 } // namespace GeoGenfun
 #endif

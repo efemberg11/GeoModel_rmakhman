@@ -13,6 +13,9 @@
 #define FunctionQuotient_h 1
 #include "GeoGenericFunctions/AbsFunction.h"
 
+// For persistification:
+class FunctionQuotientRecorder;
+
 namespace GeoGenfun {
 
   class FunctionQuotient : public AbsFunction {
@@ -50,6 +53,10 @@ namespace GeoGenfun {
   
     const AbsFunction *_arg1;
     const AbsFunction *_arg2;
+
+    // For persistification:
+    friend class ::FunctionQuotientRecorder;
+    
   };
 } // namespace GeoGenfun
 #endif

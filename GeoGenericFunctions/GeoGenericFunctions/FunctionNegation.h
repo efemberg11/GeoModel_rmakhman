@@ -13,6 +13,9 @@
 #define FunctionNegation_h 1
 #include "GeoGenericFunctions/AbsFunction.h"
 
+// For persistification:
+class FunctionNegationRecorder;
+
 namespace GeoGenfun {
 
   class FunctionNegation : public AbsFunction {
@@ -50,6 +53,10 @@ namespace GeoGenfun {
 
     // The function we're negating.  
     const AbsFunction *_arg1;
+
+    // For persistification:
+    friend class ::FunctionNegationRecorder;
+
   };
 } // namespace GeoGenfun
 #endif

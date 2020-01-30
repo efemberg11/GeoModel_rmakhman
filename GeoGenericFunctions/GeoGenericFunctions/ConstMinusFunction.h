@@ -14,6 +14,9 @@
 #define ConstMinusFunction_hh 
 #include "GeoGenericFunctions/AbsFunction.h"
 
+// For persistification
+class ConstMinusFunctionRecorder;
+
 namespace GeoGenfun {
 
   class ConstMinusFunction : public AbsFunction  {
@@ -51,6 +54,10 @@ namespace GeoGenfun {
 
     double             _constant;
     const AbsFunction *_arg;
+
+    // For persistification:
+    friend class ::ConstMinusFunctionRecorder;
+    
   };
 } // namespace GeoGenfun
 #endif

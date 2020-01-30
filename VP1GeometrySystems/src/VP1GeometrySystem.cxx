@@ -57,7 +57,7 @@
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelKernel/GeoNameTag.h"
-#include "GeoModelKernel/GeoVDetectorFactory.h"
+#include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -517,7 +517,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       //
       // 
       //
-      GeoVDetectorFactory * factory = (GeoVDetectorFactory *) F();
+      GeoVGeometryPlugin * factory = (GeoVGeometryPlugin *) F();
       
       if (!world) world=createTheWorld(nullptr);
       factory->create(world);

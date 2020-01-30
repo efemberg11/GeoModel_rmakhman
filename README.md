@@ -20,7 +20,7 @@ To build  plugins for the GeometryExplorer <https://gitlab.cern.ch/GeoModelDev/G
 
 * Build and install the plugin(s)
     
-      cd dualuseplugins
+      cd GeoModelPlugins
 
       mkdir build
 

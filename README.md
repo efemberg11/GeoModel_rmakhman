@@ -1,4 +1,4 @@
-# DualUsePlugins
+# GeoModelPlugins
 
 This repository contains plugins that create GeoModel geometries.  They are dual use in the sense that they function completely outside of Athena, but also are able to function within Athena. 
 
@@ -12,7 +12,7 @@ To build  plugins for the GeometryExplorer <https://gitlab.cern.ch/GeoModelDev/G
 
       sudo apt-get update
 
-       sudo apt install geomodel-core-dev
+      sudo apt install geomodel-core-dev
 
 * Install the GeoModelCore development kit (from source):
 

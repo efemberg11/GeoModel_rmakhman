@@ -676,6 +676,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 
   bool s_isdown =  m_d->kbEvent && SO_KEY_PRESS_EVENT(m_d->kbEvent,SoKeyboardEvent::S);
   if (s_isdown) {
+    deselectAll();
 #ifdef __APPLE__
     char buffer[1024];
     char *wd=getcwd(buffer,1024);
@@ -698,10 +699,20 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   
     GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
     PVConstLink pV=volhandle->geoPVConstLink();
-
+    SbMatrix sbMtx=volhandle->getGlobalTransformToVolume();
+    GeoTrf::Transform3D::MatrixType  mtx;
+    for (int i=0;i<4;i++) {
+      for (int j=0;j<4;j++) {
+	mtx(j,i)=sbMtx[i][j];
+      }
+    }
+    GeoTrf::Transform3D tx;
+    tx.matrix()=mtx;
+    GeoTransform *xf=new GeoTransform(tx);
     GeoPhysVol *world=newWorld();
     GeoNameTag   *nameTag = new GeoNameTag(volhandle->getName().toStdString());
     world->add(nameTag);
+    world->add(xf);
     GeoPhysVol *pVMutable=(GeoPhysVol *) &*pV;
     world->add(pVMutable);
     world->exec(&dumpGeoModelGraph);
@@ -783,8 +794,8 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
       float      angle;
       mtx.getTransform(t,r,s,so);
       translation_x=t[0];
-      translation_x=t[1];
-      translation_x=t[2];
+      translation_y=t[1];
+      translation_z=t[2];
       r.getValue(axis,angle);
       rotaxis_x=axis[0];
       rotaxis_y=axis[1];
@@ -807,8 +818,8 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
       float      angle;
       mtx.getTransform(t,r,s,so);
       translation_x=t[0];
-      translation_x=t[1];
-      translation_x=t[2];
+      translation_y=t[1];
+      translation_z=t[2];
       r.getValue(axis,angle);
       rotaxis_x=axis[0];
       rotaxis_y=axis[1];

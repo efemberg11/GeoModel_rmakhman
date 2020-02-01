@@ -14,10 +14,8 @@ using json = nlohmann::json;
 
 class JSONParser {
 public:
-	JSONParser() {addFile("Units.js");}
 	JSONParser(const char* files) 
 	{
-		//addFile("Units.js");
 		std::istringstream iss(files);
     		std::string token;
     		while (std::getline(iss, token, ':'))

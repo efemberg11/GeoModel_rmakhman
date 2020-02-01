@@ -119,6 +119,10 @@ GeoSysController::GeoSysController(IVP1System * sys)
   connect(m_d->ui_misc.lineEdit_expand_vols_volname,SIGNAL(returnPressed()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
   connect(m_d->ui_misc.pushButton_expand_vols_volname,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
 
+  connect(m_d->ui_int.checkBox_localAxes, SIGNAL(stateChanged(int)), this, SIGNAL(displayLocalAxesChanged(int)));
+  connect(m_d->ui_int.slider_AxesScale, SIGNAL(valueChanged(int)), this, SIGNAL(axesScaleChanged(int)));
+
+
   setLastSelectedVolume(0);
 
  
@@ -151,7 +155,6 @@ void GeoSysController::setZoomToVolumeOnClick(bool b)
 {
   m_d->ui_int.checkBox_zoomToVolumes->setChecked(b);
 }
-
 
 //____________________________________________________________________
 void GeoSysController::setLastSelectedVolume(VolumeHandle*vh)
@@ -268,6 +271,12 @@ ZappedVolumeListModel * GeoSysController::zappedVolumeListModel() const
 {
   return m_d->zappedVolumeListModel;
 }
+
+//____________________________________________________________________
+bool GeoSysController::displayLocalAxesOnClick() const {
+  return m_d->ui_int.checkBox_localAxes->isChecked();
+}
+
 
 //____________________________________________________________________
 bool GeoSysController::zoomToVolumeOnClick() const

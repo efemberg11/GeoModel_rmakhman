@@ -73,6 +73,9 @@ protected slots:
   GeoPhysVol *newWorld()  const;
   void saveTrees();
 
+  void toggleLocalAxes(int);
+  void setAxesScale(int);
+  
 protected:
   class Imp;
   Imp * m_d;

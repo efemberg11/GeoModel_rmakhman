@@ -69,6 +69,7 @@ public:
   bool printInfoOnClick_Transform() const;
   bool printInfoOnClick_Tree() const;
   bool printInfoOnClick_Mass() const;
+  bool displayLocalAxesOnClick() const;
   bool zoomToVolumeOnClick() const;
 
   //Settings with change signals:
@@ -95,7 +96,10 @@ signals:
 
   void saveMaterialsToFile(QString,bool);//(filename,onlyChangedMaterials)
   void loadMaterialsFromFile(QString);//filename
+  void displayLocalAxesChanged(int);
+  void axesScaleChanged(int);
 
+  
 private:
 
   class Imp;

@@ -44,6 +44,14 @@
 #include <Inventor/nodes/SoCamera.h>
 #include <Inventor/nodes/SoCylinder.h>
 #include <Inventor/nodes/SoFont.h>
+#include <Inventor/nodes/SoText2.h>
+#include <Inventor/nodes/SoTranslation.h>
+#include <Inventor/nodes/SoLineSet.h>
+#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoDrawStyle.h>
+#include <Inventor/nodes/SoLightModel.h>
+#include <Inventor/nodes/SoTransform.h>
+#include <Inventor/nodes/SoScale.h>
 
 
 #include "GeoModelKernel/GeoVolumeCursor.h"
@@ -148,7 +156,6 @@ public:
 
     //Switch associated with the system - it is initialised only if the system has info available:
     SoSwitch * soswitch;
-
   };
 
   QList<SubSystemInfo*> subsysInfoList;//We need to keep and ordered version also (since wildcards in regexp might match more than one subsystem info).
@@ -185,7 +192,9 @@ public:
 
   QMap<quint32,QByteArray> restoredTopvolstates;
   void applyTopVolStates(const QMap<quint32,QByteArray>&, bool disablenotif = false);
-
+  SoSwitch    *axesSwitch;
+  SoScale     *axesScale;
+  SoTransform *axesTransform;
 };
 
 //_____________________________________________________________________________________
@@ -265,13 +274,15 @@ QWidget * VP1GeometrySystem::buildController()
   connect(m_d->controller,SIGNAL(transparencyChanged(float)),this,SLOT(updateTransparency()));
   connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
   connect(m_d->controller->requestOutputButton(), SIGNAL(clicked()), this, SLOT(saveTrees()));
-
+  connect(m_d->controller,SIGNAL(displayLocalAxesChanged(int)), this, SLOT(toggleLocalAxes(int)));
+  connect(m_d->controller,SIGNAL(axesScaleChanged(int)), this, SLOT(setAxesScale(int)));
+  
   //Setup models/views for volume tree browser and zapped volumes list:
   m_d->volumetreemodel = new VolumeTreeModel(m_d->controller->volumeTreeBrowser());
   m_d->controller->volumeTreeBrowser()->header()->hide();
   m_d->controller->volumeTreeBrowser()->uniformRowHeights();
   m_d->controller->volumeTreeBrowser()->setModel(m_d->volumetreemodel);
-
+  
   return m_d->controller;
 }
 
@@ -297,7 +308,6 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
   
   PVConstLink world(m_d->getGeometry());
   if (!world) return;
-  
   
   if (!m_d->m_textSep) {
     // FIXME!
@@ -392,6 +402,56 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
     m_d->restoredTopvolstates.clear();
   }
   m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
+
+
+  // Build some axes for the display of the local coordinate system.
+  {
+    m_d->axesSwitch = new SoSwitch();
+    SoSeparator *axesSeparator = new SoSeparator;
+    m_d->axesScale     = new SoScale;
+    m_d->axesTransform = new SoTransform;
+    m_d->axesSwitch->whichChild=SO_SWITCH_NONE ;
+    
+    SoLightModel *lModel=new SoLightModel;
+    lModel->model=SoLightModel::BASE_COLOR;
+    SoDrawStyle *drawStyle=new SoDrawStyle;
+    drawStyle->style=SoDrawStyle::LINES;
+    drawStyle->lineWidth=5;
+    axesSeparator->addChild(lModel);
+    axesSeparator->addChild(drawStyle);
+    axesSeparator->addChild(m_d->axesTransform);
+    axesSeparator->addChild(m_d->axesScale);
+    axesSeparator->addChild(m_d->axesSwitch);
+
+
+    std::string label[]={"X", "Y", "Z"};
+    
+    for (int i=0;i<3;i++) {
+      SoSeparator *sep = new SoSeparator;
+      SoCoordinate3 *coord = new SoCoordinate3;
+      SoLineSet *lineSet=new SoLineSet;
+      SoMaterial *material=new SoMaterial;
+      coord->point.set1Value(0,SbVec3f(0,0,0));
+      coord->point.set1Value(1,SbVec3f((i==0 ? 1500:0), (i==1? 1500: 0), (i==2 ? 1500: 0)));
+      material->diffuseColor.setValue((i==0 ? 1:0), (i==1? 1:0), (i==2 ? 1:0));
+      m_d->axesSwitch->addChild(sep);
+      sep->addChild(material);
+      sep->addChild(coord);
+      sep->addChild(lineSet);
+      SoTranslation *translation = new SoTranslation;
+      translation->translation.setValue((i==0 ? 1520:0), (i==1? 1520: 0), (i==2 ? 1520: 0));
+      SoFont  *font= new SoFont;
+      font->size=32;
+      
+      SoText2 *text = new SoText2;
+      text->string=label[i].c_str();
+      sep->addChild(translation);
+      sep->addChild(font);
+      sep->addChild(text);
+     }
+    m_d->sceneroot->addChild(axesSeparator);
+  }
+
   root->enableNotify(save);
   if (save)
     root->touch();
@@ -514,6 +574,17 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
   
   return world;
 
+}
+
+void VP1GeometrySystem::toggleLocalAxes(int i) {
+  if (i==0) m_d->axesSwitch->whichChild=SO_SWITCH_NONE;
+  else m_d->axesSwitch->whichChild=SO_SWITCH_ALL;
+}
+
+void VP1GeometrySystem::setAxesScale(int i) {
+  double x=(i-50)/25.0;
+  double scale = pow(10,x);
+  m_d->axesScale->scaleFactor.setValue(scale,scale,scale);
 }
 
 //_____________________________________________________________________________________
@@ -732,7 +803,6 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   //  Zoom to volume  //
   //////////////////////
 
-  //Nb: We don't do this if we already oriented to the muon chamber above.
   if (!orientedView&&m_d->controller->zoomToVolumeOnClick()) {
     if (m_d->sceneroot&&volhandle->nodeSoSeparator()) {
       std::set<SoCamera*> cameras = getCameraList();
@@ -741,6 +811,13 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 	    VP1CameraHelper::animatedZoomToSubTree(*it,m_d->sceneroot,volhandle->nodeSoSeparator(),2.0,1.0);
       }
     }
+  }
+
+
+  if (m_d->controller->displayLocalAxesOnClick()) {
+    SbMatrix mtx=volhandle->getGlobalTransformToVolume();
+    m_d->axesSwitch->whichChild=SO_SWITCH_ALL;
+    m_d->axesTransform->setMatrix(mtx);
   }
 
 

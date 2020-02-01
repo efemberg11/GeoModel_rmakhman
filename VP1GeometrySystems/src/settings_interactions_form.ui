@@ -47,6 +47,13 @@
       <string>Print on Selection</string>
      </property>
      <layout class="QGridLayout" name="blabla_2">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="checkBox_print_shape">
+        <property name="text">
+         <string>Shape</string>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="checkBox_print_copyno">
         <property name="text">
@@ -54,27 +61,10 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="checkBox_print_material">
-        <property name="text">
-         <string>Material</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="checkBox_print_transform">
         <property name="text">
          <string>Transform</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="checkBox_print_shape">
-        <property name="text">
-         <string>Shape</string>
         </property>
        </widget>
       </item>
@@ -98,19 +88,56 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="checkBox_print_material">
+        <property name="text">
+         <string>Material</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_automaticViewReorientations">
      <property name="title">
-      <string>Automatic view reorientations</string>
+      <string>Actions on selecton</string>
      </property>
      <layout class="QVBoxLayout">
       <item>
        <widget class="QCheckBox" name="checkBox_zoomToVolumes">
         <property name="text">
          <string>Zoom to volumes</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_localAxes">
+        <property name="text">
+         <string>Show local coordinate axes</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Axes scale:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="slider_AxesScale">
+        <property name="value">
+         <number>50</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::TicksBelow</enum>
         </property>
        </widget>
       </item>

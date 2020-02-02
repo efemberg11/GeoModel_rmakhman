@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unistd.h>
 #ifdef __APPLE__
 const std::string shared_obj_extension=".dylib";
 #else
@@ -71,13 +72,27 @@ int main(int argc, char ** argv) {
     }
   }
 
-  // if (((inputPlugins.size()+inputFiles.size())<1) || outputFile=="") {
-  //   std::cout << usage << std::endl;
-  //   return 3;
-  // }
   //
-  // Create a huge world volume made of Air:
+  // Check that we can access the output file
   //
+  if (access(outputFile.c_str(),F_OK)==0) {
+    if (!access(outputFile.c_str(),W_OK)) {
+      if (system(("rm -f "+ outputFile).c_str())) {
+	std::cerr << "Error, cannot overwrite existing file " << outputFile << std::endl;
+	return 3;
+      }
+    }
+    else {
+      std::cerr << "Error, cannot overwrite existing file " << outputFile << " (permission denied)" << std::endl;
+      return 4;
+    }
+  }
+
+  
+  //
+  // Create elements and materials:
+  // 
+  
   const double  gr =   SYSTEM_OF_UNITS::gram;
   const double  mole = SYSTEM_OF_UNITS::mole;
   const double  cm3 =  SYSTEM_OF_UNITS::cm3;
@@ -95,7 +110,11 @@ int main(int argc, char ** argv) {
   air->add(Argon, 0.0129);
   air->add(Hydrogen, 0.0008);
   air->lock();
-  
+
+  //
+  // Create a huge world volume made of Air:
+  //
+
   const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm);
   const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
   GeoPhysVol *world=new GeoPhysVol(worldLog);
@@ -117,7 +136,8 @@ int main(int argc, char ** argv) {
   // Loop over files, create the geometry and put it under the world:
   //
   for (const std::string & file : inputFiles) {
-    GMDBManager* db = new GMDBManager(file.c_str());
+    QString fString=file.c_str();
+    GMDBManager* db = new GMDBManager(fString);
     if (!db->isOpen()){
       std::cerr << "Error opening input file " << file << std::endl;
       return 6;
@@ -129,7 +149,6 @@ int main(int argc, char ** argv) {
     /* build the GeoModel geometry */
     GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
-    //world->add(dbPhys);
     GeoVolumeCursor aV(dbPhys);
 	
     while (!aV.atEnd()) {
@@ -142,19 +161,19 @@ int main(int argc, char ** argv) {
     }
     delete db;
   }
-
   //
   // Open a new database:
   //
   GMDBManager db(outputFile.c_str());
-  GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
-   
+  //   
   // check the DB connection
+  //
   if (!db.isOpen()) {
     std::cerr << "Error opening output file " << outputFile << std::endl;
-    return 4;
+    return 7;
   }
 
+  GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
   dumpGeoModelGraph.saveToDB();
    

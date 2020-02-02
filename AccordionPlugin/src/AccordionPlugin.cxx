@@ -1168,7 +1168,6 @@ void AccordionPlugin::create(GeoPhysVol *world)
         }        // end loop over ndivi
       }         //  end loop over irl (zig-zag)
   }
-  std::cout << "HELLO from point1" << std::endl;
 
 #endif  //  BUILD_ACCORDION_PLATES
   

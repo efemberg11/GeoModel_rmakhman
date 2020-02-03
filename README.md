@@ -148,10 +148,11 @@ make -j4
 make install
 ```
 
-After compilation, you should apply a temporary fix:
+After compilation, you should apply two temporary fixes:
 
 ```
-export GXPLUGINPATH=/usr/local/lib/gxplugins # this is a temporary fix
+install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # this is a temporary fix
+export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 ```
 
 Then, you can run your local copy of `gmex` with:

@@ -410,7 +410,7 @@ void AccordionPlugin::create(GeoPhysVol *world)
     // Creation of the straight electrode parts. Front (TIPK) & Back (TIPL)
 
     enum FB {FRONT, BACK, TERM};
-   
+    if (0)
     for (int fb=FRONT; fb!=TERM; fb++) 
       {
        

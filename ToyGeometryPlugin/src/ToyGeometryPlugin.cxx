@@ -23,6 +23,9 @@
 #include "GeoGenericFunctions/Cos.h"
 
 #include "GeoModelKernel/Units.h"
+
+#include "GeoXmlMatManager/GeoXmlMatManager.h"
+
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 using namespace GeoGenfun;
@@ -68,11 +71,10 @@ void ToyGeometryPlugin::create(GeoPhysVol *world)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
+  const GeoXmlMatManager* matman = GeoXmlMatManager::getManager();
   
-  // Bogus densities.  Later: read from database.
-  double densityOfAir=0.1, densityOfPolystyrene=0.2;
-  const GeoMaterial *air        = new GeoMaterial("Air Two",densityOfAir);
-  const GeoMaterial *poly       = new GeoMaterial("std::Polystyrene",densityOfPolystyrene);
+  const GeoMaterial *air        = matman->getMaterial("std::Air");
+  const GeoMaterial *poly       = matman->getMaterial("std::Polystyrene");
   
   //--------------------------------------//
   // Next make the box that describes

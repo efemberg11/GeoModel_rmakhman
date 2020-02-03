@@ -16,6 +16,9 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
 # Project's dependencies.
 find_package( GeoModelCore REQUIRED )
+find_package( GeoModelTools REQUIRED )
+find_package( GeoModelDataManagers REQUIRED )
+find_package( XercesC REQUIRED )
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )

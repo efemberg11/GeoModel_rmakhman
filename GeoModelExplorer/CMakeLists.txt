@@ -39,7 +39,7 @@ endif()
 
 # Define the path where GMEX plugins are stored and configure the runtime setup script.
 set(GMEX_PLUGINPATH "${CMAKE_INSTALL_PREFIX}/lib/gxplugins")
-configure_file(scripts/setup.sh.in setup.sh)
+configure_file(scripts/setup_gmex.sh.in setup_gmex.sh)
 
 
 # Configure the package's build.
@@ -57,4 +57,4 @@ endif()
 # --- Install the executable.
 install( TARGETS gmex DESTINATION bin )
 # --- Install the runtime setup script.
-install( PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION bin )
+install( PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setup_gmex.sh DESTINATION bin )

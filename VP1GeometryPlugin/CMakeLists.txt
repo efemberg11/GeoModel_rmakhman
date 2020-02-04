@@ -31,7 +31,6 @@ endif()
 target_include_directories( GXGeometryPlugin PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
-#TODO: unify the Coin/Coin3D name for our Apple/Ubuntu packages!!
 source_group( "VP1GeometryPlugin" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GXGeometryPlugin PROPERTIES

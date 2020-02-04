@@ -12,7 +12,13 @@ file( GLOB HEADERS VP1HEPVis/*.h )
 # Configure package build.
 add_library ( VP1HEPVis SHARED ${SOURCES} ${HEADERS}  )
 target_link_libraries( VP1HEPVis PUBLIC Qt5::Core
-GeoModelCore::GeoModelKernel )
+GeoModelCore::GeoModelKernel Coin )
+if( APPLE )
+  target_link_libraries (VP1HEPVis PUBLIC ${OPENGL_LIBRARIES} ${OPENGL_gl_LIBRARY} )
+else()
+  target_link_libraries (VP1HEPVis PUBLIC )
+endif()
+
 
 # Configure debug output.
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
@@ -26,12 +32,6 @@ endif()
 target_include_directories( VP1HEPVis PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
-#TODO: unify the Coin/Coin3D name for our Apple/Ubuntu packages!!
-if( APPLE )
-  target_link_libraries (VP1HEPVis PUBLIC ${OPENGL_LIBRARIES} ${OPENGL_gl_LIBRARY} Coin)
-else()
-  target_link_libraries (VP1HEPVis PUBLIC Coin3D)
-endif()
 source_group( "VP1HEPVis" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( VP1HEPVis PROPERTIES

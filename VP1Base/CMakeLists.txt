@@ -24,11 +24,11 @@ QT5_ADD_RESOURCES(UI_RESOURCES_RCC ${UI_RESOURCES})
 
 # Configure package build.
 add_library ( VP1Base SHARED ${SOURCES} ${HEADERS} ${UI_HDRS} ${UI_RESOURCES_RCC} )
-if (APPLE)
+# if (APPLE)
   target_link_libraries( VP1Base PUBLIC VP1HEPVis Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::PrintSupport Qt5::Gui Coin::Coin SoQt::SoQt )
-else()
-  target_link_libraries( VP1Base PUBLIC VP1HEPVis Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::PrintSupport Qt5::Gui )
-endif()
+# else()
+  # target_link_libraries( VP1Base PUBLIC VP1HEPVis Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::PrintSupport Qt5::Gui )
+# endif()
 
 # Configure debug output
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR

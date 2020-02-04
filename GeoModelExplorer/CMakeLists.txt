@@ -2,11 +2,7 @@ set(CMAKE_CXX_FLAGS "-fPIC -O0 -g -gdwarf-2" )
 
 
 find_package( SoQt  )
-if ( APPLE )
-  find_package( Coin )
-else()
-  find_package( Coin3D )
-endif()
+find_package( Coin )
 
 
 # Find the header and source files.
@@ -41,7 +37,12 @@ if( APPLE )
   ENDIF("${isSystemDir}" STREQUAL "-1")
 endif()
 
-# Configure package build.
+# Define the path where GMEX plugins are stored and configure the runtime setup script.
+set(GMEX_PLUGINPATH "${CMAKE_INSTALL_PREFIX}/lib/gxplugins")
+configure_file(scripts/setup.sh.in setup.sh)
+
+
+# Configure the package's build.
 add_executable ( gmex ${SOURCES} ${HEADERS}  )
 target_link_libraries( gmex VP1GUI VP1Base VP1HEPVis SoQt Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
 
@@ -52,5 +53,8 @@ target_compile_definitions( gmex PUBLIC
 -DQT_NO_DEBUG_OUTPUT )
 endif()
 
-# Configure package installation.
-install(TARGETS gmex DESTINATION bin)
+# Configure the package's installation.
+# --- Install the executable.
+install( TARGETS gmex DESTINATION bin )
+# --- Install the runtime setup script.
+install( PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION bin )

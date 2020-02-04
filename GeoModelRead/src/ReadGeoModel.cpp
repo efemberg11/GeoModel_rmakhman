@@ -34,6 +34,7 @@
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
+#include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
@@ -781,6 +782,82 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		if(error) qFatal("GeoPgon shape error!!! Aborting...");
 		return pgon;
 	}
+	else if (type == "GenericTrap") {
+		// shape parameters
+		double ZHalfLength = 0.;
+		unsigned int NVertices = 0;
+		GeoGenericTrapVertices Vertices;
+		bool error = false;
+		GeoGenericTrap* gTrap = nullptr;
+		QString par;
+		QStringList vars;
+		QString varName;
+		QString varValue;
+
+		// get parameters from DB string
+		QStringList shapePars = parameters.split(";");
+		// qInfo() << "shapePars: " << shapePars; // debug
+
+		int sizePars = shapePars.size();
+		// check if we have more than 3 parameters
+		if (sizePars > 3) {
+
+			// get the two GeoGenericTrap parameters: the ZHalfLength plus the number of vertices
+			for( int it=0; it < 2; it++) {
+				par = shapePars[it];
+				vars = par.split("=");
+				varName = vars[0];
+				varValue = vars[1];
+				// qInfo() << "vars: " << vars; // for debug only
+				if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();
+				if (varName == "NVertices") NVertices = varValue.toUInt();
+			}
+
+			
+
+			// and now loop over the rest of the list, to get the parameters of all Z planes
+			for (int it=2; it < NVertices; it++)
+			{
+				par = shapePars[it];
+				vars = par.split("=");
+				varName = vars[0];
+				varValue = vars[1];
+				// qInfo() << "it:" << it << "par:" << par << "varName:" << varName << "varValue:" << varValue;
+
+				if (varName == "X") {
+
+					double x = varValue.toDouble();
+
+					it++; // go to next variable
+
+					par = shapePars[it];
+					vars = par.split("=");
+					varName = vars[0];
+					varValue = vars[1];
+					if (varName == "Y") {
+					  double y = varValue.toDouble();
+					  Vertices.push_back(GeoTwoVector(x,y));
+					}
+					else {
+					  error = 1;
+					}
+					if(error) qWarning() << "ERROR! GeoGenericTrap 'X' and 'Y' values are not at the right place! --> " << shapePars;
+				} else {
+					error = 1;
+					qWarning() << "ERROR! GeoGenericTrap 'ZPos' value is not at the right place! --> " << shapePars;
+				}
+			}
+			// build the basic GenericTrap shape
+			gTrap = new GeoGenericTrap(ZHalfLength,Vertices);
+		} // end if (size>3)
+		else {
+			qWarning() << "ERROR!! GeoGenericTrap has no Z vertices!! --> shape input parameters: " << shapePars;
+			error = 1;
+		}
+		if(error) qFatal("GeoGenericTrap shape error!!! Aborting...");
+		return gTrap;
+	}
+	
 	else if (type == "SimplePolygonBrep") {
 		//qInfo() << "Reading-in: SimplePolygonBrep: "; // debug
 		// shape parameters

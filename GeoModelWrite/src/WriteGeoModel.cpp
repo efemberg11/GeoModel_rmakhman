@@ -23,6 +23,7 @@
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
+#include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoShapeIntersection.h"
 #include "GeoModelKernel/GeoShapeShift.h"
@@ -1086,6 +1087,17 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		pars << "opA=" + QString::number( shapeIdA.toUInt() ) ;
 		pars << "opB=" + QString::number( shapeIdB.toUInt() ) ;
 		shapePars = pars.join(";");
+	}
+	else if (shapeType=="GenericTrap") {
+	  QStringList pars;
+	  const GeoGenericTrap * shapeIn = dynamic_cast<const GeoGenericTrap*>(shape);
+	  pars << "ZHalfLength=" + QString::number(shapeIn->getZHalfLength());
+	  pars << "NVertices="   + QString::number(shapeIn->getVertices().size());
+	  for (int i=0; i<shapeIn->getVertices().size(); ++i) {
+	    pars << "X=" + QString::number(shapeIn->getVertices()[i](0));
+	    pars << "Y=" + QString::number(shapeIn->getVertices()[i](1));
+	  }
+	  shapePars = pars.join(";");
 	}
 	else {
 		std::cout << "\n\tWARNING!!! - Shape '" << shapeType.toStdString() << "' needs to be persistified!!\n\n";

@@ -1,6 +1,10 @@
 ################################################################################
-# Package: GeoModelGeometryPlugin
+# Package: GeoModelGeometrySystems
 ################################################################################
+
+# # External dependencies:
+# find_package( Coin  REQUIRED )
+# find_package( OpenGL REQUIRED )
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -21,7 +25,6 @@ add_library ( VP1GeometrySystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 target_link_libraries (VP1GeometrySystems
   VP1GUI VP1Base VP1HEPVis
   GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite
-  SoQt Coin
   Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport Qt5::Sql)
 
 # Configure debug output

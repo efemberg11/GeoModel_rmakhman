@@ -12,7 +12,7 @@ file( GLOB HEADERS VP1HEPVis/*.h )
 # Configure package build.
 add_library ( VP1HEPVis SHARED ${SOURCES} ${HEADERS}  )
 target_link_libraries( VP1HEPVis PUBLIC Qt5::Core
-GeoModelCore::GeoModelKernel Coin )
+GeoModelCore::GeoModelKernel Coin::Coin )
 if( APPLE )
   target_link_libraries (VP1HEPVis PUBLIC ${OPENGL_LIBRARIES} ${OPENGL_gl_LIBRARY} )
 else()

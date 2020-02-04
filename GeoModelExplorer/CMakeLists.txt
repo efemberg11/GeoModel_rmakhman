@@ -1,8 +1,8 @@
 set(CMAKE_CXX_FLAGS "-fPIC -O0 -g -gdwarf-2" )
 
 
-find_package( SoQt  )
-find_package( Coin )
+# find_package( SoQt  )
+# find_package( Coin )
 
 
 # Find the header and source files.
@@ -44,7 +44,7 @@ configure_file(scripts/setup_gmex.sh.in setup_gmex.sh)
 
 # Configure the package's build.
 add_executable ( gmex ${SOURCES} ${HEADERS}  )
-target_link_libraries( gmex VP1GUI VP1Base VP1HEPVis SoQt Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
+target_link_libraries( gmex VP1GUI VP1Base VP1HEPVis Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
 
 # Configure debug output
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR

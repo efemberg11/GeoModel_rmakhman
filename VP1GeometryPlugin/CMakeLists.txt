@@ -68,6 +68,13 @@ QT5_WRAP_UI(UI_HDRS ${UIS})
 add_library ( VP1GeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 target_link_libraries (VP1GeometryPlugin VP1GeometrySystems VP1GUI VP1Base VP1HEPVis SoQt Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
 
+# Configure debug output
+if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
+"${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
+target_compile_definitions( VP1GeometryPlugin PUBLIC
+-DQT_NO_DEBUG_OUTPUT )
+endif()
+
 # Configure package installation.
 target_include_directories( VP1GeometryPlugin PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -78,11 +85,6 @@ source_group( "src" FILES ${SOURCES} )
 set_target_properties( VP1GeometryPlugin PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
-if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-   "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-   target_compile_definitions( VP1GeometryPlugin PUBLIC
-      -DQT_NO_DEBUG_OUTPUT )
-endif()
 
 # Install the library.
 # message("GEOMODEL_DIR_PLUGINS: ${GEOMODEL_DIR_PLUGINS}")

@@ -20,6 +20,8 @@ endif()
 # Configure package build.
 add_executable ( gmex ${SOURCES} ${HEADERS}  )
 target_link_libraries( gmex VP1GUI VP1Base VP1HEPVis SoQt Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
+
+# Configure debug output
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
 "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
 target_compile_definitions( gmex PUBLIC

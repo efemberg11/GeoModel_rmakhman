@@ -1,10 +1,3 @@
-# cmake_minimum_required(VERSION 3.12)
-
-# set(MYLIB_VERSION_MAJOR 1)
-# set(MYLIB_VERSION_MINOR 0)
-# set(MYLIB_VERSION_PATCH 0)
-
-# project ( "GXHEPVis" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
 # External dependencies:
 #TODO: unify the Coin/Coin3D name for our Apple/Ubuntu packages!!
@@ -16,28 +9,22 @@ else()
 endif()
 
 
-
-
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1HEPVis/*.h )
 
-# TODO: to be cleaned up...
-# include_directories("${PROJECT_SOURCE_DIR}")
-# include_directories(${Qt5Core_INCLUDE_DIRS} )
-# add_definitions (${Qt5Core_DEFINITIONS})
-# if ( APPLE )
-#   include_directories(${Coin_INCLUDE_DIR} )
-# else()
-#   include_directories(${Coin3D_INCLUDE_DIRS} )
-# endif()
-
-# message("Coin_INCLUDE_DIR: ${Coin_INCLUDE_DIR}")
 
 # Configure package build.
 add_library ( VP1HEPVis SHARED ${SOURCES} ${HEADERS}  )
 target_link_libraries( VP1HEPVis PUBLIC Qt5::Core
 GeoModelCore::GeoModelKernel )
+
+# Configure debug output.
+if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
+   "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
+   target_compile_definitions( VP1HEPVis PUBLIC
+      -DQT_NO_DEBUG_OUTPUT )
+endif()
 
 
 # Configure package installation.
@@ -55,11 +42,7 @@ source_group( "src" FILES ${SOURCES} )
 set_target_properties( VP1HEPVis PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
-if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-   "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-   target_compile_definitions( VP1HEPVis PUBLIC
-      -DQT_NO_DEBUG_OUTPUT )
-endif()
+
 
 # Install the library.
 install( TARGETS VP1HEPVis
@@ -75,16 +58,3 @@ install( TARGETS VP1HEPVis
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/VP1HEPVis
    COMPONENT Development )
-
-
-
-# # Install
-# install(TARGETS VP1HEPVis
-#   LIBRARY
-#   DESTINATION lib
-#   COMPONENT Libraries
-#   )
-#
-# # Set version number for installed library
-# set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
-# set_target_properties(VP1HEPVis PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})

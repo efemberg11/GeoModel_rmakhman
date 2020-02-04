@@ -37,7 +37,7 @@ variables:
     - mv coin-sources/* coin
     - mkdir build_coin
     - cd build_coin
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
+    - cmake "${CMAKE_ARGS}" ../coin
     - make -j2
     - make install
   artifacts:
@@ -56,7 +56,7 @@ variables:
     - hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
     - mkdir build_soqt
     - cd build_soqt
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
+    - cmake "${CMAKE_ARGS}" ../soqt
     - make -j2
     - make install
   artifacts:
@@ -70,7 +70,7 @@ variables:
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
     - mkdir geomodelcore-build
     - cd geomodelcore-build
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
+    - cmake "${CMAKE_ARGS}" ../GeoModelCore
     - make -j2
     - make install
   artifacts:
@@ -84,7 +84,7 @@ variables:
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
     - mkdir geomodelio-build
     - cd geomodelio-build
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
+    - cmake "${CMAKE_ARGS}" ../GeoModelIO
     - make -j2
     - make install
   artifacts:
@@ -100,8 +100,7 @@ variables:
     - pwd; ls
     - mkdir build
     - cd build
-    - echo "${CMAKE_ARGS}"
-    - cmake ${CMAKE_ARGS}  ..
+    - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install  ..
     - cmake --build . -- -j2
     - cmake --build . -- install
 

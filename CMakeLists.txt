@@ -38,11 +38,11 @@ include( GNUInstallDirs )
 add_subdirectory(VP1GeometryPlugin) # FIXME: to be renamed, e.g. 'GeoModelGeometryPlugin'
 add_subdirectory(VP1GeometrySystems) # FIXME: to be renamed, e.g. 'GeoModelGeometrySystem'
 add_subdirectory(GeoModelExplorer)
-add_subdirectory(VP1GUI) # FIXME: to be renamed, e.g. 'GeoModelGUI'
+add_subdirectory(VP1Gui) # FIXME: to be renamed, e.g. 'GeoModelGUI'
 add_subdirectory(VP1Base)
 add_subdirectory(VP1HEPVis)
 
-# Create and install the version description of the project.
+# Create and install the version description of the whole project.
 include( CMakePackageConfigHelpers )
 write_basic_config_version_file(
    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}ConfigVersion.cmake

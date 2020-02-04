@@ -37,16 +37,19 @@ set_target_properties( GXGeometryPlugin PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 
+# Install the actual library (i.e., libGXGeometryPlugin.1.dylib)
 install( TARGETS GXGeometryPlugin
    EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/gxplugins
    COMPONENT Runtime
    NAMELINK_SKIP )
+# Install the symlink (i.e., libGXGeometryPlugin.dylib)
 install( TARGETS GXGeometryPlugin
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/gxplugins
    COMPONENT Development
    NAMELINK_ONLY )
+# Install the header files
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GXGeometryPlugin
    COMPONENT Development )

@@ -1,34 +1,6 @@
 ################################################################################
 # Package: VP1GeometryPlugin
 ################################################################################
-# cmake_minimum_required(VERSION 3.12)
-
-# set(MYLIB_VERSION_MAJOR 1)
-# set(MYLIB_VERSION_MINOR 0)
-# set(MYLIB_VERSION_PATCH 0)
-#
-# project ( "GXGeometryPlugin" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
-
-# if ( APPLE )
-# 	find_package(OpenGL REQUIRED)
-# endif()
-#find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-
-# FIXME: the double-naming of Coin packages
-# External dependencies:
-if( APPLE )
-  find_package( Coin )
-else()
-  find_package( Coin3D )
-endif()
-
-# find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
-# find_package( GeoModelCore REQUIRED )
-# find_package( GeoModelIO REQUIRED )
-# find_package( Eigen3 REQUIRED )
-# if( APPLE )
-#   find_package(OpenGL REQUIRED)
-# endif()
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -44,29 +16,9 @@ set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
 QT5_WRAP_UI(UI_HDRS ${UIS})
 
 
-# include_directories ("${EIGEN3_INCLUDE_DIR}")
-# include_directories ("${PROJECT_SOURCE_DIR}")
-# include_directories ("${PROJECT_SOURCE_DIR}/src")
-# include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
-# include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
-# include_directories ("${PROJECT_SOURCE_DIR}/../GeoModelGeometrySystem")
-
-# include_directories(${Qt5Core_INCLUDE_DIRS} )
-# include_directories(${Qt5Gui_INCLUDE_DIRS} )
-# include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-# include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-# include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-# include_directories(${Qt5Network_INCLUDE_DIRS} )
-# include_directories(${Qt5Sql_INCLUDE_DIRS} )
-# include_directories(${Coin3D_INCLUDE_DIRS} )
-# include_directories(${SoQt_INCLUDE_DIRS} )
-# include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-
-# add_definitions (${Qt5Core_DEFINITIONS})
-
 # Configure package build.
 add_library ( GXGeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
-target_link_libraries (GXGeometryPlugin VP1GeometrySystems VP1GUI VP1Base VP1HEPVis SoQt Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
+target_link_libraries (GXGeometryPlugin VP1GeometrySystems VP1GUI VP1Base VP1HEPVis )
 
 # Configure debug output
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR

@@ -1,9 +1,7 @@
 
 find_package( Coin )
 find_package( SoQt  )
-if ( APPLE )
-	find_package(OpenGL REQUIRED)
-endif()
+find_package( OpenGL )
 find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport )
 
 

@@ -6,14 +6,9 @@ file( GLOB HEADERS VP1GUI/*.h )
 file( GLOB UIS src/*.ui VP1GUI/*.ui )
 
 
-#TODO: unify the Coin/Coin3D name for our Apple/Ubuntu packages!!
-find_package( SoQt )
-if ( APPLE )
-  find_package( Coin )
-	find_package(OpenGL REQUIRED)
-else()
-  find_package( Coin3D )
-endif()
+# find_package( SoQt )
+# find_package( Coin )
+# find_package(OpenGL REQUIRED)
 
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -30,7 +25,7 @@ QT5_ADD_RESOURCES(UI_RESOURCES_RCC ${UI_RESOURCES})
 
 # Configure package build.
 add_library ( VP1GUI SHARED ${SOURCES} ${HEADERS} ${UI_HDRS} ${UI_RESOURCES_RCC}  )
-target_link_libraries (VP1GUI VP1Base VP1HEPVis  SoQt Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
+target_link_libraries (VP1GUI VP1Base VP1HEPVis Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
 
 # Configure debug output.
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR

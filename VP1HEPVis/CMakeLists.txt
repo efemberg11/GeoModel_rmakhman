@@ -1,12 +1,7 @@
 
 # External dependencies:
-#TODO: unify the Coin/Coin3D name for our Apple/Ubuntu packages!!
-if ( APPLE )
-  find_package( Coin  REQUIRED )
-	find_package( OpenGL REQUIRED )
-else()
-  find_package( Coin3D  REQUIRED )
-endif()
+find_package( Coin  REQUIRED )
+find_package( OpenGL REQUIRED )
 
 
 # Find the header and source files.

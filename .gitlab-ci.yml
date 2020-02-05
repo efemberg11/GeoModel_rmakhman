@@ -5,7 +5,7 @@ stages:
 
 
 variables:
-  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
 
@@ -106,7 +106,8 @@ variables:
     - pwd; ls
     - mkdir build
     - cd build
-    - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install  ..
+    - echo "${CMAKE_ARGS}"
+    - cmake ${CMAKE_ARGS} ..
     - cmake --build . -- -j2
     - cmake --build . -- install
 

@@ -101,12 +101,14 @@ variables:
 
 .geomodelvisualization-build-template: &geomodelvisualization-job
   stage: build
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - echo "PWD; LS"
     - pwd; ls
     - mkdir build
     - cd build
-    - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install  ..
+    - cmake ${CMAKE_ARGS} ..
     - cmake --build . -- -j2
     - cmake --build . -- install
 

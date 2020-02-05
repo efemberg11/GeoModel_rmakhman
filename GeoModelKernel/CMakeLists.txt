@@ -6,7 +6,7 @@ file( GLOB HEADERS GeoModelKernel/*.h )
 
 # Create the library.
 add_library( GeoModelKernel SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoModelKernel PUBLIC GeoGenericFunctions )
+target_link_libraries( GeoModelKernel PUBLIC GeoGenericFunctions ${CMAKE_DL_LIBS} )
 target_include_directories( GeoModelKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} )
 target_include_directories( GeoModelKernel PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

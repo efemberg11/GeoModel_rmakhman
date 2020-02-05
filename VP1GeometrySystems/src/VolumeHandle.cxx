@@ -546,7 +546,8 @@ const GeoMaterial * VolumeHandle::geoMaterial() const {
 //____________________________________________________________________
 bool VolumeHandle::isEther() const
 {
-  return QString(geoMaterial()->getName().c_str()).endsWith("Ether");
+  return QString(geoMaterial()->getName().c_str()).endsWith("Ether") ||
+    QString(geoMaterial()->getName().c_str()).endsWith("HyperUranium");
 }
 
 //____________________________________________________________________

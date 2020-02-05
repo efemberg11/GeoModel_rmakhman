@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 */
-// Author: Joe Boudreau, repurposed from orginal work from
+// Author: Joe Boudreau, repurposed from orginal work from 
 //              Riccardo.Maria.Bianchi@cern.ch, Apr 2017
 // Update: Nov 2019
 //
@@ -21,7 +21,7 @@
 
 int main(int argc, char** argv)
 {
-
+  
   QStringList arguments;
   for (int i = 0; i<=argc; i++){
     arguments << argv[i];
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
   bool helpIsSet = parser.isSet(helpOption);
 
   QStringList inputList=parser.positionalArguments();
-
+  
   int NGeomFiles=0;
   for (int i=0;i<inputList.size()-1;i++) {
     std::string input=inputList[i].toStdString();
@@ -54,8 +54,8 @@ int main(int argc, char** argv)
       return 0;
     }
   }
-
-
+  
+  
 
 
   //If help option is set, display help and exit VP1Light
@@ -79,5 +79,5 @@ int main(int argc, char** argv)
   GXExecutionScheduler *scheduler=GXExecutionScheduler::init();
   while (scheduler->interact())
   GXExecutionScheduler::cleanup(scheduler);
-
+  
 }

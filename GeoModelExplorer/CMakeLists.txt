@@ -1,36 +1,48 @@
+
+set(MYLIB_VERSION_MAJOR 1)
+set(MYLIB_VERSION_MINOR 0)
+set(MYLIB_VERSION_PATCH 0)
+
+set( CMAKE_BUILD_TYPE DEBUG )
 set(CMAKE_CXX_FLAGS "-fPIC -O0 -g -gdwarf-2" )
 
+project ( "gmex" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-# find_package( SoQt  )
-# find_package( Coin )
+find_package( Coin REQUIRED )
+find_package( SoQt REQUIRED )
+if ( APPLE )
+	find_package(OpenGL REQUIRED)
+endif()
+find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
+
 
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
+file( GLOB HEADERS RunVP1Light/*.h )
 
 
-# Define the path where GMEX plugins are stored and configure the runtime setup script.
-set(GMEX_PLUGINPATH "${CMAKE_INSTALL_PREFIX}/lib/gxplugins")
-configure_file(scripts/setup_gmex.sh.in setup_gmex.sh)
 
-
-# Configure the package's build.
+include_directories ("${PROJECT_SOURCE_DIR}")
+include_directories ("${PROJECT_SOURCE_DIR}/src")
+include_directories ("${PROJECT_SOURCE_DIR}/../VP1Gui")
 add_executable ( gmex ${SOURCES} ${HEADERS}  )
-target_link_libraries( gmex VP1Gui VP1Base VP1HEPVis Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
 
-# Configure debug output
-if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-  "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-    target_compile_definitions( gmex PUBLIC
-      -DQT_NO_DEBUG_OUTPUT )
-endif()
+# External dependencies:
+include_directories(${Qt5Core_INCLUDE_DIRS} )
+include_directories(${Qt5Gui_INCLUDE_DIRS} )
+include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
+include_directories(${Qt5Widgets_INCLUDE_DIRS} )
+include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
+include_directories(${Qt5Network_INCLUDE_DIRS} )
 
-if( NOT APPLE )
-  set_target_properties( gmex PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE )
-endif()
+include_directories(${Coin_INCLUDE_DIRS} )
+include_directories(${SoQt_INCLUDE_DIRS} )
 
-# Configure the package's installation.
-# --- Install the executable.
-install( TARGETS gmex RUNTIME DESTINATION bin )
-# --- Install the runtime setup script.
-install( PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setup_gmex.sh DESTINATION bin )
+add_definitions (${Qt5Core_DEFINITIONS})
+add_definitions (${Qt5Gui_DEFINITIONS})
+add_definitions (${Qt5OpenGL_DEFINITIONS})
+add_definitions (${Qt5Widgets_DEFINITIONS})
+add_definitions (${Qt5PrintSupport_DEFINITIONS})
+target_link_libraries( gmex GXGui GXBase GXHEPVis ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+install(TARGETS gmex DESTINATION bin)

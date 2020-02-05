@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelIO" VERSION 2.1.0 LANGUAGES CXX )
+project( "GeoModelIO" VERSION 2.0.1 LANGUAGES CXX )
 
 # Set default build options.
 set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
@@ -20,35 +20,6 @@ find_package( Qt5 COMPONENTS Core Sql REQUIRED )
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )
-
-
-# Set global installation RPATH settings
-# Docs: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
-# -- Set macOS settings
-if( APPLE )
-  # With these settings you are able to run the programs directly from the build tree.
-  # But the RPATH is cleared when installing the executable.
-  # So we have to configure the RPATH handling farther, after this instruction.
-  SET(CMAKE_MACOSX_RPATH 1)
-endif()
-# -- Set settings for all platforms
-# use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-# when building, don't use the install RPATH already
-# (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-# set the RPATH used for installed libraries
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
-# add the automatically determined parts of the RPATH
-# which points to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-# the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-if("${isSystemDir}" STREQUAL "-1")
-     message("Setting RPATH for non-system install directory...")
-     SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif("${isSystemDir}" STREQUAL "-1")
-
 
 # Set sub-packages to build.
 add_subdirectory( GeoModelErrorHandler )

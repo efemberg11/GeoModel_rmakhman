@@ -30,10 +30,7 @@
 #include <iomanip>
 
 static bool         parIsPerformance = false;
-//static bool         parBuildGDML = false;
-//static std::string  parGDMLFileName = "ATLAS-R2-2016-01-00-01.gdml";
-static G4String  geometryFileName = "ATLAS-R2-2016-01-00-01.db";
-//static std::string  parSQLiteFileName = "ATLAS-R2-2016-01-00-01.db";
+static G4String     geometryFileName = "ATLAS-R2-2016-01-00-01.db";
 static std::string  parMacroFileName = "";
 static std::string  parPhysListName  = "FTFP_BERT";
 
@@ -74,45 +71,44 @@ int main(int argc, char** argv) {
 #else
     G4RunManager* runManager = new G4RunManager;
 #endif
+    // set mandatory initialization classes
+    
+    // 1. Detector construction
+    MyDetectorConstruction* detector = new MyDetectorConstruction;
+    detector->SetGeometryFileName (geometryFileName);
+    runManager->SetUserInitialization(detector);
   
-  // set mandatory initialization classes
+    // 2. Physics list
+    G4PhysListFactory factory;
+    if (factory.IsReferencePhysList(parPhysListName)) {
+        G4VModularPhysicsList* physList = factory.GetReferencePhysList(parPhysListName);
+        runManager->SetUserInitialization(physList);
+    } else if (parPhysListName==G4String("GV")) {
+        G4VUserPhysicsList* physList = new MyGVPhysicsList();
+        runManager->SetUserInitialization(physList);
+    } else {
+        G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
+        return -1;
+    }
   
-  // 1. Detector construction
-  MyDetectorConstruction* detector = new MyDetectorConstruction;
-  detector->SetGeometryFileName (geometryFileName); 
-  runManager->SetUserInitialization(detector);
+    // 3. User action
+    runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance));
   
-  // 2. Physics list
-  G4PhysListFactory factory;
-  if (factory.IsReferencePhysList(parPhysListName)) {
-    G4VModularPhysicsList* physList = factory.GetReferencePhysList(parPhysListName);
-    runManager->SetUserInitialization(physList);
-  } else if (parPhysListName==G4String("GV")) {
-    G4VUserPhysicsList* physList = new MyGVPhysicsList();
-    runManager->SetUserInitialization(physList);
-  } else {
-    G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
-    return -1;
-  }
-  //
-  // 3. User action
-  runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance));
-  //
-  // 4. Run the simulation in batch mode
-  G4UImanager* UI = G4UImanager::GetUIpointer();
-  G4String command = "/control/execute ";
-  UI->ApplyCommand(command+parMacroFileName);
-  //
-  // Print out the final random number
-  G4cout << G4endl
-      	 << " ================================================================= " << G4endl
-         << " Final random number = " << CLHEP::HepRandom::getTheEngine()->flat() << G4endl
-      	 << " ================================================================= " << G4endl
-         << G4endl;
-  //
-  // Delete the RunManager
-  delete runManager;
-  return 0;
+    // 4. Run the simulation in batch mode
+    G4UImanager* UI = G4UImanager::GetUIpointer();
+    G4String command = "/control/execute ";
+    UI->ApplyCommand(command+parMacroFileName);
+  
+    // Print out the final random number
+    G4cout << G4endl
+           << " ================================================================= " << G4endl
+           << " Final random number = " << CLHEP::HepRandom::getTheEngine()->flat() << G4endl
+      	   << " ================================================================= " << G4endl
+           << G4endl;
+    //
+    // Delete the RunManager
+    delete runManager;
+    return 0;
 }
 
 static struct option options[] = {
@@ -126,7 +122,7 @@ static struct option options[] = {
 
 void Help() {
   std::cout <<"\n " << std::setw(100) << std::setfill('=') << "" << std::setfill(' ') << std::endl;
-  std::cout <<"  FullSimLight Geant4 application.    \n"
+  G4cout <<"  FullSimLight Geant4 application.    \n"
             << std::endl
             <<"  **** Parameters: \n"
             <<"      -m :   REQUIRED : the standard Geant4 macro file name \n"
@@ -182,10 +178,4 @@ void GetInputArguments(int argc, char** argv) {
     Help();
     exit(-1);
   }
-  // check if build from GDML file flag is set that a GDML file was provided
-//  if (parBuildGDML && parGDMLFileName=="") {
-//        G4cout << "  *** ERROR : GDML file is required. " << G4endl;
-//        Help();
-//        exit(-1);
-//    }
 }

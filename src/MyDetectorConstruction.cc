@@ -24,6 +24,9 @@
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 
+#include "GeoModelKernel/GeoVGeometryPlugin.h"
+#include "GeoModelKernel/GeoGeometryPluginLoader.h"
+
 #include <QCoreApplication>
 #include <QString>
 #include <QDebug>
@@ -38,9 +41,7 @@ G4double MyDetectorConstruction::gFieldValue = 0.0;
 
 MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
-  fGDMLFileName      = "ATLAS-R2-2016-01-00-01.gdml";
-  fBuildFromGDML     = false;
-  fSQLiteFileName    = "ATLAS-R2-2016-01-00-01.db";
+  fGeometryFileName    = "ATLAS-R2-2016-01-00-01.db";
   fFieldValue        = 0.0;
   fDetectorMessenger = new MyDetectorMessenger(this);
 }
@@ -50,79 +51,69 @@ MyDetectorConstruction::~MyDetectorConstruction()
   delete fDetectorMessenger;
 }
 
+void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope){
+    
+    int localNoDaughters = envelope->GetNoDaughters();
+    //std::cout<<"Total n. of Daughters of "<<envelope->GetName()<<" is : "<<localNoDaughters<<std::endl;
+    for (int sampleNo=0; sampleNo<localNoDaughters; sampleNo++){
+        
+        G4VPhysicalVolume *daughter=envelope->GetDaughter(sampleNo);
+        if(daughter->GetLogicalVolume()->GetNoDaughters()>0)
+                RecursivelyCheckOverlap(daughter->GetLogicalVolume());
+        //std::cout<<"Starting Overlaps check on daughter: "<<daughter->GetName()<<std::endl;
+        daughter->CheckOverlaps();
+    }
+}
+
 G4VPhysicalVolume *MyDetectorConstruction::Construct()
 {
     fTimer.Start();
+  
     G4cout << "MyDetectorConstruction::Construct() :: starting the timer"<<G4endl;
-    if(!fBuildFromGDML)
+    
+    if (fGeometryFileName.contains(".dylib") || fGeometryFileName.contains(".so"))
     {
-        G4cout << "Building the detector from a SQLite file"<<G4endl;
+        std::cout<< "Bulding the detector from a plugin: "<<fGeometryFileName<<std::endl;
+        GeoGeometryPluginLoader loader;
+        GeoVGeometryPlugin *factory=loader.load(fGeometryFileName.data());
+        if (!factory) {
+            std::cout<<"Error!Cannot load geometry from factory. Exiting!"<<std::endl;
+            exit(0);
+            
+        }
+        std::cout<< "Plugin done for now"<<std::endl;
+         exit(0);
+        
+    }
+    else if (fGeometryFileName.contains(".db")){
+        G4cout << "Building the detector from the SQLite file: "<<fGeometryFileName<<G4endl;
+        
         // open the DB
-        GMDBManager* db = new GMDBManager(fSQLiteFileName.data());
+        GMDBManager* db = new GMDBManager(fGeometryFileName.data());
         /* Open database */
         if (db->isOpen()) {
             qDebug() << "OK! Database is open!";
         }
-        else {
+        else{
             qDebug() << "Database is not open!";
             // return;
             throw;
+            
         }
-
+    
         // -- testing the input database
         //std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
         //db->printAllMaterials();
         /* setup the GeoModel reader */
         GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
         qDebug() << "ReadGeoModel set.";
-
-
+        
+        
         /* build the GeoModel geometry */
         GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
         qDebug() << "ReadGeoModel::buildGeoModel() done.";
-
-
-    // --- testing the imported ATLAS Geometry
-
-//    // get the GeoLogVol used for the 'world' volume
-//    std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;
-//    const GeoLogVol* logVol = world->getLogVol();
-//    std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;
-//    std::cout << "'world' GeoMaterial name: " << logVol->getMaterial()->getName() << std::endl;
-//
-//    // get number of children volumes
-//    unsigned int nChil = world->getNChildVols();
-//    std:: cout << "'world' number of children: " << nChil << std::endl;
-//
-//    // loop over all children nodes
-//    std::cout << "Looping over all 'volume' children (i.e., GeoPhysVol and GeoFullPhysVol)..." << std::endl;
-//    for (unsigned int idx=0; idx<nChil; ++idx) {
-//        PVConstLink nodeLink = world->getChildVol(idx);
-//
-//        if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) ) {
-//            std::cout << "\t" << "the child n. " << idx << " ";
-//            const GeoVPhysVol *childVolV = &(*( nodeLink ));
-//            if ( dynamic_cast<const GeoPhysVol*>(childVolV) )
-//
-//            {
-//                const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
-//                std::cout << "is a GeoPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName() << std::endl;
-//                std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
-//
-//            } else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
-//                const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
-//                std::cout << "is a GeoFullPhysVol, whose GeoLogVol name is: " << childVol->getLogVol()->getName() << std::endl;
-//                std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
-//            }
-//        } else if ( dynamic_cast<const GeoNameTag*>( &(*( nodeLink ))) ) {
-//            qDebug() << "\t" << "the child n. " << idx << " is a GeoNameTag";
-//            const GeoNameTag *childVol = dynamic_cast<const GeoNameTag*>(&(*( nodeLink )));
-//            std::cout << "\t\tGeoNameTag's name: " << childVol->getName() << std::endl;
-//            //std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
-//        }
-//    }
         fTimer.Stop();
-        G4cout << "First step done. GeoModelTree built from the SQLite file "<<G4endl;
+        G4cout << "First step done. GeoModelTree built from the SQLite file."<<G4endl;
         G4cout << "*** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
         G4cout << "*** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
         G4cout << "*** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
@@ -134,34 +125,43 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         std::cout << "Building G4 geometry."<<std::endl;
         G4LogicalVolume* envelope = builder->Build(world);
         G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
-        //fWorld = builder->Build(world);
+        
         fWorld = physWorld;
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+        
+        //RecursivelyCheckOverlap(envelope);
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly check your setup selection criteria or GDML input!" << G4endl;
             G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
         }
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
-        G4cout << "Detector Construction from the SQLite file " << fSQLiteFileName.data() <<", done!"<<G4endl;
+        G4cout << "Detector Construction from the SQLite file " << fGeometryFileName.data() <<", done!"<<G4endl;
     }
-    else
-    {
-        G4cout << "Building the detector from a GDML file"<<G4endl;
+    
+    else if (fGeometryFileName.contains(".gdml")){
+        G4cout << "Building the detector from the GDML file: "<<fGeometryFileName<<G4endl;
         //fParser.SetOverlapCheck(true);
-        fParser.Read(fGDMLFileName, false); // turn off schema checker
+        fParser.Read(fGeometryFileName, false); // turn off schema checker
         fWorld = (G4VPhysicalVolume *)fParser.GetWorldVolume();
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+        
+        //RecursivelyCheckOverlap(fWorld->GetLogicalVolume());
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly! Check your setup selection criteria or the GDML input!" << G4endl;
             G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0001", FatalException, ed);
         }
-        G4cout << "Detector Construction from the GDML file " << fGDMLFileName <<", done!"<<G4endl;
+        G4cout << "Detector Construction from the GDML file " << fGeometryFileName.data() <<", done!"<<G4endl;
         // ConstructSDandField();
+        
     }
-    fTimer.Stop();
+    else{
+        std::cout<< "Error! Geometry format file not supported! Please use one of the following format: .db/.gdml/.so/.dylib. Exiting. "<<std::endl;
+        exit(-1);
+    }
     
+    fTimer.Stop();
     G4cout << "**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
     G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
     G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;

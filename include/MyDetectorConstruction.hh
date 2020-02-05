@@ -22,17 +22,20 @@ public:
   G4VPhysicalVolume *Construct();
   void ConstructSDandField();
 
-  void SetGDMLFileName  (const G4String &gdmlfile)   { fGDMLFileName = gdmlfile; }
-  void SetSQLiteFileName(const G4String &sqlitefile) { fSQLiteFileName = sqlitefile; }
+  void SetGDMLFileName  (const G4String &gdmlfile)   { fGeometryFileName = gdmlfile;}
+  //void SetSQLiteFileName(const G4String &sqlitefile) { fSQLiteFileName = sqlitefile; }
+  void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
 
   void SetMagFieldValue(const G4double fieldValue)
   {
     fFieldValue = fieldValue;
     gFieldValue = fFieldValue;
   }
-  void SetBuildFromGDML(const G4bool b) {fBuildFromGDML=b;}
+  //void SetBuildFromGDML(const G4bool b) {fBuildFromGDML=b;}
 
   static G4double GetFieldValue() { return gFieldValue; }
+    
+  void RecursivelyCheckOverlap(G4LogicalVolume* envelope);
 
 protected:
   G4Timer fTimer;
@@ -40,9 +43,11 @@ protected:
 private:
   // this static member is for the print out
   static G4double gFieldValue;
-  G4bool   fBuildFromGDML;
-  G4String fGDMLFileName;
-  G4String fSQLiteFileName;
+  //G4bool   fBuildFromGDML;
+  //G4bool   fBuildFromPlugin;
+  //G4String fGDMLFileName;
+  //G4String fSQLiteFileName;
+  G4String fGeometryFileName;
   G4double fFieldValue;
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;

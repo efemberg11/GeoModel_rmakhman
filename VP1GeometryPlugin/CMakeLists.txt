@@ -1,6 +1,27 @@
 ################################################################################
-# Package: VP1GeometryPlugin
+# Package: GXGeometryPlugin
 ################################################################################
+
+set(MYLIB_VERSION_MAJOR 1)
+set(MYLIB_VERSION_MINOR 0)
+set(MYLIB_VERSION_PATCH 0)
+
+project ( "GXGeometryPlugin" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
+
+if ( APPLE )
+	find_package(OpenGL REQUIRED)
+endif()
+#find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
+
+find_package( Coin REQUIRED )
+find_package( SoQt REQUIRED )
+find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
+find_package( GeoModelCore REQUIRED )
+find_package( GeoModelIO REQUIRED )
+find_package( Eigen3 REQUIRED )
+if( APPLE )
+  find_package(OpenGL REQUIRED)
+endif()
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -16,40 +37,34 @@ set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
 QT5_WRAP_UI(UI_HDRS ${UIS})
 
 
-# Configure package build.
+include_directories ("${EIGEN3_INCLUDE_DIR}")
+include_directories ("${PROJECT_SOURCE_DIR}")
+include_directories ("${PROJECT_SOURCE_DIR}/src")
+include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
+include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
+include_directories ("${PROJECT_SOURCE_DIR}/../VP1GeometrySystems")
 add_library ( GXGeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
-target_link_libraries (GXGeometryPlugin VP1GeometrySystems VP1Gui VP1Base VP1HEPVis )
 
-# Configure debug output
-if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-"${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-target_compile_definitions( GXGeometryPlugin PUBLIC
--DQT_NO_DEBUG_OUTPUT )
-endif()
+# External dependencies:
+include_directories(${Qt5Core_INCLUDE_DIRS} )
+include_directories(${Qt5Gui_INCLUDE_DIRS} )
+include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
+include_directories(${Qt5Widgets_INCLUDE_DIRS} )
+include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
+include_directories(${Qt5Network_INCLUDE_DIRS} )
+include_directories(${Qt5Sql_INCLUDE_DIRS} )
+include_directories(${Coin_INCLUDE_DIRS} )
+include_directories(${SoQt_INCLUDE_DIRS} )
+include_directories(${VP1HEPVis_INCLUDE_DIRS} )
+target_link_libraries (GXGeometryPlugin ${Qt5Core_LIBRARIES} GXGeometrySystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GeoModelCore::GeoModelKernel GeoModelCore::GeoGenericFunctions GeoModelIO::GeoModelRead GeoModelIO::TFPersistification GeoModelIO::GeoModelDBManager )
+add_definitions (${Qt5Core_DEFINITIONS})
 
-# Configure package installation.
-target_include_directories( GXGeometryPlugin PUBLIC
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
-source_group( "VP1GeometryPlugin" FILES ${HEADERS} )
-source_group( "src" FILES ${SOURCES} )
-set_target_properties( GXGeometryPlugin PROPERTIES
-   VERSION ${PROJECT_VERSION}
-   SOVERSION ${PROJECT_VERSION_MAJOR} )
+install(TARGETS GXGeometryPlugin
+  LIBRARY
+  DESTINATION lib/gxplugins
+  COMPONENT Libraries
+  )
 
-# Install the actual library (i.e., libGXGeometryPlugin.1.dylib)
-install( TARGETS GXGeometryPlugin
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/gxplugins
-   COMPONENT Runtime
-   NAMELINK_SKIP )
-# Install the symlink (i.e., libGXGeometryPlugin.dylib)
-install( TARGETS GXGeometryPlugin
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/gxplugins
-   COMPONENT Development
-   NAMELINK_ONLY )
-# Install the header files
-install( FILES ${HEADERS}
-   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GXGeometryPlugin
-   COMPONENT Development )
+set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
+
+set_target_properties(GXGeometryPlugin PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})

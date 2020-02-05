@@ -10,12 +10,6 @@ set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
    "Require the specified C++ standard for the build" )
 
-# # Set a subfolder where to install the visualization plugins.
-# set( ENV{GEOMODEL_VIS_PLUGINFOLDER} GeoModelPluginsViz)
-# set( GEOMODEL_DIR_PLUGINS ${CMAKE_INSTALL_LIBDIR}/$ENV{GEOMODEL_VIS_PLUGINFOLDER}
-#   CACHE PATH "The folder used to install the GeoModel visualization plugins" )
-# # message("GEOMODEL_EXPLORER_PLUGINPATH: $ENV{GEOMODEL_EXPLORER_PLUGINPATH}")
-
 # Make the module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
@@ -23,8 +17,8 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 # ADD_DEFINITIONS(-DBUILDGEOMODELEXPLORER=1)
 
 # Project's dependencies.
-find_package( GeoModelCore 2.0.0 REQUIRED )
-find_package( GeoModelIO   2.0.0 REQUIRED )
+find_package( GeoModelCore 3.1.0 REQUIRED )
+find_package( GeoModelIO   2.1.0 REQUIRED )
 find_package( Qt5 COMPONENTS Core Gui Widgets PrintSupport Network )
 if( APPLE )
   find_package(OpenGL REQUIRED)

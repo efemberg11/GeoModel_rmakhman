@@ -15,7 +15,7 @@ set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
 # Project's dependencies.
-find_package( GeoModelCore 3.1.0 REQUIRED )
+find_package( GeoModelCore 3.1.1 REQUIRED )
 find_package( Qt5 COMPONENTS Core Sql REQUIRED )
 
 # Use the GNU install directory names.

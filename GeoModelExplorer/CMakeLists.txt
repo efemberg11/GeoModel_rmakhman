@@ -8,34 +8,6 @@ set(CMAKE_CXX_FLAGS "-fPIC -O0 -g -gdwarf-2" )
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 
-# Set rpath on macOS
-# Docs: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
-if( APPLE )
-  # With these settings you are able to run the programs directly from the build tree.
-  # But the RPATH is cleared when installing the executable.
-  # So we have to configure the RPATH handling farther, after this instruction.
-  SET(CMAKE_MACOSX_RPATH 1)
-
-  # use, i.e. don't skip the full RPATH for the build tree
-  SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-
-  # when building, don't use the install RPATH already
-  # (but later on when installing)
-  SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-
-  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" )
-
-  # add the automatically determined parts of the RPATH
-  # which point to directories outside the build tree to the install RPATH
-  SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-
-  # the RPATH to be used when installing, but only if it's not a system directory
-  LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-  IF("${isSystemDir}" STREQUAL "-1")
-     SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-  ENDIF("${isSystemDir}" STREQUAL "-1")
-endif()
 
 # Define the path where GMEX plugins are stored and configure the runtime setup script.
 set(GMEX_PLUGINPATH "${CMAKE_INSTALL_PREFIX}/lib/gxplugins")
@@ -44,17 +16,21 @@ configure_file(scripts/setup_gmex.sh.in setup_gmex.sh)
 
 # Configure the package's build.
 add_executable ( gmex ${SOURCES} ${HEADERS}  )
-target_link_libraries( gmex VP1GUI VP1Base VP1HEPVis Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
+target_link_libraries( gmex VP1Gui VP1Base VP1HEPVis Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport )
 
 # Configure debug output
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-"${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-target_compile_definitions( gmex PUBLIC
--DQT_NO_DEBUG_OUTPUT )
+  "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
+    target_compile_definitions( gmex PUBLIC
+      -DQT_NO_DEBUG_OUTPUT )
+endif()
+
+if( NOT APPLE )
+  set_target_properties( gmex PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE )
 endif()
 
 # Configure the package's installation.
 # --- Install the executable.
-install( TARGETS gmex DESTINATION bin )
+install( TARGETS gmex RUNTIME DESTINATION bin )
 # --- Install the runtime setup script.
 install( PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setup_gmex.sh DESTINATION bin )

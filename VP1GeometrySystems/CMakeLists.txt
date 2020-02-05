@@ -23,7 +23,7 @@ QT5_WRAP_UI(UI_HDRS ${UIS})
 # Configure package build.
 add_library ( VP1GeometrySystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 target_link_libraries (VP1GeometrySystems
-  VP1GUI VP1Base VP1HEPVis
+  VP1Gui VP1Base VP1HEPVis
   GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite
   Qt5::Gui Qt5::Core Qt5::Widgets Qt5::Network Qt5::PrintSupport Qt5::Sql)
 

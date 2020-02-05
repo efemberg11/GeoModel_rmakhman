@@ -52,7 +52,7 @@ set_target_properties( VP1Base PROPERTIES
 install( TARGETS VP1Base
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Runtime
+   COMPONENT Runtime 
    NAMELINK_SKIP )
 install( TARGETS VP1Base
    EXPORT ${PROJECT_NAME}-export

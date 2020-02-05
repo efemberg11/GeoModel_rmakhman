@@ -18,7 +18,7 @@ QT5_WRAP_UI(UI_HDRS ${UIS})
 
 # Configure package build.
 add_library ( GXGeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
-target_link_libraries (GXGeometryPlugin VP1GeometrySystems VP1GUI VP1Base VP1HEPVis )
+target_link_libraries (GXGeometryPlugin VP1GeometrySystems VP1Gui VP1Base VP1HEPVis )
 
 # Configure debug output
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR

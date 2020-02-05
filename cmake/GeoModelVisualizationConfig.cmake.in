@@ -1,0 +1,23 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+# First off, import the upstream dependencies of the project.
+find_package( Qt5 COMPONENTS Core Widgets OpenGL Gui PrintSupport )
+find_package( GeoModelCore @GeoModelCore_VERSION@ )
+find_package( GeoModelIO @GeoModelIO_VERSION@ )
+
+# Now include the exported configuration of GeoModelVisualization.
+get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )
+include( ${SELF_DIR}/GeoModelVisualizationTargets.cmake )
+
+# Set the version of the installed project.
+set( GeoModelVisualization_VERSION "@PROJECT_VERSION@" )
+
+# Print some standard messages about the package being found.
+include( FindPackageHandleStandardArgs )
+find_package_handle_standard_args( GeoModelVisualization
+   FOUND_VAR GeoModelVisualization_FOUND
+   REQUIRED_VARS SELF_DIR Qt5_FOUND GeoModelCore_FOUND GeoModelIO_FOUND
+   VERSION_VAR GeoModelVisualization_VERSION )
+
+# Clean up.
+unset( SELF_DIR )

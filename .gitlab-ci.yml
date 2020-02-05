@@ -30,8 +30,6 @@ variables:
 # TEMPLATES FOR PACKAGES
 .coin-build-template-job: &coin-job
   stage: deps-A
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
@@ -39,7 +37,7 @@ variables:
     - mv coin-sources/* coin
     - mkdir build_coin
     - cd build_coin
-    - cmake ${CMAKE_ARGS} ../coin
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
     - make -j2
     - make install
   artifacts:
@@ -48,8 +46,6 @@ variables:
 
 .soqt-build-template-job: &soqt-job
   stage: deps-B
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
@@ -60,7 +56,7 @@ variables:
     - hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
     - mkdir build_soqt
     - cd build_soqt
-    - cmake ${CMAKE_ARGS} ../soqt
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
     - make -j2
     - make install
   artifacts:
@@ -69,14 +65,12 @@ variables:
 
 .geomodelcore-build-template-job: &geomodelcore-job
   stage: deps-A
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
     - mkdir geomodelcore-build
     - cd geomodelcore-build
-    - cmake ${CMAKE_ARGS} ../GeoModelCore
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
     - make -j2
     - make install
   artifacts:
@@ -85,14 +79,12 @@ variables:
 
 .geomodelio-build-template-job: &geomodelio-job
   stage: deps-B
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
     - mkdir geomodelio-build
     - cd geomodelio-build
-    - cmake ${CMAKE_ARGS} ../GeoModelIO
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
     - make -j2
     - make install
   artifacts:
@@ -101,12 +93,15 @@ variables:
 
 .geomodelvisualization-build-template: &geomodelvisualization-job
   stage: build
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - echo "PWD; LS"
     - pwd; ls
     - mkdir build
     - cd build
-    - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install  ..
+    - echo "${CMAKE_ARGS}"
+    - cmake ${CMAKE_ARGS}  ..
     - cmake --build . -- -j2
     - cmake --build . -- install
 

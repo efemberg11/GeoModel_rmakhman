@@ -1,0 +1,5 @@
+
+# Set up the runtime environment for GMEX (GeoModelExplorer)
+
+# e.g., export GXPLUGINPATH=../install/lib/gxplugins
+export GXPLUGINPATH=@GMEX_PLUGINPATH@

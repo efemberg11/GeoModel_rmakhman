@@ -16,10 +16,12 @@
 
 #include "VP1GeometrySystems/GeoSysController.h"
 #include "VP1GeometrySystems/ZappedVolumeListModel.h"
+
 #include "VP1Base/VP1Serialise.h"
 #include "VP1Base/VP1Deserialise.h"
 #include "VP1Base/VP1Settings.h"
 #include "VP1Base/IVP1System.h"
+
 #include "ui_geometrysystemcontroller.h"
 #include "ui_settings_display_form.h"
 #include "ui_settings_iconisedvols_form.h"
@@ -56,7 +58,7 @@ public:
 
   QString lastSaveMaterialsFile;
   QString lastLoadMaterialsFile;
-  
+
 //  std::map<QString, QList<QCheckBox*> > labelProvidingSystems; //!< First is name of system, second is list of types of information provided (system stores actual information)
 };
 
@@ -82,7 +84,7 @@ GeoSysController::GeoSysController(IVP1System * sys)
   m_d->pickStyle = new SoPickStyle;
   m_d->pickStyle->ref();
 
- 
+
 
 
   m_d->zappedVolumeListModel = new ZappedVolumeListModel(m_d->ui_iconisedvols.listView_iconisedvolumes);
@@ -125,8 +127,8 @@ GeoSysController::GeoSysController(IVP1System * sys)
 
   setLastSelectedVolume(0);
 
- 
- 
+
+
 
 }
 
@@ -378,7 +380,7 @@ void GeoSysController::actualSaveSettings(VP1Serialise&s) const
   s.save(m_d->ui_int.checkBox_zoomToVolumes);
   s.save(m_d->ui_disp.checkBox_showVolumeOutLines);//version 1+
 
-  
+
   s.ignoreWidget(m_d->ui_disp.matButton_lastSel);
   std::map<VP1GeoFlags::SubSystemFlag,QCheckBox*>::const_iterator it,itE(m_d->subSysCheckBoxMap.end());
   for (it=m_d->subSysCheckBoxMap.begin();it!=itE;++it)
@@ -431,6 +433,3 @@ void GeoSysController::actualRestoreSettings(VP1Deserialise& s)
 #include "VP1Base/VP1ControllerMacros.h"
 POSSIBLECHANGE_IMP(transparency)
 POSSIBLECHANGE_IMP(showVolumeOutLines)
-
-
-

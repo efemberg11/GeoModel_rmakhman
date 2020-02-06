@@ -2,11 +2,6 @@
 # Package: GeoMaterial2G4
 ################################################################################
 
-#cmake_minimum_required(VERSION 3.10)
-
-# Declare the package name
-#project( "GeoMaterial2G4" VERSION 1.0.0 LANGUAGES CXX )
-
 # External dependencies:
 find_package( Geant4 REQUIRED )
 find_package( GeoModelCore REQUIRED )
@@ -28,7 +23,7 @@ include(${Geant4_USE_FILE})
 
 # Create the library.
 add_library( GeoMaterial2G4 SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoMaterial2G4 PUBLIC GeoModelCore::GeoGenericFunctions ${Geant4_LIBRARIES} GeoModelCore::GeoModelKernel)
+target_link_libraries( GeoMaterial2G4 PUBLIC  GeoModelCore::GeoGenericFunctions ${Geant4_LIBRARIES} GeoModelCore::GeoModelKernel)
 target_include_directories( GeoMaterial2G4 SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ${Geant4_INCLUDE_DIR})
 target_include_directories( GeoMaterial2G4 PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

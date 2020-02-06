@@ -12,6 +12,7 @@ find_package( Geant4 REQUIRED )
 find_package( CLHEP )
 # GeoModel dependencies
 find_package( GeoModelCore REQUIRED )
+find_package (GeoModelIO REQUIRED)
 
 ##########################################################
 # NOTE! The original package also needs this Athena stuff:
@@ -44,7 +45,7 @@ include(${Geant4_USE_FILE})
 add_library( GeoModel2G4 SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModel2G4
   PUBLIC  ${GEANT4_LIBRARIES}
-  PRIVATE ${CLHEP_LIBRARIES} GeoMaterial2G4 GeoSpecialShapes)
+  PRIVATE ${CLHEP_LIBRARIES} GeoMaterial2G4 GeoModelIO::GeoSpecialShapes)
 target_include_directories( GeoModel2G4 SYSTEM PUBLIC ${GEANT4_INCLUDE_DIRS} PRIVATE ${CLHEP_INCLUDE_DIRS} ${GeoModelCore_INCLUDE_DIRS} )
 target_include_directories( GeoModel2G4 PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

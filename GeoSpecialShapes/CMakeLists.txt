@@ -16,8 +16,8 @@ file( GLOB HEADERS GeoSpecialShapes/*.h src/LArWheelCalculator_Impl/*.h)
 
 # Set the library.
 add_library( GeoSpecialShapes SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoSpecialShapes PUBLIC ${CLHEP_LIBRARIES}
-PRIVATE GeoModelCore::GeoModelKernel )
+target_link_libraries( GeoSpecialShapes PUBLIC
+PRIVATE GeoModelCore::GeoModelKernel ${CLHEP_LIBRARIES} )
 target_include_directories( GeoSpecialShapes PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

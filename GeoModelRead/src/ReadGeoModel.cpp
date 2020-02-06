@@ -1383,6 +1383,7 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			QString varValue = vars[1];
 			if (varName == "name") name = varValue.toStdString();
 		}
+    
     return new LArCustomShape(name);
   }
 	else {

@@ -59,8 +59,8 @@ findLinearApproximation(
   //TMatrixDSym A(nBasisFuntions);
   MatrixXd A (nBasisFuntions, nBasisFuntions);
   //TVectorD vY(nBasisFuntions);
-  RowVectorXd vY(nBasisFuntions);
-  
+  VectorXd vY(nBasisFuntions);
+
   for(int j = 0; j < nBasisFuntions; ++ j){
     for(int k = 0; k < nBasisFuntions; ++ k){
       double Ajk = 0.0;
@@ -78,11 +78,17 @@ findLinearApproximation(
     }
     vY[k] = vYk;
   }
-    
+
   //TMatrixDSym Ainv(A);
   MatrixXd Ainv(A);
   //Ainv.Invert();
   Ainv.inverse();
+
+  // std::cout << "Ainv: " << std::endl;
+  // std::cout << Ainv << std::endl;
+  // std::cout << "vY: " << std::endl;
+  // std::cout << vY << std::endl;
+
   return Ainv*vY;
 }
 
@@ -124,14 +130,14 @@ void LArWheelCalculator::fill_sincos_parameterization()
   const double Rstep = 1.*SYSTEM_OF_UNITS::mm;
   const int nrPoints = (Rmax - Rmin) * (1./Rstep);
   const int dataLen = nrPoints + 1;
-  
+
 //  TVectorD x(dataLen);  // angle points
 //  TVectorD ysin(dataLen);  // to be approximated function values at angle points - sin
 //  TVectorD ycos(dataLen);  // to be approximated function values at angle points - cos
   RowVectorXd x(dataLen);    // angle points
   RowVectorXd ysin(dataLen); // to be approximated function values at angle points - sin
   RowVectorXd ycos(dataLen); // to be approximated function values at angle points - cos
-    
+
   //TMatrixD bf(nBasisFunctions, dataLen); // Matrix of values of basis functions at angle points
   MatrixXd bf (nBasisFunctions, dataLen);
 

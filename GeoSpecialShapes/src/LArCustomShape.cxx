@@ -100,6 +100,8 @@ LArCustomShape::LArCustomShape(const std::string& a_shapeName)
     //#endif // XAOD_STANDALONE
 {
 //#ifdef XAOD_STANDALONE
+    std::cout << "LArCustomShape::LArCustomShape()" << std::endl;
+    std::cout << "Constructor -- Creating the calculator..." << std::endl;
     if ( createCalculator( s_calculatorTypes.at(a_shapeName) ) == 1 ) { // map.at throws std::out_of_range exception on unknown shape name
             std::string error = std::string("Can't create LArWheelCalculator for name ") + a_shapeName + " in LArCustomShape constructor";
             throw std::runtime_error(error);
@@ -131,7 +133,10 @@ LArCustomShape::~LArCustomShape()
 
 //#if defined XAOD_STANDALONE
 int LArCustomShape::createCalculator(const CalcDef_t & cdef) { // LArG4::LArWheelCalculator_t wheelType, int zside
-	LArG4::LArWheelCalculator_t wheelType = cdef.first;
+
+  std::cout << "LArCustomShape::createCalculator()" << std::endl;
+
+  LArG4::LArWheelCalculator_t wheelType = cdef.first;
 	int zside = cdef.second;
 
 	m_calculator = new LArWheelCalculator(wheelType, zside);
@@ -142,6 +147,8 @@ int LArCustomShape::createCalculator(const CalcDef_t & cdef) { // LArG4::LArWhee
         return 1;
     else
         return 0;
+  std::cout << "createCalculator() - done." << std::endl;
+
 }
 //#else // XAOD_STANDALONE
 //StatusCode LArCustomShape::createCalculator(const CalcDef_t & cdef) { // LArG4::LArWheelCalculator_t wheelType, int zside

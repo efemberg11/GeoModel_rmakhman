@@ -6,7 +6,7 @@ set( CPACK_PACKAGE_DESCRIPTION_SUMMARY
 set( CPACK_PACKAGE_DESCRIPTION
    "Geometry model I/O libraries" )
 set( CPACK_PACKAGE_VERSION "${PROJECT_VERSION}" )
-set( CPACK_PACKAGE_CONTACT "atlas-sw-core@cern.ch" )
+set( CPACK_PACKAGE_CONTACT "geomodel-developers@cern.ch" )
 
 # Set up the readme and license for the package.
 set( CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE )

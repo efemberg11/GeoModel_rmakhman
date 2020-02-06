@@ -21,7 +21,7 @@
 #include <cmath>
 
 
-//namespace CxxUtils {
+namespace CxxUtils {
 
 
 /**
@@ -103,7 +103,7 @@ struct sincos
 };
 
 
-//} // namespace CxxUtils
+} // namespace CxxUtils
 
 
 #endif //not SINCOS_H

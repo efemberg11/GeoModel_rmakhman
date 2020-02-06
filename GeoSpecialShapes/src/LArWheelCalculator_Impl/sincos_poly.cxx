@@ -144,7 +144,7 @@ void LArWheelCalculator::fill_sincos_parameterization()
   for(int i = 0; i < dataLen; ++ i){
     const double a = Rmin + i * Rstep;
     x[i] = a;
-    sincos scalpha(parameterized_slant_angle(a));
+    CxxUtils::sincos scalpha(parameterized_slant_angle(a));
     ysin[i] = scalpha.sn;
     ycos[i] = scalpha.cs;
     for(int n = 0; n < nBasisFunctions; ++ n) {
@@ -183,7 +183,7 @@ void LArWheelCalculator::fill_sincos_parameterization()
   double dsin = 0., dcos = 0.;
   double dtrig = 0.;
   for(double r = Rmin + 40.; r < Rmax - 40.; r += Rstep / 10.){
-    sincos scalpha(parameterized_slant_angle(r));
+    CxxUtils::sincos scalpha(parameterized_slant_angle(r));
     double sin_a, cos_a;
     parameterized_sincos(r, sin_a, cos_a);
     double ds = fabs(scalpha.sn - sin_a);

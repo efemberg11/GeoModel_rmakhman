@@ -120,13 +120,12 @@ cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
 ## Detector construction:
 
 The detector can be built starting from a SQLite .db file (default option) or starting from a GDML file.
-the -d flag will be used to specify the name of the geometry file, while the -g flag must be specified if you want to build the detector from a GDML file. Any GDML file can be set from the macro file by using the:
+the -g flag will be used to specify the name of the geometry file. Any GDML file can be set from the macro file by using the:
 
 ```bash
      /mydet/setGdmlFile <gdml-file-name.gdml>
 ```    
-The default values for the SQLite and GDML files are respectively
-"ATLAS-R2-2016-01-00-01.db" and "ATLAS-R2-2016-01-00-01.gdml".
+By default the detector is built from the SQLite file "geometry-ATLAS-R2-2016-01-00-01.db".
      
 ## ATLAS Geometry Files:
      
@@ -211,11 +210,10 @@ By default, i.e. if it is not specified by the above command, the type will be r
  Run the executable with the --help option to see the available options:
  
 ``` bash
- -m   <Geant4-Macro-File> [MANDATORY; a standard Geant4 macro file name]
- -f   <Physics-List-Name> [OPTIONAL;  physics list name (default: FTFP_BERT)]
- -p   <NO-ARGUMENT>       [OPTIONAL;  run in performance mode (default: no)]
- -g : flag  ==> build the detector from a GDML file (default: false -> build from SQLite file)
- -d : the GDML/SQLite file name (default: ATLAS-R2-2016-01-00-01)
+ -m   <Geant4-Macro-File>  [MANDATORY; a standard Geant4 macro file name]
+ -f   <Physics-List-Name>  [OPTIONAL;  physics list name (default: FTFP_BERT)]
+ -p   <NO-ARGUMENT>        [OPTIONAL;  run in performance mode (default: no)]
+ -g   <Geometry-File-Name> [MANDATORY; the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01.db)]
 ``` 
  A minimal set of "observable" is collected during the simulation per-primary
  particle type: mean energy deposit, mean charged and neutral step lengths,
@@ -238,15 +236,15 @@ By default, i.e. if it is not specified by the above command, the type will be r
 
 # Examples
 
- To execute the application using the <macro.g4> macro file, with the FTFP_BERT
+ To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
  Physics List, in performance mode and building the detector from the default SQLite file:
 ``` bash
- ./fullSimLight -m macro.g4 -f FTFP_BERT -p 
+ ./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -p 
  ``` 
- To execute the application using the <macro.g4> macro file, with the FTFP_BERT
- Physics List, not in performance mode and building the detector from the default SQLite file:
+ To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
+ Physics List, not in performance mode and building the detector from my geometry SQLite file:
  ``` bash
- ./fullSimLight -m macro.g4 -f FTFP_BERT -g  
+ ./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -g mygeometry.db 
 ``` 
 
 # Final Remark

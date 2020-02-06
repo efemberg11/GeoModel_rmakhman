@@ -151,10 +151,10 @@ class LArWheelCalculator
     const double m_dMechFocaltoWRP      = 369.1 * SYSTEM_OF_UNITS::cm;   //cm
     const double m_dElecFocaltoWRP      = 368.9 * SYSTEM_OF_UNITS::cm;   //cm
     const double m_rOuterCutoff         = 203.4 * SYSTEM_OF_UNITS::cm;   //cm
-    const double m_eta_hi               = 3.2   * SYSTEM_OF_UNITS::cm;   //cm 3.2 ----> (1 is 2.5)
-    const double m_eta_mid              = 2.5   * SYSTEM_OF_UNITS::cm;   //cm 2.5 ----> (1 is 1.375)
-    const double m_eta_low              = 1.375   * SYSTEM_OF_UNITS::cm;   //cm 2.5 ----> (1 is 1.375)
-    const double m_zShift               = 4.5   * SYSTEM_OF_UNITS::cm;   //cm
+    const double m_eta_hi               = 3.2 ;  
+    const double m_eta_mid              = 2.5 ; 
+    const double m_eta_low              = 1.375;
+    const double m_zShift               = 4     * SYSTEM_OF_UNITS::cm;   //cm
     
     const double m_WheelThickness = m_ActiveLength + 2.*m_StraightStartSection;
     const double m_HalfWheelThickness = m_WheelThickness * 0.5;

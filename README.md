@@ -70,8 +70,8 @@ The default values for the SQLite and GDML files are respectively
      
 The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are available at: 
 ```bash
-     wget https://geomodel.web.cern.ch/geomodel/atlas-geometry-data/ATLAS-R2-2016-01-00-01.gdml
-     wget https://geomodel.web.cern.ch/geomodel/atlas-geometry-data/ATLAS-R2-2016-01-00-01.db
+   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
+   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.db
 ```
 
 

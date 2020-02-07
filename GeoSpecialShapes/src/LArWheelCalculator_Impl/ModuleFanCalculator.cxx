@@ -52,8 +52,6 @@ namespace LArWheelCalculator_Impl
     if(adj_fan_number < lwc()->m_FirstFan) {
       //p.rotateZ((adj_fan_number - lwc()->m_FirstFan) * lwc()->m_FanStepOnPhi);
       p = GeoTrf::RotateZ3D((adj_fan_number - lwc()->m_FirstFan) * lwc()->m_FanStepOnPhi)*p;
-      //p.RotateZ3D((adj_fan_number - lwc()->m_FirstFan) * lwc()->m_FanStepOnPhi);
-      p = GeoTrf::RotateZ3D((adj_fan_number - lwc()->m_FirstFan) * lwc()->m_FanStepOnPhi)*p;
       adj_fan_number = lwc()->m_FirstFan;
     } else if(adj_fan_number >= lwc()->m_LastFan) {
       //p.rotateZ((adj_fan_number - lwc()->m_LastFan + 1) * lwc()->m_FanStepOnPhi);

@@ -4,6 +4,7 @@
 
 #include "DistanceCalculatorSaggingOff.h"
 #include "GeoSpecialShapes/LArWheelCalculator.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 
 //#include "GaudiKernel/PhysicalConstants.h"
 #include<cassert>
@@ -35,9 +36,9 @@ namespace LArWheelCalculator_Impl
   }
 
 #ifndef LARWC_DTNF_NEW
-  double DistanceCalculatorSaggingOff::DistanceToTheNeutralFibre(const CLHEP::Hep3Vector& P, int /*fan_number*/) const
+  double DistanceCalculatorSaggingOff::DistanceToTheNeutralFibre(const GeoTrf::Vector3D& P, int /*fan_number*/) const
 #else
-  double DistanceCalculatorSaggingOff::DistanceToTheNeutralFibre_ref(const CLHEP::Hep3Vector& P, int /*fan_number*/) const
+  double DistanceCalculatorSaggingOff::DistanceToTheNeutralFibre_ref(const GeoTrf::Vector3D& P, int /*fan_number*/) const
 #endif
   {
     assert(P.y() > 0.);
@@ -151,9 +152,9 @@ namespace LArWheelCalculator_Impl
 
   // IMPROVED PERFORMANCE
 #ifdef LARWC_DTNF_NEW
-  double DistanceCalculatorSaggingOff::DistanceToTheNeutralFibre(const CLHEP::Hep3Vector& P, int /*fan_number*/) const
+  double DistanceCalculatorSaggingOff::DistanceToTheNeutralFibre(const GeoTrf::Vector3D& P, int /*fan_number*/) const
 #else
-  double DistanceCalculatorSaggingOff::DistanceToTheNeutralFibre_ref(const CLHEP::Hep3Vector& P, int /*fan_number*/) const
+  double DistanceCalculatorSaggingOff::DistanceToTheNeutralFibre_ref(const GeoTrf::Vector3D& P, int /*fan_number*/) const
 #endif
   {
     double z = P.z() - lwc()->m_StraightStartSection;
@@ -243,9 +244,9 @@ namespace LArWheelCalculator_Impl
     std::abort();
   }
 
-  CLHEP::Hep3Vector DistanceCalculatorSaggingOff::NearestPointOnNeutralFibre(const CLHEP::Hep3Vector &P, int /*fan_number*/) const
+  GeoTrf::Vector3D DistanceCalculatorSaggingOff::NearestPointOnNeutralFibre(const GeoTrf::Vector3D &P, int /*fan_number*/) const
   {
-    CLHEP::Hep3Vector result;
+    GeoTrf::Vector3D result;
     double z = P.z() - lwc()->m_StraightStartSection;
     double x = P.x();
     double y = P.y();
@@ -279,18 +280,33 @@ namespace LArWheelCalculator_Impl
       const double x_prime = x * cos_a - z * sin_a;
       const double straight_part = (lwc()->m_QuarterWaveLength - lwc()->m_FanFoldRadius * sin_a) / cos_a;
       const double dz = straight_part - z_prime;
-      if (dz > 0) result.set(0., y, z_prime);
+        if (dz > 0) {
+            //result.set(0., y, z_prime);
+            result(0)=0.;
+            result(1)=y;
+            result(2)=z_prime;
+        }
+        
       else {
         double a = atan(fabs(dz / (x_prime + lwc()->m_FanFoldRadius)));
-        result.set(lwc()->m_FanFoldRadius * (cos(a) - 1), y, straight_part + lwc()->m_FanFoldRadius * sin(a));
+        //result.set(lwc()->m_FanFoldRadius * (cos(a) - 1), y, straight_part + lwc()->m_FanFoldRadius * sin(a));
+        result(0) = lwc()->m_FanFoldRadius * (cos(a) - 1);
+        result(1) = y;
+        result(2) = straight_part + lwc()->m_FanFoldRadius * sin(a);
       }
-      result.rotateY(asin(sin_a));
+      //result.rotateY(asin(sin_a));
+      result = GeoTrf::RotateY3D (asin(sin_a))* result;
       if(begin_qw){
-        result.setX(-result.x());
-        result.setZ(-result.z());
+        //result.setX(-result.x());
+        //result.setZ(-result.z());
+        result(0) = - result(0) ;
+        result(2) = - result(2) ;
       }
-      if((nqwave % 2) == 0) result.setX(-result.x());
-      result.setZ(result.z() + nqwave * lwc()->m_HalfWaveLength);
+      if((nqwave % 2) == 0)
+          //result.setX(-result.x());
+          result(0) = - result(0) ;
+          //result.setZ(result.z() + nqwave * lwc()->m_HalfWaveLength);
+          result(2) = result(2) + nqwave * lwc()->m_HalfWaveLength ;
     } else {
       if(nqwave == 0) x = -x;
       else z = lwc()->m_ActiveLength - z;
@@ -300,7 +316,10 @@ namespace LArWheelCalculator_Impl
          ( x < lwc()->m_FanFoldRadius ||
            x < - lwc()->m_StraightStartSection * z / local_straight_section / tan_beta))
       {
-        result.set(0., y, z);
+        //result.set(0., y, z);
+        result(0) = 0.;
+        result(1) = y;
+        result(2) = z;
       }
       else {
         const double z_prime = z * cos_a + x * sin_a;
@@ -308,32 +327,47 @@ namespace LArWheelCalculator_Impl
         if(z_prime < local_straight_section) {
           double a = fabs(atan((local_straight_section - z_prime) / (x_prime - lwc()->m_FanFoldRadius)));
 
-          result.set(lwc()->m_FanFoldRadius * (1 - cos(a)), y, local_straight_section - lwc()->m_FanFoldRadius * sin(a));
+          //result.set(lwc()->m_FanFoldRadius * (1 - cos(a)), y, local_straight_section - lwc()->m_FanFoldRadius * sin(a));
+          result(0) = lwc()->m_FanFoldRadius * (1 - cos(a));
+          result(1) = y;
+          result(2) = local_straight_section - lwc()->m_FanFoldRadius * sin(a);
+            
         } else {
           double straight_part = (lwc()->m_QuarterWaveLength - lwc()->m_FanFoldRadius * sin_a) / cos_a;
           if(z_prime <= straight_part) {
-            result.set(0., y, z_prime);
+            //result.set(0., y, z_prime);
+            result(0) = 0.;
+            result(1) = y;
+            result(2) = z_prime;
+            
           } else {
             double a = fabs(atan((straight_part - z_prime) /  (x_prime + lwc()->m_FanFoldRadius)) );
-            result.set(lwc()->m_FanFoldRadius * (cos(a) - 1), y, straight_part + lwc()->m_FanFoldRadius * sin(a));
+            //result.set(lwc()->m_FanFoldRadius * (cos(a) - 1), y, straight_part + lwc()->m_FanFoldRadius * sin(a));
+            result(0) = lwc()->m_FanFoldRadius * (cos(a) - 1);
+            result(1) = y;
+            result(2) = straight_part + lwc()->m_FanFoldRadius * sin(a);
           }
         }
-        result.rotateY(asin(sin_a));
+        //result.rotateY(asin(sin_a));
+        result = GeoTrf::RotateY3D (asin(sin_a))* result;
       }
       if(nqwave != 0){
-        result.setZ(lwc()->m_ActiveLength - result.z());
+        //result.setZ(lwc()->m_ActiveLength - result.z());
+        result(2) = lwc()->m_ActiveLength - result(2);
       } else {
-        result.setX(-result.x());
+        //result.setX(-result.x());
+        result(0) = - result(0);
       }
     }
-    result.setZ(result.z() + lwc()->m_StraightStartSection);
+    //result.setZ(result.z() + lwc()->m_StraightStartSection);
+    result(2) = result(2)+ lwc()->m_StraightStartSection;
     return result;
   }
 
   // IMPROVED VERSION
-  CLHEP::Hep3Vector DistanceCalculatorSaggingOff::NearestPointOnNeutralFibre_ref(const CLHEP::Hep3Vector &P, int /*fan_number*/) const
+  GeoTrf::Vector3D DistanceCalculatorSaggingOff::NearestPointOnNeutralFibre_ref(const GeoTrf::Vector3D &P, int /*fan_number*/) const
   {
-    CLHEP::Hep3Vector result;
+    GeoTrf::Vector3D result;
     double z = P.z() - lwc()->m_StraightStartSection;
     double x = P.x();
     double y = P.y();
@@ -364,10 +398,16 @@ namespace LArWheelCalculator_Impl
           double a1 = atan(fabs(dz / (x_prime + lwc()->m_FanFoldRadius)));
           const double x1 = lwc()->m_FanFoldRadius * (cos(a1) - 1.);
           const double z1 = straight_part + lwc()->m_FanFoldRadius * sin(a1);
-          result.set(x1*cos_a - z1*sin_a, y, z1*cos_a + z1*sin_a);
+          //result.set(x1*cos_a - z1*sin_a, y, z1*cos_a + z1*sin_a);
+          result(0) = x1*cos_a - z1*sin_a;
+          result(1) = y;
+          result(2) = z1*cos_a + z1*sin_a;
           return result;
         } else if(z_prime > -straight_part){ // straight part
-          result.set(-z_prime * sin_a, y, z_prime*cos_a + zshift);
+          //result.set(-z_prime * sin_a, y, z_prime*cos_a + zshift);
+          result(0) = -z_prime * sin_a;
+          result(1) = y;
+          result(2) = z_prime*cos_a + zshift;
           return result;
         } else { // low fold
           const double x_prime = x * cos_a - z * sin_a;
@@ -375,7 +415,10 @@ namespace LArWheelCalculator_Impl
           double a1 = atan(fabs(dz / (x_prime + lwc()->m_FanFoldRadius)));
           const double x1 = lwc()->m_FanFoldRadius * (cos(a1) - 1.);
           const double z1 = straight_part + lwc()->m_FanFoldRadius * sin(a1);
-          result.set(x1*cos_a - z1*sin_a, y, z1*cos_a + z1*sin_a);
+          //result.set(x1*cos_a - z1*sin_a, y, z1*cos_a + z1*sin_a);
+          result(0) = x1*cos_a - z1*sin_a;
+          result(1) = y;
+          result(2) = z1*cos_a + z1*sin_a;
           return result;
         }
       } else { // ending quarter-wave
@@ -393,28 +436,46 @@ namespace LArWheelCalculator_Impl
        (x < lwc()->m_FanFoldRadius ||
         x < - lwc()->m_StraightStartSection * z / local_straight_section / tan_beta))
     {
-      result.set(0., y, z);
+      //result.set(0., y, z);
+      result(0) = 0.;
+      result(1) = y ;
+      result(2) = z ;
     }
     else {
       const double z_prime = z * cos_a + x * sin_a;
       const double x_prime = x * cos_a - z * sin_a;
       if(z_prime < local_straight_section) {
         double a = fabs(atan((local_straight_section - z_prime) / (x_prime - lwc()->m_FanFoldRadius)));
-        result.set(lwc()->m_FanFoldRadius * (1 - cos(a)), y, local_straight_section - lwc()->m_FanFoldRadius * sin(a));
+        //result.set(lwc()->m_FanFoldRadius * (1 - cos(a)), y, local_straight_section - lwc()->m_FanFoldRadius * sin(a));
+        result(0) = lwc()->m_FanFoldRadius * (1 - cos(a));
+        result(1) = y ;
+        result(2) = local_straight_section - lwc()->m_FanFoldRadius * sin(a) ;
       } else {
         double straight_part = (lwc()->m_QuarterWaveLength - lwc()->m_FanFoldRadius * sin_a) / cos_a;
         if(z_prime <= straight_part) {
-          result.set(0., y, z_prime);
+          //result.set(0., y, z_prime);
+          result(0) = 0.;
+          result(1) = y ;
+          result(2) = z_prime;
         } else {
           double a = fabs(atan((straight_part - z_prime) /  (x_prime + lwc()->m_FanFoldRadius)) );
-          result.set(lwc()->m_FanFoldRadius * (cos(a) - 1), y, straight_part + lwc()->m_FanFoldRadius * sin(a));
+          //result.set(lwc()->m_FanFoldRadius * (cos(a) - 1), y, straight_part + lwc()->m_FanFoldRadius * sin(a));
+            result(0) = lwc()->m_FanFoldRadius * (cos(a) - 1);
+            result(1) = y ;
+            result(2) = straight_part + lwc()->m_FanFoldRadius * sin(a) ;
         }
       }
-      result.rotateY(asin(sin_a));
+      //result.rotateY(asin(sin_a));
+      result = GeoTrf::RotateY3D (asin(sin_a)) * result;
     }
-    if(sqw) result.setX(-result.x());
-    else result.setZ(lwc()->m_ActiveLength - result.z());
-    result.setZ(result.z() + lwc()->m_StraightStartSection);
+    if(sqw)
+        //result.setX(-result.x());
+        result(0) = - result(0);
+    else
+        //result.setZ(lwc()->m_ActiveLength - result.z());
+        result(2) = lwc()->m_ActiveLength - result(2);
+    //result.setZ(result.z() + lwc()->m_StraightStartSection);
+    result(2) = result(2) + lwc()->m_StraightStartSection ;
     return result;
   }
 
@@ -424,7 +485,7 @@ namespace LArWheelCalculator_Impl
         > 0 - greater phi
         = 0 - neutral fibre
   */
-  double DistanceCalculatorSaggingOff::AmplitudeOfSurface(const CLHEP::Hep3Vector& P, int side, int /*fan_number*/) const
+  double DistanceCalculatorSaggingOff::AmplitudeOfSurface(const GeoTrf::Vector3D& P, int side, int /*fan_number*/) const
   {
     double result = 0.;
     double rho = lwc()->m_FanFoldRadius;

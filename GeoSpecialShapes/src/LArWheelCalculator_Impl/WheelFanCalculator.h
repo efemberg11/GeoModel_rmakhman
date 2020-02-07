@@ -9,6 +9,7 @@
 //#include "RDBAccessSvc/IRDBAccessSvc.h"
 //#include "GeoModelUtilities/DecodeVersionKey.h"
 #include "GeoSpecialShapes/LArWheelCalculator.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 
 //#include "GaudiKernel/PhysicalConstants.h"
 // Physical constants
@@ -33,7 +34,7 @@ namespace LArWheelCalculator_Impl
   class DistanceToTheNeutralFibre_OfFan<SaggingOn_t>
   {
     public:
-      static inline double calculate(const LArWheelCalculator* lwc, int fan_number,     CLHEP::Hep3Vector &p) {
+      static inline double calculate(const LArWheelCalculator* lwc, int fan_number,     GeoTrf::Vector3D &p) {
         //lwc->set_m_fan_number(fan_number);
         return lwc->DistanceToTheNeutralFibre(p, lwc->adjust_fan_number(fan_number));
       }
@@ -42,7 +43,7 @@ namespace LArWheelCalculator_Impl
   template<> class DistanceToTheNeutralFibre_OfFan<SaggingOff_t>
   {
     public:
-      static inline double calculate(const LArWheelCalculator* lwc, int /*fan_number*/, CLHEP::Hep3Vector &p) {
+      static inline double calculate(const LArWheelCalculator* lwc, int /*fan_number*/, GeoTrf::Vector3D &p) {
         // saggingOff distance calculations does not use fan_number, use arbitrary recognisible magic number
         return lwc->DistanceToTheNeutralFibre(p, -531135);
       }
@@ -115,9 +116,11 @@ namespace LArWheelCalculator_Impl
   /// @todo Needs documentation
   template <typename SaggingType, FanSearchDirection_t dir, class NFDistance >
   inline void rotate_to_nearest_fan(const LArWheelCalculator* lwc, int &fan_number,
-                                    const double angle, CLHEP::Hep3Vector &p)
+                                    const double angle, GeoTrf::Vector3D &p)
   {
-    p.rotateZ(angle);
+    
+    //p.rotateZ(angle);
+    p=GeoTrf::RotateZ3D(angle)*p;
     StepFan<SaggingType, dir>::next(fan_number);
     //fan_number += delta;
     double d1 = NFDistance::calculate(lwc, fan_number, p);
@@ -125,7 +128,8 @@ namespace LArWheelCalculator_Impl
     //while(d0 * d1 > 0.) -> dir*d1 > 0 -> FORWARD: d1 > 0., BACKWARD: d1 < 0.
 
     while ( DoSearch<dir>::pred(d1) ) { // search:
-      p.rotateZ(angle);
+      //p.rotateZ(angle);
+      p=GeoTrf::RotateZ3D(angle)*p;
       StepFan<SaggingType, dir>::next(fan_number);
       //fan_number += delta;
 
@@ -156,15 +160,17 @@ namespace LArWheelCalculator_Impl
       /// @name Geometry methods
       /// @{
 
-      virtual double DistanceToTheNearestFan(CLHEP::Hep3Vector &p, int & out_fan_number) const
+      virtual double DistanceToTheNearestFan(GeoTrf::Vector3D &p, int & out_fan_number) const
       {
         //using Gaudi::Units::halfpi;
-          int fan_number = int((p.phi() - SYSTEM_OF_UNITS::halfpi - lwc()->m_ZeroFanPhi_ForDetNeaFan) / lwc()->m_FanStepOnPhi);
+        //int fan_number = int((p.phi() - SYSTEM_OF_UNITS::halfpi - lwc()->m_ZeroFanPhi_ForDetNeaFan) / lwc()->m_FanStepOnPhi);
+        int fan_number = int((std::atan2(p(1),p(0)) - SYSTEM_OF_UNITS::halfpi - lwc()->m_ZeroFanPhi_ForDetNeaFan) / lwc()->m_FanStepOnPhi);
         const double angle = lwc()->m_FanStepOnPhi * fan_number + lwc()->m_ZeroFanPhi_ForDetNeaFan;
 #ifdef HARDDEBUG
         printf("DistanceToTheNearestFan: initial FN %4d\n", fan_number);
 #endif
-        p.rotateZ(-angle);
+        //p.rotateZ(-angle);
+        p=GeoTrf::RotateZ3D(- angle)*p;
         // determine search direction
         typedef DistanceToTheNeutralFibre_OfFan<SaggingType> NFDistance;
 
@@ -202,7 +208,8 @@ namespace LArWheelCalculator_Impl
         if(delta > 0) fan_number --;
         */
 
-        p.rotateZ(-0.5 * step_angle);
+        //p.rotateZ(-0.5 * step_angle);
+        p=GeoTrf::RotateZ3D(-0.5 * step_angle)*p;
 #ifdef HARDDEBUG
         printf("DistanceToTheNearestFan: final FN %4d\n", fan_number);
 #endif
@@ -216,14 +223,16 @@ namespace LArWheelCalculator_Impl
         return i;
       }
 
-      virtual std::pair<int, int> GetPhiGapAndSide(const CLHEP::Hep3Vector &p) const
+      virtual std::pair<int, int> GetPhiGapAndSide(const GeoTrf::Vector3D &p) const
       {
         //using Gaudi::Units::halfpi;
-        CLHEP::Hep3Vector p1 = p;
-
-        int fan_number = int((p.phi() - SYSTEM_OF_UNITS::halfpi - lwc()->m_ZeroFanPhi) / lwc()->m_FanStepOnPhi);
+        GeoTrf::Vector3D p1 = p;
+        //int fan_number = int((p.phi() - SYSTEM_OF_UNITS::halfpi - lwc()->m_ZeroFanPhi) / lwc()->m_FanStepOnPhi);
+        int fan_number = int((std::atan2(p(1),p(0)) - SYSTEM_OF_UNITS::halfpi - lwc()->m_ZeroFanPhi) / lwc()->m_FanStepOnPhi);
         const double angle = lwc()->m_FanStepOnPhi * fan_number + lwc()->m_ZeroFanPhi;
-        p1.rotateZ(-angle);
+        p1=GeoTrf::RotateZ3D(- angle)*p1;
+        //p1.rotateZ(-angle);
+        
 
         typedef DistanceToTheNeutralFibre_OfFan<SaggingType> NFDistance;
 
@@ -238,7 +247,8 @@ namespace LArWheelCalculator_Impl
         //if(d0 < 0.) delta = -1;
         const double step_angle = - lwc()->m_FanStepOnPhi * delta;
         do {
-          p1.rotateZ(step_angle);
+          //p1.rotateZ(step_angle);
+          p1 = GeoTrf::RotateZ3D(step_angle)*p1;
           fan_number += delta;
           d1 = NFDistance::calculate(lwc(), fan_number, p1);
           //lwc()->set_m_fan_number(fan_number);
@@ -248,7 +258,8 @@ namespace LArWheelCalculator_Impl
         if(delta > 0) fan_number --;
         if(!lwc()->m_isElectrode) fan_number ++;
 
-        p1.rotateZ(-0.5 * step_angle);
+        //p1.rotateZ(-0.5 * step_angle);
+        p1 = GeoTrf::RotateZ3D(-0.5 * step_angle)*p1;
 
         const int a_fan_number = lwc()->adjust_fan_number(fan_number);
         double dd = lwc()->DistanceToTheNeutralFibre(p1, a_fan_number);

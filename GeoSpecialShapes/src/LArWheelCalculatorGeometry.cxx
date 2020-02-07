@@ -17,6 +17,8 @@
 #include "./LArWheelCalculator_Impl/IDistanceCalculator.h"
 #include "./LArWheelCalculator_Impl/IFanCalculator.h"
 
+#include "GeoModelKernel/GeoDefinitions.h"
+
 #ifdef HARDDEBUG
 #include<stdio.h>
 #endif
@@ -92,7 +94,7 @@ double LArWheelCalculator::parameterized_slant_angle(double r) const
 // Returns distance to the nearest fan. Vector p is set to nearest fan coord.
 // system.
 // m_fan_number is set to nearest fan number
-double LArWheelCalculator::DistanceToTheNearestFan(CLHEP::Hep3Vector &p, int & out_fan_number) const
+double LArWheelCalculator::DistanceToTheNearestFan(GeoTrf::Vector3D &p, int & out_fan_number) const
 {
   return m_fanCalcImpl->DistanceToTheNearestFan(p, out_fan_number);
 }
@@ -100,7 +102,7 @@ double LArWheelCalculator::DistanceToTheNearestFan(CLHEP::Hep3Vector &p, int & o
 // Relays on the fact that each two fans have a fan of a different type between
 // them.
 // Affects m_fan_number.
-std::pair<int, int> LArWheelCalculator::GetPhiGapAndSide(const CLHEP::Hep3Vector &p) const
+std::pair<int, int> LArWheelCalculator::GetPhiGapAndSide(const GeoTrf::Vector3D &p) const
 {
   return m_fanCalcImpl->GetPhiGapAndSide(p);
 }
@@ -110,19 +112,19 @@ std::pair<int, int> LArWheelCalculator::GetPhiGapAndSide(const CLHEP::Hep3Vector
 // side of the fan; negative - lower phi.
 //
 // Uses m_fan_number to compute sagging.
-double LArWheelCalculator::DistanceToTheNeutralFibre(const CLHEP::Hep3Vector& P, int fan_number) const
+double LArWheelCalculator::DistanceToTheNeutralFibre(const GeoTrf::Vector3D& P, int fan_number) const
 {
   return m_distanceCalcImpl->DistanceToTheNeutralFibre(P, fan_number);
 }
 
-CLHEP::Hep3Vector LArWheelCalculator::NearestPointOnNeutralFibre(const CLHEP::Hep3Vector &P, int fan_number) const
+GeoTrf::Vector3D LArWheelCalculator::NearestPointOnNeutralFibre(const GeoTrf::Vector3D &P, int fan_number) const
 {
   return m_distanceCalcImpl->NearestPointOnNeutralFibre(P, fan_number);
 }
 
-std::vector<double> LArWheelCalculator::NearestPointOnNeutralFibre_asVector(const CLHEP::Hep3Vector &p, int fan_number) const
+std::vector<double> LArWheelCalculator::NearestPointOnNeutralFibre_asVector(const GeoTrf::Vector3D &p, int fan_number) const
 {
-  CLHEP::Hep3Vector np = NearestPointOnNeutralFibre(p, fan_number);
+  GeoTrf::Vector3D np = NearestPointOnNeutralFibre(p, fan_number);
   return std::vector<double> { np.x(), np.y(), np.z() };
 }
 
@@ -132,7 +134,7 @@ side: < 0 - lower phi
       > 0 - greater phi
       = 0 - neutral fibre
 */
-double LArWheelCalculator::AmplitudeOfSurface(const CLHEP::Hep3Vector& P, int side, int fan_number) const
+double LArWheelCalculator::AmplitudeOfSurface(const GeoTrf::Vector3D& P, int side, int fan_number) const
 {
   return m_distanceCalcImpl->AmplitudeOfSurface(P, side, fan_number);
 }

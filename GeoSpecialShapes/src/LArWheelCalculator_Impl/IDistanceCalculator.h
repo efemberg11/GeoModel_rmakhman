@@ -6,7 +6,8 @@
 #define __LArWheelCalculator_Impl_IDistanceCalculator_H__
 
 
-#include "CLHEP/Vector/ThreeVector.h"
+//#include "CLHEP/Vector/ThreeVector.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 
 namespace LArWheelCalculator_Impl
 {
@@ -26,13 +27,13 @@ namespace LArWheelCalculator_Impl
       /// @name Geometry methods
       /// @{
 
-      virtual double DistanceToTheNeutralFibre(const CLHEP::Hep3Vector &p,
+      virtual double DistanceToTheNeutralFibre(const GeoTrf::Vector3D &p,
                                                int fan_number) const = 0;
 
-      virtual CLHEP::Hep3Vector NearestPointOnNeutralFibre(const CLHEP::Hep3Vector &p,
+      virtual GeoTrf::Vector3D NearestPointOnNeutralFibre(const GeoTrf::Vector3D &p,
                                                            int fan_number) const = 0;
 
-      virtual double AmplitudeOfSurface(const CLHEP::Hep3Vector& p, int side,
+      virtual double AmplitudeOfSurface(const GeoTrf::Vector3D& p, int side,
                                         int fan_number) const = 0;
 
       /// @}

@@ -6,7 +6,8 @@
 #define __LArWheelCalculator_Impl_IFanCalculator_H__
 
 
-#include "CLHEP/Vector/ThreeVector.h"
+//#include "CLHEP/Vector/ThreeVector.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 
 namespace LArWheelCalculator_Impl
 {
@@ -26,12 +27,12 @@ namespace LArWheelCalculator_Impl
       /// @name Geometry methods
       /// @{
 
-      virtual double DistanceToTheNearestFan(CLHEP::Hep3Vector &p,
+      virtual double DistanceToTheNearestFan(GeoTrf::Vector3D &p,
                                              int & out_fan_number) const = 0;
 
       virtual int PhiGapNumberForWheel(int i) const = 0;
 
-      virtual std::pair<int, int> GetPhiGapAndSide(const CLHEP::Hep3Vector &p) const = 0;
+      virtual std::pair<int, int> GetPhiGapAndSide(const GeoTrf::Vector3D &p) const = 0;
 
       /// @}
 

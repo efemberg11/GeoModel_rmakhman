@@ -7,7 +7,8 @@
 
 #include <vector>
 
-#include "CLHEP/Vector/ThreeVector.h"
+//#include "CLHEP/Vector/ThreeVector.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 //#ifndef XAOD_STANDALONE
 //    #include "AthenaKernel/CLASS_DEF.h"
 //#endif // XAOD_STANDALONE
@@ -108,21 +109,21 @@ class LArWheelCalculator
     /// Determines the nearest to the input point fan.
     /// Rotates point p to the localFan coordinates and returns the
     /// fan number to out_fan_number parameter.
-    double DistanceToTheNearestFan(CLHEP::Hep3Vector &p, int & out_fan_number) const;
+    double DistanceToTheNearestFan(GeoTrf::Vector3D &p, int & out_fan_number) const;
 
     /// Calculates aproximate, probably underestimate, distance to the
     /// neutral fibre of the vertical fan. Sign of return value means
     /// side of the fan; negative - lower phi.
-    double DistanceToTheNeutralFibre(const CLHEP::Hep3Vector &p, int fan_number) const;
+    double DistanceToTheNeutralFibre(const GeoTrf::Vector3D &p, int fan_number) const;
 
-    CLHEP::Hep3Vector NearestPointOnNeutralFibre(const CLHEP::Hep3Vector &p,
+    GeoTrf::Vector3D NearestPointOnNeutralFibre(const GeoTrf::Vector3D &p,
                                                  int fan_number) const;
-    std::vector<double> NearestPointOnNeutralFibre_asVector(const CLHEP::Hep3Vector &p,
+    std::vector<double> NearestPointOnNeutralFibre_asVector(const GeoTrf::Vector3D &p,
                                                             int fan_number) const;
-    int GetPhiGap(const CLHEP::Hep3Vector &p) const { return GetPhiGapAndSide(p).first; }
+    int GetPhiGap(const GeoTrf::Vector3D &p) const { return GetPhiGapAndSide(p).first; }
     int PhiGapNumberForWheel(int) const;
-    std::pair<int, int> GetPhiGapAndSide(const CLHEP::Hep3Vector &p) const;
-    double AmplitudeOfSurface(const CLHEP::Hep3Vector& P, int side, int fan_number) const;
+    std::pair<int, int> GetPhiGapAndSide(const GeoTrf::Vector3D &p) const;
+    double AmplitudeOfSurface(const GeoTrf::Vector3D& P, int side, int fan_number) const;
 
     /// @}
 

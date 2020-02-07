@@ -7,7 +7,8 @@
 //#include "GaudiKernel/MsgStream.h"
 
 #include "DistanceCalculatorSaggingOn.h"
-#include "CLHEP/Vector/ThreeVector.h"
+//#include "CLHEP/Vector/ThreeVector.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 
 #include <vector>
 #include <stdexcept>
@@ -124,23 +125,23 @@ namespace LArWheelCalculator_Impl
   // side of the fan; negative - lower phi.
   //
   // Uses m_fan_number to compute sagging.
-  double DistanceCalculatorSaggingOn::DistanceToTheNeutralFibre(const CLHEP::Hep3Vector &p, int fan_number) const {
-    CLHEP::Hep3Vector sagging_corrected( p.x()+get_sagging(p, fan_number), p.y(), p.z() );
+  double DistanceCalculatorSaggingOn::DistanceToTheNeutralFibre(const GeoTrf::Vector3D &p, int fan_number) const {
+    GeoTrf::Vector3D sagging_corrected( p.x()+get_sagging(p, fan_number), p.y(), p.z() );
     return parent::DistanceToTheNeutralFibre(sagging_corrected, fan_number);
   }
 
-  CLHEP::Hep3Vector DistanceCalculatorSaggingOn::NearestPointOnNeutralFibre(const CLHEP::Hep3Vector &p, int fan_number) const {
-    CLHEP::Hep3Vector sagging_corrected( p.x()+get_sagging(p, fan_number), p.y(), p.z() );
+  GeoTrf::Vector3D DistanceCalculatorSaggingOn::NearestPointOnNeutralFibre(const GeoTrf::Vector3D &p, int fan_number) const {
+    GeoTrf::Vector3D sagging_corrected( p.x()+get_sagging(p, fan_number), p.y(), p.z() );
     return parent::NearestPointOnNeutralFibre(sagging_corrected, fan_number);
   }
 
-  double DistanceCalculatorSaggingOn::AmplitudeOfSurface(const CLHEP::Hep3Vector& p, int side, int fan_number) const {
+  double DistanceCalculatorSaggingOn::AmplitudeOfSurface(const GeoTrf::Vector3D& p, int side, int fan_number) const {
     return parent::AmplitudeOfSurface(p, side, fan_number) - get_sagging(p, fan_number);
   }
 
 
   // the function uses m_fan_number for phi-dependent sagging computation
-  double DistanceCalculatorSaggingOn::get_sagging(const CLHEP::Hep3Vector &P, int fan_number) const {
+  double DistanceCalculatorSaggingOn::get_sagging(const GeoTrf::Vector3D &P, int fan_number) const {
 #ifdef HARDDEBUG
     std::cout << "get_sagging: MFN = " << fan_number << std::endl;
 #endif
@@ -154,7 +155,9 @@ namespace LArWheelCalculator_Impl
     //if(n >= m_NumberOfFans) n -= m_NumberOfFans;
     //const std::vector<double>& sp = m_sagging_parameter[n];
     const std::vector<double>& sp = m_sagging_parameter[fan_number];
-    double R = P.r() / SYSTEM_OF_UNITS::mm;
+      
+    //double R = P.r() / SYSTEM_OF_UNITS::mm;
+    double R =  std::sqrt(P(0)*P(0) + P(1)*P(1) + P(2)*P(2)) / SYSTEM_OF_UNITS::mm;
     double r = R;
     double result = sp[0];
     result += R * sp[1];

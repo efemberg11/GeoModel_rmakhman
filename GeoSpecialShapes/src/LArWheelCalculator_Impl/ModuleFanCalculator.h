@@ -8,6 +8,7 @@
 #include "IFanCalculator.h"
 //#include "RDBAccessSvc/IRDBAccessSvc.h"
 //#include "GeoModelUtilities/DecodeVersionKey.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 
 class LArWheelCalculator;
 
@@ -23,9 +24,9 @@ namespace LArWheelCalculator_Impl
                           const DecodeVersionKey & larVersionKey*/);
 
       // geometry methods:
-      virtual double DistanceToTheNearestFan(CLHEP::Hep3Vector &p, int & out_fan_number) const;
+      virtual double DistanceToTheNearestFan(GeoTrf::Vector3D &p, int & out_fan_number) const;
       virtual int PhiGapNumberForWheel(int i) const;
-      virtual std::pair<int, int> GetPhiGapAndSide(const CLHEP::Hep3Vector &p) const;
+      virtual std::pair<int, int> GetPhiGapAndSide(const GeoTrf::Vector3D &p) const;
 
       inline const LArWheelCalculator *lwc() const { return m_lwc; };
 

@@ -6,6 +6,7 @@
 #define __LArWheelCalculator_Impl_DistanceCalculatorSaggingOn_H__
 
 #include "DistanceCalculatorSaggingOff.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 #include <vector>
 
 class LArWheelCalculator;
@@ -32,14 +33,14 @@ namespace LArWheelCalculator_Impl
 
       /// @name Geometry methods
       /// @{
-      virtual double DistanceToTheNeutralFibre(const CLHEP::Hep3Vector &p, int fan_number) const;
-      virtual CLHEP::Hep3Vector NearestPointOnNeutralFibre(const CLHEP::Hep3Vector &p, int fan_number) const;
-      virtual double AmplitudeOfSurface(const CLHEP::Hep3Vector& P, int side, int fan_number) const;
+      virtual double DistanceToTheNeutralFibre(const GeoTrf::Vector3D &p, int fan_number) const;
+      virtual GeoTrf::Vector3D NearestPointOnNeutralFibre(const GeoTrf::Vector3D &p, int fan_number) const;
+      virtual double AmplitudeOfSurface(const GeoTrf::Vector3D& P, int side, int fan_number) const;
       /// @}
 
     private:
 
-      double get_sagging(const CLHEP::Hep3Vector &P, int fan_number) const;
+      double get_sagging(const GeoTrf::Vector3D &P, int fan_number) const;
       void init_sagging_parameters();
 
       std::vector<std::vector<double> > m_sagging_parameter;

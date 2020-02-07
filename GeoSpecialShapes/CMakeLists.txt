@@ -5,7 +5,7 @@
 # Package: GeoSpecialShapes
 ################################################################################
 
-find_package(CLHEP)
+#find_package(CLHEP)
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )  # it defines CMAKE_INSTALL_LIBDIR

@@ -7,6 +7,7 @@
 
 
 #include "IDistanceCalculator.h"
+#include "GeoModelKernel/GeoDefinitions.h"
 //#include "RDBAccessSvc/IRDBAccessSvc.h"
 //#include "GeoModelUtilities/DecodeVersionKey.h"
 
@@ -31,11 +32,11 @@ namespace LArWheelCalculator_Impl
 
       /// @name Geometry methods
       /// @{
-      virtual double DistanceToTheNeutralFibre(const CLHEP::Hep3Vector &p, int fan_number) const;
-      virtual double DistanceToTheNeutralFibre_ref(const CLHEP::Hep3Vector &p, int fan_number) const;
-      virtual CLHEP::Hep3Vector NearestPointOnNeutralFibre(const CLHEP::Hep3Vector &p, int fan_number) const;
-      virtual CLHEP::Hep3Vector NearestPointOnNeutralFibre_ref(const CLHEP::Hep3Vector &p, int fan_number) const;
-      virtual double AmplitudeOfSurface(const CLHEP::Hep3Vector& P, int side, int fan_number) const;
+      virtual double DistanceToTheNeutralFibre(const GeoTrf::Vector3D &p, int fan_number) const;
+      virtual double DistanceToTheNeutralFibre_ref(const GeoTrf::Vector3D &p, int fan_number) const;
+      virtual GeoTrf::Vector3D NearestPointOnNeutralFibre(const GeoTrf::Vector3D &p, int fan_number) const;
+      virtual GeoTrf::Vector3D NearestPointOnNeutralFibre_ref(const GeoTrf::Vector3D &p, int fan_number) const;
+      virtual double AmplitudeOfSurface(const GeoTrf::Vector3D& P, int side, int fan_number) const;
       /// @}
 
       /// Return the calculator:

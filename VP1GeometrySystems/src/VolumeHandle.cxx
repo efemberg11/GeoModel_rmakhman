@@ -30,6 +30,7 @@
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoText2.h>
 #include <Inventor/nodes/SoTranslation.h>
+#include <Inventor/nodes/SoTexture2.h>
 
 #include <QHash>
 #include <QBuffer>
@@ -38,7 +39,7 @@
 #include <QSet>
 #include <QMap>
 #include <QDataStream>
-
+#include <unistd.h>
 //____________________________________________________________________
 class VolumeHandle::Imp {
 public:
@@ -258,7 +259,18 @@ void VolumeHandle::ensureBuildNodeSep()
 
 
   //VP1Msg::messageDebug("calling toShapeNode()...");
-  SoNode * shape = m_d->commondata->toShapeNode(m_d->pV);//NB: Ignore contained transformation of GeoShapeShifts.
+  bool shapeIsKnown;
+  SoNode * shape = m_d->commondata->toShapeNode(m_d->pV, &shapeIsKnown);//NB: Ignore contained transformation of GeoShapeShifts.
+  static const char *unknownShapeTextureFile[]={"/usr/share/gmex/unknownShape.jpg","/usr/local/share/gmex/unknownShape.jpg"};
+  SoTexture2 *skin=nullptr;
+  for (int trial=0;trial<2;trial++) {
+    if (!access(unknownShapeTextureFile[trial],R_OK)) {
+      skin = new SoTexture2;
+      skin->filename.setValue(unknownShapeTextureFile[trial]);
+      skin->model=SoTexture2::REPLACE;
+      break;
+    }
+  }
   if (!shape) {
     m_d->nodesep->removeAllChildren();
     return;
@@ -302,11 +314,13 @@ void VolumeHandle::ensureBuildNodeSep()
   }
   //Add shape child(ren) and get the separator (helper) where we attach the nodesep when volume is visible:
   if (iphi >= -1) {
+    if (!shapeIsKnown && skin) m_d->nodesep->addChild(skin);
     m_d->nodesep->addChild(shape);
     m_d->attachsepHelper = m_d->commondata->phiSectorManager()->getSepHelperForNode(m_d->commondata->subSystemFlag(), iphi);
     m_d->attachlabelSepHelper = m_d->commondata->phiSectorManager()->getLabelSepHelperForNode(m_d->commondata->subSystemFlag(), iphi);
   } else {
     SoSwitch * sw = new SoSwitch;
+    if (!shapeIsKnown && skin) m_d->nodesep->addChild(skin);
     sw->addChild(shape);
     SoSeparator * sep_slicedvols = new SoSeparator;
     sw->addChild(sep_slicedvols);

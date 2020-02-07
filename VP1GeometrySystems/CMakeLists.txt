@@ -75,6 +75,7 @@ install(TARGETS GXGeometrySystems
   DESTINATION lib
   COMPONENT Libraries
   )
+install( FILES share/unknownShape.jpg DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gmex)
 
 set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
 

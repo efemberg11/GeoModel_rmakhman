@@ -9,7 +9,6 @@
 
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoShapeShift.h"
-
 #include "VP1HEPVis/nodes/SoGenericBox.h"
 #include "VP1HEPVis/nodes/SoTubs.h"
 #include "VP1HEPVis/nodes/SoPcons.h"
@@ -134,7 +133,6 @@ void VolumeHandleSharedData::registerNodeSepForVolumeHandle(SoSeparator*n,Volume
   (*(m_d->sonodesep2volhandle))[n]=vh;
   setShowVolumeOutlines(n,m_d->controller->showVolumeOutLines());
 }
-
 //_____________________________________________________________________________________
 void VolumeHandleSharedData::setShowVolumeOutlines(SoGroup*nodegroup,bool showvol)
 {
@@ -162,7 +160,7 @@ void VolumeHandleSharedData::setShowVolumeOutlines(SoGroup*nodegroup,bool showvo
 }
 
 //_____________________________________________________________________________________
-SoNode * VolumeHandleSharedData::toShapeNode(const GeoPVConstLink& pV)
+SoNode * VolumeHandleSharedData::toShapeNode(const GeoPVConstLink& pV, bool * shapeIsKnown)
 {
   const GeoLogVol * logVolume = pV->getLogVol();
 
@@ -174,17 +172,26 @@ SoNode * VolumeHandleSharedData::toShapeNode(const GeoPVConstLink& pV)
   }
 
   const GeoShape * geoshape = logVolume->getShape();
-
   m_d->visaction.reset();
   if (geoshape->typeID()==GeoShapeShift::getClassTypeID()) {
     dynamic_cast<const GeoShapeShift*>(geoshape)->getOp()->exec(&(m_d->visaction));
     //NB: the transformation part of the GeoShapeShift will be applied elsewhere
-  } else {
+  }
+  else {
     geoshape->exec(&(m_d->visaction));
   }
   shape = m_d->visaction.getShape();
-  if (shape)
-    shape->ref();
+  if (!shape) {
+    GeoPVConstLink parent=pV->getParent();
+    parent->getLogVol()->getShape()->exec(&(m_d->visaction));
+    shape = m_d->visaction.getShape();
+    if (shapeIsKnown) *shapeIsKnown=false;
+  }
+  else {
+    if (shapeIsKnown) *shapeIsKnown=true;
+  }
+
+  if (shape) shape->ref();
   m_d->logvol2shape[logVolume] = shape;
   return shape;
 }

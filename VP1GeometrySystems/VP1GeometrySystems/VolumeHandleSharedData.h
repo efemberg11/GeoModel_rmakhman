@@ -46,7 +46,7 @@ public:
   void addZappedVolumeToGui(VolumeHandle*);
   void removeZappedVolumesFromGui(VolumeHandle*);
 
-  SoNode * toShapeNode(const GeoPVConstLink& pV);//Returns shape of pV->getLogVol() (uses shared instancing as appropriate)
+  SoNode * toShapeNode(const GeoPVConstLink& pV, bool *shapeIsKnown=nullptr);//Returns shape of pV->getLogVol() (uses shared instancing as appropriate)
   SoNode * getSoCylinderOrientedLikeGeoTube(const double& radius, const double& halfLength);//(uses shared instancing as appropriate)
 
   void registerNodeSepForVolumeHandle(SoSeparator*,VolumeHandle*);

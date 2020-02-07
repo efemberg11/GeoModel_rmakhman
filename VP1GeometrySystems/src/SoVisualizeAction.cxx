@@ -26,11 +26,14 @@
 #include "VP1HEPVis/nodes/SoPolyhedron.h"
 #include "VP1HEPVis/VP1HEPVisUtils.h"
 #include "VP1GeometrySystems/SbPolyhedrizeAction.h"
-
+#include <Inventor/nodes/SoSphere.h>
 // System of units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 #include <iostream>
+
+
+
 
 SoVisualizeAction::SoVisualizeAction()
   : m_shape(0)
@@ -43,6 +46,7 @@ SoVisualizeAction::~SoVisualizeAction()
 {
   // Don't delete.  Let ref count take care of the memory.
 }
+
 
 void SoVisualizeAction::handleShape(const GeoShape *shape)
 {

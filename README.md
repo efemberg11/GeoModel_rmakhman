@@ -23,7 +23,7 @@ Follow the instructions at the respective repositories to install them.
 
 ## GeoModelCore:
 
-Clone the repository at this [address](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), then:
+Clone the repository at [GeoModelCore repo](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), then:
 
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
@@ -35,8 +35,9 @@ make install
 ```
 ## GeoModelIO:
 
-Clone the repository at this [address](https://gitlab.cern.ch/GeoModelDev/GeoModelIO).
-CAVEAT: at the moment the working branch of GeoModelIO compatible with GeoModel2G4 and FullSimLight is: [address](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/tree/master-specialshape-geomodelg4)
+Clone the repository at [GeoModelIO repo](https://gitlab.cern.ch/GeoModelDev/GeoModelIO).
+
+CAVEAT: at the moment the working branch of GeoModelIO compatible with GeoModel2G4 and FullSimLight is: [master-specialshape-geomodelg4](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/tree/master-specialshape-geomodelg4)
 
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
@@ -53,7 +54,7 @@ make install
 Before installing Geant4, check at the Geant4 website the pre-requisites needed:
 http://geant4-userdoc.web.cern.ch/geant4-userdoc/UsersGuides/InstallationGuide/html/gettingstarted.html
 Note in particular that to enable the use of geometry reading/writing from GDML XML files, the Xerces-C++ headers and library >=3 must be installed.
-Clone the repository at this [address](https://gitlab.cern.ch/geant4/geant4.git), then:
+Clone the repository at [Geant4 repo](https://gitlab.cern.ch/geant4/geant4.git), then:
 
 ```bash
 git clone https://gitlab.cern.ch/geant4/geant4.git
@@ -72,7 +73,7 @@ make install
 
 ## GeoModelG4:
 
-Clone the repository at this [address](https://gitlab.cern.ch/GeoModelDev/GeoModelG4), then:
+Clone the repository at [GeoModelG4 repo](https://gitlab.cern.ch/GeoModelDev/GeoModelG4), then:
 
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelG4.git
@@ -85,7 +86,7 @@ make install
 
 ## FullSimLight:
 
-Clone the repository at this [address](https://gitlab.cern.ch/GeoModelDev/FullSimLight), then:
+Clone the repository at [FullSimLight repo](https://gitlab.cern.ch/GeoModelDev/FullSimLight), then:
 
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/FullSimLight.git

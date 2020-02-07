@@ -6,8 +6,6 @@
 #define __LArWheelCalculator_Impl_ModuleFanCalculator_H__
 
 #include "IFanCalculator.h"
-//#include "RDBAccessSvc/IRDBAccessSvc.h"
-//#include "GeoModelUtilities/DecodeVersionKey.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
 class LArWheelCalculator;
@@ -19,9 +17,7 @@ namespace LArWheelCalculator_Impl
   class ModuleFanCalculator : public IFanCalculator
   {
     public:
-      ModuleFanCalculator(LArWheelCalculator* lwc/*,
-                          IRDBAccessSvc* rdbAccess,
-                          const DecodeVersionKey & larVersionKey*/);
+      ModuleFanCalculator(LArWheelCalculator* lwc);
 
       // geometry methods:
       virtual double DistanceToTheNearestFan(GeoTrf::Vector3D &p, int & out_fan_number) const;

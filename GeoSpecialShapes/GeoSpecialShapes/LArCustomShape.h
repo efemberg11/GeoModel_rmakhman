@@ -8,12 +8,6 @@
 #include <string>
 #include <map>
 
-//#ifndef XAOD_STANDALONE
-//    #include "GaudiKernel/ServiceHandle.h"
-//    #include "GaudiKernel/StatusCode.h"
-//    #include "StoreGate/StoreGateSvc.h"
-//#endif // XAOD_STANDALONE
-
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 #include "GeoSpecialShapes/LArWheelCalculatorEnums.h"
@@ -28,9 +22,6 @@ class LArCustomShape : public GeoShape
 {
 
  public:
-  //  #ifndef XAOD_STANDALONE
-  //  typedef ServiceHandle<StoreGateSvc> StoreGateSvc_t;
-  //  #endif // XAOD_STANDALONE
   	typedef std::pair<LArG4::LArWheelCalculator_t, int> CalcDef_t;
   	typedef std::map<std::string,  CalcDef_t> ShapeCalc_typemap;
 
@@ -65,23 +56,13 @@ class LArCustomShape : public GeoShape
   /// Executes a GeoShapeAction
   virtual void exec(GeoShapeAction* action) const;
 
-//#ifndef XAOD_STANDALONE
-//  /** @brief The standard @c StoreGateSvc/DetectorStore
-//    * Returns (kind of) a pointer to the @c StoreGateSvc
-//    */
-//   StoreGateSvc_t& detStore() const;
-//#endif // XAOD_STANDALONE
-
  protected:
 
   virtual ~LArCustomShape();
 
  private:
-  //#if defined XAOD_STANDALONE
-    int createCalculator(const CalcDef_t & cdef);
-  //#else // XAOD_STANDALONE
-  // StatusCode createCalculator(const CalcDef_t & cdef);
-  //#endif
+    
+  int createCalculator(const CalcDef_t & cdef);
 
   // Prohibited operations.
   LArCustomShape(const LArCustomShape &right);
@@ -98,11 +79,6 @@ class LArCustomShape : public GeoShape
   /// The calculator:
   const LArWheelCalculator *m_calculator;
 
-   //#ifndef XAOD_STANDALONE
-       /// Pointer to StoreGate (detector store by default)
-   //    mutable StoreGateSvc_t m_detStore;
-   //#endif // XAOD_STANDALONE
-
 };
 
 inline const std::string& LArCustomShape::getClassType() {
@@ -112,12 +88,5 @@ inline const std::string& LArCustomShape::getClassType() {
 inline ShapeType LArCustomShape::getClassTypeID() {
   return s_classTypeID;
 }
-
-//#ifndef XAOD_STANDALONE
-//    inline ServiceHandle<StoreGateSvc>& LArCustomShape::detStore() const  {
-//        return m_detStore;
-//    }
-//#endif // XAOD_STANDALONE
-
 
 #endif // LArCustomShape_h

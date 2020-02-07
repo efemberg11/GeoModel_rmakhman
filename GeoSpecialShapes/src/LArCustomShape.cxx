@@ -95,35 +95,13 @@ const LArCustomShape::ShapeCalc_typemap LArCustomShape::s_calculatorTypes = {
 LArCustomShape::LArCustomShape(const std::string& a_shapeName)
   : m_shapeName(a_shapeName),
     m_calculator(0)
-    //#ifndef XAOD_STANDALONE
-    //    ,m_detStore( "StoreGateSvc/DetectorStore", a_shapeName )
-    //#endif // XAOD_STANDALONE
 {
-//#ifdef XAOD_STANDALONE
     std::cout << "LArCustomShape::LArCustomShape()" << std::endl;
     std::cout << "Constructor -- Creating the calculator..." << std::endl;
     if ( createCalculator( s_calculatorTypes.at(a_shapeName) ) == 1 ) { // map.at throws std::out_of_range exception on unknown shape name
             std::string error = std::string("Can't create LArWheelCalculator for name ") + a_shapeName + " in LArCustomShape constructor";
             throw std::runtime_error(error);
         }
-//#else // XAOD_STANDALONE
-//    std::string name = a_shapeName;
-//    size_t index = name.find("Slice");
-//    if(index != std::string::npos) name.replace(index + 5, 2, "00");
-//    if(s_calculatorTypes.find(name) == s_calculatorTypes.end()){
-//        std::string error =
-//            std::string("LArCustomShape: unknown shape name ") +
-//                a_shapeName;
-//        throw std::runtime_error(error);
-//    } else {
-//        if(createCalculator(s_calculatorTypes.at(name)).isFailure()){ // map.at throws std::out_of_range exception on unknown shape name
-//            std::string error =
-//                std::string("Can't create LArWheelCalculator for name ") +
-//                a_shapeName + " in LArCustomShape constructor";
-//            throw std::runtime_error(error);
-//        }
-//    }
-//#endif // Athena
 }
 
 LArCustomShape::~LArCustomShape()
@@ -131,7 +109,7 @@ LArCustomShape::~LArCustomShape()
   //delete m_calculator;
 }
 
-//#if defined XAOD_STANDALONE
+
 int LArCustomShape::createCalculator(const CalcDef_t & cdef) { // LArG4::LArWheelCalculator_t wheelType, int zside
 
   std::cout << "LArCustomShape::createCalculator()" << std::endl;
@@ -150,22 +128,6 @@ int LArCustomShape::createCalculator(const CalcDef_t & cdef) { // LArG4::LArWhee
   std::cout << "createCalculator() - done." << std::endl;
 
 }
-//#else // XAOD_STANDALONE
-//StatusCode LArCustomShape::createCalculator(const CalcDef_t & cdef) { // LArG4::LArWheelCalculator_t wheelType, int zside
-//    LArG4::LArWheelCalculator_t wheelType = cdef.first;
-//    int zside = cdef.second;
-//
-//    std::string calcDSname = std::string("LAr::EMEC::")+ (zside>0?"Pos::":"Neg::")+LArWheelCalculator::LArWheelCalculatorTypeString(wheelType);
-//    if(detStore()->contains<LArWheelCalculator>(calcDSname)){
-//        return detStore()->retrieve(m_calculator, calcDSname);
-//    }
-//
-//    m_calculator = new LArWheelCalculator(wheelType, zside);
-//
-//    // ownership is passed to detStore
-//    return detStore()->record(m_calculator,  calcDSname);
-//}
-//#endif // Athena
 
 const LArWheelCalculator *LArCustomShape::calculator() const
 {

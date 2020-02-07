@@ -2,21 +2,13 @@
   Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
 */
 
-//#include "GaudiKernel/ISvcLocator.h"
-//#include "GaudiKernel/Bootstrap.h"
-//#include "GaudiKernel/MsgStream.h"
-
 #include "DistanceCalculatorSaggingOn.h"
-//#include "CLHEP/Vector/ThreeVector.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
 #include <vector>
 #include <stdexcept>
 
 #include "GeoSpecialShapes/LArWheelCalculator.h"
-
-//#include "AthenaKernel/Units.h"
-//using Athena::Units::mm;
 
 // Physical constants
 #include "GeoModelKernel/Units.h"

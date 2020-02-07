@@ -5,8 +5,6 @@
 #ifndef __LArWheelCalculator_Impl_IFanCalculator_H__
 #define __LArWheelCalculator_Impl_IFanCalculator_H__
 
-
-//#include "CLHEP/Vector/ThreeVector.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
 namespace LArWheelCalculator_Impl

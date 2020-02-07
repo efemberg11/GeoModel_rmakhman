@@ -6,12 +6,9 @@
 #define LARWHEELCALCULATOR_IMPL_WHEELFANCALCULATOR_H
 
 #include "IFanCalculator.h"
-//#include "RDBAccessSvc/IRDBAccessSvc.h"
-//#include "GeoModelUtilities/DecodeVersionKey.h"
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
-//#include "GaudiKernel/PhysicalConstants.h"
 // Physical constants
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits

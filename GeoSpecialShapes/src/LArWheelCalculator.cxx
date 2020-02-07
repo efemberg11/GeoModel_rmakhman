@@ -9,31 +9,11 @@
 #include <climits>
 #include <cassert>
 
-//#ifndef BUILDVP1LIGHT
-//    #include "GaudiKernel/ISvcLocator.h"
-//    #include "GaudiKernel/Bootstrap.h"
-//    #include "GaudiKernel/MsgStream.h"
-//    #include "GaudiKernel/PhysicalConstants.h"
-//    #include "GeoModelInterfaces/IGeoModelSvc.h"
-//    #include "RDBAccessSvc/IRDBRecord.h"
-//    #include "RDBAccessSvc/IRDBRecordset.h"
-//    #include "RDBAccessSvc/IRDBAccessSvc.h"
-//    #include "./LArWheelCalculator_Impl/RDBParamReader.h"
-//    #include "./LArWheelCalculator_Impl/RDBParamRecords.h"
-//#endif
-
-//#include "GeoModelUtilities/DecodeVersionKey.h"
-
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 
 #include "./LArWheelCalculator_Impl/DistanceCalculatorFactory.h"
 #include "./LArWheelCalculator_Impl/FanCalculatorFactory.h"
 
-//#include "AthenaKernel/Units.h"
-
-
-//using namespace Athena::Units;
-//using Gaudi::Units::twopi;
 
 
 // The radial boundaries of the inner and outer wheels are defined
@@ -114,25 +94,6 @@ LArWheelCalculator::LArWheelCalculator(LArG4::LArWheelCalculator_t a_wheelType, 
   m_distanceCalcImpl(0),
   m_fanCalcImpl(0)
 {
-  // Get pointer to the message service
-  //ISvcLocator* svcLocator = Gaudi::svcLocator();
-  //IMessageSvc* msgSvc;
-  //StatusCode status = svcLocator->service("MessageSvc", msgSvc);
-  //if(status.isFailure()){
-  //  throw std::runtime_error("LArWheelCalculator constructor: cannot initialze message service");
-  //}
-  //MsgStream msg(msgSvc, "LArWheelCalculator");
-  //msg << MSG::VERBOSE << "LArWheelCalculator constructor at " << this
-  //    << " (type " << LArWheelCalculatorTypeString(m_type)
-  //    << "):" << endmsg;
-
-//#ifdef LARWC_DTNF_NEW
-//  msg << MSG::VERBOSE << "compiled with new DTNF" << endmsg;
-//#endif
-
-  // Access source of detector parameters.
- // msg << MSG::VERBOSE
- //     << "initializing data members from DB..." << endmsg;
 
     
 //#ifndef BUILDVP1LIGHT
@@ -199,43 +160,6 @@ LArWheelCalculator::LArWheelCalculator(LArG4::LArWheelCalculator_t a_wheelType, 
 //  m_zWheelFrontFace = m_dMechFocaltoWRP + m_dWRPtoFrontFace;
 //  m_zWheelBackFace = m_zWheelFrontFace + m_WheelThickness;
 //
-//  msg << MSG::DEBUG << "... got these values:" << std::endl
-//      << "m_zWheelRefPoint       : " << m_zWheelRefPoint / cm << " [cm]" << std::endl
-//      << "m_dMechFocaltoWRP      : " << m_dMechFocaltoWRP / cm << " [cm]" << std::endl
-//      << "m_dElecFocaltoWRP      : " << m_dElecFocaltoWRP / cm << " [cm]" << std::endl
-//      << "m_HalfGapBetweenWheels : " << m_HalfGapBetweenWheels / cm << " [cm]" << std::endl
-//      << "m_rOuterCutoff         : " << m_rOuterCutoff / cm << " [cm]" << std::endl
-//      << "m_zWheelFrontFace      : " << m_zWheelFrontFace / cm << " [cm]" << std::endl
-//      << "m_zWheelBackFace       : " << m_zWheelBackFace / cm << " [cm]" << std::endl
-//      << "m_zShift               : " << m_zShift / cm << " [cm]" << std::endl
-//      << "Phi rotation           : " << (m_phiRotation? "true": "false") << std::endl
-//      << "eta wheels limits      : " << m_eta_low << ", " << m_eta_mid << ", " << m_eta_hi
-//      << endmsg;
-//  msg << MSG::VERBOSE << "hardcoded constants: " << std::endl
-//      << "m_WheelThickness       : " << m_WheelThickness / cm << " [cm]" << std::endl
-//      << "m_dWRPtoFrontFace      : " << m_dWRPtoFrontFace / cm << " [cm]"
-//      << endmsg;
-
-    //#endif
-//#ifdef BUILDVP1LIGHT //FIXME: check all this!!!
-    //TO DO: put real values
-   //m_zWheelRefPoint = 999;// / cm
-   //m_dMechFocaltoWRP = 999;// / cm << " [cm]" << std::endl
-   //m_dElecFocaltoWRP = 999;//      : " << m_dElecFocaltoWRP / cm << " [cm]" << std::endl
-   //m_HalfGapBetweenWheels = 999;// : " << m_HalfGapBetweenWheels / cm << " [cm]" << std::endl
-   //m_rOuterCutoff = 999;//         : " << m_rOuterCutoff / cm << " [cm]" << std::endl
-   //m_zWheelFrontFace = 999;//      : " << m_zWheelFrontFace / cm << " [cm]" << std::endl
-   //m_zWheelBackFace = 999;//       : " << m_zWheelBackFace / cm << " [cm]" << std::endl
-   //m_zShift = 999;//               : " << m_zShift / cm << " [cm]" << std::endl
-   m_phiRotation = true;//? "true": "false") << std::endl
-   //m_eta_low = 999;//
-   //m_eta_mid = 999;//
-   //m_eta_hi = 999;//
-
-   //m_WheelThickness = 999;//       : " << m_WheelThickness / cm << " [cm]" << std::endl
-   //m_dWRPtoFrontFace = 999;//      : " << m_dWRPtoFrontFace / cm << " [cm]"
-//#endif
-
 
   // Constructor initializes the geometry.
 

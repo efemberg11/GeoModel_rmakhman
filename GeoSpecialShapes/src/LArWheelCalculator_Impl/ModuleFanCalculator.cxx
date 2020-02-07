@@ -6,10 +6,7 @@
 
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-//#include "CLHEP/Vector/ThreeVector.h"
 
-//#include "GaudiKernel/PhysicalConstants.h"
-//using namespace Gaudi::Units;
 // Physical constants
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
@@ -20,10 +17,6 @@
 
 namespace LArWheelCalculator_Impl
 {
-
-  //ModuleFanCalculator::ModuleFanCalculator(LArWheelCalculator* lwc,
-  //                                         IRDBAccessSvc* /*rdbAccess*/,
-  //                                         const DecodeVersionKey & /*larVersionKey*/)
   ModuleFanCalculator::ModuleFanCalculator(LArWheelCalculator* lwc)
     : m_lwc(lwc)
   {

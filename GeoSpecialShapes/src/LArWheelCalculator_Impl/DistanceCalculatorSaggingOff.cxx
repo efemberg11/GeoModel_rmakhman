@@ -6,7 +6,6 @@
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
-//#include "GaudiKernel/PhysicalConstants.h"
 #include<cassert>
 
 //#define LWC_PARAM_ANGLE
@@ -17,19 +16,12 @@
 
 #include<signal.h>
 
-//using namespace Gaudi::Units;
-
 // Physical constants
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
 namespace LArWheelCalculator_Impl
-{
-
-  //DistanceCalculatorSaggingOff::DistanceCalculatorSaggingOff(LArWheelCalculator* c,
-  //                                                           IRDBAccessSvc* /*rdbAccess*/,
-  //                                                           const DecodeVersionKey & /*larVersionKey*/)
-  DistanceCalculatorSaggingOff::DistanceCalculatorSaggingOff(LArWheelCalculator* c)
+{  DistanceCalculatorSaggingOff::DistanceCalculatorSaggingOff(LArWheelCalculator* c)
     : m_lwc(c)
   {
     m_EndQuarterWave = lwc()->m_ActiveLength - lwc()->m_QuarterWaveLength;

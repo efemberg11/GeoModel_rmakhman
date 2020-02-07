@@ -7,11 +7,7 @@
 
 #include <vector>
 
-//#include "CLHEP/Vector/ThreeVector.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-//#ifndef XAOD_STANDALONE
-//    #include "AthenaKernel/CLASS_DEF.h"
-//#endif // XAOD_STANDALONE
 
 #include "GeoSpecialShapes/LArWheelCalculatorEnums.h"
 // Physical constants
@@ -22,8 +18,6 @@
 #define LARWC_DTNF_NEW
 
 class IRDBRecordset;
-//class RDBParamRecords;
-
 //#define HARDDEBUG
 
 // Forward declarations
@@ -138,9 +132,6 @@ class LArWheelCalculator
     double m_sin_parametrization[7]; // up to pol6
     double m_cos_parametrization[7];
     std::vector<std::vector<double> > m_sagging_parameter; // !
-    //double m_WheelThickness;
-    // double m_HalfWheelThickness;
-    //double m_zWheelFrontFace, m_zWheelBackFace;
     
     // N.B. all const values copied from the DB@
     // https://atlas-geometry-db.web.cern.ch/atlas-geometry-db/
@@ -223,11 +214,5 @@ class LArWheelCalculator
 
     void fill_sincos_parameterization();
 };
-
-//#ifndef XAOD_STANDALONE
-    //using the macro below we can assign an identifier (and a version)
-    //This is required and checked at compile time when you try to record/retrieve
-//    CLASS_DEF(LArWheelCalculator , 900345678 , 1)
-//#endif // XAOD_STANDALONE
 
 #endif // GEOSPECIALSHAPES_LARWHEELCALCULATOR_H

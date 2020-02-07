@@ -13,6 +13,10 @@
 // TFPersistification includes
 #include "TFPersistification/TransFunctionInterpreter.h"
 
+// GeoSpecialShapes
+#include "GeoSpecialShapes/LArCustomShape.h"
+
+
 // GeoModelKernel
 #include "GeoModelKernel/GeoTransform.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
@@ -813,7 +817,7 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 				if (varName == "NVertices") NVertices = varValue.toUInt();
 			}
 
-			
+
 
 			// and now loop over the rest of the list, to get the parameters of all Z planes
 			for (int it=2; it < NVertices; it++)
@@ -857,7 +861,6 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		if(error) qFatal("GeoGenericTrap shape error!!! Aborting...");
 		return gTrap;
 	}
-	
 	else if (type == "SimplePolygonBrep") {
 		//qInfo() << "Reading-in: SimplePolygonBrep: "; // debug
 		// shape parameters
@@ -1369,6 +1372,20 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		// build and return the GeoShapeShift instance
 		return new GeoShapeUnion(shapeA, shapeB);
 	}
+  //LAr custom shape
+  else if(type == "CustomShape") {
+    std::string name = "";
+    // get parameters from DB string
+		QStringList shapePars = parameters.split(";");
+    foreach( QString par, shapePars) {
+			QStringList vars = par.split("=");
+			QString varName = vars[0];
+			QString varValue = vars[1];
+			if (varName == "name") name = varValue.toStdString();
+		}
+    
+    return new LArCustomShape(name);
+  }
 	else {
 		// QString msg = "WARNING!! - Shape '" + type + "' not implemented yet!!! Returning a dummy cube.";
 		// qWarning(msg.toStdString().c_str());

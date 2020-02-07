@@ -7,6 +7,8 @@
 // TFPersistification includes
 #include "TFPersistification/TransFunctionPersistifier.h"
 
+// GeoSpecialShapes
+#include "GeoSpecialShapes/LArCustomShape.h"
 
 // GeoModelKernel includes
 #include "GeoModelKernel/GeoNodePath.h"
@@ -765,7 +767,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 				tr(0,3)=dx;
 				tr(1,3)=dy;
 				tr(2,3)=dz;
-				
+
 				// explicitely set the last row: (0,0,0,1)
 				tr(3,0)=0;
 				tr(3,1)=0;
@@ -1099,6 +1101,12 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 	  }
 	  shapePars = pars.join(";");
 	}
+  //LAr custom shape
+  else if(shape->typeID() == LArCustomShape::getClassTypeID()) {
+    const LArCustomShape* shapeIn = dynamic_cast<const LArCustomShape*> (shape);
+    if (nullptr==shapeIn) throw std::runtime_error("TypeID did not match cast for custom shape");
+    shapePars = "name=" + QString::fromStdString(shapeIn->name());
+  }
 	else {
 		std::cout << "\n\tWARNING!!! - Shape '" << shapeType.toStdString() << "' needs to be persistified!!\n\n";
 		m_objectsNotPersistified << shapeType;

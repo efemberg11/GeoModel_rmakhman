@@ -37,7 +37,7 @@ public:
   static G4double GetFieldValue() { return gFieldValue; }
     
   void RecursivelyCheckOverlap(G4LogicalVolume* envelope);
-  void CreateTheWorld(GeoPhysVol* world);
+  GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
 
 protected:
   G4Timer fTimer;

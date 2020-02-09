@@ -66,7 +66,7 @@ void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope){
     }
 }
 
-void MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
+GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
 {
     if (world == nullptr)
     {
@@ -77,7 +77,7 @@ void MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
         const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
         world = new GeoPhysVol(worldLog);
     }
-    //return world;
+    return world;
 }
 
 G4VPhysicalVolume *MyDetectorConstruction::Construct()
@@ -97,9 +97,11 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
             exit(0);
             
         }
+        
+        
         std::cout<< "----> factory built: "<<fGeometryFileName<<std::endl;
         
-        CreateTheWorld(world);
+        world = CreateTheWorld(nullptr);
         std::cout<< "----> Fake World created: "<<fGeometryFileName<<std::endl;
         factory->create(world);
     

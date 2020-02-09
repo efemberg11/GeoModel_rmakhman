@@ -117,11 +117,11 @@ int main(int argc, char** argv) {
 }
 
 static struct option options[] = {
-    {"standard Geant4 macro file (REQUIRED)"                           , required_argument, 0, 'm'},
-    {"physics list name (default FTFP_BERT)"                           , required_argument, 0, 'f'},
-    {"flag to run the application in performance mode (default FALSE)" , no_argument      , 0, 'p'},
-    {"Geometry file name (default:geometry-ATLAS-R2-2016-01-00-01.db)" , required_argument, 0, 'g'},
-    {"flag to run the geometry overlap check (default FALSE)"          , no_argument      , 0, 'o'},
+    {"macro file            "  , required_argument, 0, 'm'},
+    {"physics list name     "  , required_argument, 0, 'f'},
+    {"performance flag      "  , no_argument      , 0, 'p'},
+    {"geometry file name    "  , required_argument, 0, 'g'},
+    {"overlap geometry check"  , no_argument      , 0, 'o'},
     {0, 0, 0, 0}
 };
 
@@ -130,17 +130,18 @@ void Help() {
   std::cout <<"\n " << std::setw(100) << std::setfill('=') << "" << std::setfill(' ') << std::endl;
   G4cout <<"  FullSimLight Geant4 application.    \n"
             << std::endl
-            <<"  **** Parameters: \n"
+            <<"  **** Parameters: \n\n"
             <<"      -m :   REQUIRED : the standard Geant4 macro file name \n"
             <<"      -f :   physics list name (default: FTFP_BERT) \n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
             <<"      -g :   the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01.db)\n"
-            <<"      -o :   flag  ==> run the geometry overlap check \n"
+            <<"      -o :   flag  ==> run the geometry overlap check (default: FALSE)\n"
             << std::endl;
-  std::cout <<"\nUsage: fullSimLight [OPTIONS] INPUT_FILE\n\n" <<std::endl;
+  std::cout <<"\nUsage: ./fullSimLight [OPTIONS] -m <MACRO_FILE>\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
-    printf("\t-%c  --%s\t%s\n", options[i].val, options[i].name, options[i].has_arg ? options[i].name : "");
+    //printf("\t-%c  --%s\t%s\n", options[i].val, options[i].name, options[i].has_arg ? options[i].name : "");
+    printf("\t-%c  --%s\t\n", options[i].val, options[i].name);
   }
   std::cout<<"\n "<<std::setw(100)<<std::setfill('=')<<""<<std::setfill(' ')<<std::endl;
 }

@@ -30,7 +30,7 @@
 #include <iomanip>
 
 static bool         parIsPerformance   = false;
-static G4String     geometryFileName   = "ATLAS-R2-2016-01-00-01.db";
+static G4String     geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01.db";
 static std::string  parMacroFileName   = "";
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
@@ -120,7 +120,7 @@ static struct option options[] = {
     {"standard Geant4 macro file (REQUIRED)"                           , required_argument, 0, 'm'},
     {"physics list name (default FTFP_BERT)"                           , required_argument, 0, 'f'},
     {"flag to run the application in performance mode (default FALSE)" , no_argument      , 0, 'p'},
-    {"Geometry file name (default:ATLAS-R2-2016-01-00-01.db)"          , required_argument, 0, 'g'},
+    {"Geometry file name (default:geometry-ATLAS-R2-2016-01-00-01.db)" , required_argument, 0, 'g'},
     {"flag to run the geometry overlap check (default FALSE)"          , no_argument      , 0, 'o'},
     {0, 0, 0, 0}
 };
@@ -135,7 +135,7 @@ void Help() {
             <<"      -f :   physics list name (default: FTFP_BERT) \n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
-            <<"      -g :   the Geometry file name (default: ATLAS-R2-2016-01-00-01.db)\n"
+            <<"      -g :   the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01.db)\n"
             <<"      -o :   flag  ==> run the geometry overlap check \n"
             << std::endl;
   std::cout <<"\nUsage: fullSimLight [OPTIONS] INPUT_FILE\n\n" <<std::endl;

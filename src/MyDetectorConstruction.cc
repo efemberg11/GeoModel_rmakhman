@@ -41,7 +41,7 @@ G4double MyDetectorConstruction::gFieldValue = 0.0;
 
 MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
-  fGeometryFileName    = "ATLAS-R2-2016-01-00-01.db";
+  fGeometryFileName    = "geometry-ATLAS-R2-2016-01-00-01.db";
   fFieldValue          = 0.0;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;

@@ -12,6 +12,7 @@ class G4VPhysicalVolume;
 class G4FieldManager;
 class G4UniformMagField;
 class MyDetectorMessenger;
+class GeoPhysVol;
 
 class MyDetectorConstruction : public G4VUserDetectorConstruction {
 
@@ -36,6 +37,7 @@ public:
   static G4double GetFieldValue() { return gFieldValue; }
     
   void RecursivelyCheckOverlap(G4LogicalVolume* envelope);
+  void CreateTheWorld(GeoPhysVol* world);
 
 protected:
   G4Timer fTimer;

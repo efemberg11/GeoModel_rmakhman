@@ -65,12 +65,26 @@ void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope){
     }
 }
 
+void MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
+{
+    if (world == nullptr)
+    {
+        // Setup the 'World' volume from which everything else will be suspended
+        double densityOfAir=0.1;
+        const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
+        const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+        const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
+        world = new GeoPhysVol(worldLog);
+    }
+    //return world;
+}
+
 G4VPhysicalVolume *MyDetectorConstruction::Construct()
 {
     fTimer.Start();
-  
+   
     G4cout << "MyDetectorConstruction::Construct() :: starting the timer"<<G4endl;
-    
+    GeoPhysVol* world = nullptr;
     if (fGeometryFileName.contains(".dylib") || fGeometryFileName.contains(".so"))
     {
         std::cout<< "Bulding the detector from a plugin: "<<fGeometryFileName<<std::endl;
@@ -81,8 +95,41 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
             exit(0);
             
         }
-        std::cout<< "Plugin done for now"<<std::endl;
-         exit(0);
+        std::cout<< "----> factory built: "<<fGeometryFileName<<std::endl;
+        
+        CreateTheWorld(world);
+        std::cout<< "----> Fake World created: "<<fGeometryFileName<<std::endl;
+        factory->create(world);
+    
+        std::cout<< "----> factory create world?: "<<fGeometryFileName<<std::endl;
+
+        qDebug() << "ReadGeoModel::buildGeoModel() done.";
+        fTimer.Stop();
+        G4cout << "First step done. GeoModelTree built from the SQLite file."<<G4endl;
+        G4cout << "*** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
+        G4cout << "*** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
+        G4cout << "*** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
+        
+        fTimer.Start();
+        // build the Geant4 geometry and get an hanlde to the world' volume
+        ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
+        
+        std::cout << "Building G4 geometry."<<std::endl;
+        G4LogicalVolume* envelope = builder->Build(world);
+        G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
+        
+        fWorld = physWorld;
+        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+        
+        //RecursivelyCheckOverlap(envelope);
+        if (fWorld == 0) {
+            G4ExceptionDescription ed;
+            ed << "World volume not set properly check your setup selection criteria or input files!" << G4endl;
+            G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
+        }
+        G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
+        G4cout << "Detector Construction from the plugin file " << fGeometryFileName.data() <<", done!"<<G4endl;
+        exit(0);
         
     }
     else if (fGeometryFileName.contains(".db")){
@@ -110,7 +157,8 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         
         
         /* build the GeoModel geometry */
-        GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
+        //GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
+        world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
         qDebug() << "ReadGeoModel::buildGeoModel() done.";
         fTimer.Stop();
         G4cout << "First step done. GeoModelTree built from the SQLite file."<<G4endl;
@@ -130,6 +178,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
         
         //RecursivelyCheckOverlap(envelope);
+        
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly check your setup selection criteria or GDML input!" << G4endl;

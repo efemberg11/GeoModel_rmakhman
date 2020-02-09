@@ -97,15 +97,9 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
             exit(0);
             
         }
-        
-        
-        std::cout<< "----> factory built: "<<fGeometryFileName<<std::endl;
-        
+
         world = CreateTheWorld(nullptr);
-        std::cout<< "----> Fake World created: "<<fGeometryFileName<<std::endl;
         factory->create(world);
-    
-        std::cout<< "----> factory create world?: "<<fGeometryFileName<<std::endl;
 
         qDebug() << "ReadGeoModel::buildGeoModel() done.";
         fTimer.Stop();

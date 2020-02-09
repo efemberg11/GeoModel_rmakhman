@@ -42,8 +42,9 @@ G4double MyDetectorConstruction::gFieldValue = 0.0;
 MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
   fGeometryFileName    = "ATLAS-R2-2016-01-00-01.db";
-  fFieldValue        = 0.0;
-  fDetectorMessenger = new MyDetectorMessenger(this);
+  fFieldValue          = 0.0;
+  fDetectorMessenger   = new MyDetectorMessenger(this);
+  fRunOverlapCheck     = false;
 }
 
 MyDetectorConstruction::~MyDetectorConstruction()
@@ -85,6 +86,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
    
     G4cout << "MyDetectorConstruction::Construct() :: starting the timer"<<G4endl;
     GeoPhysVol* world = nullptr;
+    G4LogicalVolume* envelope;
     if (fGeometryFileName.contains(".dylib") || fGeometryFileName.contains(".so"))
     {
         std::cout<< "Bulding the detector from a plugin: "<<fGeometryFileName<<std::endl;
@@ -115,13 +117,12 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
         
         std::cout << "Building G4 geometry."<<std::endl;
-        G4LogicalVolume* envelope = builder->Build(world);
+        envelope = builder->Build(world);
         G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
         
         fWorld = physWorld;
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
         
-        //RecursivelyCheckOverlap(envelope);
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly check your setup selection criteria or input files!" << G4endl;
@@ -171,13 +172,11 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
         
         std::cout << "Building G4 geometry."<<std::endl;
-        G4LogicalVolume* envelope = builder->Build(world);
+        envelope = builder->Build(world);
         G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
         
         fWorld = physWorld;
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
-        
-        //RecursivelyCheckOverlap(envelope);
         
         if (fWorld == 0) {
             G4ExceptionDescription ed;
@@ -196,6 +195,8 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
         
         //RecursivelyCheckOverlap(fWorld->GetLogicalVolume());
+        envelope = fWorld->GetLogicalVolume();
+        
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly! Check your setup selection criteria or the GDML input!" << G4endl;
@@ -214,6 +215,13 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     G4cout << "**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
     G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
     G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
+    
+    if (fRunOverlapCheck){
+        RecursivelyCheckOverlap(envelope);
+        G4cout<<"Recursive overlap check done! Exiting."<<G4endl;
+        exit(0);
+    }
+    
     return fWorld;
 }
 

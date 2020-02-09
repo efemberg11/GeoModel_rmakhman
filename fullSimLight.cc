@@ -29,10 +29,11 @@
 #include <iostream>
 #include <iomanip>
 
-static bool         parIsPerformance = false;
-static G4String     geometryFileName = "ATLAS-R2-2016-01-00-01.db";
-static std::string  parMacroFileName = "";
-static std::string  parPhysListName  = "FTFP_BERT";
+static bool         parIsPerformance   = false;
+static G4String     geometryFileName   = "ATLAS-R2-2016-01-00-01.db";
+static std::string  parMacroFileName   = "";
+static std::string  parPhysListName    = "FTFP_BERT";
+static bool         parRunOverlapCheck = false;
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -49,6 +50,7 @@ int main(int argc, char** argv) {
     << "   Geant4 macro       =  " << parMacroFileName                << G4endl
     << "   Performance mode   =  " << parIsPerformance                << G4endl
     << "   Geometry file      =  " << geometryFileName                << G4endl
+    << "   Run Overlap Check  =  " << parRunOverlapCheck              << G4endl
     << " ===================================================== "      << G4endl;
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
@@ -71,10 +73,13 @@ int main(int argc, char** argv) {
 #else
     G4RunManager* runManager = new G4RunManager;
 #endif
-    // set mandatory initialization classes
     
+    // set mandatory initialization classes
     // 1. Detector construction
     MyDetectorConstruction* detector = new MyDetectorConstruction;
+    
+    if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
+        
     detector->SetGeometryFileName (geometryFileName);
     runManager->SetUserInitialization(detector);
   
@@ -116,6 +121,7 @@ static struct option options[] = {
     {"physics list name (default FTFP_BERT)"                           , required_argument, 0, 'f'},
     {"flag to run the application in performance mode (default FALSE)" , no_argument      , 0, 'p'},
     {"Geometry file name (default:ATLAS-R2-2016-01-00-01.db)"          , required_argument, 0, 'g'},
+    {"flag to run the geometry overlap check (default FALSE)"          , no_argument      , 0, 'o'},
     {0, 0, 0, 0}
 };
 
@@ -130,6 +136,7 @@ void Help() {
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
             <<"      -g :   the Geometry file name (default: ATLAS-R2-2016-01-00-01.db)\n"
+            <<"      -o :   flag  ==> run the geometry overlap check \n"
             << std::endl;
   std::cout <<"\nUsage: fullSimLight [OPTIONS] INPUT_FILE\n\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -147,7 +154,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "pm:f:g:", options, &optidx);
+   c = getopt_long(argc, argv, "pm:f:g:o", options, &optidx);
    if (c == -1)
      break;
    //
@@ -166,6 +173,9 @@ void GetInputArguments(int argc, char** argv) {
      break;
    case 'g':
      geometryFileName = optarg;
+     break;
+   case 'o':
+     parRunOverlapCheck = true;
      break;
    default:
      Help();

@@ -24,7 +24,7 @@ public:
   void ConstructSDandField();
 
   void SetGDMLFileName  (const G4String &gdmlfile)   { fGeometryFileName = gdmlfile;}
-  //void SetSQLiteFileName(const G4String &sqlitefile) { fSQLiteFileName = sqlitefile; }
+  void SetRunOverlapCheck(const bool runOvCheck) { fRunOverlapCheck = runOvCheck; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
 
   void SetMagFieldValue(const G4double fieldValue)
@@ -45,7 +45,7 @@ protected:
 private:
   // this static member is for the print out
   static G4double gFieldValue;
-  //G4bool   fBuildFromGDML;
+  G4bool   fRunOverlapCheck;
   //G4bool   fBuildFromPlugin;
   //G4String fGDMLFileName;
   //G4String fSQLiteFileName;

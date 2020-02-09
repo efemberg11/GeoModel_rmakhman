@@ -135,7 +135,7 @@ By default the detector is built from the SQLite file "geometry-ATLAS-R2-2016-01
 The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are available at: 
 ```bash
    wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
-   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.db
+   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
 ```
 
 
@@ -215,8 +215,9 @@ By default, i.e. if it is not specified by the above command, the type will be r
 ``` bash
  -m   <Geant4-Macro-File>  [MANDATORY; a standard Geant4 macro file name]
  -f   <Physics-List-Name>  [OPTIONAL;  physics list name (default: FTFP_BERT)]
- -p   <NO-ARGUMENT>        [OPTIONAL;  run in performance mode (default: no)]
- -g   <Geometry-File-Name> [MANDATORY; the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01.db)]
+ -p   <NO-ARGUMENT>        [OPTIONAL;  run in performance mode (default: false)]
+ -g   <Geometry-File-Name> [MANDATORY; the Geometry file name  (default: geometry-ATLAS-R2-2016-01-00-01.db)]
+ -o : <NO-ARGUMENT>        [OPTIONAL;  run the geometry overlap check (default: false)]
 ``` 
  A minimal set of "observable" is collected during the simulation per-primary
  particle type: mean energy deposit, mean charged and neutral step lengths,

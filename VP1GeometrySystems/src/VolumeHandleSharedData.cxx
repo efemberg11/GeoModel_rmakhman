@@ -158,16 +158,16 @@ void VolumeHandleSharedData::setShowVolumeOutlines(SoGroup*nodegroup,bool showvo
     }
   }
 }
-
 //_____________________________________________________________________________________
 SoNode * VolumeHandleSharedData::toShapeNode(const GeoPVConstLink& pV, bool * shapeIsKnown)
 {
   const GeoLogVol * logVolume = pV->getLogVol();
-
+  
   // if shape already stored for this volume, return that
   SoShape * shape (0);
   std::map<const GeoLogVol *, SoShape *>::iterator itShape = m_d->logvol2shape.find(logVolume);
   if (itShape!=m_d->logvol2shape.end()) {
+    if (shapeIsKnown) *shapeIsKnown=true;
     return itShape->second;
   }
 
@@ -188,11 +188,11 @@ SoNode * VolumeHandleSharedData::toShapeNode(const GeoPVConstLink& pV, bool * sh
     if (shapeIsKnown) *shapeIsKnown=false;
   }
   else {
+    shape->ref();
+    m_d->logvol2shape[logVolume] = shape;
     if (shapeIsKnown) *shapeIsKnown=true;
   }
 
-  if (shape) shape->ref();
-  m_d->logvol2shape[logVolume] = shape;
   return shape;
 }
 

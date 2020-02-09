@@ -263,12 +263,15 @@ void VolumeHandle::ensureBuildNodeSep()
   SoNode * shape = m_d->commondata->toShapeNode(m_d->pV, &shapeIsKnown);//NB: Ignore contained transformation of GeoShapeShifts.
   static const char *unknownShapeTextureFile[]={"/usr/share/gmex/unknownShape.jpg","/usr/local/share/gmex/unknownShape.jpg"};
   SoTexture2 *skin=nullptr;
-  for (int trial=0;trial<2;trial++) {
-    if (!access(unknownShapeTextureFile[trial],R_OK)) {
-      skin = new SoTexture2;
-      skin->filename.setValue(unknownShapeTextureFile[trial]);
-      skin->model=SoTexture2::REPLACE;
-      break;
+  if (!shapeIsKnown) {
+    std::cout << "Unknown shape:" << m_d->pV->getLogVol()->getShape()->type() << std::endl;
+    for (int trial=0;trial<2;trial++) {
+      if (!access(unknownShapeTextureFile[trial],R_OK)) {
+	skin = new SoTexture2;
+	skin->filename.setValue(unknownShapeTextureFile[trial]);
+	skin->model=SoTexture2::REPLACE;
+	break;
+      }
     }
   }
   if (!shape) {

@@ -24,7 +24,7 @@ file( GLOB HEADERS JSONParser/*.h )
 add_library( JSONParser SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET JSONParser
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-if( NLOHMANN_JSON_FOUND )
+if( nlohmann_json_FOUND )
   target_link_libraries( JSONParser PUBLIC nlohmann_json::nlohmann_json GeoModelCore::GeoModelKernel )
 else()
   message(STATUS "'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")

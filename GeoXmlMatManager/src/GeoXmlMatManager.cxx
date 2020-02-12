@@ -80,7 +80,8 @@ GeoXmlMatManager::~GeoXmlMatManager()
 
 const GeoXmlMatManager* GeoXmlMatManager::getManager()
 {
-  return (s_instance ? s_instance : new GeoXmlMatManager());
+  if(!s_instance) s_instance = new GeoXmlMatManager();
+  return s_instance;
 }
 
 GeoMaterial* GeoXmlMatManager::getMaterial(const std::string& name)

@@ -10,7 +10,7 @@ before_script:
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
-  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install
   GIT_SUBMODULE_STRATEGY: recursive
 
 geomodelcore-build:
@@ -18,9 +18,9 @@ geomodelcore-build:
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
-    - mkdir build_GeoModelCore
-    - cd  build_GeoModelCore
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
+    - cd GeoModelCore
+    - mkdir build ; cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../
     - make -j$(nproc)
     - make install
   artifacts:
@@ -32,9 +32,10 @@ geomodelio-build:
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-    - mkdir build_GeoModelIO
-    - cd build_GeoModelIO
-    - cmake -DCMAKE_INSTALL_PREFIX=../install  ../GeoModelIO
+    - cd GeoModelIO
+    - git checkout master-specialshape-geomodelg4
+    - mkdir build ; cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install  ../
     - make -j$(nproc)
     - make install
   artifacts:
@@ -48,9 +49,8 @@ CLHEP-build:
     - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
     - cd CLHEP
     - git checkout CLHEP_2_4_1_0
-    - cd ../ ; mkdir build_CLHEP
-    - cd build_CLHEP
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../CLHEP
+    - mkdir build ; cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../
     - make -j$(nproc)
     - make install
   artifacts:
@@ -63,9 +63,10 @@ geant4-build:
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/geant4/geant4.git
-    - mkdir build_geant4
-    - cd build_geant4
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../geant4 -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../../install/xerces-c
+    - cd geant4
+    - git checkout tags/v10.6.0
+    - mkdir build ; cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../ -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON
     - make -j$(nproc)
     - make install
   artifacts:
@@ -80,11 +81,9 @@ geant4-build:
   script:
     - echo "PWD; LS"
     - pwd; ls
-    - cd ../
-    - mkdir build_GeoModelG4
-    - cd build_GeoModelG4
+    - mkdir build ; cd build
     - echo "${CMAKE_ARGS}"
-    - cmake ${CMAKE_ARGS}  ../GeoModelG4
+    - cmake ${CMAKE_ARGS}  ../
     - cmake --build . -- -j$(nproc)
     - cmake --build . -- install
 

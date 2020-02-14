@@ -11,6 +11,9 @@ set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
    "Require the specified C++ standard for the build" )
 
+include(cmake/PrintBuildInfo.cmake)
+
+
 # Make the module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 

@@ -10,7 +10,7 @@ before_script:
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
-  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install
+  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
 geomodelcore-build:

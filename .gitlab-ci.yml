@@ -10,7 +10,7 @@ before_script:
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
-  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DMOTIF_LIBRARIES=../install/lib
   GIT_SUBMODULE_STRATEGY: recursive
 
 geomodelcore-build:
@@ -66,7 +66,7 @@ geant4-build:
     - cd geant4
     - git checkout tags/v10.6.0
     - mkdir build ; cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../ -DGEANT4_USE_XM=OFF -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../ -DGEANT4_USE_XM=ON -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON
     - make -j$(nproc)
     - make install
   artifacts:

@@ -10,7 +10,7 @@ before_script:
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
-  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install 
+  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../../install
   GIT_SUBMODULE_STRATEGY: recursive
 
 geomodelcore-build:
@@ -82,6 +82,8 @@ geant4-build:
     - echo "PWD; LS"
     - pwd; ls
     - mkdir build ; cd build
+    - pwd ; cd ../../ ; ls
+    - cd GeoModelG4/build 
     - echo "${CMAKE_ARGS}"
     - cmake ${CMAKE_ARGS}  ../
     - cmake --build . -- -j$(nproc)

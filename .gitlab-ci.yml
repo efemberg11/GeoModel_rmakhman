@@ -3,6 +3,7 @@ stages:
   - dependencies-CLHEP
   - dependencies-io
   - dependencies-geant4
+  - dependencies-geomodelg4
   - build
 
 

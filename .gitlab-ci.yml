@@ -1,0 +1,106 @@
+stages:
+  - dependencies-core
+  - dependencies-io
+  - dependencies-CLHEP
+  - dependencies-geant4
+  - build
+
+  - build
+
+before_script:
+  - yum -y install cmake glibc-devel which
+  - set +e && source CI/setup_lcg.sh; set -e
+
+variables:
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  GIT_SUBMODULE_STRATEGY: recursive
+
+geomodelcore-build:
+  stage: dependencies-core
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - cd GeoModelCore
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../
+    - make -j$(nproc)
+    - make install
+  artifacts:
+    paths:
+      - install
+
+geomodelio-build:
+  stage: dependencies-io
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - cd GeoModelIO
+    - git checkout master-specialshape-geomodelg4
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install  ../
+    - make -j$(nproc)
+    - make install
+  artifacts:
+    paths:
+      - install
+
+CLHEP-build:
+  stage: dependencies-CLHEP
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
+    - cd CLHEP
+    - git checkout CLHEP_2_4_1_0
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../
+    - make -j$(nproc)
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+geant4-build:
+  stage: dependencies-geant4
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/geant4/geant4.git
+    - cd geant4
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../ -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../../install/xerces-c
+    - make -j$(nproc)
+    - make install
+  artifacts:
+    paths:
+     - install
+
+
+.build_template: &build_template
+  stage: build
+  tags:
+    - cvmfs
+  script:
+    - echo "PWD; LS"
+    - pwd; ls
+    - mkdir build
+    - cd build
+    - echo "${CMAKE_ARGS}"
+    - cmake ${CMAKE_ARGS}  ..
+    - cmake --build . -- -j$(nproc)
+    - cmake --build . -- install
+
+build_slc6:
+  <<: *build_template
+  image: cern/slc6-base
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+
+build_cc7:
+  <<: *build_template
+  image: cern/cc7-base
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}

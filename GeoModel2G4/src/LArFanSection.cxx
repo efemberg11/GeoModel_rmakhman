@@ -6,7 +6,7 @@
 #include "GeoModel2G4/LArFanSection.h"
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 #include<iostream>
-
+#include <cassert>
 
 void LArFanSections::print(void) const
 {

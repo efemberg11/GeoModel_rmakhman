@@ -44,27 +44,8 @@ variables:
     paths:
       - install
 
-.geomodelio-build-template-job: &geomodelio-job
-  stage: deps-B
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-    - cd GeoModelIO
-    - git checkout master-specialshape-geomodelg4
-    - cd ../
-    - mkdir geomodelio-build
-    - cd geomodelio-build
-    - cmake ${CMAKE_ARGS} ../GeoModelIO
-    - make -j32
-    - make install
-  artifacts:
-    paths:
-      - install
-
 .CLHEP-build-template-job: &CLHEP-job
-  stage: deps-C
+  stage: deps-B
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
@@ -76,6 +57,25 @@ variables:
     - mkdir CLHEP-build
     - cd CLHEP-build
     - cmake ${CMAKE_ARGS} ../CLHEP
+    - make -j32
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodelio-build-template-job: &geomodelio-job
+  stage: deps-C
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - cd GeoModelIO
+    - git checkout master-specialshape-geomodelg4
+    - cd ../
+    - mkdir geomodelio-build
+    - cd geomodelio-build
+    - cmake ${CMAKE_ARGS} ../GeoModelIO
     - make -j32
     - make install
   artifacts:
@@ -121,14 +121,14 @@ geomodelcore-mac:
   <<: *macos-job
   <<: *geomodelcore-job
 
-geomodelio-mac:
-  <<: *macos-job
-  <<: *geomodelio-job
-  needs: ["geomodelcore-mac"]
-
 CLHEP-mac:
   <<: *macos-job
   <<: *CLHEP-job
+
+geomodelio-mac:
+  <<: *macos-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-mac", "CLHEP-mac"]
 
 Geant4-mac:
   <<: *macos-job
@@ -146,14 +146,14 @@ geomodelcore-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelcore-job
 
-geomodelio-ubuntu:
-  <<: *ubuntu-job
-  <<: *geomodelio-job
-  needs: ["geomodelcore-ubuntu"]
-
 CLHEP-ubuntu:
   <<: *ubuntu-job
   <<: *CLHEP-job
+
+geomodelio-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-ubuntu", "CLHEP-ubuntu"]
 
 Geant4-ubuntu:
   <<: *ubuntu-job

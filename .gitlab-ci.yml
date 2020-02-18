@@ -1,11 +1,10 @@
 stages:
   - dependencies-core
-  - dependencies-io
   - dependencies-CLHEP
+  - dependencies-io
   - dependencies-geant4
   - build
 
-  - build
 
 before_script:
   - yum -y install cmake glibc-devel which
@@ -30,22 +29,6 @@ geomodelcore-build:
     paths:
       - install
 
-geomodelio-build:
-  stage: dependencies-io
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-    - cd GeoModelIO
-    - git checkout master-specialshape-geomodelg4
-    - mkdir build
-    - cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install  ../
-    - make -j$(nproc)
-    - make install
-  artifacts:
-    paths:
-      - install
-
 CLHEP-build:
   stage: dependencies-CLHEP
   script:
@@ -62,6 +45,21 @@ CLHEP-build:
     paths:
       - install
 
+geomodelio-build:
+  stage: dependencies-io
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - cd GeoModelIO
+    - git checkout master-specialshape-geomodelg4
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=../../install  ../
+    - make -j$(nproc)
+    - make install
+  artifacts:
+    paths:
+      - install
 
 geant4-build:
   stage: dependencies-geant4

@@ -38,7 +38,7 @@ variables:
     - mkdir geomodelcore-build
     - cd geomodelcore-build
     - cmake ${CMAKE_ARGS} ../GeoModelCore
-    - make -j2
+    - make -j32
     - make install
   artifacts:
     paths:
@@ -54,7 +54,7 @@ variables:
     - mkdir geomodelio-build
     - cd geomodelio-build
     - cmake ${CMAKE_ARGS} ../GeoModelIO
-    - make -j2
+    - make -j32
     - make install
   artifacts:
     paths:
@@ -73,7 +73,7 @@ variables:
     - mkdir CLHEP-build
     - cd CLHEP-build
     - cmake ${CMAKE_ARGS} ../CLHEP
-    - make -j2
+    - make -j32
     - make install
   artifacts:
     paths:
@@ -92,7 +92,7 @@ variables:
     - mkdir Geant4-build
     - cd Geant4-build
     - cmake ${CMAKE_ARGS} ../geant4
-    - make -j2
+    - make -j32
     - make install
   artifacts:
     paths:
@@ -108,7 +108,7 @@ variables:
     - mkdir build
     - cd build
     - cmake ${CMAKE_ARGS} ..
-    - cmake --build . -- -j2
+    - cmake --build . -- -j32
     - cmake --build . -- install
 
 # ACTUAL JOBS

@@ -6,7 +6,7 @@ stages:
   - build
 
 before_script:
-  - yum -y install cmake glibc-devel which motif 
+  - yum -y install cmake glibc-devel which motif
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:
@@ -94,9 +94,15 @@ build_slc6:
   image: cern/slc6-base
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  before_script:
+    - yum -y install cmake glibc-devel which motif
+    - set +e && source CI/setup_lcg.sh; set -e
 
 build_cc7:
   <<: *build_template
   image: cern/cc7-base
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  before_script:
+    - yum -y install cmake glibc-devel which motif
+    - set +e && source CI/setup_lcg.sh; set -e

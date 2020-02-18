@@ -5,16 +5,15 @@ stages:
   - dependencies-geant4
   - build
 
-before_script:
-  - yum -y install glibc-devel which motif
-  - wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz
-  - tar xf cmake-3.2.2.tar.gz
-  - cd cmake-3.2.2
-  - ./configure
-  - make
+default:
+  image: ubuntu:18.0
+  before_script:
+  - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential libeigen3-dev
+  tags:
+    - docker
 
 variables:
-  CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
 geomodelcore-build:
@@ -80,8 +79,7 @@ geant4-build:
 
 .build_template: &build_template
   stage: build
-  tags:
-    - cvmfs
+
   script:
     - echo "PWD; LS"
     - pwd; ls
@@ -93,20 +91,34 @@ geant4-build:
     - cmake --build . -- -j$(nproc)
     - cmake --build . -- install
 
-build_slc6:
-  <<: *build_template
-  image: cern/slc6-base
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  before_script:
-    - yum -y install cmake glibc-devel which motif
-    - set +e && source CI/setup_lcg.sh; set -e
+# build_slc6:
+#   <<: *build_template
+#   image: cern/slc6-base
+#  tags:
+#    - cvmfs
+#  variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#  before_script:
+#   - yum -y install cmake glibc-devel which motif
+#   - set +e && source CI/setup_lcg.sh; set -e
+#
+# build_cc7:
+#   <<: *build_template
+#   image: cern/cc7-base
+#  tags:
+#    - cvmfs
+#  variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+# before_script:
+#   - yum -y install cmake glibc-devel which motif
+#   - set +e && source CI/setup_lcg.sh; set -e
 
-build_cc7:
+build_ubuntu:
   <<: *build_template
-  image: cern/cc7-base
+  # image: ubuntu:18.04
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  before_script:
-    - yum -y install cmake glibc-devel which motif
-    - set +e && source CI/setup_lcg.sh; set -e
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  # tags:
+  #   - docker
+  # before_script:
+  # - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential libeigen3-dev

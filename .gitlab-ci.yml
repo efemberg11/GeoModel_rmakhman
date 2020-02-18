@@ -1,124 +1,163 @@
 stages:
-  - dependencies-core
-  - dependencies-io
-  - dependencies-CLHEP
-  - dependencies-geant4
+  - deps-A
+  - deps-B
+  - deps-C
+  - deps-D
   - build
 
-default:
-  image: ubuntu:18.0
-  before_script:
-  - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential libeigen3-dev
-  tags:
-    - docker
 
 variables:
   CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
-geomodelcore-build:
-  stage: dependencies-core
+
+# TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
+.macos-template-job: &macos-job
+  tags:
+    - macos
+  allow_failure: true
+  timeout: 30 minutes
+  before_script:
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+
+.ubuntu-template-job: &ubuntu-job
+  image: ubuntu:18.04
+  tags:
+    - docker
+  before_script:
+  - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev
+
+
+.geomodelcore-build-template-job: &geomodelcore-job
+  stage: deps-A
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
-    - cd GeoModelCore
-    - mkdir build ; cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../
-    - make -j$(nproc)
+    - mkdir geomodelcore-build
+    - cd geomodelcore-build
+    - cmake ${CMAKE_ARGS} ../GeoModelCore
+    - make -j2
     - make install
   artifacts:
     paths:
       - install
 
-geomodelio-build:
-  stage: dependencies-io
+.geomodelio-build-template-job: &geomodelio-job
+  stage: deps-B
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-    - cd GeoModelIO
-    - git checkout master-specialshape-geomodelg4
-    - mkdir build ; cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install  ../
-    - make -j$(nproc)
+    - mkdir geomodelio-build
+    - cd geomodelio-build
+    - cmake ${CMAKE_ARGS} ../GeoModelIO
+    - make -j2
     - make install
   artifacts:
     paths:
       - install
 
-CLHEP-build:
-  stage: dependencies-CLHEP
+.CLHEP-build-template-job: &CLHEP-job
+  stage: deps-C
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
     - cd CLHEP
     - git checkout CLHEP_2_4_1_0
-    - mkdir build ; cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../
-    - make -j$(nproc)
+    - cd ../
+    - mkdir CLHEP-build
+    - cd CLHEP-build
+    - cmake ${CMAKE_ARGS} ../CLHEP
+    - make -j2
     - make install
   artifacts:
     paths:
       - install
 
-
-geant4-build:
-  stage: dependencies-geant4
+.Geant4-build-template-job: &Geant4-job
+  stage: deps-D
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/geant4/geant4.git
     - cd geant4
     - git checkout tags/v10.6.0
-    - mkdir build ; cd build
-    - cmake -DCMAKE_INSTALL_PREFIX=../../install ../ -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON
-    - make -j$(nproc)
+    - cd ../
+    - mkdir Geant4-build
+    - cd Geant4-build
+    - cmake ${CMAKE_ARGS} ../geant4
+    - make -j2
     - make install
   artifacts:
     paths:
-     - install
+      - install
 
-
-.build_template: &build_template
+.geomodelg4-build-template: &geomodelg4-job
   stage: build
-
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - echo "PWD; LS"
     - pwd; ls
-    - mkdir build ; cd build
-    - pwd ; cd ../../ ; ls
-    - cd GeoModelG4/build
-    - echo "${CMAKE_ARGS}"
-    - cmake ${CMAKE_ARGS}  ../
-    - cmake --build . -- -j$(nproc)
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ..
+    - cmake --build . -- -j2
     - cmake --build . -- install
 
-# build_slc6:
-#   <<: *build_template
-#   image: cern/slc6-base
-#  tags:
-#    - cvmfs
-#  variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#  before_script:
-#   - yum -y install cmake glibc-devel which motif
-#   - set +e && source CI/setup_lcg.sh; set -e
-#
-# build_cc7:
-#   <<: *build_template
-#   image: cern/cc7-base
-#  tags:
-#    - cvmfs
-#  variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-# before_script:
-#   - yum -y install cmake glibc-devel which motif
-#   - set +e && source CI/setup_lcg.sh; set -e
+# ACTUAL JOBS
 
-build_ubuntu:
-  <<: *build_template
-  # image: ubuntu:18.04
-  variables:
-      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  # tags:
-  #   - docker
-  # before_script:
-  # - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential libeigen3-dev
+### MACOS PATH
+geomodelcore-mac:
+  <<: *macos-job
+  <<: *geomodelcore-job
+
+geomodelio-mac:
+  <<: *macos-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-mac"]
+
+CLHEP-mac:
+  <<: *macos-job
+  <<: *CLHEP-job
+
+Geant4-mac:
+  <<: *macos-job
+  <<: *Geant4-job
+  needs: ["CLHEP-mac"]
+
+geomodelg4-mac:
+  <<: *macos-job
+  <<: *geomodelg4-job
+  needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac"]
+
+
+### UBUNTU PATH
+geomodelcore-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelcore-job
+
+geomodelio-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-ubuntu"]
+
+CLHEP-ubuntu:
+  <<: *ubuntu-job
+  <<: *CLHEP-job
+
+Geant4-ubuntu:
+  <<: *ubuntu-job
+  <<: *Geant4-job
+  needs: ["CLHEP-ubuntu"]
+
+geomodelg4-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelg4-job
+  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu"]

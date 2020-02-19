@@ -14,6 +14,9 @@ using json = nlohmann::json;
 class G4VPhysicalVolume;
 class G4FieldManager;
 class G4UniformMagField;
+class G4MagneticField;
+class G4VIntegrationDriver;
+class G4MagIntegratorStepper;
 class MyDetectorMessenger;
 class GeoPhysVol;
 
@@ -30,6 +33,10 @@ public:
   void SetRunOverlapCheck(const bool runOvCheck)     { fRunOverlapCheck = runOvCheck; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
+
+  /// Common method to construct a driver with a stepper of requested type.
+  G4VIntegrationDriver*
+  createDriverAndStepper(std::string stepperType) const;
 
   void SetMagFieldValue(const G4double fieldValue)
   {
@@ -67,6 +74,7 @@ private:
   // this static member is for the print out
   static G4double gFieldValue;
   G4bool   fRunOverlapCheck;
+  G4double fMinStep;
   G4String fGeometryFileName;
   G4String fReportFileName;
   G4double fFieldValue;

@@ -40,7 +40,7 @@
 #include "G4MagIntegratorStepper.hh"
 #include "G4Version.hh"
 #include "G4VIntegrationDriver.hh"
-#if G4VERSION_NUMBER > 1060
+#if G4VERSION_NUMBER >= 1060
 #include "G4InterpolationDriver.hh"
 #endif
 
@@ -941,19 +941,11 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
             driver = new G4IntegrationDriver<G4TsitourasRK45>(
                                                               fMinStep, stepper, stepper->GetNumberOfVariables());
         }
-#if G4VERSION_NUMBER > 1060
+#if G4VERSION_NUMBER >= 1060
         else if (stepperType=="DormandPrince745Int") {
             G4DormandPrince745* stepper = new G4DormandPrince745(eqRhs);
             driver = new G4InterpolationDriver<G4DormandPrince745>(
                                                                    fMinStep, stepper, stepper->GetNumberOfVariables());
-        } else if (stepperType=="DormandPrinceRK56Int") {
-            G4DormandPrinceRK56* stepper = new G4DormandPrinceRK56(eqRhs);
-            driver = new G4InterpolationDriver<G4DormandPrinceRK56>(
-                                                                    fMinStep, stepper, stepper->GetNumberOfVariables());
-        } else if (stepperType=="DormandPrinceRK78Int") {
-            G4DormandPrinceRK78* stepper = new G4DormandPrinceRK78(eqRhs);
-            driver = new G4InterpolationDriver<G4DormandPrinceRK78>(
-                                                                    fMinStep, stepper, stepper->GetNumberOfVariables());
         }
 #endif
         else {

@@ -109,7 +109,6 @@ variables:
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelG4.git
-    - cd GeoModelG4
     - mkdir GeoModelG4-build
     - cd GeoModelG4-build
     - cmake ${CMAKE_ARGS} ../GeoModelG4

@@ -4,6 +4,9 @@ stages:
   - deps-geomodelio
   - deps-Geant4
   - deps-geomodelg4
+  - deps-geomodeldatamanagers
+  - deps-json
+  - deps-geomodeltools
   - build
 
 
@@ -118,6 +121,55 @@ variables:
     paths:
       - install
 
+.geomodeldatamanagers-build-template: &geomodeldatamanagers-job
+  stage: deps-geomodeldatamanagers
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers
+    - mkdir GeoModeldDataManagers-build
+    - cd GeoModeldDataManagers-build
+    - cmake ${CMAKE_ARGS} ../GeoModeldDataManagers
+    - make -j32
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+.json-build-template: &json-job
+  stage: deps-json
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git https://github.com/nlohmann/json.git
+    - mkdir json-build
+    - cd json-build
+    - cmake ${CMAKE_ARGS} ../json
+    - make -j32
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodeltools-build-template: &geomodeltools-job
+  stage: deps-geomodeltools
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelTools
+    - mkdir geomodeltools-build
+    - cd geomodeltools-build
+    - cmake ${CMAKE_ARGS} ../GeoModelTools
+    - make -j32
+    - make install
+  artifacts:
+    paths:
+      - install
+
 .fullsimlight-build-template: &fullsimlight-job
   stage: build
   variables:
@@ -157,10 +209,23 @@ geomodelg4-mac:
   <<: *geomodelg4-job
   needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac"]
 
+geomodeldatamanagers-mac:
+  <<: *macos-job
+  <<: *geomodeldatamanagers-job
+  
+json-mac:
+  <<: *macos-job
+  <<: *json-job
+
+geomodeltools-mac:
+  <<: *macos-job
+  <<: *geomodeltools-job
+  needs: ["json-mac"]
+
 fullsimlight-mac:
   <<: *macos-job
   <<: *fullsimlight-job
-  needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac", "geomodelg4-mac"]
+  needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac", "geomodelg4-mac", "geomodeldatamanagers-mac","geomodeltools-mac"]
 
 
 
@@ -188,7 +253,20 @@ geomodelg4-ubuntu:
   <<: *geomodelg4-job
   needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu"]
 
+geomodeldatamanagers-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodeldatamanagers-job
+  
+json-ubuntu:
+  <<: *ubuntu-job
+  <<: *json-job
+
+geomodeltools-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodeltools-job
+  needs: ["json-ubuntu"]
+
 fullsimlight-ubuntu:
   <<: *ubuntu-job
   <<: *fullsimlight-job
-  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu", "geomodelg4-ubuntu"]
+  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu", "geomodelg4-ubuntu", "geomodeldatamanagers-ubuntu", "geomodeltools-ubuntu"]

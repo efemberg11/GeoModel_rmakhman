@@ -121,23 +121,6 @@ variables:
     paths:
       - install
 
-.geomodeldatamanagers-build-template: &geomodeldatamanagers-job
-  stage: deps-geomodeldatamanagers
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers
-    - mkdir GeoModeldDataManagers-build
-    - cd GeoModeldDataManagers-build
-    - cmake ${CMAKE_ARGS} ../GeoModeldDataManagers
-    - make -j32
-    - make install
-  artifacts:
-    paths:
-      - install
-
-
 .json-build-template: &json-job
   stage: deps-json
   variables:
@@ -164,6 +147,23 @@ variables:
     - mkdir geomodeltools-build
     - cd geomodeltools-build
     - cmake ${CMAKE_ARGS} ../GeoModelTools
+    - make -j32
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+.geomodeldatamanagers-build-template: &geomodeldatamanagers-job
+  stage: deps-geomodeldatamanagers
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers
+    - mkdir GeoModeldDataManagers-build
+    - cd GeoModeldDataManagers-build
+    - cmake ${CMAKE_ARGS} ../GeoModeldDataManagers
     - make -j32
     - make install
   artifacts:
@@ -209,10 +209,6 @@ geomodelg4-mac:
   <<: *geomodelg4-job
   needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac"]
 
-geomodeldatamanagers-mac:
-  <<: *macos-job
-  <<: *geomodeldatamanagers-job
-  
 json-mac:
   <<: *macos-job
   <<: *json-job
@@ -220,7 +216,12 @@ json-mac:
 geomodeltools-mac:
   <<: *macos-job
   <<: *geomodeltools-job
-  needs: ["json-mac"]
+  needs: ["json-mac", "geomodelcore-mac",  "geomodelio-mac" ]
+
+geomodeldatamanagers-mac:
+  <<: *macos-job
+  <<: *geomodeldatamanagers-job
+  needs: ["geomodelcore-mac", "geomodeltools-mac"]
 
 fullsimlight-mac:
   <<: *macos-job
@@ -252,11 +253,7 @@ geomodelg4-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelg4-job
   needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu"]
-
-geomodeldatamanagers-ubuntu:
-  <<: *ubuntu-job
-  <<: *geomodeldatamanagers-job
-  
+ 
 json-ubuntu:
   <<: *ubuntu-job
   <<: *json-job
@@ -264,7 +261,12 @@ json-ubuntu:
 geomodeltools-ubuntu:
   <<: *ubuntu-job
   <<: *geomodeltools-job
-  needs: ["json-ubuntu"]
+  needs: ["json-ubuntu", "geomodelcore-ubuntu",  "geomodelio-ubuntu"]
+
+geomodeldatamanagers-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodeldatamanagers-job
+  needs: ["geomodelcore-ubuntu", "geomodeltools-ubuntu"]
 
 fullsimlight-ubuntu:
   <<: *ubuntu-job

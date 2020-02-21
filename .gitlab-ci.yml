@@ -127,7 +127,7 @@ variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
-    - git https://github.com/nlohmann/json.git
+    - git clone https://github.com/nlohmann/json.git
     - mkdir json-build
     - cd json-build
     - cmake ${CMAKE_ARGS} ../json

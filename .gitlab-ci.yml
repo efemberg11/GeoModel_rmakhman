@@ -4,9 +4,9 @@ stages:
   - deps-geomodelio
   - deps-Geant4
   - deps-geomodelg4
-  - deps-geomodeldatamanagers
   - deps-json
   - deps-geomodeltools
+  - deps-geomodeldatamanagers
   - build
 
 

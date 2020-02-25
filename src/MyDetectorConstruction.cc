@@ -26,7 +26,6 @@
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
-#include "GeoXmlMatManager/GeoXmlMatManager.h"
 
 #include <QCoreApplication>
 #include <QString>
@@ -74,10 +73,14 @@ GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
         // Setup the 'World' volume from which everything else will be suspended
         // Get the materials that we shall use.
         // -------------------------------------//
-        const GeoXmlMatManager* matman = GeoXmlMatManager::getManager();
-        const GeoMaterial *worldMat        = matman->getMaterial("std::Air");
+        GeoMaterial* Air=new GeoMaterial("Air", 1.290*SYSTEM_OF_UNITS::mg/SYSTEM_OF_UNITS::cm3);
+        GeoElement* Oxigen = new GeoElement("Oxygen",  "O", 8.0, 16.0*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
+        GeoElement* Nitrogen = new GeoElement("Nitrogen", "N", 7., 14.0067*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
+        Air->add(Nitrogen, .8);
+        Air->add(Oxigen, .2);
+        Air->lock();
         const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-        const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
+        const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Air);
         world = new GeoPhysVol(worldLog);
     }
     return world;

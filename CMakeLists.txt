@@ -8,7 +8,7 @@ project(fullSimLight)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
+ 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -17,8 +17,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
 find_package( GeoModelG4 REQUIRED )
-find_package( GeoModelDataManagers REQUIRED )
-find_package( GeoModelTools REQUIRED )
 
 ## External dependencies.
 #----------------------------------------------------------------------------
@@ -55,7 +53,7 @@ add_executable(fullSimLight fullSimLight.cc ${sources} ${headers})
 
 #----------------------------------------------------------------------------
 # Link all needed libraries
-target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 GeoXmlMatManager XMLParser ${Geant4_LIBRARIES})
+target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES})
 
 
 #----------------------------------------------------------------------------

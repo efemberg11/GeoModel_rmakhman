@@ -95,7 +95,7 @@ variables:
     - cd ../
     - mkdir Geant4-build
     - cd Geant4-build
-    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../../install/xerces-c /../geant4
+    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../../install/xerces-c/ ../geant4
     - make -j32
     - make install
   artifacts:

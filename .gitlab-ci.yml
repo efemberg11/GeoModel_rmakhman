@@ -2,6 +2,7 @@ stages:
   - deps-geomodelcore
   - deps-CLHEP
   - deps-geomodelio
+  - deps-xerces-c
   - deps-Geant4
   - deps-geomodelg4
   - build
@@ -82,6 +83,25 @@ variables:
   artifacts:
     paths:
       - install
+    
+
+.xerces-c-build-template-job: &xerces-c-job
+  stage: deps-xerces-c
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - wget https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.2.tar.gz
+    - tar -xf xerces-c-3.2.2.tar.gz
+    - mkdir xerces-c-build
+    - cd xerces-c-build
+    - cmake ${CMAKE_ARGS} 
+    - make -j32
+    - make install
+  artifacts:
+    paths:
+      - install
+
 
 .Geant4-build-template-job: &Geant4-job
   stage: deps-Geant4
@@ -147,10 +167,14 @@ geomodelio-mac:
   <<: *geomodelio-job
   needs: ["geomodelcore-mac", "CLHEP-mac"]
 
+xerces-c-mac:
+  <<: *macos-job
+  <<: *xerces-c-job
+
 Geant4-mac:
   <<: *macos-job
   <<: *Geant4-job
-  needs: ["CLHEP-mac"]
+  needs: ["CLHEP-mac", "xerces-c-mac"]
 
 geomodelg4-mac:
   <<: *macos-job
@@ -178,10 +202,14 @@ geomodelio-ubuntu:
   <<: *geomodelio-job
   needs: ["geomodelcore-ubuntu", "CLHEP-ubuntu"]
 
+xerces-c-ubuntu:
+  <<: *ubuntu-job
+  <<: *xerces-c-job
+
 Geant4-ubuntu:
   <<: *ubuntu-job
   <<: *Geant4-job
-  needs: ["CLHEP-ubuntu"]
+  needs: ["CLHEP-ubuntu", "xerces-c-ubuntu"]
 
 geomodelg4-ubuntu:
   <<: *ubuntu-job

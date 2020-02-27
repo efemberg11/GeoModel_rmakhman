@@ -95,7 +95,7 @@ variables:
     - tar -xf xerces-c-3.2.2.tar.gz
     - mkdir xerces-c-build
     - cd xerces-c-build
-    - cmake ${CMAKE_ARGS} 
+    - cmake ${CMAKE_ARGS} ../
     - make -j32
     - make install
   artifacts:

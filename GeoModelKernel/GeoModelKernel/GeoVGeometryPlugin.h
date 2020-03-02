@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOVGEOMETRYPLUGIN_H
@@ -8,14 +8,15 @@
 /**
  * @class: GeoVGeometryPlugin
  *
- * @brief Abstact Base Class for a geometry plugin.  The geometry
- *	plugin builds the raw geometry, and publishes a list of
- *      of alignable transforms and full physical volumes 
+ * @brief Abstact Base Class for a geometry plugin.
+ *	  The geometry plugin builds the raw geometry
  */
 
 #include "GeoModelKernel/GeoVPhysVol.h"
 
 class GeoPhysVol;
+class GeoVStore;
+
 class GeoVGeometryPlugin 
 {
  public:
@@ -23,7 +24,7 @@ class GeoVGeometryPlugin
   virtual ~GeoVGeometryPlugin();
 
   //	Create the system.
-  virtual void create (GeoPhysVol* world) = 0;
+  virtual void create (GeoPhysVol* world, GeoVStore* store=nullptr) = 0;
 
  private:
   GeoVGeometryPlugin(const GeoVGeometryPlugin &right)=delete;

@@ -16,6 +16,7 @@
 // C++ includes
 #include <string>
 #include <set>
+#include <mutex>
 
 
 // FWD declarations
@@ -54,13 +55,24 @@ private:
 	GeoPhysVol* buildGeoModelByCalls();
 	GeoPhysVol* buildGeoModelOneGo();
 
-	GeoPhysVol* loopOverAllChildren();
+	// GeoPhysVol* loopOverAllChildren(QStringList keys);
+	void loopOverAllChildren(QStringList keys);
+	void processParentChildren(const QString &parentKey);
+	void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child, std::mutex &mux);
+
+	// GeoPhysVol* loopOverAllChildrenInBunches(); 
+	void loopOverAllChildrenInBunches(); 
+	// void loopOverChildrenKeys(const unsigned int &start, const unsigned int &end); 
+
 
 	GeoPhysVol* getRootVolume();
 
 	GeoVPhysVol* parseChildren(GeoVPhysVol* vol, QMap<unsigned int, QStringList> children, int depth = 0);
 	GeoVPhysVol* parseVPhysVol(QStringList values, QString nodeType, int depth = 0);
-	GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber);
+
+	GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber, std::mutex &mux);
+	GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN, std::mutex &mux);
+
 	GeoLogVol* buildLogVol(QString id);
 	GeoShape* buildShape(QString id);
 	GeoMaterial* buildMaterial(QString id);
@@ -72,7 +84,7 @@ private:
 	GeoTransform* parseTransform(QStringList values);
 	GeoTransform* buildTransform(QString id);
 	GeoSerialTransformer* parseSerialTransformer(QStringList values);
-	GeoSerialTransformer* buildSerialTransformer(QString id);
+	GeoSerialTransformer* buildSerialTransformer(QString id, std::mutex &mux);
 	TRANSFUNCTION parseFunction(const std::string& expr);
 	TRANSFUNCTION buildFunction(QString id);
 	GeoNameTag* parseNameTag(QStringList values);
@@ -84,7 +96,7 @@ private:
 
 	bool isNodeBuilt(const QString id, const QString tableId, const QString copyNumber);
 	GeoGraphNode* getNode(const QString id, const QString tableId, const QString copyNumber);
-	void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
+	void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node, std::mutex &mux);
 
 	void checkInputString(QString input);
 

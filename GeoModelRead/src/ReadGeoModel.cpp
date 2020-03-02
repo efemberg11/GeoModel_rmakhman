@@ -63,7 +63,12 @@
 // C++ includes
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
 #include <vector>     /* exit, EXIT_FAILURE */
-
+#include <stdexcept>
+#include <future>
+#include <mutex>
+#include <chrono>
+ 
+std::mutex mux0;
 
 
 using namespace GeoGenfun;
@@ -80,9 +85,10 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 	  m_deepDebug = true;
 	  std::cout << "You defined the GEOMODELREAD_DEEP_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
+	// m_deepDebug = true; // FIXME: switch me off!
 
-        if ( progress != nullptr) {
-	    m_progress = progress;
+	if ( progress != nullptr) {
+	m_progress = progress;
 	}
 
 	// set the geometry file
@@ -165,175 +171,226 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 	m_root_vol_data = m_dbManager->getRootPhysVol();
 	std::cout << "root volume data, loaded." << std::endl;
 
-	return loopOverAllChildren();
+	// return loopOverAllChildren();
+	
+	loopOverAllChildrenInBunches();
+	return getRootVolume();
+
 }
 
 
 //----------------------------------------
-GeoPhysVol* ReadGeoModel::loopOverAllChildren()
+void ReadGeoModel::loopOverAllChildren(QStringList keys)
 {
 
+	std::cout << "Thread " << std::this_thread::get_id() << std::endl;
 	std::cout << "Looping over all children to build the GeoModel tree..." << std::endl;
 
-	int nChildrenRecords = m_allchildren.size();
+	int nChildrenRecords = keys.size();
+	std::cout << "processing " << nChildrenRecords << " keys..." << std::endl;
 
-	// This should go in VP1Light, not in this library. The library could be used by standalone apps without a GUI
-        /*
-	  QProgressDialog progress("Loading the geometry...", "Abort Loading", 0, nChildrenRecords, 0);
-  	  progress.setWindowModality(Qt::WindowModal);
-	  progress.show();
-	*/
+	// loop over parents' keys. 
+	// It returns a list of children with positions (sorted by position)
+	// int counter = 0;
+	
+	// Get Start Time
+	// std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+	
+	foreach (const QString &parentKey, keys ) {
 
-	// loop over parents' keys
-	int counter = 0;
-	foreach (const QString &parentKey, m_allchildren.keys() ) {
+		// qWarning() << "parentKey" << parentKey;
 
-		 /* //This should go in VP1Light as well!
-		  if (progress.wasCanceled()) {
-			std::cout << "You aborted the loading of the geometry." << std::endl;
+		processParentChildren(parentKey);
+		// std::future<void> resultFromDB = std::async(std::launch::async, &ReadGeoModel::processParentChildren, this, parentKey);
+		
+	} // end loop over parent's childrenPositions records
 
-			QMessageBox msgBox;
-			msgBox.setText("You aborted the loading of the geometry.");
-			msgBox.setInformativeText("Do you want to really abort it?");
-			msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-			msgBox.setDefaultButton(QMessageBox::No);
-			int ret = msgBox.exec();
-
-			switch (ret) {
-			   case QMessageBox::Yes:
-			      // Abort the loading of the geometry
-			      break;
-			   case QMessageBox::No:
-			      // Continue with the loading of the geometry
-			      progress.reset();
-			  default:
-			      // should never be reached
-			      break;
-			}
-		  }
-		*/
-
-
-
-		++counter;
-		std::cout.precision(0);
-		if ( nChildrenRecords < 10000 && counter % 500 == 0 ) {
-			float done = ( (float)counter / nChildrenRecords) * 100;
-			std::cout << "\t" << std::fixed << counter << "children records processed [" << done << "%]" << std::endl;
-			if ( m_progress != nullptr  ) {
-			  //progress.setValue(counter); // This should go in VP1Light
-			  *m_progress = counter;
-			}
-		}
-		else if ( nChildrenRecords > 10000 && counter % 2000 == 0 ) {
-			float done = ( (float)counter / nChildrenRecords) * 100;
-			std::cout << "\t" << std::fixed << counter << " children records processed [" << done << "%]" << std::endl;
-			if ( m_progress != nullptr ) {
-			  //progress.setValue(counter); // This should go in VP1Light
-			  *m_progress = counter;
-			}
-		}
-		if (m_deepDebug) qDebug() << "\nparent: " << parentKey << ':' << m_allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]";
-
-		// get the parent's details
-		QStringList parentKeyItems = parentKey.split(":");
-		QString parentId = parentKeyItems[0];
-		QString parentTableId = parentKeyItems[1];
-		QString parentCopyN = parentKeyItems[2];
-		if (m_deepDebug) qDebug() << "parent ID:" << parentId << ", parent table ID:" << parentTableId << ", parent copy number:" << parentCopyN;
-
-		bool isRootVolume = false;
-		if (parentId == "NULL") {
-		  isRootVolume = true;
-		}
-
-		GeoVPhysVol* parentVol = nullptr;
-
-		// build or get parent volume.
-		// Using the parentCopyNumber here, to get a given instance of the parent volume
-		if (!isRootVolume) {
-			if (m_deepDebug) qDebug() << "get the parent volume...";
-		 	parentVol = buildVPhysVol( parentId, parentTableId, parentCopyN);
-	 	}
-
-
-		// get the parent's children
-		QMap<unsigned int, QStringList> children = m_allchildren.value(parentKey);
-
-
-
-		// loop over children, sorted by child position automatically
-		// "id", "parentId", "parentTable", "parentCopyNumber", "position", "childTable", "childId", "childCopyNumber"
-		if (m_deepDebug) qDebug() << "parent volume has " << children.size() << "children. Looping over them...";
-		foreach(QStringList child, children) {
-
-			if (m_deepDebug) qDebug() << "child:" << child;
-
-			// build or get child node
-			if (child.length() < 8) {
-				std::cout <<  "ERROR!!! Probably you are using an old geometry file..." << std::endl;
-				exit(EXIT_FAILURE);
-			}
-			QString childTableId = child[5];
-			QString childId = child[6];
-			QString childCopyN = child[7];
-
-			QString childNodeType = m_tableid_tableName[childTableId.toUInt()];
-
-			if (m_deepDebug) qDebug() << "childTableId:" << childTableId << ", type:" << childNodeType << ", childId:" << childId;
-
-			if (childNodeType.isEmpty()) {
-				qWarning("ERROR!!! childNodeType is empty!!! Aborting...");
-				exit(EXIT_FAILURE);
-			}
-
-			if (childNodeType == "GeoPhysVol") {
-				if (m_deepDebug) qDebug() << "GeoPhysVol child...";
-				GeoVPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
-				if (!isRootVolume) volAddHelper(parentVol, childNode);
-			}
-			else if (childNodeType == "GeoFullPhysVol") {
-				if (m_deepDebug) qDebug() << "GeoFullPhysVol child...";
-				GeoVPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
-				if (!isRootVolume) volAddHelper(parentVol, childNode);
-			}
-			else if (childNodeType == "GeoSerialDenominator") {
-				if (m_deepDebug) qDebug() << "GeoSerialDenominator child...";
-				GeoSerialDenominator* childNode = buildSerialDenominator(childId);
-				if (!isRootVolume) volAddHelper(parentVol, childNode);
-			}
-			else if (childNodeType == "GeoAlignableTransform") {
-				if (m_deepDebug) qDebug() << "GeoAlignableTransform child...";
-				GeoAlignableTransform* childNode = buildAlignableTransform(childId);
-				if (!isRootVolume) volAddHelper(parentVol, childNode);
-			}
-			else if (childNodeType == "GeoTransform") {
-				if (m_deepDebug) qDebug() << "GeoTransform child...";
-				GeoTransform* childNode = buildTransform(childId);
-				if (!isRootVolume) volAddHelper(parentVol, childNode);
-			}
-			else if (childNodeType == "GeoSerialTransformer") {
-				if (m_deepDebug) qDebug() << "GeoSerialTransformer child...";
-				GeoSerialTransformer* childNode = buildSerialTransformer(childId);
-				if (!isRootVolume) volAddHelper(parentVol, childNode);
-			}
-			else if (childNodeType == "GeoNameTag") {
-				if (m_deepDebug) qDebug() << "GeoNameTag child...";
-				GeoNameTag* childNode = buildNameTag(childId);
-				if (!isRootVolume) volAddHelper(parentVol, childNode);
-	                }
-			else {
-				QString msg = "[" + childNodeType + "]" + QString(" ==> ERROR!!! - The conversion for this type of child node needs to be implemented, still!!!");
-				qFatal("%s", msg.toLatin1().constData());
-			}
-
-		} // loop over all children
-	} // loop over childrenPositions records
+	// // Get End Time
+	// auto end = std::chrono::system_clock::now();
+	// auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+	// std::cout << "Total Time Taken = " << diff << " Seconds" << std::endl;
 
 	// return the root volume
-	return getRootVolume();
+	// return getRootVolume(); // moved to caller
 }
 
+void ReadGeoModel::loopOverAllChildrenInBunches() 
+{
+	int nChildrenRecords = m_allchildren.size();
+	std::cout << "number of children to process: " << nChildrenRecords << std::endl;
+
+
+	if (nChildrenRecords <= 100) {
+		loopOverAllChildren(m_allchildren.keys());
+	} else {
+
+		// Get Start Time
+		std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+		unsigned int nThreads = std::thread::hardware_concurrency();
+		std::cout << "On this platform, " << nThreads << " concurrent threads are supported.\n";
+		// unsigned int nThreads = 10; // test with a fixed number of threads
+		
+		unsigned int nBunches = nChildrenRecords / nThreads;
+
+		// a vector to store the "futures" of async calls
+		std::vector<std::future<void>> futures;
+
+		for (unsigned int bb=0; bb<nThreads; ++bb ) {
+
+			unsigned int start = nBunches * bb;
+			unsigned int stop  = (nBunches * (bb+1)) - 1;
+			if ( bb == (nThreads - 1) ) stop = nChildrenRecords - 1;
+			std::cout << "Thread " << bb+1 << " - Start: " << start << ", stop: " << stop << std::endl;
+			QStringList bunch = QStringList((m_allchildren.keys()).mid(start,stop));
+
+			// loopOverAllChildren(bunch);
+			futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildren, this, bunch) );
+		}
+		
+		// wait for all async calls to complete
+		//retrive and print the value stored in the future
+		std::cout << "Waiting..." << std::flush;
+	  	for(auto &e : futures) {
+	    	e.wait();
+	   	}
+    	std::cout << "Done!\n";
+
+		// Get End Time
+		auto end = std::chrono::system_clock::now();
+		auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+		std::cout << "Total Time Taken to process all children: " << diff << " Seconds" << std::endl;
+	}
+	return;
+}
+
+
+// void ReadGeoModel::loopOverChildrenKeys(const unsigned int &start, const unsigned int &end) 
+// {
+// 	for ( unsigned int it = start; it <= end; ++it) 
+// 	{
+// 		QString parentKey = m_allchildren[it].key();
+// 		processParentChildren(parentKey);
+// 	}
+// }
+
+
+void ReadGeoModel::processParentChildren(const QString &parentKey) 
+{
+	std::lock_guard<std::mutex> lk(mux0);
+
+	if (m_deepDebug) qDebug() << "\n" << "parent: " << parentKey << ':' << m_allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]";
+
+	// get the parent's details
+	QStringList parentKeyItems = parentKey.split(":");
+	QString parentId = parentKeyItems[0];
+	QString parentTableId = parentKeyItems[1];
+	QString parentCopyN = parentKeyItems[2];
+	if (m_deepDebug) qDebug() << "parent ID:" << parentId << ", parent table ID:" << parentTableId << ", parent copy number:" << parentCopyN;
+
+	bool isRootVolume = false;
+	if (parentId == "NULL") {
+		isRootVolume = true;
+	}
+
+	GeoVPhysVol* parentVol = nullptr;
+
+	// build or get parent volume.
+	// Using the parentCopyNumber here, to get a given instance of the parent volume
+	if (!isRootVolume) {
+		if (m_deepDebug) qDebug() << "get the parent volume...";
+		std::mutex mux2;
+		parentVol = buildVPhysVol( parentId, parentTableId, parentCopyN, mux2);
+	}
+
+
+	// get the parent's children
+	QMap<unsigned int, QStringList> children = m_allchildren.value(parentKey);
+	// qWarning() << "children" << children;
+
+
+	// loop over children, sorted by child position automatically
+	// "id", "parentId", "parentTable", "parentCopyNumber", "position", "childTable", "childId", "childCopyNumber"
+	if (m_deepDebug) qDebug() << "parent volume has " << children.size() << "children. Looping over them...";
+	foreach(QStringList child, children) {
+
+		// std::future<std::string> resultFromDB = std::async(std::launch::async, fetchDataFromDB, "Data");
+		std::mutex mux3;
+		processChild(parentVol, isRootVolume, child, mux3);
+
+	} // loop over all children
+}
+
+
+void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child, std::mutex &mux) 
+{
+	std::lock_guard<std::mutex> lk(mux);
+
+	if (m_deepDebug) qDebug() << "child:" << child;
+
+	if (child.length() < 8) {
+		std::cout <<  "ERROR!!! Probably you are using an old geometry file..." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	// build or get child node
+	QString childTableId = child[5];
+	QString childId = child[6];
+	QString childCopyN = child[7];
+
+	QString childNodeType = m_tableid_tableName[childTableId.toUInt()];
+
+	if (m_deepDebug) qDebug() << "childTableId:" << childTableId << ", type:" << childNodeType << ", childId:" << childId;
+
+	if (childNodeType.isEmpty()) {
+		qWarning("ERROR!!! childNodeType is empty!!! Aborting...");
+		exit(EXIT_FAILURE);
+	}
+
+
+	std::mutex mux4;
+
+	if (childNodeType == "GeoPhysVol") {
+		if (m_deepDebug) qDebug() << "GeoPhysVol child...";
+		GeoVPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN, mux4));
+		if (!isRootVolume) volAddHelper(parentVol, childNode);
+	}
+	else if (childNodeType == "GeoFullPhysVol") {
+		// std::mutex mux5;
+		if (m_deepDebug) qDebug() << "GeoFullPhysVol child...";
+		GeoVPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN, mux4));
+		if (!isRootVolume) volAddHelper(parentVol, childNode);
+	}
+	else if (childNodeType == "GeoSerialDenominator") {
+		if (m_deepDebug) qDebug() << "GeoSerialDenominator child...";
+		GeoSerialDenominator* childNode = buildSerialDenominator(childId);
+		if (!isRootVolume) volAddHelper(parentVol, childNode);
+	}
+	else if (childNodeType == "GeoAlignableTransform") {
+		if (m_deepDebug) qDebug() << "GeoAlignableTransform child...";
+		GeoAlignableTransform* childNode = buildAlignableTransform(childId);
+		if (!isRootVolume) volAddHelper(parentVol, childNode);
+	}
+	else if (childNodeType == "GeoTransform") {
+		if (m_deepDebug) qDebug() << "GeoTransform child...";
+		GeoTransform* childNode = buildTransform(childId);
+		if (!isRootVolume) volAddHelper(parentVol, childNode);
+	}
+	else if (childNodeType == "GeoSerialTransformer") {
+		if (m_deepDebug) qDebug() << "GeoSerialTransformer child...";
+		GeoSerialTransformer* childNode = buildSerialTransformer(childId, mux4);
+		if (!isRootVolume) volAddHelper(parentVol, childNode);
+	}
+	else if (childNodeType == "GeoNameTag") {
+		if (m_deepDebug) qDebug() << "GeoNameTag child...";
+		GeoNameTag* childNode = buildNameTag(childId);
+		if (!isRootVolume) volAddHelper(parentVol, childNode);
+			}
+	else {
+		QString msg = "[" + childNodeType + "]" + QString(" ==> ERROR!!! - The conversion for this type of child node needs to be implemented, still!!!");
+		qFatal("%s", msg.toLatin1().constData());
+	}
+}
 
 void ReadGeoModel::volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild)
 {
@@ -355,53 +412,70 @@ void ReadGeoModel::checkInputString(QString input)
 	}
 }
 
+
+
 // Instantiate a PhysVol and get its children
-GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString copyN)
+GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString copyN, std::mutex &mux)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildVPhysVol()" << id << tableId << copyN;
 
 	checkInputString(id);
 	checkInputString(tableId);
 
-	// if previously built, return that
+	// if previously built, return that // TODO: apparently this is only used for VPhysVol... check that, because it should be used for all nodes, otherwise we create new nodes in memory even if we have a copy of them already...
 	if (isNodeBuilt(id, tableId, copyN)) {
 		if (m_deepDebug) qDebug() << "getting the volume from memory...";
 		return dynamic_cast<GeoVPhysVol*>(getNode(id, tableId, copyN));
 	}
 
+	// if not built already, then build it.
+	// PROTECTED!!
+	std::mutex mux6;
+	GeoVPhysVol* vol = nullptr;
 	if (m_deepDebug) qDebug() << "building a new volume...";
+	vol = buildNewVPhysVol(id, tableId, copyN, mux6);
+	// if (m_deepDebug) std::cout << "--> built a new volume: " << vol << std::endl;
+	return vol;
+}
 
-	// QString nodeType = m_dbManager->getNodeTypeFromTableId(tableId.toUInt());
+
+// Build a new VPhysVol volume and store it
+GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(QString id, QString tableId, QString copyN, std::mutex &mux)
+{
+	std::lock_guard<std::mutex> lk(mux);
+
+	if (m_deepDebug) qDebug() << "ReadGeoModel::buildNewVPhysVol() - building a new volume...";
+
 	QString nodeType = m_tableid_tableName[tableId.toUInt()];
 
 	// get the parent volume parameters
 	// here we do not need to use copyN, since the actual volume is the same for all instances
+	if (m_deepDebug) qDebug() << "\tget the parent...";
 	QStringList values;
 	if (nodeType == "GeoPhysVol")
-		 values = m_physVols[id.toUInt()];
+		values = m_physVols[id.toUInt()];
 	else if (nodeType == "GeoFullPhysVol")
-		 values = m_fullPhysVols[id.toUInt()];
-
+		values = m_fullPhysVols[id.toUInt()];
 
 
 	QString volId = values[0];
 	QString logVolId = values[1];
-	//QString parentId = values[2]; // FIXME: delete it, it is not used any more
 
 	if (m_deepDebug) {
-	  qDebug() << "\tPhysVol-ID:" << volId;
-	  qDebug() << "\tPhysVol-LogVol:" << logVolId;
-	  //qDebug() << "\tPhysVol-parentId:" << parentId;
-	  qDebug() << "\tnodeType:" << nodeType;
+	qDebug() << "\tPhysVol-ID:" << volId;
+	qDebug() << "\tPhysVol-LogVol:" << logVolId;
+	qDebug() << "\tnodeType:" << nodeType;
 	}
 
 	// GET LOGVOL
-	GeoLogVol* logVol = buildLogVol(logVolId);
+	if (m_deepDebug) qDebug() << "\tget LogVol...";
+	GeoLogVol* logVol = buildLogVol(logVolId); // TODO: For PhysVols we first check if we created the vol in memory already; but I'm not sure about other nodes. Check it...
 
 	// a pointer to the VPhysVol
 	GeoVPhysVol* vol = nullptr;
 
 	// BUILD THE PHYSVOL OR THE FULLPHYSVOL
+	if (m_deepDebug) qDebug() << "\tbuild the VPhysVol...";
 	if (nodeType == "GeoPhysVol")
 		vol = new GeoPhysVol(logVol);
 	else if (nodeType == "GeoFullPhysVol")
@@ -410,11 +484,12 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString co
 		qWarning() << "ERROR!!! Unkonwn node type!! : " << nodeType;
 
 	// storing the address of the newly built node
-	storeNode(id, tableId, copyN, vol);
+	if (m_deepDebug) qDebug() << "\tstoring the VPhysVol...";
+	std::mutex mux7;
+	storeNode(id, tableId, copyN, vol, mux7);
 
 	return vol;
 }
-
 
 // Get the root volume
 GeoPhysVol* ReadGeoModel::getRootVolume()
@@ -423,7 +498,8 @@ GeoPhysVol* ReadGeoModel::getRootVolume()
 	QString id = m_root_vol_data[1];
 	QString tableId = m_root_vol_data[2];
 	QString copyNumber = "1"; // the Root volume has only one copy by definition
-	return dynamic_cast<GeoPhysVol*>(buildVPhysVol(id, tableId, copyNumber));
+	std::mutex muxB;
+	return dynamic_cast<GeoPhysVol*>(buildVPhysVol(id, tableId, copyNumber, muxB));
 }
 
 
@@ -494,6 +570,9 @@ GeoElement* ReadGeoModel::buildElement(QString id)
 GeoShape* ReadGeoModel::buildShape(QString shapeId)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildShape()";
+
+//   try // TODO: implement try/catch
+//   {
 	QStringList paramsShape = m_shapes[ shapeId.toUInt() ];
 
 	QString id = paramsShape[0];
@@ -501,6 +580,7 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 	QString parameters = paramsShape[2];
 
 	if (m_deepDebug) qDebug() << "\tShape-ID:" << id << ", Shape-type:" << type;
+
 
 	if (type == "Box") {
 			// shape parameters
@@ -1301,7 +1381,8 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		// const GeoShape* shapeA = getShape( QString::number(shapeId) );
 		const GeoShape* shapeA = buildShape( QString::number(shapeId) );
 		// get the referenced Transform
-		QStringList transPars = m_dbManager->getItemFromTableName("Transforms", transfId);
+		// QStringList transPars = m_dbManager->getItemFromTableName("Transforms", transfId);
+		QStringList transPars = m_transforms[transfId];
 		if (m_deepDebug) qDebug() << "child:" << transPars;
 		GeoTransform* transf = parseTransform(transPars);
 		const GeoTrf::Transform3D transfX = transf->getTransform();
@@ -1376,14 +1457,21 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
   else if(type == "CustomShape") {
     std::string name = "";
     // get parameters from DB string
-		QStringList shapePars = parameters.split(";");
-    foreach( QString par, shapePars) {
-			QStringList vars = par.split("=");
-			QString varName = vars[0];
-			QString varValue = vars[1];
-			if (varName == "name") name = varValue.toStdString();
-		}
-    
+	QStringList shapePars = parameters.split(";");
+	// qWarning() << "shapePars: " << shapePars << shapePars.size() << shapePars.isEmpty();
+	if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
+	{ 
+		foreach( QString par, shapePars) {
+				QStringList vars = par.split("=");
+				QString varName = vars[0];
+				QString varValue = vars[1];
+				if (varName == "name") name = varValue.toStdString();
+			}
+	} else {
+		// throw std::invalid_argument("CustomShape parameters' list is empty!!");
+		std::cout << "ERROR!!! --> CustomShape parameters' list is empty!! It seems the ATLAS geometry file you are running on is corrupted." << std::endl;
+		exit(EXIT_FAILURE);
+	}
     return new LArCustomShape(name);
   }
 	else {
@@ -1392,6 +1480,15 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
 		return new GeoBox(30.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm); // FIXME: bogus shape. Use actual shape!
 	}
+
+// }
+
+// catch (std::invalid_argument& e)
+// {
+//     std::cerr << e.what() << std::endl;
+//     exit(EXIT_FAILURE);
+// }
+
 
 }
 
@@ -1587,8 +1684,10 @@ GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 }
 
 
-GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
+GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId, std::mutex &mux)
 {
+	std::lock_guard<std::mutex> lk(mux);
+
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildSerialTransformer()";
 
 	QStringList values = m_serialTransformers[nodeId.toUInt()];
@@ -1615,8 +1714,9 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 
 	// GET PHYSVOL
 	if (m_deepDebug) qDebug() << "referenced physVol - Id:" << physVolId << ", type:" << physVolType << "tableId:" << physVolTableIdStr;
-	const GeoVPhysVol* physVol = buildVPhysVol(physVolId, physVolTableIdStr, "1"); // we use "1" as default copyNumber: taking the first copy of the VPhysVol as the referenced volume
-	//qDebug() << "physVol:" << physVol << ", function:" << &func;
+	std::mutex muxA;
+	const GeoVPhysVol* physVol = buildVPhysVol(physVolId, physVolTableIdStr, "1", muxA); // we use "1" as default copyNumber: taking the first copy of the VPhysVol as the referenced volume
+	if (m_deepDebug) qDebug() << "physVol:" << physVol << ", function:" << &func;
 
 	// get PhysVol or FullPhysVol pointer and return the SerialTransformer
 	if (dynamic_cast<const GeoFullPhysVol*>(physVol)) {
@@ -1692,11 +1792,13 @@ GeoGraphNode* ReadGeoModel::getNode(const QString id, const QString tableId, con
 	return m_memMap[key];
 }
 
-void ReadGeoModel::storeNode(const QString id, const QString tableId, const QString copyN, GeoGraphNode* node)
+void ReadGeoModel::storeNode(const QString id, const QString tableId, const QString copyN, GeoGraphNode* node, std::mutex &mux)
 {
+	std::lock_guard<std::mutex> lk(mux);
 	if (m_deepDebug) qDebug() << "ReadGeoModel::storeNode(): " << id << tableId << copyN << node;
 	QString key = id + ":" + tableId + ":" + copyN;
 	m_memMap[key] = node;
+	if (m_deepDebug) qDebug() << "Store done.";
 }
 
 

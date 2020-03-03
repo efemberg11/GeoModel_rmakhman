@@ -30,6 +30,8 @@ echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 
 ## Quick instructions - Build everything
 
+With these instructions you will build the whole the software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](/contacts.md).
+
 
 ### Build and Install locally
 
@@ -97,6 +99,19 @@ export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 # After compilation, you should apply two temporary fixes:
 install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # this is a temporary fix
 export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
+```
+
+### (Optional) Build an example GeoModelPlugin
+
+```bash
+# Build atlas/GeoModelPlugins
+git clone ssh://git@gitlab.cern.ch:7999/atlas/GeoModelPlugins.git
+mkdir build_plugins
+cd build_plugins
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelPlugins
+make -j4
+make install
+cd ..
 ```
 
 ### Run GeoModelExplorer (gmex)

@@ -30,7 +30,7 @@ echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 
 ## Quick instructions - Build everything
 
-With these instructions you will build the whole the software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](/contacts.md).
+With these instructions you will build the whole the software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](../contacts.md).
 
 
 ### Build and Install locally

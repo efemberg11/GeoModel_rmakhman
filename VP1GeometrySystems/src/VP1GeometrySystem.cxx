@@ -96,6 +96,11 @@
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 
+
+static QString m_existingGeoInput;
+
+
+
 class VP1GeometrySystem::Imp {
 public:
   Imp (VP1GeometrySystem*gs)
@@ -119,12 +124,12 @@ public:
   SoMaterial* getDummyMaterial();
 
   QString selectGeometryFile();
-  
+
   class SubSystemInfo {
   public:
-    // "geomodellocation" contains name of tree tops, 
+    // "geomodellocation" contains name of tree tops,
     // or possible a bit more complex info in case of muons.
-    SubSystemInfo( QCheckBox* cb,const QRegExp& the_geomodeltreetopregexp, 
+    SubSystemInfo( QCheckBox* cb,const QRegExp& the_geomodeltreetopregexp,
 		  VP1GeoFlags::SubSystemFlag the_flag,
 		   const std::string& the_matname)
 
@@ -204,6 +209,7 @@ VP1GeometrySystem::VP1GeometrySystem(QString name )
            "Riccardo.Maria.Bianchi@cern.ch"),
     m_d(new Imp(this))
 {
+
 }
 
 
@@ -244,7 +250,7 @@ void VP1GeometrySystem::setZoomToVolumeOnClick(bool b) {
 
 //_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::addSubSystem(const VP1GeoFlags::SubSystemFlag& f,
-					  const QString& treetopregexp, 
+					  const QString& treetopregexp,
 					  const std::string& matname)
 {
   QCheckBox * cb = controller->subSystemCheckBox(f);
@@ -270,19 +276,19 @@ QWidget * VP1GeometrySystem::buildController()
   setShowVolumeOutLines(m_d->controller->showVolumeOutLines());
   connect(m_d->controller,SIGNAL(saveMaterialsToFile(QString,bool)),this,SLOT(saveMaterialsToFile(QString,bool)));
   connect(m_d->controller,SIGNAL(loadMaterialsFromFile(QString)),this,SLOT(loadMaterialsFromFile(QString)));
- 
+
   connect(m_d->controller,SIGNAL(transparencyChanged(float)),this,SLOT(updateTransparency()));
   connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
   connect(m_d->controller->requestOutputButton(), SIGNAL(clicked()), this, SLOT(saveTrees()));
   connect(m_d->controller,SIGNAL(displayLocalAxesChanged(int)), this, SLOT(toggleLocalAxes(int)));
   connect(m_d->controller,SIGNAL(axesScaleChanged(int)), this, SLOT(setAxesScale(int)));
-  
+
   //Setup models/views for volume tree browser and zapped volumes list:
   m_d->volumetreemodel = new VolumeTreeModel(m_d->controller->volumeTreeBrowser());
   m_d->controller->volumeTreeBrowser()->header()->hide();
   m_d->controller->volumeTreeBrowser()->uniformRowHeights();
   m_d->controller->volumeTreeBrowser()->setModel(m_d->volumetreemodel);
-  
+
   return m_d->controller;
 }
 
@@ -304,11 +310,11 @@ void VP1GeometrySystem::Imp::catchKbdState(void *address, SoEventCallback *CB) {
 void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSeparator *root)
 {
   m_d->sceneroot = root;
-  
-  
+
+
   PVConstLink world(m_d->getGeometry());
   if (!world) return;
-  
+
   if (!m_d->m_textSep) {
     // FIXME!
     //    std::cout<<"Making new Text sep"<<std::endl;
@@ -317,23 +323,23 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
     m_d->m_textSep->ref();
   }
   m_d->sceneroot->addChild(m_d->m_textSep);
-  
+
   // FIXME - what if font is missing?
   SoFont *myFont = new SoFont;
   myFont->name.setValue("Arial");
   myFont->size.setValue(12.0);
   m_d->m_textSep->addChild(myFont);
-  
+
   bool save = root->enableNotify(false);
-  
+
   //Catch keyboard events:
   SoEventCallback *catchEvents = new SoEventCallback();
   catchEvents->addEventCallback(SoKeyboardEvent::getClassTypeId(),Imp::catchKbdState, m_d);
   root->addChild(catchEvents);
-  
+
   root->addChild(m_d->controller->drawOptions());
   root->addChild(m_d->controller->pickStyle());
-  
+
   {
     GeoVolumeCursor av(world);
     while (!av.atEnd()) {
@@ -341,33 +347,33 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
       av.next();
     }
   }
-  
+
   foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
     connect(subsys->checkbox,SIGNAL(toggled(bool)),this,SLOT(checkboxChanged()));
   }
-  
-  
+
+
   if(VP1Msg::debug()){
     qDebug() << "Looping on volumes from the input GeoModel...";
   }
   GeoVolumeCursor av(world);
   while (!av.atEnd()) {
-    
+
     std::string name = av.getName();
-    
+
     //Let us see if we recognize this volume:
     bool found = false;
     foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
       if (subsys->geomodeltreetopregexp.exactMatch(name.c_str())){
 	{
-	  
+
 	  found = true;
 	  //We did... now, time to extract info:
 	  subsys->treetopinfo.resize(subsys->treetopinfo.size()+1);
 	  subsys->treetopinfo.back().pV = av.getVolume();
 	  subsys->treetopinfo.back().xf = av.getTransform();
 	  subsys->treetopinfo.back().volname = av.getName();
-	  
+
 	  //Add a switch for this system (turned off for now):
 	  SoSwitch * sw = new SoSwitch();
 	  //But add a separator on top of it (for caching):
@@ -411,7 +417,7 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
     m_d->axesScale     = new SoScale;
     m_d->axesTransform = new SoTransform;
     m_d->axesSwitch->whichChild=SO_SWITCH_NONE ;
-    
+
     SoLightModel *lModel=new SoLightModel;
     lModel->model=SoLightModel::BASE_COLOR;
     SoDrawStyle *drawStyle=new SoDrawStyle;
@@ -425,7 +431,7 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
 
 
     std::string label[]={"X", "Y", "Z"};
-    
+
     for (int i=0;i<3;i++) {
       SoSeparator *sep = new SoSeparator;
       SoCoordinate3 *coord = new SoCoordinate3;
@@ -442,7 +448,7 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
       translation->translation.setValue((i==0 ? 1520:0), (i==1? 1520: 0), (i==2 ? 1520: 0));
       SoFont  *font= new SoFont;
       font->size=32;
-      
+
       SoText2 *text = new SoText2;
       text->string=label[i].c_str();
       sep->addChild(translation);
@@ -483,6 +489,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoPhysVol* world)
 
 
 QString VP1GeometrySystem::Imp::selectGeometryFile() {
+  std::cout << "selectGeometryFile()" << std::endl;
   QString path;
   char buffer[1024];
   char *wd=getcwd(buffer,1024);
@@ -495,16 +502,27 @@ QString VP1GeometrySystem::Imp::selectGeometryFile() {
 //_____________________________________________________________________________________
 GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 {
+
   QString path;
-  
-  char *pEnv=getenv("GX_GEOMETRY_FILE0");
-  if (pEnv) {
-    path=pEnv;
-    unsetenv("GX_GEOMETRY_FILE0");
+  std::cout << "m_existingGeoInput:  " << m_existingGeoInput.toStdString() << std::endl;
+  if (m_existingGeoInput.size() > 0 ) {
+    path = m_existingGeoInput;
+  } else {
+
+    char *pEnv=getenv("GX_GEOMETRY_FILE0");
+    if (pEnv) {
+      path=pEnv;
+      unsetenv("GX_GEOMETRY_FILE0");
+    }
+    else {
+      path=selectGeometryFile();
+    }
+
+    m_existingGeoInput = path;
   }
-  else {
-    path=selectGeometryFile();
-  }
+
+
+
   if (path=="") return nullptr;
 
   GeoPhysVol *world=getenv("GX_GEOMETRY_FILE1") ? createTheWorld(nullptr) : nullptr;
@@ -520,18 +538,18 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       // open the DB
       GMDBManager* db = new GMDBManager(path);
       if (!db->isOpen()) throw std::runtime_error ("Error, database is not open ");
-      
+
       /* set the GeoModel reader */
       GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-      
+
       /* build the GeoModel geometry */
       GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
       if (world) {
-	
+
 	//world->add(dbPhys);
 	GeoVolumeCursor aV(dbPhys);
-	
+
 	while (!aV.atEnd()) {
 	  GeoNameTag *nameTag=new GeoNameTag(aV.getName());
 	  GeoTransform *transform= new GeoTransform(aV.getTransform());
@@ -540,7 +558,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 	  world->add((GeoVPhysVol *) &*aV.getVolume());
 	  aV.next();
 	}
-	
+
       }
       else {
 	world = createTheWorld(dbPhys);
@@ -556,11 +574,11 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 	QMessageBox::warning(0, "Error!","Cannot load geometry from factory. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
 	exit(0);
       }
-      
+
       if (!world) world=createTheWorld(nullptr);
       factory->create(world);
     }
-    
+
     g++;
     char *pEnv=getenv((std::string("GX_GEOMETRY_FILE")+std::to_string(g)).c_str());
     if (pEnv) {
@@ -571,7 +589,9 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       path="";
     }
   }
-  
+
+// } // end if m_existingGeoInput
+
   return world;
 
 }
@@ -668,18 +688,18 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 
   if (pickedPath->getNodeFromTail(1)->getTypeId()==SoSeparator::getClassTypeId()
       && pickedPath->getNodeFromTail(2)->getTypeId()==SoSwitch::getClassTypeId()
-      && pickedPath->getNodeFromTail(3)->getTypeId()==SoSeparator::getClassTypeId()) 
+      && pickedPath->getNodeFromTail(3)->getTypeId()==SoSeparator::getClassTypeId())
   {
     //Scenario 3:
     nodesep = static_cast<SoSeparator*>(pickedPath->getNodeFromTail(3));
     pickedPath->pop();//To get highlighting of siblings also.
-  } 
-  else if (pickedPath->getNodeFromTail(1)->getTypeId()==SoSwitch::getClassTypeId() 
-      && pickedPath->getNodeFromTail(2)->getTypeId()==SoSeparator::getClassTypeId()) 
+  }
+  else if (pickedPath->getNodeFromTail(1)->getTypeId()==SoSwitch::getClassTypeId()
+      && pickedPath->getNodeFromTail(2)->getTypeId()==SoSeparator::getClassTypeId())
   {
     //Scenario 2:
     nodesep = static_cast<SoSeparator*>(pickedPath->getNodeFromTail(2));
-  } 
+  }
   else if (pickedPath->getNodeFromTail(1)->getTypeId()==SoSeparator::getClassTypeId()) {
     //Scenario 1 (normal):
     nodesep = static_cast<SoSeparator*>(pickedPath->getNodeFromTail(1));
@@ -715,7 +735,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   if (shift_isdown) {
     //Parent of volume should be put in CONTRACTED state.
     deselectAll();
-    
+
     VolumeHandle * parent=volhandle->parent();
     if (parent) parent->setState(VP1GeoFlags::CONTRACTED);
     m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
@@ -751,7 +771,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 #ifdef __APPLE__
     char buffer[1024];
     char *wd=getcwd(buffer,1024);
-    
+
     QString path = QFileDialog::getSaveFileName(nullptr, tr("Save Geometry File"),
 						wd,
 						tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
@@ -761,13 +781,13 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 						tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
 #endif
     if (path.isEmpty()) return;
-    
+
     GMDBManager db(path);
-    
+
     // check the DB connection
     if (!db.isOpen())
       qDebug() << "OK! Database is open!";
-  
+
     GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
     PVConstLink pV=volhandle->geoPVConstLink();
     SbMatrix sbMtx=volhandle->getGlobalTransformToVolume();
@@ -1004,11 +1024,11 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 										  controller->volumeTreeBrowser(),
 										  m_textSep);
 	const GeoTrf::Transform3D::MatrixType & mtx=it->xf.matrix();
-	SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, Eigen and SoQt have different conventions 
-		      mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // For the matrix of homogenous transformations. 
+	SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, Eigen and SoQt have different conventions
+		      mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // For the matrix of homogenous transformations.
 		      mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),
 		      mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
-				
+
 	VolumeHandle * vh = new VolumeHandle(volhandle_subsysdata,0,it->pV,ichild++,matr);
 	si->vollist.push_back(vh);
       }
@@ -1211,7 +1231,7 @@ void VP1GeometrySystem::updateTransparency()
 void VP1GeometrySystem::resetSubSystems(VP1GeoFlags::SubSystemFlags f)
 {
   if (f.empty()) {
-    return; 
+    return;
   }
 
   deselectAll();
@@ -1404,7 +1424,7 @@ void VP1GeometrySystem::saveTrees() {
 #ifdef __APPLE__
   char buffer[1024];
   char *wd=getcwd(buffer,1024);
-  
+
   QString path = QFileDialog::getSaveFileName(nullptr, tr("Save Geometry File"),
 					      wd,
 					      tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
@@ -1414,9 +1434,9 @@ void VP1GeometrySystem::saveTrees() {
 					      tr("Geometry files (*.db)"),0,QFileDialog::DontUseNativeDialog);
 #endif
   if (path.isEmpty()) return;
-  
+
   GMDBManager db(path);
-  
+
   // check the DB connection
   if (db.isOpen())
     qDebug() << "OK! Database is open!";
@@ -1442,7 +1462,7 @@ void VP1GeometrySystem::saveTrees() {
 	world->add(pV);
       }
     }
-  } 
+  }
   world->exec(&dumpGeoModelGraph);
   dumpGeoModelGraph.saveToDB();
   world->unref();
@@ -1452,13 +1472,13 @@ GeoPhysVol *VP1GeometrySystem::newWorld()  const {
   const double  gr =   SYSTEM_OF_UNITS::gram;
   const double  mole = SYSTEM_OF_UNITS::mole;
   const double  cm3 =  SYSTEM_OF_UNITS::cm3;
-  
+
   // Define the chemical elements
   GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
   GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
   GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
   GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
-  
+
   double densityOfAir=0.001214 *gr/cm3;
   GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
   air->add(Nitrogen  , 0.7494);
@@ -1466,7 +1486,7 @@ GeoPhysVol *VP1GeometrySystem::newWorld()  const {
   air->add(Argon, 0.0129);
   air->add(Hydrogen, 0.0008);
   air->lock();
-  
+
   const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
   const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
   GeoPhysVol* world = new GeoPhysVol(worldLog);

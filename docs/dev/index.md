@@ -13,14 +13,14 @@ In the following, you will find basic strategies to effectively build the GeoMod
 ### Linux/Ubuntu
 
 ```bash
-apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev
+apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libxerces-c-dev
 ```
 
 ### macOS
 
 ```bash
 # install external dependencies
-brew install cmake eigen doxygen wget boost hg
+brew install cmake eigen doxygen wget boost hg xerces-c
 
 # install Qt
 brew install qt5

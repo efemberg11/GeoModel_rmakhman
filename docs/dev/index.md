@@ -2,7 +2,7 @@
 
 Here below, you will find instructions on how to compile the GeoModel libraries from scratch. You can want to do that for different reasons:
 
-- you want to build the libraries for an OS which is not officially supported or for a version of it for which no pre-compiled packages are provided (for info, see the [Start](/start/install.md) section)
+- you want to build the libraries for an OS which is not officially supported or for a version of it for which no pre-compiled packages are provided (for info, see the [Start](../start/) section)
 - you want to test the latest version of the code
 - you want to contribute to the development of the libraries
 

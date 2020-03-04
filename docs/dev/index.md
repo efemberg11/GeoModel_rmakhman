@@ -90,7 +90,7 @@ cd ..
 
 ```bash
 # After compilation, you should apply this temporary fix:
-export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
+export GXPLUGINPATH=install/lib/gxplugins # this is a temporary fix
 ```
 
 #### macOS

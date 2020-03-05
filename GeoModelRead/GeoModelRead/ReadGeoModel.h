@@ -16,7 +16,7 @@
 // C++ includes
 #include <string>
 #include <set>
-#include <mutex>
+// #include <mutex>
 
 
 // FWD declarations
@@ -58,7 +58,8 @@ private:
 	// GeoPhysVol* loopOverAllChildren(QStringList keys);
 	void loopOverAllChildren(QStringList keys);
 	void processParentChildren(const QString &parentKey);
-	void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child, std::mutex &mux);
+	// void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child, std::mutex &mux);
+	void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child);
 
 	// GeoPhysVol* loopOverAllChildrenInBunches(); 
 	void loopOverAllChildrenInBunches(); 
@@ -70,8 +71,10 @@ private:
 	GeoVPhysVol* parseChildren(GeoVPhysVol* vol, QMap<unsigned int, QStringList> children, int depth = 0);
 	GeoVPhysVol* parseVPhysVol(QStringList values, QString nodeType, int depth = 0);
 
-	GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber, std::mutex &mux);
-	GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN, std::mutex &mux);
+	// GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber, std::mutex &mux);
+	GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber);
+	// GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN, std::mutex &mux);
+	GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN);
 
 	GeoLogVol* buildLogVol(QString id);
 	GeoShape* buildShape(QString id);
@@ -84,7 +87,8 @@ private:
 	GeoTransform* parseTransform(QStringList values);
 	GeoTransform* buildTransform(QString id);
 	GeoSerialTransformer* parseSerialTransformer(QStringList values);
-	GeoSerialTransformer* buildSerialTransformer(QString id, std::mutex &mux);
+	// GeoSerialTransformer* buildSerialTransformer(QString id, std::mutex &mux);
+	GeoSerialTransformer* buildSerialTransformer(QString id);
 	TRANSFUNCTION parseFunction(const std::string& expr);
 	TRANSFUNCTION buildFunction(QString id);
 	GeoNameTag* parseNameTag(QStringList values);
@@ -96,7 +100,8 @@ private:
 
 	bool isNodeBuilt(const QString id, const QString tableId, const QString copyNumber);
 	GeoGraphNode* getNode(const QString id, const QString tableId, const QString copyNumber);
-	void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node, std::mutex &mux);
+	// void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node, std::mutex &mux);
+	void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
 
 	void checkInputString(QString input);
 

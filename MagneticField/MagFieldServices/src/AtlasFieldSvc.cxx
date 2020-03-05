@@ -12,20 +12,24 @@
 #include "MagFieldServices/AtlasFieldSvc.h"
 
 // PathResolver
-#include "PathResolver/PathResolver.h"
+//#include "PathResolver/PathResolver.h"
 
 // StoreGate
-#include "StoreGate/StoreGateSvc.h"
+//#include "StoreGate/StoreGateSvc.h"
 
 // Athena Pool
-#include "AthenaPoolUtilities/AthenaAttributeList.h"
-#include "AthenaPoolUtilities/CondAttrListCollection.h"
+//#include "AthenaPoolUtilities/AthenaAttributeList.h"
+//#include "AthenaPoolUtilities/CondAttrListCollection.h"
 
 // IncidentSvc
-#include "GaudiKernel/IIncidentSvc.h"
+//#include "GaudiKernel/IIncidentSvc.h"
 
 // CLHEP
-#include "CLHEP/Units/SystemOfUnits.h"
+//#include "CLHEP/Units/SystemOfUnits.h"
+// Units
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
+// ****
 
 // ROOT
 #include "TFile.h"
@@ -90,24 +94,24 @@ MagField::AtlasFieldSvc::~AtlasFieldSvc()
 }
 
 /** framework methods */
-StatusCode MagField::AtlasFieldSvc::initialize()
+bool MagField::AtlasFieldSvc::initialize()
 {
-    ATH_MSG_INFO( "initialize() ..." );
+    std::cout<< "initialize() ..." << std::endl;
 
     // determine map location from COOL, if available
     if ( m_useMapsFromCOOL ) {
       // Register callback
       StoreGateSvc* detStore;
       if ( service( "DetectorStore", detStore ).isFailure() ) {
-          ATH_MSG_FATAL( "Could not get detector store" );
-          return StatusCode::FAILURE;
+          //ATH_MSG_FATAL( "Could not get detector store" );
+          return false;
       }
       std::string folder( m_coolMapsFolderName );
-      ATH_MSG_INFO("maps will be chosen reading COOL folder " << folder);
+        std::cout<<"maps will be chosen reading COOL folder " << folder << std::endl;
       if ( detStore->regFcn( &MagField::AtlasFieldSvc::updateMapFilenames, this,
                                  m_mapHandle, folder ).isFailure() ) {
-              ATH_MSG_FATAL( "Could not book callback for " << folder );
-              return StatusCode::FAILURE;
+              //ATH_MSG_FATAL( "Could not book callback for " << folder );
+              return false;
       }
     }
 
@@ -116,28 +120,28 @@ StatusCode MagField::AtlasFieldSvc::initialize()
         // Register callback
         StoreGateSvc* detStore;
         if ( service( "DetectorStore", detStore ).isFailure() ) {
-            ATH_MSG_FATAL( "Could not get detector store" );
-            return StatusCode::FAILURE;
+            //ATH_MSG_FATAL( "Could not get detector store" );
+            return false;
         }
         std::string folder( m_coolCurrentsFolderName );
-        ATH_MSG_INFO("magnet currents will be read from COOL folder " << folder);
+        std::cout<<"magnet currents will be read from COOL folder " << folder<< std::endl;
         if ( detStore->regFcn( &MagField::AtlasFieldSvc::updateCurrent, this,
                                m_currentHandle, folder ).isFailure() ) {
-            ATH_MSG_FATAL( "Could not book callback for " << folder );
-            return StatusCode::FAILURE;
+            //ATH_MSG_FATAL( "Could not book callback for " << folder );
+            return false;
         }
-        ATH_MSG_INFO( "Booked callback for " << folder );
+        std::cout<< "Booked callback for " << folder << std::endl;
         // actual initalization has to wait for the fist callback
     } else {
-        ATH_MSG_INFO( "Currents are set-up by jobOptions - delaying map initialization until BeginRun incident happens" );
+        std::cout<< "Currents are set-up by jobOptions - delaying map initialization until BeginRun incident happens" << std::endl;
 
         ServiceHandle<IIncidentSvc> incidentSvc("IncidentSvc", name());
         if (incidentSvc.retrieve().isFailure()) {
-            ATH_MSG_FATAL( "Unable to retrieve the IncidentSvc" );
-            return StatusCode::FAILURE;
+            //ATH_MSG_FATAL( "Unable to retrieve the IncidentSvc" );
+            return false;
         } else {
             incidentSvc->addListener( this, IncidentType::BeginRun );
-            ATH_MSG_INFO( "Added listener to BeginRun incident" );
+            std::cout<< "Added listener to BeginRun incident" << std::endl;
         }
     }
 
@@ -151,67 +155,66 @@ StatusCode MagField::AtlasFieldSvc::initialize()
 
     /* // retrieve the manipulator tool
        if (m_doManipulation) {
-       ATH_MSG_INFO( "field will be manipulated, retrieving tool" );
+       std::cout<< "field will be manipulated, retrieving tool" << std::endl;
        if (m_manipulator.retrieve().isFailure()) {
-       ATH_MSG_FATAL( "unable to retrieve manipulation tool" );
+       //ATH_MSG_FATAL( "unable to retrieve manipulation tool" );
        } else {
-       ATH_MSG_INFO( "manipulation tool retrieved" );
+       std::cout<< "manipulation tool retrieved" << std::endl;
        getFieldActual = &MagField::AtlasFieldSvc::getFieldManipulated;
        }
        } else {
-       ATH_MSG_INFO( "no manipulation set up" );
+       std::cout<< "no manipulation set up" << std::endl;
        getFieldActual = &MagField::AtlasFieldSvc::getFieldStandard;
        } */
 
-    ATH_MSG_INFO( "initialize() successful" );
-    return StatusCode::SUCCESS;
+    std::cout<< "initialize() successful" << std::endl;
+    return true;
 }
 
 void MagField::AtlasFieldSvc::handle(const Incident& runIncident)
 {
-    ATH_MSG_INFO( "handling incidents ..." );
+    std::cout<< "handling incidents ..." << std::endl;
     if ( !m_useDCS && runIncident.type() == IncidentType::BeginRun) {
         // get thread-local storage
         AtlasFieldSvcTLS &tls = getAtlasFieldSvcTLS();
 
         if ( importCurrents(tls).isFailure() ) {
-            ATH_MSG_FATAL( "Failure in manual setting of currents" );
+            //ATH_MSG_FATAL( "Failure in manual setting of currents" );
         } else {
-            ATH_MSG_INFO( "BeginRun incident handled" );
+            std::cout<< "BeginRun incident handled" << std::endl;
 	}
     }
-    ATH_MSG_INFO( "incidents handled successfully" );
-}
+    std::cout<< "incidents handled successfully" << std::endl;
 
-StatusCode MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
+bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
 {
-    ATH_MSG_INFO( "importCurrents() ..." );
+    std::cout<< "importCurrents() ..." << std::endl;
 
     // take the current values from JobOptions
     double solcur(m_useSoleCurrent);
     double torcur(m_useToroCurrent);
     if ( solcur < m_soleMinCurrent ) {
         solcur = 0.0;
-        ATH_MSG_INFO( "Solenoid is off" );
+        std::cout<< "Solenoid is off" << std::endl;
     }
     if ( torcur < m_toroMinCurrent) {
         torcur = 0.0;
-        ATH_MSG_INFO( "Toroids are off" );
+        std::cout<< "Toroids are off" << std::endl;
     }
     setSolenoidCurrent(solcur);
     setToroidCurrent(torcur);
     // read the map file
     if ( initializeMap(tls).isFailure() ) {
-        ATH_MSG_FATAL( "Failed to initialize field map" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_FATAL( "Failed to initialize field map" );
+        return false;
     }
 
-    ATH_MSG_INFO( "Currents imported and map initialized" );
-    return StatusCode::SUCCESS;
+    std::cout<< "Currents imported and map initialized" << std::endl;
+    return true;
 }
 
 /** callback for possible magnet current update **/
-StatusCode MagField::AtlasFieldSvc::updateCurrent(IOVSVC_CALLBACK_ARGS)
+bool MagField::AtlasFieldSvc::updateCurrent(IOVSVC_CALLBACK_ARGS)
 {
     // get magnet currents from DCS
     double solcur(0.);
@@ -224,12 +227,12 @@ StatusCode MagField::AtlasFieldSvc::updateCurrent(IOVSVC_CALLBACK_ARGS)
     // both ways
     bool hasChanNames(false);
  
-    ATH_MSG_INFO( "Attempt 1 at reading currents from DCS (using channel name)" );
+    std::cout<< "Attempt 1 at reading currents from DCS (using channel name)" << std::endl;
     for ( CondAttrListCollection::const_iterator itr = m_currentHandle->begin();
 	  itr != m_currentHandle->end(); ++itr ) {
 
           std::string name = m_currentHandle->chanName(itr->first);
-          ATH_MSG_INFO( "Trying to read from DCS: [channel name, index, value] " << name << " , " << itr->first << " , " << itr->second["value"].data<float>() );
+          std::cout<< "Trying to read from DCS: [channel name, index, value] " << name << " , " << itr->first << " , " << itr->second["value"].data<float>() << std::endl;
 
 	  if (name.compare("") != 0) {
 	    hasChanNames = true;
@@ -246,7 +249,7 @@ StatusCode MagField::AtlasFieldSvc::updateCurrent(IOVSVC_CALLBACK_ARGS)
           }
     }
     if ( !hasChanNames ) {
-        ATH_MSG_INFO( "Attempt 2 at reading currents from DCS (using channel index)" );
+        std::cout<< "Attempt 2 at reading currents from DCS (using channel index)" << std::endl;
         // in no channel is named, try again using channel index instead
         for ( CondAttrListCollection::const_iterator itr = m_currentHandle->begin();
               itr != m_currentHandle->end(); ++itr ) {
@@ -264,19 +267,19 @@ StatusCode MagField::AtlasFieldSvc::updateCurrent(IOVSVC_CALLBACK_ARGS)
     }
 
     if ( !gotsol || !gottor ) {
-        if ( !gotsol ) ATH_MSG_ERROR( "Missing solenoid current in DCS information" );
-        if ( !gottor ) ATH_MSG_ERROR( "Missing toroid current in DCS information" );
-        return StatusCode::FAILURE;
+        //if ( !gotsol ) ATH_MSG_ERROR( "Missing solenoid current in DCS information" );
+        //if ( !gottor ) ATH_MSG_ERROR( "Missing toroid current in DCS information" );
+        return false;
     }
-    ATH_MSG_INFO( "Currents read from DCS: solenoid " << solcur << " toroid " << torcur );
+    std::cout<< "Currents read from DCS: solenoid " << solcur << " toroid " << torcur << std::endl;
     // round to zero if close to zero
     if ( solcur < m_soleMinCurrent) {
         solcur = 0.0;
-        ATH_MSG_INFO( "Solenoid is off" );
+        std::cout<< "Solenoid is off" << std::endl;
     }
     if ( torcur < m_toroMinCurrent) {
         torcur = 0.0;
-        ATH_MSG_INFO( "Toroids are off" );
+        std::cout<< "Toroids are off" << std::endl;
     }
     // did solenoid/toroid change status between on and off?
     bool solWasOn( solenoidOn() );
@@ -289,24 +292,24 @@ StatusCode MagField::AtlasFieldSvc::updateCurrent(IOVSVC_CALLBACK_ARGS)
 
         // map has changed. re-initialize the map
         if ( initializeMap(tls).isFailure() ) {
-            ATH_MSG_ERROR( "Failed to re-initialize field map" );
-            return StatusCode::FAILURE;
+            //ATH_MSG_ERROR( "Failed to re-initialize field map" );
+            return false;
         }
     } else {
         // map is still valid. just scale the currents
         if (!m_lockMapCurrents)
           scaleField();
         else
-          ATH_MSG_INFO( "Currents are NOT scaled - using map values sole=" << m_mapSoleCurrent << " toro=" << m_mapToroCurrent );
+          std::cout<< "Currents are NOT scaled - using map values sole=" << m_mapSoleCurrent << " toro=" << m_mapToroCurrent << std::endl;
     }
 
-    return StatusCode::SUCCESS;
+    return true;
 }
 
 /** callback for possible field map filenames update **/
-StatusCode MagField::AtlasFieldSvc::updateMapFilenames(IOVSVC_CALLBACK_ARGS)
+bool MagField::AtlasFieldSvc::updateMapFilenames(IOVSVC_CALLBACK_ARGS)
 {
-    ATH_MSG_INFO( "reading magnetic field map filenames from COOL" );
+    std::cout<< "reading magnetic field map filenames from COOL" << std::endl;
 
     std::string fullMapFilename("");
     std::string soleMapFilename("");
@@ -319,7 +322,7 @@ StatusCode MagField::AtlasFieldSvc::updateMapFilenames(IOVSVC_CALLBACK_ARGS)
         const float soleCur = attr["SolenoidCurrent"].data<float>();
         const float toroCur = attr["ToroidCurrent"].data<float>();
         
-        ATH_MSG_INFO("found map of type " << mapType << " with soleCur=" << soleCur << " toroCur=" << toroCur << " (path " << mapFile << ")");
+        std::cout<<"found map of type " << mapType << " with soleCur=" << soleCur << " toroCur=" << toroCur << " (path " << mapFile << ")")<< std::endl;
 
 	// first 5 letters are reserved (like "file:")
 	const std::string mapFile_decoded = mapFile.substr(5);
@@ -338,13 +341,13 @@ StatusCode MagField::AtlasFieldSvc::updateMapFilenames(IOVSVC_CALLBACK_ARGS)
     }
 
     if (fullMapFilename == "" || soleMapFilename == "" || toroMapFilename == "") {
-      ATH_MSG_ERROR("unexpected content in COOL field map folder");
-      return StatusCode::FAILURE;
+      //ATH_MSG_ERROR("unexpected content in COOL field map folder");
+      return false;
     }
 
     // check if maps really changed
     if (fullMapFilename != m_fullMapFilename || soleMapFilename != m_soleMapFilename || toroMapFilename != m_toroMapFilename) {
-      ATH_MSG_INFO( "map set is new! reinitializing map");
+      std::cout<< "map set is new! reinitializing map"<< std::endl;
       m_fullMapFilename = fullMapFilename;
       m_soleMapFilename = soleMapFilename;
       m_toroMapFilename = toroMapFilename;
@@ -354,22 +357,22 @@ StatusCode MagField::AtlasFieldSvc::updateMapFilenames(IOVSVC_CALLBACK_ARGS)
 
       // trigger map reinitialization
       if ( initializeMap(tls).isFailure() ) {
-         ATH_MSG_ERROR( "failed to re-initialize field map" );
-         return StatusCode::FAILURE;
+         //ATH_MSG_ERROR( "failed to re-initialize field map" );
+         return false;
       }
     } else { 
-      ATH_MSG_INFO( "no need to update map set");
+      std::cout<< "no need to update map set"<< std::endl;
     }
 
-    return StatusCode::SUCCESS;
+    return true;
 }
 
 //
 //  read and initialize map
 //
-StatusCode MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
+bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
 {
-    ATH_MSG_INFO( "Initializing the field map (solenoidCurrent=" << solenoidCurrent() << " toroidCurrent=" << toroidCurrent() << ")" );
+    std::cout<< "Initializing the field map (solenoidCurrent=" << solenoidCurrent() << " toroidCurrent=" << toroidCurrent() << ")" << std::endl;
     // empty the current map first
     clearMap(tls);
 
@@ -383,27 +386,27 @@ StatusCode MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
         mapFile = m_toroMapFilename;
     } else {
         // all magnets OFF. no need to read map
-        return StatusCode::SUCCESS;
+        return true;
     }
     // find the path to the map file
     std::string resolvedMapFile = PathResolver::find_file( mapFile.c_str(), "DATAPATH" );
     if ( resolvedMapFile == "" ) {
-        ATH_MSG_ERROR( "Field map file " << mapFile << " not found" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( "Field map file " << mapFile << " not found" );
+        return false;
     }
     // read the map file
     if ( readMap( resolvedMapFile.c_str() ).isFailure() ) {
-        ATH_MSG_ERROR( "Something went wrong while trying to read the field map " << resolvedMapFile );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( "Something went wrong while trying to read the field map " << resolvedMapFile );
+        return false;
     }
-    ATH_MSG_INFO( "Initialized the field map from " << resolvedMapFile );
+    std::cout<< "Initialized the field map from " << resolvedMapFile << std::endl;
     // scale magnet current as needed
     if (!m_lockMapCurrents)
       scaleField();
     else
-      ATH_MSG_INFO( "Currents are NOT scaled - using map values sole=" << m_mapSoleCurrent << " toro=" << m_mapToroCurrent );
+      std::cout<< "Currents are NOT scaled - using map values sole=" << m_mapSoleCurrent << " toro=" << m_mapToroCurrent << std::endl;
 
-    return StatusCode::SUCCESS;
+    return true;
 }
 
 void MagField::AtlasFieldSvc::scaleField()
@@ -419,7 +422,7 @@ void MagField::AtlasFieldSvc::scaleField()
             solezone->scaleField( factor );
             // remake the fast map
             buildZR();
-            ATH_MSG_INFO( "Scaled the solenoid field by a factor " << factor );
+            std::cout<< "Scaled the solenoid field by a factor " << factor << std::endl;
         }
     }
     //
@@ -433,20 +436,20 @@ void MagField::AtlasFieldSvc::scaleField()
                     m_zone[i].scaleField( factor );
                 }
             }
-            ATH_MSG_INFO( "Scaled the toroid field by a factor " << factor );
+            std::cout<< "Scaled the toroid field by a factor " << factor << std::endl;
         }
     }
 }
 
 /** framework methods */
-StatusCode MagField::AtlasFieldSvc::finalize()
+bool MagField::AtlasFieldSvc::finalize()
 {
-    //ATH_MSG_INFO( "finalize() ..." );
+    //std::cout<< "finalize() ..." << std::endl;
     //
     // finalization code would go here
     //
-    ATH_MSG_INFO( "finalize() successful" );
-    return StatusCode::SUCCESS;
+    std::cout<< "finalize() successful" << std::endl;
+    return true;
 }
 
 /* void MagField::AtlasFieldSvc::getFieldStandard(const double *xyz, double *bxyz, double *deriv) */
@@ -578,34 +581,34 @@ void MagField::AtlasFieldSvc::clearMap(AtlasFieldSvcTLS &tls)
 // Read the solenoid map from file.
 // The filename must end with ".root".
 //
-StatusCode MagField::AtlasFieldSvc::readMap( const char* filename )
+bool MagField::AtlasFieldSvc::readMap( const char* filename )
 {
     if ( strstr(filename, ".root") == 0 ) {
-        ATH_MSG_ERROR("input file name '" << filename << "' does not end with .root");
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR("input file name '" << filename << "' does not end with .root");
+        return false;
     } 
     TFile* rootfile = new TFile(filename, "OLD");
     if ( ! rootfile ) {
-        ATH_MSG_ERROR("failed to open " << filename);
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR("failed to open " << filename);
+        return false;
     }
-    ATH_MSG_INFO("reading the map from " << filename);
+    std::cout<<"reading the map from " << filename<< std::endl;
     if ( readMap(rootfile).isFailure() ) {
-        ATH_MSG_ERROR("something went wrong while trying to read the ROOT field map file");
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR("something went wrong while trying to read the ROOT field map file");
+        return false;
     }
 
     rootfile->Close();
     delete rootfile;
 
-    return StatusCode::SUCCESS;
+    return true;
 }
 
 //
 // read an ASCII field map from istream
 // convert units m -> mm, and T -> kT
 //
-StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
+bool MagField::AtlasFieldSvc::readMap( std::istream& input )
 {
     const std::string myname("readMap()");
     // first line contains version, date, time
@@ -615,30 +618,30 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
     int time;
     input >> word >> version;
     if ( word != "FORMAT-VERSION" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'FORMAT-VERION'");
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'FORMAT-VERION'");
+        return false;
     }
     if ( version < 5 || version > 6) {
-        ATH_MSG_ERROR( myname << ": version number is " << version << " instead of 5 or 6");
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": version number is " << version << " instead of 5 or 6");
+        return false;
     }
     input >> word >> date;
     if ( word != "DATE" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'DATE'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'DATE'" );
+        return false;
     }
     input >> word >> time;
     if ( word != "TIME" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'TIME'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'TIME'" );
+        return false;
     }
 
     // read and skip header cards
     int nheader;
     input >> word >> nheader;
     if ( word != "HEADERS" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'HEADERS'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'HEADERS'" );
+        return false;
     }
     std::string restofline;
     getline( input, restofline );
@@ -651,8 +654,8 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nzone;
     input >> word >> nzone;
     if ( word != "ZONES" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'ZONES'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'ZONES'" );
+        return false;
     }
     std::vector<int> jz(nzone), nz(nzone);
     std::vector<int> jr(nzone), nr(nzone);
@@ -704,8 +707,8 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nbiot;
     input >> word >> nbiot;
     if ( word != "BIOT" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'BIOT'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'BIOT'" );
+        return false;
     }
     std::vector<BFieldCond> bslist;
     for ( int i = 0; i < nbiot; i++ ) {
@@ -739,8 +742,8 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nc;
     input >> word >> nc;
     if ( word != "COIL" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'COIL'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'COIL'" );
+        return false;
     }
     getline( input, restofline );
     for ( int i = 0; i < nc; i++ ) {
@@ -752,8 +755,8 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nauxarr;
     input >> word >> nauxarr;
     if ( word != "AUXARR" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'AUXARR'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'AUXARR'" );
+        return false;
     }
     if ( version == 6 ) input >> word; // skip 'T'
     for ( int i = 0; i < nauxarr; i++ ) {
@@ -765,8 +768,8 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nmesh;
     input >> word >> nmesh;
     if ( word != "MESH" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'MESH'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'MESH'" );
+        return false;
     }
     std::vector<double> meshlist;
     for ( int i = 0; i < nmesh; i++ ) {
@@ -793,16 +796,16 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
     std::string ftype, bytype;
     input >> word >> nf >> nzlist >> ftype >> bytype;
     if ( word != "FIELD" ) {
-        ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'FIELD'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'FIELD'" );
+        return false;
     }
     if ( ftype != "I2PACK" ) {
-        ATH_MSG_ERROR( myname << ": found '" << ftype << "' instead of 'I2PACK'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << ftype << "' instead of 'I2PACK'" );
+        return false;
     }
     if ( bytype != "FBYTE" ) {
-        ATH_MSG_ERROR( myname << ": found '" << bytype << "' instead of 'FBYTE'" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( myname << ": found '" << bytype << "' instead of 'FBYTE'" );
+        return false;
     }
     // read zone by zone
     for ( int i = 0; i < nzlist; i++ ) {
@@ -811,7 +814,8 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
         izone--; // fortran -> C++
         if ( idzone != m_zone[izone].id() ) {
             ATH_MSG_ERROR( myname << ": zone id " << idzone << " != " << m_zone[izone].id() );
-            return StatusCode(2);
+            //return StatusCode(2);
+            return true; // TO DO - it shoudl be recoverable - handle ! enum class ErrorCode : code_t { FAILURE = 0, SUCCESS = 1, RECOVERABLE = 2 };
         }
 
         std::vector<int> data[3];
@@ -819,7 +823,8 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
         // for field data in 2 bytes
         for ( int j = 0; j < 3; j++ ) { // repeat z, r, phi
             int ierr = read_packed_data( input, data[j] );
-            if ( ierr != 0 ) return StatusCode(ierr);
+            //if ( ierr != 0 ) return StatusCode(ierr);
+            if ( ierr != 0 ) return true; // TODO it could be 2 .. to handle!   enum class ErrorCode : code_t { FAILURE = 0, SUCCESS = 1, RECOVERABLE = 2 };
             for ( int k = 0; k < nfzone; k++ ) {
                 // recover sign
                 data[j][k] = ( data[j][k]%2==0 ) ? data[j][k]/2 : -(data[j][k]+1)/2;
@@ -845,7 +850,7 @@ StatusCode MagField::AtlasFieldSvc::readMap( std::istream& input )
     buildLUT();
     buildZR();
 
-    return StatusCode::SUCCESS;
+    return true;
 }
 
 //
@@ -992,24 +997,24 @@ void MagField::AtlasFieldSvc::writeMap( TFile* rootfile ) const
 // read the map from a ROOT file.
 // returns 0 if successful.
 //
-StatusCode MagField::AtlasFieldSvc::readMap( TFile* rootfile )
+bool MagField::AtlasFieldSvc::readMap( TFile* rootfile )
 {
     if ( rootfile == 0 ) {
       // no file
-      ATH_MSG_ERROR("readMap(): unable to read field map, no TFile given");
-      return StatusCode::FAILURE;
+      //ATH_MSG_ERROR("readMap(): unable to read field map, no TFile given");
+      return false;
     }
     if ( rootfile->cd() == false ) {
       // could not make it current directory
-      ATH_MSG_ERROR("readMap(): unable to cd() into the ROOT field map TFile");
-      return StatusCode::FAILURE; 
+      //ATH_MSG_ERROR("readMap(): unable to cd() into the ROOT field map TFile");
+      return false;
     }
     // open the tree
     TTree* tree = (TTree*)rootfile->Get("BFieldMap");
     if ( tree == 0 ) {
       // no tree
-      ATH_MSG_ERROR("readMap(): TTree 'BFieldMap' does not exist in ROOT field map");
-      return StatusCode::FAILURE;
+      //ATH_MSG_ERROR("readMap(): TTree 'BFieldMap' does not exist in ROOT field map");
+      return false;
     }
     int id;
     double zmin, zmax, rmin, rmax, phimin, phimax;
@@ -1140,7 +1145,7 @@ StatusCode MagField::AtlasFieldSvc::readMap( TFile* rootfile )
     buildLUT();
     buildZR();
 
-    return StatusCode::SUCCESS;
+    return true;
 }
 
 //
@@ -1171,7 +1176,7 @@ int MagField::AtlasFieldSvc::read_packed_data( std::istream& input, std::vector<
             mode = c;
         }
         else if (c <= ' ' || c > 'z') {
-            ATH_MSG_ERROR( myname << ": unexpected letter '" << c << "' in input" );
+            //ATH_MSG_ERROR( myname << ": unexpected letter '" << c << "' in input" );
             return 3;
         }
         else { // normal letter in the range '!' - 't'
@@ -1236,7 +1241,7 @@ int MagField::AtlasFieldSvc::read_packed_int( std::istream &input, int &n ) cons
     if ( c >= 'K' && c <= 't' ) {
         n = 42*n + c - 'K';
     } else {
-        ATH_MSG_ERROR( myname << ": unexpected letter '" << c << "' in input" );
+        //ATH_MSG_ERROR( myname << ": unexpected letter '" << c << "' in input" );
         return 4;
     }
     return 0;

@@ -10,18 +10,18 @@
 #define MAGFIELDSERVICES_ATLASFIELDSVC_H 1
 
 // FrameWork includes
-#include "AthenaBaseComps/AthService.h"
-#include "GaudiKernel/ToolHandle.h"
-#include "GaudiKernel/IIncidentListener.h"
+//#include "AthenaBaseComps/AthService.h"
+//#include "GaudiKernel/ToolHandle.h"
+//#include "GaudiKernel/IIncidentListener.h"
 
 // MagField includes
-#include "MagFieldInterfaces/IMagFieldSvc.h"
+//#include "MagFieldInterfaces/IMagFieldSvc.h"
 #include "MagFieldServices/AtlasFieldSvcTLS.h"
 #include "MagFieldServices/BFieldCache.h"
 #include "MagFieldServices/BFieldCacheZR.h"
 #include "MagFieldServices/BFieldCond.h"
 #include "MagFieldServices/BFieldZone.h"
-#include "MagFieldServices/BFieldMeshZR.h"
+//#include "MagFieldServices/BFieldMeshZR.h"
 // #include "MagFieldInterfaces/IMagFieldManipulator.h"
 
 // STL includes
@@ -29,45 +29,46 @@
 #include <iostream>
 
 // forward declarations
-class CondAttrListCollection;
+//class CondAttrListCollection;
 class BFieldZone;
 class TFile;
-class Incident;
+//class Incident;
 
 namespace MagField {
 
   /** @class AtlasFieldSvc
       @author Elmar.Ritsch -at- cern.ch
     */
-
-  class AtlasFieldSvc : public extends<AthService, IMagFieldSvc, IIncidentListener> {
+    class AtlasFieldSvc{
+  //class AtlasFieldSvc : public extends<AthService, IMagFieldSvc, IIncidentListener> {
     public:
 
       //** Constructor with parameters */
-      AtlasFieldSvc( const std::string& name, ISvcLocator* pSvcLocator );
+      AtlasFieldSvc( const std::string& name/*, ISvcLocator* pSvcLocator*/ );
 
       /** Destructor */
       virtual ~AtlasFieldSvc();
 
       /** Athena algorithm's interface methods */
-      virtual StatusCode  initialize() override;
-      virtual StatusCode  finalize() override;
+      //virtual bool  initialize() override;
+      //virtual bool  finalize() override;
 
       /** Read **/
-      virtual void handle(const Incident& runIncident) override;
+      //virtual void handle(const Incident& runIncident) override;
 
       /** Call back for possible magnet current update **/
-      StatusCode updateCurrent(IOVSVC_CALLBACK_ARGS);
+      //StatusCode updateCurrent(IOVSVC_CALLBACK_ARGS);
 
       /** Call back for possible magnet filename update **/
-      StatusCode updateMapFilenames(IOVSVC_CALLBACK_ARGS);
+      //StatusCode updateMapFilenames(IOVSVC_CALLBACK_ARGS);
 
       /** get B field value at given position */
       /** xyz[3] is in mm, bxyz[3] is in kT */
       /** if deriv[9] is given, field derivatives are returned in kT/mm */
-      virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
-      virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
-
+      //virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
+      //virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
+        virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const  final;
+        virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const  final;
     private:
       /** Retrieve, initialize and return a thread-local storage object */
       inline struct AtlasFieldSvcTLS &getAtlasFieldSvcTLS() const;
@@ -93,13 +94,13 @@ namespace MagField {
       inline bool fillFieldCacheZR(double z, double r, AtlasFieldSvcTLS &tls) const;
 
       // set currents from when DCS is not read
-      StatusCode importCurrents(AtlasFieldSvcTLS &tls);
+      bool importCurrents(AtlasFieldSvcTLS &tls);
       // initialize map
-      StatusCode initializeMap(AtlasFieldSvcTLS &tls);
+      bool initializeMap(AtlasFieldSvcTLS &tls);
       // read the field map from an ASCII or ROOT file
-      StatusCode readMap( const char* filename );
-      StatusCode readMap( std::istream& input );
-      StatusCode readMap( TFile* rootfile );
+      bool readMap( const char* filename );
+      bool readMap( std::istream& input );
+      bool readMap( TFile* rootfile );
       // write the field map to a ROOT file
       void writeMap( TFile* rootfile ) const;
       // clear the field map
@@ -144,9 +145,9 @@ namespace MagField {
       bool m_lockMapCurrents;
 
       // handle for COOL field map filenames
-      const DataHandle<CondAttrListCollection> m_mapHandle;
+      //const DataHandle<CondAttrListCollection> m_mapHandle;
       // handle for COOL currents
-      const DataHandle<CondAttrListCollection> m_currentHandle;
+      //const DataHandle<CondAttrListCollection> m_currentHandle;
 
       // full 3d map (made of multiple zones)
       std::vector<BFieldZone>        m_zone;

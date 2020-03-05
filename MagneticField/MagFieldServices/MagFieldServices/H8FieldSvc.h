@@ -38,9 +38,9 @@ namespace MagField {
       virtual ~H8FieldSvc();
 
       /** Athena algorithm's interface methods */
-      StatusCode  initialize();
-      StatusCode  start();
-      StatusCode  finalize();
+      bool  initialize();
+      bool  start();
+      bool  finalize();
 
       /** get B field value at given position */
       /** xyz[3] is in mm, bxyz[3] is in kT */
@@ -51,9 +51,9 @@ namespace MagField {
 
     private:
       // initialize map
-      StatusCode initializeMap();
+      bool initializeMap();
       // read the field map
-      StatusCode readMap( const std::string mapFile );
+      bool readMap( const std::string mapFile );
 
       /** Data members **/
 

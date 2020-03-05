@@ -15,13 +15,13 @@
 #include "MagFieldServices/H8FieldSvc.h"
 
 // PathResolver
-#include "PathResolver/PathResolver.h"
+//#include "PathResolver/PathResolver.h"
 
 // StoreGate
-#include "StoreGate/StoreGateSvc.h"
+//#include "StoreGate/StoreGateSvc.h"
 
 // Athena Pool
-#include "AthenaPoolUtilities/CondAttrListCollection.h"
+//#include "AthenaPoolUtilities/CondAttrListCollection.h"
 
 // CLHEP
 #include "CLHEP/Units/SystemOfUnits.h"
@@ -51,37 +51,37 @@ MagField::H8FieldSvc::~H8FieldSvc()
 }
 
 /** framework methods */
-StatusCode MagField::H8FieldSvc::initialize()
+bool MagField::H8FieldSvc::initialize()
 {
-    ATH_MSG_INFO( "initialize() ..." );
-    return StatusCode::SUCCESS;
+    //ATH_MSG_INFO( "initialize() ..." );
+    return true;
 }
 
-StatusCode MagField::H8FieldSvc::start()
+bool MagField::H8FieldSvc::start()
 {
-    ATH_MSG_INFO( "start() ..." );
+    //ATH_MSG_INFO( "start() ..." );
     return readMap( m_H8MapFilename );
 }
 
-StatusCode MagField::H8FieldSvc::finalize()
+bool MagField::H8FieldSvc::finalize()
 {
-    ATH_MSG_INFO( "finalize() ..." );
-    return StatusCode::SUCCESS;
+    //ATH_MSG_INFO( "finalize() ..." );
+    return true;
 }
 
-StatusCode MagField::H8FieldSvc::readMap( const std::string mapFile )
+bool MagField::H8FieldSvc::readMap( const std::string mapFile )
 {
     // find the path to the map file
     std::string resolvedMapFile = PathResolver::find_file( mapFile.c_str(), "DATAPATH" );
     if ( resolvedMapFile == "" ) {
-        ATH_MSG_ERROR( "Field map file " << mapFile << " not found" );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( "Field map file " << mapFile << " not found" );
+        return false;
     }
     // opne the map file
     std::ifstream input( resolvedMapFile.c_str() );
     if ( ! input.good() ) {
-        ATH_MSG_ERROR( "Failed to open the field map " << resolvedMapFile );
-        return StatusCode::FAILURE;
+        //ATH_MSG_ERROR( "Failed to open the field map " << resolvedMapFile );
+        return false;
     }
     // skip the file header line
     char line[256];
@@ -114,24 +114,24 @@ StatusCode MagField::H8FieldSvc::readMap( const std::string mapFile )
 	grid.setOffset(offset);
 	
         if ( grid.defined() ) {
-            ATH_MSG_INFO("setting offset for magnet " << igrid << " to " << offset[0] << ", " << offset[1] << ", " << offset[2] << " mm");
+            //ATH_MSG_INFO("setting offset for magnet " << igrid << " to " << offset[0] << ", " << offset[1] << ", " << offset[2] << " mm");
 	    // save grid
 	    double its_min[3];
 	    double its_max[3];
 	    double its_d[3];
 	    grid.getBounds(its_min, its_max, its_d);
-            ATH_MSG_INFO("new magnet grid #" << igrid << " found");
-            ATH_MSG_INFO("  - min    (mm) " << its_min[0] << ", " << its_min[1] << ", " << its_min[2]);
-            ATH_MSG_INFO("  - max    (mm) " << its_max[0] << ", " << its_max[1] << ", " << its_max[2]);
-            ATH_MSG_INFO("  - offset (mm) " << its_d[0] << ", " << its_d[1] << ", " << its_d[2]);
+            //ATH_MSG_INFO("new magnet grid #" << igrid << " found");
+            //ATH_MSG_INFO("  - min    (mm) " << its_min[0] << ", " << its_min[1] << ", " << its_min[2]);
+            //ATH_MSG_INFO("  - max    (mm) " << its_max[0] << ", " << its_max[1] << ", " << its_max[2]);
+            //ATH_MSG_INFO("  - offset (mm) " << its_d[0] << ", " << its_d[1] << ", " << its_d[2]);
             m_grid.push_back( grid );
 	    igrid++;
         } else {
             break;
         }
     }
-    ATH_MSG_INFO( "Initialized the field map from " << resolvedMapFile );
-    return StatusCode::SUCCESS;
+    //ATH_MSG_INFO( "Initialized the field map from " << resolvedMapFile );
+    return true;
 }
 
 void MagField::H8FieldSvc::getField( const double *xyz, double *B, double *deriv ) const

@@ -50,8 +50,10 @@ namespace MagField {
       virtual ~AtlasFieldSvc();
 
       /** Athena algorithm's interface methods */
-      //virtual bool  initialize() override;
-      //virtual bool  finalize() override;
+//      virtual bool  initialize() override;
+//      virtual bool  finalize() override;
+        virtual bool  initialize() ;
+        virtual bool  finalize() ;
 
       /** Read **/
       //virtual void handle(const Incident& runIncident) override;
@@ -131,13 +133,13 @@ namespace MagField {
       double m_soleMinCurrent; // minimum solenoid current to be considered ON
       double m_toroMinCurrent; // minimum toroid current to be considered ON
       // flag to use magnet current from DCS in COOL
-      bool m_useDCS;
+      //bool m_useDCS;
       // COOL folder name containing current information
-      std::string m_coolCurrentsFolderName;
+      //std::string m_coolCurrentsFolderName;
       // flag to read magnet map filenames from COOL
-      bool m_useMapsFromCOOL;
+      //bool m_useMapsFromCOOL;
       // COOL folder name containing field maps
-      std::string m_coolMapsFolderName;
+      //std::string m_coolMapsFolderName;
       // actual current if DCS is not in use
       double m_useSoleCurrent; // solenoid current in A
       double m_useToroCurrent; // toroid current in A

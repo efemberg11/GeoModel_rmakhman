@@ -324,7 +324,6 @@ void ReadGeoModel::processParentChildren(const QString &parentKey)
 
 void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child, std::mutex &mux) 
 {
-	std::lock_guard<std::mutex> lk(mux);
 
 	if (m_deepDebug) qDebug() << "child:" << child;
 
@@ -348,6 +347,7 @@ void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, cons
 	}
 
 
+	// std::lock_guard<std::mutex> lk(mux);
 	std::mutex mux4;
 
 	if (childNodeType == "GeoPhysVol") {

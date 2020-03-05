@@ -20,6 +20,7 @@ project( "MagFieldServices" VERSION 1.0.0 LANGUAGES CXX )
 
 # External dependencies:
 find_package( CLHEP )
+
 #find_package( ROOT COMPONENTS Core Tree MathCore Hist RIO pthread )
 
 
@@ -59,10 +60,11 @@ include( GNUInstallDirs )  # it defines CMAKE_INSTALL_LIBDIR
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS MagFieldServices/*.h )
 
+
 # Set target and properties
 add_library( MagFieldServices SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( MagFieldServices PUBLIC CLHEP )
-target_include_directories( MagFieldServices PUBLIC
+target_link_libraries( MagFieldServices PUBLIC ${CLHEP_LIBRARIES} )
+target_include_directories( MagFieldServices PUBLIC ${CLHEP_INCLUDE_DIRS}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
 

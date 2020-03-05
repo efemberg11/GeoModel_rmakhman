@@ -4,7 +4,9 @@
  *  Created on: May 20, 2016
  *      Author: riccardo.maria.bianchi@cern.ch
  *
- * major updates: Feb 2019 rbianchi
+ * major updates: 
+ *  - Feb 2019, R.M.Bianchi
+ *  - Mar 2020, R.M.Bianchi
  */
 
 // local includes
@@ -88,7 +90,6 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 	  m_deepDebug = true;
 	  std::cout << "You defined the GEOMODELREAD_DEEP_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
-	// m_deepDebug = true; // FIXME: switch me off!
 
 	if ( progress != nullptr) {
 	m_progress = progress;
@@ -183,6 +184,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 
 
 //----------------------------------------
+// Serial loop over parents' children
 void ReadGeoModel::loopOverAllChildren(QStringList keys)
 {
 
@@ -195,48 +197,45 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
 
 	// loop over parents' keys. 
 	// It returns a list of children with positions (sorted by position)
-	// int counter = 0;
 	
 	// Get Start Time
-	// std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 	
 	foreach (const QString &parentKey, keys ) {
-
 		// qWarning() << "parentKey" << parentKey;
-
 		processParentChildren(parentKey);
-		// std::future<void> resultFromDB = std::async(std::launch::async, &ReadGeoModel::processParentChildren, this, parentKey);
-		
 	} // end loop over parent's childrenPositions records
 
-	// // Get End Time
-	// auto end = std::chrono::system_clock::now();
-	// auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
-	// std::cout << "Total Time Taken = " << diff << " Seconds" << std::endl;
-
-	// return the root volume
-	// return getRootVolume(); // moved to caller
+	// Get End Time
+	auto end = std::chrono::system_clock::now();
+	auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+	muxCout.lock();
+	std::cout << "Thread " << std::this_thread::get_id() << " -- Time Taken to process " << nChildrenRecords << " children = " << diff << " Seconds" << std::endl;
+	muxCout.unlock();
 }
 
+//----------------------------------------
+// Parallel loop over parents' children
 void ReadGeoModel::loopOverAllChildrenInBunches() 
 {
 	int nChildrenRecords = m_allchildren.size();
 	std::cout << "number of children to process: " << nChildrenRecords << std::endl;
 
-
+	// If we have a few children, then process them serially
 	if (nChildrenRecords <= 100) {
 		loopOverAllChildren(m_allchildren.keys());
-	} else {
-
+	}
+	// ...otherwise, lets spawn some threads to process them in bunches, parallelly!
+	else {
 		// Get Start Time
 		std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 		unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
 		unsigned int nThreads = nThreadsPlatform * 2;
 		std::cout << "On this platform, " << nThreadsPlatform << " concurrent threads are supported. Using " << nThreads << " threads.\n";
-		// unsigned int nThreads = 10; // test with a fixed number of threads
 		
 		unsigned int nBunches = nChildrenRecords / nThreads;
+		std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each." << std::endl;
 
 		// a vector to store the "futures" of async calls
 		std::vector<std::future<void>> futures;
@@ -244,14 +243,16 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 		for (unsigned int bb=0; bb<nThreads; ++bb ) {
 
 			unsigned int start = nBunches * bb;
-			unsigned int stop  = (nBunches * (bb+1)) - 1;
-			if ( bb == (nThreads - 1) ) stop = nChildrenRecords - 1;
+			int len = nBunches;
+			if ( bb == (nThreads - 1) ) len = -1; // '-1' means for mid() all the elements starting from 'start'
+
 
 			muxCout.lock();
-			std::cout << "Thread " << bb+1 << " - Start: " << start << ", stop: " << stop << std::endl;
+			std::cout << "Thread " << bb+1 << " - Start: " << start << ", len: " << len << "   ['len=-1' = all remaining items]" << std::endl;
 			muxCout.unlock();
 
-			QStringList bunch = QStringList((m_allchildren.keys()).mid(start,stop));
+			QStringList bunch = QStringList((m_allchildren.keys()).mid(start,len));
+			std::cout << "'bunch' size: " << bunch.size() << std::endl;
 
 			// loopOverAllChildren(bunch);
 			futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildren, this, bunch) );
@@ -277,21 +278,8 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 	return;
 }
 
-
-// void ReadGeoModel::loopOverChildrenKeys(const unsigned int &start, const unsigned int &end) 
-// {
-// 	for ( unsigned int it = start; it <= end; ++it) 
-// 	{
-// 		QString parentKey = m_allchildren[it].key();
-// 		processParentChildren(parentKey);
-// 	}
-// }
-
-
 void ReadGeoModel::processParentChildren(const QString &parentKey) 
 {
-	// std::lock_guard<std::mutex> lk(mux0);
-
 	if (m_deepDebug) qDebug() << "\n" << "parent: " << parentKey << ':' << m_allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]";
 
 	// get the parent's details
@@ -312,27 +300,18 @@ void ReadGeoModel::processParentChildren(const QString &parentKey)
 	// Using the parentCopyNumber here, to get a given instance of the parent volume
 	if (!isRootVolume) {
 		if (m_deepDebug) qDebug() << "get the parent volume...";
-		// std::mutex mux2;
-		// parentVol = buildVPhysVol( parentId, parentTableId, parentCopyN, mux2);
 		parentVol = buildVPhysVol( parentId, parentTableId, parentCopyN);
 	}
-
 
 	// get the parent's children
 	QMap<unsigned int, QStringList> children = m_allchildren.value(parentKey);
 	// qWarning() << "children" << children;
 
-
 	// loop over children, sorted by child position automatically
 	// "id", "parentId", "parentTable", "parentCopyNumber", "position", "childTable", "childId", "childCopyNumber"
 	if (m_deepDebug) qDebug() << "parent volume has " << children.size() << "children. Looping over them...";
 	foreach(QStringList child, children) {
-
-		// std::future<std::string> resultFromDB = std::async(std::launch::async, fetchDataFromDB, "Data");
-		// std::mutex mux3;
-		// processChild(parentVol, isRootVolume, child, mux3);
 		processChild(parentVol, isRootVolume, child);
-
 	} // loop over all children
 }
 
@@ -340,7 +319,6 @@ void ReadGeoModel::processParentChildren(const QString &parentKey)
 // void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child, std::mutex &mux) 
 void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child) 
 {
-
 	if (m_deepDebug) qDebug() << "child:" << child;
 
 	if (child.length() < 8) {
@@ -362,20 +340,13 @@ void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, cons
 		exit(EXIT_FAILURE);
 	}
 
-
-	// std::lock_guard<std::mutex> lk(mux);
-	// std::mutex mux4;
-
 	if (childNodeType == "GeoPhysVol") {
 		if (m_deepDebug) qDebug() << "GeoPhysVol child...";
-		// GeoVPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN, mux4));
 		GeoVPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoFullPhysVol") {
-		// std::mutex mux5;
 		if (m_deepDebug) qDebug() << "GeoFullPhysVol child...";
-		// GeoVPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN, mux4));
 		GeoVPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
@@ -396,7 +367,6 @@ void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, cons
 	}
 	else if (childNodeType == "GeoSerialTransformer") {
 		if (m_deepDebug) qDebug() << "GeoSerialTransformer child...";
-		// GeoSerialTransformer* childNode = buildSerialTransformer(childId, mux4);
 		GeoSerialTransformer* childNode = buildSerialTransformer(childId);
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
@@ -432,9 +402,7 @@ void ReadGeoModel::checkInputString(QString input)
 }
 
 
-
 // Instantiate a PhysVol and get its children
-// GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString copyN, std::mutex &mux)
 GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString copyN)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildVPhysVol()" << id << tableId << copyN;
@@ -448,12 +416,8 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString co
 		return dynamic_cast<GeoVPhysVol*>(getNode(id, tableId, copyN));
 	}
 
-	// if not built already, then build it.
-	// PROTECTED!!
-	// std::mutex mux6;
 	GeoVPhysVol* vol = nullptr;
 	if (m_deepDebug) qDebug() << "building a new volume...";
-	// vol = buildNewVPhysVol(id, tableId, copyN, mux6);
 	vol = buildNewVPhysVol(id, tableId, copyN);
 	// if (m_deepDebug) std::cout << "--> built a new volume: " << vol << std::endl;
 	return vol;
@@ -461,11 +425,8 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString co
 
 
 // Build a new VPhysVol volume and store it
-// GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(QString id, QString tableId, QString copyN, std::mutex &mux)
 GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(QString id, QString tableId, QString copyN)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildVPV);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildNewVPhysVol() - building a new volume...";
 
 	QString nodeType = m_tableid_tableName[tableId.toUInt()];
@@ -507,8 +468,6 @@ GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(QString id, QString tableId, QString
 
 	// storing the address of the newly built node
 	if (m_deepDebug) qDebug() << "\tstoring the VPhysVol...";
-	// std::mutex mux7;
-	// storeNode(id, tableId, copyN, vol, mux7);
 	storeNode(id, tableId, copyN, vol);
 
 	return vol;
@@ -521,16 +480,12 @@ GeoPhysVol* ReadGeoModel::getRootVolume()
 	QString id = m_root_vol_data[1];
 	QString tableId = m_root_vol_data[2];
 	QString copyNumber = "1"; // the Root volume has only one copy by definition
-	// std::mutex muxB;
-	// return dynamic_cast<GeoPhysVol*>(buildVPhysVol(id, tableId, copyNumber, muxB));
 	return dynamic_cast<GeoPhysVol*>(buildVPhysVol(id, tableId, copyNumber));
 }
 
 
 GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildMat);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildMaterial()";
 	QStringList values = m_materials[id.toUInt()];
 
@@ -569,8 +524,6 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 
 GeoElement* ReadGeoModel::buildElement(QString id)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildEl);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildElement()";
 
 	if (m_elements.size() == 0)
@@ -597,8 +550,6 @@ GeoElement* ReadGeoModel::buildElement(QString id)
 
 GeoShape* ReadGeoModel::buildShape(QString shapeId)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildSh);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildShape()";
 
 //   try // TODO: implement try/catch
@@ -1525,8 +1476,6 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 
 GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildLog);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildLogVol()";
 
 	// get logVol properties from the DB
@@ -1558,8 +1507,6 @@ GeoSerialDenominator* ReadGeoModel::buildSerialDenominator(QString id)
 
 GeoSerialDenominator* ReadGeoModel::parseSerialDenominator(QStringList values)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildSD);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseSerialDenominator()";
 	QString id = values[0];
 	QString baseName = values[1];
@@ -1615,12 +1562,9 @@ GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(QString id)
 
 GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildATr);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseAlignableTransform()";
 
 	QString id = values.takeFirst(); // it pops out the first element, leaving the other items in the list
-
 	// printTransformationValues(values); // DEBUG
 
 	// get the 12 matrix elements
@@ -1672,14 +1616,11 @@ GeoTransform* ReadGeoModel::buildTransform(QString id)
 
 GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildTr);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseTransform()";
 	if (m_deepDebug) qDebug() << "values:" << values;
 
 	QString id = values.takeFirst(); // it pops out the first element, the 'id', leaving the other items in the list
-
-  // printTransformationValues(values); // DEBUG
+  	// printTransformationValues(values); // DEBUG
 
 	// get the 12 matrix elements
 	double xx = values[0].toDouble();
@@ -1722,11 +1663,8 @@ GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 }
 
 
-// GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId, std::mutex &mux)
 GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildST);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildSerialTransformer()";
 
 	QStringList values = m_serialTransformers[nodeId.toUInt()];
@@ -1753,8 +1691,6 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 
 	// GET PHYSVOL
 	if (m_deepDebug) qDebug() << "referenced physVol - Id:" << physVolId << ", type:" << physVolType << "tableId:" << physVolTableIdStr;
-	// std::mutex muxA;
-	// const GeoVPhysVol* physVol = buildVPhysVol(physVolId, physVolTableIdStr, "1", muxA); // we use "1" as default copyNumber: taking the first copy of the VPhysVol as the referenced volume
 	const GeoVPhysVol* physVol = buildVPhysVol(physVolId, physVolTableIdStr, "1"); // we use "1" as default copyNumber: taking the first copy of the VPhysVol as the referenced volume
 	if (m_deepDebug) qDebug() << "physVol:" << physVol << ", function:" << &func;
 
@@ -1772,14 +1708,11 @@ TRANSFUNCTION ReadGeoModel::buildFunction(QString id)
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildFunction()";
 	QStringList values = m_functions[id.toUInt()];
-	// return parseFunction( values[0].toUInt(), values[1].toStdString() );
 	return parseFunction( values[1].toStdString() );
 }
 
 TRANSFUNCTION ReadGeoModel::parseFunction(const std::string& expr)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildFun);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseFunction(const std::string& expr)";
 	// qDebug() << "id:" << Qstring::number(id) << " - expression: " << QString::fromStdString(expr);
 	if (m_deepDebug) qDebug() << "expression: " << QString::fromStdString(expr);
@@ -1796,7 +1729,7 @@ TRANSFUNCTION ReadGeoModel::parseFunction(const std::string& expr)
 	return *(func.release()); // make func returns a pointer to the managed object and releases the ownership, then get the object dereferencing the pointer
 }
 
-GeoNameTag* ReadGeoModel::buildNameTag(QString id)
+GeoNameTag* ReadGeoModel::buildNameTag(QString id) // TODO: Remove the "parseABC" methods, put everything into "buildABC". The "parseABC" are there for historical reasons.
 {
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildNameTag()";
 	return parseNameTag( m_nameTags[id.toUInt()] );
@@ -1804,8 +1737,6 @@ GeoNameTag* ReadGeoModel::buildNameTag(QString id)
 
 GeoNameTag* ReadGeoModel::parseNameTag(QStringList values)
 {
-	// std::lock_guard<std::mutex> lk(muxBuildNT);
-
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseNameTag()";
 	QString id = values[0];
 	QString name = values[1];
@@ -1831,7 +1762,6 @@ GeoGraphNode* ReadGeoModel::getNode(const QString id, const QString tableId, con
 	return m_memMap[key];
 }
 
-// void ReadGeoModel::storeNode(const QString id, const QString tableId, const QString copyN, GeoGraphNode* node, std::mutex &mux)
 void ReadGeoModel::storeNode(const QString id, const QString tableId, const QString copyN, GeoGraphNode* node)
 {
 	std::lock_guard<std::mutex> lk(muxStore);
@@ -1840,6 +1770,5 @@ void ReadGeoModel::storeNode(const QString id, const QString tableId, const QStr
 	m_memMap[key] = node;
 	if (m_deepDebug) qDebug() << "Store done.";
 }
-
 
 } /* namespace GeoModelIO */

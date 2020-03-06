@@ -10,11 +10,6 @@ In the following, you will find basic strategies to effectively build the GeoMod
 
 ## System Dependencies
 
-### Linux/Ubuntu
-
-```bash
-apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libxerces-c-dev
-```
 
 ### macOS
 
@@ -22,9 +17,21 @@ apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essentia
 # install external dependencies
 brew install cmake eigen doxygen wget boost hg xerces-c
 
-# install Qt
+# install and configure Qt
 brew install qt5
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
+```
+
+### Linux/Ubuntu
+
+```bash
+apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libxerces-c-dev
+```
+
+### Linux/Fedora
+
+```bash
+dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial xerces-c-devel unzip freeglut-devel wget eigen3-devel
 ```
 
 
@@ -83,15 +90,45 @@ make -j4
 make install
 cd ..
 ```
+
+
+### (Optional) Build an example GeoModelPlugin
+
+
+
+```bash
+# Build the GeoModelTools
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelTools.git
+mkdir build_tools
+cd build_tools
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelTools
+make -j4
+make install
+cd ..
+
+# Build the GeoModelATLAS/GeoModelDataManagers
+git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers.git
+mkdir build_managers
+cd build_managers
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelDataManagers
+make -j4
+make install
+cd ..
+
+# Build atlas/GeoModelPlugins
+git clone https://gitlab.cern.ch/atlas/GeoModelPlugins.git
+mkdir build_plugins
+cd build_plugins
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelPlugins
+make -j4
+make install
+cd ..
+```
+
+
 ### Post install settings
 
 
-#### Linux
-
-```bash
-# After compilation, you should apply this temporary fix:
-export GXPLUGINPATH=install/lib/gxplugins # this is a temporary fix
-```
 
 #### macOS
 
@@ -101,18 +138,22 @@ install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # this is a tem
 export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 ```
 
-### (Optional) Build an example GeoModelPlugin
+#### Linux/Ubuntu
 
 ```bash
-# Build atlas/GeoModelPlugins
-git clone ssh://git@gitlab.cern.ch:7999/atlas/GeoModelPlugins.git
-mkdir build_plugins
-cd build_plugins
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelPlugins
-make -j4
-make install
-cd ..
+# After compilation, you should apply this temporary fix:
+export GXPLUGINPATH=install/lib/gxplugins # this is a temporary fix
 ```
+
+#### Linux/Fedora
+
+```bash
+# After compilation, you should apply this temporary fix:
+export GXPLUGINPATH=install/lib/gxplugins # this is a temporary fix
+export LD_LIBRARY_PATH=install/lib:install/lib64:$LD_LIBRARY_PATH # this is a temporary fix, we will fix the installation on Fedora
+```
+
+
 
 ### Run GeoModelExplorer (gmex)
 

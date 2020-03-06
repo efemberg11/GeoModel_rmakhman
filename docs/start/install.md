@@ -1,10 +1,16 @@
 # Install the GeoModel Libraries
 
-In this section, instructions on how to install the GeoModel libraries on different platforms are given. The instructions are aimed at end users and will install stable, pre-compiled versions of the libraries.
+In this section, instructions on how to **install** the GeoModel libraries on different platforms are given. The instructions are aimed at **end users**. A relevant package manager will be used for each of the **supported platforms**, and the commands will install **stable**, **pre-compiled** versions of the libraries.
 
-Instead, if you would like to get the latest version of the code from the GeoModel repository, or if you want to develop the libraries, you have to compile them from scratch. In that case, please follow the instructions provided in the [dev](/dev/index.md) section.
+Instead, if you would like to:
 
-If you have problems, please send a message to the mailing list provided in the [Contacts] page.
+- build the libraries for an unsupported platform
+- get the latest version of the code from the GeoModel repository
+- develop the libraries
+
+then, you have to **compile them** from scratch. In that case, please follow the instructions provided in the [For Developers](../dev/index.md) section.
+
+If you have problems, please send a message to the mailing list provided in the [Contacts](../contacts.md) page.
 
 
 ## Install the GeoModel visualizer and all the libraries

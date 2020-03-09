@@ -13,10 +13,10 @@
 #define H8FIELDSVC_H
 
 // FrameWork includes
-#include "AthenaBaseComps/AthService.h"
+//#include "AthenaBaseComps/AthService.h"
 
 // MagField includes
-#include "MagFieldInterfaces/IMagFieldSvc.h"
+//#include "MagFieldInterfaces/IMagFieldSvc.h"
 #include "MagFieldServices/BFieldH8Grid.h"
 
 // STL includes
@@ -28,11 +28,11 @@ class CondAttrListCollection;
 
 namespace MagField {
 
-  class H8FieldSvc : public extends<AthService, IMagFieldSvc> {
+class H8FieldSvc{ //: public extends<AthService, IMagFieldSvc> {
     public:
 
       //** Constructor with parameters */
-      H8FieldSvc( const std::string& name, ISvcLocator* pSvcLocator );
+    H8FieldSvc( const std::string& name/*, ISvcLocator* pSvcLocator*/ );
 
       /** Destructor */
       virtual ~H8FieldSvc();

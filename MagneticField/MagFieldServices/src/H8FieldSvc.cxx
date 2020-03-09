@@ -27,8 +27,8 @@
 #include "CLHEP/Units/SystemOfUnits.h"
 
 /** Constructor **/
-MagField::H8FieldSvc::H8FieldSvc( const std::string& name,ISvcLocator* svc ) :
-    base_class(name,svc),
+MagField::H8FieldSvc::H8FieldSvc( const std::string& name/*,ISvcLocator* svc */) :
+    //base_class(name,svc),
     m_H8MapFilename("MagneticFieldMaps/mbps1-all-id-800-mbps2-muons-800x4.data"),
     m_dx1(0),
     m_dy1(0),
@@ -37,13 +37,13 @@ MagField::H8FieldSvc::H8FieldSvc( const std::string& name,ISvcLocator* svc ) :
     m_dy2(0),
     m_dz2(0)
 {
-    declareProperty("H8MapFile", m_H8MapFilename, "File storing the H8 magnetic field map");
-    declareProperty("dx1", m_dx1, "x component of magnet #1 shift (in mm)");
-    declareProperty("dy1", m_dy1, "y component of magnet #1 shift (in mm)");
-    declareProperty("dz1", m_dz1, "z component of magnet #1 shift (in mm)");
-    declareProperty("dx2", m_dx2, "x component of magnet #2 shift (in mm)");
-    declareProperty("dy2", m_dy2, "y component of magnet #2 shift (in mm)");
-    declareProperty("dz2", m_dz2, "z component of magnet #2 shift (in mm)");
+//    declareProperty("H8MapFile", m_H8MapFilename, "File storing the H8 magnetic field map");
+//    declareProperty("dx1", m_dx1, "x component of magnet #1 shift (in mm)");
+//    declareProperty("dy1", m_dy1, "y component of magnet #1 shift (in mm)");
+//    declareProperty("dz1", m_dz1, "z component of magnet #1 shift (in mm)");
+//    declareProperty("dx2", m_dx2, "x component of magnet #2 shift (in mm)");
+//    declareProperty("dy2", m_dy2, "y component of magnet #2 shift (in mm)");
+//    declareProperty("dz2", m_dz2, "z component of magnet #2 shift (in mm)");
 }
 
 MagField::H8FieldSvc::~H8FieldSvc()
@@ -72,7 +72,8 @@ bool MagField::H8FieldSvc::finalize()
 bool MagField::H8FieldSvc::readMap( const std::string mapFile )
 {
     // find the path to the map file
-    std::string resolvedMapFile = PathResolver::find_file( mapFile.c_str(), "DATAPATH" );
+    //std::string resolvedMapFile = PathResolver::find_file( mapFile.c_str(), "DATAPATH" );
+    std::string resolvedMapFile = mapFile.c_str();
     if ( resolvedMapFile == "" ) {
         //ATH_MSG_ERROR( "Field map file " << mapFile << " not found" );
         return false;

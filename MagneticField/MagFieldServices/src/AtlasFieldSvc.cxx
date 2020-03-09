@@ -585,18 +585,18 @@ void MagField::AtlasFieldSvc::clearMap(AtlasFieldSvcTLS &tls)
 // Read the solenoid map from file.
 // The filename must end with ".root".
 //
-//bool MagField::AtlasFieldSvc::readMap( const char* filename )
-//{
-//    if ( strstr(filename, ".root") == 0 ) {
+bool MagField::AtlasFieldSvc::readMap( const char* filename )
+{
+    if ( strstr(filename, ".root") == 0 ) {
 //        //ATH_MSG_ERROR("input file name '" << filename << "' does not end with .root");
-//        return false;
-//    }
+        return false;
+    }
 //    TFile* rootfile = new TFile(filename, "OLD");
 //    if ( ! rootfile ) {
 //        //ATH_MSG_ERROR("failed to open " << filename);
 //        return false;
 //    }
-//    std::cout<<"reading the map from " << filename<< std::endl;
+    std::cout<<"reading the map from " << filename<< std::endl;
 //    if ( readMap(rootfile).isFailure() ) {
 //        //ATH_MSG_ERROR("something went wrong while trying to read the ROOT field map file");
 //        return false;
@@ -605,8 +605,8 @@ void MagField::AtlasFieldSvc::clearMap(AtlasFieldSvcTLS &tls)
 //    rootfile->Close();
 //    delete rootfile;
 //
-//    return true;
-//}
+    return true;
+}
 
 //
 // read an ASCII field map from istream

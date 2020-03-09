@@ -38,7 +38,7 @@
 /** Constructor **/
 MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name/*,ISvcLocator* svc*/) :
     //base_class(name,svc),
-    base_class(name),
+    //base_class(name),
     m_fullMapFilename("MagneticFieldMaps/bfieldmap_7730_20400_14m.root"),
     m_soleMapFilename("MagneticFieldMaps/bfieldmap_7730_0_14m.root"),
     m_toroMapFilename("MagneticFieldMaps/bfieldmap_0_20400_14m.root"),
@@ -46,10 +46,10 @@ MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name/*,ISvcLocator* sv
     m_mapToroCurrent(20400.),
     m_soleMinCurrent(1.0),
     m_toroMinCurrent(1.0),
-    m_useDCS(false),
-    m_coolCurrentsFolderName("/EXT/DCS/MAGNETS/SENSORDATA"),
-    m_useMapsFromCOOL(true),
-    m_coolMapsFolderName("/GLOBAL/BField/Maps"),
+    //m_useDCS(false),
+    //m_coolCurrentsFolderName("/EXT/DCS/MAGNETS/SENSORDATA"),
+    //m_useMapsFromCOOL(true),
+    //m_coolMapsFolderName("/GLOBAL/BField/Maps"),
     m_useSoleCurrent(7730.),
     m_useToroCurrent(20400.),
     m_lockMapCurrents(false),
@@ -379,16 +379,17 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
 
     // determine the map to load
     std::string mapFile("");
-    if ( solenoidOn() && toroidOn() ) {
+    //ALL the Magnets are ON
+    //if ( solenoidOn() && toroidOn() ) {
         mapFile = m_fullMapFilename;
-    } else if ( solenoidOn() ) {
-        mapFile = m_soleMapFilename;
-    } else if ( toroidOn() ) {
-        mapFile = m_toroMapFilename;
-    } else {
+    //} else if ( solenoidOn() ) {
+    //    mapFile = m_soleMapFilename;
+    //} else if ( toroidOn() ) {
+    //    mapFile = m_toroMapFilename;
+    //} else {
         // all magnets OFF. no need to read map
-        return true;
-    }
+    //    return true;
+    //}
     // find the path to the map file
     //std::string resolvedMapFile = PathResolver::find_file( mapFile.c_str(), "DATAPATH" );
     std::string resolvedMapFile = mapFile.c_str();
@@ -415,24 +416,25 @@ void MagField::AtlasFieldSvc::scaleField()
 {
     BFieldZone *solezone(0);
     //
-    if ( solenoidOn() ) {
+    //if ( solenoidOn() ) {
         solezone = findZoneSlow( 0.0, 0.0, 0.0 );
         if ( m_mapSoleCurrent > 0.0 &&
-             std::abs( solenoidCurrent()/m_mapSoleCurrent - 1.0 ) > 0.001 ) {
+             std::abs( getSolenoidCurrent()/m_mapSoleCurrent - 1.0 ) > 0.001 ) {
             // scale the field in the solenoid zone
-            double factor = solenoidCurrent()/m_mapSoleCurrent;
+            double factor = getSolenoidCurrent()/m_mapSoleCurrent;
             solezone->scaleField( factor );
             // remake the fast map
             buildZR();
             std::cout<< "Scaled the solenoid field by a factor " << factor << std::endl;
         }
-    }
+    //}
     //
-    if ( toroidOn() ) {
+    //if ( toroidOn() )
+    //{
         if ( m_mapToroCurrent > 0.0 &&
-             std::abs( toroidCurrent()/m_mapToroCurrent - 1.0 ) > 0.001 ) {
+             std::abs( getToroidCurrent()/m_mapToroCurrent - 1.0 ) > 0.001 ) {
             // scale the field in all zones except for the solenoid zone
-            double factor = toroidCurrent()/m_mapToroCurrent;
+            double factor = getToroidCurrent()/m_mapToroCurrent;
             for ( unsigned i = 0; i < m_zone.size(); i++ ) {
                 if ( &(m_zone[i]) != solezone ) {
                     m_zone[i].scaleField( factor );
@@ -440,7 +442,7 @@ void MagField::AtlasFieldSvc::scaleField()
             }
             std::cout<< "Scaled the toroid field by a factor " << factor << std::endl;
         }
-    }
+    //}
 }
 
 /** framework methods */
@@ -815,7 +817,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
         input >> izone >> idzone >> nfzone;
         izone--; // fortran -> C++
         if ( idzone != m_zone[izone].id() ) {
-            ATH_MSG_ERROR( myname << ": zone id " << idzone << " != " << m_zone[izone].id() );
+            //ATH_MSG_ERROR( myname << ": zone id " << idzone << " != " << m_zone[izone].id() );
             //return StatusCode(2);
             return true; // TO DO - it shoudl be recoverable - handle ! enum class ErrorCode : code_t { FAILURE = 0, SUCCESS = 1, RECOVERABLE = 2 };
         }

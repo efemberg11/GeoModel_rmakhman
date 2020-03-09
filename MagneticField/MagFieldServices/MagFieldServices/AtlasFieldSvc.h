@@ -71,6 +71,13 @@ namespace MagField {
       //virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
         virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const  final;
         virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const  final;
+        
+        void   setToroidCurrent (double current)   { m_toroidCurrent = current; }
+        void   setSolenoidCurrent (double current) { m_solenoidCurrent = current; }
+        double getToroidCurrent()   { return m_toroidCurrent; }
+        double getSolenoidCurrent() { return m_solenoidCurrent; }
+        
+        
     private:
       /** Retrieve, initialize and return a thread-local storage object */
       inline struct AtlasFieldSvcTLS &getAtlasFieldSvcTLS() const;
@@ -145,6 +152,9 @@ namespace MagField {
       double m_useToroCurrent; // toroid current in A
       // flag to skip current rescale and use map currents as they are
       bool m_lockMapCurrents;
+        
+      double m_toroidCurrent;
+      double m_solenoidCurrent;
 
       // handle for COOL field map filenames
       //const DataHandle<CondAttrListCollection> m_mapHandle;

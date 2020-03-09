@@ -1,2 +1,1 @@
-# GeoModelXML
-
+GMX is a straight copy of Nigel Hessey's GeoModelXml

@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/purpie/gmx/GMXPlugin/src/GMXPlugin.cxx
+GeoModelKernel/GeoVGeometryPlugin.h
+/Users/purpie/gmx/GMXPlugin/src/GeoModelKernel/GeoVGeometryPlugin.h
+GeoModelKernel/GeoNameTag.h
+/Users/purpie/gmx/GMXPlugin/src/GeoModelKernel/GeoNameTag.h
+GeoModelKernel/Units.h
+/Users/purpie/gmx/GMXPlugin/src/GeoModelKernel/Units.h
+GeoModelXml/GmxInterface.h
+/Users/purpie/gmx/GMXPlugin/src/GeoModelXml/GmxInterface.h
+GeoModelXml/Gmx2Geo.h
+/Users/purpie/gmx/GMXPlugin/src/GeoModelXml/Gmx2Geo.h
+iostream
+-
+fstream
+-
+sstream
+-
+

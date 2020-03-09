@@ -14,7 +14,7 @@
 
 #include <vector>
 #include <iostream>
-#include "TFile.h"
+//#include "TFile.h"
 #include "MagFieldServices/BFieldZone.h"
 
 class BFieldSolenoid {
@@ -25,8 +25,8 @@ public:
     ~BFieldSolenoid() { delete m_orig; if (m_orig!=m_tilt) delete m_tilt; }
     // read/write map from/to file
     int readMap( std::istream& input );
-    int readMap( TFile* rootfile );
-    void writeMap( TFile* rootfile, bool tilted = false );
+    //int readMap( TFile* rootfile );
+    //void writeMap( TFile* rootfile, bool tilted = false );
     // move and tilt the map
     void moveMap( double dx, double dy, double dz, double ax, double ay );
     // compute magnetic field

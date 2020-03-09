@@ -9,7 +9,7 @@
 #include <string>
 #include <cmath>
 #include <algorithm>
-#include "TTree.h"
+//#include "TTree.h"
 using namespace std;
 
 //
@@ -92,155 +92,155 @@ BFieldSolenoid::readMap( istream& input )
 // if tilted = true, write the moved-and-tilted map.
 // ohterwise, write the original map.
 //
-void
-BFieldSolenoid::writeMap( TFile* rootfile, bool tilted )
-{
-    BFieldMesh<double> *map = tilted ? m_tilt : m_orig;
-    if ( map == 0 ) return; // no map to write
-    if ( rootfile == 0 ) return; // no file
-    if ( rootfile->cd() == false ) return; // could not make it current directory
-    // define the tree
-    TTree* tree = new TTree( "BFieldSolenoid", "BFieldSolenoid version 4" );
-    double zmin = map->zmin();
-    double zmax = map->zmax();
-    double rmin = map->rmin();
-    double rmax = map->rmax();
-    double phimin = map->phimin();
-    double phimax = map->phimax();
-    int nmeshz = map->nmesh(0);
-    int nmeshr = map->nmesh(1);
-    int nmeshphi = map->nmesh(2);
-    double *meshz, *meshr, *meshphi;
-    int nfield = nmeshz*nmeshr*nmeshphi;
-    double *fieldz, *fieldr, *fieldphi;
-    meshz = new double[nmeshz];
-    meshr = new double[nmeshr];
-    meshphi = new double[nmeshphi];
-    fieldz = new double[nfield];
-    fieldr = new double[nfield];
-    fieldphi = new double[nfield];
-    // define the tree branches
-    tree->Branch( "zmin", &zmin, "zmin/D" );
-    tree->Branch( "zmax", &zmax, "zmax/D" );
-    tree->Branch( "rmin", &rmin, "rmin/D" );
-    tree->Branch( "rmax", &rmax, "rmax/D" );
-    tree->Branch( "phimin", &phimin, "phimin/D" );
-    tree->Branch( "phimax", &phimax, "phimax/D" );
-    tree->Branch( "nmeshz", &nmeshz, "nmeshz/I" );
-    tree->Branch( "meshz", meshz, "meshz[nmeshz]/D" );
-    tree->Branch( "nmeshr", &nmeshr, "nmeshr/I" );
-    tree->Branch( "meshr", meshr, "meshr[nmeshr]/D" );
-    tree->Branch( "nmeshphi", &nmeshphi, "nmeshphi/I" );
-    tree->Branch( "meshphi", meshphi, "meshphi[nmeshphi]/D" );
-    tree->Branch( "nfield", &nfield, "nfield/I" );
-    tree->Branch( "fieldz", fieldz, "fieldz[nfield]/D" );
-    tree->Branch( "fieldr", fieldr, "fieldr[nfield]/D" );
-    tree->Branch( "fieldphi", fieldphi, "fieldphi[nfield]/D" );
-    // fill the mesh and field arrays
-    for ( int j = 0; j < nmeshz; j++ ) {
-        meshz[j] = map->mesh(0,j);
-    }
-    for ( int j = 0; j < nmeshr; j++ ) {
-        meshr[j] = map->mesh(1,j);
-    }
-    for ( int j = 0; j < nmeshphi; j++ ) {
-        meshphi[j] = map->mesh(2,j);
-    }
-    for ( int j = 0; j < nfield; j++ ) {
-        const BFieldVector<double> f = map->field(j);
-        fieldz[j] = f.z();
-        fieldr[j] = f.r();
-        fieldphi[j] = f.phi();
-    }
-    // write
-    tree->Fill();
-    rootfile->Write();
-    // clean up
-    delete[] meshz;
-    delete[] meshr;
-    delete[] meshphi;
-    delete[] fieldz;
-    delete[] fieldr;
-    delete[] fieldphi;
-}
+//void
+//BFieldSolenoid::writeMap( TFile* rootfile, bool tilted )
+//{
+//    BFieldMesh<double> *map = tilted ? m_tilt : m_orig;
+//    if ( map == 0 ) return; // no map to write
+//    if ( rootfile == 0 ) return; // no file
+//    if ( rootfile->cd() == false ) return; // could not make it current directory
+//    // define the tree
+//    TTree* tree = new TTree( "BFieldSolenoid", "BFieldSolenoid version 4" );
+//    double zmin = map->zmin();
+//    double zmax = map->zmax();
+//    double rmin = map->rmin();
+//    double rmax = map->rmax();
+//    double phimin = map->phimin();
+//    double phimax = map->phimax();
+//    int nmeshz = map->nmesh(0);
+//    int nmeshr = map->nmesh(1);
+//    int nmeshphi = map->nmesh(2);
+//    double *meshz, *meshr, *meshphi;
+//    int nfield = nmeshz*nmeshr*nmeshphi;
+//    double *fieldz, *fieldr, *fieldphi;
+//    meshz = new double[nmeshz];
+//    meshr = new double[nmeshr];
+//    meshphi = new double[nmeshphi];
+//    fieldz = new double[nfield];
+//    fieldr = new double[nfield];
+//    fieldphi = new double[nfield];
+//    // define the tree branches
+//    tree->Branch( "zmin", &zmin, "zmin/D" );
+//    tree->Branch( "zmax", &zmax, "zmax/D" );
+//    tree->Branch( "rmin", &rmin, "rmin/D" );
+//    tree->Branch( "rmax", &rmax, "rmax/D" );
+//    tree->Branch( "phimin", &phimin, "phimin/D" );
+//    tree->Branch( "phimax", &phimax, "phimax/D" );
+//    tree->Branch( "nmeshz", &nmeshz, "nmeshz/I" );
+//    tree->Branch( "meshz", meshz, "meshz[nmeshz]/D" );
+//    tree->Branch( "nmeshr", &nmeshr, "nmeshr/I" );
+//    tree->Branch( "meshr", meshr, "meshr[nmeshr]/D" );
+//    tree->Branch( "nmeshphi", &nmeshphi, "nmeshphi/I" );
+//    tree->Branch( "meshphi", meshphi, "meshphi[nmeshphi]/D" );
+//    tree->Branch( "nfield", &nfield, "nfield/I" );
+//    tree->Branch( "fieldz", fieldz, "fieldz[nfield]/D" );
+//    tree->Branch( "fieldr", fieldr, "fieldr[nfield]/D" );
+//    tree->Branch( "fieldphi", fieldphi, "fieldphi[nfield]/D" );
+//    // fill the mesh and field arrays
+//    for ( int j = 0; j < nmeshz; j++ ) {
+//        meshz[j] = map->mesh(0,j);
+//    }
+//    for ( int j = 0; j < nmeshr; j++ ) {
+//        meshr[j] = map->mesh(1,j);
+//    }
+//    for ( int j = 0; j < nmeshphi; j++ ) {
+//        meshphi[j] = map->mesh(2,j);
+//    }
+//    for ( int j = 0; j < nfield; j++ ) {
+//        const BFieldVector<double> f = map->field(j);
+//        fieldz[j] = f.z();
+//        fieldr[j] = f.r();
+//        fieldphi[j] = f.phi();
+//    }
+//    // write
+//    tree->Fill();
+//    rootfile->Write();
+//    // clean up
+//    delete[] meshz;
+//    delete[] meshr;
+//    delete[] meshphi;
+//    delete[] fieldz;
+//    delete[] fieldr;
+//    delete[] fieldphi;
+//}
 
 //
 // read the map from a ROOT file.
 // returns 0 if successful.
 //
-int
-BFieldSolenoid::readMap( TFile* rootfile )
-{
-    if ( rootfile == 0 ) return 1; // no file
-    if ( rootfile->cd() == false ) return 2; // could not make it current directory
-    if ( m_orig == m_tilt ) delete m_orig;
-    else { delete m_orig; delete m_tilt; }
-    m_orig = m_tilt = new BFieldMesh<double>;
-    // open the tree
-    TTree* tree = (TTree*)rootfile->Get("BFieldSolenoid");
-    if ( tree == 0 ) return 3; // no tree
-    double zmin, zmax, rmin, rmax, phimin, phimax;
-    int nmeshz, nmeshr, nmeshphi;
-    double *meshz, *meshr, *meshphi;
-    int nfield;
-    double *fieldz, *fieldr, *fieldphi;
-    //unsigned char *fbyte;
-    // define the fixed-sized branches first
-    tree->SetBranchAddress( "zmin", &zmin );
-    tree->SetBranchAddress( "zmax", &zmax );
-    tree->SetBranchAddress( "rmin", &rmin );
-    tree->SetBranchAddress( "rmax", &rmax );
-    tree->SetBranchAddress( "phimin", &phimin );
-    tree->SetBranchAddress( "phimax", &phimax );
-    tree->SetBranchAddress( "nmeshz", &nmeshz );
-    tree->SetBranchAddress( "nmeshr", &nmeshr );
-    tree->SetBranchAddress( "nmeshphi", &nmeshphi );
-    tree->SetBranchAddress( "nfield", &nfield );
-    // prepare arrays - need to know the maximum sizes
-    tree->GetEntry(0);
-    meshz = new double[nmeshz];
-    meshr = new double[nmeshr];
-    meshphi = new double[nmeshphi];
-    fieldz = new double[nfield];
-    fieldr = new double[nfield];
-    fieldphi = new double[nfield];
-    // define the variable length branches
-    tree->SetBranchAddress( "meshz", meshz );
-    tree->SetBranchAddress( "meshr", meshr );
-    tree->SetBranchAddress( "meshphi", meshphi );
-    tree->SetBranchAddress( "fieldz", fieldz );
-    tree->SetBranchAddress( "fieldr", fieldr );
-    tree->SetBranchAddress( "fieldphi", fieldphi );
-    // read again, and copy data
-    tree->GetEntry(0);
-    m_orig->setRange( zmin, zmax, rmin, rmax, phimin, phimax );
-    m_orig->reserve( nmeshz, nmeshr, nmeshphi );
-    for ( int j = 0; j < nmeshz; j++ ) {
-        m_orig->appendMesh( 0, meshz[j] );
-    }
-    for ( int j = 0; j < nmeshr; j++ ) {
-        m_orig->appendMesh( 1, meshr[j] );
-    }
-    for ( int j = 0; j < nmeshphi; j++ ) {
-        m_orig->appendMesh( 2, meshphi[j] );
-    }
-    for ( int j = 0; j < nfield; j++ ) {
-        BFieldVector<double> field( fieldz[j], fieldr[j], fieldphi[j] );
-        m_orig->appendField( field );
-    }
-    // clean up
-    tree->Delete();
-    delete[] meshz;
-    delete[] meshr;
-    delete[] meshphi;
-    delete[] fieldz;
-    delete[] fieldr;
-    delete[] fieldphi;
-    // build the LUTs
-    m_orig->buildLUT();
-
-    return 0;
-}
+//int
+//BFieldSolenoid::readMap( TFile* rootfile )
+//{
+//    if ( rootfile == 0 ) return 1; // no file
+//    if ( rootfile->cd() == false ) return 2; // could not make it current directory
+//    if ( m_orig == m_tilt ) delete m_orig;
+//    else { delete m_orig; delete m_tilt; }
+//    m_orig = m_tilt = new BFieldMesh<double>;
+//    // open the tree
+//    TTree* tree = (TTree*)rootfile->Get("BFieldSolenoid");
+//    if ( tree == 0 ) return 3; // no tree
+//    double zmin, zmax, rmin, rmax, phimin, phimax;
+//    int nmeshz, nmeshr, nmeshphi;
+//    double *meshz, *meshr, *meshphi;
+//    int nfield;
+//    double *fieldz, *fieldr, *fieldphi;
+//    //unsigned char *fbyte;
+//    // define the fixed-sized branches first
+//    tree->SetBranchAddress( "zmin", &zmin );
+//    tree->SetBranchAddress( "zmax", &zmax );
+//    tree->SetBranchAddress( "rmin", &rmin );
+//    tree->SetBranchAddress( "rmax", &rmax );
+//    tree->SetBranchAddress( "phimin", &phimin );
+//    tree->SetBranchAddress( "phimax", &phimax );
+//    tree->SetBranchAddress( "nmeshz", &nmeshz );
+//    tree->SetBranchAddress( "nmeshr", &nmeshr );
+//    tree->SetBranchAddress( "nmeshphi", &nmeshphi );
+//    tree->SetBranchAddress( "nfield", &nfield );
+//    // prepare arrays - need to know the maximum sizes
+//    tree->GetEntry(0);
+//    meshz = new double[nmeshz];
+//    meshr = new double[nmeshr];
+//    meshphi = new double[nmeshphi];
+//    fieldz = new double[nfield];
+//    fieldr = new double[nfield];
+//    fieldphi = new double[nfield];
+//    // define the variable length branches
+//    tree->SetBranchAddress( "meshz", meshz );
+//    tree->SetBranchAddress( "meshr", meshr );
+//    tree->SetBranchAddress( "meshphi", meshphi );
+//    tree->SetBranchAddress( "fieldz", fieldz );
+//    tree->SetBranchAddress( "fieldr", fieldr );
+//    tree->SetBranchAddress( "fieldphi", fieldphi );
+//    // read again, and copy data
+//    tree->GetEntry(0);
+//    m_orig->setRange( zmin, zmax, rmin, rmax, phimin, phimax );
+//    m_orig->reserve( nmeshz, nmeshr, nmeshphi );
+//    for ( int j = 0; j < nmeshz; j++ ) {
+//        m_orig->appendMesh( 0, meshz[j] );
+//    }
+//    for ( int j = 0; j < nmeshr; j++ ) {
+//        m_orig->appendMesh( 1, meshr[j] );
+//    }
+//    for ( int j = 0; j < nmeshphi; j++ ) {
+//        m_orig->appendMesh( 2, meshphi[j] );
+//    }
+//    for ( int j = 0; j < nfield; j++ ) {
+//        BFieldVector<double> field( fieldz[j], fieldr[j], fieldphi[j] );
+//        m_orig->appendField( field );
+//    }
+//    // clean up
+//    tree->Delete();
+//    delete[] meshz;
+//    delete[] meshr;
+//    delete[] meshphi;
+//    delete[] fieldz;
+//    delete[] fieldr;
+//    delete[] fieldphi;
+//    // build the LUTs
+//    m_orig->buildLUT();
+//
+//    return 0;
+//}
 
 //
 // Returns the magnetic field at any position.

@@ -31,7 +31,7 @@
 // forward declarations
 //class CondAttrListCollection;
 class BFieldZone;
-class TFile;
+//class TFile;
 //class Incident;
 
 namespace MagField {
@@ -102,9 +102,9 @@ namespace MagField {
       // read the field map from an ASCII or ROOT file
       bool readMap( const char* filename );
       bool readMap( std::istream& input );
-      bool readMap( TFile* rootfile );
+      //bool readMap( TFile* rootfile );
       // write the field map to a ROOT file
-      void writeMap( TFile* rootfile ) const;
+      //void writeMap( TFile* rootfile ) const;
       // clear the field map
       void clearMap(AtlasFieldSvcTLS &tls);
 

@@ -24,7 +24,7 @@ file( GLOB HEADERS MagFieldServices/*.h )
 
 # Set target and properties
 add_library( MagFieldServices SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( MagFieldServices PUBLIC ${CLHEP_LIBRARIES} )
+target_link_libraries( MagFieldServices PUBLIC ${CLHEP_LIBRARIES} MagFieldInterfaces)
 target_include_directories( MagFieldServices PUBLIC ${CLHEP_INCLUDE_DIRS}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

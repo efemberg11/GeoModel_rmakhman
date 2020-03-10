@@ -15,7 +15,7 @@
 //#include "GaudiKernel/IIncidentListener.h"
 
 // MagField includes
-//#include "MagFieldInterfaces/IMagFieldSvc.h"
+#include "MagFieldInterfaces/IMagFieldSvc.h"
 #include "MagFieldServices/AtlasFieldSvcTLS.h"
 #include "MagFieldServices/BFieldCache.h"
 #include "MagFieldServices/BFieldCacheZR.h"
@@ -39,7 +39,7 @@ namespace MagField {
   /** @class AtlasFieldSvc
       @author Elmar.Ritsch -at- cern.ch
     */
-    class AtlasFieldSvc{
+    class AtlasFieldSvc: public IMagFieldSvc {
   //class AtlasFieldSvc : public extends<AthService, IMagFieldSvc, IIncidentListener> {
     public:
 
@@ -72,10 +72,10 @@ namespace MagField {
         virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const  final;
         virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const  final;
         
-        void   setToroidCurrent (double current)   { m_toroidCurrent = current; }
-        void   setSolenoidCurrent (double current) { m_solenoidCurrent = current; }
-        double getToroidCurrent()   { return m_toroidCurrent; }
-        double getSolenoidCurrent() { return m_solenoidCurrent; }
+//        void   setToroidCurrent (double current)   { m_toroidCurrent = current; }
+//        void   setSolenoidCurrent (double current) { m_solenoidCurrent = current; }
+//        double getToroidCurrent()   { return m_toroidCurrent; }
+//        double getSolenoidCurrent() { return m_solenoidCurrent; }
         
         
     private:

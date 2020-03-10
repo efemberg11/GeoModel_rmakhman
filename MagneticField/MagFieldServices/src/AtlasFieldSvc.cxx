@@ -151,8 +151,8 @@ bool MagField::AtlasFieldSvc::initialize()
 
     // clear the map for zero field
     clearMap(tls);
-    //TO DO setSolenoidCurrent(0.0);
-    //TO DO setToroidCurrent(0.0);
+    setSolenoidCurrent(0.0);
+    setToroidCurrent(0.0);
 
     /* // retrieve the manipulator tool
        if (m_doManipulation) {
@@ -202,8 +202,8 @@ bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
         torcur = 0.0;
         std::cout<< "Toroids are off" << std::endl;
     }
-    //TO DO setSolenoidCurrent(solcur);
-    //TO DO setToroidCurrent(torcur);
+    setSolenoidCurrent(solcur);
+    setToroidCurrent(torcur);
     // read the map file
     if ( !initializeMap(tls)) {
         //ATH_MSG_FATAL( "Failed to initialize field map" );
@@ -380,16 +380,16 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
     // determine the map to load
     std::string mapFile("");
     //ALL the Magnets are ON
-    //if ( solenoidOn() && toroidOn() ) {
+    if ( solenoidOn() && toroidOn() ) {
         mapFile = m_fullMapFilename;
-    //} else if ( solenoidOn() ) {
-    //    mapFile = m_soleMapFilename;
-    //} else if ( toroidOn() ) {
-    //    mapFile = m_toroMapFilename;
-    //} else {
+    } else if ( solenoidOn() ) {
+        mapFile = m_soleMapFilename;
+    } else if ( toroidOn() ) {
+        mapFile = m_toroMapFilename;
+    } else {
         // all magnets OFF. no need to read map
-    //    return true;
-    //}
+        return true;
+    }
     // find the path to the map file
     //std::string resolvedMapFile = PathResolver::find_file( mapFile.c_str(), "DATAPATH" );
     std::string resolvedMapFile = mapFile.c_str();
@@ -416,7 +416,7 @@ void MagField::AtlasFieldSvc::scaleField()
 {
     BFieldZone *solezone(0);
     //
-    //if ( solenoidOn() ) {
+    if ( solenoidOn() ) {
         solezone = findZoneSlow( 0.0, 0.0, 0.0 );
         if ( m_mapSoleCurrent > 0.0 &&
              std::abs( getSolenoidCurrent()/m_mapSoleCurrent - 1.0 ) > 0.001 ) {
@@ -427,10 +427,10 @@ void MagField::AtlasFieldSvc::scaleField()
             buildZR();
             std::cout<< "Scaled the solenoid field by a factor " << factor << std::endl;
         }
-    //}
+    }
     //
-    //if ( toroidOn() )
-    //{
+    if ( toroidOn() )
+    {
         if ( m_mapToroCurrent > 0.0 &&
              std::abs( getToroidCurrent()/m_mapToroCurrent - 1.0 ) > 0.001 ) {
             // scale the field in all zones except for the solenoid zone
@@ -442,7 +442,7 @@ void MagField::AtlasFieldSvc::scaleField()
             }
             std::cout<< "Scaled the toroid field by a factor " << factor << std::endl;
         }
-    //}
+    }
 }
 
 /** framework methods */

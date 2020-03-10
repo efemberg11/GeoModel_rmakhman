@@ -16,7 +16,7 @@
 //#include "AthenaBaseComps/AthService.h"
 
 // MagField includes
-//#include "MagFieldInterfaces/IMagFieldSvc.h"
+#include "MagFieldInterfaces/IMagFieldSvc.h"
 #include "MagFieldServices/BFieldH8Grid.h"
 
 // STL includes
@@ -27,8 +27,8 @@
 class CondAttrListCollection;
 
 namespace MagField {
-
-class H8FieldSvc{ //: public extends<AthService, IMagFieldSvc> {
+//class H8FieldSvc{ : public extends<AthService, IMagFieldSvc> {
+  class H8FieldSvc: public IMagFieldSvc{
     public:
 
       //** Constructor with parameters */

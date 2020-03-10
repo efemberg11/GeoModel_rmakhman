@@ -12,13 +12,13 @@
 #include <iostream>
 
 // Framework includes
-#include "GaudiKernel/IAlgTool.h"
+//#include "GaudiKernel/IAlgTool.h"
 
 // Amg classes
-#include "GeoPrimitives/GeoPrimitives.h"
+//#include "GeoPrimitives/GeoPrimitives.h"
 
 /** Declaration of the interface ID ( interface id, major version, minor version) */
-static const InterfaceID IID_IMagFieldManipulator("IMagFieldManipulator", 1, 0);
+//static const InterfaceID IID_IMagFieldManipulator("IMagFieldManipulator", 1, 0);
 
 namespace MagField {
 
@@ -26,8 +26,9 @@ namespace MagField {
  
  @ author Valerio.Ippolito -at- cern.ch
  */
-    class IMagFieldManipulator: virtual public IAlgTool {
-
+    //class IMagFieldManipulator: virtual public IAlgTool {
+    
+    class IMagFieldManipulator{
     ///////////////////////////////////////////////////////////////////
     // Public methods:
     ///////////////////////////////////////////////////////////////////
@@ -36,9 +37,9 @@ namespace MagField {
         IMagFieldManipulator() {;}
 
         /** Retrieve interface ID */
-        static const InterfaceID& interfaceID() {
-            return IID_IMagFieldManipulator;
-        }
+//        static const InterfaceID& interfaceID() {
+//            return IID_IMagFieldManipulator;
+//        }
 
         /** change the point where the field should be evaluated */
         /** in AtlasFieldSvc, this is called before B field is evaluated and */

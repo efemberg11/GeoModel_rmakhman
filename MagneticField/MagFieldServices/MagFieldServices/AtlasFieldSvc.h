@@ -21,8 +21,8 @@
 #include "MagFieldServices/BFieldCacheZR.h"
 #include "MagFieldServices/BFieldCond.h"
 #include "MagFieldServices/BFieldZone.h"
-//#include "MagFieldServices/BFieldMeshZR.h"
-// #include "MagFieldInterfaces/IMagFieldManipulator.h"
+#include "MagFieldServices/BFieldMeshZR.h"
+#include "MagFieldInterfaces/IMagFieldManipulator.h"
 
 // STL includes
 #include <vector>

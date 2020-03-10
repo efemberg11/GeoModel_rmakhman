@@ -26,6 +26,4 @@ include( GNUInstallDirs )
 # Set sub-packages to build.
 add_subdirectory( ToyGeometryPlugin )
 add_subdirectory( AccordionPlugin )
-#add_subdirectory( GMXPlugin )
-#add_subdirectory( AGDDPlugin )
 

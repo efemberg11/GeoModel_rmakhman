@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/purpie/GeoModelNew/GeoModelPlugins/AGDDPlugin/src/AGDDPlugin.cxx
+GeoModelKernel/GeoVGeometryPlugin.h
+/Users/purpie/GeoModelNew/GeoModelPlugins/AGDDPlugin/src/GeoModelKernel/GeoVGeometryPlugin.h
+AGDDControl/AGDDController.h
+/Users/purpie/GeoModelNew/GeoModelPlugins/AGDDPlugin/src/AGDDControl/AGDDController.h
+AGDDKernel/AGDDSectionStore.h
+/Users/purpie/GeoModelNew/GeoModelPlugins/AGDDPlugin/src/AGDDKernel/AGDDSectionStore.h
+AGDDControl/AGDD2GeoModelBuilder.h
+/Users/purpie/GeoModelNew/GeoModelPlugins/AGDDPlugin/src/AGDDControl/AGDD2GeoModelBuilder.h
+GeoModelKernel/GeoNameTag.h
+/Users/purpie/GeoModelNew/GeoModelPlugins/AGDDPlugin/src/GeoModelKernel/GeoNameTag.h
+GeoModelKernel/Units.h
+/Users/purpie/GeoModelNew/GeoModelPlugins/AGDDPlugin/src/GeoModelKernel/Units.h
+iostream
+-
+

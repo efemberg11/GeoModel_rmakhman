@@ -7,13 +7,13 @@ plugin (AGDDPlugin) needed to run it with gmex
 
 from e.g. $HOME:
 
-git clone https://gitlab.cern.ch/dellacqu/agdd.git
+git clone https://gitlab.cern.ch/GeoModelATLAS/agdd.git
 
 ## Building
 
 from e.g. $HOME
 
 mkdir build_agdd ; cd build_agdd
-cmake -DCMAKE_INSTALL_PREFIX=../install ../agdd
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release ../agdd
 make install
 

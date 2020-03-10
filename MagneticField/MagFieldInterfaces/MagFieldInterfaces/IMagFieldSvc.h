@@ -12,10 +12,10 @@
 #include <iostream>
 
 // Framework includes
-#include "GaudiKernel/IInterface.h"
+//#include "GaudiKernel/IInterface.h"
 
 // Amg classes
-#include "GeoPrimitives/GeoPrimitives.h"
+//#include "GeoPrimitives/GeoPrimitives.h"
 
 namespace MagField {
 
@@ -23,7 +23,8 @@ namespace MagField {
  
  @ author Elmar.Ritsch -at- cern.ch
  */
-    class IMagFieldSvc: virtual public IInterface {
+    //class IMagFieldSvc: virtual public IInterface {
+    class IMagFieldSvc{
 
     ///////////////////////////////////////////////////////////////////
     // Public methods:
@@ -31,7 +32,7 @@ namespace MagField {
     public:
 
         /** Creates the InterfaceID and interfaceID() method */
-        DeclareInterfaceID(IMagFieldSvc, 1, 0);
+        //DeclareInterfaceID(IMagFieldSvc, 1, 0);
 
         /** constructor */
         IMagFieldSvc() : m_solenoidCurrent(0.0), m_toroidCurrent(0.0) {;}
@@ -42,12 +43,12 @@ namespace MagField {
         virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const = 0;
 
         /** a getField() wrapper for Amg classes */
-        void getField(const Amg::Vector3D *xyz, Amg::Vector3D *bxyz) const {
-          getField( xyz->data(), bxyz->data(), nullptr );
-        }
-        void getField(const Amg::Vector3D *xyz, Amg::Vector3D *bxyz, Amg::RotationMatrix3D *deriv) const {
-          getField( xyz->data(), bxyz->data(), deriv->data() );
-        }
+        //void getField(const Amg::Vector3D *xyz, Amg::Vector3D *bxyz) const {
+        //  getField( xyz->data(), bxyz->data(), nullptr );
+        //}
+        //void getField(const Amg::Vector3D *xyz, Amg::Vector3D *bxyz, Amg::RotationMatrix3D *deriv) const {
+        //  getField( xyz->data(), bxyz->data(), deriv->data() );
+        //}
 
         /** get B field value on the z-r plane at given position */
         /** works only inside the solenoid; otherwise calls getField() above */
@@ -56,10 +57,10 @@ namespace MagField {
         virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const = 0;
 
         /** status of the magnets */
-        bool solenoidOn() const { return solenoidCurrent() > 0.0; }
-        bool toroidOn() const   { return toroidCurrent()   > 0.0; }
-        float solenoidCurrent() const { return m_solenoidCurrent; }
-        float toroidCurrent() const   { return m_toroidCurrent;   }
+        bool solenoidOn() const { return getSolenoidCurrent() > 0.0; }
+        bool toroidOn() const   { return getToroidCurrent()   > 0.0; }
+        float getSolenoidCurrent() const { return m_solenoidCurrent; }
+        float getToroidCurrent() const   { return m_toroidCurrent;   }
 
     protected:
         void setSolenoidCurrent(float current) { m_solenoidCurrent = current; }

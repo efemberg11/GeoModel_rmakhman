@@ -12,6 +12,8 @@ set(CMAKE_CXX_EXTENSIONS ON)
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+add_subdirectory(MagneticField)
+
 # Dependencies.
 ## GeoModel dependencies.
 find_package( GeoModelCore REQUIRED )

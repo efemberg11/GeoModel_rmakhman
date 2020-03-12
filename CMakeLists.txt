@@ -20,7 +20,6 @@ find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
 find_package( nlohmann_json )
 find_package( XercesC REQUIRED )
-find_package( Eigen3 )
 
 # Set up the build of the libraries of the project.
 add_subdirectory( XMLParser )

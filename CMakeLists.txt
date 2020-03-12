@@ -15,11 +15,13 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
+# Set up the "optional" dependencies.
+include( SetupXercesC )
+
 # Find the externals needed by the project.
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
 find_package( nlohmann_json )
-find_package( XercesC REQUIRED )
 
 # Set up the build of the libraries of the project.
 add_subdirectory( XMLParser )

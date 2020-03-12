@@ -16,6 +16,9 @@ source_group( "src" FILES ${SOURCES} )
 set_target_properties( XMLParser PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
+if( GEOMODEL_USE_BUILTIN_XERCESC )
+   add_dependencies( XMLParser XercesC )
+endif()
 
 # Install the library.
 install( TARGETS XMLParser

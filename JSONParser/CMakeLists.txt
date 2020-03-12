@@ -6,11 +6,7 @@ file( GLOB HEADERS JSONParser/*.h )
 
 # Create the library.
 add_library( JSONParser SHARED ${HEADERS} ${SOURCES} )
-if( nlohmann_json_FOUND )
-   target_link_libraries( JSONParser PUBLIC nlohmann_json::nlohmann_json )
-else()
-   message( WARNING "'nlohmann_json' not found by CMake! The build may fail." )
-endif()
+target_link_libraries( JSONParser PUBLIC nlohmann_json::nlohmann_json )
 target_include_directories( JSONParser PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
@@ -19,6 +15,9 @@ source_group( "src" FILES ${SOURCES} )
 set_target_properties( JSONParser PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
+if( GEOMODEL_USE_BUILTIN_JSON )
+   add_dependencies( JSONParser JSON )
+endif()
 
 # Install the library.
 install( TARGETS JSONParser

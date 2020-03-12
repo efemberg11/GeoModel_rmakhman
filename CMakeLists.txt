@@ -17,11 +17,11 @@ include( GNUInstallDirs )
 
 # Set up the "optional" dependencies.
 include( SetupXercesC )
+include( SetupJSON )
 
 # Find the externals needed by the project.
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
-find_package( nlohmann_json )
 
 # Set up the build of the libraries of the project.
 add_subdirectory( XMLParser )

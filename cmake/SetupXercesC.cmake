@@ -22,6 +22,8 @@ if( GEOMODEL_USE_BUILTIN_XERCESC )
       "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/XercesCInstall/${CMAKE_INSTALL_LIBDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}xerces-c${CMAKE_SHARED_LIBRARY_SUFFIX}" )
    set( XercesC_LIBRARIES "${XercesC_LIBRARY}" )
 
+   # Create the include directory already, otherwise CMake refuses to
+   # create the imported target.
    file( MAKE_DIRECTORY "${XercesC_INCLUDE_DIR}" )
 
    # Build/install Eigen3 using ExternalProject_Add(...).

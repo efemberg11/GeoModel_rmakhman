@@ -7,7 +7,7 @@ stages:
 
 # Common setup for the CI Docker images.
 before_script:
-  - yum -y install glibc-devel which git make
+  - yum -y install glibc-devel which git make gmp-devel
   - set +e && source CI/setup_lcg.sh; set -e
 
 # Build the upstream project(s) needed by this one.

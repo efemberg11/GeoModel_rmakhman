@@ -21,10 +21,10 @@ before_script:
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
     - mkdir GeoModelCore-build GeoModelIO-build
     - cd GeoModelCore-build/
-    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install ../GeoModelCore/
+    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install ${CMAKE_EXTRA_FLAGS} ../GeoModelCore/
     - cmake --build . --target install
     - cd ../GeoModelIO-build/
-    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ../GeoModelIO/
+    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ${CMAKE_EXTRA_FLAGS} ../GeoModelIO/
     - cmake --build . --target install
   artifacts:
     paths:
@@ -38,6 +38,18 @@ dependencies:centos7:
   <<: *dependencies_template
   image: cern/cc7-base:latest
 
+dependencies:slc6-standalone:
+  <<: *dependencies_template
+  image: cern/slc6-base:latest
+  variables:
+    CMAKE_EXTRA_FLAGS: -DCMAKE_USE_BUILTIN_EIGEN=TRUE
+
+dependencies:centos7-standalone:
+  <<: *dependencies_template
+  image: cern/cc7-base:latest
+  variables:
+    CMAKE_EXTRA_FLAGS: -DCMAKE_USE_BUILTIN_EIGEN=TRUE
+
 # Build this project.
 .build_template: &build_template
   stage: build
@@ -47,7 +59,7 @@ dependencies:centos7:
   script:
     - mkdir build
     - cd build/
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ../
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ${CMAKE_EXTRA_FLAGS} ../
     - cmake --build .
 
 build:slc6:
@@ -61,3 +73,19 @@ build:centos7:
   image: cern/cc7-base:latest
   dependencies:
     - dependencies:centos7
+
+build:slc6-standalone:
+  <<: *build_template
+  image: cern/slc6-base:latest
+  dependencies:
+    - dependencies:slc6-standalone
+  variables:
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE
+
+build:centos7-standalone:
+  <<: *build_template
+  image: cern/cc7-base:latest
+  dependencies:
+    - dependencies:centos7-standalone
+  variables:
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE

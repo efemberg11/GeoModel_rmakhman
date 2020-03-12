@@ -24,16 +24,40 @@ before_script:
     - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install ../GeoModelCore/
     - cmake --build . --target install
     - cd ../GeoModelIO-build/
-    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=../dependencies-install ../GeoModelIO/
+    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ../GeoModelIO/
     - cmake --build . --target install
   artifacts:
     paths:
       - dependencies-install/
 
-slc6_dependencies:
+dependencies:slc6:
   <<: *dependencies_template
   image: cern/slc6-base:latest
 
-centos7_dependencies:
+dependencies:centos7:
   <<: *dependencies_template
   image: cern/cc7-base:latest
+
+# Build this project.
+.build_template: &build_template
+  stage: build
+  tags:
+    - docker
+    - cvmfs
+  script:
+    - mkdir build
+    - cd build/
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ../
+    - cmake --build .
+
+build:slc6:
+  <<: *build_template
+  image: cern/slc6-base:latest
+  dependencies:
+    - dependencies:slc6
+
+build:centos7:
+  <<: *build_template
+  image: cern/cc7-base:latest
+  dependencies:
+    - dependencies:centos7

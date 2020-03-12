@@ -1,0 +1,39 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+# List of the CI build stages.
+stages:
+  - dependencies
+  - build
+
+# Common setup for the CI Docker images.
+before_script:
+  - yum -y install glibc-devel which git
+  - set +e && source CI/setup_lcg.sh; set -e
+
+# Build the upstream project(s) needed by this one.
+.dependencies_template: &dependencies_template
+  stage: dependencies
+  tags:
+    - docker
+    - cvmfs
+  script:
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - mkdir GeoModelCore-build GeoModelIO-build
+    - cd GeoModelCore-build/
+    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install ../GeoModelCore/
+    - cmake --build . --target install
+    - cd ../GeoModelIO-build/
+    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=../dependencies-install ../GeoModelIO/
+    - cmake --build . --target install
+  artifacts:
+    paths:
+      - dependencies-install/
+
+slc6_dependencies:
+  <<: *dependencies_template
+  image: cern/slc6-base:latest
+
+centos7_dependencies:
+  <<: *dependencies_template
+  image: cern/cc7-base:latest

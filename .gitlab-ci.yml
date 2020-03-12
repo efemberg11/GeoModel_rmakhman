@@ -42,13 +42,13 @@ dependencies:slc6-standalone:
   <<: *dependencies_template
   image: cern/slc6-base:latest
   variables:
-    CMAKE_EXTRA_FLAGS: -DCMAKE_USE_BUILTIN_EIGEN=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_EIGEN=TRUE
 
 dependencies:centos7-standalone:
   <<: *dependencies_template
   image: cern/cc7-base:latest
   variables:
-    CMAKE_EXTRA_FLAGS: -DCMAKE_USE_BUILTIN_EIGEN=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_EIGEN=TRUE
 
 # Build this project.
 .build_template: &build_template

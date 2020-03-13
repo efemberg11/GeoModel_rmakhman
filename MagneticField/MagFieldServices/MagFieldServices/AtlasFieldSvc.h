@@ -31,7 +31,7 @@
 // forward declarations
 //class CondAttrListCollection;
 class BFieldZone;
-//class TFile;
+class TFile;
 //class Incident;
 
 namespace MagField {
@@ -67,16 +67,8 @@ namespace MagField {
       /** get B field value at given position */
       /** xyz[3] is in mm, bxyz[3] is in kT */
       /** if deriv[9] is given, field derivatives are returned in kT/mm */
-      //virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
-      //virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
-        virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const  final;
-        virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const  final;
-        
-//        void   setToroidCurrent (double current)   { m_toroidCurrent = current; }
-//        void   setSolenoidCurrent (double current) { m_solenoidCurrent = current; }
-//        double getToroidCurrent()   { return m_toroidCurrent; }
-//        double getSolenoidCurrent() { return m_solenoidCurrent; }
-        
+      virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
+      virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
         
     private:
       /** Retrieve, initialize and return a thread-local storage object */
@@ -109,9 +101,16 @@ namespace MagField {
       // read the field map from an ASCII or ROOT file
       bool readMap( const char* filename );
       bool readMap( std::istream& input );
-      //bool readMap( TFile* rootfile );
+      bool readMap( TFile* rootfile );
       // write the field map to a ROOT file
-      //void writeMap( TFile* rootfile ) const;
+      void writeMap( TFile* rootfile ) const;
+      // translate the map from root file into ascii file and write it out
+      bool translateMap (std::string inFile,
+                           std::string outFile,
+                           std::string outTreeName,
+                           bool        rz,
+                           double      bScalor = 1.,
+                           double      lScalor = 1.) const;
       // clear the field map
       void clearMap(AtlasFieldSvcTLS &tls);
 

@@ -7,8 +7,8 @@
 #include <sstream>
 #include <string>
 
-#include "JSONParser/handlerStore.h"
-#include "JSONParser/JSONHandler.h"
+#include "GeoModelJSONParser/handlerStore.h"
+#include "GeoModelJSONParser/JSONHandler.h"
 
 using json = nlohmann::json;
 

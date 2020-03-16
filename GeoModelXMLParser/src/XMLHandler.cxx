@@ -2,8 +2,8 @@
   Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "XMLParser/XMLHandler.h"
-#include "XMLParser/XMLHandlerStore.h"
+#include "GeoModelXMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandlerStore.h"
 
 #include "ExpressionEvaluator/ExpressionEvaluator.h"
 

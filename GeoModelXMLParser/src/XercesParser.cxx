@@ -4,9 +4,9 @@
 
 #include <iostream>
 
-#include "XMLParser/XercesParser.h"
-#include "XMLParser/XMLHandler.h"
-#include "XMLParser/XMLHandlerStore.h"
+#include "GeoModelXMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandlerStore.h"
 
 #include "xercesc/util/PlatformUtils.hpp"
 #include "xercesc/util/XMLException.hpp"

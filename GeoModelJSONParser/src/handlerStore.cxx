@@ -1,5 +1,5 @@
-#include "JSONParser/handlerStore.h"
-#include "JSONParser/JSONHandler.h"
+#include "GeoModelJSONParser/handlerStore.h"
+#include "GeoModelJSONParser/JSONHandler.h"
 
 handlerStore* handlerStore::getHandlerStore() 
 {

@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.1 )
 
 # Set up the project.
-project( "XMLParser" VERSION 1.0.0 LANGUAGES CXX )
+project( "GeoModelXMLParser" VERSION 1.0.0 LANGUAGES CXX )
 
 find_package( GeoModelCore REQUIRED )
 find_package( XercesC REQUIRED )
@@ -17,33 +17,33 @@ include( GNUInstallDirs )
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
-file( GLOB HEADERS XMLParser/*.h )
+file( GLOB HEADERS GeoModelXMLParser/*.h )
 
 # Create the library.
-add_library( XMLParser SHARED ${HEADERS} ${SOURCES} )
-set_property( TARGET XMLParser
+add_library( GeoModelXMLParser SHARED ${HEADERS} ${SOURCES} )
+set_property( TARGET GeoModelXMLParser
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( XMLParser PUBLIC ExpressionEvaluator XercesC::XercesC GeoModelCore::GeoModelKernel )
-target_include_directories( XMLParser SYSTEM PUBLIC )
-target_include_directories( XMLParser PUBLIC
+target_link_libraries( GeoModelXMLParser PUBLIC ExpressionEvaluator XercesC::XercesC GeoModelCore::GeoModelKernel )
+target_include_directories( GeoModelXMLParser SYSTEM PUBLIC )
+target_include_directories( GeoModelXMLParser PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
-source_group( "XMLParser" FILES ${HEADERS} )
+source_group( "GeoModelXMLParser" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 
 # # Install the library.
-# install( TARGETS XMLParser
-#    EXPORT XMLParser
+# install( TARGETS GeoModelXMLParser
+#    EXPORT GeoModelXMLParser
 #    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/XMLParser )
+#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXMLParser )
 
 # Install a CMake description of the project/library.
-# install( EXPORT XMLParser DESTINATION cmake )
+# install( EXPORT GeoModelXMLParser DESTINATION cmake )
 
 
 # new test GeoModelCore
-install( TARGETS XMLParser EXPORT XMLParser-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/XMLParser )
+install( TARGETS GeoModelXMLParser EXPORT GeoModelXMLParser-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXMLParser )
 #
 # Version the shared library. (Please update when cutting a new release!)
 #
@@ -52,5 +52,5 @@ set(MYLIB_VERSION_MINOR 1)
 set(MYLIB_VERSION_PATCH 0)
 set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
 
-set_target_properties(XMLParser PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
+set_target_properties(GeoModelXMLParser PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
 

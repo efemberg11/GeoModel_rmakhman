@@ -46,6 +46,7 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
   fFieldValue          = 0.0;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
+  fReportFileName      = "gmclash_report.json";
 }
 
 MyDetectorConstruction::~MyDetectorConstruction()

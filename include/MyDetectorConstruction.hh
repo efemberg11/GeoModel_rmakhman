@@ -26,6 +26,7 @@ public:
   void SetGDMLFileName  (const G4String &gdmlfile)   { fGeometryFileName = gdmlfile;}
   void SetRunOverlapCheck(const bool runOvCheck) { fRunOverlapCheck = runOvCheck; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
+  void SetReportFileName(const G4String &reportFileName) { fReportFileName = reportFileName; }
 
   void SetMagFieldValue(const G4double fieldValue)
   {
@@ -59,6 +60,7 @@ private:
   //G4String fGDMLFileName;
   //G4String fSQLiteFileName;
   G4String fGeometryFileName;
+  G4String fReportFileName;
   G4double fFieldValue;
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;

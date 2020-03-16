@@ -31,7 +31,7 @@
 
 static G4String parMacroFileName = "macro.g4";
 static G4String geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01.db";
-static G4String outputFileName     = "gmclash_report";
+static G4String reportFileName     = "gmclash_report.json";
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     G4cout
     << " ===================  Running GeoModelClash =================== "      << G4endl
     << "   Geometry file name               =  " << geometryFileName         << G4endl
-    << "   Output clashes report file name  =  " << outputFileName           << G4endl
+    << "   Output clashes report file name  =  " << reportFileName           << G4endl
     << " ============================================================== "      << G4endl;
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
@@ -75,6 +75,7 @@ int main(int argc, char** argv) {
     detector->SetRunOverlapCheck(true);
         
     detector->SetGeometryFileName (geometryFileName);
+    detector->SetReportFileName (reportFileName);
     runManager->SetUserInitialization(detector);
   
 //    // 2. Physics list
@@ -153,7 +154,7 @@ void GetInputArguments(int argc, char** argv) {
      geometryFileName = optarg;
      break;
    case 'o':
-     outputFileName = optarg;
+     reportFileName = optarg;
      break;
    default:
      Help();

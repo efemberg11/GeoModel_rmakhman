@@ -33,10 +33,51 @@
 #include <QDebug>
 #include <QFileInfo>
 
+#include <nlohmann/json.hpp>
+
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 // ****
+using json = nlohmann::json;
+
+
+namespace clashdet {
+    enum typeOfClash{ withMother, withSister, fullyEncapsSister};
+    // a simple struct to model a clash detection erro
+    struct clash {
+        typeOfClash clashType;
+        std::string volume1Name;
+        std::string volume1CopyNo;
+        std::string volume1EntityType;
+        std::string volume2Name;
+        std::string volume2EntityType;
+        double x,y,z;
+        G4double distance;
+    };
+    
+    void to_json(json& j, const clash& p) {
+        j = json{{"typeOfClash", p.clashType}, {"volume1Name", p.volume1Name}, {"volume1CopyNo", p.volume1CopyNo}, {"volume1EntityType", p.volume1EntityType},{"volume2Name", p.volume2Name},{"volume2EntityType", p.volume2EntityType},{"x", p.x},{"y", p.y},{"z", p.z},{"distance", p.distance} };
+    }
+    
+    void from_json(const json& j, clash& p) {
+        j.at("clashType").get_to(p.clashType);
+        j.at("volume1Name").get_to(p.volume1Name);
+        j.at("volume1CopyNo").get_to(p.volume1CopyNo);
+        j.at("volume1EntityType").get_to(p.volume1EntityType);
+        j.at("volume2Name").get_to(p.volume2Name);
+        j.at("volume2EntityType").get_to(p.volume2EntityType);
+        j.at("x").get_to(p.x);
+        j.at("y").get_to(p.y);
+        j.at("z").get_to(p.z);
+        j.at("distance").get_to(p.distance);
+ 
+    }
+} // namespace clashdet
+
+
+
+
 
 G4double MyDetectorConstruction::gFieldValue = 0.0;
 
@@ -69,9 +110,12 @@ void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope){
     }
 }
 
-bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int res, G4double tol,
-                                           G4bool verbose, G4int maxErr)
+bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int res, G4double tol,G4bool verbose, G4int maxErr)
 {
+  
+        std::ofstream o(fReportFileName);
+        clashdet::clash singleClash;
+        json jSingleClash;
     
         if (res <= 0) { return false; }
         G4VSolid* solid = volume->GetLogicalVolume()->GetSolid();
@@ -108,7 +152,9 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                         "GeomVol1002", JustWarning, message);
             return false;
         }
-        
+    
+    
+    
         // Generate random points on the surface of the solid,
         // transform them into the mother volume coordinate system
         // and find the bonding box
@@ -150,6 +196,25 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                 << "          at mother local point " << mp << ", "
                 << "overlapping by at least: "
                 << G4BestUnit(distin, "Length");
+                
+                //fill the singleClash struct
+                //singleClash.clashType = 'withMother';
+                singleClash.volume1Name=volume->GetName();
+                singleClash.volume1EntityType=solid->GetEntityType();
+                singleClash.volume1CopyNo =volume->GetCopyNo();
+                singleClash.volume2Name =  motherLog->GetName();
+                singleClash.volume2EntityType = motherSolid->GetEntityType();
+                singleClash.x = mp[0];
+                singleClash.y = mp[1];
+                singleClash.z = mp[2];
+                singleClash.distance = distin;
+                
+                //write the singleClash in the json file
+                to_json(jSingleClash, singleClash);
+                // write prettified JSON to another file
+                o << std::setw(4) << jSingleClash << std::endl;
+
+            
                 if (trials >= maxErr)
                 {
                     message << G4endl
@@ -273,6 +338,24 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                 << "          local point " << plocal << ", "
                 << "overlapping by at least: "
                 << G4BestUnit(distout, "Length");
+                
+                //fill the singleClash struct
+                //singleClash.clashType = 'withDaughter';
+                singleClash.volume1Name=volume->GetName();
+                singleClash.volume1EntityType=solid->GetEntityType();
+                singleClash.volume1CopyNo =volume->GetCopyNo();
+                singleClash.volume2Name =  daughter->GetName();
+                singleClash.volume2EntityType = daughterSolid->GetEntityType();
+                singleClash.x = plocal[0];
+                singleClash.y = plocal[1];
+                singleClash.z = plocal[2];
+                singleClash.distance = distout;
+                
+                //write the singleClash in the json file
+                to_json(jSingleClash, singleClash);
+                // write prettified JSON to another file
+                o << std::setw(4) << jSingleClash << std::endl;
+                
                 if (trials >= maxErr)
                 {
                     message << G4endl
@@ -311,6 +394,24 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                     << daughter->GetName() << ':' << daughter->GetCopyNo()
                     << " (" << daughterSolid->GetEntityType() << ")"
                     << " at the same level !";
+                    
+                    //fill the singleClash struct
+                    //singleClash.clashType = 'withDaughter';
+                    singleClash.volume1Name=volume->GetName();
+                    singleClash.volume1EntityType=solid->GetEntityType();
+                    singleClash.volume1CopyNo =volume->GetCopyNo();
+                    singleClash.volume2Name =  daughter->GetName();
+                    singleClash.volume2EntityType = daughterSolid->GetEntityType();
+//                    singleClash.x = plocal[0];
+//                    singleClash.y = plocal[1];
+//                    singleClash.z = plocal[2];
+//                    singleClash.distance = distout;
+                    //write the singleClash in the json file
+                    to_json(jSingleClash, singleClash);
+                    // write prettified JSON to another file
+                    o << std::setw(4) << jSingleClash << std::endl;
+                    
+                    
                     if (trials >= maxErr)
                     {
                         message << G4endl
@@ -325,6 +426,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
         }
         
         if (verbose && trials == 0) { G4cout << "OK! " << G4endl; }
+        o.close();
         return retval;
 }
 

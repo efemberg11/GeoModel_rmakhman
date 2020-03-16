@@ -9,7 +9,7 @@
 #include "GeoMatComponentHandler.h"
 #include "GeoNamespaceHandler.h"
 
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/Units.h"

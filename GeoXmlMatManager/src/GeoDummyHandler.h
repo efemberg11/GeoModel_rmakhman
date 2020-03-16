@@ -5,7 +5,7 @@
 #ifndef GEOMODELSVC_GEODUMMYHANDLER_H
 #define GEOMODELSVC_GEODUMMYHANDLER_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class GeoDummyHandler : public XMLHandler {

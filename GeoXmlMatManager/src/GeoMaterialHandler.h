@@ -5,7 +5,7 @@
 #ifndef GEOMODELSVC_GEOMATERIALHANDLER_H
 #define GEOMODELSVC_GEOMATERIALHANDLER_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class GeoXmlMatManager;

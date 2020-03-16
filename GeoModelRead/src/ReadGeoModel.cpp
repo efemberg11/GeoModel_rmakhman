@@ -72,7 +72,7 @@ using namespace GeoXF;
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(true)
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false)
 {
 	qDebug() << "===> DumpGeoModelAction: constructor";
 
@@ -88,7 +88,7 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 	// set the geometry file
 	m_dbManager = db;
 	if (m_dbManager->isOpen()) {
-		qDebug() << "OK! Database is open!";
+	  if (m_deepDebug) qDebug() << "OK! Database is open!";
 	}
 	else {
 		qWarning() << "ERROR!! Database is NOT open!";
@@ -103,7 +103,7 @@ ReadGeoModel::~ReadGeoModel() {
 
 GeoPhysVol* ReadGeoModel::buildGeoModel()
 {
-	qDebug() << "ReadGeoModel::buildGeoModel()";
+  if (m_deepDebug) qDebug() << "ReadGeoModel::buildGeoModel()";
 
 	// return buildGeoModelByCalls();
 	GeoPhysVol* rootVolume = buildGeoModelOneGo();
@@ -122,48 +122,33 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 
 GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 {
-	qDebug() << "ReadGeoModel::buildGeoModelOneGo()";
+  if (m_deepDebug) qDebug() << "ReadGeoModel::buildGeoModelOneGo()";
 
 	// get all objects from the DB
 	m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
-	std::cout << "GeoPhysVol, loaded." << std::endl;
 	m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
-	std::cout << "GeoFullPhysVol, loaded." << std::endl;
 	m_logVols = m_dbManager->getTableFromNodeType("GeoLogVol");
-	std::cout << "GeoLogVol, loaded." << std::endl;
 	m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
-	std::cout << "GeoShape, loaded." << std::endl;
 	m_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
-	std::cout << "GeoMaterial, loaded." << std::endl;
 	m_elements = m_dbManager->getTableFromNodeType("GeoElement");
-	std::cout << "GeoElement, loaded." << std::endl;
 	m_functions = m_dbManager->getTableFromNodeType("Function");
-	std::cout << "Function, loaded." << std::endl;
 	m_serialDenominators = m_dbManager->getTableFromNodeType("GeoSerialDenominator");
-	std::cout << "GeoSerialDenominator, loaded." << std::endl;
 	m_serialTransformers = m_dbManager->getTableFromNodeType("GeoSerialTransformer");
-	std::cout << "GeoSerialTransformer, loaded." << std::endl;
 	m_alignableTransforms = m_dbManager->getTableFromNodeType("GeoAlignableTransform");
-	std::cout << "GeoAlignableTransform, loaded." << std::endl;
 	m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
-	std::cout << "GeoTransform, loaded." << std::endl;
 	m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
-	std::cout << "GeoNameTag, loaded." << std::endl;
 	// qDebug() << "physVols: " << _physVols;
 	// qDebug() << "fullPhysVols: " << _fullPhysVols;
 
 	// get DB metadata
 	m_tableid_tableName = m_dbManager->getAll_TableIDsNodeTypes();
-	std::cout << "DB metadata, loaded." << std::endl;
 
 	// get the children table from DB
 	m_allchildren = m_dbManager->getChildrenTable();
 	// qDebug() << "all children from DB:" << _allchildren;
-	std::cout << "children positions, loaded." << std::endl;
 
 	// get the root volume data
 	m_root_vol_data = m_dbManager->getRootPhysVol();
-	std::cout << "root volume data, loaded." << std::endl;
 
 	return loopOverAllChildren();
 }
@@ -432,7 +417,7 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildMaterial()";
 	QStringList values = m_materials[id.toUInt()];
 
-	qDebug() << "mat values=" << values;
+	if (m_deepDebug) qDebug() << "mat values=" << values;
 	QString matId = values[0];
 	QString matName = values[1];
 	double matDensity = values[2].toDouble();
@@ -451,7 +436,7 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 		QStringList elements = matElements.split(";");
 		foreach( QString par, elements) {
 
-			qDebug() << "par:" << par;
+		  if (m_deepDebug) qDebug() << "par:" << par;
 			QStringList vars = par.split(":");
 			QString elId = vars[0];
 			double elFraction = vars[1].toDouble();

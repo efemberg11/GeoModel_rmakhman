@@ -37,7 +37,16 @@ public:
   static G4double GetFieldValue() { return gFieldValue; }
     
   void RecursivelyCheckOverlap(G4LogicalVolume* envelope);
-  GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
+  bool myCheckOverlaps(G4VPhysicalVolume* volume, G4int res = 1000, G4double tol = 0., G4bool verbose = true, G4int maxErr = 1);
+    // Verifies if the placed volume is overlapping with existing
+    // daughters or with the mother volume. Provides default resolution
+    // for the number of points to be generated and verified.
+    // A tolerance for the precision of the overlap check can be specified,
+    // by default it is set to maximum precision.
+    // Reports a maximum of overlaps errors according to parameter in input.
+    // Returns true if the volume is overlapping.
+  
+    GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
 
 protected:
   G4Timer fTimer;

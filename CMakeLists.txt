@@ -102,7 +102,6 @@ endif()
 #ROOT_GENERATE_DICTIONARY(G__geantinoMaps ${headers} LINKDEF geantinoMapsLinkDef.h)
 
 
-
 #----------------------------------------------------------------------------
 # Copy all scripts to the build/OUTPUT directory. This is so that, after
 # install, we can run the executable directly because it relies on these

@@ -71,9 +71,9 @@ BFieldCacheZR::getB( const double *xyz, double r, double *B, double *deriv ) con
         invr = 0.0;
     }
     float c(x*invr);
-    float s(y*invr);
+    float es(y*invr);
     B[0] = Bzr[1]*c;
-    B[1] = Bzr[1]*s;
+    B[1] = Bzr[1]*es;
     B[2] = Bzr[0];
 
     // compute field derivatives if requested
@@ -86,18 +86,18 @@ BFieldCacheZR::getB( const double *xyz, double r, double *B, double *deriv ) con
         }
         // convert to cartesian coordinates
         float cc = c*c;
-        float cs = c*s;
-        float ss = s*s;
-        float sinvr = s*invr;
+        float cs = c*es;
+        float ss = es*es;
+        float sinvr = es*invr;
         float cinvr = c*invr;
         deriv[0] = cc*dBdr[1] + sinvr*B[1];
         deriv[1] = cs*dBdr[1] - cinvr*B[1];
         deriv[2] = c*dBdz[1];
         deriv[3] = cs*dBdr[1] - sinvr*B[0];
         deriv[4] = ss*dBdr[1] + cinvr*B[0];
-        deriv[5] = s*dBdz[1];
+        deriv[5] = es*dBdz[1];
         deriv[6] = c*dBdr[0];
-        deriv[7] = s*dBdr[0];
+        deriv[7] = es*dBdr[0];
         deriv[8] = dBdz[0];
     }
 }

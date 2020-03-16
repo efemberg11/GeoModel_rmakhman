@@ -172,20 +172,20 @@ bool MagField::AtlasFieldSvc::initialize()
     return true;
 }
 
-//void MagField::AtlasFieldSvc::handle(const Incident& runIncident)
-//{
-//    std::cout<< "handling incidents ..." << std::endl;
-//    if ( !m_useDCS && runIncident.type() == IncidentType::BeginRun) {
-//        // get thread-local storage
-//        AtlasFieldSvcTLS &tls = getAtlasFieldSvcTLS();
-//
-//        if ( importCurrents(tls).isFailure() ) {
-//            //ATH_MSG_FATAL( "Failure in manual setting of currents" );
-//        } else {
-//            std::cout<< "BeginRun incident handled" << std::endl;
-//    }
-//    }
-//    std::cout<< "incidents handled successfully" << std::endl;
+void MagField::AtlasFieldSvc::handle()
+{
+   // get thread-local storage
+   AtlasFieldSvcTLS &tls = getAtlasFieldSvcTLS();
+   if (! importCurrents(tls))
+   {
+       std::cout<< "Failure in manual setting of currents" <<std::endl;
+       
+   } else{
+       
+       std::cout<< "Currents imported successfully" << std::endl;
+       
+   }
+}
 
 bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
 {

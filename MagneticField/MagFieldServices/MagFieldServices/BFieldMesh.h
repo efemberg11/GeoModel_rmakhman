@@ -211,37 +211,36 @@ void BFieldMesh<T>::getB( const double *xyz, double *B, double* deriv ) const
     }
     // convert (Bz,Br,Bphi) to (Bx,By,Bz)
     double c = (r>0.0) ? x/r : cos(mphi[iphi]);
-    double s = (r>0.0) ? y/r : sin(mphi[iphi]);
-    B[0] = Bzrphi[1]*c - Bzrphi[2]*s;
-    B[1] = Bzrphi[1]*s + Bzrphi[2]*c;
+    double es = (r>0.0) ? y/r : sin(mphi[iphi]);
+    B[0] = Bzrphi[1]*c - Bzrphi[2]*es;
+    B[1] = Bzrphi[1]*es + Bzrphi[2]*c;
     B[2] = Bzrphi[0];
 
     // compute field derivatives if requested
     if ( deriv ) {
         double sz = m_scale/(mz[iz+1]-mz[iz]);
-        double sr = m_scale/(mr[ir+1]-mr[ir]);
+        double esr = m_scale/(mr[ir+1]-mr[ir]);
         double sphi = m_scale/(mphi[iphi+1]-mphi[iphi]);
         double dBdz[3], dBdr[3], dBdphi[3];
         for ( int j = 0; j < 3; j++ ) { // Bz, Br, Bphi components
             dBdz[j]   = sz*( gr*( gphi*(field[4][j]-field[0][j]) + fphi*(field[5][j]-field[1][j]) ) +
                              fr*( gphi*(field[6][j]-field[2][j]) + fphi*(field[7][j]-field[3][j]) ) );
-            dBdr[j]   = sr*( gz*( gphi*(field[2][j]-field[0][j]) + fphi*(field[3][j]-field[1][j]) ) +
+            dBdr[j]   = esr*( gz*( gphi*(field[2][j]-field[0][j]) + fphi*(field[3][j]-field[1][j]) ) +
                              fz*( gphi*(field[6][j]-field[4][j]) + fphi*(field[7][j]-field[5][j]) ) );
             dBdphi[j] = sphi*( gz*( gr*(field[1][j]-field[0][j]) + fr*(field[3][j]-field[2][j]) ) +
                                fz*( gr*(field[5][j]-field[4][j]) + fr*(field[7][j]-field[6][j]) ) );
         }
         // convert to cartesian coordinates
         double cc = c*c;
-        double cs = c*s;
-        double ss = s*s;
-        deriv[0] = cc*dBdr[1] - cs*dBdr[2] - cs*dBdphi[1]/r + ss*dBdphi[2]/r + s*B[1]/r;
+        double cs = c*es;
+        double ss = es*es;
+        deriv[0] = cc*dBdr[1] - cs*dBdr[2] - cs*dBdphi[1]/r + ss*dBdphi[2]/r + es*B[1]/r;
         deriv[1] = cs*dBdr[1] - ss*dBdr[2] + cc*dBdphi[1]/r - cs*dBdphi[2]/r - c*B[1]/r;
-        deriv[2] = c*dBdz[1] - s*dBdz[2];
-        deriv[3] = cs*dBdr[1] + cc*dBdr[2] - ss*dBdphi[1]/r - cs*dBdphi[2]/r - s*B[0]/r;
-        deriv[4] = ss*dBdr[1] + cs*dBdr[2] + cs*dBdphi[1]/r + cc*dBdphi[2]/r + c*B[0]/r;
-        deriv[5] = s*dBdz[1] + c*dBdz[2];
-        deriv[6] = c*dBdr[0] - s*dBdphi[0]/r;
-        deriv[7] = s*dBdr[1] + c*dBdphi[0]/r;
+        deriv[2] = c*dBdz[1] - es*dBdz[2];
+        deriv[3] = cs*dBdr[1] + cc*dBdr[2] - ss*dBdphi[1]/r - cs*dBdphi[2]/r - es*B[0]/r;
+        deriv[5] = es*dBdz[1] + c*dBdz[2];
+        deriv[6] = c*dBdr[0] - es*dBdphi[0]/r;
+        deriv[7] = es*dBdr[1] + c*dBdphi[0]/r;
         deriv[8] = dBdz[0];
     }
     return;
@@ -268,10 +267,10 @@ void BFieldMesh<T>::buildLUT()
         q = width/(n+0.5);
         m_invUnit[j] = 1.0/q; // new unit size
         n++;
-        int m = 0; // mesh number
+        int m_number = 0; // mesh number
         for ( int i = 0; i < n; i++ ) { // LUT index
-            if ( i*q + m_mesh[j].front() > m_mesh[j][m+1] ) m++;
-            m_LUT[j].push_back(m);
+            if ( i*q + m_mesh[j].front() > m_mesh[j][m_number+1] ) m_number++;
+            m_LUT[j].push_back(m_number);
         }
     }
     m_roff = m_mesh[2].size();       // index offset for incrementing r by 1

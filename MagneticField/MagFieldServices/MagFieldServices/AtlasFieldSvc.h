@@ -56,7 +56,7 @@ namespace MagField {
         virtual bool  finalize() ;
 
       /** Read **/
-      //virtual void handle(const Incident& runIncident) override;
+      virtual void handle();
 
       /** Call back for possible magnet current update **/
       //StatusCode updateCurrent(IOVSVC_CALLBACK_ARGS);
@@ -146,14 +146,14 @@ namespace MagField {
       //bool m_useMapsFromCOOL;
       // COOL folder name containing field maps
       //std::string m_coolMapsFolderName;
-      // actual current if DCS is not in use
+        // actual current if DCS is not in use
       double m_useSoleCurrent; // solenoid current in A
       double m_useToroCurrent; // toroid current in A
       // flag to skip current rescale and use map currents as they are
       bool m_lockMapCurrents;
         
-      double m_toroidCurrent;
-      double m_solenoidCurrent;
+//      double m_toroidCurrent;
+//      double m_solenoidCurrent;
 
       // handle for COOL field map filenames
       //const DataHandle<CondAttrListCollection> m_mapHandle;

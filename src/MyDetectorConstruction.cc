@@ -63,6 +63,8 @@
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
+#include "MagFieldServices/AtlasFieldSvc.h"
+#include "StandardFieldSvc.h"
 
 #include <QCoreApplication>
 #include <QString>
@@ -772,7 +774,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
             G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0001", FatalException, ed);
         }
         G4cout << "Detector Construction from the GDML file " << fGeometryFileName.data() <<", done!"<<G4endl;
-        // ConstructSDandField();
+        
         
     }
     else{
@@ -804,24 +806,26 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
         exit(0);
     }
+    G4cout<<"Building Magnetic Field."<<G4endl;
+    ConstructSDandField();
     
     return fWorld;
 }
 
 void MyDetectorConstruction::ConstructSDandField()
 {
-  if (std::abs(fFieldValue) > 0.0) {
-    // Apply a global uniform magnetic field along the Z axis.
-    // Notice that only if the magnetic field is not zero, the Geant4
-    // transportion in field gets activated.
-    auto uniformMagField     = new G4UniformMagField(G4ThreeVector(0.0, 0.0, fFieldValue));
-    G4FieldManager *fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-    fieldMgr->SetDetectorField(uniformMagField);
-    fieldMgr->CreateChordFinder(uniformMagField);
-    G4cout << G4endl << " *** SETTING MAGNETIC FIELD : fieldValue = " << fFieldValue / tesla << " Tesla *** " << G4endl
-           << G4endl;
-
-  } else {
+//  if (std::abs(fFieldValue) > 0.0) {
+//    // Apply a global uniform magnetic field along the Z axis.
+//    // Notice that only if the magnetic field is not zero, the Geant4
+//    // transportion in field gets activated.
+//    auto uniformMagField     = new G4UniformMagField(G4ThreeVector(0.0, 0.0, fFieldValue));
+//    G4FieldManager *fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+//    fieldMgr->SetDetectorField(uniformMagField);
+//    fieldMgr->CreateChordFinder(uniformMagField);
+//    G4cout << G4endl << " *** SETTING MAGNETIC FIELD : fieldValue = " << fFieldValue / tesla << " Tesla *** " << G4endl
+//           << G4endl;
+//
+//  } else {
 //      G4FieldManager * fieldMgr = new G4FieldManager();
 //      // Retrieve the G4MagneticField
 //      //G4MagneticField* field = m_fieldSvc->getField();
@@ -840,16 +844,33 @@ void MyDetectorConstruction::ConstructSDandField()
 //      chordFinder->SetIntegrationDriver(driver);
 //#endif
 
-      G4MagneticField *magField;
-      magField = new G4QuadrupoleMagField( 1.*tesla/(1.*meter) );
-      G4FieldManager* fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-      fieldMgr->SetDetectorField(magField);
-      fieldMgr->CreateChordFinder(magField);
+//      G4MagneticField *magField;
+//      magField = new G4QuadrupoleMagField( 1.*tesla/(1.*meter) );
+//      G4FieldManager* fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+//      fieldMgr->SetDetectorField(magField);
+//      fieldMgr->CreateChordFinder(magField);
       
-    G4cout << G4endl << " *** NO MAGNETIC FIELD SET  *** " << G4endl << G4endl;
+      MagField::AtlasFieldSvc * atlasField = new MagField::AtlasFieldSvc("AtlasField");
+      //atlasField->setSolenoidCurrent(7730.);
+      //atlasField->setToroidCurrent(20400.);
+    
+      atlasField->handle();
+      std::cout<<"GetSolenoidCurrent: "<<atlasField->getSolenoidCurrent()<<std::endl;
+      std::cout<<"GetToroidCurrent:   "<<atlasField->getToroidCurrent()<<std::endl;
+    
+      G4FieldManager * fieldMgr = new G4FieldManager();
+      // Retrieve the G4MagneticField
+      //G4MagneticField* field = atlasField->getField();
+    
+      //fieldMgr->SetDetectorField(field);
+      //fieldMgr->CreateChordFinder(field);
+      StandardFieldSvc* myfield = new StandardFieldSvc;
+      //exit(-1);
+    
+      G4cout << G4endl << " *** MAGNETIC FIELD SET FROM FILE  *** " << G4endl << G4endl;
     
     
-  }
+  //}
 }
 //=============================================================================
 // Create the driver with a stepper

@@ -74,52 +74,52 @@ BFieldCache::getB( const double *xyz, double r, double phi, double *B, double *d
                                    fr*( gphi*field[6] + fphi*field[7] ) ) );
     }
     // convert (Bz,Br,Bphi) to (Bx,By,Bz)
-    float invr, c, s;
+    float invr, c, es;
     if ( r > 0.0 ) {
         invr = 1.0/r;
         c = x*invr;
-        s = y*invr;
+        es = y*invr;
     } else {
         invr = 0.0;
         c = cos(m_phimin);
-        s = sin(m_phimin);
+        es = sin(m_phimin);
     }
-    B[0] = Bzrphi[1]*c - Bzrphi[2]*s;
-    B[1] = Bzrphi[1]*s + Bzrphi[2]*c;
+    B[0] = Bzrphi[1]*c - Bzrphi[2]*es;
+    B[1] = Bzrphi[1]*es + Bzrphi[2]*c;
     B[2] = Bzrphi[0];
 
     // compute field derivatives if requested
     if ( deriv ) {
         float sz = m_scale*m_invz;
-        float sr = m_scale*m_invr;
+        float esr = m_scale*m_invr;
         float sphi = m_scale*m_invphi;
         float dBdz[3], dBdr[3], dBdphi[3];
         for ( int j = 0; j < 3; j++ ) { // Bz, Br, Bphi components
             const float *field = m_field[j];
             dBdz[j]   = sz*( gr*( gphi*(field[4]-field[0]) + fphi*(field[5]-field[1]) ) +
                              fr*( gphi*(field[6]-field[2]) + fphi*(field[7]-field[3]) ) );
-            dBdr[j]   = sr*( gz*( gphi*(field[2]-field[0]) + fphi*(field[3]-field[1]) ) +
+            dBdr[j]   = esr*( gz*( gphi*(field[2]-field[0]) + fphi*(field[3]-field[1]) ) +
                              fz*( gphi*(field[6]-field[4]) + fphi*(field[7]-field[5]) ) );
             dBdphi[j] = sphi*( gz*( gr*(field[1]-field[0]) + fr*(field[3]-field[2]) ) +
                                fz*( gr*(field[5]-field[4]) + fr*(field[7]-field[6]) ) );
         }
         // convert to cartesian coordinates
         float cc = c*c;
-        float cs = c*s;
-        float ss = s*s;
+        float cs = c*es;
+        float ss = es*es;
         float ccinvr = cc*invr;
         float csinvr = cs*invr;
         float ssinvr = ss*invr;
-        float sinvr = s*invr;
+        float sinvr = es*invr;
         float cinvr = c*invr;
         deriv[0] = cc*dBdr[1] - cs*dBdr[2] - csinvr*dBdphi[1] + ssinvr*dBdphi[2] + sinvr*B[1];
         deriv[1] = cs*dBdr[1] - ss*dBdr[2] + ccinvr*dBdphi[1] - csinvr*dBdphi[2] - cinvr*B[1];
-        deriv[2] = c*dBdz[1] - s*dBdz[2];
+        deriv[2] = c*dBdz[1] - es*dBdz[2];
         deriv[3] = cs*dBdr[1] + cc*dBdr[2] - ssinvr*dBdphi[1] - csinvr*dBdphi[2] - sinvr*B[0];
         deriv[4] = ss*dBdr[1] + cs*dBdr[2] + csinvr*dBdphi[1] + ccinvr*dBdphi[2] + cinvr*B[0];
-        deriv[5] = s*dBdz[1] + c*dBdz[2];
+        deriv[5] = es*dBdz[1] + c*dBdz[2];
         deriv[6] = c*dBdr[0] - sinvr*dBdphi[0];
-        deriv[7] = s*dBdr[0] + cinvr*dBdphi[0];
+        deriv[7] = es*dBdr[0] + cinvr*dBdphi[0];
         deriv[8] = dBdz[0];
     }
 }

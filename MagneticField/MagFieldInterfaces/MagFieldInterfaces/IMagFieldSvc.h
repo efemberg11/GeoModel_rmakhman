@@ -62,7 +62,7 @@ namespace MagField {
         float getSolenoidCurrent() const { return m_solenoidCurrent; }
         float getToroidCurrent() const   { return m_toroidCurrent;   }
 
-    protected:
+    //protected:
         void setSolenoidCurrent(float current) { m_solenoidCurrent = current; }
         void setToroidCurrent  (float current) { m_toroidCurrent   = current; }
 

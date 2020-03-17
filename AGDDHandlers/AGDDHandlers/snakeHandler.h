@@ -5,7 +5,7 @@
 #ifndef snakeHandler_H
 #define snakeHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 
 #include <string>
 

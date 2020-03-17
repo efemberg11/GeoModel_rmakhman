@@ -5,7 +5,7 @@
 #ifndef sectionHandler_H
 #define sectionHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class AGDDSection;

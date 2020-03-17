@@ -5,7 +5,7 @@
 #ifndef msgHandler_H
 #define msgHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class msgHandler:public XMLHandler {

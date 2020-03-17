@@ -5,7 +5,7 @@
 #ifndef aliasHandler_H
 #define aliasHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class aliasHandler:public XMLHandler {

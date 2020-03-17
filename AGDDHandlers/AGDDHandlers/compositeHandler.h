@@ -5,7 +5,7 @@
 #ifndef compositeHandler_H
 #define compositeHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class compositeHandler:public XMLHandler {

@@ -5,7 +5,7 @@
 #ifndef boxHandler_H
 #define boxHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class boxHandler:public XMLHandler {

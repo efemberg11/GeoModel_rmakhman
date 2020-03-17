@@ -5,7 +5,7 @@
 #ifndef consHandler_H
 #define consHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class consHandler:public XMLHandler {

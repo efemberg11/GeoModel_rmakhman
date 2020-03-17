@@ -5,7 +5,7 @@
 #ifndef addmaterialHandler_H
 #define addmaterialHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class addmaterialHandler:public XMLHandler {

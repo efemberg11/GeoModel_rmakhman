@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/aliasHandler.h"
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include "AGDDKernel/AliasStore.h"
 #include <iostream>
 

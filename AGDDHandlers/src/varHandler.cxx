@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/varHandler.h"
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <iostream>
 
 

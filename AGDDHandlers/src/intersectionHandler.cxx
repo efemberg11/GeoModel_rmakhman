@@ -4,7 +4,7 @@
 
 #include "AGDDHandlers/intersectionHandler.h"
 #include "AGDDModel/AGDDIntersection.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include <iostream>
 #include "AGDDKernel/AGDDPositioner.h"
 #include "AGDDKernel/AGDDVolumeStore.h"

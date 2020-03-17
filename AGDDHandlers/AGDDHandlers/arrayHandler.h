@@ -5,7 +5,7 @@
 #ifndef arrayHandler_H
 #define arrayHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class arrayHandler:public XMLHandler {

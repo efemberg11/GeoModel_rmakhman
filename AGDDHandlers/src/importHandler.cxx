@@ -3,8 +3,8 @@
 */
 
 #include "AGDDHandlers/importHandler.h"
-#include "XMLParser/XMLHandler.h"
-#include "XMLParser/IAGDDParser.h"
+#include "GeoModelXMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/IAGDDParser.h"
 //   #include "AGDDControl/AGDDController.h"
 #include <iostream>
 

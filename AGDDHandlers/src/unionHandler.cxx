@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/unionHandler.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include "AGDDModel/AGDDUnion.h"
 #include <iostream>
 #include "AGDDKernel/AGDDPositioner.h"

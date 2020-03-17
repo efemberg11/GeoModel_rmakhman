@@ -5,7 +5,7 @@
 #ifndef chamberPositionerHandler_H
 #define chamberPositionerHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 
 #include <string>
 

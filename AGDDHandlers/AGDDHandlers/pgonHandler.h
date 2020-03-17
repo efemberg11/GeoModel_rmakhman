@@ -5,7 +5,7 @@
 #ifndef pgonHandler_H
 #define pgonHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class pgonHandler:public XMLHandler {

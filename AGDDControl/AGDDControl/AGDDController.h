@@ -10,7 +10,7 @@ class IAGDDParser;
 class GeoFullPhysVol;
 
 #include "AGDDKernel/AGDDSectionStore.h"
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 
 #include <string>
 #include <vector>

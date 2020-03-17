@@ -5,7 +5,7 @@
 #ifndef colorHandler_H
 #define colorHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class AGDDColor;

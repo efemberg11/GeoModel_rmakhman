@@ -5,7 +5,7 @@
 #ifndef pconHandler_H
 #define pconHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class pconHandler:public XMLHandler {

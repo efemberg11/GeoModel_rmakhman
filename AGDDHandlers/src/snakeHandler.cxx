@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/snakeHandler.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include "AGDDHandlers/snake_pointHandler.h"
 #include "AGDDModel/AGDDSnake.h"
 #include <iostream>

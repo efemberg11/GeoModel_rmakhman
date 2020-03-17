@@ -5,7 +5,7 @@
 #ifndef sectorHandler_H
 #define sectorHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class sectorHandler:public XMLHandler {

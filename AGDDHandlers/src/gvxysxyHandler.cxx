@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/gvxysxyHandler.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include "AGDDModel/AGDDGvxy.h"
 #include "AGDDHandlers/gvxy_pointHandler.h"
 #include <iostream>

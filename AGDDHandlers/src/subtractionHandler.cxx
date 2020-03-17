@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/subtractionHandler.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include "AGDDModel/AGDDSubtraction.h"
 #include <iostream>
 #include "AGDDKernel/AGDDPositioner.h"

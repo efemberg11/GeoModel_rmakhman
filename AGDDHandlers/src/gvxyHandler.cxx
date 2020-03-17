@@ -5,7 +5,7 @@
 #include "AGDDHandlers/gvxyHandler.h"
 #include "AGDDModel/AGDDGvxy.h"
 #include "AGDDHandlers/gvxy_pointHandler.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include <iostream>
 
 using namespace xercesc;

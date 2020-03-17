@@ -4,7 +4,7 @@
 
 #include "AGDDHandlers/compositionHandler.h"
 #include "AGDDModel/AGDDComposition.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include <iostream>
 #include "AGDDKernel/AGDDPositioner.h"
 #include "AGDDKernel/AGDDPositionerStore.h"

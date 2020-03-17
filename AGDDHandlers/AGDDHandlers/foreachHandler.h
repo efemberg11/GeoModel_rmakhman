@@ -5,7 +5,7 @@
 #ifndef foreachHandler_H
 #define foreachHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class foreachHandler:public XMLHandler {

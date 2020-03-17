@@ -7,6 +7,8 @@
 #include "G4GDMLParser.hh"
 #include "G4String.hh"
 #include "G4Timer.hh"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class G4VPhysicalVolume;
 class G4FieldManager;
@@ -37,8 +39,8 @@ public:
 
   static G4double GetFieldValue() { return gFieldValue; }
     
-  void RecursivelyCheckOverlap(G4LogicalVolume* envelope);
-  bool myCheckOverlaps(G4VPhysicalVolume* volume, G4int res = 1000, G4double tol = 0., G4bool verbose = true, G4int maxErr = 1);
+  void RecursivelyCheckOverlap(G4LogicalVolume* envelope, std::vector<json>& jlist);
+  bool myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res = 1000, G4double tol = 0., G4bool verbose = true, G4int maxErr = 1 );
     // Verifies if the placed volume is overlapping with existing
     // daughters or with the mother volume. Provides default resolution
     // for the number of points to be generated and verified.

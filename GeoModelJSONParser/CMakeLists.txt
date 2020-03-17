@@ -2,34 +2,34 @@
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
-file( GLOB HEADERS JSONParser/*.h )
+file( GLOB HEADERS GeoModelJSONParser/*.h )
 
 # Create the library.
-add_library( JSONParser SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( JSONParser PUBLIC nlohmann_json::nlohmann_json )
-target_include_directories( JSONParser PUBLIC
+add_library( GeoModelJSONParser SHARED ${HEADERS} ${SOURCES} )
+target_link_libraries( GeoModelJSONParser PUBLIC nlohmann_json::nlohmann_json )
+target_include_directories( GeoModelJSONParser PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
-source_group( "JSONParser" FILES ${HEADERS} )
+source_group( "GeoModelJSONParser" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
-set_target_properties( JSONParser PROPERTIES
+set_target_properties( GeoModelJSONParser PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 if( GEOMODEL_USE_BUILTIN_JSON )
-   add_dependencies( JSONParser JSON )
+   add_dependencies( GeoModelJSONParser JSON )
 endif()
 
 # Install the library.
-install( TARGETS JSONParser
+install( TARGETS GeoModelJSONParser
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    COMPONENT Runtime
    NAMELINK_SKIP )
-install( TARGETS JSONParser
+install( TARGETS GeoModelJSONParser
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    COMPONENT Development
    NAMELINK_ONLY )
 install( FILES ${HEADERS}
-   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/JSONParser
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelJSONParser
    COMPONENT Development )

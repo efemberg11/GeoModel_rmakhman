@@ -6,7 +6,7 @@
 #define XercesParser_H
 
 #include <string>
-#include "XMLParser/IAGDDParser.h"
+#include "GeoModelXMLParser/IAGDDParser.h"
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>

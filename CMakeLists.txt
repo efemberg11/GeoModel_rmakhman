@@ -24,8 +24,8 @@ find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
 
 # Set up the build of the libraries of the project.
-add_subdirectory( XMLParser )
-add_subdirectory( JSONParser )
+add_subdirectory( GeoModelXMLParser )
+add_subdirectory( GeoModelJSONParser )
 add_subdirectory( ExpressionEvaluator )
 add_subdirectory( GMCAT )
 

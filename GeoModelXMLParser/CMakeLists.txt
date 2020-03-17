@@ -2,35 +2,35 @@
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
-file( GLOB HEADERS XMLParser/*.h )
+file( GLOB HEADERS GeoModelXMLParser/*.h )
 
 # Create the library.
-add_library( XMLParser SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( XMLParser PUBLIC XercesC::XercesC ExpressionEvaluator )
-target_include_directories( XMLParser SYSTEM PUBLIC )
-target_include_directories( XMLParser PUBLIC
+add_library( GeoModelXMLParser SHARED ${HEADERS} ${SOURCES} )
+target_link_libraries( GeoModelXMLParser PUBLIC XercesC::XercesC
+   ExpressionEvaluator )
+target_include_directories( GeoModelXMLParser PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
-source_group( "XMLParser" FILES ${HEADERS} )
+source_group( "GeoModelXMLParser" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
-set_target_properties( XMLParser PROPERTIES
+set_target_properties( GeoModelXMLParser PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 if( GEOMODEL_USE_BUILTIN_XERCESC )
-   add_dependencies( XMLParser XercesC )
+   add_dependencies( GeoModelXMLParser XercesC )
 endif()
 
 # Install the library.
-install( TARGETS XMLParser
+install( TARGETS GeoModelXMLParser
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    COMPONENT Runtime
    NAMELINK_SKIP )
-install( TARGETS XMLParser
+install( TARGETS GeoModelXMLParser
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    COMPONENT Development
    NAMELINK_ONLY )
 install( FILES ${HEADERS}
-   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/XMLParser
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXMLParser
    COMPONENT Development )

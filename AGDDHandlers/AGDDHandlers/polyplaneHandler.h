@@ -5,7 +5,7 @@
 #ifndef polyplaneHandler_H
 #define polyplaneHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include "AGDDHandlers/Polyplane.h"
 #include <string>
 

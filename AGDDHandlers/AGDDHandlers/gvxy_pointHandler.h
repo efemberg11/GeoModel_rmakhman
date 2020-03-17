@@ -5,7 +5,7 @@
 #ifndef gvxy_pointHandler_H
 #define gvxy_pointHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include "AGDDKernel/TwoPoint.h"
 #include <string>
 

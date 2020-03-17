@@ -5,7 +5,7 @@
 #ifndef UbeamHandler_H
 #define UbeamHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class UbeamHandler:public XMLHandler {

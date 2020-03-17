@@ -5,7 +5,7 @@
 #ifndef trdHandler_H
 #define trdHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 
 #include <string>
 

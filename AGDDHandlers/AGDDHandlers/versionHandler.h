@@ -5,7 +5,7 @@
 #ifndef versionHandler_H
 #define versionHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class versionHandler:public XMLHandler {

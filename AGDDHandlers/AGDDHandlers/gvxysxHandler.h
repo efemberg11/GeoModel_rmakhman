@@ -5,7 +5,7 @@
 #ifndef gvxysxHandler_H
 #define gvxysxHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class gvxysxHandler:public XMLHandler {

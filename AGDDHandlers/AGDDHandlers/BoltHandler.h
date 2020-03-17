@@ -5,7 +5,7 @@
 #ifndef BoltHandler_H
 #define BoltHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class BoltHandler:public XMLHandler {

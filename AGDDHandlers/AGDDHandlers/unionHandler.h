@@ -5,7 +5,7 @@
 #ifndef unionHandler_H
 #define unionHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class unionHandler:public XMLHandler {

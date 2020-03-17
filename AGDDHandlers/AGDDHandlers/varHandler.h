@@ -5,7 +5,7 @@
 #ifndef varHandler_H
 #define varHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class varHandler:public XMLHandler {

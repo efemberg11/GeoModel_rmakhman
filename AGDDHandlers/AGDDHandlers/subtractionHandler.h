@@ -5,7 +5,7 @@
 #ifndef subtractionHandler_H
 #define subtractionHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 
 #include <string>
 

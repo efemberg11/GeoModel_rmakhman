@@ -5,7 +5,7 @@
 #ifndef elcylHandler_H
 #define elcylHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class elcylHandler:public XMLHandler {

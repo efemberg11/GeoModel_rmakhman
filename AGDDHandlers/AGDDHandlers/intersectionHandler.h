@@ -5,7 +5,7 @@
 #ifndef intersectionHandler_H
 #define intersectionHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class intersectionHandler:public XMLHandler {

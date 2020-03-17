@@ -5,7 +5,7 @@
 #ifndef compositionHandler_H
 #define compositionHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class compositionHandler:public XMLHandler {

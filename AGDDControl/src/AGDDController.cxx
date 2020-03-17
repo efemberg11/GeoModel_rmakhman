@@ -4,8 +4,8 @@
 
 #include "AGDDControl/AGDDController.h"
 #include "AGDDKernel/AGDDBuilder.h"
-#include "XMLParser/IAGDDParser.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/IAGDDParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include "AGDDControl/AGDD2GeoModelBuilder.h"
 #include "AGDDKernel/AGDDVolumeStore.h"
 #include "AGDDKernel/AGDDSectionStore.h"

@@ -5,7 +5,7 @@
 #ifndef fractionmassHandler_H
 #define fractionmassHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class fractionmassHandler:public XMLHandler {

@@ -5,7 +5,7 @@
 #ifndef tubsHandler_H
 #define tubsHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 
 #include <string>
 

@@ -5,7 +5,7 @@
 #ifndef posRPhiZHandler_H
 #define posRPhiZHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 
 #include <string>
 

@@ -5,7 +5,7 @@
 #ifndef importHandler_H
 #define importHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class importHandler:public XMLHandler {

@@ -5,7 +5,7 @@
 #ifndef mposWedgeHandler_H
 #define mposWedgeHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class AGDDPositioner;

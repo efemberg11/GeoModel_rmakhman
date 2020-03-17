@@ -5,7 +5,7 @@
 #ifndef snake_pointHandler_H
 #define snake_pointHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 
 #include "CLHEP/Vector/ThreeVector.h"
 

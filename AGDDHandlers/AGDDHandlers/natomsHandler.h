@@ -5,7 +5,7 @@
 #ifndef natomsHandler_H
 #define natomsHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class natomsHandler:public XMLHandler {

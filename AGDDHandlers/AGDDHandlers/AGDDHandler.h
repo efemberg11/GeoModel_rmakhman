@@ -5,7 +5,7 @@
 #ifndef AGDDHandler_H
 #define AGDDHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class AGDDHandler:public XMLHandler {

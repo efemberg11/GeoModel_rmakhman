@@ -5,7 +5,7 @@
 #ifndef materialHandler_H
 #define materialHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class AGDDMaterial;

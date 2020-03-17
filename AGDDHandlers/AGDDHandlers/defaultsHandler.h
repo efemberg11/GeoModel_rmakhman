@@ -5,7 +5,7 @@
 #ifndef defaultsHandler_H
 #define defaultsHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class defaultsHandler:public XMLHandler {

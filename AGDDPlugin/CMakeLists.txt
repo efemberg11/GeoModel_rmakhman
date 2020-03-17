@@ -7,7 +7,7 @@ set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
 set( CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard used for the build" )
 set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 
-find_package( AGDD REQUIRED )
+#find_package( AGDD REQUIRED )
 find_package( CLHEP REQUIRED )
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelTools REQUIRED )
@@ -18,7 +18,7 @@ file( GLOB SOURCES src/*.cxx )
 
 # Set up the library.
 add_library( AGDDPlugin SHARED ${SOURCES} )
-target_link_libraries( AGDDPlugin PUBLIC GeoModelCore::GeoModelKernel AGDDHandlers AGDDControl XMLParser )
+target_link_libraries( AGDDPlugin PUBLIC GeoModelCore::GeoModelKernel AGDDHandlers AGDDControl GeoModelXMLParser )
 target_include_directories( AGDDPlugin PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

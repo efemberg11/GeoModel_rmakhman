@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/compositeHandler.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include "AGDDHandlers/AddMaterial.h"
 #include "AGDDModel/AGDDMolecule.h"
 #include "AGDDModel/AGDDMixture.h"

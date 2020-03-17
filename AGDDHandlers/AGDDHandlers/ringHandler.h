@@ -5,7 +5,7 @@
 #ifndef ringHandler_H
 #define ringHandler_H
 
-#include "XMLParser/XMLHandler.h"
+#include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
 class ringHandler:public XMLHandler {

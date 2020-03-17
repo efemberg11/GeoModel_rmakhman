@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/pconHandler.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include "AGDDModel/AGDDPcon.h"
 #include "AGDDHandlers/polyplaneHandler.h"
 #include <iostream>

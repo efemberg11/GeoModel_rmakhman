@@ -24,7 +24,7 @@ file( GLOB HEADERS AGDDHandlers/*.h )
 add_library( AGDDHandlers SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET AGDDHandlers
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( AGDDHandlers PUBLIC AGDDKernel AGDDModel XMLParser GeoModelCore::GeoModelKernel CLHEP::CLHEP )
+target_link_libraries( AGDDHandlers PUBLIC AGDDKernel AGDDModel GeoModelXMLParser GeoModelCore::GeoModelKernel CLHEP::CLHEP )
 target_include_directories( AGDDHandlers SYSTEM PUBLIC )
 target_include_directories( AGDDHandlers PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

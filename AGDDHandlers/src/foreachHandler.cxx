@@ -3,7 +3,7 @@
 */
 
 #include "AGDDHandlers/foreachHandler.h"
-#include "XMLParser/XercesParser.h"
+#include "GeoModelXMLParser/XercesParser.h"
 #include <iostream>
 
 

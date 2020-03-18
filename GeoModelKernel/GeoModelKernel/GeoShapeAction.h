@@ -33,9 +33,7 @@ class GeoTubs;
 class GeoTube;
 class GeoEllipticalTube;
 class GeoTorus;
-
-class LArCustomShape;
-
+class GeoUnidentifiedShape;
 class GeoSimplePolygonBrep;
 class GeoTessellatedSolid;
 
@@ -106,13 +104,14 @@ class GeoShapeAction
   //	Returns a pointer to the path object.
   GeoShapePath * getPath ();
 
-  virtual void handleLArCustom (const LArCustomShape *);
   virtual void handleSimplePolygonBrep (const GeoSimplePolygonBrep *);
   virtual void handleTessellatedSolid (const GeoTessellatedSolid *);
   virtual void handleEllipticalTube (const GeoEllipticalTube *);
   virtual void handleTorus (const GeoTorus *);
   virtual void handleGenericTrap (const GeoGenericTrap *);
+  virtual void handleUnidentifiedShape(const GeoUnidentifiedShape *shape);
 
+  
  private:
   GeoShapeAction(const GeoShapeAction &right);
   GeoShapeAction & operator=(const GeoShapeAction &right);

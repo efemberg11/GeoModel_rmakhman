@@ -23,7 +23,7 @@
 #include "GeoModelKernel/GeoEllipticalTube.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoGenericTrap.h"
-
+#include "GeoModelKernel/GeoUnidentifiedShape.h"
 
 GeoShapeAction::GeoShapeAction()
   : m_terminate(false)
@@ -133,11 +133,6 @@ GeoShapePath * GeoShapeAction::getPath ()
   return &m_path;
 }
 
-void GeoShapeAction::handleLArCustom (const LArCustomShape *lar)
-{
-  handleShape( (GeoShape *) lar);
-}
-
 void GeoShapeAction::handleSimplePolygonBrep (const GeoSimplePolygonBrep* brep)
 {
   handleShape(brep);
@@ -161,6 +156,11 @@ void GeoShapeAction::handleTorus (const GeoTorus * torus)
 void GeoShapeAction::handleGenericTrap (const GeoGenericTrap * gentrap)
 {
   handleShape(gentrap);
+}
+
+void GeoShapeAction::handleUnidentifiedShape (const GeoUnidentifiedShape * uShape)
+{
+  handleShape(uShape);
 }
 
 

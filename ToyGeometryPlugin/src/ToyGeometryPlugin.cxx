@@ -42,7 +42,7 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
   ~ToyGeometryPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world);
+  virtual void create(GeoPhysVol *world, GeoVStore* store);
 
  private:
 
@@ -67,7 +67,7 @@ ToyGeometryPlugin::~ToyGeometryPlugin()
 
 
 //## Other Operations (implementation)
-void ToyGeometryPlugin::create(GeoPhysVol *world)
+void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
 {
   // Get the materials that we shall use.
   // -------------------------------------//

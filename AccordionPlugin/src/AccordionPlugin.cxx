@@ -60,7 +60,7 @@ class AccordionPlugin : public GeoVGeometryPlugin  {
   ~AccordionPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world);
+  virtual void create(GeoPhysVol *world, GeoVStore* store);
 
  private:
 
@@ -92,7 +92,7 @@ AccordionPlugin::~AccordionPlugin()
 
 
 //## Other Operations (implementation)
-void AccordionPlugin::create(GeoPhysVol *world)
+void AccordionPlugin::create(GeoPhysVol *world, GeoVStore*)
 {
   // Get the materials that we shall use.
   // -------------------------------------//

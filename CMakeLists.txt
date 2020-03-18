@@ -6,6 +6,7 @@ project( "GeoModelG4" VERSION 1.0.0 LANGUAGES CXX )
 # Set up the build of the three libraries of the project.
 add_subdirectory(GeoMaterial2G4)
 add_subdirectory(GeoModel2G4)
+add_subdirectory(GeoSpecialShapes)
 
 
 install(EXPORT GeoMaterial2G4-export FILE GeoModelG4-GeoMaterial2G4.cmake DESTINATION lib/cmake/GeoModelG4)

@@ -29,17 +29,9 @@ set_target_properties( GeoSpecialShapes PROPERTIES
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 
 
-# Install the library.
-install( TARGETS GeoSpecialShapes
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Runtime
-   NAMELINK_SKIP )
-install( TARGETS GeoSpecialShapes
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Development
-   NAMELINK_ONLY )
-install( FILES ${HEADERS}
-   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoSpecialShapes
-   COMPONENT Development )
+# new test GeoModelG4
+install( TARGETS GeoSpecialShapes EXPORT GeoSpecialShapes-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoSpecialShapes )
+
+
+

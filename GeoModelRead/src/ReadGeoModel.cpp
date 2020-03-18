@@ -5,6 +5,7 @@
  *      Author: riccardo.maria.bianchi@cern.ch
  *
  * major updates: Feb 2019 rbianchi
+                  Mar 2020 boudreau 
  */
 
 // local includes
@@ -13,9 +14,7 @@
 // TFPersistification includes
 #include "TFPersistification/TransFunctionInterpreter.h"
 
-// GeoSpecialShapes
-#include "GeoSpecialShapes/LArCustomShape.h"
-
+#include "GeoModelKernel/GeoUnidentifiedShape.h"
 
 // GeoModelKernel
 #include "GeoModelKernel/GeoTransform.h"
@@ -1369,14 +1368,29 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			if (varName == "name") name = varValue.toStdString();
 		}
     
-    return new LArCustomShape(name);
+    return new GeoUnidentifiedShape("LArCustomShape",name);
   }
-	else {
-		// QString msg = "WARNING!! - Shape '" + type + "' not implemented yet!!! Returning a dummy cube.";
-		// qWarning(msg.toStdString().c_str());
-		m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
-		return new GeoBox(30.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm); // FIXME: bogus shape. Use actual shape!
-	}
+  else if (type=="UnidentifiedShape") {
+    std::string name = "";
+    std::string asciiData = "";
+    // get parameters from DB string
+    QStringList shapePars = parameters.split(";");
+    foreach( QString par, shapePars) {
+      QStringList vars = par.split("=");
+      QString varName = vars[0];
+      QString varValue = vars[1];
+      if (varName == "name") name = varValue.toStdString();
+      if (varName == "asciiData") asciiData=varValue.toStdString();
+    }
+    return new GeoUnidentifiedShape(name,asciiData);
+    
+  }
+  else {
+    // QString msg = "WARNING!! - Shape '" + type + "' not implemented yet!!! Returning a dummy cube.";
+    // qWarning(msg.toStdString().c_str());
+    m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
+    return new GeoBox(30.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm); // FIXME: bogus shape. Use actual shape!
+  }
 
 }
 

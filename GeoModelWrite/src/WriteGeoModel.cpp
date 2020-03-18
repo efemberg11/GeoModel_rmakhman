@@ -8,7 +8,7 @@
 #include "TFPersistification/TransFunctionPersistifier.h"
 
 // GeoSpecialShapes
-#include "GeoSpecialShapes/LArCustomShape.h"
+// #include "GeoSpecialShapes/LArCustomShape.h"
 
 // GeoModelKernel includes
 #include "GeoModelKernel/GeoNodePath.h"
@@ -32,6 +32,8 @@
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
 
+#include "GeoModelKernel/GeoUnidentifiedShape.h"
+
 // Qt includes
 #include <QSqlQuery>
 #include <QSqlError>
@@ -50,7 +52,7 @@ namespace GeoModelIO {
 /// Get next child position available, given the parent type, id and copy number
 unsigned int WriteGeoModel::getChildPosition(const QString parentId, const QString parentType, const unsigned int copyN)
 {
-	qDebug() << "WriteGeoModel::getChildPosition()";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getChildPosition()";
 	QString tableId = getIdFromNodeType(parentType);
 	QString key = tableId + ":" + parentId + ":" + QString::number(copyN);
 
@@ -60,13 +62,13 @@ unsigned int WriteGeoModel::getChildPosition(const QString parentId, const QStri
 	    ++m_parentChildrenMap2[key];
     }
 
-    qDebug() << "parent key:" << key << " [tableId:parentId:copyN] - pos: " <<  m_parentChildrenMap2[key];
+    //JFB Commented out: qDebug() << "parent key:" << key << " [tableId:parentId:copyN] - pos: " <<  m_parentChildrenMap2[key];
 	return m_parentChildrenMap2[key];
 }
 
 unsigned int WriteGeoModel::setVolumeCopyNumber(QString volId, QString volType)
 {
-	qDebug() << "WriteGeoModel::setVolumeCopyNumber()";
+	//JFB Commented out: qDebug() << "WriteGeoModel::setVolumeCopyNumber()";
 	QString tableId = getIdFromNodeType(volType);
 	QString key = tableId + ":" + volId;
 
@@ -76,44 +78,44 @@ unsigned int WriteGeoModel::setVolumeCopyNumber(QString volId, QString volType)
     	++m_volumeCopiesMap[key];
     }
 
-    qDebug() << "volume key:" << key << " [tableId:volumeId] - copy number: " <<  m_volumeCopiesMap[key];
+    //JFB Commented out: qDebug() << "volume key:" << key << " [tableId:volumeId] - copy number: " <<  m_volumeCopiesMap[key];
 	return m_volumeCopiesMap[key];
 }
 
 
 unsigned int WriteGeoModel::getLatestParentCopyNumber(QString parentId, QString parentType)
 {
-	qDebug() << "WriteGeoModel::getLatestParentCopyNumber()";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getLatestParentCopyNumber()";
 	QString tableId = getIdFromNodeType(parentType);
 	QString key = tableId + ":" + parentId;
-    qDebug() << "key:" << key;
+    //JFB Commented out: qDebug() << "key:" << key;
 
 	if ( ! (m_volumeCopiesMap.contains(key)) ) {
 		qFatal("ERROR!!! Something's wrong in storing the number of copies!");
 	}
 
-    qDebug() << "get latest parent copy number:" << key << " [tableId:parentId] - copy number: " <<  m_volumeCopiesMap[key];
+    //JFB Commented out: qDebug() << "get latest parent copy number:" << key << " [tableId:parentId] - copy number: " <<  m_volumeCopiesMap[key];
 	return m_volumeCopiesMap[key];
 }
 
 
 void WriteGeoModel::handlePhysVol (const GeoPhysVol *vol)
 {
-	qDebug() << "\nWriteGeoModel::handlePhysVol(GeoPhysVol*)";
+	//JFB Commented out: qDebug() << "\nWriteGeoModel::handlePhysVol(GeoPhysVol*)";
 	handleVPhysVolObjects( vol );
 }
 
 
 void WriteGeoModel::handleFullPhysVol (const GeoFullPhysVol *vol)
 {
-	qDebug() << "\nWriteGeoModel::handleFullPhysVol( GeoFullPhysVol* )";
+	//JFB Commented out: qDebug() << "\nWriteGeoModel::handleFullPhysVol( GeoFullPhysVol* )";
 	handleVPhysVolObjects( vol );
 }
 
 
 void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 {
-	qDebug() << "WriteGeoModel::handleVPhysVolObjects( GeoVPhysVol* )";
+	//JFB Commented out: qDebug() << "WriteGeoModel::handleVPhysVolObjects( GeoVPhysVol* )";
 
 
 	// get the address string for the current volume
@@ -132,7 +134,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
         upperVol = path->getItem(len-2); // item(len-1) is THIS volume ==> the length is updated when visiting a VPhysVol node
     else
         upperVol = path->getItem(len-1); // ROOT volume
-	qDebug() << "path: " << path << " - length: " << len << " - upper vol: " << upperVol << " - tail vol: " << tailVol << " - head vol: " << headVol;
+	//JFB Commented out: qDebug() << "path: " << path << " - length: " << len << " - upper vol: " << upperVol << " - tail vol: " << tailVol << " - head vol: " << headVol;
 	//	std::cout << "path: " << path << std::endl;
 
 	// this below is performed until the root volume is found, then "length" is not used anymore,
@@ -147,7 +149,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 		if (len > 1) {
 			doGetParentNode = true; // TODO: is that needed????
 		} else{
-			qDebug() << "This is the Root volume!";
+			//JFB Commented out: qDebug() << "This is the Root volume!";
             isRootVolume = true;
 			m_rootVolumeFound = true;
 			storeRootVolume = true;
@@ -162,11 +164,11 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 	// If we do, the ID of the parent of the SerialTransformer is returned, which is wrong.
 	if (m_unconnectedTree) {
 		doGetParentNode = false;
-		qDebug() << "Handling an unconnected tree: we skip the parent-finding step...";
+		//JFB Commented out: qDebug() << "Handling an unconnected tree: we skip the parent-finding step...";
 		// now, we reset the status,
 		// otherwise all the children of the first referenced, unconnected volume
 		// will be treated as unconnected as well
-		qDebug() << "setting 'unconnected' to: false";
+		//JFB Commented out: qDebug() << "setting 'unconnected' to: false";
 		m_unconnectedTree = false;
 	}
 
@@ -185,41 +187,41 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 	if (doGetParentNode) {
 
         bool isShared = vol->isShared();
-        qDebug() << "is this node shared?" << isShared;
+        //JFB Commented out: qDebug() << "is this node shared?" << isShared;
 
         //if (isShared)
             parentNode = upperVol;
         //else
 		//    parentNode = dynamic_cast<const GeoVPhysVol*>( &(*(vol->getParent() ))); // this cannot be trust for shared nodes
-        qDebug() << "parentNode address" << parentNode;
+        //JFB Commented out: qDebug() << "parentNode address" << parentNode;
 
 		if (parentNode) {
 			QString parentAddress = getAddressStringFromPointer(parentNode);
-			qDebug() << "==> parent's address:" << parentNode;
+			//JFB Commented out: qDebug() << "==> parent's address:" << parentNode;
 
 			if (isAddressStored(parentAddress))
 				parentId = getStoredIdFromAddress(parentAddress);
 			//		else
 			//			qFatal("FATAL ERROR!!! - The parent node of this child should has been stored in the DB already, but it was not found!!");
 
-			qDebug() << "==> parent's LogVol name:" << QString::fromStdString(parentNode->getLogVol()->getName());
+			//JFB Commented out: qDebug() << "==> parent's LogVol name:" << QString::fromStdString(parentNode->getLogVol()->getName());
 		}
 		else {
-			qDebug() << "NULL parent node!! --> this node appeared unconnected.";
+			//JFB Commented out: qDebug() << "NULL parent node!! --> this node appeared unconnected.";
 		}
 	}
 
 	// counting children
 	unsigned int nChildren = vol->getNChildVols();
-	qDebug() << "number of child physical volumes:" << nChildren;
-	qDebug() << "[number of PhysVol and SerialTransformer child nodes:" << vol->getNChildVolAndST() << "]";
+	//JFB Commented out: qDebug() << "number of child physical volumes:" << nChildren;
+	//JFB Commented out: qDebug() << "[number of PhysVol and SerialTransformer child nodes:" << vol->getNChildVolAndST() << "]";
 
 	//// for debug
 	// GeoCountVolAction cv;
 	// cv.setDepthLimit(1);
 	// vol->exec(&cv);
 	// int nChildCount = cv.getCount();
-	// qDebug() << "number of child volumes:" << nChildCount;
+	// //JFB Commented out: qDebug() << "number of child volumes:" << nChildCount;
 
 
 
@@ -240,7 +242,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 		// LOGVOL
 		const GeoLogVol* logVol = vol->getLogVol();
 		const QString logName = QString::fromStdString(logVol->getName());
-		qDebug() << "LogVol name:"  << logName;
+		//JFB Commented out: qDebug() << "LogVol name:"  << logName;
 
 
 		// MATERIAL
@@ -276,27 +278,27 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 		logvolId = storeObj(logVol, logName, shapeId, matId);
 
 		if (dynamic_cast<const GeoPhysVol*>(vol)) {
-			qDebug() << "New PhysVol, storing it...";
+			//JFB Commented out: qDebug() << "New PhysVol, storing it...";
 			const GeoPhysVol* physVol = dynamic_cast<const GeoPhysVol*>(vol);
 			// store the PhysVol volume into the DB
 			physId = storeObj(physVol, logvolId, parentId, storeRootVolume); // with parent info
             volTypeStr = "GeoPhysVol";
-			qDebug() << "PhysVol stored. Id:" << physId.toString();
+			//JFB Commented out: qDebug() << "PhysVol stored. Id:" << physId.toString();
 		}
 		else if (dynamic_cast<const GeoFullPhysVol*>(vol)) {
-			qDebug() << "New FullPhysVol, storing it...";
+			//JFB Commented out: qDebug() << "New FullPhysVol, storing it...";
 			const GeoFullPhysVol* fullVol = dynamic_cast<const GeoFullPhysVol*>(vol);
 			// store the FullPhysVol volume into the DB
 			physId = storeObj(fullVol, logvolId, parentId, storeRootVolume); // with parent info
             volTypeStr = "GeoFullPhysVol";
-			qDebug() << "FullPhysVol stored. Id:" << physId.toString();
+			//JFB Commented out: qDebug() << "FullPhysVol stored. Id:" << physId.toString();
 		} else {
 			qWarning() << "WARNING!! Unknown GeoVPhysVol type!!";
 		}
 
 	} else {
 		//	qDebug() << "Volume stored already. It is a shared volume. Taking ID from memory map and moving to its physical children...";
-		qDebug() << "Volume stored already. It is a shared volume. Now, we are handling a 'copy' of it. We take the ID from memory map...";
+		//JFB Commented out: qDebug() << "Volume stored already. It is a shared volume. Now, we are handling a 'copy' of it. We take the ID from memory map...";
 		physId = getStoredIdFromAddress(address);
         volTypeStr = getGeoTypeFromVPhysVol(vol);
 	}
@@ -305,16 +307,16 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
     // to distinguish this volume from the other volumes created from the same shared node (if any)
     if (volTypeStr == "NULL") qFatal("ERROR!! volTypeStr is 'NULL'!!!");
     const unsigned int volCopyN = setVolumeCopyNumber(physId.toString(), volTypeStr);
-    qDebug() << "physId: " << physId << "- volume copy number: " << volCopyN;
+    //JFB Commented out: qDebug() << "physId: " << physId << "- volume copy number: " << volCopyN;
 
     if ( isRootVolume || parentId == "NULL") {
-        qDebug() << "This is the RootVolume or the volume has 'NULL' parent (unconnected subtree?) - So, we do not store the child position for this volume!";
+        //JFB Commented out: qDebug() << "This is the RootVolume or the volume has 'NULL' parent (unconnected subtree?) - So, we do not store the child position for this volume!";
     } else {
 	    // store the parent-child relationship in the DB
 	    QString parentType = getGeoTypeFromVPhysVol(parentNode);
         // get the copy number of the parent
         const unsigned int parentCopyN = getLatestParentCopyNumber(parentId.toString(), parentType);
-	    qDebug() << "PhysVol Id:" << physId << " - copyNumber:" << QString::number(parentCopyN);
+	    //JFB Commented out: qDebug() << "PhysVol Id:" << physId << " - copyNumber:" << QString::number(parentCopyN);
 
 	    QString childType  = getGeoTypeFromVPhysVol(vol);
 
@@ -330,11 +332,11 @@ QString WriteGeoModel::getGeoTypeFromVPhysVol(const GeoVPhysVol* vol)
 
 	QString geoType;
 	if (dynamic_cast<const GeoPhysVol*>(vol)) {
-		qDebug() << "GeoType: GeoPhysVol";
+		//JFB Commented out: qDebug() << "GeoType: GeoPhysVol";
 		geoType = "GeoPhysVol";
 	}
 	else if (dynamic_cast<const GeoFullPhysVol*>(vol)) {
-		qDebug() << "GeoType: GeoFullPhysVol";
+		//JFB Commented out: qDebug() << "GeoType: GeoFullPhysVol";
 		geoType = "GeoFullPhysVol";
 	} else {
 		qWarning() << "WARNING!! Unknown GeoVPhysVol type!!";
@@ -345,13 +347,13 @@ QString WriteGeoModel::getGeoTypeFromVPhysVol(const GeoVPhysVol* vol)
 
 void WriteGeoModel::handleSerialDenominator (const GeoSerialDenominator *node)
 {
-	qDebug() << "\nWriteGeoModel::handleSerialDenominator(GeoSerialDenominator*)";
+	//JFB Commented out: qDebug() << "\nWriteGeoModel::handleSerialDenominator(GeoSerialDenominator*)";
 
 	QString address = getAddressStringFromPointer( node );
 
 	std::string baseNameStr = node->getBaseName();
 	QString baseName = QString::fromStdString(baseNameStr);
-	qDebug() << "base name:" << baseName << "address:" << address;
+	//JFB Commented out: qDebug() << "base name:" << baseName << "address:" << address;
 
 	// variables used to persistify the object
 	QVariant sdId;
@@ -365,15 +367,15 @@ void WriteGeoModel::handleSerialDenominator (const GeoSerialDenominator *node)
 	// check if this object has been stored already
 	if (! isAddressStored(address)) {
 
-		qDebug() << "New SerialDenominator, storing it...";
+		//JFB Commented out: qDebug() << "New SerialDenominator, storing it...";
 
 		/* STORE THE OBJECT IN THE DB */
 		sdId = storeObj(node, baseName);
-		qDebug() << "SerialDenominator stored. Id:" << sdId.toString();
+		//JFB Commented out: qDebug() << "SerialDenominator stored. Id:" << sdId.toString();
 
 	} else {
 		sdId = getStoredIdFromAddress(address);
-		qDebug() << "SerialDenominator already stored in the DB. Id:" << sdId.toString();
+		//JFB Commented out: qDebug() << "SerialDenominator already stored in the DB. Id:" << sdId.toString();
 	}
 
 	storeChildPosition(parentId, parentType, sdId, parentCopyN, getChildPosition( parentId, parentType, parentCopyN ), "GeoSerialDenominator", 0); // TODO: Check if the copyN=0 at the end is OK for nodes as Transforms, which cannot be used as parents, only as children!
@@ -383,7 +385,7 @@ void WriteGeoModel::handleSerialDenominator (const GeoSerialDenominator *node)
 
 void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
 {
-	qDebug() << "\nWriteGeoModel::handleSerialTransformer(GeoSerialTransformer*)";
+	//JFB Commented out: qDebug() << "\nWriteGeoModel::handleSerialTransformer(GeoSerialTransformer*)";
 
 	QString address = getAddressStringFromPointer( node );
 
@@ -404,7 +406,7 @@ void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
 	// check if this object has been stored already
 	if (! isAddressStored(address)) {
 
-		qDebug() << "New SerialTransformer, storing it...";
+		//JFB Commented out: qDebug() << "New SerialTransformer, storing it...";
 
 		/*
 		 * Get Node characteristics
@@ -419,7 +421,7 @@ void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
 		// get linked function and number of copies
 		const GeoXF::Function * func = node->getFunction();
 		nCopies =  node->getNCopies();
-		qDebug() << "n. of copies:" << QString::number(nCopies);
+		//JFB Commented out: qDebug() << "n. of copies:" << QString::number(nCopies);
 
 		// get linked VPhysVol volume
 		const GeoVPhysVol *vol = &( *( node->getVolume() ) );
@@ -443,7 +445,7 @@ void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
             std::cout << "SEVERE WARNING!! Handling std::runtime_error! -->" << error.what() << std::endl;
         }
 		QString expression = QString::fromStdString( persistifier.getCodedString() );
-		qDebug() << "FUNCTION:" << expression;
+		//JFB Commented out: qDebug() << "FUNCTION:" << expression;
 
 		if (expression.size() == 0) {
 				qFatal("FATAL ERROR!! Function expression is empty!! Aborting...");
@@ -469,10 +471,10 @@ void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
 		 * ==> So, we need to persitify it as a new tree, to get all its children visited and persistified
 		 *
 		 */
-		qDebug() << "Handling the referenced VPhysVol, going into the sub-tree, if any...";
+		//JFB Commented out: qDebug() << "Handling the referenced VPhysVol, going into the sub-tree, if any...";
 		handleReferencedVPhysVol(vol);
 
-		qDebug() << "Storing the referenced VPhysVol...";
+		//JFB Commented out: qDebug() << "Storing the referenced VPhysVol...";
 		QString physvolAddress = getAddressStringFromPointer(vol);
 		physvolId = getStoredIdFromAddress(physvolAddress);
 
@@ -482,14 +484,14 @@ void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
 		 */
 		// store the SerialTransformer volume in the DB
 		stId = storeObj(node, functionId, physvolId, volType, nCopies);
-		qDebug() << "SerialTransformer stored. Id:" << stId.toString();
+		//JFB Commented out: qDebug() << "SerialTransformer stored. Id:" << stId.toString();
 
 	} else {
 		stId = getStoredIdFromAddress(address);
-		qDebug() << "SerialTransformer already stored in the DB. Id:" << stId.toString();
+		//JFB Commented out: qDebug() << "SerialTransformer already stored in the DB. Id:" << stId.toString();
 	}
 
-	qDebug() << "Storing:" << parentId << parentType << stId;
+	//JFB Commented out: qDebug() << "Storing:" << parentId << parentType << stId;
 	storeChildPosition(parentId, parentType, stId, parentCopyN, getChildPosition( parentId, parentType, parentCopyN ), "GeoSerialTransformer", 0); // TODO: Check if the copyN=0 at the end is OK for nodes as Transforms, which cannot be used as parents, only as children!
 }
 
@@ -498,7 +500,7 @@ void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
 
 void WriteGeoModel::handleTransform(const GeoTransform* node)
 {
-	qDebug() << "\nWriteGeoModel::handleTransform(GeoTransform*)";
+	//JFB Commented out: qDebug() << "\nWriteGeoModel::handleTransform(GeoTransform*)";
 
 	QString address = getAddressStringFromPointer( node );
 
@@ -519,11 +521,11 @@ void WriteGeoModel::handleTransform(const GeoTransform* node)
 	// Store the child-parent relationship
 
 	if ( dynamic_cast<const GeoAlignableTransform*>(node) ) {
-		qDebug() << "Storing a GeoAlignableTransform...";
+		//JFB Commented out: qDebug() << "Storing a GeoAlignableTransform...";
 		storeChildPosition(parentId, parentType, trId, parentCopyN, getChildPosition( parentId, parentType, parentCopyN ), "GeoAlignableTransform", 0); // TODO: Check if the copyN=0 at the end is OK for nodes as Transforms, which cannot be used as parents, only as children!
 	}
 	else if ( dynamic_cast<const GeoTransform*>(node) ) {
-		qDebug() << "Storing a GeoTransform...";
+		//JFB Commented out: qDebug() << "Storing a GeoTransform...";
 		storeChildPosition(parentId, parentType, trId, parentCopyN, getChildPosition( parentId, parentType, parentCopyN ), "GeoTransform", 0); // TODO: Check if the copyN=0 at the end is OK for nodes as Transforms, which cannot be used as parents, only as children!
 	}
 	else {
@@ -535,11 +537,11 @@ void WriteGeoModel::handleTransform(const GeoTransform* node)
 
 void WriteGeoModel::handleNameTag(const GeoNameTag* node)
 {
-	qDebug() << "\nWriteGeoModel::handleNameTag(GeoNameTag*)";
+	//JFB Commented out: qDebug() << "\nWriteGeoModel::handleNameTag(GeoNameTag*)";
 
 	std::string nameStr = node->getName();
 	QString name = QString::fromStdString(nameStr);
-	qDebug() << "name:" << name;
+	//JFB Commented out: qDebug() << "name:" << name;
 
 	QString address = getAddressStringFromPointer( node );
 
@@ -567,12 +569,12 @@ void WriteGeoModel::handleNameTag(const GeoNameTag* node)
 //__________________________________________________
 QStringList WriteGeoModel::getParentNode()
 {
-    qDebug() << "WriteGeoModel::getParentNode()";
+    //JFB Commented out: qDebug() << "WriteGeoModel::getParentNode()";
 
 	// check the current volume position in the geometry tree
 	GeoNodePath* path = getPath();
 	unsigned int len = path->getLength();
-	qDebug() << "length: " << len;
+	//JFB Commented out: qDebug() << "length: " << len;
 
 	// reset the number of visited node, if len is different than before
 	if (len > m_len) {
@@ -601,7 +603,7 @@ QStringList WriteGeoModel::getParentNode()
 
 				// get the parent memory address
 				QString parentAddress = getAddressStringFromPointer(parentNode);
-				qDebug() << "-- parent's address:" << parentNode;
+				//JFB Commented out: qDebug() << "-- parent's address:" << parentNode;
 
 				// get the id of the parent node, which should be stored already in the DB
 				if (isAddressStored(parentAddress)) {
@@ -611,7 +613,7 @@ QStringList WriteGeoModel::getParentNode()
 					// qFatal("FATAL ERROR!!! - The parent node of this child should has been stored in the DB already, but it was not found!!");
 					qWarning() << "The parent node of this child node seems to not having be stored in the DB yet! [It is normal if it is the root volume or a transformation node used for example only in the definition of a 'GeoShapeShift' instance]";
 				}
-				qDebug() << "-- parent's LogVol name:" << QString::fromStdString(parentNode->getLogVol()->getName());
+				//JFB Commented out: qDebug() << "-- parent's LogVol name:" << QString::fromStdString(parentNode->getLogVol()->getName());
 			}
 		}
 		else{
@@ -629,10 +631,15 @@ QStringList WriteGeoModel::getParentNode()
 //__________________________________________________________________
 QVariant WriteGeoModel::storeShape(const GeoShape* shape)
 {
-	const QString shapeType = QString::fromStdString(shape->type());
-	qDebug() << "storeShape() - shape name:" << shapeType  << ", address:" << shape;
+	QString shapeType = QString::fromStdString(shape->type());
+	//JFB Commented out: qDebug() << "storeShape() - shape name:" << shapeType  << ", address:" << shape;
 	// get shape parameters
 	QString shapePars = getShapeParameters(shape);
+
+       
+	// LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
+	if (shapeType=="CustomShape") shapeType="UnidentifiedShape";
+	
 	// store the shape in the DB and returns the ID
 	return storeObj(shape, shapeType, shapePars);
 }
@@ -647,11 +654,11 @@ QVariant WriteGeoModel::storeMaterial(const GeoMaterial* mat)
 	const unsigned int numElements = mat->getNumElements();
 
 	const QString matNumElements = QString::number(numElements);
-	qDebug() << "storeMaterial() - material name:" << matName
-			<< ", address:" << mat
-			<< ", matID:" << matID
-			<< ", matDensity:" << matDensity
-			<< ", matNumElements:" << matNumElements;
+	//JFB Commented out: qDebug() << "storeMaterial() - material name:" << matName
+	//		<< ", address:" << mat
+	//		<< ", matID:" << matID
+	//		<< ", matDensity:" << matDensity
+	//		<< ", matNumElements:" << matNumElements;
 
 	// loop over the elements composing the material
 	QString matElements;
@@ -673,13 +680,13 @@ QVariant WriteGeoModel::storeMaterial(const GeoMaterial* mat)
 		//Gets the fraction by weight of the i-th element
 		const QString elementFraction = QString::number( mat->getFraction(i) );
 
-		qDebug() << "\t--> element ID: " << elementId.toString() << " - getFraction:" << elementFraction;
+		//JFB Commented out: qDebug() << "\t--> element ID: " << elementId.toString() << " - getFraction:" << elementFraction;
 
 		matElementsList << elementId.toString() + ":" + elementFraction;
 	}
 	matElements = matElementsList.join(";");
 
-	qDebug() << "\t==> material's elements:" << matElements;
+	//JFB Commented out: qDebug() << "\t==> material's elements:" << matElements;
 
 	// store the material in the DB and returns the ID
 	return storeObj(mat, matName, matDensity, matElements);
@@ -720,7 +727,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 	// check if this object has been stored already
 	if (! isAddressStored(address)) {
 
-		qDebug() << "New Transform, storing it...";
+		//JFB Commented out: qDebug() << "New Transform, storing it...";
 
 
 				// TODO: simplify and put common code in a separate class
@@ -775,7 +782,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 				tr(3,3)=1;
 
 		std::vector<double> params = getTransformParameters(tr);
-		qDebug() << "Transform parameters:" << QVector<double>::fromStdVector(params);
+		//JFB Commented out: qDebug() << "Transform parameters:" << QVector<double>::fromStdVector(params);
 
 		/*
 		 * STORE THE OBJECT IN THE DB
@@ -784,11 +791,11 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 		// store the object in the DB
 		if ( dynamic_cast<const GeoAlignableTransform*>(node) ) {
 			trId = storeObj(dynamic_cast<const GeoAlignableTransform*>(node), params);
-			qDebug() << "AlignableTransform stored. Id:" << trId.toString();
+			//JFB Commented out: qDebug() << "AlignableTransform stored. Id:" << trId.toString();
 		}
 		else if ( dynamic_cast<const GeoTransform*>(node) ) {
 			trId = storeObj(dynamic_cast<const GeoTransform*>(node), params);
-			qDebug() << "Transform stored. Id:" << trId.toString();
+			//JFB Commented out: qDebug() << "Transform stored. Id:" << trId.toString();
 		}
 		else {
 			std::cout << "WARNING!!! - This type of transformation still needs to be persistified!!" << std::endl;
@@ -796,7 +803,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 
 	} else {
 		trId = getStoredIdFromAddress(address);
-		qDebug() << "Transform already stored in the DB. Id:" << trId.toString();
+		//JFB Commented out: qDebug() << "Transform already stored in the DB. Id:" << trId.toString();
 	}
 
 	return trId;
@@ -805,7 +812,7 @@ QVariant WriteGeoModel::storeTranform(const GeoTransform* node)
 
 void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 {
-	qDebug() << "\nWriteGeoModel::handleReferencedVPhysVol(GeoVPhysVol*)";
+	//JFB Commented out: qDebug() << "\nWriteGeoModel::handleReferencedVPhysVol(GeoVPhysVol*)";
 
 	// qDebug() << "PhysVol's LogVol name:" << QString::fromStdString(vol->getLogVol()->getName());
 
@@ -814,7 +821,7 @@ void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 
 	QVariant parentId = "NULL";
 
-	qDebug() << "setting 'unconnected' to: false";
+	//JFB Commented out: qDebug() << "setting 'unconnected' to: false";
 	m_unconnectedTree = false;
 
 	// get the parent volume, if this is not the Root volume
@@ -822,18 +829,18 @@ void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 
 	if (parentNode) {
 		QString parentAddress = getAddressStringFromPointer(parentNode);
-		qDebug() << "--> parent's address:" << parentNode;
+		//JFB Commented out: qDebug() << "--> parent's address:" << parentNode;
 
 		if (isAddressStored(parentAddress))
 			parentId = getStoredIdFromAddress(parentAddress);
 		//		else
 		//			qFatal("FATAL ERROR!!! - The parent node of this child should has been stored in the DB already, but it was not found!!");
 
-		qDebug() << "--> parent's LogVol name:" << QString::fromStdString(parentNode->getLogVol()->getName());
+		//JFB Commented out: qDebug() << "--> parent's LogVol name:" << QString::fromStdString(parentNode->getLogVol()->getName());
 	}
 	else {
-		qDebug() << "NULL parent node!! --> it seems to be an unconnected subtree.";
-		qDebug() << "setting 'unconnected' to: true";
+		//JFB Commented out: qDebug() << "NULL parent node!! --> it seems to be an unconnected subtree.";
+		//JFB Commented out: qDebug() << "setting 'unconnected' to: true";
 		m_unconnectedTree = true;
 	}
 
@@ -854,16 +861,16 @@ void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 	// check if this object has been stored already
 	if (! isAddressStored(address)) {
 
-		qDebug() << "This is a new root PhysVol node of an 'unconnected' tree, so we start another action on it to dump it into the DB...";
+		//JFB Commented out: qDebug() << "This is a new root PhysVol node of an 'unconnected' tree, so we start another action on it to dump it into the DB...";
 
 		// Dump the tree volumes into the DB
 		vol->exec(this); // TODO: check if the new action overwrites the id of the volumes already in the DB...!!!
 
 	} else {
-		qDebug() << "The referenced volume has been stored already. Skipping...";
+		//JFB Commented out: qDebug() << "The referenced volume has been stored already. Skipping...";
 	}
 	// at the end, we make sure we reset the status
-	qDebug() << "setting 'unconnected' to: false";
+	//JFB Commented out: qDebug() << "setting 'unconnected' to: false";
 	m_unconnectedTree = false;
 }
 
@@ -872,12 +879,12 @@ void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 {
 	const QString shapeType = QString::fromStdString(shape->type());
-	qDebug() << "shapeType:" << shapeType;
+	//JFB Commented out: qDebug() << "shapeType:" << shapeType;
 
 	QString shapePars = "";
 
 	if (shapeType == "Box") {
-		qDebug() << "get GeoBox parameters";
+		//JFB Commented out: qDebug() << "get GeoBox parameters";
 		QStringList pars;
 		const GeoBox* box = dynamic_cast<const GeoBox*>(shape);
 		pars << "XHalfLength=" + QString::number(box->getXHalfLength()) ;
@@ -1033,7 +1040,7 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		//qDebug() << "Tessellated pars:" << shapePars; // debug
 	}
 	else if (shapeType == "Intersection") {
-		qDebug() << "get GeoShapeIntersection parameters";
+		//JFB Commented out: qDebug() << "get GeoShapeIntersection parameters";
 		QStringList pars;
 		const GeoShapeIntersection* shapeIn = dynamic_cast<const GeoShapeIntersection*>(shape);
 		// get the referenced Shape used in the 'union' operation, store it in the DB
@@ -1046,7 +1053,7 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		shapePars = pars.join(";");
 	}
 	else if (shapeType == "Shift") {
-		qDebug() << "get GeoShapeShift parameters";
+		//JFB Commented out: qDebug() << "get GeoShapeShift parameters";
 		QStringList pars;
 		const GeoShapeShift* shapeIn = dynamic_cast<const GeoShapeShift*>(shape);
 
@@ -1063,7 +1070,7 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		shapePars = pars.join(";");
 	}
 	else if (shapeType == "Subtraction") {
-		qDebug() << "get GeoShapeSubtraction parameters";
+		//JFB Commented out: qDebug() << "get GeoShapeSubtraction parameters";
 		QStringList pars;
 		const GeoShapeSubtraction* shapeIn = dynamic_cast<const GeoShapeSubtraction*>(shape);
 		// get the referenced Shape used in the 'union' operation, store it in the DB
@@ -1076,7 +1083,7 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		shapePars = pars.join(";");
 	}
 	else if (shapeType == "Union") {
-		qDebug() << "get GeoShapeUnion parameters";
+		//JFB Commented out: qDebug() << "get GeoShapeUnion parameters";
 		QStringList pars;
 		const GeoShapeUnion* shapeIn = dynamic_cast<const GeoShapeUnion*>(shape);
 
@@ -1101,16 +1108,26 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 	  }
 	  shapePars = pars.join(";");
 	}
-  //LAr custom shape
-  else if(shape->typeID() == LArCustomShape::getClassTypeID()) {
-    const LArCustomShape* shapeIn = dynamic_cast<const LArCustomShape*> (shape);
-    if (nullptr==shapeIn) throw std::runtime_error("TypeID did not match cast for custom shape");
-    shapePars = "name=" + QString::fromStdString(shapeIn->name());
+	else if (shapeType=="UnidentifiedShape") {
+	  const GeoUnidentifiedShape *shapeIn=dynamic_cast<const GeoUnidentifiedShape *> (shape);
+	  QStringList pars;
+	  pars << "name="+QString::fromStdString(shapeIn->name());
+	  pars << "asciiData="+QString::fromStdString(shapeIn->asciiData());
+	  shapePars=pars.join(";");
   }
-	else {
-		std::cout << "\n\tWARNING!!! - Shape '" << shapeType.toStdString() << "' needs to be persistified!!\n\n";
-		m_objectsNotPersistified << shapeType;
-	}
+  //LAr custom shape
+  // else if(shapeType == "CustomShape") {
+  //   std::cout << "\n\tWARNING!!! - Use of LArCustomShape is deprecated, translating to GeoUnidentifiedShape representation!!\n\n";
+  //   const LArCustomShape* shapeIn = dynamic_cast<const LArCustomShape*> (shape);
+  //   QStringList pars;
+  //   pars << "name=LArCustomShape";
+  //   pars << "asciiData="+QString::fromStdString(shapeIn->name());
+  //   shapePars=pars.join(";");
+  // }
+  else {
+    std::cout << "\n\tWARNING!!! - Shape '" << shapeType.toStdString() << "' needs to be persistified!!\n\n";
+    m_objectsNotPersistified << shapeType;
+  }
 
   return shapePars;
 
@@ -1145,7 +1162,7 @@ std::vector<double> WriteGeoModel::getTransformParameters(GeoTrf::Transform3D tr
 
 WriteGeoModel::WriteGeoModel(GMDBManager &db)
 {
-	qDebug() << "WriteGeoModel: constructor";
+	//JFB Commented out: qDebug() << "WriteGeoModel: constructor";
 
 	// init variables
 	m_len = 0;
@@ -1156,10 +1173,10 @@ WriteGeoModel::WriteGeoModel(GMDBManager &db)
 	// init anche check the database handle
 	m_dbManager = &db;
 	if (m_dbManager->isOpen()) {
-		qDebug() << "OK! Database is open!";
+		//JFB Commented out: qDebug() << "OK! Database is open!";
 	}
 	else {
-		qDebug() << "Database is not open!";
+		//JFB Commented out: qDebug() << "Database is not open!";
 	}
 
     m_dbpath = m_dbManager->getDBFilePath();
@@ -1178,7 +1195,7 @@ WriteGeoModel::~WriteGeoModel()
 
 void WriteGeoModel::showMemoryMap()
 {
-	qDebug() << "WriteGeoModel::showMemoryMap()";
+	//JFB Commented out: qDebug() << "WriteGeoModel::showMemoryMap()";
 
 	QMap<QString, QVariant>::const_iterator it = m_memMap.constBegin();
 	while (it != m_memMap.constEnd()) {
@@ -1191,59 +1208,59 @@ void WriteGeoModel::showMemoryMap()
 
 QVariant WriteGeoModel::storeObj(const GeoMaterial* pointer, const QString name, const QString density, const QString elements)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoMaterial*) - name:" << name << "- address:" << pointer << "- density:" << density << "- elements:" << elements;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoMaterial*) - name:" << name << "- address:" << pointer << "- density:" << density << "- elements:" << elements;
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant materialId;
 
 	if (! isAddressStored(address)) {
-		qDebug() << "New Material! Storing it...";
+		//JFB Commented out: qDebug() << "New Material! Storing it...";
 
 		materialId = addMaterial(name, density, elements);
 
 		storeAddress( address, materialId );
 	}
 	else {
-		qDebug() << "Material node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "Material node stored already. Getting ID from the memory map...";
 		materialId = getStoredIdFromAddress(address);
 	}
-	qDebug() << "materialId:" << materialId;
+	//JFB Commented out: qDebug() << "materialId:" << materialId;
 	return materialId;
 }
 
 
 QVariant WriteGeoModel::storeObj(const GeoElement* pointer, const QString name, const QString symbol, const QString elZ, const QString elA)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoElement*) - name:" << name << "address:" << pointer << " - symbol: " << symbol << " - elZ: " << elZ << " - elA: " << elA;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoElement*) - name:" << name << "address:" << pointer << " - symbol: " << symbol << " - elZ: " << elZ << " - elA: " << elA;
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant elementId;
 
 	if (! isAddressStored(address)) {
-		qDebug() << "New Element! Storing it...";
+		//JFB Commented out: qDebug() << "New Element! Storing it...";
 
 		elementId = addElement(name, symbol, elZ, elA);
 
 		storeAddress( address, elementId );
 	}
 	else {
-		qDebug() << "Element node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "Element node stored already. Getting ID from the memory map...";
 		elementId = getStoredIdFromAddress(address);
 	}
-	qDebug() << "elementId:" << elementId;
+	//JFB Commented out: qDebug() << "elementId:" << elementId;
 	return elementId;
 }
 
 
 QVariant WriteGeoModel::storeObj(const GeoShape* pointer, const QString name, const QString parameters)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoShape*) - name:" << name << "address:" << pointer;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoShape*) - name:" << name << "address:" << pointer;
 
 	QString address = getAddressStringFromPointer( pointer );
 
 	QVariant shapeId;
 	if (! isAddressStored(address)) {
-		qDebug() << "New Shape! Storing it...";
+		//JFB Commented out: qDebug() << "New Shape! Storing it...";
 
 		// shapeId = m_dbManager->addShape(name, parameters);
 		shapeId = addShape(name, parameters);
@@ -1251,22 +1268,22 @@ QVariant WriteGeoModel::storeObj(const GeoShape* pointer, const QString name, co
 		storeAddress( address, shapeId);
 	}
 	else {
-		qDebug() << "Shape node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "Shape node stored already. Getting ID from the memory map...";
 		shapeId = getStoredIdFromAddress(address);
 	}
-	qDebug() << "shapeId:" << shapeId;
+	//JFB Commented out: qDebug() << "shapeId:" << shapeId;
 	return shapeId;
 }
 
 QVariant WriteGeoModel::storeObj(const GeoLogVol* pointer, const QString name, const QVariant shapeId, const QVariant materialId)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoLogVol*) - name:" << name << "address:" << pointer;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoLogVol*) - name:" << name << "address:" << pointer;
 
 	QString address = getAddressStringFromPointer( pointer );
 
 	QVariant logvolId;
 	if (! isAddressStored(address)) {
-		qDebug() << "New LogVol! Storing it...";
+		//JFB Commented out: qDebug() << "New LogVol! Storing it...";
 
 		// logvolId = m_dbManager->addLogVol(name, shapeId, materialId);
 		logvolId = addLogVol(name, shapeId, materialId);
@@ -1274,23 +1291,23 @@ QVariant WriteGeoModel::storeObj(const GeoLogVol* pointer, const QString name, c
 		storeAddress( address, logvolId );
 	}
 	else {
-		qDebug() << "LogVol node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "LogVol node stored already. Getting ID from the memory map...";
 		logvolId = getStoredIdFromAddress(address);
 	}
-	qDebug() << "logvolId:" << logvolId;
+	//JFB Commented out: qDebug() << "logvolId:" << logvolId;
 	return logvolId;
 }
 
 
 QVariant WriteGeoModel::storeObj(const GeoPhysVol* pointer, const QVariant logvolId, const QVariant parentId, bool isRootVolume)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoPhysVol*) - address:" << pointer << "- is root volume?" << isRootVolume;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoPhysVol*) - address:" << pointer << "- is root volume?" << isRootVolume;
 
 	QString address = getAddressStringFromPointer( pointer );
 
 	QVariant physvolId;
 	if (! isAddressStored(address)) {
-		qDebug() << "New PhysVol! Storing it...";
+		//JFB Commented out: qDebug() << "New PhysVol! Storing it...";
 
 		// physvolId = m_dbManager->addPhysVol(logvolId, parentId, isRootVolume);
 		physvolId = addPhysVol(logvolId, parentId, isRootVolume);
@@ -1298,22 +1315,22 @@ QVariant WriteGeoModel::storeObj(const GeoPhysVol* pointer, const QVariant logvo
 		storeAddress( address, physvolId );
 	}
 	else {
-		qDebug() << "PhysVol node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "PhysVol node stored already. Getting ID from the memory map...";
 		physvolId = getStoredIdFromAddress(address);
 	}
-	qDebug() << "physvolId:" << physvolId;
+	//JFB Commented out: qDebug() << "physvolId:" << physvolId;
 	return physvolId;
 }
 
 QVariant WriteGeoModel::storeObj(const GeoFullPhysVol* pointer, const QVariant logvolId, const QVariant parentId, bool isRootVolume)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoFullPhysVol*) - address:" << pointer << "- is root volume?" << isRootVolume;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoFullPhysVol*) - address:" << pointer << "- is root volume?" << isRootVolume;
 
 	QString address = getAddressStringFromPointer( pointer );
 
 	QVariant physvolId;
 	if (! isAddressStored(address)) {
-		qDebug() << "New FullPhysVol! Storing it...";
+		//JFB Commented out: qDebug() << "New FullPhysVol! Storing it...";
 
 		// physvolId = m_dbManager->addFullPhysVol(logvolId, parentId, isRootVolume);
 		physvolId = addFullPhysVol(logvolId, parentId, isRootVolume);
@@ -1321,22 +1338,22 @@ QVariant WriteGeoModel::storeObj(const GeoFullPhysVol* pointer, const QVariant l
 		storeAddress( address, physvolId );
 	}
 	else {
-		qDebug() << "FullPhysVol node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "FullPhysVol node stored already. Getting ID from the memory map...";
 		physvolId = getStoredIdFromAddress(address);
 	}
-	qDebug() << "fullphysvolId:" << physvolId;
+	//JFB Commented out: qDebug() << "fullphysvolId:" << physvolId;
 	return physvolId;
 }
 
 QVariant WriteGeoModel::storeObj(const GeoSerialDenominator* pointer, const QString baseName)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoSerialDenominator*) - baseName:" << baseName << "address:" << pointer;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoSerialDenominator*) - baseName:" << baseName << "address:" << pointer;
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant id;
 
 	if (! isAddressStored(address)) {
-		qDebug() << "New SerialDenominator! Storing it...";
+		//JFB Commented out: qDebug() << "New SerialDenominator! Storing it...";
 
 		// id = m_dbManager->addSerialDenominator(baseName);
 		id = addSerialDenominator(baseName);
@@ -1344,23 +1361,23 @@ QVariant WriteGeoModel::storeObj(const GeoSerialDenominator* pointer, const QStr
 		storeAddress( address, id );
 	}
 	else {
-		qDebug() << "SerialDenominator node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "SerialDenominator node stored already. Getting ID from the memory map...";
 		id = getStoredIdFromAddress(address);
 	}
-	qDebug() << "ID:" << id;
+	//JFB Commented out: qDebug() << "ID:" << id;
 	return id;
 }
 
 
 QVariant WriteGeoModel::storeObj(const GeoSerialTransformer* pointer, const QVariant functionId, const QVariant volId, const QString volType, const unsigned int copies)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoSerialTransformer*):" << volId.toUInt() << volType << "- n. of copies: " << copies;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoSerialTransformer*):" << volId.toUInt() << volType << "- n. of copies: " << copies;
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant id;
 
 	if (! isAddressStored(address)) {
-		qDebug() << "New SerialTransformer! Storing it...";
+		//JFB Commented out: qDebug() << "New SerialTransformer! Storing it...";
 
 		// id = m_dbManager->addSerialTransformer(functionId, volId, volType, copies);
 		id = addSerialTransformer(functionId, volId, volType, copies);
@@ -1368,22 +1385,22 @@ QVariant WriteGeoModel::storeObj(const GeoSerialTransformer* pointer, const QVar
 		storeAddress( address, id );
 	}
 	else {
-		qDebug() << "SerialTransformer node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "SerialTransformer node stored already. Getting ID from the memory map...";
 		id = getStoredIdFromAddress(address);
 	}
-	qDebug() << "ID:" << id;
+	//JFB Commented out: qDebug() << "ID:" << id;
 	return id;
 }
 
 QVariant WriteGeoModel::storeObj(const GeoXF::Function* pointer, const QString expression)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoXF::Function*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoXF::Function*)";
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant id;
 
 	if (! isAddressStored(address)) {
-		qDebug() << "New GeoXF::Function! Storing it...";
+		//JFB Commented out: qDebug() << "New GeoXF::Function! Storing it...";
 
 		// id = m_dbManager->addFunction(expression);
 		id = addFunction(expression);
@@ -1391,23 +1408,23 @@ QVariant WriteGeoModel::storeObj(const GeoXF::Function* pointer, const QString e
 		storeAddress( address, id );
 	}
 	else {
-		qDebug() << "GeoXF::Function node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "GeoXF::Function node stored already. Getting ID from the memory map...";
 		id = getStoredIdFromAddress(address);
 	}
-	qDebug() << "ID:" << id;
+	//JFB Commented out: qDebug() << "ID:" << id;
 	return id;
 }
 
 QVariant WriteGeoModel::storeObj(const GeoTransform* pointer, std::vector<double> parameters)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoTransform*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoTransform*)";
 
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant id;
 
 	if (! isAddressStored(address)) {
-		qDebug() << "New GeoXF::Function! Storing it...";
+		//JFB Commented out: qDebug() << "New GeoXF::Function! Storing it...";
 
 		// id = m_dbManager->addTransform( QVector<double>::fromStdVector(parameters) );
 		id = addTransform( parameters );
@@ -1415,23 +1432,23 @@ QVariant WriteGeoModel::storeObj(const GeoTransform* pointer, std::vector<double
 		storeAddress( address, id );
 	}
 	else {
-		qDebug() << "GeoTransform node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "GeoTransform node stored already. Getting ID from the memory map...";
 		id = getStoredIdFromAddress(address);
 	}
-	qDebug() << "ID:" << id;
+	//JFB Commented out: qDebug() << "ID:" << id;
 	return id;
 }
 
 QVariant WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, std::vector<double> parameters)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoAlignableTransform*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoAlignableTransform*)";
 
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant id;
 
 	if (! isAddressStored(address)) {
-		qDebug() << "New GeoXF::Function! Storing it...";
+		//JFB Commented out: qDebug() << "New GeoXF::Function! Storing it...";
 
 		// id = m_dbManager->addAlignableTransform( QVector<double>::fromStdVector(parameters) );
 		id = addAlignableTransform( parameters );
@@ -1439,23 +1456,23 @@ QVariant WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, std::vect
 		storeAddress( address, id );
 	}
 	else {
-		qDebug() << "GeoAlignableTransform node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "GeoAlignableTransform node stored already. Getting ID from the memory map...";
 		id = getStoredIdFromAddress(address);
 	}
-	qDebug() << "ID:" << id;
+	//JFB Commented out: qDebug() << "ID:" << id;
 	return id;
 }
 
 
 QVariant WriteGeoModel::storeObj(const GeoNameTag* pointer, const QString name)
 {
-	qDebug() << "WriteGeoModel::storeObj(GeoNameTag*) - name:" << name << "address:" << pointer;
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoNameTag*) - name:" << name << "address:" << pointer;
 
 	QString address = getAddressStringFromPointer( pointer );
 	QVariant id;
 
 	if (! isAddressStored(address)) {
-		qDebug() << "New SerialDenominator! Storing it...";
+		//JFB Commented out: qDebug() << "New SerialDenominator! Storing it...";
 
 		// id = m_dbManager->addNameTag(name);
 		id = addNameTag(name);
@@ -1463,16 +1480,16 @@ QVariant WriteGeoModel::storeObj(const GeoNameTag* pointer, const QString name)
 		storeAddress( address, id );
 	}
 	else {
-		qDebug() << "SerialDenominator node stored already. Getting ID from the memory map...";
+		//JFB Commented out: qDebug() << "SerialDenominator node stored already. Getting ID from the memory map...";
 		id = getStoredIdFromAddress(address);
 	}
-	qDebug() << "ID:" << id;
+	//JFB Commented out: qDebug() << "ID:" << id;
 	return id;
 }
 
 void WriteGeoModel::storeChildPosition(const QVariant parentId, const QString parentType, const QVariant childId, const unsigned int parentCopyN, const unsigned int childPos, const QString childType, const unsigned int childCopyN)
 {
-	qDebug() << "WriteGeoModel::storeChildPosition()";
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeChildPosition()";
 	addChildPosition(parentId, parentType, childId, parentCopyN, childPos, childType, childCopyN); // FIXME: change the positions of the parameters to a more logical order, like: parentID, parentType, parentCopyN, childPos, ChildType, childId, childCopyN
 	return;
 }
@@ -1487,7 +1504,7 @@ unsigned int WriteGeoModel::addRecord(std::vector<QStringList>* container, const
 
 QVariant WriteGeoModel::addMaterial(const QString name, const QString density, const QString elements)
 {
-	qDebug() << "WriteGeoModel::addMaterial(QString*) - name:" << name << "- density:" << density << "- elements:" << elements;
+	//JFB Commented out: qDebug() << "WriteGeoModel::addMaterial(QString*) - name:" << name << "- density:" << density << "- elements:" << elements;
 	std::vector<QStringList>* container = &m_materials;
 	QStringList values;
 	values << name << density << elements;
@@ -1497,7 +1514,7 @@ QVariant WriteGeoModel::addMaterial(const QString name, const QString density, c
 
 QVariant WriteGeoModel::addElement(const QString name, const QString symbol, const QString elZ, const QString elA)
 {
-	qDebug() << "WriteGeoModel::addElement(QString*) - name:" << name << "- symbol: " << symbol << "- elZ:" << elZ << "- elA:" << elA;
+	//JFB Commented out: qDebug() << "WriteGeoModel::addElement(QString*) - name:" << name << "- symbol: " << symbol << "- elZ:" << elZ << "- elA:" << elA;
 	std::vector<QStringList>* container = &m_elements;
 	QStringList values;
 	values << name << symbol << elZ << elA;
@@ -1507,7 +1524,7 @@ QVariant WriteGeoModel::addElement(const QString name, const QString symbol, con
 
 QVariant WriteGeoModel::addNameTag(const QString name)
 {
-	qDebug() << "WriteGeoModel::addNameTag(QString*) - name:" << name;
+	//JFB Commented out: qDebug() << "WriteGeoModel::addNameTag(QString*) - name:" << name;
 	std::vector<QStringList>* container = &m_nameTags;
 	QStringList values;
 	values << name;
@@ -1516,7 +1533,7 @@ QVariant WriteGeoModel::addNameTag(const QString name)
 
 QVariant WriteGeoModel::addSerialDenominator(const QString &baseName)
 {
-	qDebug() << "WriteGeoModel::addSerialDenominator(QString*) - basename:" << baseName;
+	//JFB Commented out: qDebug() << "WriteGeoModel::addSerialDenominator(QString*) - basename:" << baseName;
 	std::vector<QStringList>* container = &m_serialDenominators;
 	QStringList values;
 	values << baseName;
@@ -1526,7 +1543,7 @@ QVariant WriteGeoModel::addSerialDenominator(const QString &baseName)
 
 QVariant WriteGeoModel::addFunction(const QString expression)
 {
-	qDebug() << "WriteGeoModel::addFunction(QString*) - expression:" << expression;
+	//JFB Commented out: qDebug() << "WriteGeoModel::addFunction(QString*) - expression:" << expression;
 	std::vector<QStringList>* container = &m_functions;
 	QStringList values;
 	values << expression;
@@ -1536,7 +1553,7 @@ QVariant WriteGeoModel::addFunction(const QString expression)
 
 QVariant WriteGeoModel::addAlignableTransform(const std::vector<double> params)
 {
-	qDebug() << "WriteGeoModel::addAlignableTransform(QString*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::addAlignableTransform(QString*)";
 	std::vector<QStringList>* container = &m_alignableTransforms;
 	QStringList values;
 	foreach(double par, params) {
@@ -1549,7 +1566,7 @@ QVariant WriteGeoModel::addAlignableTransform(const std::vector<double> params)
 
 QVariant WriteGeoModel::addTransform(const std::vector<double> params)
 {
-	qDebug() << "WriteGeoModel::addTransform(QString*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::addTransform(QString*)";
 	std::vector<QStringList>* container = &m_transforms;
 	QStringList values;
 	foreach(double par, params) {
@@ -1560,7 +1577,7 @@ QVariant WriteGeoModel::addTransform(const std::vector<double> params)
 
 QString WriteGeoModel::getIdFromNodeType( QString nodeType )
 {
-        qDebug() << "getIdFromNodeType(" << nodeType <<")";
+        //JFB Commented out: qDebug() << "getIdFromNodeType(" << nodeType <<")";
 		if (m_memMap_Tables.contains(nodeType))
 			return QString::number(m_memMap_Tables.value(nodeType));
 		else
@@ -1569,7 +1586,7 @@ QString WriteGeoModel::getIdFromNodeType( QString nodeType )
 
 QVariant WriteGeoModel::addSerialTransformer(const QVariant &funcId, const QVariant &physvolId, const QString volType, const unsigned int &copies)
 {
-	qDebug() << "WriteGeoModel::addSerialTransformer()";
+	//JFB Commented out: qDebug() << "WriteGeoModel::addSerialTransformer()";
 	std::vector<QStringList>* container = &m_serialTransformers;
 	QString volTypeID = getIdFromNodeType(volType);
 
@@ -1648,7 +1665,7 @@ void WriteGeoModel::addChildPosition(const QVariant parentId, const QString pare
 
 void WriteGeoModel::saveToDB()
 {
-	qDebug() << "WriteGeoModel::savetoDB()";
+	//JFB Commented out: qDebug() << "WriteGeoModel::savetoDB()";
     std::cout << "saving to file: " << m_dbpath.toStdString() << std::endl;
 
 	m_dbManager->addListOfRecords("GeoMaterial", m_materials);
@@ -1677,13 +1694,13 @@ void WriteGeoModel::saveToDB()
 
 void WriteGeoModel::storeAddress(const QString address, QVariant id)
 {
-	qDebug() << "WriteGeoModel::storeAddress(" << address << "," << id << ")";
+	//JFB Commented out: qDebug() << "WriteGeoModel::storeAddress(" << address << "," << id << ")";
 	m_memMap.insert(address, id);
 }
 
 bool WriteGeoModel::isAddressStored(const QString address)
 {
-	qDebug() << "WriteGeoModel::isAddressStored(): " << address;
+	//JFB Commented out: qDebug() << "WriteGeoModel::isAddressStored(): " << address;
 	//showMemoryMap(); // only for Debug
 	return m_memMap.contains(address);
 }
@@ -1691,14 +1708,14 @@ bool WriteGeoModel::isAddressStored(const QString address)
 
 QVariant WriteGeoModel::getStoredIdFromAddress(QString address)
 {
-	qDebug() << "WriteGeoModel::getStoredIdFromAddress(): " << address;
+	//JFB Commented out: qDebug() << "WriteGeoModel::getStoredIdFromAddress(): " << address;
 	return m_memMap.value(address);
 }
 
 // get pointer string
 QString WriteGeoModel::getAddressStringFromPointer(const GeoMaterial* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoMaterial*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoMaterial*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
@@ -1706,7 +1723,7 @@ QString WriteGeoModel::getAddressStringFromPointer(const GeoMaterial* pointer)
 // get pointer string
 QString WriteGeoModel::getAddressStringFromPointer(const GeoElement* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoElement*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoElement*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
@@ -1714,7 +1731,7 @@ QString WriteGeoModel::getAddressStringFromPointer(const GeoElement* pointer)
 // get pointer string
 QString WriteGeoModel::getAddressStringFromPointer(const GeoShape* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoShape*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoShape*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
@@ -1722,7 +1739,7 @@ QString WriteGeoModel::getAddressStringFromPointer(const GeoShape* pointer)
 // get pointer string
 QString WriteGeoModel::getAddressStringFromPointer(const GeoLogVol* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoLogVol*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoLogVol*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
@@ -1730,14 +1747,14 @@ QString WriteGeoModel::getAddressStringFromPointer(const GeoLogVol* pointer)
 // get pointer string
 QString WriteGeoModel::getAddressStringFromPointer(const GeoPhysVol* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoPhysVol*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoPhysVol*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
 }
 QString WriteGeoModel::getAddressStringFromPointer(const GeoVPhysVol* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoVPhysVol*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoVPhysVol*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
@@ -1745,21 +1762,21 @@ QString WriteGeoModel::getAddressStringFromPointer(const GeoVPhysVol* pointer)
 // get pointer string
 QString WriteGeoModel::getAddressStringFromPointer(const GeoSerialDenominator* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoSerialDenominator*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoSerialDenominator*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
 }
 QString WriteGeoModel::getAddressStringFromPointer(const GeoSerialTransformer* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoSerialTransformer*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoSerialTransformer*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
 }
 QString WriteGeoModel::getAddressStringFromPointer(const GeoXF::Function* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoXF::Function*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoXF::Function*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
@@ -1767,7 +1784,7 @@ QString WriteGeoModel::getAddressStringFromPointer(const GeoXF::Function* pointe
 
 QString WriteGeoModel::getAddressStringFromPointer(const GeoTransform* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoTransform*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoTransform*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
@@ -1775,7 +1792,7 @@ QString WriteGeoModel::getAddressStringFromPointer(const GeoTransform* pointer)
 
 QString WriteGeoModel::getAddressStringFromPointer(const GeoNameTag* pointer)
 {
-	qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoNameTag*)";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getAddressStringFromPointer(GeoNameTag*)";
 	std::ostringstream oss;
 	oss << pointer;
 	return getQStringFromOss(oss);
@@ -1783,10 +1800,10 @@ QString WriteGeoModel::getAddressStringFromPointer(const GeoNameTag* pointer)
 
 QString WriteGeoModel::getQStringFromOss(std::ostringstream &oss)
 {
-	qDebug() << "WriteGeoModel::getQStringFromOss()";
+	//JFB Commented out: qDebug() << "WriteGeoModel::getQStringFromOss()";
 	std::string addr = oss.str();
 	QString address = QString::fromStdString(addr);
-	qDebug() << "address string:" << address;
+	//JFB Commented out: qDebug() << "address string:" << address;
 	return address;
 }
 

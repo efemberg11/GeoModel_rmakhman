@@ -1,6 +1,5 @@
 stages:
   - dependencies
-  - dependencies-CLHEP
   - build
 
 before_script:
@@ -19,24 +18,6 @@ geomodelcore-build:
     - mkdir geomodelcore-build
     - cd geomodelcore-build
     - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
-    - make -j$(nproc)
-    - make install
-  artifacts:
-    paths:
-      - install
-
-# TODO: this is only needed by SpecialShapes
-# Remove it when SpecialShapes will be migrated to another package
-CLHEP-build:
-  stage: dependencies-CLHEP
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
-    - cd CLHEP
-    - git checkout CLHEP_2_4_1_0
-    - cd ../ ; mkdir build_CLHEP
-    - cd build_CLHEP
-    - cmake -DCMAKE_INSTALL_PREFIX=../install ../CLHEP
     - make -j$(nproc)
     - make install
   artifacts:

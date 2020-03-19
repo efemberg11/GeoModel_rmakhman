@@ -72,9 +72,6 @@ variables:
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-    - cd GeoModelIO
-    - git checkout master-specialshape-geomodelg4
-    - cd ../
     - mkdir geomodelio-build
     - cd geomodelio-build
     - cmake ${CMAKE_ARGS} ../GeoModelIO

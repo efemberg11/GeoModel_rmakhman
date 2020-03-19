@@ -66,7 +66,7 @@ Choose the release you want to use, i.e. Geant4-10.6.0, and checkout the corresp
 ```bash
 git checkout tags/v10.6.0
 mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../  -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -GEANT4_BUILD_MULTITHREADED=ON
+cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../  -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON
 make
 make install
 ```

@@ -159,10 +159,12 @@ void HGTDPlugin::create(GeoPhysVol *world, GeoVStore*)
    
   world->add( new GeoNameTag("HGTD_Pos"));
   // world->add(xfHGTDPos); // StoredAlignX
+  world->add( new GeoTransform(GeoTrf::TranslateZ3D(3500)));
   world->add(HGTD_EnvelopePos);
   world->add( new GeoNameTag("HGTD_Neg"));
   // world->add(xfHGTDNeg); // StoredAlignX
   world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*SYSTEM_OF_UNITS::deg)));
+  world->add( new GeoTransform(GeoTrf::TranslateZ3D(3500)));
   world->add(HGTD_EnvelopeNeg);
   
 

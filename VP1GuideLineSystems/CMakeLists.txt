@@ -21,8 +21,6 @@ find_package( Coin REQUIRED )
 find_package( SoQt REQUIRED )
 #find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
 find_package( GeoModelCore REQUIRED )
-find_package( GeoModelIO REQUIRED )
-find_package( Eigen3 REQUIRED )
 if( APPLE )
   find_package(OpenGL REQUIRED)
 endif()
@@ -41,7 +39,6 @@ set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
 QT5_WRAP_UI(UI_HDRS ${UIS})
 
 
-include_directories ("${EIGEN3_INCLUDE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
@@ -61,9 +58,9 @@ include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 
 if ( APPLE )
   target_link_directories (GXGuideLineSystems PUBLIC ${Coin_LIB_DIR} )
-  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
   else()
-  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 endif()
 
 

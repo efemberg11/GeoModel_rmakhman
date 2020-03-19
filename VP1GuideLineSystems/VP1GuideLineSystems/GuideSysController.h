@@ -143,9 +143,6 @@ private:
   Imp * m_d;
 
 private slots:
-  void updateProjPartsCheckboxStates_Pixel();
-  void updateProjPartsCheckboxStates_SCT();
-  void updateProjPartsCheckboxStates_TRT();
   void possibleChange_showFloor();
   void possibleChange_floorColourAndTransp();
   void possibleChange_floorExtent();
@@ -170,16 +167,6 @@ private slots:
   void possibleChange_etaConeValue2();
   void possibleChange_etaConeValue3();
   void possibleChange_etaExtent();
-  void possibleChange_applicablePixelProjParts();
-  void possibleChange_applicableSCTProjParts();
-  void possibleChange_applicableTRTProjParts();
-  void possibleChange_shownPixelProjSurfaces();
-  void possibleChange_shownSCTProjSurfaces();
-  void possibleChange_shownTRTProjSurfaces();
-  void possibleChange_showTrackingVolumes();
-  void possibleChange_showInnerDetector();
-  void possibleChange_showCalorimeters();
-  void possibleChange_showMuonSpectrometer();
   void possibleChange_showLines();
   void possibleChange_lineDirection();
 };

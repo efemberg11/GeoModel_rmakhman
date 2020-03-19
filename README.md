@@ -43,12 +43,10 @@ make install
 ## GeoModelIO:
 
 Clone the repository at this [address](https://gitlab.cern.ch/GeoModelDev/GeoModelIO).
-CAVEAT: at the moment the working branch of GeoModelIO compatible with GeoModel2G4 and FullSimLight is: [address](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/tree/master-specialshape-geomodelg4)
 
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
 cd GeoModelIO
-git checkout master-specialshape-geomodelg4
 mkdir build ; cd build
 cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
 make

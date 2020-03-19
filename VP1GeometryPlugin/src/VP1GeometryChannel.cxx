@@ -14,7 +14,7 @@
 
 #include "VP1GeometryPlugin/VP1GeometryChannel.h"
 #include "VP1GeometrySystems/VP1GeometrySystem.h"
-//#include "VP1GuideLineSystems/VP1GuideLineSystem.h"
+#include "VP1GuideLineSystems/VP1GuideLineSystem.h"
 #include "VP1Base/VP1QtUtils.h"
 
 VP1GeometryChannel::VP1GeometryChannel()
@@ -26,8 +26,9 @@ VP1GeometryChannel::VP1GeometryChannel()
 
 void VP1GeometryChannel::init()
 {
-  //addSystem(new VP1GuideLineSystem);
   addSystem(new VP1GeometrySystem);
   if (VP1QtUtils::environmentVariableIsOn("VP1_SECOND_GEOMSYS"))
     addSystem(new VP1GeometrySystem("AltGeo"),IVP13DStandardChannelWidget::StartDisabled);
+  addSystem(new VP1GuideLineSystem);
+
 }

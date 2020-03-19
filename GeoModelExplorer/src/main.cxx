@@ -49,20 +49,25 @@ int main(int argc, char** argv)
       {
       setenv((std::string("GX_GEOMETRY_FILE")+std::to_string(NGeomFiles++)).c_str(),inputList[i].toStdString().c_str(), true);
     }
-    else {
-      qWarning() << "Warning, file " << input.c_str() << " type not recognized";
-      return 0;
-    }
   }
   
+
   
+  int NJsonFiles=0;
+  for (int i=0;i<inputList.size()-1;i++) {
+    std::string input=inputList[i].toStdString();
+    if (input.find(".json")!=std::string::npos){
+     
+      setenv((std::string("GX_JSON_FILE")+std::to_string(NJsonFiles++)).c_str(),inputList[i].toStdString().c_str(), true);
+    }
+  }
 
 
   //If help option is set, display help and exit VP1Light
   if(helpIsSet){
     qInfo() << "Usage";
     qInfo() << " ";
-    qInfo() << "  vp1light [options] [dbfile1] [dbfile2]... [sharedlib1] [sharedlib2] [sharedlib3]...";
+    qInfo() << "  vp1light [options] [dbfile1] [dbfile2]... [sharedlib1] [sharedlib2] [sharedlib3]... [clash1.json] [clash2.json]...";
     qInfo() << "Options:";
     qInfo() << "  -h, --help                   = Show help.";
     return 0;

@@ -113,11 +113,57 @@ source <path_to_geant4_install_dir>/bin/geant4.sh
 cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
 ```
 
+# FullSimLight: Build, run and options
 
- # Detector
+The applications can be built and used both with sequential and multithreaded
+Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will
+run in proper multithreaded mode.
+
+Run the executable with the --help option to see the available options:
+
+``` bash
+-m   <Geant4-Macro-File>  [MANDATORY; a standard Geant4 macro file name]
+-f   <Physics-List-Name>  [OPTIONAL;  physics list name (default: FTFP_BERT)]
+-p   <NO-ARGUMENT>        [OPTIONAL;  run in performance mode (default: false)]
+-g   <Geometry-File-Name> [MANDATORY; the Geometry file name  (default: geometry-ATLAS-R2-2016-01-00-01.db)]
+-o : <NO-ARGUMENT>        [OPTIONAL;  run the geometry overlap check (default: false)]
+``` 
+A minimal set of "observable" is collected during the simulation per-primary
+particle type: mean energy deposit, mean charged and neutral step lengths,
+mean number of steps made by charged and neutral particles, mean number of
+secondary e-, e+ and gamma particles. The result is reported at the end of
+each event for each primary particle that were transported in the given event.
+At the end of the simulation a final report is printed showing the run time,
+the primary generator and magnetic field settings used during the run, the
+total number of events and primary particles transported and the per-primary
+type simulation statistics of the above-mentioned quantities.
+
+The simulation can be executed in "performance" mode by providing the -p
+input flag. No any user actions are created in this case beyond the
+only one RunAction (only for the Master-thread in case of MT) that will
+start and stop a timer at the beginning and the end of the simulation
+(initialization time won't be included). Therefore, there is no scoring
+in this case.
 
 
-## Detector construction:
+
+## Examples
+
+To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
+Physics List, in performance mode and building the detector from the default SQLite file:
+``` bash
+./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -p 
+``` 
+To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
+Physics List, not in performance mode and building the detector from my geometry SQLite file:
+``` bash
+./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -g mygeometry.db 
+``` 
+
+## Detector
+
+
+### Detector construction:
 
 The detector can be built starting from a SQLite .db file (default option) or starting from a GDML file.
 the -g flag will be used to specify the name of the geometry file. Any GDML file can be set from the macro file by using the:
@@ -127,7 +173,7 @@ the -g flag will be used to specify the name of the geometry file. Any GDML file
 ```    
 By default the detector is built from the SQLite file "geometry-ATLAS-R2-2016-01-00-01.db".
      
-## ATLAS Geometry Files:
+### ATLAS Geometry Files:
      
 The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are available at: 
 ```bash
@@ -136,7 +182,7 @@ The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are av
 ```
 
 
- # Magnetic field
+## Magnetic field
  
  A constant magnetic field can be set through the macro command:
  
@@ -146,12 +192,12 @@ The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are av
 The default value is zero i.e. no magnetic field is created.
 
 
- # Primary Generator
+## Primary Generator
 
  The primary generator is a particle gun that will generate primary particles
  at the (0,0,0) position with the following options:
 
-## Number of primaries per event:
+### Number of primaries per event:
 The number of primary particles per event can be set through the macro
 command:
 
@@ -161,7 +207,7 @@ command:
 
 By default, i.e. if it is not specified by the above command, the number of primary particles will be randomly selected for each individual event from the [1, 10] interval uniformly.
 
-## Primary particle energy:
+### Primary particle energy:
 The primary particle energy can be set through the macro command:
 
 ``` bash
@@ -169,7 +215,7 @@ The primary particle energy can be set through the macro command:
 ```
 By default, i.e. if it is not specified by the above command, the kinetic energy will be randomly selected for each individual primary particle from the [1 GeV, 100 GeV] uniformly.
 
-## Primary particle direction:
+### Primary particle direction:
 The primary particle momentum direction can be set through the macro command: 
 
 ``` bash
@@ -177,7 +223,7 @@ The primary particle momentum direction can be set through the macro command:
 ```
 By default, i.e. if it is not specified by the above command, the momentum direction will be randomly selected for each individual primary particle from isotropic distribution.
 
-## Primary particle type:
+### Primary particle type:
 The primary particle type can be set through the macro command:
 
 ``` bash
@@ -187,7 +233,7 @@ By default, i.e. if it is not specified by the above command, the type will be r
 
 
 
-# Physics List
+## Physics List
 
  The Physics List can be specified as an input argument with the -f flag
  (e.g. -f FTFP_BERT). Notice that the name of the Geant4 built in Physics List
@@ -199,54 +245,34 @@ By default, i.e. if it is not specified by the above command, the type will be r
  and used in the corresponding GeantV application with exactly the same
  settings). In order to use it one need to specify -f GV as input parameter. 
 
+# GMClash: Build, run and options
 
+GMclash allows to run geometry overlap checks on a geometry file specified as input with the -g flag. The clashes report is then saved in a json file. 
 
-# Build, run and options
-
- The applications can be built and used both with sequential and multithreaded
- Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will
- run in proper multithreaded mode.
-
- Run the executable with the --help option to see the available options:
- 
 ``` bash
- -m   <Geant4-Macro-File>  [MANDATORY; a standard Geant4 macro file name]
- -f   <Physics-List-Name>  [OPTIONAL;  physics list name (default: FTFP_BERT)]
- -p   <NO-ARGUMENT>        [OPTIONAL;  run in performance mode (default: false)]
- -g   <Geometry-File-Name> [MANDATORY; the Geometry file name  (default: geometry-ATLAS-R2-2016-01-00-01.db)]
- -o : <NO-ARGUMENT>        [OPTIONAL;  run the geometry overlap check (default: false)]
+-g :   the Geometry file name 
+-o :   clashes report file name (default: gmclash_report)
 ``` 
- A minimal set of "observable" is collected during the simulation per-primary
- particle type: mean energy deposit, mean charged and neutral step lengths,
- mean number of steps made by charged and neutral particles, mean number of
- secondary e-, e+ and gamma particles. The result is reported at the end of
- each event for each primary particle that were transported in the given event.
- At the end of the simulation a final report is printed showing the run time,
- the primary generator and magnetic field settings used during the run, the
- total number of events and primary particles transported and the per-primary
- type simulation statistics of the above-mentioned quantities.
 
- The simulation can be executed in "performance" mode by providing the -p
- input flag. No any user actions are created in this case beyond the
- only one RunAction (only for the Master-thread in case of MT) that will
- start and stop a timer at the beginning and the end of the simulation
- (initialization time won't be included). Therefore, there is no scoring
- in this case.
+The output json file format is the following:
 
-
-
-# Examples
-
- To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
- Physics List, in performance mode and building the detector from the default SQLite file:
 ``` bash
- ./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -p 
- ``` 
- To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
- Physics List, not in performance mode and building the detector from my geometry SQLite file:
- ``` bash
- ./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -g mygeometry.db 
+"distance[mm]": 51.21328179620343,
+"typeOfClash": 1,
+"volume1CopyNo": 16969,
+"volume1EntityType": "G4Tubs",
+"volume1Name": "LAr::Barrel::Cryostat::Cylinder::#13Phys",
+"volume2CopyNo": 16969,
+"volume2EntityType": "G4UnionSolid",
+"volume2Name": "LAr::DM::SectorEnvelopes2r",
+"x": -1.736718203796568,
+"y": -1263.348806272393,
+"z": -166.75403155804725
 ``` 
+where:
+* *distance* is the minimum estimated distance of the overlap
+* *typeOfClash* can be 0 for *withMother*, 1 for *withSister* and 2 for *fullyEncapsSister*
+* *x,y,z* are the global coordinates of the point of impact
 
 # Final Remark
 

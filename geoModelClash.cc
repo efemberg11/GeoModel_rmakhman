@@ -14,28 +14,20 @@
 #include "G4UIsession.hh"
 #include "G4UIterminal.hh"
 
-#include "G4PhysListFactory.hh"
-#include "G4VUserPhysicsList.hh"
-#include "G4VModularPhysicsList.hh"
-
 #include "Randomize.hh"
 #include "MyDetectorConstruction.hh"
-#include "MyGVPhysicsList.hh"
-
-#include "MyActionInitialization.hh"
 
 #include <getopt.h>
 #include <err.h>
 #include <iostream>
 #include <iomanip>
 
-static G4String parMacroFileName = "macro.g4";
-static G4String geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01.db";
+static G4String parMacroFileName   = "macro.g4";
+static G4String geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db";
 static G4String reportFileName     = "gmclash_report.json";
 
 void GetInputArguments(int argc, char** argv);
 void Help();
-
 
 int main(int argc, char** argv) {
     
@@ -52,12 +44,12 @@ int main(int argc, char** argv) {
     G4Random::setTheEngine(new CLHEP::MixMaxRng);
     // set seed and print info
     G4Random::setTheSeed(12345678);
-//    G4cout << G4endl
-//    << " ===================================================== "      << G4endl
-//    << "   Random engine      = " << G4Random::getTheEngine()->name() << G4endl
-//    << "   Initial seed       = " << G4Random::getTheSeed()           << G4endl
-//    << " ===================================================== "      << G4endl
-//    << G4endl;
+    G4cout << G4endl
+    << " ===================================================== "      << G4endl
+    << "   Random engine      = " << G4Random::getTheEngine()->name() << G4endl
+    << "   Initial seed       = " << G4Random::getTheSeed()           << G4endl
+    << " ===================================================== "      << G4endl
+    << G4endl;
     
     // Construct the default run manager
 #ifdef G4MULTITHREADED
@@ -78,22 +70,6 @@ int main(int argc, char** argv) {
     detector->SetReportFileName (reportFileName);
     runManager->SetUserInitialization(detector);
   
-//    // 2. Physics list
-//    G4PhysListFactory factory;
-//    if (factory.IsReferencePhysList(parPhysListName)) {
-//        G4VModularPhysicsList* physList = factory.GetReferencePhysList(parPhysListName);
-//        runManager->SetUserInitialization(physList);
-//    } else if (parPhysListName==G4String("GV")) {
-//        G4VUserPhysicsList* physList = new MyGVPhysicsList();
-//        runManager->SetUserInitialization(physList);
-//    } else {
-//        G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
-//        return -1;
-//    }
-  
-    // 3. User action
-    //runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance));
-  
     // 4. Run the simulation in batch mode
     G4UImanager* UI = G4UImanager::GetUIpointer();
     G4String command = "/control/execute ";
@@ -112,7 +88,7 @@ int main(int argc, char** argv) {
 }
 
 static struct option options[] = {
-    {"geometry file name       "  , required_argument, 0, 'g'},
+    {"geometry file name              "  , required_argument, 0, 'g'},
     {"output clashes report file name "  , required_argument, 0, 'o'},
     {0, 0, 0, 0}
 };
@@ -123,10 +99,10 @@ void Help() {
   G4cout <<"  GeoModelClash Geant4 application.    \n"
             << std::endl
             <<"  **** Parameters: \n\n"
-            <<"      -g :   the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01.db)\n"
+            <<"      -g :   the Geometry file name \n"
             <<"      -o :   clashes report file name (default: gmclash_report)\n"
             << std::endl;
-  std::cout <<"\nUsage: ./gmclash [OPTIONS] -m <MACRO_FILE>\n" <<std::endl;
+  std::cout <<"\nUsage: ./gmclash [OPTIONS]\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
     printf("\t-%c  --%s\t\n", options[i].val, options[i].name);
   }
@@ -142,7 +118,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "pm:f:g:o", options, &optidx);
+   c = getopt_long(argc, argv, "g:o:", options, &optidx);
    if (c == -1)
      break;
    //

@@ -203,8 +203,8 @@ By default, i.e. if it is not specified by the above command, the type will be r
 
 # Build, run and options
 
- The application can be built and used both with sequential and multithreaded
- Geant4 builds. In case of multithreaded Geant4 toolkit, the application will
+ The applications can be built and used both with sequential and multithreaded
+ Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will
  run in proper multithreaded mode.
 
  Run the executable with the --help option to see the available options:

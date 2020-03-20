@@ -561,7 +561,7 @@ GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
         Air->add(Nitrogen, .8);
         Air->add(Oxigen, .2);
         Air->lock();
-        const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+        const GeoBox* worldBox = new GeoBox(1300*SYSTEM_OF_UNITS::cm, 1300*SYSTEM_OF_UNITS::cm, 1300*SYSTEM_OF_UNITS::cm);
         const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Air);
         world = new GeoPhysVol(worldLog);
     }
@@ -621,7 +621,6 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
 //        //     parser.SetEnergyCutsExport(true);
 //        parser.Write("accordion.gdml", fWorld->GetLogicalVolume());
 //        G4cout << "Geometry exported in GDML, done!"<<G4endl;
-        exit(0);
         
     }
     else if (fGeometryFileName.contains(".db")){
@@ -712,16 +711,16 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         fTimer.Start();
         std::vector<json> jlist;
         RecursivelyCheckOverlap(envelope, jlist);
+        fTimer.Stop();
+        G4cout << "\n**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
+        G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
+        G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
+        
         json jReport={{"ClashesReport",jlist}};
-        std::cout<<"Opening json file: "<<fReportFileName<<std::endl;
+        std::cout<<"\n**** Writing out the clashes report file: "<<fReportFileName<<std::endl;
         std::ofstream outJsonFile(fReportFileName);
         outJsonFile << std::setw(4) << jReport << std::endl;
         outJsonFile.close();
-        
-        fTimer.Stop();
-        G4cout << "**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
-        G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
-        G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
         
         G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
         exit(0);

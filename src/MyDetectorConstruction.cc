@@ -19,6 +19,8 @@
 #include "GeoModel2G4/ExtParameterisedVolumeBuilder.h"
 #include "G4LogicalVolume.hh"
 #include "G4UnitsTable.hh"
+#include "G4GDMLParser.hh"
+
 
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -33,31 +35,31 @@
 #include <QDebug>
 #include <QFileInfo>
 
-#include <nlohmann/json.hpp>
 
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 // ****
-using json = nlohmann::json;
+
 
 
 namespace clashdet {
-    enum typeOfClash{ withMother, withSister, fullyEncapsSister};
+    enum typeOfClash{ withMother=0, withSister, fullyEncapsSister};
     // a simple struct to model a clash detection erro
     struct clash {
         typeOfClash clashType;
         std::string volume1Name;
-        std::string volume1CopyNo;
+        G4int       volume1CopyNo;
         std::string volume1EntityType;
         std::string volume2Name;
+        G4int       volume2CopyNo;
         std::string volume2EntityType;
         double x,y,z;
         G4double distance;
     };
     
     void to_json(json& j, const clash& p) {
-        j = json{{"typeOfClash", p.clashType}, {"volume1Name", p.volume1Name}, {"volume1CopyNo", p.volume1CopyNo}, {"volume1EntityType", p.volume1EntityType},{"volume2Name", p.volume2Name},{"volume2EntityType", p.volume2EntityType},{"x", p.x},{"y", p.y},{"z", p.z},{"distance", p.distance} };
+        j = json{{"typeOfClash", p.clashType}, {"volume1Name", p.volume1Name}, {"volume1CopyNo", p.volume1CopyNo}, {"volume1EntityType", p.volume1EntityType},{"volume2Name", p.volume2Name},{"volume2CopyNo", p.volume2CopyNo}, {"volume2EntityType", p.volume2EntityType},{"x", p.x},{"y", p.y},{"z", p.z},{"distance[mm]", p.distance} };
     }
     
     void from_json(const json& j, clash& p) {
@@ -66,11 +68,12 @@ namespace clashdet {
         j.at("volume1CopyNo").get_to(p.volume1CopyNo);
         j.at("volume1EntityType").get_to(p.volume1EntityType);
         j.at("volume2Name").get_to(p.volume2Name);
+        j.at("volume2CopyNo").get_to(p.volume2CopyNo);
         j.at("volume2EntityType").get_to(p.volume2EntityType);
         j.at("x").get_to(p.x);
         j.at("y").get_to(p.y);
         j.at("z").get_to(p.z);
-        j.at("distance").get_to(p.distance);
+        j.at("distance[mm]").get_to(p.distance);
  
     }
 } // namespace clashdet
@@ -95,7 +98,102 @@ MyDetectorConstruction::~MyDetectorConstruction()
   delete fDetectorMessenger;
 }
 
-void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope){
+bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume* volume, G4ThreeVector& local){
+
+    int localNoDaughters = envelope->GetNoDaughters();
+    //std::cout<<"Total n. of Daughters of "<<envelope->GetName()<<" is : "<<localNoDaughters<<std::endl;
+    G4VPhysicalVolume *daughter;
+    G4LogicalVolume *daughterLV;
+    bool isFound;
+ 
+    for (int n=0; n<localNoDaughters; n++)
+    {
+        
+        daughter=envelope->GetDaughter(n);
+        daughterLV = daughter->GetLogicalVolume();
+//        std::cout<<"Checking daughter "<<n<<" out of "<<localNoDaughters<<std::endl;
+//        std::cout<<"-----> Daughter Name is: "<<daughter->GetName()<<std::endl;
+//        std::cout<<"-----> DaughterLV Name is: "<<daughterLV->GetName()<< " it has daughterLV->GetNoDaughters(): "<<daughterLV->GetNoDaughters()<<std::endl;
+        if (daughterLV->GetNoDaughters()>0)
+        {
+            //std::cout<<"------------> More than 0 daughters"<<std::endl;
+            if(daughterLV->IsAncestor(volume))
+            {
+                fTree.push_back(daughter);
+                //std::cout<<"--------------> Found the ancestor! Daughter: "<< daughter->GetName() <<", the logical volume connected is: "<< daughterLV->GetName()<< std::endl;
+                
+                if(daughterLV->GetNoDaughters()>1){
+//                    std::cout<<"---------------> MORE than 1 daughters"<<std::endl;
+//                    std::cout<<"---------------> Iterating to the next level. Passing Volume: "<<daughterLV->GetName()<<". Elements in the tree: "<<fTree.size()<<std::endl;
+                    isFound = iterateFromWorld(daughterLV, volume, local);
+                    if(isFound) return true;
+                    break;
+                    
+                }else
+                {
+//                    std::cout<<"---------------> ONLY 1 daughter"<<std::endl;
+//                    std::cout<<daughterLV->GetDaughter(0)->GetName()<< " should be equal to == "<< volume->GetName()<< " and "<<daughterLV->GetDaughter(0)->GetCopyNo()<<" should be equal to :"<<volume->GetCopyNo()<<std::endl;
+                    fTree.push_back(daughterLV->GetDaughter(0));
+//                    std::cout<<"Found the volume! Daughter: "<< daughter->GetName() <<", the logical volume connected is: "<< daughterLV->GetName()<< std::endl;
+                    return true;
+                }
+            }
+//            std::cout<<"------------> Not the ANCESTOR"<<std::endl;
+            if(daughterLV->GetName()== volume->GetLogicalVolume()->GetName() && daughter->GetName()== volume->GetName() && daughter->GetCopyNo()== volume->GetCopyNo())
+            {
+                std::cout<<" *** Volume FOUND - EVERYTHING CHECKED!"<<std::endl;
+                std::cout<<daughterLV->GetName()<< " should be equal to == " <<volume->GetLogicalVolume()->GetName()<<std::endl;
+                fTree.push_back(volume);//TO CHECK
+                return true;
+                
+            }
+//            else std::cout<<"------------> Names are different  "<<daughterLV->GetName()<< "  and  " <<volume->GetLogicalVolume()->GetName()<<std::endl;
+        } else //the volume has zero daughters
+        {
+//            std::cout<<"------------> ZERO daughters!!!"<<std::endl;
+            if(daughterLV->GetName()== volume->GetLogicalVolume()->GetName() && daughter->GetName()== volume->GetName() && daughter->GetCopyNo()== volume->GetCopyNo())
+            {
+                std::cout<<" *** Volume FOUND - EVERYTHING CHECKED!!!"<<std::endl;
+                std::cout<<daughterLV->GetName()<< " should be equal to == "<< volume->GetLogicalVolume()->GetName()<<std::endl;
+                fTree.push_back(daughter);
+//                std::cout<<"Found the volume! Daughter: "<< daughter->GetName() <<", the logical volume connected is: "<< daughterLV->GetName()<< std::endl;
+                return true;
+                
+            }
+//            else {
+//                std::cout<<"------------> Too bad, it is not the right one!!!"<<std::endl;
+//                std::cout<<daughterLV->GetName()<< " should have been equal to == "<< volume->GetLogicalVolume()->GetName()<<std::endl;
+//            }
+        }
+    }
+    std::cout<<"***** Research ends here! ***** "<<std::endl;
+    return true;
+}
+
+G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local){
+    
+    std::cout<<"Converting coordinates from Local to Global: "<<std::endl;
+    std::cout<<"G4VPhysicalVolumes chain is: \n"<<fWorld->GetName();
+    for (auto & element : fTree) {
+        std::cout<<" --> " << element->GetName()<<" ( "<< element->GetLogicalVolume()->GetName()<<" ) ";
+    }
+    std::cout<<std::endl;
+    G4ThreeVector globalPoint = local;
+    G4ThreeVector localPoint;
+    for (std::vector<G4VPhysicalVolume*>::reverse_iterator element = fTree.rbegin();
+         element != fTree.rend(); ++element )
+    {
+        localPoint = globalPoint;
+        std::cout<<"Translating from "<<(*element)->GetName()<<" to "<<(*element)->GetMotherLogical()->GetName()<<std::endl;
+        G4AffineTransform Tm((*element)->GetRotation(), (*element)->GetTranslation());
+        globalPoint = Tm.TransformPoint(localPoint);
+        std::cout<<"Local point: "<<localPoint<<" transformed in global: "<<globalPoint<<std::endl;
+    }
+    return globalPoint;
+}
+
+
+void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope,std::vector<json>& jlist){
     
     int localNoDaughters = envelope->GetNoDaughters();
     //std::cout<<"Total n. of Daughters of "<<envelope->GetName()<<" is : "<<localNoDaughters<<std::endl;
@@ -103,20 +201,18 @@ void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope){
         
         G4VPhysicalVolume *daughter=envelope->GetDaughter(sampleNo);
         if(daughter->GetLogicalVolume()->GetNoDaughters()>0)
-                RecursivelyCheckOverlap(daughter->GetLogicalVolume());
+                RecursivelyCheckOverlap(daughter->GetLogicalVolume(), jlist);
         //std::cout<<"Starting Overlaps check on daughter: "<<daughter->GetName()<<std::endl;
-        //daughter->CheckOverlaps();
-        myCheckOverlaps(daughter);
+        //std::cout<<"... "<<sampleNo<<std::endl;
+        myCheckOverlaps(daughter, jlist);
     }
 }
 
-bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int res, G4double tol,G4bool verbose, G4int maxErr)
+bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res, G4double tol,G4bool verbose, G4int maxErr)
 {
-  
-        std::ofstream o(fReportFileName);
+        std::cout.precision(8);
         clashdet::clash singleClash;
         json jSingleClash;
-    
         if (res <= 0) { return false; }
         G4VSolid* solid = volume->GetLogicalVolume()->GetSolid();
         G4LogicalVolume* motherLog = volume->GetMotherLogical();
@@ -131,7 +227,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
         
         if (verbose)
         {
-            G4cout << "Checking overlaps for volume " << volume->GetName()
+            G4cout << "*************  Checking overlaps for volume " << volume->GetName()
             << " (" << solid->GetEntityType() << ") ... ";
         }
 
@@ -152,8 +248,6 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                         "GeomVol1002", JustWarning, message);
             return false;
         }
-    
-    
     
         // Generate random points on the surface of the solid,
         // transform them into the mother volume coordinate system
@@ -197,24 +291,6 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                 << "overlapping by at least: "
                 << G4BestUnit(distin, "Length");
                 
-                //fill the singleClash struct
-                //singleClash.clashType = 'withMother';
-                singleClash.volume1Name=volume->GetName();
-                singleClash.volume1EntityType=solid->GetEntityType();
-                singleClash.volume1CopyNo =volume->GetCopyNo();
-                singleClash.volume2Name =  motherLog->GetName();
-                singleClash.volume2EntityType = motherSolid->GetEntityType();
-                singleClash.x = mp[0];
-                singleClash.y = mp[1];
-                singleClash.z = mp[2];
-                singleClash.distance = distin;
-                
-                //write the singleClash in the json file
-                to_json(jSingleClash, singleClash);
-                // write prettified JSON to another file
-                o << std::setw(4) << jSingleClash << std::endl;
-
-            
                 if (trials >= maxErr)
                 {
                     message << G4endl
@@ -223,6 +299,34 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                 }
                 G4Exception("G4PVPlacement::CheckOverlaps()",
                             "GeomVol1002", JustWarning, message);
+                
+                std::cout<<"**** GMClash detected a clash ::withMother - at local point: " <<mp<<std::endl;
+                iterateFromWorld(fWorld->GetLogicalVolume(), volume, mp);
+                G4ThreeVector globalPoint = localToGlobal (mp);
+                std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
+                fTree.clear();
+                
+                //fill the singleClash struct
+                singleClash.clashType = clashdet::withMother;
+                singleClash.volume1Name=volume->GetName();
+                singleClash.volume1CopyNo =volume->GetCopyNo();
+                singleClash.volume1EntityType=solid->GetEntityType();
+                singleClash.volume2Name =  motherLog->GetName();
+                //singleClash.volume2CopyNo
+                singleClash.volume2EntityType = motherSolid->GetEntityType();
+                singleClash.x = globalPoint[0];
+                singleClash.y = globalPoint[1];
+                singleClash.z = globalPoint[2];
+                singleClash.distance = distin;
+                
+                //write the singleClash in the json file
+                to_json(jSingleClash, singleClash);
+                // write prettified JSON to another file
+                jlist.push_back(jSingleClash);
+                
+                
+                
+                
                 if (trials >= maxErr)  { return true; }
                 break;
             }
@@ -327,6 +431,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                 ++trials;
                 retval = true;
                 std::ostringstream message;
+                
                 message << "Overlap with volume already placed !" << G4endl
                 << "          Overlap is detected for volume "
                 << volume->GetName() << ':' << volume->GetCopyNo()
@@ -337,24 +442,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                 << " volume's" << G4endl
                 << "          local point " << plocal << ", "
                 << "overlapping by at least: "
-                << G4BestUnit(distout, "Length");
-                
-                //fill the singleClash struct
-                //singleClash.clashType = 'withDaughter';
-                singleClash.volume1Name=volume->GetName();
-                singleClash.volume1EntityType=solid->GetEntityType();
-                singleClash.volume1CopyNo =volume->GetCopyNo();
-                singleClash.volume2Name =  daughter->GetName();
-                singleClash.volume2EntityType = daughterSolid->GetEntityType();
-                singleClash.x = plocal[0];
-                singleClash.y = plocal[1];
-                singleClash.z = plocal[2];
-                singleClash.distance = distout;
-                
-                //write the singleClash in the json file
-                to_json(jSingleClash, singleClash);
-                // write prettified JSON to another file
-                o << std::setw(4) << jSingleClash << std::endl;
+                << G4BestUnit(distout, "Length")<<std::endl;
                 
                 if (trials >= maxErr)
                 {
@@ -364,6 +452,30 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                 }
                 G4Exception("G4PVPlacement::CheckOverlaps()",
                             "GeomVol1002", JustWarning, message);
+                
+                std::cout<<"**** GMClash detected a clash ::withSister - at local point: " <<plocal<<std::endl;
+                iterateFromWorld(fWorld->GetLogicalVolume(), volume, plocal);
+                G4ThreeVector globalPoint = localToGlobal (plocal);
+                std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
+                fTree.clear();
+                
+                //fill the singleClash struct
+                singleClash.clashType         = clashdet::withSister;
+                singleClash.volume1Name       = volume->GetName();
+                singleClash.volume1CopyNo     = volume->GetCopyNo();
+                singleClash.volume1EntityType = solid->GetEntityType();
+                singleClash.volume2Name       = daughter->GetName();
+                singleClash.volume2CopyNo     = daughter->GetCopyNo();
+                singleClash.volume2EntityType = daughterSolid->GetEntityType();
+                singleClash.x = globalPoint[0];
+                singleClash.y = globalPoint[1];
+                singleClash.z = globalPoint[2];
+                singleClash.distance = distout;
+                
+                //write the singleClash in the json file
+                to_json(jSingleClash, singleClash);
+                jlist.push_back(jSingleClash);
+                
                 if (trials >= maxErr)  { return true; }
             }
             else if (distout == kInfinity)
@@ -394,24 +506,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                     << daughter->GetName() << ':' << daughter->GetCopyNo()
                     << " (" << daughterSolid->GetEntityType() << ")"
                     << " at the same level !";
-                    
-                    //fill the singleClash struct
-                    //singleClash.clashType = 'withDaughter';
-                    singleClash.volume1Name=volume->GetName();
-                    singleClash.volume1EntityType=solid->GetEntityType();
-                    singleClash.volume1CopyNo =volume->GetCopyNo();
-                    singleClash.volume2Name =  daughter->GetName();
-                    singleClash.volume2EntityType = daughterSolid->GetEntityType();
-//                    singleClash.x = plocal[0];
-//                    singleClash.y = plocal[1];
-//                    singleClash.z = plocal[2];
-//                    singleClash.distance = distout;
-                    //write the singleClash in the json file
-                    to_json(jSingleClash, singleClash);
-                    // write prettified JSON to another file
-                    o << std::setw(4) << jSingleClash << std::endl;
-                    
-                    
+            
                     if (trials >= maxErr)
                     {
                         message << G4endl
@@ -420,13 +515,36 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, G4int re
                     }
                     G4Exception("G4PVPlacement::CheckOverlaps()",
                                 "GeomVol1002", JustWarning, message);
+                    
+                    std::cout<<"**** GMClash detected a clash ::fullyEncapsSister - at local point: " <<dPoint<<std::endl;
+                    iterateFromWorld(fWorld->GetLogicalVolume(), volume, dPoint);
+                    G4ThreeVector globalPoint = localToGlobal (dPoint);
+                    std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
+                    fTree.clear();
+                    
+                    //fill the singleClash struct
+                    singleClash.clashType         = clashdet::fullyEncapsSister;
+                    singleClash.volume1Name       = volume->GetName();
+                    singleClash.volume1CopyNo     = volume->GetCopyNo();
+                    singleClash.volume1EntityType = solid->GetEntityType();
+                    singleClash.volume2Name       = daughter->GetName();
+                    singleClash.volume2CopyNo     = daughter->GetCopyNo();
+                    singleClash.volume2EntityType = daughterSolid->GetEntityType();
+                    singleClash.x = globalPoint[0];
+                    singleClash.y = globalPoint[1];
+                    singleClash.z = globalPoint[2];
+                    //                    singleClash.distance = distout;
+                    
+                    //write the singleClash in the json file
+                    to_json(jSingleClash, singleClash);
+                    jlist.push_back(jSingleClash);
+                    
                     if (trials >= maxErr)  { return true; }
                 }
             }
         }
         
-        if (verbose && trials == 0) { G4cout << "OK! " << G4endl; }
-        o.close();
+        if (verbose && trials == 0) { G4cout << "OK, done! " << G4endl; }
         return retval;
 }
 
@@ -443,7 +561,7 @@ GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
         Air->add(Nitrogen, .8);
         Air->add(Oxigen, .2);
         Air->lock();
-        const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+        const GeoBox* worldBox = new GeoBox(1300*SYSTEM_OF_UNITS::cm, 1300*SYSTEM_OF_UNITS::cm, 1300*SYSTEM_OF_UNITS::cm);
         const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Air);
         world = new GeoPhysVol(worldLog);
     }
@@ -497,7 +615,12 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         }
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
         G4cout << "Detector Construction from the plugin file " << fGeometryFileName.data() <<", done!"<<G4endl;
-        exit(0);
+        
+//        G4GDMLParser parser;
+//        parser.SetRegionExport(true);
+//        //     parser.SetEnergyCutsExport(true);
+//        parser.Write("accordion.gdml", fWorld->GetLogicalVolume());
+//        G4cout << "Geometry exported in GDML, done!"<<G4endl;
         
     }
     else if (fGeometryFileName.contains(".db")){
@@ -584,8 +707,22 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
     
     if (fRunOverlapCheck){
-        RecursivelyCheckOverlap(envelope);
-        G4cout<<"Recursive overlap check done! Exiting."<<G4endl;
+        G4cout << "\n ===================  Starting Clashes Detection  =================== \n" << G4endl;
+        fTimer.Start();
+        std::vector<json> jlist;
+        RecursivelyCheckOverlap(envelope, jlist);
+        fTimer.Stop();
+        G4cout << "\n**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
+        G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
+        G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
+        
+        json jReport={{"ClashesReport",jlist}};
+        std::cout<<"\n**** Writing out the clashes report file: "<<fReportFileName<<std::endl;
+        std::ofstream outJsonFile(fReportFileName);
+        outJsonFile << std::setw(4) << jReport << std::endl;
+        outJsonFile.close();
+        
+        G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
         exit(0);
     }
     

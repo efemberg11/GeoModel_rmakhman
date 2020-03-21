@@ -28,7 +28,7 @@ class GMXPlugin : public GeoVGeometryPlugin  {
   ~GMXPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world);
+  virtual void create(GeoPhysVol *world, GeoVStore* store);
 
  private:
 
@@ -53,7 +53,7 @@ GMXPlugin::~GMXPlugin()
 
 
 //## Other Operations (implementation)
-void GMXPlugin::create(GeoPhysVol *world)
+void GMXPlugin::create(GeoPhysVol *world, GeoVStore*)
 {
 
   	std::cout<< "creating a GeoModelXml detector "<<std::endl;

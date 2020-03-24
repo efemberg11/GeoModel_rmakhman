@@ -4,9 +4,10 @@
  *  Created on: May 20, 2016
  *      Author: riccardo.maria.bianchi@cern.ch
  *
- * major updates: 
+ * major updates:
  *  - Feb 2019, R.M.Bianchi
  *  - Mar 2020, R.M.Bianchi
+ *  - Mar 2020, boudreau
  */
 
 // local includes
@@ -15,9 +16,7 @@
 // TFPersistification includes
 #include "TFPersistification/TransFunctionInterpreter.h"
 
-// GeoSpecialShapes
-#include "GeoSpecialShapes/LArCustomShape.h"
-
+#include "GeoModelKernel/GeoUnidentifiedShape.h"
 
 // GeoModelKernel
 #include "GeoModelKernel/GeoTransform.h"
@@ -69,7 +68,7 @@
 #include <future>
 #include <mutex>
 #include <chrono>
- 
+
 std::mutex muxStore;
 std::mutex muxGet;
 std::mutex muxCout;
@@ -82,7 +81,7 @@ using namespace GeoXF;
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(true)
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false)
 {
 	qDebug() << "===> DumpGeoModelAction: constructor";
 
@@ -98,7 +97,7 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 	// set the geometry file
 	m_dbManager = db;
 	if (m_dbManager->isOpen()) {
-		qDebug() << "OK! Database is open!";
+	  if (m_deepDebug) qDebug() << "OK! Database is open!";
 	}
 	else {
 		qWarning() << "ERROR!! Database is NOT open!";
@@ -113,7 +112,7 @@ ReadGeoModel::~ReadGeoModel() {
 
 GeoPhysVol* ReadGeoModel::buildGeoModel()
 {
-	qDebug() << "ReadGeoModel::buildGeoModel()";
+  if (m_deepDebug) qDebug() << "ReadGeoModel::buildGeoModel()";
 
 	// return buildGeoModelByCalls();
 	GeoPhysVol* rootVolume = buildGeoModelOneGo();
@@ -132,51 +131,36 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 
 GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 {
-	qDebug() << "ReadGeoModel::buildGeoModelOneGo()";
+  if (m_deepDebug) qDebug() << "ReadGeoModel::buildGeoModelOneGo()";
 
 	// get all objects from the DB
 	m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
-	std::cout << "GeoPhysVol, loaded." << std::endl;
 	m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
-	std::cout << "GeoFullPhysVol, loaded." << std::endl;
 	m_logVols = m_dbManager->getTableFromNodeType("GeoLogVol");
-	std::cout << "GeoLogVol, loaded." << std::endl;
 	m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
-	std::cout << "GeoShape, loaded." << std::endl;
 	m_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
-	std::cout << "GeoMaterial, loaded." << std::endl;
 	m_elements = m_dbManager->getTableFromNodeType("GeoElement");
-	std::cout << "GeoElement, loaded." << std::endl;
 	m_functions = m_dbManager->getTableFromNodeType("Function");
-	std::cout << "Function, loaded." << std::endl;
 	m_serialDenominators = m_dbManager->getTableFromNodeType("GeoSerialDenominator");
-	std::cout << "GeoSerialDenominator, loaded." << std::endl;
 	m_serialTransformers = m_dbManager->getTableFromNodeType("GeoSerialTransformer");
-	std::cout << "GeoSerialTransformer, loaded." << std::endl;
 	m_alignableTransforms = m_dbManager->getTableFromNodeType("GeoAlignableTransform");
-	std::cout << "GeoAlignableTransform, loaded." << std::endl;
 	m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
-	std::cout << "GeoTransform, loaded." << std::endl;
 	m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
-	std::cout << "GeoNameTag, loaded." << std::endl;
 	// qDebug() << "physVols: " << _physVols;
 	// qDebug() << "fullPhysVols: " << _fullPhysVols;
 
 	// get DB metadata
 	m_tableid_tableName = m_dbManager->getAll_TableIDsNodeTypes();
-	std::cout << "DB metadata, loaded." << std::endl;
 
 	// get the children table from DB
 	m_allchildren = m_dbManager->getChildrenTable();
 	// qDebug() << "all children from DB:" << _allchildren;
-	std::cout << "children positions, loaded." << std::endl;
 
 	// get the root volume data
 	m_root_vol_data = m_dbManager->getRootPhysVol();
-	std::cout << "root volume data, loaded." << std::endl;
 
 	// return loopOverAllChildren();
-	
+
 	loopOverAllChildrenInBunches();
 	return getRootVolume();
 
@@ -195,12 +179,12 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
 	std::cout << "processing " << nChildrenRecords << " keys..." << std::endl;
 	muxCout.unlock();
 
-	// loop over parents' keys. 
+	// loop over parents' keys.
 	// It returns a list of children with positions (sorted by position)
-	
+
 	// Get Start Time
 	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-	
+
 	foreach (const QString &parentKey, keys ) {
 		// qWarning() << "parentKey" << parentKey;
 		processParentChildren(parentKey);
@@ -216,7 +200,7 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
 
 //----------------------------------------
 // Parallel loop over parents' children
-void ReadGeoModel::loopOverAllChildrenInBunches() 
+void ReadGeoModel::loopOverAllChildrenInBunches()
 {
 	int nChildrenRecords = m_allchildren.size();
 	std::cout << "number of children to process: " << nChildrenRecords << std::endl;
@@ -233,7 +217,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 		unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
 		unsigned int nThreads = nThreadsPlatform * 2;
 		std::cout << "On this platform, " << nThreadsPlatform << " concurrent threads are supported. Using " << nThreads << " threads.\n";
-		
+
 		unsigned int nBunches = nChildrenRecords / nThreads;
 		std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each." << std::endl;
 
@@ -257,7 +241,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 			// loopOverAllChildren(bunch);
 			futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildren, this, bunch) );
 		}
-		
+
 		// wait for all async calls to complete
 		//retrive and print the value stored in the future
 		muxCout.lock();
@@ -278,7 +262,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 	return;
 }
 
-void ReadGeoModel::processParentChildren(const QString &parentKey) 
+void ReadGeoModel::processParentChildren(const QString &parentKey)
 {
 	if (m_deepDebug) qDebug() << "\n" << "parent: " << parentKey << ':' << m_allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]";
 
@@ -316,8 +300,8 @@ void ReadGeoModel::processParentChildren(const QString &parentKey)
 }
 
 
-// void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child, std::mutex &mux) 
-void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child) 
+// void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child, std::mutex &mux)
+void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child)
 {
 	if (m_deepDebug) qDebug() << "child:" << child;
 
@@ -325,7 +309,7 @@ void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, cons
 		std::cout <<  "ERROR!!! Probably you are using an old geometry file..." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	
+
 	// build or get child node
 	QString childTableId = child[5];
 	QString childId = child[6];
@@ -489,7 +473,7 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildMaterial()";
 	QStringList values = m_materials[id.toUInt()];
 
-	qDebug() << "mat values=" << values;
+	if (m_deepDebug) qDebug() << "mat values=" << values;
 	QString matId = values[0];
 	QString matName = values[1];
 	double matDensity = values[2].toDouble();
@@ -508,7 +492,7 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 		QStringList elements = matElements.split(";");
 		foreach( QString par, elements) {
 
-			qDebug() << "par:" << par;
+		  if (m_deepDebug) qDebug() << "par:" << par;
 			QStringList vars = par.split(":");
 			QString elId = vars[0];
 			double elFraction = vars[1].toDouble();
@@ -1438,29 +1422,51 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
   else if(type == "CustomShape") {
     std::string name = "";
     // get parameters from DB string
-	QStringList shapePars = parameters.split(";");
-	// qWarning() << "shapePars: " << shapePars << shapePars.size() << shapePars.isEmpty();
-	if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
-	{ 
-		foreach( QString par, shapePars) {
-				QStringList vars = par.split("=");
-				QString varName = vars[0];
-				QString varValue = vars[1];
-				if (varName == "name") name = varValue.toStdString();
-			}
-	} else {
-		// throw std::invalid_argument("CustomShape parameters' list is empty!!");
-		std::cout << "ERROR!!! --> CustomShape parameters' list is empty!! It seems the ATLAS geometry file you are running on is corrupted." << std::endl;
-		exit(EXIT_FAILURE);
-	}
-    return new LArCustomShape(name);
+  	QStringList shapePars = parameters.split(";");
+  	// qWarning() << "shapePars: " << shapePars << shapePars.size() << shapePars.isEmpty();
+  	if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
+  	{
+  		foreach( QString par, shapePars) {
+  				QStringList vars = par.split("=");
+  				QString varName = vars[0];
+  				QString varValue = vars[1];
+  				if (varName == "name") name = varValue.toStdString();
+  			}
+  	} else {
+  		// throw std::invalid_argument("CustomShape parameters' list is empty!!");
+  		std::cout << "ERROR!!! --> CustomShape parameters' list is empty!! It seems the geometry file you are running on is corrupted." << std::endl;
+  		exit(EXIT_FAILURE);
+  	}
+      return new GeoUnidentifiedShape("LArCustomShape",name);
   }
-	else {
-		// QString msg = "WARNING!! - Shape '" + type + "' not implemented yet!!! Returning a dummy cube.";
-		// qWarning(msg.toStdString().c_str());
-		m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
-		return new GeoBox(30.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm); // FIXME: bogus shape. Use actual shape!
-	}
+  else if (type=="UnidentifiedShape") {
+    std::string name = "";
+    std::string asciiData = "";
+    // get parameters from DB string
+    QStringList shapePars = parameters.split(";");
+    if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
+  	{
+      foreach( QString par, shapePars) {
+        QStringList vars = par.split("=");
+        QString varName = vars[0];
+        QString varValue = vars[1];
+        if (varName == "name") name = varValue.toStdString();
+        if (varName == "asciiData") asciiData=varValue.toStdString();
+      }
+    } else {
+      // throw std::invalid_argument("UnidentifiedShape parameters' list is empty!!");
+      std::cout << "ERROR!!! --> UnidentifiedShape parameters' list is empty!! It seems the geometry file you are running on is corrupted." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    return new GeoUnidentifiedShape(name,asciiData);
+
+  }
+  else {
+    // QString msg = "WARNING!! - Shape '" + type + "' not implemented yet!!! Returning a dummy cube.";
+    // qWarning(msg.toStdString().c_str());
+    m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
+    return new GeoBox(30.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm); // FIXME: bogus shape. Use actual shape!
+  }
 
 // }
 

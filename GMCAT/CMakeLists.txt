@@ -1,27 +1,20 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 0)
-set(MYLIB_VERSION_PATCH 0)
+# Declare the package's executable.
+add_executable( gmcat src/gmcat.cxx )
+target_link_libraries( gmcat PRIVATE GeoModelCore::GeoModelKernel
+   GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite
+   GeoModelIO::GeoModelDBManager )
 
-set( CMAKE_BUILD_TYPE DEBUG )
-set(CMAKE_CXX_FLAGS "-fPIC -O0 -g -gdwarf-2" )
+# Tweak how debug information should be attached to the executable, in Debug
+# builds.
+if( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND
+   "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" )
+   target_compile_options( gmcat PRIVATE "-gdwarf-2" )
+endif()
 
-project ( "gmcat" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
-
-find_package( GeoModelCore REQUIRED )
-find_package( GeoModelIO REQUIRED )
-find_package( Eigen3 REQUIRED )
-file( GLOB SOURCES src/*.cxx )
-
-include_directories ("${PROJECT_SOURCE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}/src")
-add_executable ( gmcat ${SOURCES} ${HEADERS}  )
-
-# External dependencies:
-
-target_link_libraries (gmcat GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-install(TARGETS gmcat DESTINATION bin)
-
-
-
-
+# Install the executable.
+install( TARGETS gmcat
+   EXPORT ${PROJECT_NAME}-export
+   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   COMPONENT Runtime )

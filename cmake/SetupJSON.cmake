@@ -1,11 +1,11 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 #
-# This module is used to set up nlohmann_json for the project. Either by
+# This module is used to set up "nlohmann_json" for the project. Either by
 # looking for it on the build machine, or by downloading it during the build
 # itself.
 #
 
-# Configuration option for how XercesC should be used.
+# Configuration option for how "nlohmann_json" should be used.
 option( GEOMODEL_USE_BUILTIN_JSON
    "Download a version of nlohmann_json during the build" FALSE )
 

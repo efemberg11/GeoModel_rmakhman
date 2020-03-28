@@ -77,11 +77,11 @@ target_link_libraries(fillHistogramExample ${Geant4_LIBRARIES})
 
 if( nlohmann_json_FOUND )
 
-target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json )
+target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces  nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json )
+target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json )
+target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
@@ -89,11 +89,11 @@ else()
 
 message(STATUS "'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
 
-target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 

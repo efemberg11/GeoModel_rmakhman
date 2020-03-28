@@ -14,6 +14,7 @@ find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
 # Set sub-packages to build.
 add_subdirectory(VP1GeometryPlugin)
 add_subdirectory(VP1GeometrySystems)
+add_subdirectory(GXClashPointSystems)
 add_subdirectory(GeoModelExplorer)
 add_subdirectory(VP1Gui)
 add_subdirectory(VP1Base)

@@ -88,7 +88,6 @@ public:
 GuideSysController::GuideSysController(IVP1System * sys)
   : VP1Controller(sys,"GuideSysController"), m_d(new Imp)
 {
-   std::cout << "HELLO from GuideSysController" << std::endl;
 
   m_d->theclass = this;
   m_d->ui.setupUi(this);

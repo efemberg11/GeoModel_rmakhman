@@ -115,7 +115,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   m_d->floor->setColourAndTransp(m_d->controller->floorColourAndTransp());
   connect(m_d->controller,SIGNAL(showFloorChanged(bool)),m_d->floor,SLOT(setShown(bool)));
   m_d->floor->setShown(m_d->controller->showFloor());
-  std::cout << "HELLO from GuideLineSystem: Floor" << std::endl;
 
   //CartesianGrid:
   m_d->cartesiangrid = new VP1CartesianGrid(root,this);
@@ -127,7 +126,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   m_d->cartesiangrid->setColourAndTransp(m_d->controller->gridColourAndTransp());
   connect(m_d->controller,SIGNAL(showCartesianGridChanged(bool)),m_d->cartesiangrid,SLOT(setShown(bool)));
   m_d->cartesiangrid->setShown(m_d->controller->showCartesianGrid());
-  std::cout << "HELLO from GuideLineSystem: CartGrid" << std::endl;
 
   //CylindricalGrid:
   m_d->cylindricalgrid = new VP1CylindricalGrid(root,this);
@@ -139,7 +137,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   m_d->cylindricalgrid->setColourAndTransp(m_d->controller->gridColourAndTransp());
   connect(m_d->controller,SIGNAL(showCylindricalGridChanged(bool)),m_d->cylindricalgrid,SLOT(setShown(bool)));
   m_d->cylindricalgrid->setShown(m_d->controller->showCylindricalGrid());
-  std::cout << "HELLO from GuideLineSystem: CylGrid" << std::endl;
 
   //Letters:
   m_d->letters = new VP1Letters(m_d->controller->lettersMaterial(),root,this);
@@ -149,7 +146,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   m_d->letters->setVerticalPosition(m_d->controller->lettersVerticalPos());
   connect(m_d->controller,SIGNAL(showLettersChanged(bool)),m_d->letters,SLOT(setShown(bool)));
   m_d->letters->setShown(m_d->controller->showLetters());
-  std::cout << "HELLO from GuideLineSystem: Letters" << std::endl;
 
   //Coordinate axes:
   m_d->coordinateaxes = new VP1CoordinateAxes(m_d->controller->xAxisMaterial(),
@@ -164,7 +160,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   m_d->coordinateaxes->setRelativeAxisThickness(m_d->controller->relAxesThickness());
   connect(m_d->controller,SIGNAL(showAxesChanged(bool)),m_d->coordinateaxes,SLOT(setShown(bool)));
   m_d->coordinateaxes->setShown(m_d->controller->showAxes());
-  std::cout << "HELLO from GuideLineSystem: Axes" << std::endl;
 
   //Eta cones:
   m_d->etacone1 = new VP1EtaCone(m_d->controller->etaCone1Material(),root,this);
@@ -174,7 +169,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   m_d->etacone1->setEtaValue(m_d->controller->etaConeValue1());
   connect(m_d->controller,SIGNAL(showEtaCone1Changed(bool)),m_d->etacone1,SLOT(setShown(bool)));
   m_d->etacone1->setShown(m_d->controller->showEtaCone1());
-  std::cout << "HELLO from GuideLineSystem: Eta1" << std::endl;
 
   m_d->etacone2 = new VP1EtaCone(m_d->controller->etaCone2Material(),root,this);
   connect(m_d->controller,SIGNAL(etaExtentChanged(const double&)),m_d->etacone2,SLOT(setExtent(const double&)));
@@ -183,7 +177,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   m_d->etacone2->setEtaValue(m_d->controller->etaConeValue2());
   connect(m_d->controller,SIGNAL(showEtaCone2Changed(bool)),m_d->etacone2,SLOT(setShown(bool)));
   m_d->etacone2->setShown(m_d->controller->showEtaCone2());
-  std::cout << "HELLO from GuideLineSystem: Eta2" << std::endl;
 
   m_d->etacone3 = new VP1EtaCone(m_d->controller->etaCone3Material(),root,this);
   connect(m_d->controller,SIGNAL(etaExtentChanged(const double&)),m_d->etacone3,SLOT(setExtent(const double&)));
@@ -192,7 +185,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   m_d->etacone3->setEtaValue(m_d->controller->etaConeValue3());
   connect(m_d->controller,SIGNAL(showEtaCone3Changed(bool)),m_d->etacone3,SLOT(setShown(bool)));
   m_d->etacone3->setShown(m_d->controller->showEtaCone3());
-  std::cout << "HELLO from GuideLineSystem: Eta3" << std::endl;
 
   //Lines
   m_d->lines = new VP1Lines(root, this);
@@ -200,7 +192,6 @@ void VP1GuideLineSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
 	m_d->lines->setShown(m_d->controller->showLines());	
   connect(m_d->controller,SIGNAL(lineDirectionChanged(const SbVec3f&)),m_d->lines,SLOT(setDirection(const SbVec3f&)));
   m_d->lines->setDirection(m_d->controller->lineDirection());  
-  std::cout << "HELLO from GuideLineSystem: Lines" << std::endl;
   
   SoSeparator * projsep = new SoSeparator;
   root->addChild(projsep);

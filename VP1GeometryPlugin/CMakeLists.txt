@@ -44,6 +44,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1GeometrySystems")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1GuideLineSystems")
+include_directories ("${PROJECT_SOURCE_DIR}/../GXClashPointSystems")
 add_library ( GXGeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 
 # External dependencies:
@@ -57,7 +58,7 @@ include_directories(${Qt5Sql_INCLUDE_DIRS} )
 include_directories(${Coin_INCLUDE_DIRS} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGeometryPlugin ${Qt5Core_LIBRARIES} GXGeometrySystems GXGuideLineSystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GeoModelCore::GeoModelKernel GeoModelCore::GeoGenericFunctions GeoModelIO::GeoModelRead GeoModelIO::TFPersistification GeoModelIO::GeoModelDBManager )
+target_link_libraries (GXGeometryPlugin ${Qt5Core_LIBRARIES} GXGeometrySystems GXGuideLineSystems  GXClashPointSystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GeoModelCore::GeoModelKernel GeoModelCore::GeoGenericFunctions GeoModelIO::GeoModelRead GeoModelIO::TFPersistification GeoModelIO::GeoModelDBManager )
 add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGeometryPlugin

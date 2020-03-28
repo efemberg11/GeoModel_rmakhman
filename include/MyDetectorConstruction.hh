@@ -52,7 +52,7 @@ public:
     
   //Retrieves the corresponding point in global coordinates,
   //using the chain of G4VPhysicalVolumes stored in the fTree vector
-  G4ThreeVector localToGlobal(G4ThreeVector& mp);
+  G4ThreeVector localToGlobal(G4ThreeVector& mp, bool skipFirstIt);
   
   // Iterate from the volume envelope through all the daughter volumes, and look for the ancestors of
   // 'volume', populating the fTree vector of G4VPhysicalVolumes

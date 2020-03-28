@@ -170,7 +170,7 @@ bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhys
     return true;
 }
 
-G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local){
+G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool skipFirstIt){
     
     std::cout<<"Converting coordinates from Local to Global: "<<std::endl;
     std::cout<<"G4VPhysicalVolumes chain is: \n"<<fWorld->GetName();
@@ -183,11 +183,22 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local){
     for (std::vector<G4VPhysicalVolume*>::reverse_iterator element = fTree.rbegin();
          element != fTree.rend(); ++element )
     {
-        localPoint = globalPoint;
-        std::cout<<"Translating from "<<(*element)->GetName()<<" to "<<(*element)->GetMotherLogical()->GetName()<<std::endl;
-        G4AffineTransform Tm((*element)->GetRotation(), (*element)->GetTranslation());
-        globalPoint = Tm.TransformPoint(localPoint);
-        std::cout<<"Local point: "<<localPoint<<" transformed in global: "<<globalPoint<<std::endl;
+        // if the clash happens with the mother volumes the clashing point is already
+        // in the mother coordinates - so we skip the first loop
+        if(skipFirstIt){
+            std::cout<<"IS mother, skipping the first iteration"<<std::endl;
+            skipFirstIt=false;
+            
+        }
+        else{
+            localPoint = globalPoint;
+            std::cout<<"Translating from "<<(*element)->GetName()<<" to "<<(*element)->GetMotherLogical()->GetName()<<std::endl;
+            G4AffineTransform Tm((*element)->GetRotation(), (*element)->GetTranslation());
+            globalPoint = Tm.TransformPoint(localPoint);
+            std::cout<<"Local point: "<<localPoint<<" transformed in global: "<<globalPoint<<std::endl;
+            
+        }
+
     }
     return globalPoint;
 }
@@ -302,7 +313,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 
                 std::cout<<"**** GMClash detected a clash ::withMother - at local point: " <<mp<<std::endl;
                 iterateFromWorld(fWorld->GetLogicalVolume(), volume, mp);
-                G4ThreeVector globalPoint = localToGlobal (mp);
+                G4ThreeVector globalPoint = localToGlobal (mp, true);
                 std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
                 fTree.clear();
                 
@@ -453,9 +464,15 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 G4Exception("G4PVPlacement::CheckOverlaps()",
                             "GeomVol1002", JustWarning, message);
                 
-                std::cout<<"**** GMClash detected a clash ::withSister - at local point: " <<plocal<<std::endl;
-                iterateFromWorld(fWorld->GetLogicalVolume(), volume, plocal);
-                G4ThreeVector globalPoint = localToGlobal (plocal);
+                std::cout<<"**** GMClash detected a clash ::withSister - at sister local point: " <<plocal<<std::endl;
+                // Transform the generated point to the mother's coordinate system
+                // and then to current volume's coordinate system
+                //
+                G4ThreeVector mp2 = Td.TransformPoint(plocal);
+                G4ThreeVector msi = Tm.InverseTransformPoint(mp2);
+                iterateFromWorld(fWorld->GetLogicalVolume(), volume, msi);
+                
+                G4ThreeVector globalPoint = localToGlobal (msi, false);
                 std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
                 fTree.clear();
                 
@@ -516,9 +533,10 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                     G4Exception("G4PVPlacement::CheckOverlaps()",
                                 "GeomVol1002", JustWarning, message);
                     
-                    std::cout<<"**** GMClash detected a clash ::fullyEncapsSister - at local point: " <<dPoint<<std::endl;
-                    iterateFromWorld(fWorld->GetLogicalVolume(), volume, dPoint);
-                    G4ThreeVector globalPoint = localToGlobal (dPoint);
+                    std::cout<<"**** GMClash detected a clash ::fullyEncapsSister - at volume1 local point: " <<msi<<std::endl;
+                    iterateFromWorld(fWorld->GetLogicalVolume(), volume, msi);
+                    G4ThreeVector globalPoint = localToGlobal (msi, false);
+
                     std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
                     fTree.clear();
                     

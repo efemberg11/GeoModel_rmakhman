@@ -5,6 +5,7 @@ stages:
   - deps-xerces-c
   - deps-Geant4
   - deps-geomodelg4
+  - deps-nlohmann_json
   - build
 
 
@@ -135,6 +136,22 @@ variables:
     paths:
       - install
 
+.nlohmann_json-build-template: &nlohmann_json-job
+  stage: deps-nlohmann_json
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://github.com/nlohmann/json.git
+    - mkdir nlohmann_json-build
+    - cd nlohmann_json-build
+    - cmake ${CMAKE_ARGS} ../json
+    - make -j32
+    - make install
+  artifacts:
+    paths:
+      - install
+
 .fullsimlight-build-template: &fullsimlight-job
   stage: build
   variables:
@@ -178,10 +195,14 @@ geomodelg4-mac:
   <<: *geomodelg4-job
   needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac"]
 
+nlohmann_json-mac:
+  <<: *macos-job
+  <<: *nlohmann_json-job
+
 fullsimlight-mac:
   <<: *macos-job
   <<: *fullsimlight-job
-  needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac", "geomodelg4-mac"]
+  needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac", "geomodelg4-mac", "nlohmann_json-mac"]
 
 
 
@@ -212,8 +233,12 @@ geomodelg4-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelg4-job
   needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu"]
- 
+
+nlohmann_json-ubuntu:
+  <<: *ubuntu-job
+  <<: *nlohmann_json-job
+  
 fullsimlight-ubuntu:
   <<: *ubuntu-job
   <<: *fullsimlight-job
-  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu", "geomodelg4-ubuntu"]
+  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu", "geomodelg4-ubuntu", "nlohmann_json-ubuntu"]

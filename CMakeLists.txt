@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelTools" VERSION 3.1.2 LANGUAGES CXX )
+project( "GeoModelTools" VERSION 4.0.0 LANGUAGES CXX )
 
 # Set default build options.
 set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )

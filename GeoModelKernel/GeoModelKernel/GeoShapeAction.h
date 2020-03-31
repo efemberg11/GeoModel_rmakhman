@@ -36,10 +36,11 @@ class GeoTorus;
 class GeoUnidentifiedShape;
 class GeoSimplePolygonBrep;
 class GeoTessellatedSolid;
-
 class GeoGenericTrap;
 
-class GeoShapeAction 
+class LArCustomShape; // TODO: This is ATLAS-specific and should be removed at some point, but it is needed in Athena
+
+class GeoShapeAction
 {
  public:
   GeoShapeAction();
@@ -111,7 +112,9 @@ class GeoShapeAction
   virtual void handleGenericTrap (const GeoGenericTrap *);
   virtual void handleUnidentifiedShape(const GeoUnidentifiedShape *shape);
 
-  
+  virtual void handleLArCustom (const LArCustomShape *); // TODO: This is ATLAS-specific and should be removed at some point, but it is needed in Athena
+
+
  private:
   GeoShapeAction(const GeoShapeAction &right);
   GeoShapeAction & operator=(const GeoShapeAction &right);
@@ -119,7 +122,7 @@ class GeoShapeAction
   //	A limit may be placed upon the depth to which the action
   //	descends.  0 = self.  1 = self and children.
   Query<unsigned int> m_depth;
-  
+
   //	Termination flag; causes an abortion of action execution.
   bool m_terminate;
   GeoShapePath m_path;

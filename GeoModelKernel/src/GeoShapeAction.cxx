@@ -163,4 +163,8 @@ void GeoShapeAction::handleUnidentifiedShape (const GeoUnidentifiedShape * uShap
   handleShape(uShape);
 }
 
-
+// TODO: This is ATLAS-specific and should be removed at some point, but it is needed in Athena
+void GeoShapeAction::handleLArCustom (const LArCustomShape *lar)
+{
+  handleShape( (GeoShape *) lar);
+}

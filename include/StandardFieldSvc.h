@@ -16,13 +16,11 @@
 #include "MagFieldInterfaces/IMagFieldSvc.h"
 
 // Base classes
-#include "G4MagFieldSvcBase.h"
+#include "G4MagFieldSvcBase.hh"
 
 
 /// @class AtlasField
 /// @brief G4 wrapper around the main ATLAS magnetic field service.
-///
-/// @todo TODO this should probably be put in a good namespace.
 ///
 class AtlasField : public G4MagneticField
 {
@@ -34,33 +32,31 @@ class AtlasField : public G4MagneticField
     /// Implementation of G4 method to retrieve field value
     void GetFieldValue(const double *point, double *field) const
     {
-      m_magFieldSvc->getField(point, field);
+      m_magFieldSvc_AtlasField->getField(point, field);
     }
 
   private:
 
     /// Pointer to the magnetic field service.
     /// We use a raw pointer here to avoid ServiceHandle overhead.
-    MagField::IMagFieldSvc* m_magFieldSvc;
+    MagField::IMagFieldSvc* m_magFieldSvc_AtlasField;
 };
 
 
 /// @class StandardFieldSvc
 /// @brief Athena service for constructing the AtlasField object
 ///
-/// @todo TODO this should probably be put in a good namespace.
-///
 class StandardFieldSvc final : public G4MagFieldSvcBase
 {
   public:
 
     /// Standard constructor
-    StandardFieldSvc(const std::string& name, ISvcLocator* pSvcLocator);
+    StandardFieldSvc(const std::string& name/*, ISvcLocator* pSvcLocator*/);
     /// Empty destructor
     ~StandardFieldSvc() {}
 
     /// Athena method. called at initialization time, being customized here.
-    StatusCode initialize() override final;
+    //StatusCode initialize() override final;
 
   protected:
 
@@ -70,9 +66,9 @@ class StandardFieldSvc final : public G4MagFieldSvcBase
   private:
 
     /// Handle to the ATLAS magnetic field service
-    ServiceHandle<MagField::IMagFieldSvc> m_magFieldSvc;
+    //ServiceHandle<MagField::IMagFieldSvc> m_magFieldSvc;
+    MagField::IMagFieldSvc* m_magFieldSvc;
 
 };
-
 #endif // G4ATLASSERVICES_StandardFieldSvc_H
 

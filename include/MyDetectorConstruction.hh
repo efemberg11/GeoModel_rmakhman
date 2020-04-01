@@ -9,6 +9,9 @@
 #include "G4Timer.hh"
 #include <nlohmann/json.hpp>
 
+#include "G4Cache.hh"
+#include "G4MagneticField.hh"
+
 using json = nlohmann::json;
 
 class G4VPhysicalVolume;
@@ -82,6 +85,7 @@ private:
   G4VPhysicalVolume *fWorld;
   MyDetectorMessenger *fDetectorMessenger;
   std::vector<G4VPhysicalVolume*> fTree;
+  G4Cache<G4MagneticField*> fField; //pointer to the thread-local fields
 };
 
 #endif

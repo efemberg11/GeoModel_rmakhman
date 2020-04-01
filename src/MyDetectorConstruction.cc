@@ -45,8 +45,6 @@
 #endif
 
 
-
-
 // **** INCLUDES for GeoModel
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
@@ -63,8 +61,7 @@
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
-#include "MagFieldServices/AtlasFieldSvc.h"
-#include "StandardFieldSvc.h"
+
 
 #include <QCoreApplication>
 #include <QString>
@@ -77,6 +74,8 @@
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 // ****
 
+#include "MagFieldServices/AtlasFieldSvc.h"
+#include "StandardFieldSvc.h"
 
 
 namespace clashdet {
@@ -127,6 +126,7 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
   fRunOverlapCheck     = false;
   fReportFileName      = "gmclash_report.json";
   fMinStep             = 1.0e-2;
+  fField.Put(0);
 }
 
 MyDetectorConstruction::~MyDetectorConstruction()
@@ -222,9 +222,11 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool s
         // if the clash happens with the mother volumes the clashing point is already
         // in the mother coordinates - so we skip the first loop
         if(skipFirstIt){
+
             std::cout<<"IS mother, skipping the first iteration"<<std::endl;
             skipFirstIt=false;
             
+
         }
         else{
             localPoint = globalPoint;
@@ -234,6 +236,7 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool s
             std::cout<<"Local point: "<<localPoint<<" transformed in global: "<<globalPoint<<std::endl;
             
         }
+
 
     }
     return globalPoint;
@@ -528,13 +531,16 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                             "GeomVol1002", JustWarning, message);
                 
                 std::cout<<"**** GMClash detected a clash ::withSister - at sister local point: " <<plocal<<std::endl;
+
                 // Transform the generated point to the mother's coordinate system
                 // and then to current volume's coordinate system
                 //
                 G4ThreeVector mp2 = Td.TransformPoint(plocal);
                 G4ThreeVector msi = Tm.InverseTransformPoint(mp2);
+
                 iterateFromWorld(fWorld->GetLogicalVolume(), volume, msi);
                 
+
                 G4ThreeVector globalPoint = localToGlobal (msi, false);
                 std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
                 fTree.clear();
@@ -806,71 +812,70 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
         exit(0);
     }
-    G4cout<<"Building Magnetic Field."<<G4endl;
-    ConstructSDandField();
-    
     return fWorld;
 }
 
 void MyDetectorConstruction::ConstructSDandField()
 {
-//  if (std::abs(fFieldValue) > 0.0) {
-//    // Apply a global uniform magnetic field along the Z axis.
-//    // Notice that only if the magnetic field is not zero, the Geant4
-//    // transportion in field gets activated.
-//    auto uniformMagField     = new G4UniformMagField(G4ThreeVector(0.0, 0.0, fFieldValue));
-//    G4FieldManager *fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-//    fieldMgr->SetDetectorField(uniformMagField);
-//    fieldMgr->CreateChordFinder(uniformMagField);
-//    G4cout << G4endl << " *** SETTING MAGNETIC FIELD : fieldValue = " << fFieldValue / tesla << " Tesla *** " << G4endl
-//           << G4endl;
+  if (std::abs(fFieldValue) > 0.0) {
+    // Apply a global uniform magnetic field along the Z axis.
+    // Notice that only if the magnetic field is not zero, the Geant4
+    // transportation in field gets activated.
+    auto uniformMagField     = new G4UniformMagField(G4ThreeVector(0.0, 0.0, fFieldValue));
+    G4FieldManager *fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+    fieldMgr->SetDetectorField(uniformMagField);
+    fieldMgr->CreateChordFinder(uniformMagField);
+    G4cout << G4endl << " *** SETTING UNIFORM MAGNETIC FIELD : fieldValue = " << fFieldValue / tesla << " Tesla *** " << G4endl
+           << G4endl;
+
+  } else
+  {
+      G4cout << G4endl << " *** MAGNETIC FIELD SET FROM FILE  *** " << G4endl << G4endl;
+      if (fField.Get() == 0)
+      {
+          StandardFieldSvc* myMagField = new StandardFieldSvc("StandardFieldSvc");
+          G4MagneticField* g4Field =  myMagField->getField();
+          if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
+          fField.Put(g4Field);
+          
+//          std::cout.precision(8);
+//          G4double point[3] = {0,0,0};
+//          G4double bfield[3];
+//          std::cout<<"4) Debug g4Field"<<std::endl;
+//          for(int i=0; i<10; i++){
+//              point[0]=i;
+//              point[1]=i+10;
+//              point[2]=i+100;
+//              g4Field->GetFieldValue(point,bfield);
 //
-//  } else {
-//      G4FieldManager * fieldMgr = new G4FieldManager();
-//      // Retrieve the G4MagneticField
-//      //G4MagneticField* field = m_fieldSvc->getField();
-//
-//      // Configure the field manager
-//      //fieldMgr->SetDetectorField(field);
-//      //fieldMgr->CreateChordFinder(field);
+//              std::cout<<"g4Field->GetField(" <<point[0]<<" "<<point[1]<<" "<<point[2]<<"): "<<bfield[0]/tesla<<" "<<bfield[1]/tesla<<" "<<bfield[2]/tesla<<std::endl;
+//          }
+//          exit(-1);
+        
+          //This is thread-local
+          G4FieldManager* fieldMgr =
+          G4TransportationManager::GetTransportationManager()->GetFieldManager();
+          G4cout<< "DeltaStep "<<fieldMgr->GetDeltaOneStep()/mm <<"mm" <<G4endl;
+          //G4ChordFinder *pChordFinder = new G4ChordFinder(mymagField);
+        
 //#if G4VERSION_NUMBER < 1040
-//      auto stepper = getStepper(m_integratorStepper, field);
-//      G4MagInt_Driver* magDriver = fieldMgr->GetChordFinder()->GetIntegrationDriver();
-//      magDriver->RenewStepperAndAdjust(stepper);
+//
+//        auto stepper = getStepper(m_integratorStepper, field);
+//        G4MagInt_Driver* magDriver = fieldMgr->GetChordFinder()->GetIntegrationDriver();
+//        magDriver->RenewStepperAndAdjust(stepper);
 //#else
 //
-//      auto chordFinder = fieldMgr->GetChordFinder();
-//      auto driver = createDriverAndStepper(m_integratorStepper, field);
-//      chordFinder->SetIntegrationDriver(driver);
+//        auto chordFinder = fieldMgr->GetChordFinder();
+//        auto driver = createDriverAndStepper(m_integratorStepper, field);
+//        chordFinder->SetIntegrationDriver(driver);
+        
+          fieldMgr->SetDetectorField(fField.Get());
+          fieldMgr->CreateChordFinder(fField.Get());
 //#endif
-
-//      G4MagneticField *magField;
-//      magField = new G4QuadrupoleMagField( 1.*tesla/(1.*meter) );
-//      G4FieldManager* fieldMgr = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-//      fieldMgr->SetDetectorField(magField);
-//      fieldMgr->CreateChordFinder(magField);
+          
+      }
       
-      MagField::AtlasFieldSvc * atlasField = new MagField::AtlasFieldSvc("AtlasField");
-      //atlasField->setSolenoidCurrent(7730.);
-      //atlasField->setToroidCurrent(20400.);
-    
-      atlasField->handle();
-      std::cout<<"GetSolenoidCurrent: "<<atlasField->getSolenoidCurrent()<<std::endl;
-      std::cout<<"GetToroidCurrent:   "<<atlasField->getToroidCurrent()<<std::endl;
-    
-      G4FieldManager * fieldMgr = new G4FieldManager();
-      // Retrieve the G4MagneticField
-      //G4MagneticField* field = atlasField->getField();
-    
-      //fieldMgr->SetDetectorField(field);
-      //fieldMgr->CreateChordFinder(field);
-      StandardFieldSvc* myfield = new StandardFieldSvc;
-      //exit(-1);
-    
-      G4cout << G4endl << " *** MAGNETIC FIELD SET FROM FILE  *** " << G4endl << G4endl;
-    
-    
-  //}
+  }
 }
 //=============================================================================
 // Create the driver with a stepper
@@ -878,18 +883,17 @@ void MyDetectorConstruction::ConstructSDandField()
 G4VIntegrationDriver*
 MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
 {
-    
-    
+
     G4Mag_EqRhs* eqRhs(nullptr);
 //        if (!m_equationOfMotion.empty())
 //        {
 //            eqRhs = m_equationOfMotion->makeEquationOfMotion(field);
-//            ATH_MSG_INFO("Configuring alternative equation of motion using " <<
+//            //ATH_MSG_INFO("Configuring alternative equation of motion using " <<
 //                         m_equationOfMotion.name() );
 //        }
 //        else
 //        {
-//            ATH_MSG_VERBOSE("Using G4Mag_UsualEqRhs as the equation of motion.");
+//            //ATH_MSG_VERBOSE("Using G4Mag_UsualEqRhs as the equation of motion.");
 //            eqRhs = new G4Mag_UsualEqRhs(field);
 //        }
     G4VIntegrationDriver* driver = nullptr;

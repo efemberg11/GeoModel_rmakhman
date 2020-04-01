@@ -39,9 +39,9 @@
 MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name/*,ISvcLocator* svc*/) :
     //base_class(name,svc),
     //base_class(name),
-    m_fullMapFilename("MagneticFieldMaps/full_bfieldmap_7730_20400_14m.root"),
-    m_soleMapFilename("MagneticFieldMaps/solenoid_bfieldmap_7730_0_14m.root"),
-    m_toroMapFilename("MagneticFieldMaps/toroid_bfieldmap_0_20400_14m.root"),
+    m_fullMapFilename("full_bfieldmap_7730_20400_14m.root"),
+    m_soleMapFilename("solenoid_bfieldmap_7730_0_14m.root"),
+    m_toroMapFilename("toroid_bfieldmap_0_20400_14m.root"),
     m_mapSoleCurrent(7730.),
     m_mapToroCurrent(20400.),
     m_soleMinCurrent(1.0),
@@ -207,6 +207,7 @@ bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
     // read the map file
     if ( !initializeMap(tls)) {
         //ATH_MSG_FATAL( "Failed to initialize field map" );
+        std::cout<< "Failed to initialize field map" << std::endl;
         return false;
     }
 
@@ -373,7 +374,7 @@ bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
 //
 bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
 {
-    //std::cout<< "Initializing the field map (solenoidCurrent=" << solenoidCurrent() << " toroidCurrent=" << toroidCurrent() << ")" << std::endl;
+    std::cout<< "Initializing the field map (solenoidCurrent=" << getSolenoidCurrent() << " toroidCurrent=" << getToroidCurrent() << ")" << std::endl;
     // empty the current map first
     clearMap(tls);
 
@@ -472,21 +473,24 @@ void MagField::AtlasFieldSvc::getField(const double *xyz, double *bxyz, double *
   // test if the TLS was initialized and the cache is valid
   if ( !tls.isInitialized || !cache.inside(z, r, phi) ) {
     // cache is invalid -> refresh cache
+    //std::cout<<"Cache is valid, refresh cache"<<std::endl;
     if (!fillFieldCache(z, r, phi, tls)) {
+      std::cout<<"Caching failed!!! -> outside the valid map volume"<<std::endl;
       // caching failed -> outside the valid map volume
       // return default field (0.1 gauss)
       const double defaultB(0.1*CLHEP::gauss);
       bxyz[0] = bxyz[1] = bxyz[2] = defaultB;
+      std::cout<<"Return default field: "<<bxyz[0]<<" "<<  bxyz[1] <<" "<< bxyz[2]<<std::endl;
       // return zero gradient if requested
       if ( deriv ) {
           for ( int i = 0; i < 9; i++ ) {
             deriv[i] = 0.;
+            std::cout<<"Returning zero gradient"<<std::endl;
           }
       }
       return;
     }
   }
-
   // do interpolation
   cache.getB(xyz, r, phi, bxyz, deriv);
 
@@ -588,23 +592,25 @@ void MagField::AtlasFieldSvc::clearMap(AtlasFieldSvcTLS &tls)
 bool MagField::AtlasFieldSvc::readMap( const char* filename )
 {
     if ( strstr(filename, ".root") == 0 ) {
-//        //ATH_MSG_ERROR("input file name '" << filename << "' does not end with .root");
+        std::cout<<"input file name '" << filename << "' does not end with .root"<< std::endl;
+        //ATH_MSG_ERROR("input file name '" << filename << "' does not end with .root");
         return false;
     }
-//    TFile* rootfile = new TFile(filename, "OLD");
-//    if ( ! rootfile ) {
-//        //ATH_MSG_ERROR("failed to open " << filename);
-//        return false;
-//    }
+    TFile* rootfile = new TFile(filename, "OLD");
+    if ( ! rootfile ) {
+        std::cout<<"failed to open " << filename<< std::endl;
+        //ATH_MSG_ERROR("failed to open " << filename);
+        return false;
+    }
     std::cout<<"reading the map from " << filename<< std::endl;
-//    if ( readMap(rootfile).isFailure() ) {
-//        //ATH_MSG_ERROR("something went wrong while trying to read the ROOT field map file");
-//        return false;
-//    }
-//
-//    rootfile->Close();
-//    delete rootfile;
-//
+    if ( !readMap(rootfile) ) {
+        std::cout<<"something went wrong while trying to read the ROOT field map file"<<std::endl;
+        //ATH_MSG_ERROR("something went wrong while trying to read the ROOT field map file");
+        return false;
+    }
+
+    rootfile->Close();
+    delete rootfile;
     return true;
 }
 
@@ -1172,11 +1178,13 @@ bool MagField::AtlasFieldSvc::readMap( TFile* rootfile )
     if ( rootfile == 0 ) {
       // no file
       //ATH_MSG_ERROR("readMap(): unable to read field map, no TFile given");
+      std::cout<<"readMap(): unable to read field map, no TFile given"<<std::endl;
       return false;
     }
     if ( rootfile->cd() == false ) {
       // could not make it current directory
       //ATH_MSG_ERROR("readMap(): unable to cd() into the ROOT field map TFile");
+      std::cout<<"readMap(): unable to cd() into the ROOT field map TFile"<<std::endl;
       return false;
     }
     // open the tree
@@ -1184,6 +1192,7 @@ bool MagField::AtlasFieldSvc::readMap( TFile* rootfile )
     if ( tree == 0 ) {
       // no tree
       //ATH_MSG_ERROR("readMap(): TTree 'BFieldMap' does not exist in ROOT field map");
+      std::cout<<"readMap(): TTree 'BFieldMap' does not exist in ROOT field map"<<std::endl;
       return false;
     }
     int id;

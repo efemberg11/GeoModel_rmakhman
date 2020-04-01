@@ -3,41 +3,48 @@
 */
 
 #include "StandardFieldSvc.h"
+#include "MagFieldServices/AtlasFieldSvc.h"
 
 //-----------------------------------------------------------------------------
 // Constructor for the AtlasField G4 field object
 //-----------------------------------------------------------------------------
-AtlasField::AtlasField(MagField::IMagFieldSvc* m)
-  : m_magFieldSvc(m)
-{}
+AtlasField::AtlasField(MagField::IMagFieldSvc* mfield)
+  : m_magFieldSvc_AtlasField(mfield)
+{
+    std::cout<<"New instance of AtlasField, setting m_magFieldSvc_AtlasField: "<<m_magFieldSvc_AtlasField<<" to "<<mfield<<std::endl;
+
+}
 
 //-----------------------------------------------------------------------------
 // Constructor for the StandardFieldSvc
 //-----------------------------------------------------------------------------
-StandardFieldSvc::StandardFieldSvc(const std::string& name,
-                                   ISvcLocator* pSvcLocator)
-  : G4MagFieldSvcBase(name, pSvcLocator),
-    m_magFieldSvc("MagField::AtlasFieldSvc/AtlasFieldSvc", name)
+StandardFieldSvc::StandardFieldSvc(const std::string& name/*,
+                                   ISvcLocator* pSvcLocator*/)
+  : G4MagFieldSvcBase(name)
+  // m_magFieldSvc("MagField::AtlasFieldSvc/AtlasFieldSvc", name)
 {
-  declareProperty("MagneticFieldSvc", m_magFieldSvc);
+    MagField::AtlasFieldSvc * atlasFieldSvs = new MagField::AtlasFieldSvc("AtlasField");
+    atlasFieldSvs->handle();
+    m_magFieldSvc = atlasFieldSvs;
+    //declareProperty("MagneticFieldSvc", m_magFieldSvc);
 }
 
 //-----------------------------------------------------------------------------
 // Initialize the service
 //-----------------------------------------------------------------------------
-StatusCode StandardFieldSvc::initialize()
-{
-  ATH_MSG_INFO( "Initializing " << name() );
-  ATH_CHECK( m_magFieldSvc.retrieve() );
-  return StatusCode::SUCCESS;
-}
+//StatusCode StandardFieldSvc::initialize()
+//{
+//  ATH_MSG_INFO( "Initializing " << name() );
+//  ATH_CHECK( m_magFieldSvc.retrieve() );
+//  return StatusCode::SUCCESS;
+//}
 
 //-----------------------------------------------------------------------------
 // Create and retrieve the magnetic field
 //-----------------------------------------------------------------------------
 G4MagneticField* StandardFieldSvc::makeField()
 {
-  ATH_MSG_INFO( "StandardFieldSvc::makeField" );
+  std::cout<<"StandardFieldSvc::makeField with m_magFieldSvc "<<m_magFieldSvc<<std::endl;
   return new AtlasField( &*m_magFieldSvc );
 }
 

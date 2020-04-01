@@ -99,7 +99,7 @@ void Help() {
   G4cout <<"  GeoModelClash Geant4 application.    \n"
             << std::endl
             <<"  **** Parameters: \n\n"
-            <<"      -g :   the Geometry file name \n"
+            <<"      -g :   the Geometry file name [.db/.gdml/.dylib/.so] \n"
             <<"      -o :   clashes report file name (default: gmclash_report)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmclash [OPTIONS]\n" <<std::endl;

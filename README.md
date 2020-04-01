@@ -67,6 +67,10 @@ cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../  -DGEA
 make
 make install
 ```
+NB: Before running ./fullSimLight or ./gmclash, make sure to source the *geant4.sh* file to set all the Geant4 environment variables. 
+```bash
+source <path-to-install-directory>/bin/geant4.sh
+```
 
 ## GeoModelG4:
 
@@ -232,7 +236,6 @@ The primary particle type can be set through the macro command:
 By default, i.e. if it is not specified by the above command, the type will be randomly selected from a pre-defined list for each individual primary particle uniformly. The current list of particles includes e-, e+ and gamma particles. It can be extended by adding more particles to the list in the MyPrimaryGeneratorAction class.
 
 
-
 ## Physics List
 
  The Physics List can be specified as an input argument with the -f flag
@@ -247,11 +250,11 @@ By default, i.e. if it is not specified by the above command, the type will be r
 
 # GMClash: Build, run and options
 
-GMclash allows to run geometry overlap checks on a geometry file specified as input with the -g flag. The clashes report is then saved in a json file. 
+GMClash allows to run geometry overlap checks on a geometry file specified as input with the -g flag. It supports SQLite and GDML formats. The geometry can also be described with a dual-plugin (.dylib or .so). The clashes report is given in an output json file (default: gmclash_report.json)
 
 ``` bash
--g :   the Geometry file name 
--o :   clashes report file name (default: gmclash_report)
+-g :   the Geometry file name [.db/.gdml/.dylib/.so]
+-o :   clashes report file name (default: gmclash_report.json)
 ``` 
 
 The output json file format is the following:
@@ -273,6 +276,14 @@ where:
 * *distance* is the minimum estimated distance of the overlap
 * *typeOfClash* can be 0 for *withMother*, 1 for *withSister* and 2 for *fullyEncapsSister*
 * *x,y,z* are the global coordinates of the point of impact
+
+## Examples
+
+To execute a clash detection on a geometry described with the SQLite file *LArBarrel.db*:
+``` bash
+./gmclash -g LArBarrel.db -o cr_LArBarrel.json 
+``` 
+
 
 # Final Remark
 

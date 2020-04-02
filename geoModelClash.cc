@@ -55,10 +55,8 @@ int main(int argc, char** argv) {
     G4Random::setTheSeed(12345678);
     
     G4cout << G4endl
-    << " ===================================================== "      << G4endl
     << "   Random engine      = " << G4Random::getTheEngine()->name() << G4endl
     << "   Initial seed       = " << G4Random::getTheSeed()           << G4endl
-    << " ===================================================== "      << G4endl
     << G4endl;
     
     // Detector construction
@@ -97,10 +95,6 @@ void Help() {
 
 void GetInputArguments(int argc, char** argv) {
   // process arguments
-  if (argc == 1) {
-   Help();
-   exit(0);
-  }
   while (true) {
    int c, optidx = 0;
    c = getopt_long(argc, argv, "g:o:", options, &optidx);

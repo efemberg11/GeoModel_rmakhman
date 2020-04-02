@@ -122,6 +122,7 @@ static struct option options[] = {
     {"performance flag      "  , no_argument      , 0, 'p'},
     {"geometry file name    "  , required_argument, 0, 'g'},
     {"overlap geometry check"  , no_argument      , 0, 'o'},
+    {"help"                    , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
 
@@ -155,7 +156,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "pm:f:g:o", options, &optidx);
+   c = getopt_long(argc, argv, "pm:f:g:oh", options, &optidx);
    if (c == -1)
      break;
    //
@@ -178,6 +179,9 @@ void GetInputArguments(int argc, char** argv) {
    case 'o':
      parRunOverlapCheck = true;
      break;
+   case 'h':
+     Help();
+     exit(0);
    default:
      Help();
      errx(1, "unknown option %c", c);

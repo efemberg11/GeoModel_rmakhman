@@ -73,6 +73,7 @@ int main(int argc, char** argv) {
 static struct option options[] = {
     {"geometry file name              "  , required_argument, 0, 'g'},
     {"output clashes report file name "  , required_argument, 0, 'o'},
+    {"help"                              , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
 
@@ -97,7 +98,7 @@ void GetInputArguments(int argc, char** argv) {
   // process arguments
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:o:", options, &optidx);
+   c = getopt_long(argc, argv, "g:o:h", options, &optidx);
    if (c == -1)
      break;
    //
@@ -111,6 +112,9 @@ void GetInputArguments(int argc, char** argv) {
    case 'o':
      reportFileName = optarg;
      break;
+   case 'h':
+     Help();
+     exit(0);
    default:
      Help();
      errx(1, "unknown option %c", c);

@@ -1,19 +1,9 @@
 
 //--------------------------------------------------------
-// fullSimLight application: 17 September 2019 (README)
+// gmclash application: March 2020 (README)
 //--------------------------------------------------------
 
-#include "G4Types.hh"
-#ifdef G4MULTITHREADED
-  #include "G4MTRunManager.hh"
-#else
-  #include "G4RunManager.hh"
-#endif
-
-#include "G4UImanager.hh"
-#include "G4UIsession.hh"
-#include "G4UIterminal.hh"
-
+#include "G4Version.hh"
 #include "Randomize.hh"
 #include "MyDetectorConstruction.hh"
 
@@ -22,7 +12,6 @@
 #include <iostream>
 #include <iomanip>
 
-static G4String parMacroFileName   = "macro.g4";
 static G4String geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db";
 static G4String reportFileName     = "gmclash_report.json";
 
@@ -40,10 +29,31 @@ int main(int argc, char** argv) {
     << "   Output clashes report file name  =  " << reportFileName           << G4endl
     << " ============================================================== "      << G4endl;
     
-    //choose the Random engine: set to MixMax explicitely (default form 10.4)
+    // version banner
+    G4String vs = G4Version;
+    vs = vs.substr(1,vs.size()-2);
+    G4String versionString = " Geant4 version ";
+    versionString += vs;
+    versionString += "   ";
+    versionString += G4Date;
+    G4cout << G4endl
+    << "**************************************************************" << G4endl
+    << versionString << G4endl
+    << "                       Copyright : Geant4 Collaboration" << G4endl
+    << "                      References : NIM A 506 (2003), 250-303" << G4endl
+    << "                                 : IEEE-TNS 53 (2006), 270-278" << G4endl
+    << "                                 : NIM A 835 (2016), 186-225" << G4endl
+    << "                             WWW : http://geant4.org/" << G4endl
+    << "**************************************************************" << G4endl
+    << G4endl;
+    
+    
+    // choose the Random engine: set to MixMax explicitely
+    // (default from 10.4)
     G4Random::setTheEngine(new CLHEP::MixMaxRng);
     // set seed and print info
     G4Random::setTheSeed(12345678);
+    
     G4cout << G4endl
     << " ===================================================== "      << G4endl
     << "   Random engine      = " << G4Random::getTheEngine()->name() << G4endl
@@ -51,39 +61,14 @@ int main(int argc, char** argv) {
     << " ===================================================== "      << G4endl
     << G4endl;
     
-    // Construct the default run manager
-#ifdef G4MULTITHREADED
-    G4MTRunManager* runManager = new G4MTRunManager;
-    // Number of threads can be defined via macro command
-    G4int nThreads = 4;
-    runManager->SetNumberOfThreads(nThreads);
-#else
-    G4RunManager* runManager = new G4RunManager;
-#endif
-    
-    // set mandatory initialization classes
-    // 1. Detector construction
+    // Detector construction
     MyDetectorConstruction* detector = new MyDetectorConstruction;
     detector->SetRunOverlapCheck(true);
-        
     detector->SetGeometryFileName (geometryFileName);
     detector->SetReportFileName (reportFileName);
-    runManager->SetUserInitialization(detector);
-  
-    // 4. Run the simulation in batch mode
-    G4UImanager* UI = G4UImanager::GetUIpointer();
-    G4String command = "/control/execute ";
-    UI->ApplyCommand(command+parMacroFileName);
-  
-    // Print out the final random number
-//    G4cout << G4endl
-//           << " ================================================================= " << G4endl
-//           << " Final random number = " << CLHEP::HepRandom::getTheEngine()->flat() << G4endl
-//             << " ================================================================= " << G4endl
-//           << G4endl;
-//    //
-    // Delete the RunManager
-    delete runManager;
+    detector->Construct();
+    
+    delete detector;
     return 0;
 }
 

@@ -589,8 +589,7 @@ GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
 G4VPhysicalVolume *MyDetectorConstruction::Construct()
 {
     fTimer.Start();
-   
-    G4cout << "MyDetectorConstruction::Construct() :: starting the timer"<<G4endl;
+
     GeoPhysVol* world = nullptr;
     G4LogicalVolume* envelope;
     if (fGeometryFileName.contains(".dylib") || fGeometryFileName.contains(".so"))

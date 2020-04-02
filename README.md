@@ -67,7 +67,7 @@ cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../  -DGEA
 make
 make install
 ```
-NB: Before running ./fullSimLight or ./gmclash, make sure to source the *geant4.sh* file to set all the Geant4 environment variables. 
+NB: Before running ./fullSimLight make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
 ```bash
 source <path-to-install-directory>/bin/geant4.sh
 ```

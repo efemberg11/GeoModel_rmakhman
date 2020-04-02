@@ -30,7 +30,7 @@
 #include <iomanip>
 
 static bool         parIsPerformance   = false;
-static G4String     geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01.db";
+static G4String     geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db";
 static std::string  parMacroFileName   = "";
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
@@ -135,7 +135,7 @@ void Help() {
             <<"      -f :   physics list name (default: FTFP_BERT) \n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
-            <<"      -g :   the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01.db)\n"
+            <<"      -g :   the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db)\n"
             <<"      -o :   flag  ==> run the geometry overlap check (default: FALSE)\n"
             << std::endl;
   std::cout <<"\nUsage: ./fullSimLight [OPTIONS] -m <MACRO_FILE>\n" <<std::endl;

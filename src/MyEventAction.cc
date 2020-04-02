@@ -10,6 +10,8 @@
 #include "G4Gamma.hh"
 #include "G4Electron.hh"
 #include "G4Positron.hh"
+#include "G4Geantino.hh"
+#include "G4ChargedGeantino.hh"
 
 #include "G4ThreeVector.hh"
 #include "G4PrimaryVertex.hh"
@@ -60,7 +62,7 @@ void MyEventAction::EndOfEventAction(const G4Event* evt) {
     G4int primaryTypeIndx = MyPrimaryGeneratorAction::GetPrimaryTypeIndex(pPartName);
     run->FillPerEventNumPrimaries(primaryTypeIndx);
     run->FillPerEvent(fEventDataPerPrimary[ip],primaryTypeIndx);
-    G4cout<< "  Primary Particle:  " << ip  << " (type inedx = " << primaryTypeIndx << ")\n"
+    G4cout<< "  Primary Particle:  " << ip  << " (type index = " << primaryTypeIndx << ")\n"
           << "    Name      =  "     << pPartName                                   << " \n"
           << "    Energy    =  "     << pPartEkin/GeV                          << " [GeV]\n"
           << "    Direction =  "     << pPartDir                                    << " \n"

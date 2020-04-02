@@ -2,10 +2,10 @@
  ==========================
 
  In this directory you can find the FullSimLight project,
- a [Geant4](https://geant4.web.cern.ch) based simulation of the full 
- ATLAS detector.
- 
- The ATLAS geometry can be imported via a .db or a .gdml file.
+ a [Geant4](https://geant4.web.cern.ch) based simulation that can be run on multiple geometries.
+
+ Any  geometry can be given as input to FullSimLight and be simulated. The supported formats are SQLite (.db), GDML (.gdml) and dual-use plugins as the ones described in  the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins) (.dylib/.so).
+ The ATLAS detector geometry description can be imported via a SQLite or a GDML file. 
 
  An installation of Geant4 including the GDML extension (which requires
  the XercesC package installed in the system) is required i.e. the
@@ -17,9 +17,10 @@
 ## Dependencies:
 
 FullSimLight project depends on [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), [GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModelIO),
-[Geant4](https://geant4.web.cern.ch) and 
-[GeoModelG4](https://gitlab.cern.ch/GeoModelDev/GeoModelG4)
-Follow the instructions at the respective repositories to install them. 
+[Geant4](https://geant4.web.cern.ch), 
+[GeoModelG4](https://gitlab.cern.ch/GeoModelDev/GeoModelG4) and 
+[nlohmann_json](https://github.com/nlohmann/json.git)
+Following are the instructions to install them. 
 
 ## GeoModelCore:
 
@@ -69,7 +70,7 @@ make install
 ```
 NB: Before running ./fullSimLight make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
 ```bash
-source <path-to-install-directory>/bin/geant4.sh
+source <path_to_geant4_install_dir>/bin/geant4.sh
 ```
 
 ## GeoModelG4:
@@ -79,6 +80,16 @@ Clone the repository at [GeoModelG4 repo](https://gitlab.cern.ch/GeoModelDev/Geo
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelG4.git
 cd GeoModelG4
+mkdir build ; cd build
+cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
+make
+make install
+```
+## nlohmann_json:
+Clone the repository at [nlohmann_json repo](https://github.com/nlohmann/json.git), then:
+```bash
+git clone https://github.com/nlohmann/json.git
+cd json
 mkdir build ; cd build
 cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
 make
@@ -119,7 +130,7 @@ cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
 
 # FullSimLight: Build, run and options
 
-The applications can be built and used both with sequential and multithreaded
+The application can be built and used both with sequential and multithreaded
 Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will
 run in proper multithreaded mode.
 
@@ -251,7 +262,9 @@ By default, i.e. if it is not specified by the above command, the type will be r
 
 # GeoModelClash: Build, run and options
 
-GeoModelClash (gmclash) allows to run geometry overlap checks on a geometry file specified as input with the -g flag. It supports SQLite and GDML formats. The geometry can also be described with a dual-plugin (.dylib or .so) as the ones available at the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins). The clashes report is given in an output json file (default: gmclash_report.json)
+GeoModelClash (gmclash) allows to run geometry overlap checks on a geometry file specified as input with the -g flag. It supports SQLite and GDML formats. The geometry can also be described with a dual-plugin (.dylib or .so) as the ones available at the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins). The clashes report is given in an output json file (default: gmclash_report.json).
+
+Run the executable with the --help option to see the available options:
 
 ``` bash
 -g :   the Geometry file name [.db/.gdml/.dylib/.so] (default: geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db)

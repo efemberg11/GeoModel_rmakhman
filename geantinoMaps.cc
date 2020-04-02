@@ -29,6 +29,7 @@
 #include <iostream>
 #include <iomanip>
 
+
 static bool         parCreateGeantinoMaps = true;
 static bool         parIsPerformance   = false;
 static G4String     geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db";

@@ -68,12 +68,14 @@ add_executable(fillHistogramExample fillHistogramExample.cc src/Histo.cc include
 add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 add_executable(plotGeantinoMaps plotGeantinoMaps.cc)
 
+
 #----------------------------------------------------------------------------
 # Link all needed libraries
 
 target_link_libraries(fillHistogramExample ${Geant4_LIBRARIES})
 
 if( nlohmann_json_FOUND )
+
 
 target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json ${ROOT_LIBRARIES})
 
@@ -82,6 +84,7 @@ target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager G
 target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json ${ROOT_LIBRARIES})
 
 target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
+
 
 else()
 

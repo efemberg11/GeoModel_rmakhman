@@ -53,7 +53,7 @@ private:
 	GeoPhysVol* buildGeoModelOneGo();
 
 	void loopOverAllChildren(QStringList keys);
-	void loopOverAllChildrenInBunches(); 
+	void loopOverAllChildrenInBunches();
 	void processParentChildren(const QString &parentKey);
 	void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child);
 
@@ -101,6 +101,7 @@ private:
 	std::string _dbName;
 	GMDBManager* m_dbManager;
 	bool m_deepDebug;
+	bool m_debug;
 
 	// callback handles
 	unsigned long* m_progress;

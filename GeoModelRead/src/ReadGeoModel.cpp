@@ -16,7 +16,6 @@
 // TFPersistification includes
 #include "TFPersistification/TransFunctionInterpreter.h"
 
-#include "GeoModelKernel/GeoUnidentifiedShape.h"
 
 // GeoModelKernel
 #include "GeoModelKernel/GeoTransform.h"
@@ -27,11 +26,13 @@
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoLogVol.h"
+#include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoGraphNode.h"
 
 // GeoModel shapes
+#include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoPara.h"
@@ -49,6 +50,8 @@
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
+#include "GeoModelKernel/GeoUnidentifiedShape.h"
+
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -60,6 +63,7 @@
 
 // Qt includes
 #include <QDebug>
+#include <QString>
 
 // C++ includes
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
@@ -89,6 +93,11 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 	  m_deepDebug = true;
 	  std::cout << "You defined the GEOMODELREAD_DEEP_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
+	#ifdef GEOMODELREAD_DEBUG
+	  m_debug = true;
+	  std::cout << "You defined the GEOMODELREAD_DEBUG variable, so you will see a verbose output." << std::endl;
+ 	#endif
+  // m_deepDebug = true;
 
 	if ( progress != nullptr) {
 	m_progress = progress;
@@ -117,6 +126,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 	// return buildGeoModelByCalls();
 	GeoPhysVol* rootVolume = buildGeoModelOneGo();
 
+  // warn the user if there are unknown/unhalded shapes
 	if (m_unknown_shapes.size() > 0) {
 		qWarning() << "\tWARNING!! There were unknwon shapes:";
 		for ( auto it = m_unknown_shapes.begin(); it != m_unknown_shapes.end(); it++ ) {
@@ -172,12 +182,13 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 void ReadGeoModel::loopOverAllChildren(QStringList keys)
 {
 
-	muxCout.lock();
-	std::cout << "Thread " << std::this_thread::get_id() << std::endl;
-	std::cout << "Looping over all children to build the GeoModel tree..." << std::endl;
-	int nChildrenRecords = keys.size();
-	std::cout << "processing " << nChildrenRecords << " keys..." << std::endl;
-	muxCout.unlock();
+  int nChildrenRecords = keys.size();
+
+  if (m_debug || m_deepDebug) {
+    muxCout.lock();
+  	std::cout << "Thread " << std::this_thread::get_id() << " - processing " << nChildrenRecords << " keys..." << std::endl;
+  	muxCout.unlock();
+  }
 
 	// loop over parents' keys.
 	// It returns a list of children with positions (sorted by position)
@@ -193,9 +204,12 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
 	// Get End Time
 	auto end = std::chrono::system_clock::now();
 	auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
-	muxCout.lock();
-	std::cout << "Thread " << std::this_thread::get_id() << " -- Time Taken to process " << nChildrenRecords << " children = " << diff << " Seconds" << std::endl;
-	muxCout.unlock();
+
+  if (m_debug || m_deepDebug) {
+    muxCout.lock();
+  	std::cout << "Thread " << std::this_thread::get_id() << " -- Time Taken to process " << nChildrenRecords << " children = " << diff << " Seconds" << std::endl;
+  	muxCout.unlock();
+  }
 }
 
 //----------------------------------------
@@ -206,7 +220,9 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 	std::cout << "number of children to process: " << nChildrenRecords << std::endl;
 
 	// If we have a few children, then process them serially
-	if (nChildrenRecords <= 100) {
+//   if (true) // force serial run, without threads --> only for debug!!
+    if (nChildrenRecords <= 500)
+    {
 		loopOverAllChildren(m_allchildren.keys());
 	}
 	// ...otherwise, lets spawn some threads to process them in bunches, parallelly!
@@ -215,11 +231,11 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 		std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 		unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
-		unsigned int nThreads = nThreadsPlatform * 2;
+        unsigned int nThreads = nThreadsPlatform * 2;
 		std::cout << "On this platform, " << nThreadsPlatform << " concurrent threads are supported. Using " << nThreads << " threads.\n";
 
 		unsigned int nBunches = nChildrenRecords / nThreads;
-		std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each." << std::endl;
+		std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each, plus the remainder." << std::endl;
 
 		// a vector to store the "futures" of async calls
 		std::vector<std::future<void>> futures;
@@ -231,21 +247,27 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 			if ( bb == (nThreads - 1) ) len = -1; // '-1' means for mid() all the elements starting from 'start'
 
 
-			muxCout.lock();
-			std::cout << "Thread " << bb+1 << " - Start: " << start << ", len: " << len << "   ['len=-1' = all remaining items]" << std::endl;
-			muxCout.unlock();
+      if (m_debug || m_deepDebug) {
+  			muxCout.lock();
+  			std::cout << "Thread " << bb+1 << " - Start: " << start << ", len: " << len << "   ['len=-1' = all remaining items]" << std::endl;
+  			muxCout.unlock();
+      }
 
 			QStringList bunch = QStringList((m_allchildren.keys()).mid(start,len));
-			std::cout << "'bunch' size: " << bunch.size() << std::endl;
+      if (m_debug || m_deepDebug) {
+        muxCout.lock();
+			   std::cout << "'bunch' size: " << bunch.size() << std::endl;
+        muxCout.unlock();
+      }
 
 			// loopOverAllChildren(bunch);
 			futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildren, this, bunch) );
 		}
 
 		// wait for all async calls to complete
-		//retrive and print the value stored in the future
+		//retrieve and print the value stored in the future
 		muxCout.lock();
-		std::cout << "Waiting..." << std::flush;
+		std::cout << "Waiting for the threads to finish..." << std::flush;
 		muxCout.unlock();
 	  	for(auto &e : futures) {
 	    	e.wait();
@@ -303,7 +325,11 @@ void ReadGeoModel::processParentChildren(const QString &parentKey)
 // void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child, std::mutex &mux)
 void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child)
 {
-	if (m_deepDebug) qDebug() << "child:" << child;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::processChild() - child:" << child;
+    muxCout.unlock();
+  }
 
 	if (child.length() < 8) {
 		std::cout <<  "ERROR!!! Probably you are using an old geometry file..." << std::endl;
@@ -317,7 +343,11 @@ void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, cons
 
 	QString childNodeType = m_tableid_tableName[childTableId.toUInt()];
 
-	if (m_deepDebug) qDebug() << "childTableId:" << childTableId << ", type:" << childNodeType << ", childId:" << childId;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "childTableId:" << childTableId << ", type:" << childNodeType << ", childId:" << childId;
+    muxCout.unlock();
+  }
 
 	if (childNodeType.isEmpty()) {
 		qWarning("ERROR!!! childNodeType is empty!!! Aborting...");
@@ -325,37 +355,30 @@ void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, cons
 	}
 
 	if (childNodeType == "GeoPhysVol") {
-		if (m_deepDebug) qDebug() << "GeoPhysVol child...";
 		GeoVPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoFullPhysVol") {
-		if (m_deepDebug) qDebug() << "GeoFullPhysVol child...";
 		GeoVPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoSerialDenominator") {
-		if (m_deepDebug) qDebug() << "GeoSerialDenominator child...";
 		GeoSerialDenominator* childNode = buildSerialDenominator(childId);
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoAlignableTransform") {
-		if (m_deepDebug) qDebug() << "GeoAlignableTransform child...";
 		GeoAlignableTransform* childNode = buildAlignableTransform(childId);
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoTransform") {
-		if (m_deepDebug) qDebug() << "GeoTransform child...";
 		GeoTransform* childNode = buildTransform(childId);
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoSerialTransformer") {
-		if (m_deepDebug) qDebug() << "GeoSerialTransformer child...";
 		GeoSerialTransformer* childNode = buildSerialTransformer(childId);
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoNameTag") {
-		if (m_deepDebug) qDebug() << "GeoNameTag child...";
 		GeoNameTag* childNode = buildNameTag(childId);
 		if (!isRootVolume) volAddHelper(parentVol, childNode);
 			}
@@ -389,19 +412,31 @@ void ReadGeoModel::checkInputString(QString input)
 // Instantiate a PhysVol and get its children
 GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString copyN)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildVPhysVol()" << id << tableId << copyN;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildVPhysVol()" << id << tableId << copyN;
+    muxCout.unlock();
+  }
 
 	checkInputString(id);
 	checkInputString(tableId);
 
 	// if previously built, return that // TODO: apparently this is only used for VPhysVol... check that, because it should be used for all nodes, otherwise we create new nodes in memory even if we have a copy of them already...
 	if (isNodeBuilt(id, tableId, copyN)) {
-		if (m_deepDebug) qDebug() << "getting the volume from memory...";
+		if (m_deepDebug) {
+      muxCout.lock();
+      qDebug() << "getting the volume from memory...";
+      muxCout.unlock();
+    }
 		return dynamic_cast<GeoVPhysVol*>(getNode(id, tableId, copyN));
 	}
 
 	GeoVPhysVol* vol = nullptr;
-	if (m_deepDebug) qDebug() << "building a new volume...";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "building a new volume...";
+    muxCout.unlock();
+  }
 	vol = buildNewVPhysVol(id, tableId, copyN);
 	// if (m_deepDebug) std::cout << "--> built a new volume: " << vol << std::endl;
 	return vol;
@@ -411,13 +446,21 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString co
 // Build a new VPhysVol volume and store it
 GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(QString id, QString tableId, QString copyN)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildNewVPhysVol() - building a new volume...";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildNewVPhysVol() - building a new volume...";
+    muxCout.unlock();
+  }
 
 	QString nodeType = m_tableid_tableName[tableId.toUInt()];
 
 	// get the parent volume parameters
 	// here we do not need to use copyN, since the actual volume is the same for all instances
-	if (m_deepDebug) qDebug() << "\tget the parent...";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "\tget the parent...";
+    muxCout.unlock();
+  }
 	QStringList values;
 	if (nodeType == "GeoPhysVol")
 		values = m_physVols[id.toUInt()];
@@ -429,29 +472,47 @@ GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(QString id, QString tableId, QString
 	QString logVolId = values[1];
 
 	if (m_deepDebug) {
-	qDebug() << "\tPhysVol-ID:" << volId;
-	qDebug() << "\tPhysVol-LogVol:" << logVolId;
-	qDebug() << "\tnodeType:" << nodeType;
+    muxCout.lock();
+		// std::cout << "Waiting..." << std::flush;
+  	qDebug() << "\tPhysVol-ID:" << volId;
+  	qDebug() << "\tPhysVol-LogVol:" << logVolId;
+  	qDebug() << "\tnodeType:" << nodeType;
+    muxCout.unlock();
 	}
 
 	// GET LOGVOL
-	if (m_deepDebug) qDebug() << "\tget LogVol...";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "\tget LogVol...";
+    muxCout.unlock();
+  }
 	GeoLogVol* logVol = buildLogVol(logVolId); // TODO: For PhysVols we first check if we created the vol in memory already; but I'm not sure about other nodes. Check it...
 
 	// a pointer to the VPhysVol
 	GeoVPhysVol* vol = nullptr;
 
 	// BUILD THE PHYSVOL OR THE FULLPHYSVOL
-	if (m_deepDebug) qDebug() << "\tbuild the VPhysVol...";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "\tbuild the VPhysVol...";
+    muxCout.unlock();
+  }
 	if (nodeType == "GeoPhysVol")
 		vol = new GeoPhysVol(logVol);
 	else if (nodeType == "GeoFullPhysVol")
 		vol = new GeoFullPhysVol(logVol);
-	else
+	else {
+    muxCout.lock();
 		qWarning() << "ERROR!!! Unkonwn node type!! : " << nodeType;
+    muxCout.unlock();
+  }
 
 	// storing the address of the newly built node
-	if (m_deepDebug) qDebug() << "\tstoring the VPhysVol...";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "\tstoring the VPhysVol...";
+    muxCout.unlock();
+  }
 	storeNode(id, tableId, copyN, vol);
 
 	return vol;
@@ -460,7 +521,11 @@ GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(QString id, QString tableId, QString
 // Get the root volume
 GeoPhysVol* ReadGeoModel::getRootVolume()
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::getRootVolume()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::getRootVolume()";
+    muxCout.unlock();
+  }
 	QString id = m_root_vol_data[1];
 	QString tableId = m_root_vol_data[2];
 	QString copyNumber = "1"; // the Root volume has only one copy by definition
@@ -470,20 +535,32 @@ GeoPhysVol* ReadGeoModel::getRootVolume()
 
 GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildMaterial()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildMaterial()";
+    muxCout.unlock();
+  }
 	QStringList values = m_materials[id.toUInt()];
 
-	if (m_deepDebug) qDebug() << "mat values=" << values;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "mat values=" << values;
+    muxCout.unlock();
+  }
 	QString matId = values[0];
 	QString matName = values[1];
 	double matDensity = values[2].toDouble();
 	QString matElements = values[3];
 
-	if (m_deepDebug) qDebug() << "\tMaterial - ID:" << matId
-			<< ", name:" << matName
-			<< ", density:" << matDensity
-			<< " ( " << matDensity / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3) << "[g/cm3] )"
-			<< ", elements:" << matElements;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "\tMaterial - ID:" << matId
+		  << ", name:" << matName
+		  << ", density:" << matDensity
+		  << " ( " << matDensity / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3) << "[g/cm3] )"
+		  << ", elements:" << matElements;
+    muxCout.unlock();
+  }
 
 	GeoMaterial* mat = new GeoMaterial(matName.toStdString(), matDensity);
 
@@ -492,7 +569,11 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 		QStringList elements = matElements.split(";");
 		foreach( QString par, elements) {
 
-		  if (m_deepDebug) qDebug() << "par:" << par;
+		  if (m_deepDebug) {
+        muxCout.lock();
+        qDebug() << "par:" << par;
+        muxCout.unlock();
+      }
 			QStringList vars = par.split(":");
 			QString elId = vars[0];
 			double elFraction = vars[1].toDouble();
@@ -508,7 +589,11 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 
 GeoElement* ReadGeoModel::buildElement(QString id)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildElement()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildElement()";
+    muxCout.unlock();
+  }
 
 	if (m_elements.size() == 0)
 		qFatal("ERROR! 'm_elements' is empty! Did you load the 'Elements' table? \n\t ==> Aborting...");
@@ -521,12 +606,16 @@ GeoElement* ReadGeoModel::buildElement(QString id)
 	double elZ = values[3].toDouble();
 	double elA = values[4].toDouble();
 
-	if (m_deepDebug) qDebug() << "\tElement - ID:" << elId
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "\tElement - ID:" << elId
 			<< ", name:" << elName
 			<< ", symbol:" << elSymbol
 			<< ", Z:" << elZ
 			<< ", A:" << elA
 			<< " ( " << elA / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole) << "[g/mole] )";
+    muxCout.unlock();
+  }
 
 	return new GeoElement(elName.toStdString(), elSymbol.toStdString(), elZ, elA);
 }
@@ -534,7 +623,11 @@ GeoElement* ReadGeoModel::buildElement(QString id)
 
 GeoShape* ReadGeoModel::buildShape(QString shapeId)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildShape()";
+	if (m_deepDebug) {
+     muxCout.lock();
+    std::cout << "ReadGeoModel::buildShape()" << std::endl;
+     muxCout.unlock();
+  }
 
 //   try // TODO: implement try/catch
 //   {
@@ -544,7 +637,11 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 	QString type = paramsShape[1];
 	QString parameters = paramsShape[2];
 
-	if (m_deepDebug) qDebug() << "\tShape-ID:" << id << ", Shape-type:" << type;
+	if (m_deepDebug) {
+     muxCout.lock();
+    std::cout << "\tShape-ID:" << id.toStdString() << ", Shape-type:" << type.toStdString();
+     muxCout.unlock();
+  }
 
 
 	if (type == "Box") {
@@ -579,6 +676,7 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
 			QString varValue = vars[1];
+      // qWarning() << "varValue Cons:" << varValue;
 			if (varName == "RMin1") RMin1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "RMin2") RMin2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "RMax1") RMax1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
@@ -706,32 +804,49 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 					if (varName == "ZRmax") rmax = varValue.toDouble();
 					else error = 1;
 
-					if(error) qWarning() << "ERROR! GeoPcon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars;
+					if(error) {
+            muxCout.lock();
+            qWarning() << "ERROR! GeoPcon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars;
+            muxCout.unlock();
+          }
 
 					// add a Z plane to the GeoPcon
 					pcon->addPlane(zpos, rmin, rmax);
 				} else {
 					error = 1;
+          muxCout.lock();
 					qWarning() << "ERROR! GeoPcon 'ZPos' value is not at the right place! --> " << shapePars;
+          muxCout.unlock();
 				}
 			}
 
 			// sanity check on the resulting Pcon shape
 			if( pcon->getNPlanes() != NZPlanes) {
 				error = 1;
+        muxCout.lock();
 				qWarning() << "ERROR! GeoPcon number of planes: " << QString::number(pcon->getNPlanes()) << " is not equal to the original size! --> " << shapePars;
+        muxCout.unlock();
 			}
 			if(!pcon->isValid()) {
 				error = 1;
-				qWarning() << "ERROR! GeoPcon shape is not valid!! -- input: " << shapePars;
+        muxCout.lock();
+        qWarning() << "ERROR! GeoPcon shape is not valid!! -- input: " << shapePars;
+        muxCout.unlock();
 			}
 	  } // end if (size>3)
 		else {
-			qWarning() << "ERROR!! GeoPcon has no Z planes!! --> shape input parameters: " << shapePars;
+      muxCout.lock();
+      qWarning() << "ERROR!! GeoPcon has no Z planes!! --> shape input parameters: " << shapePars;
+      muxCout.unlock();
 			error = 1;
 		}
 
-		if(error) qFatal("GeoPcon shape error!!! Aborting...");
+		if(error) {
+      muxCout.lock();
+      std::cout << "FATAL ERROR!!! - GeoPcon shape error!!! Aborting..." << std::endl;
+      muxCout.unlock();
+      exit(EXIT_FAILURE);
+    }
 
 		return pcon;
 	}
@@ -804,31 +919,48 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 					if (varName == "ZRmax") rmax = varValue.toDouble();
 					else error = 1;
 
-					if(error) qWarning() << "ERROR! GeoPgon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars;
+					if(error) {
+            muxCout.lock();
+            qWarning() << "ERROR! GeoPgon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars;
+            muxCout.unlock();
+          }
 
 					// add a Z plane to the GeoPgon
 					pgon->addPlane(zpos, rmin, rmax);
 				} else {
 					error = 1;
+          muxCout.lock();
 					qWarning() << "ERROR! GeoPgon 'ZPos' value is not at the right place! --> " << shapePars;
+          muxCout.unlock();
 				}
 			}
 
 			// sanity check on the resulting Pgon shape
 			if( pgon->getNPlanes() != NZPlanes) {
 				error = 1;
+        muxCout.lock();
 				qWarning() << "ERROR! GeoPgon number of planes: " << QString::number(pgon->getNPlanes()) << " is not equal to the original size! --> " << shapePars;
+        muxCout.unlock();
 			}
 			if(!pgon->isValid()) {
 				error = 1;
+        muxCout.lock();
 				qWarning() << "ERROR! GeoPgon shape is not valid!! -- input: " << shapePars;
+        muxCout.unlock();
 			}
 		} // end if (size>3)
 		else {
+      muxCout.lock();
 			qWarning() << "ERROR!! GeoPgon has no Z planes!! --> shape input parameters: " << shapePars;
+      muxCout.unlock();
 			error = 1;
 		}
-		if(error) qFatal("GeoPgon shape error!!! Aborting...");
+		if(error) {
+      muxCout.lock();
+      std::cout << "FATAL ERROR!!! - GeoPgon shape error!!! Aborting..." << std::endl;
+      muxCout.unlock();
+      exit(EXIT_FAILURE);
+    }
 		return pgon;
 	}
 	else if (type == "GenericTrap") {
@@ -890,12 +1022,24 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 					else {
 					  error = 1;
 					}
-					if(error) qWarning() << "ERROR! GeoGenericTrap 'X' and 'Y' values are not at the right place! --> " << shapePars;
+					if(error) {
+            muxCout.lock();
+            qWarning() << "ERROR! GeoGenericTrap 'X' and 'Y' values are not at the right place! --> " << shapePars;
+            muxCout.unlock();
+          }
 				} else {
 					error = 1;
+          muxCout.lock();
 					qWarning() << "ERROR! GeoGenericTrap 'ZPos' value is not at the right place! --> " << shapePars;
+          muxCout.unlock();
 				}
 			}
+      if(error) {
+        muxCout.lock();
+        std::cout << "FATAL ERROR!!! - GeoGenericTrap shape error!!! Aborting..." << std::endl;
+        muxCout.unlock();
+        exit(EXIT_FAILURE);
+      }
 			// build the basic GenericTrap shape
 			gTrap = new GeoGenericTrap(ZHalfLength,Vertices);
 		} // end if (size>3)
@@ -903,7 +1047,12 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			qWarning() << "ERROR!! GeoGenericTrap has no Z vertices!! --> shape input parameters: " << shapePars;
 			error = 1;
 		}
-		if(error) qFatal("GeoGenericTrap shape error!!! Aborting...");
+    if(error) {
+      muxCout.lock();
+      std::cout << "FATAL ERROR!!! - GeoGenericTrap shape error!!! Aborting..." << std::endl;
+      muxCout.unlock();
+      exit(EXIT_FAILURE);
+    }
 		return gTrap;
 	}
 	else if (type == "SimplePolygonBrep") {
@@ -965,7 +1114,11 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 				if (varName == "yV") yV = varValue.toDouble();
 				else error = 1;
 
-				if(error) qWarning() << "ERROR! GeoSimplePolygonBrep 'xVertex' and 'yVertex' values are not at the right place! --> " << shapePars;
+				if(error) {
+          muxCout.lock();
+          qWarning() << "ERROR! GeoSimplePolygonBrep 'xVertex' and 'yVertex' values are not at the right place! --> " << shapePars;
+          muxCout.unlock();
+        }
 
 				// add a Z plane to the GeoSimplePolygonBrep
 				sh->addVertex(xV, yV);
@@ -973,18 +1126,29 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			// sanity check on the resulting shape
 			if( sh->getNVertices() != NVertices) {
 				error = 1;
+        muxCout.lock();
 				qWarning() << "ERROR! GeoSimplePolygonBrep number of planes: " << QString::number(sh->getNVertices()) << " is not equal to the original size! --> " << shapePars;
+        muxCout.unlock();
 			}
 			if(!sh->isValid()) {
 				error = 1;
+        muxCout.lock();
 				qWarning() << "ERROR! GeoSimplePolygonBrep shape is not valid!! -- input: " << shapePars;
+        muxCout.unlock();
 			}
 		} // end if (size>3)
 		else {
+      muxCout.lock();
 			qWarning() << "ERROR!! GeoSimplePolygonBrep has no vertices!! --> shape input parameters: " << shapePars;
+      muxCout.unlock();
 			error = 1;
 		}
-		if(error) qFatal("GeoSimplePolygonBrep shape error!!! Aborting...");
+    if(error) {
+      muxCout.lock();
+      std::cout << "FATAL ERROR!!! - GeoSimplePolygonBrep shape error!!! Aborting..." << std::endl;
+      muxCout.unlock();
+      exit(EXIT_FAILURE);
+    }
 		return sh;
 
 	}
@@ -1005,7 +1169,11 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 
 		// get parameters from DB string
 		QStringList shapePars = parameters.split(";");
-		qInfo() << "shapePars: " << shapePars; // debug
+    if (m_deepDebug) {
+      muxCout.lock();
+      qInfo() << "shapePars: " << shapePars; // debug
+      muxCout.unlock();
+    }
 
 		int sizePars = shapePars.size();
 		// check if we have at least 13 parameters,
@@ -1020,7 +1188,9 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			varValue = vars[1];
 			if (varName == "nFacets") nFacets = varValue.toInt();
 			else {
-				qWarning("ERROR!! - GeoTessellatedSolid - nFacets is not defined!!");
+        muxCout.lock();
+        qWarning("ERROR!! - GeoTessellatedSolid - nFacets is not defined!!");
+        muxCout.unlock();
 				error = true; // TODO: check "error.h" functionalities and replace with that if useful
 			}
 
@@ -1043,7 +1213,9 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 					facetType = "TRI";
 				}
 				else {
+          muxCout.lock();
 					qWarning() << "ERROR!! - GeoTessellatedSolid - Facet type is not defined! [got: '" << varName << "']";
+          muxCout.unlock();
 					error = true;
 				}
 
@@ -1059,7 +1231,9 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 					if (varValue == "ABSOLUTE") isAbsolute = true;
 					else if (varValue == "RELATIVE") isAbsolute = false;
 					else {
+            muxCout.lock();
 						qWarning() << "ERROR! - GeoTessellatedSolid - Vertex type not defined!";
+            muxCout.unlock();
 						error=true;
 					}
 				}
@@ -1074,16 +1248,20 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 				varValue = vars[1];
 				if (varName == "nV") nVertexes = varValue.toUInt();
 				else {
+          muxCout.lock();
 					qWarning() << "ERROR! - GeoTessellatedSolid - nVertices not defined!";
+          muxCout.unlock();
 					error=true;
 				}
 
 
-				qDebug() << "it:" << it;
+				// qDebug() << "it:" << it;
 				// if we get a QUAD ==> GeoQuadrangularFacet
 				if (facetType=="QUAD") {
 
+          muxCout.lock();
 					qDebug() << "Handling a QUAD facet...";
+          muxCout.unlock();
 					// to store the 4 vertices of the GeoQuadrangularFacet
 					auto vV = std::vector<std::unique_ptr<GeoFacetVertex>>{};
 
@@ -1101,7 +1279,9 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 						varValue = vars[1];
 						if (varName == "xV") xV = varValue.toDouble();
 						else {
+              muxCout.lock();
 							qWarning() << "ERROR! Got '" << varName << "' instead of 'xV'!";
+              muxCout.unlock();
 							error = 1;
 						}
 
@@ -1114,7 +1294,9 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 						varValue = vars[1];
 						if (varName == "yV") yV = varValue.toDouble();
 						else {
+              muxCout.lock();
 							qWarning() << "ERROR! Got '" << varName << "' instead of 'yV'!";
+              muxCout.unlock();
 							error = 1;
 						}
 
@@ -1127,11 +1309,17 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 						varValue = vars[1];
 						if (varName == "zV") zV = varValue.toDouble();
 						else {
+              muxCout.lock();
 							qWarning() << "ERROR! Got '" << varName << "' instead of 'zV'!";
+              muxCout.unlock();
 							error = 1;
 						}
 
-						if(error) qWarning() << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars;
+						if(error) {
+              muxCout.lock();
+              qWarning() << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars;
+              muxCout.unlock();
+            }
 
 						// build the facet's vertex and store it
 						vV.push_back(std::make_unique<GeoFacetVertex>( GeoFacetVertex(xV,yV,zV)) );
@@ -1144,7 +1332,10 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 				// if we get a TRI ==> GeoTriangularFacet
 				else if (facetType=="TRI") {
 
+          muxCout.lock();
 					qDebug() << "Handling a TRI facet...";
+          muxCout.unlock();
+
 //					std::vector<GeoFacetVertex*> vV(3, 0); // to store the 3 vertices of the GeoTriangularFacet
 					auto vV = std::vector<std::unique_ptr<GeoFacetVertex>>{};
 
@@ -1183,7 +1374,11 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 						if (varName == "zV") zV = varValue.toDouble();
 						else error = 1;
 
-						if(error) qWarning() << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars;
+						if(error) {
+              muxCout.lock();
+              qWarning() << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars;
+              muxCout.unlock();
+            }
 
 						// build the facet's vertex and store it
 						vV.push_back(std::make_unique<GeoFacetVertex>( GeoFacetVertex(xV,yV,zV)) );
@@ -1200,7 +1395,9 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			// sanity check on the resulting shape
 			if( sh->getNumberOfFacets() != nFacets) {
 				error = 1;
+        muxCout.lock();
 				qWarning() << "ERROR! GeoTessellatedSolid number of facets: " << QString::number(sh->getNumberOfFacets()) << " is not equal to the original size! --> " << shapePars;
+        muxCout.unlock();
 			}
 			/*
 			 * TODO: uncomment it, when the isValid() method will be implemented for GeoTessellatedSolid
@@ -1211,10 +1408,17 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			*/
 		} // END OF if (size>13)
 		else {
+      muxCout.lock();
 			qWarning() << "ERROR!! GeoTessellatedSolid has no facets!! --> shape input parameters: " << shapePars;
+      muxCout.unlock();
 			error = 1;
 		}
-		if(error) qFatal("GeoTessellatedSolid shape error!!! Aborting...");
+		if(error) {
+      muxCout.lock();
+      std::cout << "GeoTessellatedSolid shape error!!! Aborting..." << std::endl;
+      muxCout.unlock();
+      exit(EXIT_FAILURE);
+    }
 		return sh;
 
 	}
@@ -1264,6 +1468,7 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 					QStringList vars = par.split("=");
 					QString varName = vars[0];
 					QString varValue = vars[1];
+          // qWarning() << "varValue:" << varValue;
 					if (varName == "XHalfLength1") XHalfLength1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 					if (varName == "XHalfLength2") XHalfLength2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 					if (varName == "YHalfLength1") YHalfLength1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
@@ -1343,14 +1548,13 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			if (varName == "X") transfId = varValue.toUInt();
 		}
 		// get the referenced shape
-		// const GeoShape* shapeA = getShape( QString::number(shapeId) );
 		const GeoShape* shapeA = buildShape( QString::number(shapeId) );
 		// get the referenced Transform
-		// QStringList transPars = m_dbManager->getItemFromTableName("Transforms", transfId);
 		QStringList transPars = m_transforms[transfId];
 		if (m_deepDebug) qDebug() << "child:" << transPars;
 		GeoTransform* transf = parseTransform(transPars);
 		const GeoTrf::Transform3D transfX = transf->getTransform();
+        transf->unref(); // delete the transf from the heap
 
 		// qWarning() << "GeoShift:";
 		// printTrf(transfX);
@@ -1371,32 +1575,28 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			if (varName == "opA") opA = varValue.toUInt();
 			if (varName == "opB") opB = varValue.toUInt();
 		}
-		// get the referenced shape
 
-		//if (VP1Msg::debug())
-    		//VP1Msg::messageDebug("GeoSubstraction - building shape A...\n");
+        if (opA == 0 || opB == 0) {
+          std::cout << "ERROR! Subtraction shape - input shape IDs are empty! (opA: " << opA << ", opB:" << opB << ")" << std::endl;
+          exit(EXIT_FAILURE);
+        }
 
-		const GeoShape* shapeA = buildShape( QString::number(opA) );
+        // get the referenced shapes
+        QString shAId = QString::number(opA);
+        const GeoShape* shapeA = buildShape( shAId );
 
-		/*
-		if (VP1Msg::debug()) {
-			QString msg = QString::fromStdString(shapeA->type());
-    			VP1Msg::messageDebug("GeoSubstraction - built shape A: "+msg);
-    			VP1Msg::messageDebug("GeoSubstraction - building shape B...\n");
-    		}
-		*/
+        QString shBId = QString::number(opB);
+        const GeoShape* shapeB = buildShape( shBId );
 
-		const GeoShape* shapeB = buildShape( QString::number(opB) );
+       if ( shapeA == NULL) {
+           std::cout << "ERROR!!! shapeA is NULL!" << std::endl;
+           exit(EXIT_FAILURE);
+       }
 
-		/*
-		if (VP1Msg::debug()) {
-			QString msg = QString::fromStdString(shapeB->type());
-    			VP1Msg::messageDebug("GeoSubstraction - built shape B: "+msg+"\n");
-    		}
-		*/
+       //        std::cout << "Subtraction -- " << "opA: " << opA << ", opB: " << opB << ", shapeA: " << shapeA << ", shapeB: " << shapeB << std::endl;
 
-		// build and return the GeoShapeShift instance
-		return new GeoShapeSubtraction(shapeA, shapeB);
+		   // build and return the GeoShapeSubtraction instance
+      return new GeoShapeSubtraction(shapeA, shapeB);
 	}
 	else if (type == "Union") {
 		// shape parameters
@@ -1411,11 +1611,18 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			if (varName == "opA") opA = varValue.toUInt();
 			if (varName == "opB") opB = varValue.toUInt();
 		}
-		if (opA == 0 || opB == 0) std::cout << "ERROR! 'GeoUnion' shape: opA or opB have not been properly intialized!" << std::endl;
+		if (opA == 0 || opB == 0) {
+          muxCout.lock();
+          std::cout << "ERROR! 'GeoUnion' shape - opA or opB have not been properly intialized!" << std::endl;
+          muxCout.unlock();
+          exit(EXIT_FAILURE);
+        }
 		// get the referenced shape
 		const GeoShape* shapeA = buildShape( QString::number(opA) );
 		const GeoShape* shapeB = buildShape( QString::number(opB) );
 		// build and return the GeoShapeShift instance
+
+//        std::cout << "Union -- " << "opA: " << opA << ", opB: " << opB << ", shapeA: " << shapeA << ", shapeB: " << shapeB << std::endl;
 		return new GeoShapeUnion(shapeA, shapeB);
 	}
   //LAr custom shape
@@ -1433,8 +1640,10 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
   				if (varName == "name") name = varValue.toStdString();
   			}
   	} else {
-  		// throw std::invalid_argument("CustomShape parameters' list is empty!!");
-  		std::cout << "ERROR!!! --> CustomShape parameters' list is empty!! It seems the geometry file you are running on is corrupted." << std::endl;
+      muxCout.lock();
+      // throw std::invalid_argument("CustomShape parameters' list is empty!!");
+      std::cout << "ERROR!!! --> CustomShape parameters' list is empty!! It seems the geometry file you are running on is corrupted." << std::endl;
+      muxCout.unlock();
   		exit(EXIT_FAILURE);
   	}
       return new GeoUnidentifiedShape("LArCustomShape",name);
@@ -1455,7 +1664,9 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
       }
     } else {
       // throw std::invalid_argument("UnidentifiedShape parameters' list is empty!!");
+      muxCout.lock();
       std::cout << "ERROR!!! --> UnidentifiedShape parameters' list is empty!! It seems the geometry file you are running on is corrupted." << std::endl;
+      muxCout.unlock();
       exit(EXIT_FAILURE);
     }
     return new GeoUnidentifiedShape(name,asciiData);
@@ -1482,11 +1693,19 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 
 GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildLogVol()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildLogVol()";
+    muxCout.unlock();
+  }
 
 	// get logVol properties from the DB
 	QStringList values = m_logVols[logVolId.toUInt()];
-	if (m_deepDebug) qDebug() << "params:" << values;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "buildLogVol() - params:" << values;
+    muxCout.unlock();
+  }
 
 	// build the LogVol
 	QString logVolName = values[1];
@@ -1497,7 +1716,11 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 
 	// GET LOGVOL MATERIAL
 	QString matId = values[3];
-	if (m_deepDebug) qDebug() << "material Id:" << matId;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "buildLogVol() - material Id:" << matId;
+    muxCout.unlock();
+  }
 	GeoMaterial* mat = buildMaterial(matId);
 
 	return new GeoLogVol(logVolName.toStdString(), shape, mat);
@@ -1507,21 +1730,34 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 
 GeoSerialDenominator* ReadGeoModel::buildSerialDenominator(QString id)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildSerialDenominator()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildSerialDenominator()";
+    muxCout.unlock();
+  }
 	return parseSerialDenominator( m_serialDenominators[id.toUInt()] );
 }
 
 GeoSerialDenominator* ReadGeoModel::parseSerialDenominator(QStringList values)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::parseSerialDenominator()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::parseSerialDenominator()";
+    muxCout.unlock();
+  }
 	QString id = values[0];
 	QString baseName = values[1];
-	if (m_deepDebug) qDebug() << "\tID:" << id << ", base-name:" << baseName;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "\tparseSerialDenominator() - ID:" << id << ", base-name:" << baseName;
+    muxCout.unlock();
+  }
 	return new GeoSerialDenominator(baseName.toStdString());
 }
 
 // TODO: this should be moved to an Utilities class!
 void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
+  muxCout.lock();
 	std::cout << "transformation: " << std::endl;
 	std::cout << "[[" << t(0, 0) << " , ";
 	std::cout <<         t(0, 1) << " , ";
@@ -1539,6 +1775,7 @@ void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
 	std::cout <<         t(3, 1) << " , ";
 	std::cout <<         t(3, 2) << " , ";
 	std::cout <<         t(3, 3) << " ]]" << std::endl;
+  muxCout.unlock();
 }
 
 // TODO: should go in a QtUtils header-only class, to be used in other packages
@@ -1552,23 +1789,33 @@ QList<double> ReadGeoModel::convertQstringListToDouble(QStringList listin) {
 
 void ReadGeoModel::printTransformationValues(QStringList values) {
 	QList<double> t = convertQstringListToDouble(values);
-	std::cout << "transformation input values: " << std::endl;
+  muxCout.lock();
+  std::cout << "transformation input values: " << std::endl;
 	qWarning() << "[[" << t[0] << "," << t[1] << "," << t[2] << "]["
 	                   << t[3] << "," << t[4] << "," << t[5] << "]["
 	                   << t[6] << "," << t[7] << "," << t[8] << "]["
 	                   << t[9] << "," << t[10] << "," << t[11] << "]]";
+  muxCout.unlock();
 }
 
 
 GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(QString id)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildAlignableTransform()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildAlignableTransform()";
+    muxCout.unlock();
+  }
 	return parseAlignableTransform( m_alignableTransforms[id.toUInt()] );
 }
 
 GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::parseAlignableTransform()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::parseAlignableTransform()";
+    muxCout.unlock();
+  }
 
 	QString id = values.takeFirst(); // it pops out the first element, leaving the other items in the list
 	// printTransformationValues(values); // DEBUG
@@ -1615,15 +1862,21 @@ GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 
 GeoTransform* ReadGeoModel::buildTransform(QString id)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildTransform()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildTransform()";
+    muxCout.unlock();
+  }
 	return parseTransform( m_transforms[id.toUInt()] );
 }
 
 
 GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 {
+  muxCout.lock();
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseTransform()";
 	if (m_deepDebug) qDebug() << "values:" << values;
+  muxCout.unlock();
 
 	QString id = values.takeFirst(); // it pops out the first element, the 'id', leaving the other items in the list
   	// printTransformationValues(values); // DEBUG
@@ -1671,13 +1924,19 @@ GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 
 GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 {
+  muxCout.lock();
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildSerialTransformer()";
+  muxCout.unlock();
 
 	QStringList values = m_serialTransformers[nodeId.toUInt()];
+  muxCout.lock();
 	if (m_deepDebug) qDebug() << "values:" << values;
+  muxCout.unlock();
 
 	// std::cout <<"ST * " << values[0].toStdString() << " " << values[1].toStdString() << " " << values[2].toStdString() << std::endl;
-	if (m_deepDebug) qDebug() << "ST * " << values[0] << ", " << values[1] << ", " << values[2] << ", " << values[3] << ", " << values[4];
+  muxCout.lock();
+  if (m_deepDebug) qDebug() << "buildSerialTransformer() - ST * " << values[0] << ", " << values[1] << ", " << values[2] << ", " << values[3] << ", " << values[4];
+  muxCout.unlock();
 
 	QString id = values[0];
 	QString functionId = values[1];
@@ -1689,16 +1948,25 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 
 	QString physVolType = m_tableid_tableName[physVolTableId];
 
-	if (m_deepDebug) qDebug() << "\tID:" << id << ", functionId:" << functionId << ", physVolId:" << physVolId << ", physVolTableId:" << physVolTableId << ", copies:" << copies;
+  muxCout.lock();
+	if (m_deepDebug) qDebug() << "\tbuildSerialTransformer() - ID:" << id << ", functionId:" << functionId << ", physVolId:" << physVolId << ", physVolTableId:" << physVolTableId << ", copies:" << copies;
+  muxCout.unlock();
 
 	// GET FUNCTION
-	if (m_deepDebug) qDebug() << "function Id:" << functionId;
+  muxCout.lock();
+	if (m_deepDebug) qDebug() << "\tbuildSerialTransformer() - function Id:" << functionId;
+  muxCout.unlock();
 	TRANSFUNCTION func = buildFunction(functionId);
 
 	// GET PHYSVOL
-	if (m_deepDebug) qDebug() << "referenced physVol - Id:" << physVolId << ", type:" << physVolType << "tableId:" << physVolTableIdStr;
+  muxCout.lock();
+	if (m_deepDebug) qDebug() << "\tbuildSerialTransformer() - referenced physVol - Id:" << physVolId << ", type:" << physVolType << "tableId:" << physVolTableIdStr;
+  muxCout.unlock();
 	const GeoVPhysVol* physVol = buildVPhysVol(physVolId, physVolTableIdStr, "1"); // we use "1" as default copyNumber: taking the first copy of the VPhysVol as the referenced volume
-	if (m_deepDebug) qDebug() << "physVol:" << physVol << ", function:" << &func;
+
+  muxCout.lock();
+  if (m_deepDebug) qDebug() << "\tbuildSerialTransformer() - physVol:" << physVol << ", function:" << &func;
+  muxCout.unlock();
 
 	// get PhysVol or FullPhysVol pointer and return the SerialTransformer
 	if (dynamic_cast<const GeoFullPhysVol*>(physVol)) {
@@ -1712,41 +1980,59 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 
 TRANSFUNCTION ReadGeoModel::buildFunction(QString id)
 {
+  muxCout.lock();
 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildFunction()";
+  muxCout.unlock();
 	QStringList values = m_functions[id.toUInt()];
 	return parseFunction( values[1].toStdString() );
 }
 
 TRANSFUNCTION ReadGeoModel::parseFunction(const std::string& expr)
 {
+  muxCout.lock();
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseFunction(const std::string& expr)";
-	// qDebug() << "id:" << Qstring::number(id) << " - expression: " << QString::fromStdString(expr);
 	if (m_deepDebug) qDebug() << "expression: " << QString::fromStdString(expr);
+  muxCout.unlock();
 
 	if (expr.empty()) {
 			qFatal("FATAL ERROR!! Function expression is empty!! Aborting...");
 			abort();
 	}
 
-	TransFunctionInterpreter interpreter;
+  muxCout.lock();
 	if (m_deepDebug) qDebug() << "expression:" << QString::fromStdString(expr);
+  muxCout.unlock();
+  TransFunctionInterpreter interpreter;
 	TFPTR func=interpreter.interpret( expr );
-	if (m_deepDebug) qDebug() << "expression interpreted";
+	// if (m_deepDebug) qDebug() << "expression interpreted";
 	return *(func.release()); // make func returns a pointer to the managed object and releases the ownership, then get the object dereferencing the pointer
 }
 
 GeoNameTag* ReadGeoModel::buildNameTag(QString id) // TODO: Remove the "parseABC" methods, put everything into "buildABC". The "parseABC" are there for historical reasons.
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildNameTag()";
+
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::buildNameTag()";
+    muxCout.unlock();
+  }
 	return parseNameTag( m_nameTags[id.toUInt()] );
 }
 
 GeoNameTag* ReadGeoModel::parseNameTag(QStringList values)
 {
-	if (m_deepDebug) qDebug() << "ReadGeoModel::parseNameTag()";
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "ReadGeoModel::parseNameTag()";
+    muxCout.unlock();
+  }
 	QString id = values[0];
 	QString name = values[1];
-	if (m_deepDebug) qDebug() << "nameTag:" << name;
+	if (m_deepDebug) {
+    muxCout.lock();
+    qDebug() << "nameTag:" << name;
+    muxCout.unlock();
+  }
 	return new GeoNameTag(name.toStdString());
 }
 

@@ -6,11 +6,11 @@
 #include "MyEventAction.hh"
 #include "MySteppingAction.hh"
 #include "MyTrackingAction.hh"
+#include "LengthIntegrator.hh"
 
 
-
-MyActionInitialization::MyActionInitialization(bool isperformance)
-: G4VUserActionInitialization(), fIsPerformance(isperformance) {}
+MyActionInitialization::MyActionInitialization(bool isperformance, bool createGeantinoMaps)
+: G4VUserActionInitialization(), fIsPerformance(isperformance), fCreateGeantinoMaps(createGeantinoMaps) {}
 
 
 MyActionInitialization::~MyActionInitialization() {}
@@ -41,5 +41,11 @@ void MyActionInitialization::Build() const {
     SetUserAction(evtact);
     SetUserAction(new MyTrackingAction(evtact));
     SetUserAction(new MySteppingAction(evtact));
+      if(fCreateGeantinoMaps){
+          std::cout<<"fCreateGeantinoMaps is true"<<std::endl;
+          G4UA::LengthIntegrator* myLenghtInt = new G4UA::LengthIntegrator("eccolo");
+          SetUserAction((G4UserEventAction*)   myLenghtInt);
+          SetUserAction((G4UserSteppingAction*)myLenghtInt);
+      }
   }
 }

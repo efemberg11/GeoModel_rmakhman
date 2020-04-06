@@ -23,7 +23,7 @@ It is suggested to create a local work directory where all code will be download
 mkdir geomodel_work; cd geomodel_work
 ```
 
-### Eigen
+### Eigen - Math Library
 
 ```bash
 git clone https://github.com/eigenteam/eigen-git-mirror.git
@@ -34,7 +34,7 @@ cd ..
 ```
 
 
-### XercesC
+### XercesC - XML Parser
 
 
 From http://xerces.apache.org/xerces-c/download.cgi download e.g. `xerces-c-3.2.2.tar.gz`
@@ -49,7 +49,7 @@ cd ..
 ```
 
 
-### nlohmann
+### nlohmann_json - JSON Parser
 
 ```bash
 git clone https://github.com/nlohmann/json.git
@@ -60,7 +60,7 @@ cd ..
 ```
 
 
-### GeoModel tool suite
+### GeoModel Toolsuite
 
 Note: GeoModelVisualization requires Qt5 and other libraries. Please refer to the `gmex` [documentation](https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization/README.md)
 

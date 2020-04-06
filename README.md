@@ -3,7 +3,7 @@
 Tools and utilities for GeoModel-based detector description projects. This includes the CLHEP ExpressionEvaluator 
 (which was moved here to use throughout the project without linking against CLHEP), an XML parser (GeoModelXMLParser) and
 a JSON Parser. The GeoModelTools installation requires the GeoModel suite ([GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), 
-[GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModelIO)), Eigen3, XercesC, and nlohmann_json.
+[GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModelIO)), [Eigen3](http://eigen.tuxfamily.org/), [XercesC](https://xerces.apache.org/xerces-c/), and [nlohmann_json](https://github.com/nlohmann/json).
 
 ## Installation
 

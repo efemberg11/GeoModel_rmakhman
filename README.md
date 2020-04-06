@@ -23,7 +23,7 @@ cd ..
 
 ## Running gmex with AGDD
 
-```
+```bash
 mkdir run; cd run
 cp ../agdd/AGDDPlugin/data/AMDC.xml .
 gmex /usr/local/lib/libAGDDPlugin.1.0.0.dylib

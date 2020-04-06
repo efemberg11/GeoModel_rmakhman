@@ -113,7 +113,7 @@ cd ..
 
 ```bash
 # install external dependencies
-brew install eigen xerces-c nlohmann_json qt
+brew install eigen xerces-c nlohmann-json qt
 # configure qt
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.bash_profile
 

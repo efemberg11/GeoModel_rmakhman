@@ -27,8 +27,8 @@ file( GLOB HEADERS MuonAGDDBase/*.h )
 add_library( MuonAGDDBase SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET MuonAGDDBase
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( MuonAGDDBase PUBLIC GeoModelKernel AGDDKernel XercesC::XercesC ExpressionEvaluator MuonAGDDDescription MuonGeoModel GeoModelXMLParser )
-#  target_include_directories( AGDDKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ) )
+target_link_libraries( MuonAGDDBase PUBLIC GeoModelCore::GeoModelKernel AGDDKernel XercesC::XercesC GeoModelTools::ExpressionEvaluator MuonAGDDDescription MuonGeoModel GeoModelTools::GeoModelXMLParser )
+
 target_include_directories( MuonAGDDBase PUBLIC ${EIGEN3_INCLUDE_DIR}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

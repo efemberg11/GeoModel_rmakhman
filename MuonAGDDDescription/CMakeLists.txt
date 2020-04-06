@@ -25,7 +25,7 @@ file( GLOB HEADERS MuonAGDDDescription/*.h )
 add_library( MuonAGDDDescription SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET MuonAGDDDescription
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( MuonAGDDDescription PUBLIC GeoModelKernel AGDDKernel CLHEP )
+target_link_libraries( MuonAGDDDescription PUBLIC GeoModelCore::GeoModelKernel AGDDKernel CLHEP::CLHEP )
 #  target_include_directories( AGDDKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ) )
 target_include_directories( MuonAGDDDescription PUBLIC ${EIGEN3_INCLUDE_DIR}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

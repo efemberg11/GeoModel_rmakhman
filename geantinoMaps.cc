@@ -29,6 +29,7 @@
 #include <iostream>
 #include <iomanip>
 
+static bool         parCreateGeantinoMaps = true;
 static bool         parIsPerformance   = false;
 static G4String     geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db";
 static std::string  parMacroFileName   = "";
@@ -97,7 +98,7 @@ int main(int argc, char** argv) {
     }
   
     // 3. User action
-    runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance));
+    runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance, parCreateGeantinoMaps));
   
     // 4. Run the simulation in batch mode
     G4UImanager* UI = G4UImanager::GetUIpointer();

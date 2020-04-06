@@ -14,6 +14,18 @@ set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
 # Print Build Info on screen
 include(cmake/BuildTypeInfo.cmake)
 
+# WARNING! 
+# Building in 'Debug' mode with Clang (macOS) makes the GeoModelRead library 
+# crash when running with multiple threads. 
+# ( Details: https://its.cern.ch/jira/browse/ATLASDD-38 )
+# Thus, if we are on macOS and the build type has been set to 'Debug',
+# we send a warning message to the user
+if ( APPLE AND ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  message(STATUS "**********")
+  message(STATUS "WARNING!! You chose to build in 'Debug' mode. However, on macOS (where you appear to run), this makes multi-threaded GeoModelRead crash. Therefore, if you need debug symbols, please build with 'RelWithDebInfo'. (Details:  https://its.cern.ch/jira/browse/ATLASDD-38)")
+  message(STATUS "**********")
+endif()
+
 # Make the module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
@@ -30,7 +42,6 @@ add_subdirectory( GeoModelDBManager )
 add_subdirectory( TFPersistification )
 add_subdirectory( GeoModelRead )
 add_subdirectory( GeoModelWrite )
-#add_subdirectory( GeoSpecialShapes )
 #
 
 # Create and install the version description of the project.

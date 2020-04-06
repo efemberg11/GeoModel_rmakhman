@@ -18,7 +18,7 @@ file( GLOB SOURCES src/*.cxx )
 
 # Set up the library.
 add_library( AGDDPlugin SHARED ${SOURCES} )
-target_link_libraries( AGDDPlugin PUBLIC GeoModelCore::GeoModelKernel AGDDHandlers AGDDControl GeoModelXMLParser )
+target_link_libraries( AGDDPlugin PUBLIC GeoModelCore::GeoModelKernel AGDDHandlers AGDDControl GeoModelTools::GeoModelXMLParser )
 target_include_directories( AGDDPlugin PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

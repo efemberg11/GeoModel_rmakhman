@@ -5,7 +5,9 @@ Tools and utilities for GeoModel-based detector description projects. This inclu
 a JSON Parser. The GeoModelTools installation requires the GeoModel suite ([GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), 
 [GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModelIO)), [Eigen3](http://eigen.tuxfamily.org/), [XercesC](https://xerces.apache.org/xerces-c/), and [nlohmann_json](https://github.com/nlohmann/json).
 
-## Installation
+**Note**: If you are developing on macOS, you can refer to the [quick instructions](#quick-installation-macos) too, which can be found at the bottom of the page.
+
+## Step-by-step Installation
 
 Detailed installation procedures are available for each and every package, here is a brief and not-exhaustive list of 
 installation procedures for many of them, just bear in mind prepackaged versions are already available (e.g. 
@@ -107,4 +109,44 @@ sudo make install
 cd ..
 ```
 
+## Quick installation - macOS
+
+```bash
+# install external dependencies
+brew install eigen xerces-c nlohmann_json qt
+# configure qt
+echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.bash_profile
+
+# install GeoModelCore
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+mkdir build_GeoModelCore; cd build_GeoModelCore
+cmake ../GeoModelCore
+make -j
+sudo make install
+cd ..
+
+# install GeoModelIO
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+mkdir build_GeoModelIO; cd build_GeoModelIO
+cmake ../GeoModelIO
+make -j
+sudo make install
+cd ..
+
+# install GeoModelExplorer ('gmex')
+git clone https://gitlab.cern.ch/GeoModelDev/geomodelvisualization.git
+mkdir build_geomodelvisualization; cd build_geomodelvisualization
+cmake ../geomodelvisualization
+make -j
+sudo make install
+cd ..
+
+# install GeoModelTools
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelTools.git
+mkdir build_GeoModelTools; cd build_GeoModelTools
+cmake ../GeoModelTools
+make -j
+sudo make install
+cd ..
+```
 

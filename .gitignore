@@ -6,3 +6,6 @@
 
 # Visual Studio Code IDE
 .vscode
+
+# VI / VIM
+*.swp

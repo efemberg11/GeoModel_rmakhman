@@ -89,7 +89,7 @@ using namespace GeoXF;
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false), m_debug(false), m_runMultithreaded(false)
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false), m_debug(false), m_runMultithreaded(true)
 {
 	qDebug() << "===> DumpGeoModelAction: constructor";
 
@@ -119,9 +119,9 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
     
     // Check if the user asked for running in multi-threading mode
 //    const char* env_option_multithreaded = std::getenv("GEOMODEL_GEOMODELIO_MULTITHREADED");
-    if( "1" == getEnvVar("GEOMODEL_GEOMODELIO_MULTITHREADED") ) {
-        std::cout << "\nYou set the GEOMODEL_GEOMODELIO_MULTITHREADED to '1', so we will run GeoModelIO with multiple threads. WARNING! This is an experimental feature and on macOS you could get a crash if you compile in 'Debug' mode! If you have problems with this, ask to the developers (geomodel-developers@cern.ch)\n\n";
-        m_runMultithreaded = true;
+    if( "1" == getEnvVar("GEOMODEL_GEOMODELIO_NOT_MULTITHREADED") ) {
+        std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NOT_MULTITHREADED to '1', so we will run GeoModelIO in serial mode, without using worker threads. If you experience problems, please ask to the GeoModel developers ( --> geomodel-developers<at>cern.ch )\n\n";
+        m_runMultithreaded = false;
     }
 }
 
@@ -233,12 +233,11 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
 void ReadGeoModel::loopOverAllChildrenInBunches()
 {
 	int nChildrenRecords = m_allchildren.size();
-	std::cout << "number of children to process: " << nChildrenRecords << std::endl;
+	if (m_debug) std::cout << "number of children to process: " << nChildrenRecords << std::endl;
 
 	// If we have a few children, then process them serially
-//   if (true) // force serial run, without threads --> only for debug!!
-    if ( !(m_runMultithreaded) || nChildrenRecords <= 500)
-    {
+    	if ( !(m_runMultithreaded) || nChildrenRecords <= 500)
+    	{
 		loopOverAllChildren(m_allchildren.keys());
 	}
 	// ...otherwise, lets spawn some threads to process them in bunches, parallelly!
@@ -248,10 +247,10 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 
 		unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
         unsigned int nThreads = nThreadsPlatform * 2;
-		std::cout << "WARNING! - You chose to run with multiple threads, this is an experimental feature.\nOn this platform, " << nThreadsPlatform << " concurrent threads are supported. Using " << nThreads << " threads.\n";
+		if (m_debug) std::cout << "INFO - You are running with multiple threads. On this platform, " << nThreadsPlatform << " concurrent threads are supported. Using " << nThreads << " threads.\n";
 
 		unsigned int nBunches = nChildrenRecords / nThreads;
-		std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each, plus the remainder." << std::endl;
+		if (m_debug) std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each, plus the remainder." << std::endl;
 
 		// a vector to store the "futures" of async calls
 		std::vector<std::future<void>> futures;
@@ -283,19 +282,19 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 		// wait for all async calls to complete
 		//retrieve and print the value stored in the future
 		muxCout.lock();
-		std::cout << "Waiting for the threads to finish..." << std::flush;
+		if (m_debug) std::cout << "Waiting for the threads to finish..." << std::flush;
 		muxCout.unlock();
 	  	for(auto &e : futures) {
 	    	e.wait();
 	   	}
 		muxCout.lock();
-    	std::cout << "Done!\n";
+    	if (m_debug) std::cout << "Done!\n";
 		muxCout.unlock();
 
 		// Get End Time
 		auto end = std::chrono::system_clock::now();
 		auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
-		std::cout << "Total Time Taken to process all children: " << diff << " Seconds" << std::endl;
+		std::cout << "(Total time taken to recreate all " << nChildrenRecords << " mother-children relationships: " << diff << " seconds)" << std::endl;
 	}
 	return;
 }

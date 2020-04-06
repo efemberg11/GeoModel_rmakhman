@@ -72,6 +72,8 @@
 #include <future>
 #include <mutex>
 #include <chrono>
+#include <cstdlib> /* std::getenv */
+
 
 std::mutex muxStore;
 std::mutex muxGet;
@@ -83,9 +85,11 @@ using namespace GeoGenfun;
 using namespace GeoXF;
 
 
+
+
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false)
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false), m_debug(false), m_runMultithreaded(false)
 {
 	qDebug() << "===> DumpGeoModelAction: constructor";
 
@@ -112,13 +116,25 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 		qWarning() << "ERROR!! Database is NOT open!";
 		return;
 	}
+    
+    // Check if the user asked for running in multi-threading mode
+//    const char* env_option_multithreaded = std::getenv("GEOMODEL_GEOMODELIO_MULTITHREADED");
+    if( "1" == getEnvVar("GEOMODEL_GEOMODELIO_MULTITHREADED") ) {
+        std::cout << "\nYou set the GEOMODEL_GEOMODELIO_MULTITHREADED to '1', so we will run GeoModelIO with multiple threads. WARNING! This is an experimental feature and on macOS you could get a crash if you compile in 'Debug' mode! If you have problems with this, ask to the developers (geomodel-developers@cern.ch)\n\n";
+        m_runMultithreaded = true;
+    }
 }
 
 ReadGeoModel::~ReadGeoModel() {
 	// TODO Auto-generated destructor stub
 }
 
-
+std::string ReadGeoModel::getEnvVar( std::string const & key ) const
+{
+    char * val = std::getenv( key.c_str() );
+    return val == NULL ? std::string("") : std::string(val);
+}
+    
 GeoPhysVol* ReadGeoModel::buildGeoModel()
 {
   if (m_deepDebug) qDebug() << "ReadGeoModel::buildGeoModel()";
@@ -221,7 +237,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 
 	// If we have a few children, then process them serially
 //   if (true) // force serial run, without threads --> only for debug!!
-    if (nChildrenRecords <= 500)
+    if ( !(m_runMultithreaded) || nChildrenRecords <= 500)
     {
 		loopOverAllChildren(m_allchildren.keys());
 	}
@@ -232,7 +248,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 
 		unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
         unsigned int nThreads = nThreadsPlatform * 2;
-		std::cout << "On this platform, " << nThreadsPlatform << " concurrent threads are supported. Using " << nThreads << " threads.\n";
+		std::cout << "WARNING! - You chose to run with multiple threads, this is an experimental feature.\nOn this platform, " << nThreadsPlatform << " concurrent threads are supported. Using " << nThreads << " threads.\n";
 
 		unsigned int nBunches = nChildrenRecords / nThreads;
 		std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each, plus the remainder." << std::endl;

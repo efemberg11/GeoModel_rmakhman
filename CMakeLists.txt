@@ -12,7 +12,7 @@ set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
    "Require the specified C++ standard for the build" )
 
 # Print Build Info on screen
-include(cmake/PrintBuildInfo.cmake)
+include(cmake/BuildTypeInfo.cmake)
 
 # Make the module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )

@@ -49,6 +49,8 @@ public:
 
 private:
 
+    std::string getEnvVar( std::string const & key ) const;
+
 	GeoPhysVol* buildGeoModelByCalls();
 	GeoPhysVol* buildGeoModelOneGo();
 
@@ -102,6 +104,7 @@ private:
 	GMDBManager* m_dbManager;
 	bool m_deepDebug;
 	bool m_debug;
+    bool m_runMultithreaded;
 
 	// callback handles
 	unsigned long* m_progress;

@@ -24,6 +24,7 @@ public:
   G4double fNGamma;         // sum of number of secondary gamma
   G4double fNElec;          // sum of number of secondary e-
   G4double fNPosit;         // sum of number of secondary e+
+  G4double fNGeantino;      // sum of number of secondary geantinos
 };
 
 #endif

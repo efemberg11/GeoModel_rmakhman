@@ -54,7 +54,7 @@ MyPrimaryGeneratorAction::MyPrimaryGeneratorAction() {
   fPrimaryParticleName        = "e-";
   fParticleGun                = new G4ParticleGun(1);
   fParticleTable              = G4ParticleTable::GetParticleTable();
-  fPrimaryParticleEnergy      =  10.*GeV;
+  fPrimaryParticleEnergy      = 10.*GeV;
   fPrimaryParticlePosition    = G4ThreeVector(0.0,0.0,0.0);
   //
   fGunMessenger  = new MyPrimaryGeneratorMessenger(this);
@@ -97,7 +97,7 @@ void MyPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
             << G4endl;
       exit(-1);
     }
-    std::cout<<"Setting the particle gun"<<std::endl;
+    //std::cout<<"Setting the particle gun"<<std::endl;
     fParticleGun->SetParticleDefinition       (pDef                     );
     fParticleGun->SetParticleEnergy           (fPrimaryParticleEnergy   );
     fParticleGun->SetParticlePosition         (fPrimaryParticlePosition );

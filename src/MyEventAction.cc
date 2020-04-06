@@ -91,5 +91,7 @@ void MyEventAction::AddSecondaryTrack(const G4Track* track, G4int primid) {
     fEventDataPerPrimary[primid].fNElec += 1.;
   } else if (pdf==G4Positron::Positron()) {
     fEventDataPerPrimary[primid].fNPosit += 1.;
+  } else if (pdf==G4Geantino::Geantino()) {
+      fEventDataPerPrimary[primid].fNGeantino += 1.;
   }
 }

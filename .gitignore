@@ -3,3 +3,6 @@
 # Eclipse IDE
 .cproject
 .project
+
+# Visual Studio Code IDE
+.vscode

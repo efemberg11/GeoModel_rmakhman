@@ -17,7 +17,6 @@
 #include <string>
 #include <set>
 
-
 // FWD declarations
 class GeoVPhysVol;
 class GeoPhysVol;
@@ -46,21 +45,28 @@ public:
 	ReadGeoModel(GMDBManager* db, unsigned long* progress = nullptr);
 	virtual ~ReadGeoModel();
 
-	// void printRecords();
 	GeoPhysVol* buildGeoModel();
 
 private:
 
+    std::string getEnvVar( std::string const & key ) const;
+
 	GeoPhysVol* buildGeoModelByCalls();
 	GeoPhysVol* buildGeoModelOneGo();
 
-	GeoPhysVol* loopOverAllChildren();
+	void loopOverAllChildren(QStringList keys);
+	void loopOverAllChildrenInBunches();
+	void processParentChildren(const QString &parentKey);
+	void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child);
 
 	GeoPhysVol* getRootVolume();
 
 	GeoVPhysVol* parseChildren(GeoVPhysVol* vol, QMap<unsigned int, QStringList> children, int depth = 0);
 	GeoVPhysVol* parseVPhysVol(QStringList values, QString nodeType, int depth = 0);
+
 	GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber);
+	GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN);
+
 	GeoLogVol* buildLogVol(QString id);
 	GeoShape* buildShape(QString id);
 	GeoMaterial* buildMaterial(QString id);
@@ -95,9 +101,10 @@ private:
 
 	// input arguments
 	std::string _dbName;
-//	GeoPhysVol* _root;
 	GMDBManager* m_dbManager;
 	bool m_deepDebug;
+	bool m_debug;
+    bool m_runMultithreaded;
 
 	// callback handles
 	unsigned long* m_progress;

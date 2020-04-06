@@ -109,12 +109,14 @@ sudo make install
 cd ..
 ```
 
-## Quick installation - macOS
+## Quick build instructions - macOS
+
+If you don't have the `brew` package manager installed, please install it by issue the command on its website: https://brew.sh/
 
 ```bash
 # install external dependencies
 brew install eigen xerces-c nlohmann-json qt
-# configure qt
+# --- configure qt
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.bash_profile
 
 # install GeoModelCore

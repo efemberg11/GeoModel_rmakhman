@@ -104,7 +104,8 @@ private:
 	GMDBManager* m_dbManager;
 	bool m_deepDebug;
 	bool m_debug;
-    bool m_runMultithreaded;
+  bool m_runMultithreaded;
+  unsigned int m_runMultithreaded_nThreads;
 
 	// callback handles
 	unsigned long* m_progress;

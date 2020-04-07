@@ -75,10 +75,10 @@
 #include <cstdlib> /* std::getenv */
 
 
+// mutexes for the multi-threading mode
 std::mutex muxStore;
 std::mutex muxGet;
 std::mutex muxCout;
-
 
 
 using namespace GeoGenfun;
@@ -89,7 +89,7 @@ using namespace GeoXF;
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false), m_debug(false), m_runMultithreaded(true)
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false), m_debug(false), m_runMultithreaded(true), m_runMultithreaded_nThreads(0)
 {
 	qDebug() << "===> DumpGeoModelAction: constructor";
 
@@ -116,13 +116,26 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 		qWarning() << "ERROR!! Database is NOT open!";
 		return;
 	}
-    
+
     // Check if the user asked for running in multi-threading mode
-//    const char* env_option_multithreaded = std::getenv("GEOMODEL_GEOMODELIO_MULTITHREADED");
     if( "1" == getEnvVar("GEOMODEL_GEOMODELIO_NOT_MULTITHREADED") ) {
         std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NOT_MULTITHREADED to '1', so we will run GeoModelIO in serial mode, without using worker threads. If you experience problems, please ask to the GeoModel developers ( --> geomodel-developers<at>cern.ch )\n\n";
         m_runMultithreaded = false;
     }
+    // Check if the user asked for running in multi-threading mode
+    if ( "" != getEnvVar("GEOMODEL_GEOMODELIO_NTHREADS")) {
+      unsigned int nThreads = std::stoi(getEnvVar("GEOMODEL_GEOMODELIO_NTHREADS"));
+      if( nThreads > 0 ) {
+          std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NTHREADS to " << nThreads << "; thus, that number of worker threads will be used." << std::endl;
+          m_runMultithreaded_nThreads = nThreads;
+      } else if (nThreads == 0) {
+        std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NTHREADS to " << nThreads << "; thus, GeoModelIO will be run in serial mode." << std::endl;
+        m_runMultithreaded_nThreads = nThreads;
+        m_runMultithreaded = false;
+      }
+    }
+
+
 }
 
 ReadGeoModel::~ReadGeoModel() {
@@ -134,7 +147,7 @@ std::string ReadGeoModel::getEnvVar( std::string const & key ) const
     char * val = std::getenv( key.c_str() );
     return val == NULL ? std::string("") : std::string(val);
 }
-    
+
 GeoPhysVol* ReadGeoModel::buildGeoModel()
 {
   if (m_deepDebug) qDebug() << "ReadGeoModel::buildGeoModel()";

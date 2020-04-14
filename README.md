@@ -23,8 +23,8 @@ FullSimLight project depends on [GeoModelCore](https://gitlab.cern.ch/GeoModelDe
 Following are the instructions to install them. 
 
 ## GeoModelCore:
-
-Clone the repository at [GeoModelCore repo](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), then:
+First, install GeoModelCore dependencies: [Eigen](http://eigen.tuxfamily.org/)and (optional) [Doxygen](http://www.doxygen.nl/index.html).
+Then, clone the repository at [GeoModelCore repo](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), then:
 
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
@@ -74,8 +74,19 @@ source <path_to_geant4_install_dir>/bin/geant4.sh
 ```
 
 ## GeoModelG4:
+First, install GeoModelG4 dependency: [CLHEP](https://gitlab.cern.ch/CLHEP/CLHEP.git)
 
-Clone the repository at [GeoModelG4 repo](https://gitlab.cern.ch/GeoModelDev/GeoModelG4), then:
+```bash
+git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
+cd CLHEP
+git checkout CLHEP_2_4_1_0
+mkdir build ; cd build
+cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
+make
+make install
+```
+
+Then, clone the repository at [GeoModelG4 repo](https://gitlab.cern.ch/GeoModelDev/GeoModelG4), then:
 
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelG4.git

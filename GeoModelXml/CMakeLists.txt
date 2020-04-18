@@ -31,7 +31,7 @@ set_property( TARGET GeoModelXml
    PROPERTY PUBLIC_HEADER ${HEADERS} )
 
 target_compile_definitions( GeoModelXml PUBLIC -DSTANDALONE_GMX )
-target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel ExpressionEvaluator XercesC::XercesC ZLIB::ZLIB  )
+target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel GeoModelTools::ExpressionEvaluator XercesC::XercesC ZLIB::ZLIB  )
 #  target_include_directories( AGDDKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ) )
 target_include_directories( GeoModelXml PUBLIC ${EIGEN3_INCLUDE_DIR}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

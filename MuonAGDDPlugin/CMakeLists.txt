@@ -18,7 +18,7 @@ file( GLOB SOURCES src/*.cxx )
 
 # Set up the library.
 add_library( MuonAGDDPlugin SHARED ${SOURCES} )
-target_link_libraries( MuonAGDDPlugin PUBLIC GeoModelCore::GeoModelKernel AGDDHandlers AGDDControl GeoModelXMLParser MuonAGDDBase )
+target_link_libraries( MuonAGDDPlugin PUBLIC GeoModelCore::GeoModelKernel AGDDHandlers AGDDControl GeoModelTools::GeoModelXMLParser MuonAGDDBase )
 target_include_directories( MuonAGDDPlugin PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

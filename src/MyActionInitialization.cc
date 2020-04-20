@@ -43,7 +43,7 @@ void MyActionInitialization::Build() const {
     SetUserAction(new MySteppingAction(evtact));
       if(fCreateGeantinoMaps){
           std::cout<<"fCreateGeantinoMaps is true"<<std::endl;
-          G4UA::LengthIntegrator* myLenghtInt = new G4UA::LengthIntegrator("eccolo");
+          G4UA::LengthIntegrator* myLenghtInt = new G4UA::LengthIntegrator("CreateGeantinoMaps");
           SetUserAction((G4UserEventAction*)   myLenghtInt);
           SetUserAction((G4UserSteppingAction*)myLenghtInt);
       }

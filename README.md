@@ -42,7 +42,7 @@ Database files can be downloaded from:
 
 ## Build from source 
 
-### Ubuntu Bionic, Disco, or Eoan
+### Ubuntu Linux (Bionic, Disco, or Eoan)
 
 
 **These instructions will install to /usr/local**
@@ -84,7 +84,7 @@ You can build plugins for gmex!
 - see <https://gitlab.cern.ch/GeoModelATLAS/DualUsePlugins>
     
     
-### macOS
+### macOS (10.14.5 'Mojave' and 10.15 'Catalina')
 
 Here below you will find the instructions to build GeoModelVisualization and all GeoModel dependencies from source, on macOS.
 
@@ -101,15 +101,10 @@ brew install qt5
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 ```
 
-Then, we install the grpahics libraries. First, set the package manager to install a custom version of them:
+Then, we install the graphics libraries (Coin and SoQt). We set a custom version of them:
 
 ```bash
-brew tap ric-bianchi/vp1light
-```
-
-Then, install the Coin and SoQt graphics libraries:
-
-```
+brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
 brew install simage coin-bb soqt-bb
 ```
 

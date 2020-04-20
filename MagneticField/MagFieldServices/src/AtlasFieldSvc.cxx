@@ -628,21 +628,21 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     int time;
     input >> word >> version;
     if ( word != "FORMAT-VERSION" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'FORMAT-VERION'");
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'FORMAT-VERION'"<<std::endl;
         return false;
     }
     if ( version < 5 || version > 6) {
-        //ATH_MSG_ERROR( myname << ": version number is " << version << " instead of 5 or 6");
+        std::cout<<"ERROR: "<< myname << ": version number is " << version << " instead of 5 or 6"<<std::endl;
         return false;
     }
     input >> word >> date;
     if ( word != "DATE" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'DATE'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'DATE'" <<std::endl;
         return false;
     }
     input >> word >> time;
     if ( word != "TIME" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'TIME'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'TIME'" <<std::endl;
         return false;
     }
 
@@ -650,7 +650,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nheader;
     input >> word >> nheader;
     if ( word != "HEADERS" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'HEADERS'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'HEADERS'" <<std::endl;
         return false;
     }
     std::string restofline;
@@ -664,7 +664,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nzone;
     input >> word >> nzone;
     if ( word != "ZONES" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'ZONES'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'ZONES'" <<std::endl;
         return false;
     }
     std::vector<int> jz(nzone), nz(nzone);
@@ -717,7 +717,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nbiot;
     input >> word >> nbiot;
     if ( word != "BIOT" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'BIOT'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'BIOT'" <<std::endl;
         return false;
     }
     std::vector<BFieldCond> bslist;
@@ -752,7 +752,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nc;
     input >> word >> nc;
     if ( word != "COIL" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'COIL'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'COIL'" <<std::endl;
         return false;
     }
     getline( input, restofline );
@@ -765,7 +765,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nauxarr;
     input >> word >> nauxarr;
     if ( word != "AUXARR" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'AUXARR'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'AUXARR'" <<std::endl;
         return false;
     }
     if ( version == 6 ) input >> word; // skip 'T'
@@ -778,7 +778,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     int nmesh;
     input >> word >> nmesh;
     if ( word != "MESH" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'MESH'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'MESH'" <<std::endl;
         return false;
     }
     std::vector<double> meshlist;
@@ -806,15 +806,15 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     std::string ftype, bytype;
     input >> word >> nf >> nzlist >> ftype >> bytype;
     if ( word != "FIELD" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << word << "' instead of 'FIELD'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'FIELD'" <<std::endl;
         return false;
     }
     if ( ftype != "I2PACK" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << ftype << "' instead of 'I2PACK'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << ftype << "' instead of 'I2PACK'" <<std::endl;
         return false;
     }
     if ( bytype != "FBYTE" ) {
-        //ATH_MSG_ERROR( myname << ": found '" << bytype << "' instead of 'FBYTE'" );
+        std::cout<<"ERROR: "<< myname << ": found '" << bytype << "' instead of 'FBYTE'" <<std::endl;
         return false;
     }
     // read zone by zone
@@ -823,7 +823,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
         input >> izone >> idzone >> nfzone;
         izone--; // fortran -> C++
         if ( idzone != m_zone[izone].id() ) {
-            //ATH_MSG_ERROR( myname << ": zone id " << idzone << " != " << m_zone[izone].id() );
+            std::cout<<"ERROR: "<< myname << ": zone id " << idzone << " != " << m_zone[izone].id() <<std::endl;
             //return StatusCode(2);
             return true; // TO DO - it shoudl be recoverable - handle ! enum class ErrorCode : code_t { FAILURE = 0, SUCCESS = 1, RECOVERABLE = 2 };
         }

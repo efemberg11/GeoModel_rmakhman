@@ -13,7 +13,7 @@ option( GEOMODEL_USE_BUILTIN_JSON
 if( GEOMODEL_USE_BUILTIN_JSON )
 
    # Tell the user what's happening.
-   message( STATUS "Building nlohmann_json as part of the project" )
+   message( STATUS "'GEOMODEL_USE_BUILTIN_JSON' was set to 'true' ==> Building nlohmann_json as part of the project" )
 
    # The include directory and library that will be produced.
    set( nlohmann_json_INCLUDE_DIR
@@ -50,6 +50,9 @@ if( GEOMODEL_USE_BUILTIN_JSON )
 else()
 
    # Just find an existing installation of nlohmann_json.
-   find_package( nlohmann_json )
+   find_package( nlohmann_json QUIET)
+   if( NOT nlohmann_json_FOUND )
+     message(STATUS "WARNING! 'nlohmann_json' was not found by CMake!! However, if you installed this single-header library in a standard system include dir (e.g., '/usr/local/include'), I will be able to use it.")
+   endif()
 
 endif()

@@ -6,7 +6,12 @@ file( GLOB HEADERS GeoModelJSONParser/*.h )
 
 # Create the library.
 add_library( GeoModelJSONParser SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoModelJSONParser PUBLIC nlohmann_json::nlohmann_json )
+if (nlohmann_json_FOUND)
+  # we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
+  # this is not needed if the single-header library is installed in a regular
+  # system include folder (e.g., '/usr/local/include')
+  target_link_libraries( GeoModelJSONParser PUBLIC nlohmann_json::nlohmann_json )
+endif()
 target_include_directories( GeoModelJSONParser PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )

@@ -633,12 +633,12 @@ QVariant WriteGeoModel::storeShape(const GeoShape* shape)
 {
 	QString shapeType = QString::fromStdString(shape->type());
 	//JFB Commented out: qDebug() << "storeShape() - shape name:" << shapeType  << ", address:" << shape;
-	// get shape parameters
+	
+    // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
+    if (shapeType=="CustomShape") shapeType="UnidentifiedShape";
+    
+    // get shape parameters
 	QString shapePars = getShapeParameters(shape);
-
-       
-	// LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
-	if (shapeType=="CustomShape") shapeType="UnidentifiedShape";
 	
 	// store the shape in the DB and returns the ID
 	return storeObj(shape, shapeType, shapePars);

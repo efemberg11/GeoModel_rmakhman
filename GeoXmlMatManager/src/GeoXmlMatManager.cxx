@@ -14,7 +14,15 @@
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/Units.h"
 
+#include <cstdlib>
+#include <filesystem>
 #include <iomanip>
+
+#define PATH_ENV_NAME      "GEOMODEL_XML_DIR"
+#define MATERIALS_FILENAME "materials.xml"
+#define ELEMENTS_FILENAME  "elements.xml"
+
+namespace fs=std::filesystem;
 
 GeoXmlMatManager* GeoXmlMatManager::s_instance{nullptr};
 
@@ -29,7 +37,7 @@ public:
     , m_materialsHandler("GeoMaterials")
   {}
   ~Impl(){}
-  
+
   //______________________________________________________
   // Handlers for the XML parser
   GeoElementHandler      m_elementHandler;
@@ -64,9 +72,31 @@ public:
 GeoXmlMatManager::GeoXmlMatManager()
   : m_pImpl(new Impl(this))
 {
+  char* path = getenv(PATH_ENV_NAME);
+  std::string errorMessage{""};
+  if(!path) {
+    errorMessage = std::string(PATH_ENV_NAME) + " environment not defined!";
+    throw std::runtime_error(errorMessage);
+  }
+
+  fs::path fsPath(path);
+  std::vector<fs::path> paths { fsPath
+				, fsPath / std::string(ELEMENTS_FILENAME)
+				, fsPath / std::string(MATERIALS_FILENAME) };
+
+  for(fs::path p : paths) {
+    if(!fs::exists(p)) {
+      errorMessage = std::string(p) + " does not exist!";
+      break;
+    }
+  }
+  if(!errorMessage.empty()) {
+    throw std::runtime_error(errorMessage.c_str());
+  }
+
   XercesParser xercesParser;
-  xercesParser.ParseFileAndNavigate("elements.xml");
-  xercesParser.ParseFileAndNavigate("materials.xml");
+  xercesParser.ParseFileAndNavigate(paths[1]); // Parse elements
+  xercesParser.ParseFileAndNavigate(paths[2]); // Parse materials
   // The last material needs to be locked
   lockMaterial();
   // Build special materials
@@ -80,7 +110,15 @@ GeoXmlMatManager::~GeoXmlMatManager()
 
 const GeoXmlMatManager* GeoXmlMatManager::getManager()
 {
-  if(!s_instance) s_instance = new GeoXmlMatManager();
+  if(!s_instance) {
+    try {
+      s_instance = new GeoXmlMatManager();
+    }
+    catch(std::runtime_error& ex) {
+      std::cerr << ex.what() << std::endl;
+      return nullptr;
+    }
+  }
   return s_instance;
 }
 

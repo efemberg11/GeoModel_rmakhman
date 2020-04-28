@@ -145,8 +145,16 @@ make install
 
 After compilation, you should apply two temporary fixes:
 
+On MacOS:
 ```
 install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # this is a temporary fix
+```
+On Ubuntu:
+```
+export LD_LIBRARY_PATH=${PWD}/../install/lib/
+```
+On both:
+```
 export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 ```
 

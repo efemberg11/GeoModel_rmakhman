@@ -19,7 +19,7 @@ if( GEOMODEL_USE_BUILTIN_JSON )
    set( nlohmann_json_INCLUDE_DIR
       "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/JSONInstall/${CMAKE_INSTALL_INCLUDEDIR}" )
    set( nlohmann_json_INCLUDE_DIRS "${nlohmann_json_INCLUDE_DIR}" )
-   message(STATUS "Installing nlohmann_json in: ${nlohmann_json_INCLUDE_DIR}")
+   message(STATUS "Installing the built-in 'nlohmann_json' in: ${nlohmann_json_INCLUDE_DIR}")
 
    # Create the include directory already, otherwise CMake refuses to
    # create the imported target.

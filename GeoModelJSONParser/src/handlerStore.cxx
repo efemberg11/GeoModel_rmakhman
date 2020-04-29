@@ -1,13 +1,13 @@
 #include "GeoModelJSONParser/handlerStore.h"
 #include "GeoModelJSONParser/JSONHandler.h"
-
-handlerStore* handlerStore::getHandlerStore() 
+ 
+handlerStore* handlerStore::getHandlerStore()
 {
 	static handlerStore *theStore=new handlerStore();
 	return theStore;
 }
 
-void handlerStore::registerHandler(JSONHandler* h) 
+void handlerStore::registerHandler(JSONHandler* h)
 {
 	std::cout<<"registering JSONHandler "<<h->name()<<std::endl;
 	store[h->name()]=h;
@@ -20,7 +20,7 @@ JSONHandler* handlerStore::getHandler(std::string name)
 		std::cout<<" JSONHandler "<<name<<" not found in store!!"<<std::endl;
 		return 0;
 	}
-		
+
 }
 void handlerStore::listHandlers()
 {

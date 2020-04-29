@@ -19,12 +19,14 @@ find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
 
 find_package( Coin REQUIRED )
 find_package( SoQt REQUIRED )
-find_package( nlohmann_json QUIET )
 
+
+find_package(nlohmann_json QUIET)
 #find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
 if( APPLE )
   find_package(OpenGL REQUIRED)
 endif()
+
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -61,13 +63,19 @@ if ( APPLE )
   target_link_directories (GXClashPointSystems PUBLIC ${Coin_LIB_DIR} )
 endif()
 
+target_link_libraries (GXClashPointSystems PRIVATE SoQt::SoQt Coin::Coin  ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 
+if( GEOMODEL_USE_BUILTIN_JSON )
+   add_dependencies( GXClashPointSystems JSON )
+endif()
 
-if( nlohmann_json_FOUND )
-  target_link_libraries (GXClashPointSystems SoQt::SoQt Coin::Coin  nlohmann_json::nlohmann_json ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-else()
-  message(STATUS "'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
-  target_link_libraries (GXClashPointSystems SoQt::SoQt Coin::Coin  ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+message(STATUS "dir: ${nlohmann_json_INCLUDE_DIR}")
+if( nlohmann_json_FOUND OR GEOMODEL_USE_BUILTIN_JSON )
+  # we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
+  # this is not needed if the single-header library is installed in a regular
+  # system include folder (e.g., '/usr/local/include')
+  # NOTE: Needs to be PUBLIC for the built-in nlohmann_json
+  target_link_libraries( GXClashPointSystems PUBLIC nlohmann_json::nlohmann_json )
 endif()
 
 add_definitions (${Qt5Core_DEFINITIONS})

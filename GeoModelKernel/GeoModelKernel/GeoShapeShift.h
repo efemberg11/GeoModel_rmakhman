@@ -8,6 +8,12 @@
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
+
+#ifndef _GeoShapePersistification_On_
+class Persistifier;
+#endif
+
+
 class GeoShapeShift : public GeoShape
 {
  public:
@@ -52,6 +58,10 @@ class GeoShapeShift : public GeoShape
   
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
+
+    //    For I/O only!
+  GeoShapeShift(){}
+  friend class Persistifier;
 
 };
 

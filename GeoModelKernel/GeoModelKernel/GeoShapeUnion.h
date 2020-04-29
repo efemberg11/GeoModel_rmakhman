@@ -7,6 +7,10 @@
 
 #include "GeoModelKernel/GeoShape.h"
 
+#ifndef _GeoShapePersistification_On_
+class Persistifier;
+#endif
+
 class GeoShapeUnion : public GeoShape
 {
  public:
@@ -51,6 +55,10 @@ class GeoShapeUnion : public GeoShape
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
+
+    //    For I/O only!
+  GeoShapeUnion(){}
+  friend Persistifier;
 
 };
 

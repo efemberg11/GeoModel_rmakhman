@@ -19,7 +19,7 @@
 #include "VP1Base/VP1Serialise.h"
 #include "VP1Base/VP1Deserialise.h"
 #include "VP1Base/VP1Msg.h"
-#include <QFileDialog>
+
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/nodes/SoPointSet.h>
@@ -30,11 +30,16 @@
 #include <Inventor/nodes/SoBaseColor.h>
 #include <Inventor/SbVec3f.h>
 
+#include <QFileDialog>
+
+#include <nlohmann/json.hpp>
+
 #include <map>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
-#include <nlohmann/json.hpp>
+
+
 using json = nlohmann::json;
 
 class GXClashPointSystem::Imp {
@@ -59,7 +64,7 @@ public:
 		     1.0);
   }
 
-  
+
 };
 
 namespace clashdet {
@@ -76,12 +81,12 @@ namespace clashdet {
         double      x,y,z;
         double      distance;
     };
-    
+
     void to_json(json& j, const clash& p) {
         j = json{{"typeOfClash", p.clashType}, {"volume1Name", p.volume1Name}, {"volume1CopyNo", p.volume1CopyNo}, {"volume1EntityType", p.volume1EntityType},{"volume2Name", p.volume2Name},{"volume2CopyNo", p.volume2CopyNo}
 , {"volume2EntityType", p.volume2EntityType},{"x", p.x},{"y", p.y},{"z", p.z},{"distance[mm]", p.distance} };
     }
-    
+
     void from_json(const json& j, clash& p) {
         j.at("clashType").get_to(p.clashType);
         j.at("volume1Name").get_to(p.volume1Name);
@@ -94,7 +99,7 @@ namespace clashdet {
         j.at("y").get_to(p.y);
         j.at("z").get_to(p.z);
         j.at("distance[mm]").get_to(p.distance);
- 
+
     }
 } // namespace clashdet
 
@@ -124,7 +129,7 @@ QWidget * GXClashPointSystem::buildController()
           SIGNAL(inputFileChanged()),
 	  this,
 	  SLOT(selectInputFile()));
-	  
+
   return m_d->controller;
 }
 
@@ -165,7 +170,7 @@ void GXClashPointSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   s0->addChild(red);
   s1->addChild(green);
   s2->addChild(blue);
-  
+
   m_d->switch0=new SoSwitch;
   m_d->switch1=new SoSwitch;
   m_d->switch2=new SoSwitch;
@@ -218,7 +223,7 @@ void GXClashPointSystem::restoreFromState(QByteArray ba) {
 
 void GXClashPointSystem::selectInputFile() {
 
-  
+
   QString path;
   char buffer[1024];
   char *wd=getcwd(buffer,1024);
@@ -226,18 +231,18 @@ void GXClashPointSystem::selectInputFile() {
 				      wd,
 				      tr("Clashpoint files (*.json)"),0,QFileDialog::DontUseNativeDialog);
   SoGroup *switches[]={m_d->switch0, m_d->switch1, m_d->switch2};
-  
+
   if (path!="") {
     m_d->switch0->removeAllChildren();
     m_d->switch1->removeAllChildren();
     m_d->switch2->removeAllChildren();
     std::ifstream i(path.toStdString());
     auto j=json::parse(i);
-    
+
     try {
       SoCoordinate3 *coords[]={new SoCoordinate3, new SoCoordinate3, new SoCoordinate3};
       unsigned int   counter[]={0,0,0};
-      
+
       for (const auto& element : j["ClashesReport"])
       {
 	clashdet::typeOfClash type=element["typeOfClash"];
@@ -253,7 +258,7 @@ void GXClashPointSystem::selectInputFile() {
     catch (std::exception & e) {
       std::cout << e.what() << std::endl;
      }
-       
+
   }
 
 

@@ -89,7 +89,7 @@ variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
-    - wget https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.2.tar.gz
+    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
     - tar -xf xerces-c-3.2.2.tar.gz
     - mkdir xerces-c-build
     - cd xerces-c-build

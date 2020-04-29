@@ -7,9 +7,18 @@
 
 #include "GeoModelKernel/GeoShape.h"
 
+
+#ifndef _GeoShapePersistification_On_
+class Persistifier;
+#endif
+
+
 class GeoShapeIntersection : public GeoShape
 {
  public:
+
+
+
   //	Constructor taking two shape operands.
   GeoShapeIntersection (const GeoShape* A, const GeoShape* B);
   
@@ -52,7 +61,10 @@ class GeoShapeIntersection : public GeoShape
   
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
-
+    
+  //    For I/O only!
+  GeoShapeIntersection(){}
+  friend class Persistifier;
 };
 
 inline const std::string& GeoShapeIntersection::getClassType ()

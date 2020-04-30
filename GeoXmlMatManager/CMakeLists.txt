@@ -22,7 +22,7 @@ file( GLOB HEADERS GeoXmlMatManager/*.h )
 # Create the library
 add_library( GeoXmlMatManager SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET GeoXmlMatManager PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( GeoXmlMatManager PUBLIC GeoModelCore::GeoModelKernel GeoModelXMLParser )
+target_link_libraries( GeoXmlMatManager PUBLIC GeoModelCore::GeoModelKernel GeoModelTools::GeoModelXMLParser )
 target_include_directories( GeoXmlMatManager SYSTEM PUBLIC )
 target_include_directories( GeoXmlMatManager PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

@@ -17,7 +17,7 @@ file( GLOB SOURCES src/*.cxx )
 
 # Set up the library.
 add_library( HGTDPlugin SHARED ${SOURCES} )
-target_link_libraries( HGTDPlugin PUBLIC GeoModelCore::GeoModelKernel GeoXmlMatManager GeoModelXMLParser )
+target_link_libraries( HGTDPlugin PUBLIC GeoModelCore::GeoModelKernel GeoXmlMatManager GeoModelTools::GeoModelXMLParser )
 target_include_directories( HGTDPlugin PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

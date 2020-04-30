@@ -825,8 +825,12 @@ void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 	m_unconnectedTree = false;
 
 	// get the parent volume, if this is not the Root volume
-	const GeoVPhysVol* parentNode = dynamic_cast<const GeoVPhysVol*>( &(*(vol->getParent() )));
-
+	// JFB The following construct does not work:  what if the parent is null?  
+	// const GeoVPhysVol* parentNode = dynamic_cast<const GeoVPhysVol*>( &(*(vol->getParent() )));
+	/// JFB So I replaced it by the next two lines:
+	auto p=vol->getParent();
+	const GeoVPhysVol* parentNode = p ? dynamic_cast<const GeoVPhysVol*>( &(*(vol->getParent() ))) : nullptr;
+	
 	if (parentNode) {
 		QString parentAddress = getAddressStringFromPointer(parentNode);
 		//JFB Commented out: qDebug() << "--> parent's address:" << parentNode;

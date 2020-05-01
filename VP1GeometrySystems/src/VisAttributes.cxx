@@ -260,7 +260,6 @@ DetVisAttributes::DetVisAttributes() {
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexDetVisAttributes.json");
     if (access(userFile.c_str(),R_OK)==0) {
-      std::cout << userFile << std::endl;
       std::ifstream in(userFile);
       auto j=json::parse(in);
       for (const json & element : j["DetVisAttributes"]) {
@@ -308,7 +307,6 @@ MatVisAttributes::MatVisAttributes() {
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexMatVisAttributes.json");
     if (access(userFile.c_str(),R_OK)==0) {
-      std::cout << userFile << std::endl;
       std::ifstream in(userFile);
       auto j=json::parse(in);
       for (const json & element : j["MatVisAttributes"]) {
@@ -350,7 +348,6 @@ VolVisAttributes::VolVisAttributes() {
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexVolVisAttributes.json");
     if (access(userFile.c_str(),R_OK)==0) {
-      std::cout << userFile << std::endl;
       std::ifstream in(userFile);
       auto j=json::parse(in);
       for (const json & element : j["VolVisAttributes"]) {

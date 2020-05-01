@@ -31,6 +31,7 @@ endif()
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1GeometrySystems/*.h )
 file( GLOB UIS src/*.ui VP1GeometrySystems/*.ui )
+file( GLOB DATA share/*.jpg share/*.json )
 
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -75,7 +76,7 @@ install(TARGETS GXGeometrySystems
   DESTINATION lib
   COMPONENT Libraries
   )
-install( FILES share/unknownShape.jpg DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gmex)
+install( FILES ${DATA} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gmex)
 
 set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
 

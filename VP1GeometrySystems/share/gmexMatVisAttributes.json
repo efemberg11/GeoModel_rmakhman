@@ -1,5 +1,5 @@
 {
-    "DetVisAttributes": [
+    "MatVisAttributes": [
         {
             "ambient": {
                 "B": 0.5699999928474426,

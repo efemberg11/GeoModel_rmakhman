@@ -68,7 +68,8 @@ private:
 	GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN);
 
 	GeoLogVol* buildLogVol(QString id);
-	GeoShape* buildShape(QString id);
+	// GeoShape* buildShape(QString id);
+	GeoShape* buildShape(unsigned int id);
 	GeoMaterial* buildMaterial(QString id);
 	GeoElement* buildElement(QString id);
 	GeoSerialDenominator* parseSerialDenominator(QStringList values);
@@ -130,6 +131,9 @@ private:
 	QStringList m_root_vol_data;
 
 	QHash<QString, GeoGraphNode*> m_memMap;
+	QHash<QString, GeoGraphNode*> m_memMapShapes;
+
+  std::vector<std::vector, std::pair<unsigned int, unsigned int>> shapeGraph;
 
 	std::set<std::string> m_unknown_shapes;
 

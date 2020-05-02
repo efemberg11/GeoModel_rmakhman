@@ -69,12 +69,10 @@ if( GEOMODEL_USE_BUILTIN_JSON )
    add_dependencies( GXClashPointSystems JSON )
 endif()
 
-message(STATUS "dir: ${nlohmann_json_INCLUDE_DIR}")
+# we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
+# this is not needed if the single-header library is installed in a regular
+# system include folder (e.g., '/usr/local/include')
 if( nlohmann_json_FOUND OR GEOMODEL_USE_BUILTIN_JSON )
-  # we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
-  # this is not needed if the single-header library is installed in a regular
-  # system include folder (e.g., '/usr/local/include')
-  # NOTE: Needs to be PUBLIC for the built-in nlohmann_json
   target_link_libraries( GXClashPointSystems PUBLIC nlohmann_json::nlohmann_json )
 endif()
 

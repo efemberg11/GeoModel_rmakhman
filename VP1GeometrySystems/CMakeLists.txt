@@ -23,6 +23,7 @@ find_package( SoQt REQUIRED )
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
 find_package( Eigen3 REQUIRED )
+find_package(nlohmann_json QUIET)
 if( APPLE )
   find_package(OpenGL REQUIRED)
 endif()
@@ -60,12 +61,22 @@ include_directories(${Coin_INCLUDE_DIR} )
 include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 
+
+# we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
+# this is not needed if the single-header library is installed in a regular
+# system include folder (e.g., '/usr/local/include')
+if( nlohmann_json_FOUND OR GEOMODEL_USE_BUILTIN_JSON )
+  target_link_libraries( GXGeometrySystems nlohmann_json::nlohmann_json )
+endif()
+
 if ( APPLE )
   target_link_directories (GXGeometrySystems PUBLIC ${Coin_LIB_DIR} )
   target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
   else()
   target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 endif()
+
+
 
 
 

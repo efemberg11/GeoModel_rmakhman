@@ -633,12 +633,12 @@ QVariant WriteGeoModel::storeShape(const GeoShape* shape)
 {
 	QString shapeType = QString::fromStdString(shape->type());
 	//JFB Commented out: qDebug() << "storeShape() - shape name:" << shapeType  << ", address:" << shape;
-	// get shape parameters
+	
+    // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
+    if (shapeType=="CustomShape") shapeType="UnidentifiedShape";
+    
+    // get shape parameters
 	QString shapePars = getShapeParameters(shape);
-
-       
-	// LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
-	if (shapeType=="CustomShape") shapeType="UnidentifiedShape";
 	
 	// store the shape in the DB and returns the ID
 	return storeObj(shape, shapeType, shapePars);
@@ -825,8 +825,12 @@ void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 	m_unconnectedTree = false;
 
 	// get the parent volume, if this is not the Root volume
-	const GeoVPhysVol* parentNode = dynamic_cast<const GeoVPhysVol*>( &(*(vol->getParent() )));
-
+	// JFB The following construct does not work:  what if the parent is null?  
+	// const GeoVPhysVol* parentNode = dynamic_cast<const GeoVPhysVol*>( &(*(vol->getParent() )));
+	/// JFB So I replaced it by the next two lines:
+	auto p=vol->getParent();
+	const GeoVPhysVol* parentNode = p ? dynamic_cast<const GeoVPhysVol*>( &(*(vol->getParent() ))) : nullptr;
+	
 	if (parentNode) {
 		QString parentAddress = getAddressStringFromPointer(parentNode);
 		//JFB Commented out: qDebug() << "--> parent's address:" << parentNode;

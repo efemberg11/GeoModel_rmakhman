@@ -16,6 +16,9 @@
 // C++ includes
 #include <string>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
+
 
 // FWD declarations
 class GeoVPhysVol;
@@ -30,11 +33,20 @@ class GeoAlignableTransform;
 class GeoTransform;
 class GeoSerialTransformer;
 class GeoGraphNode;
+class GeoShapeSubtraction;
+class GeoBox;
+
 
 using namespace GeoGenfun;
 using namespace GeoXF;
 
+
+
 typedef const Function & TRANSFUNCTION;
+// containers for boolean shapes
+// pointer: [id, (pointer, id), (pointer, id)]
+typedef std::tuple<unsigned int/*shape ID*/, unsigned int/*shapeA ID*/, GeoShape*, unsigned int/*shapeB ID*/, GeoShape*> tuple_shapes_info_sub;
+typedef std::unordered_map<GeoShapeSubtraction*, tuple_shapes_info_sub> map_shapes_info_sub;
 
 
 namespace GeoModelIO {
@@ -49,10 +61,12 @@ public:
 
 private:
 
-    std::string getEnvVar( std::string const & key ) const;
+  std::string getEnvVar( std::string const & key ) const;
 
 	GeoPhysVol* buildGeoModelByCalls();
 	GeoPhysVol* buildGeoModelOneGo();
+
+  GeoBox* buildDummyShape();
 
 	void loopOverAllChildren(QStringList keys);
 	void loopOverAllChildrenInBunches();
@@ -69,7 +83,7 @@ private:
 
 	GeoLogVol* buildLogVol(QString id);
 	// GeoShape* buildShape(QString id);
-	GeoShape* buildShape(unsigned int id);
+	GeoShape* buildShape(const unsigned int id);
 	GeoMaterial* buildMaterial(QString id);
 	GeoElement* buildElement(QString id);
 	GeoSerialDenominator* parseSerialDenominator(QStringList values);
@@ -85,13 +99,24 @@ private:
 	GeoNameTag* parseNameTag(QStringList values);
 	GeoNameTag* buildNameTag(QString id);
 
-	GeoShape* getShape(QString id);
+  void volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild);
 
-	void volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild);
+  // methods for shapes
+  std::string getShapeType(const unsigned int shapeId);
+  bool isShapeOperator(const unsigned int shapeId);
+  bool isShapeOperator(const std::string type);
+
+
+  // caching methods
+  bool isBuiltShape(const unsigned int id);
+  void storeBuiltShape(const unsigned int, GeoShape* node);
+  GeoShape* getBuiltShape(const unsigned int id);
 
 	bool isNodeBuilt(const QString id, const QString tableId, const QString copyNumber);
+  void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
 	GeoGraphNode* getNode(const QString id, const QString tableId, const QString copyNumber);
-	void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
+
+
 
 	void checkInputString(QString input);
 
@@ -131,9 +156,13 @@ private:
 	QStringList m_root_vol_data;
 
 	QHash<QString, GeoGraphNode*> m_memMap;
-	QHash<QString, GeoGraphNode*> m_memMapShapes;
+	std::unordered_map<unsigned int, GeoShape*> m_memMapShapes;
 
-  std::vector<std::vector, std::pair<unsigned int, unsigned int>> shapeGraph;
+
+  map_shapes_info_sub m_shapes_info_sub;
+
+
+  // std::vector<std::vector, std::pair<unsigned int, unsigned int>> shapeGraph;
 
 	std::set<std::string> m_unknown_shapes;
 

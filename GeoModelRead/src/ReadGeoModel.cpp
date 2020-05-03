@@ -8,6 +8,7 @@
  *  - Feb 2019, R.M.Bianchi
  *  - Mar 2020, R.M.Bianchi
  *  - Mar 2020, boudreau
+ *  - May 2020, R.M.Bianchi
  */
 
 // local includes
@@ -66,19 +67,24 @@
 #include <QString>
 
 // C++ includes
-#include <stdlib.h>     /* exit, EXIT_FAILURE */
-#include <vector>     /* exit, EXIT_FAILURE */
+#include <stdlib.h> /* exit, EXIT_FAILURE */
 #include <stdexcept>
 #include <future>
 #include <mutex>
 #include <chrono>
-#include <cstdlib> /* std::getenv */
-
+#include <cstdlib>  /* std::getenv */
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 // mutexes for the multi-threading mode
 std::mutex muxStore;
 std::mutex muxGet;
+std::mutex muxStoreShape;
+std::mutex muxGetShape;
 std::mutex muxCout;
+// std::mutex muxBuildShape;
+
 
 
 using namespace GeoGenfun;
@@ -449,7 +455,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(QString id, QString tableId, QString co
 	checkInputString(id);
 	checkInputString(tableId);
 
-	// if previously built, return that // TODO: apparently this is only used for VPhysVol... check that, because it should be used for all nodes, otherwise we create new nodes in memory even if we have a copy of them already...
+	// if previously built, return that // FIXME: TODO: apparently this is only used for VPhysVol... check that, because it should be used for all nodes, otherwise we create new nodes in memory even if we have a copy of them already...
 	if (isNodeBuilt(id, tableId, copyN)) {
 		if (m_deepDebug) {
       muxCout.lock();
@@ -649,7 +655,17 @@ GeoElement* ReadGeoModel::buildElement(QString id)
 }
 
 
-GeoShape* ReadGeoModel::buildShape(QString shapeId)
+std::string ReadGeoModel::getShapeType(const unsigned int shapeId)
+{
+  	QStringList paramsShape = m_shapes[ shapeId ];
+  	QString qtype = paramsShape[1];
+    std::string type = qtype.toStdString();
+    return type;
+}
+
+
+// GeoShape* ReadGeoModel::buildShape(QString shapeId)
+GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 {
 	if (m_deepDebug) {
      muxCout.lock();
@@ -659,15 +675,20 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 
 //   try // TODO: implement try/catch
 //   {
-	QStringList paramsShape = m_shapes[ shapeId.toUInt() ];
+	// QStringList paramsShape = m_shapes[ shapeId.toUInt() ];
+	QStringList paramsShape = m_shapes[ shapeId ];
 
 	QString id = paramsShape[0];
-	QString type = paramsShape[1];
+	QString qtype = paramsShape[1];
 	QString parameters = paramsShape[2];
+
+  std::string type = qtype.toStdString();
+
+
 
 	if (m_deepDebug) {
      muxCout.lock();
-    std::cout << "\tShape-ID:" << id.toStdString() << ", Shape-type:" << type.toStdString();
+     std::cout << "\tShape-ID:" << id.toStdString() << ", Shape-type:" << qtype.toStdString();
      muxCout.unlock();
   }
 
@@ -1557,8 +1578,8 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			if (varName == "opB") opB = varValue.toUInt();
 		}
 		// get the referenced shape
-		const GeoShape* shapeA = buildShape( QString::number(opA) );
-		const GeoShape* shapeB = buildShape( QString::number(opB) );
+		const GeoShape* shapeA = buildShape( opA );
+		const GeoShape* shapeB = buildShape( opB );
 		// build and return the GeoShapeShift instance
 		return new GeoShapeIntersection(shapeA, shapeB);
 	}
@@ -1576,7 +1597,7 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			if (varName == "X") transfId = varValue.toUInt();
 		}
 		// get the referenced shape
-		const GeoShape* shapeA = buildShape( QString::number(shapeId) );
+		const GeoShape* shapeA = buildShape( shapeId );
 		// get the referenced Transform
 		QStringList transPars = m_transforms[transfId];
 		if (m_deepDebug) qDebug() << "child:" << transPars;
@@ -1591,6 +1612,14 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 		return new GeoShapeShift(shapeA, transfX);
 	}
 	else if (type == "Subtraction") {
+
+    // Check what shapes are subtracted:
+    // - If they are actual shapes, build them and return
+    // - If they are boolean/operator shapes, then store the shape for later and continue
+
+    // storeCompositeShapeChain(shapeId, type, parameters);
+    // return buildDummyShape(); // DUMMY!!!
+
 		// shape parameters
 		unsigned int opA = 0;
 		unsigned int opB = 0;
@@ -1603,28 +1632,42 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 			if (varName == "opA") opA = varValue.toUInt();
 			if (varName == "opB") opB = varValue.toUInt();
 		}
+    if (opA == 0 || opB == 0) {
+      std::cout << "ERROR! Subtraction shape - input shape IDs are empty! (opA: " << opA << ", opB:" << opB << ")" << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
-        if (opA == 0 || opB == 0) {
-          std::cout << "ERROR! Subtraction shape - input shape IDs are empty! (opA: " << opA << ", opB:" << opB << ")" << std::endl;
-          exit(EXIT_FAILURE);
-        }
+    // if both operands are built already,
+    // then build the operator shape and return
+    if ( isBuiltShape(opA) && isBuiltShape(opB) ) {
+        std::cout << "both operand shapes are built, build the operator shape..." << std::endl;
+        const GeoShape* shapeA = getBuiltShape(opA);
+        const GeoShape* shapeB = getBuiltShape(opB);
+        return new GeoShapeSubtraction(shapeA, shapeB);
+    }
 
-        // get the referenced shapes
-        QString shAId = QString::number(opA);
-        const GeoShape* shapeA = buildShape( shAId );
+    // if the operands are not built, then first check their type
+    bool isAOperator = isShapeOperator( opA );
+    bool isBOperator = isShapeOperator( opB );
 
-        QString shBId = QString::number(opB);
-        const GeoShape* shapeB = buildShape( shBId );
-
-       if ( shapeA == NULL) {
-           std::cout << "ERROR!!! shapeA is NULL!" << std::endl;
-           exit(EXIT_FAILURE);
-       }
-
-       //        std::cout << "Subtraction -- " << "opA: " << opA << ", opB: " << opB << ", shapeA: " << shapeA << ", shapeB: " << shapeB << std::endl;
-
-		   // build and return the GeoShapeSubtraction instance
+    // if both are simple/actual shapes, then build them and returns...
+    if ( !isAOperator && !isBOperator) {
+      const GeoShape* shapeA = buildShape( opA );
+      const GeoShape* shapeB = buildShape( opB );
+      if ( shapeA == NULL || shapeB == NULL ) {
+        std::cout << "ERROR!!! shapeA or shapeB are NULL!" << std::endl;
+        exit(EXIT_FAILURE);
       return new GeoShapeSubtraction(shapeA, shapeB);
+      }
+    }
+    // ...otherwise, build the Subtraction operator shape without operands and return this,
+    // then save the needed pieces of information to build the actual operands and shape later
+    else {
+      GeoShapeSubtraction* sub = new GeoShapeSubtraction();
+      tuple_shapes_info_sub tt (shapeId, opA, nullptr, opB, nullptr);
+      m_shapes_info_sub[sub] = tt;
+      return sub;
+    }
 	}
 	else if (type == "Union") {
 		// shape parameters
@@ -1646,8 +1689,8 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
           exit(EXIT_FAILURE);
         }
 		// get the referenced shape
-		const GeoShape* shapeA = buildShape( QString::number(opA) );
-		const GeoShape* shapeB = buildShape( QString::number(opB) );
+		const GeoShape* shapeA = buildShape( opA );
+		const GeoShape* shapeB = buildShape( opB );
 		// build and return the GeoShapeShift instance
 
 //        std::cout << "Union -- " << "opA: " << opA << ", opB: " << opB << ", shapeA: " << shapeA << ", shapeB: " << shapeB << std::endl;
@@ -1703,8 +1746,9 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
   else {
     // QString msg = "WARNING!! - Shape '" + type + "' not implemented yet!!! Returning a dummy cube.";
     // qWarning(msg.toStdString().c_str());
-    m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
-    return new GeoBox(30.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm); // FIXME: bogus shape. Use actual shape!
+    // m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
+    m_unknown_shapes.insert(type); // save unknwon shapes for later warning message
+    return buildDummyShape();
   }
 
 // }
@@ -1716,6 +1760,69 @@ GeoShape* ReadGeoModel::buildShape(QString shapeId)
 // }
 
 
+}
+
+
+
+bool ReadGeoModel::isShapeOperator(const unsigned int shapeId)
+{
+  return isShapeOperator( getShapeType(shapeId) );
+}
+
+bool ReadGeoModel::isShapeOperator(const std::string type)
+{
+  std::unordered_set<std::string> opShapes = {"Intersection", "Shift", "Subtraction", "Union"};
+  return (opShapes.find(type) != opShapes.end());
+}
+
+
+
+
+
+
+// // Store the whole shapes' chain of GeoSubtraction/GeoUnion/GeoShift/... shapes
+// void ReadGeoModel::storeCompositeShapeChain(const unsigned int shapeId, const std::string type, const QString parameters) {
+//
+//   if (type == "Subtraction") {
+//     std::pair<unsigned int, unsigned int> refShapes = getRefShapesSubtraction(parameters);
+//     unsigned int shapeA = refShapes[0];
+//     unsigned int shapeB = refShapes[1];
+//
+//     m_refShapes[shapeId] = {}
+//   }
+//   else {
+//     std::cout << "ERROR!!! shape " << type << " is NOT processed in storeCompositeShapeChain()!!!" << std::endl;
+//   }
+// }
+
+
+// std::pair<unsigned int, unsigned int> ReadGeoModel::getRefShapesSubtraction(QString& parameters)
+// {
+//   // referenced shapes IDs placeholders
+//   unsigned int opA = 0;
+//   unsigned int opB = 0;
+//
+//   // get actual IDs of referenced shapes from DB string
+//   QStringList shapePars = parameters.split(";");
+//   foreach( QString par, shapePars) {
+//     QStringList vars = par.split("=");
+//     QString varName = vars[0];
+//     QString varValue = vars[1];
+//     if (varName == "opA") opA = varValue.toUInt();
+//     if (varName == "opB") opB = varValue.toUInt();
+//   }
+//
+//   if (opA == 0 || opB == 0) {
+//     std::cout << "ERROR! Subtraction shape - input shape IDs are empty! (opA: " << opA << ", opB:" << opB << ")" << std::endl;
+//     exit(EXIT_FAILURE);
+//   }
+//
+//   return std::pair<unsigned int, unsigned int>(opA, opB);
+// }
+
+
+GeoBox* ReadGeoModel::buildDummyShape() {
+  return new GeoBox(30.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm); // FIXME: bogus shape. Use actual shape!
 }
 
 
@@ -1739,8 +1846,10 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 	QString logVolName = values[1];
 
 	// GET LOGVOL SHAPE
-	QString shapeId = values[2];
+  // muxBuildShape.lock();
+	unsigned int shapeId = values[2].toUInt();
 	GeoShape* shape = buildShape(shapeId);
+  // muxBuildShape.unlock();
 
 	// GET LOGVOL MATERIAL
 	QString matId = values[3];
@@ -2065,6 +2174,29 @@ GeoNameTag* ReadGeoModel::parseNameTag(QStringList values)
 }
 
 
+
+bool ReadGeoModel::isBuiltShape(const unsigned int id)
+{
+  std::lock_guard<std::mutex> lk(muxStoreShape);
+  std::cout << "ReadGeoModel::isBuiltShape(): " << id << std::endl;
+  return m_memMapShapes.count(id);
+}
+GeoShape* ReadGeoModel::getBuiltShape(const unsigned int id)
+{
+	std::lock_guard<std::mutex> lk(muxGetShape);
+	std::cout << "ReadGeoModel::getBuiltShape(): " << id << std::endl;
+	return m_memMapShapes[id];
+}
+
+void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* node)
+{
+	std::lock_guard<std::mutex> lk(muxStoreShape);
+	std::cout << "ReadGeoModel::storeShapeBuilt(): " << id << node << std::endl;
+	m_memMapShapes[id] = node;
+}
+
+
+
 bool ReadGeoModel::isNodeBuilt(const QString id, const QString tableId, const QString copyNumber)
 {
 	std::lock_guard<std::mutex> lk(muxStore);
@@ -2072,7 +2204,6 @@ bool ReadGeoModel::isNodeBuilt(const QString id, const QString tableId, const QS
 	QString key = id + ":" + tableId + ":" + copyNumber;
 	return m_memMap.contains(key);
 }
-
 
 GeoGraphNode* ReadGeoModel::getNode(const QString id, const QString tableId, const QString copyN)
 {

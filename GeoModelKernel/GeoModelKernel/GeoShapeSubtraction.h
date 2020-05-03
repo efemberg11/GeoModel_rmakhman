@@ -7,6 +7,12 @@
 
 #include "GeoModelKernel/GeoShape.h"
 
+
+#ifndef _GeoShapePersistification_On_
+class Persistifier;
+#endif
+
+
 class GeoShapeSubtraction : public GeoShape
 {
  public:
@@ -52,6 +58,10 @@ class GeoShapeSubtraction : public GeoShape
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
+  //    For I/O only!
+  GeoShapeSubtraction(){}
+  friend class Persistifier;
+  
 };
 
 inline const std::string& GeoShapeSubtraction::getClassType ()

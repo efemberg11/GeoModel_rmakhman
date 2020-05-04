@@ -30,7 +30,7 @@
 #include <iomanip>
 
 static bool         parIsPerformance   = false;
-static G4String     geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db";
+static G4String     geometryFileName   ;
 static std::string  parMacroFileName   = "";
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
@@ -133,12 +133,12 @@ void Help() {
             << std::endl
             <<"  **** Parameters: \n\n"
             <<"      -m :   REQUIRED : the standard Geant4 macro file name \n"
+            <<"      -g :   REQUIRED : the Geometry file name \n"
+            <<"      -o :   flag  ==> run the geometry overlap check (default: FALSE)\n"
             <<"      -f :   physics list name (default: FTFP_BERT) \n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
-            <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
-            <<"      -g :   the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db)\n"
-            <<"      -o :   flag  ==> run the geometry overlap check (default: FALSE)\n"
-            << std::endl;
+            <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"<< std::endl;
+    
   std::cout <<"\nUsage: ./fullSimLight [OPTIONS] -m <MACRO_FILE>\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
     //printf("\t-%c  --%s\t%s\n", options[i].val, options[i].name, options[i].has_arg ? options[i].name : "");
@@ -189,8 +189,14 @@ void GetInputArguments(int argc, char** argv) {
   }
   // check if mandatory Geant4 macro file was provided
   if (parMacroFileName=="") {
-    G4cout << "  *** ERROR : Geant4 macro file is required. " << G4endl;
-    Help();
-    exit(-1);
+      G4cout << "  *** ERROR : Geant4 macro file is required. " << G4endl;
+      Help();
+      exit(-1);
   }
+  // check if mandatory Geometry file was provided
+  if (geometryFileName=="") {
+      G4cout << "  *** ERROR : Geometry file is required. " << G4endl;
+      Help();
+      exit(-1);
+    }
 }

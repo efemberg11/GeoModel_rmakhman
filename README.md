@@ -149,9 +149,9 @@ Run the executable with the --help option to see the available options:
 
 ``` bash
 -m   <Geant4-Macro-File>  [MANDATORY; a standard Geant4 macro file name]
+-g   <Geometry-File-Name> [MANDATORY; the Geometry file name]
 -f   <Physics-List-Name>  [OPTIONAL;  physics list name (default: FTFP_BERT)]
 -p   <NO-ARGUMENT>        [OPTIONAL;  run in performance mode (default: false)]
--g   <Geometry-File-Name> [MANDATORY; the Geometry file name  (default: geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db)]
 -o : <NO-ARGUMENT>        [OPTIONAL;  run the geometry overlap check (default: false)]
 ``` 
 A minimal set of "observable" is collected during the simulation per-primary
@@ -176,13 +176,12 @@ in this case.
 
 ### Geometry:
 
-The detector can be built starting from a SQLite .db file (default option), from a GDML file or from a dual-use plugin like the ones in the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins).
+The detector can be built starting from a SQLite .db file, from a GDML file or from a dual-use plugin like the ones in the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins).
 The -g flag will be used to specify the name of the geometry file. Any GDML file can be set from the macro file by using the:
 
 ```bash
      /mydet/setGdmlFile <gdml-file-name.gdml>
 ```    
-By default the detector is built from the SQLite file "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db".
      
 ### ATLAS Geometry Files:
      
@@ -195,9 +194,10 @@ The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are av
 
 During the installation a default macro file <macro.g4> will be installed in your bin directory.
 To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
-Physics List, in performance mode and building the detector from the default SQLite file:
+Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db file :
+
 ``` bash
-./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -p 
+./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -p -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
 ``` 
 To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
 Physics List, not in performance mode and building the detector from my geometry gdml file:
@@ -278,8 +278,8 @@ GeoModelClash (gmclash) allows to run geometry overlap checks on a geometry file
 Run the executable with the --help option to see the available options:
 
 ``` bash
--g :   the Geometry file name [.db/.gdml/.dylib/.so] (default: geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db)
--o :   clashes report file name (default: gmclash_report.json)
+-g :   MANDATORY: the Geometry file name [.db/.gdml/.dylib/.so] 
+-o :   OPTIONAL : clashes report file name (default: gmclash_report.json)
 ``` 
 
 The output json file format is the following:
@@ -304,9 +304,9 @@ where:
 
 ## Examples
 
-GeoModelClash can be run without any commad line parameter, in this way it will execute a clash detection on the default ATLAS geometry *geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db* and write out the clashes report in the *gmclash_report.json* file
+To run GeoModelClash one has to specify with the -g flag the geometry file (this is mandatory). By default gmclash writes out the clashes report in the *gmclash_report.json* file
 ``` bash
-./gmclash
+./gmclash -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
 ``` 
 To execute a clash detection on a geometry described with the SQLite file *LArBarrel.db* and write out the clashes report in the *cr_LArBarrel.json* file :
 ``` bash

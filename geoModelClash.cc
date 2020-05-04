@@ -12,7 +12,7 @@
 #include <iostream>
 #include <iomanip>
 
-static G4String geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db";
+static G4String geometryFileName   ;
 static G4String reportFileName     = "gmclash_report.json";
 
 void GetInputArguments(int argc, char** argv);
@@ -83,8 +83,8 @@ void Help() {
   G4cout <<"  GeoModelClash Geant4 application.    \n"
             << std::endl
             <<"  **** Parameters: \n\n"
-            <<"      -g :   the Geometry file name [.db/.gdml/.dylib/.so] \n"
-            <<"      -o :   clashes report file name (default: gmclash_report)\n"
+            <<"      -g :   [MANDATORY] the Geometry file name [.db/.gdml/.dylib/.so] \n"
+            <<"      -o :   [OPTIONAL] clashes report file name (default: gmclash_report)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmclash [OPTIONS]\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -96,7 +96,13 @@ void Help() {
 
 void GetInputArguments(int argc, char** argv) {
   // process arguments
-  while (true) {
+ if (argc == 1)
+ {
+     Help();
+     exit(0);
+     
+ }
+ while (true) {
    int c, optidx = 0;
    c = getopt_long(argc, argv, "g:o:h", options, &optidx);
    if (c == -1)
@@ -119,5 +125,12 @@ void GetInputArguments(int argc, char** argv) {
      Help();
      errx(1, "unknown option %c", c);
    }
+  }
+  // check if mandatory Geometry file was provided
+  if (geometryFileName=="") {
+      G4cout << "  *** ERROR : Geometry file is required. " << G4endl;
+      Help();
+      exit(-1);
+      
   }
 }

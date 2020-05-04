@@ -4,11 +4,32 @@
  *  Created on: May 20, 2016
  *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
  *
- * major updates: Feb 2019 rbianchi
+ * major updates:
+ * - 2019 Feb, R.M.Bianchi
+ * - 2020 May, R.M.Bianchi 
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
 #define GeoModelRead_ReadGeoModel_H_
+
+
+// *** PERSISTIFICATION SETTINGS FOR GeoModel BOOLEAN SHAPES ***
+// Note:
+// -- The instructions below are needed
+// -- to correctly persistify/restore boolean shapes.
+// -- They must be declared before including GeoModelKernel files.
+// This variable is used by GeoModel boolean shapes to switch ON
+// the persistification mode
+#define _GeoShapePersistification_On_
+// fwd declaration of namespace::class we want to use to persistify
+// the GeoModel boolean shapes
+namespace GeoModelIO { class ReadGeoModel; }
+// the 'Persistifier' class name is used by GeoModel boolean shapes
+// to grant access to friend classes
+typedef GeoModelIO::ReadGeoModel Persistifier;
+// *************************************************************
+
+
 
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelKernel/GeoXF.h"

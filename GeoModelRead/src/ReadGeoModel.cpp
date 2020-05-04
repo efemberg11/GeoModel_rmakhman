@@ -11,6 +11,7 @@
  *  - May 2020, R.M.Bianchi
  */
 
+
 // local includes
 #include "GeoModelRead/ReadGeoModel.h"
 
@@ -86,11 +87,8 @@ std::mutex muxCout;
 // std::mutex muxBuildShape;
 
 
-
 using namespace GeoGenfun;
 using namespace GeoXF;
-
-
 
 
 namespace GeoModelIO {
@@ -1663,7 +1661,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
     // ...otherwise, build the Subtraction operator shape without operands and return this,
     // then save the needed pieces of information to build the actual operands and shape later
     else {
-      GeoShapeSubtraction* sub = new GeoShapeSubtraction();
+      GeoShapeSubtraction* sub = new GeoShapeSubtraction;
       tuple_shapes_info_sub tt (shapeId, opA, nullptr, opB, nullptr);
       m_shapes_info_sub[sub] = tt;
       return sub;

@@ -102,7 +102,7 @@ Clone the repository at [nlohmann_json repo](https://github.com/nlohmann/json.gi
 git clone https://github.com/nlohmann/json.git
 cd json
 mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
+cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release -DJSON_BuildTests=False ../
 make
 make install
 ```

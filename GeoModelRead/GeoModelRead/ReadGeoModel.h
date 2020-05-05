@@ -6,18 +6,21 @@
  *
  * major updates:
  * - 2019 Feb, R.M.Bianchi
- * - 2020 May, R.M.Bianchi 
+ * - 2020 May, R.M.Bianchi
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
 #define GeoModelRead_ReadGeoModel_H_
 
 
-// *** PERSISTIFICATION SETTINGS FOR GeoModel BOOLEAN SHAPES ***
+// ****************************************************************
+// *** PERSISTIFICATION SETTINGS FOR GeoModel BOOLEAN SHAPES ******
+// ****************************************************************
 // Note:
 // -- The instructions below are needed
 // -- to correctly persistify/restore boolean shapes.
 // -- They must be declared before including GeoModelKernel files.
+// ****************************************************************
 // This variable is used by GeoModel boolean shapes to switch ON
 // the persistification mode
 #define _GeoShapePersistification_On_
@@ -27,7 +30,8 @@ namespace GeoModelIO { class ReadGeoModel; }
 // the 'Persistifier' class name is used by GeoModel boolean shapes
 // to grant access to friend classes
 typedef GeoModelIO::ReadGeoModel Persistifier;
-// *************************************************************
+// ****************************************************************
+// ****************************************************************
 
 
 
@@ -37,6 +41,9 @@ typedef GeoModelIO::ReadGeoModel Persistifier;
 // C++ includes
 #include <string>
 #include <set>
+#include <tuple>
+#include <vector>
+#include <deque>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -66,8 +73,11 @@ using namespace GeoXF;
 typedef const Function & TRANSFUNCTION;
 // containers for boolean shapes
 // pointer: [id, (pointer, id), (pointer, id)]
-typedef std::tuple<unsigned int/*shape ID*/, unsigned int/*shapeA ID*/, GeoShape*, unsigned int/*shapeB ID*/, GeoShape*> tuple_shapes_info_sub;
-typedef std::unordered_map<GeoShapeSubtraction*, tuple_shapes_info_sub> map_shapes_info_sub;
+// typedef std::tuple<unsigned int/*shape ID*/, unsigned int/*shapeA ID*/, GeoShape*, unsigned int/*shapeB ID*/, GeoShape*> tuple_shapes_info_type_sub;
+// typedef std::unordered_map<GeoShapeSubtraction*, tuple_shapes_info_type_sub> map_shapes_info_type_sub;
+// typedef std::tuple<unsigned int/*shape ID*/, GeoShape*, unsigned int/*opA ID*/, GeoShape*, unsigned int/*opB ID*/, GeoShape*> tuple_shapes_boolean_info;
+typedef std::tuple<unsigned int/*shape ID*/, GeoShape*, unsigned int/*opA ID*/, unsigned int/*opB ID*/> tuple_shapes_boolean_info;
+typedef std::deque<tuple_shapes_boolean_info> type_shapes_boolean_info;
 
 
 namespace GeoModelIO {
@@ -112,7 +122,8 @@ private:
 	GeoAlignableTransform* parseAlignableTransform(QStringList values);
 	GeoAlignableTransform* buildAlignableTransform(QString id);
 	GeoTransform* parseTransform(QStringList values);
-	GeoTransform* buildTransform(QString id);
+	GeoTransform* buildTransform(unsigned int id);
+	GeoTransform* buildTransform(QString id); // TODO: to be dropped when removing Qt
 	GeoSerialTransformer* parseSerialTransformer(QStringList values);
 	GeoSerialTransformer* buildSerialTransformer(QString id);
 	TRANSFUNCTION parseFunction(const std::string& expr);
@@ -126,6 +137,14 @@ private:
   std::string getShapeType(const unsigned int shapeId);
   bool isShapeOperator(const unsigned int shapeId);
   bool isShapeOperator(const std::string type);
+  bool isShapeBoolean(const unsigned int shapeId);
+  bool isShapeBoolean(const std::string type);
+  void createBooleanShapeOperands();
+  std::pair<unsigned int, unsigned int> getBooleanShapeOperands(const unsigned int shape);
+  GeoShape* addEmptyBooleanShapeForCompletion(const unsigned int shapeID);
+  GeoShape* getBooleanReferencedShape(const unsigned int shapeID);
+  void assignOperandShapesToBoolean(GeoShape* boolShPtr);
+
 
 
   // caching methods
@@ -133,17 +152,22 @@ private:
   void storeBuiltShape(const unsigned int, GeoShape* node);
   GeoShape* getBuiltShape(const unsigned int id);
 
+  bool isBuiltTransform(const unsigned int id);
+  void storeBuiltTransform(const unsigned int, GeoTransform* node);
+  GeoTransform* getBuiltTransform(const unsigned int id);
+
 	bool isNodeBuilt(const QString id, const QString tableId, const QString copyNumber);
   void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
 	GeoGraphNode* getNode(const QString id, const QString tableId, const QString copyNumber);
 
 
-
+  // Utility functions
 	void checkInputString(QString input);
-
+  std::vector<std::string> splitString(const std::string& s, char delimiter);
 	void printTrf(GeoTrf::Transform3D t);
 	void printTransformationValues(QStringList t);
 	QList<double> convertQstringListToDouble(QStringList listin);
+  std::vector<std::string> toStdVectorStrings(QStringList qlist);
 
 
 	// input arguments
@@ -178,9 +202,10 @@ private:
 
 	QHash<QString, GeoGraphNode*> m_memMap;
 	std::unordered_map<unsigned int, GeoShape*> m_memMapShapes;
+	std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
 
 
-  map_shapes_info_sub m_shapes_info_sub;
+  type_shapes_boolean_info m_shapes_info_sub;
 
 
   // std::vector<std::vector, std::pair<unsigned int, unsigned int>> shapeGraph;

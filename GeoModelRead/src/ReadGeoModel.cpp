@@ -83,6 +83,8 @@ std::mutex muxStore;
 std::mutex muxGet;
 std::mutex muxStoreShape;
 std::mutex muxGetShape;
+std::mutex muxStoreTransf;
+std::mutex muxGetTransf;
 std::mutex muxCout;
 // std::mutex muxBuildShape;
 
@@ -93,7 +95,7 @@ using namespace GeoXF;
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false), m_debug(false), m_runMultithreaded(true), m_runMultithreaded_nThreads(0)
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false), m_debug(false), m_runMultithreaded(false), m_runMultithreaded_nThreads(0)
 {
 	qDebug() << "===> DumpGeoModelAction: constructor";
 
@@ -131,6 +133,7 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
       unsigned int nThreads = std::stoi(getEnvVar("GEOMODEL_GEOMODELIO_NTHREADS"));
       if( nThreads > 0 ) {
           std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NTHREADS to " << nThreads << "; thus, that number of worker threads will be used." << std::endl;
+          m_runMultithreaded = true;
           m_runMultithreaded_nThreads = nThreads;
       } else if (nThreads == 0) {
         std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NTHREADS to " << nThreads << "; thus, GeoModelIO will be run in serial mode." << std::endl;
@@ -656,13 +659,13 @@ GeoElement* ReadGeoModel::buildElement(QString id)
 std::string ReadGeoModel::getShapeType(const unsigned int shapeId)
 {
   	QStringList paramsShape = m_shapes[ shapeId ];
+    std::cout << "shapeID: " <<  shapeId << ", shapeType:" << paramsShape[1].toStdString() << std::endl;
   	QString qtype = paramsShape[1];
     std::string type = qtype.toStdString();
     return type;
 }
 
 
-// GeoShape* ReadGeoModel::buildShape(QString shapeId)
 GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 {
 	if (m_deepDebug) {
@@ -690,6 +693,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
      muxCout.unlock();
   }
 
+  GeoShape* shape = nullptr;
 
 	if (type == "Box") {
 			// shape parameters
@@ -706,7 +710,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 					if (varName == "YHalfLength") YHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 					if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			}
-		return new GeoBox(XHalfLength, YHalfLength, ZHalfLength);
+		shape = new GeoBox(XHalfLength, YHalfLength, ZHalfLength);
 	}
 	else if (type == "Cons") {
 		// shape parameters
@@ -732,7 +736,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 			if (varName == "SPhi") SPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "DPhi") DPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 		}
-		return new GeoCons (RMin1, RMin2, RMax1, RMax2, DZ, SPhi, DPhi);
+		shape = new GeoCons (RMin1, RMin2, RMax1, RMax2, DZ, SPhi, DPhi);
 	}
 	else if (type == "Torus") {
 		// Member Data:
@@ -761,7 +765,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 			if (varName == "SPhi") SPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "DPhi") DPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 		}
-		return new GeoTorus (Rmin, Rmax, Rtor, SPhi, DPhi);
+		shape = new GeoTorus (Rmin, Rmax, Rtor, SPhi, DPhi);
 	}
 	else if (type == "Para") {
 		// shape parameters
@@ -784,7 +788,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 			if (varName == "Theta") Theta = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "Phi") Phi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 		}
-		return new GeoPara (XHalfLength, YHalfLength, ZHalfLength, Alpha, Theta, Phi);
+		shape = new GeoPara (XHalfLength, YHalfLength, ZHalfLength, Alpha, Theta, Phi);
 	}
 	else if (type == "Pcon") {
 		// shape parameters
@@ -895,7 +899,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       exit(EXIT_FAILURE);
     }
 
-		return pcon;
+		shape = pcon;
 	}
 	else if (type == "Pgon") {
 		// shape parameters
@@ -1008,7 +1012,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       muxCout.unlock();
       exit(EXIT_FAILURE);
     }
-		return pgon;
+		shape = pgon;
 	}
 	else if (type == "GenericTrap") {
 		// shape parameters
@@ -1100,7 +1104,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       muxCout.unlock();
       exit(EXIT_FAILURE);
     }
-		return gTrap;
+		shape = gTrap;
 	}
 	else if (type == "SimplePolygonBrep") {
 		//qInfo() << "Reading-in: SimplePolygonBrep: "; // debug
@@ -1196,7 +1200,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       muxCout.unlock();
       exit(EXIT_FAILURE);
     }
-		return sh;
+		shape = sh;
 
 	}
 	else if (type == "TessellatedSolid") {
@@ -1466,7 +1470,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       muxCout.unlock();
       exit(EXIT_FAILURE);
     }
-		return sh;
+		shape = sh;
 
 	}
 	else if (type == "Trap") {
@@ -1500,7 +1504,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 					if (varName == "Dxdypdzp") Dxdypdzp = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 					if (varName == "Angleydzp") Angleydzp = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			}
-		return new GeoTrap (ZHalfLength, Theta, Phi, Dydzn, Dxdyndzn, Dxdypdzn, Angleydzn, Dydzp, Dxdyndzp, Dxdypdzp, Angleydzp);
+		shape = new GeoTrap (ZHalfLength, Theta, Phi, Dydzn, Dxdyndzn, Dxdypdzn, Angleydzn, Dydzp, Dxdyndzp, Dxdypdzp, Angleydzp);
 	}
 	else if (type == "Trd") {
 			// shape constructor parameters
@@ -1522,7 +1526,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 					if (varName == "YHalfLength2") YHalfLength2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 					if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			}
-		return new GeoTrd (XHalfLength1, XHalfLength2, YHalfLength1, YHalfLength2, ZHalfLength);
+		shape = new GeoTrd (XHalfLength1, XHalfLength2, YHalfLength1, YHalfLength2, ZHalfLength);
 	}
 	else if (type == "Tube") {
 		// shape parameters
@@ -1539,7 +1543,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 			if (varName == "RMax") RMax = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 		}
-		return new GeoTube(RMin, RMax, ZHalfLength);
+		shape = new GeoTube(RMin, RMax, ZHalfLength);
 	}
 	else if (type == "Tubs") {
 		// shape parameters
@@ -1560,7 +1564,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 			if (varName == "SPhi") SPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "DPhi") DPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 		}
-		return new GeoTubs (RMin, RMax, ZHalfLength, SPhi, DPhi);
+		shape = new GeoTubs (RMin, RMax, ZHalfLength, SPhi, DPhi);
 	}
 	else if (type == "Intersection") {
 		// shape parameters
@@ -1579,7 +1583,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 		const GeoShape* shapeA = buildShape( opA );
 		const GeoShape* shapeB = buildShape( opB );
 		// build and return the GeoShapeShift instance
-		return new GeoShapeIntersection(shapeA, shapeB);
+		shape = new GeoShapeIntersection(shapeA, shapeB);
 	}
 	else if (type == "Shift") {
 		// shape parameters
@@ -1597,17 +1601,21 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 		// get the referenced shape
 		const GeoShape* shapeA = buildShape( shapeId );
 		// get the referenced Transform
-		QStringList transPars = m_transforms[transfId];
-		if (m_deepDebug) qDebug() << "child:" << transPars;
-		GeoTransform* transf = parseTransform(transPars);
+		// QStringList transPars = m_transforms[transfId];
+		// if (m_deepDebug) qDebug() << "child:" << transPars;
+		// GeoTransform* transf = parseTransform(transPars);
+    // TODO: here we create a fake GeoTransform to get a GeoTrf::Transform3D.
+    // TODO: ==> Perhaps we could keep a table for bare GeoTrf::Transform3D transforms used in GeoShift nodes.
+		GeoTransform* transf = buildTransform(transfId);
 		const GeoTrf::Transform3D transfX = transf->getTransform();
-        transf->unref(); // delete the transf from the heap
+    transf->unref(); // delete the transf from the heap
 
 		// qWarning() << "GeoShift:";
 		// printTrf(transfX);
 
-		// build and return the GeoShapeShift instance
-		return new GeoShapeShift(shapeA, transfX);
+		// build and cache the GeoShapeShift instance
+		shape = new GeoShapeShift(shapeA, transfX);
+    storeBuiltShape(shapeId, shape);
 	}
 	else if (type == "Subtraction") {
 
@@ -1641,30 +1649,38 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
         std::cout << "both operand shapes are built, build the operator shape..." << std::endl;
         const GeoShape* shapeA = getBuiltShape(opA);
         const GeoShape* shapeB = getBuiltShape(opB);
-        return new GeoShapeSubtraction(shapeA, shapeB);
+        GeoShapeSubtraction* shapeN = new GeoShapeSubtraction(shapeA, shapeB);
+        storeBuiltShape(shapeId, shapeN);
+        shape = shapeN;
     }
 
     // if the operands are not built, then first check their type
     bool isAOperator = isShapeOperator( opA );
     bool isBOperator = isShapeOperator( opB );
 
-    // if both are simple/actual shapes, then build them and returns...
+    // if both are simple/actual shapes (i.e., not booleans),
+    // then build them, then build the boolean shape with them, and returns...
     if ( !isAOperator && !isBOperator) {
       const GeoShape* shapeA = buildShape( opA );
       const GeoShape* shapeB = buildShape( opB );
       if ( shapeA == NULL || shapeB == NULL ) {
         std::cout << "ERROR!!! shapeA or shapeB are NULL!" << std::endl;
         exit(EXIT_FAILURE);
-      return new GeoShapeSubtraction(shapeA, shapeB);
       }
+      GeoShapeSubtraction* shapeN = new GeoShapeSubtraction(shapeA, shapeB);
+      storeBuiltShape(shapeId, shapeN);
+      shape = shapeN;
     }
-    // ...otherwise, build the Subtraction operator shape without operands and return this,
-    // then save the needed pieces of information to build the actual operands and shape later
+    // ...otherwise, build the Subtraction operator shape without operands
+    // and return this;
+    // also, save the needed pieces of information to build the actual
+    // operands and shape later.
     else {
       GeoShapeSubtraction* sub = new GeoShapeSubtraction;
-      tuple_shapes_info_sub tt (shapeId, opA, nullptr, opB, nullptr);
-      m_shapes_info_sub[sub] = tt;
-      return sub;
+      // tuple_shapes_boolean_info tt (shapeId, sub, opA, nullptr, opB, nullptr);
+      tuple_shapes_boolean_info tt (shapeId, sub, opA, opB);
+      m_shapes_info_sub.push_back(tt);
+      shape = sub;
     }
 	}
 	else if (type == "Union") {
@@ -1692,7 +1708,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 		// build and return the GeoShapeShift instance
 
 //        std::cout << "Union -- " << "opA: " << opA << ", opB: " << opB << ", shapeA: " << shapeA << ", shapeB: " << shapeB << std::endl;
-		return new GeoShapeUnion(shapeA, shapeB);
+		shape = new GeoShapeUnion(shapeA, shapeB);
+    
 	}
   //LAr custom shape
   else if(type == "CustomShape") {
@@ -1715,7 +1732,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       muxCout.unlock();
   		exit(EXIT_FAILURE);
   	}
-      return new GeoUnidentifiedShape("LArCustomShape",name);
+      shape = new GeoUnidentifiedShape("LArCustomShape",name);
   }
   else if (type=="UnidentifiedShape") {
     std::string name = "";
@@ -1738,7 +1755,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       muxCout.unlock();
       exit(EXIT_FAILURE);
     }
-    return new GeoUnidentifiedShape(name,asciiData);
+    shape = new GeoUnidentifiedShape(name,asciiData);
 
   }
   else {
@@ -1746,8 +1763,13 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
     // qWarning(msg.toStdString().c_str());
     // m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
     m_unknown_shapes.insert(type); // save unknwon shapes for later warning message
-    return buildDummyShape();
+    shape = buildDummyShape();
   }
+
+  //! store the shape we built into the cache,
+  //! for later use if referenced again by another node
+  storeBuiltShape(shapeId, shape);
+  return shape;
 
 // }
 
@@ -1762,14 +1784,283 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 
 
 
+void inspectListShapesToBuild(type_shapes_boolean_info list)
+{
+  for (auto tuple : list) {
+    std::apply([](auto&&... args) { ( (std::cout << args << ", "), ...); }, tuple); // needs C++17
+    std::cout << std::endl;
+  }
+}
+
+
+void ReadGeoModel::createBooleanShapeOperands()
+{
+  if (m_shapes_info_sub.size() == 0) return;
+
+  std::cout << "\ncreateBooleanShapeOperands() - start..." << std::endl;
+
+  inspectListShapesToBuild(m_shapes_info_sub);
+
+  // Create a map iterator and point to beginning of map
+	type_shapes_boolean_info::iterator it = m_shapes_info_sub.begin();
+
+	// Iterate over the map using Iterator till end.
+	while (it != m_shapes_info_sub.end())
+  {
+    // get the tuple containing the data about the operand shapes to build
+    tuple_shapes_boolean_info tuple = *it;
+
+      // Initializing variables for unpacking
+      unsigned int shapeID = 0;       //std::get<0>(tuple);
+      GeoShape* boolShPtr  = nullptr; //std::get<1>(tuple);
+      unsigned int idA     = 0;       //std::get<2>(tuple);
+      unsigned int idB     = 0;       //std::get<3>(tuple);
+
+      // use 'tie' to unpack the tuple values into separate variables
+      // here we ignore the two variables that are used for GeoShapeShift (below)
+      // std::tie(shapeID, boolShPtr, idA, ptrA, idB, ptrB, ignore, ignore) = tuple;
+      std::tie(shapeID, boolShPtr, idA, idB) = tuple;
+
+      // debug
+  		std::cout << "operands' map's item: " << shapeID << ", " << boolShPtr << "," << idA << "," << idB << std::endl; // debug only!
+
+      if (shapeID == 0 || boolShPtr == nullptr || idA == 0 || idB == 0) {
+        std::cout << "ERROR! Boolean/Operator shape - shape is NULL or operands' IDs are not defined! (shapeID: " << shapeID << ", idA: " << idA << ", idB:" << idB << ")" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+      if (isShapeBoolean(std::get<0>(tuple))) {
+
+      GeoShape* shapeA = nullptr;
+      GeoShape* shapeB = nullptr;
+
+      // if both operands are built already...
+      if ( isBuiltShape(idA) && isBuiltShape(idB) ) {
+        std::cout << "both operand shapes are built, build the operator shape..." << std::endl;
+        // then build the operator shape...
+        shapeA = getBuiltShape(idA);
+        shapeB = getBuiltShape(idB); //TODO: customize for Shift as well
+      } else {
+        // otherwise, build the operand shapes
+        shapeA = getBooleanReferencedShape(idA);
+        shapeB = getBooleanReferencedShape(idB);
+      }
+      // Now, assign the new shapes to the boolean shape we're building
+      if (dynamic_cast<GeoShapeIntersection*>(boolShPtr)) {
+        GeoShapeIntersection* ptr = dynamic_cast<GeoShapeIntersection*>(boolShPtr);
+        ptr->m_opA = shapeA;
+        ptr->m_opB = shapeB;
+        ptr->m_opA->ref();
+        ptr->m_opB->ref();
+      }
+      else if (dynamic_cast<GeoShapeSubtraction*>(boolShPtr)) {
+        GeoShapeSubtraction* ptr = dynamic_cast<GeoShapeSubtraction*>(boolShPtr);
+        ptr->m_opA = shapeA;
+        ptr->m_opB = shapeB;
+        ptr->m_opA->ref();
+        ptr->m_opB->ref();
+      }
+      else if (dynamic_cast<GeoShapeUnion*>(boolShPtr)) {
+        GeoShapeUnion* ptr = dynamic_cast<GeoShapeUnion*>(boolShPtr);
+        ptr->m_opA = shapeA;
+        ptr->m_opB = shapeB;
+        ptr->m_opA->ref();
+        ptr->m_opB->ref();
+      }
+      else{
+        std::cout << "ERROR!!! shape is not boolean/operator! Write to 'geomodel-developers@cern.ch'. Exiting..." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    } else if ("Shift" == getShapeType(std::get<0>(tuple))) {
+
+      GeoShape* opShape = nullptr;
+      GeoTrf::Transform3D shiftX;
+      GeoTransform* shiftTransf = nullptr; // TODO: remove the need for a temp GeoTransform, store the bare transforms as well...
+
+      // if both operands are built already...
+      if ( isBuiltShape(idA) && isBuiltShape(idB) ) {
+        std::cout << "both operand shapes are built, build the operator shape..." << std::endl;
+        // then build the operator shape...
+        opShape = getBuiltShape(idA);
+        shiftTransf = getBuiltTransform(idB);
+      } else {
+        // otherwise, build the operand shapes
+        opShape = getBooleanReferencedShape(idA);
+        shiftTransf = buildTransform(idB);
+      }
+      shiftX = shiftTransf->getTransform();
+      shiftTransf->unref(); // delete from heap, we only needed to get the bare transform // TODO: remove that need, store the bare transforms as well...
+
+      if (dynamic_cast<GeoShapeShift*>(boolShPtr)) {
+      GeoShapeShift* ptr = dynamic_cast<GeoShapeShift*>(boolShPtr);
+      ptr->m_op = opShape;
+      ptr->m_shift = shiftX;
+      ptr->m_op->ref();
+      } else{
+        std::cout << "ERROR!!! shape is not a Shift operator! Exiting..." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
+
+    // then, store the now completed shape...
+    storeBuiltShape(shapeID, boolShPtr);
+    // ...and continue to the next item
+		it++;
+	}
+}
+
+
+
+GeoShape* ReadGeoModel::getBooleanReferencedShape(const unsigned int shapeID)
+{
+  if (0 == shapeID) {
+    std::cout << "ERROR!! ShapeID = 0!" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  GeoShape* shape;
+  // if A is built already, then take it from cache
+  if (isBuiltShape(shapeID)) {
+    std::cout << "operandA is built, taking it from cache..." << std::endl;
+    shape = getBuiltShape(shapeID);
+  } else {
+    // if not built and not a boolean shape, then build it
+    if (!isShapeOperator(shapeID)) {
+      std::cout << "operandA is not built and not an operator, build it..." << std::endl;
+      shape = buildShape( shapeID );
+      if ( shape == NULL ) {
+        std::cout << "ERROR!!! shape is NULL!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+    }
+    // if A is a boolean shape, then create an empty shape,
+    // store it for later completion, and use that
+    else {
+      std::cout << "operandA is not built but it is an operator, add it to build it later..." << std::endl;
+      shape = addEmptyBooleanShapeForCompletion(shapeID);
+      }
+  }
+
+  inspectListShapesToBuild(m_shapes_info_sub); // debug
+
+  return shape;
+}
+
+
+
+
+GeoShape* ReadGeoModel::addEmptyBooleanShapeForCompletion(const unsigned int shapeID)
+{
+  // get the operands' IDs,
+  // build an empty instance of the appropriate boolean/operator shape,
+  // and store all of that together, by appending to this same container,
+  // so it will be visited at a later time during this very same loop
+  std::pair<unsigned int, unsigned int> ops = getBooleanShapeOperands(shapeID);
+  unsigned int opA = ops.first;
+  unsigned int opB = ops.second;
+
+  // get the type and create an appropriate empty shape
+  std::string shType = getShapeType(shapeID);
+  GeoShape* shape = nullptr;
+  if (shType == "Intersection"){
+    shape = new GeoShapeIntersection();
+  } else if (shType == "Shift") {
+    shape = new GeoShapeShift();
+  } else if (shType == "Subtraction") {
+    shape = new GeoShapeSubtraction();
+  } else if (shType == "Union") {
+    shape = new GeoShapeUnion();
+  }
+  // tuple_shapes_boolean_info tt (shapeID, shape, opA, nullptr, opB, nullptr);
+  tuple_shapes_boolean_info tt (shapeID, shape, opA, opB);
+  std::cout << "adding 'empty' shape: " << shapeID << ", " << shape << ", " << opA << ", " << opB << std::endl;
+  m_shapes_info_sub.push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over
+  return shape;
+}
+
+
+std::vector<std::string> ReadGeoModel::splitString(const std::string& s, const char delimiter)
+{
+   std::vector<std::string> tokens;
+   std::string token;
+   std::istringstream tokenStream(s);
+   while (std::getline(tokenStream, token, delimiter))
+   {
+      tokens.push_back(token);
+   }
+   return tokens;
+}
+
+std::vector<std::string> ReadGeoModel::toStdVectorStrings(QStringList qlist)
+{
+  std::vector<std::string> vec;
+  foreach(QString qstr, qlist) {
+    vec.push_back(qstr.toStdString());
+  }
+  return vec;
+}
+
+std::pair<unsigned int, unsigned int> ReadGeoModel::getBooleanShapeOperands(const unsigned int shapeID)
+{
+  std::pair<unsigned int, unsigned int> pair;
+
+  std::vector<std::string> paramsShape = toStdVectorStrings(m_shapes[ shapeID ]);
+
+	unsigned int id = std::stoi(paramsShape[0]); //! the ID of the boolean/operator shape
+	std::string type = paramsShape[1]; //! the GeoModel type of the shape
+	std::string parameters = paramsShape[2];  //! the parameters defining the shape, coming from the DB
+
+  //! The Subtraction boolean shape has two operands, here we store their IDs
+  unsigned int opA = 0;
+  unsigned int opB = 0;
+  // get parameters from DB string
+  std::vector<std::string> shapePars = splitString( parameters, ';' );
+  // std::cout << "shapePars size: " << shapePars.size() << std::endl; // debug only
+
+  for (auto par : shapePars) {
+    std::vector<std::string> vars = splitString(par, '=');
+    std::string varName = vars[0];
+    std::string varValue = vars[1];
+    // std::cout << "vars ==> " << vars[0] << ", " << vars[1] << std::endl; // debug
+    if ( isShapeBoolean(type) ) {
+      if (varName == "opA") opA = std::stoi(varValue);
+      if (varName == "opB") opB = std::stoi(varValue);
+    } else if ("Shift" == type) {
+      if (varName == "A") opA = std::stoi(varValue);
+      if (varName == "X") opB = std::stoi(varValue);
+    } else {
+      std::cout << "ERROR!!! This type of shape cannot be handled here: " << type << ", --> Exiting..." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+  if (opA == 0 || opB == 0) {
+    std::cout << "ERROR! Intersection/Subtraction/Union/Shift shape - operands' IDs are empty! (opA: " << opA << ", opB:" << opB << ")" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  pair.first = opA;
+  pair.second = opB;
+
+  return pair;
+}
+
+
 bool ReadGeoModel::isShapeOperator(const unsigned int shapeId)
 {
   return isShapeOperator( getShapeType(shapeId) );
 }
-
 bool ReadGeoModel::isShapeOperator(const std::string type)
 {
   std::unordered_set<std::string> opShapes = {"Intersection", "Shift", "Subtraction", "Union"};
+  return (opShapes.find(type) != opShapes.end());
+}
+
+bool ReadGeoModel::isShapeBoolean(const unsigned int shapeId)
+{
+  return isShapeBoolean( getShapeType(shapeId) );
+}
+bool ReadGeoModel::isShapeBoolean(const std::string type)
+{
+  std::unordered_set<std::string> opShapes = {"Intersection", "Subtraction", "Union"};
   return (opShapes.find(type) != opShapes.end());
 }
 
@@ -1848,6 +2139,11 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 	unsigned int shapeId = values[2].toUInt();
 	GeoShape* shape = buildShape(shapeId);
   // muxBuildShape.unlock();
+
+  // now, create the missing operand shapes for boolean/operator shapes
+  createBooleanShapeOperands();
+  // after that, clear the container that store the operands to build
+  m_shapes_info_sub.clear();
 
 	// GET LOGVOL MATERIAL
 	QString matId = values[3];
@@ -1995,26 +2291,43 @@ GeoAlignableTransform* ReadGeoModel::parseAlignableTransform(QStringList values)
 	return new GeoAlignableTransform(txf);
 }
 
+
+// GeoTransform* ReadGeoModel::buildTransform(unsigned int id)
+// {
+// 	if (m_deepDebug) {
+//     muxCout.lock();
+//     qDebug() << "ReadGeoModel::buildTransform(unsigned int)";
+//     muxCout.unlock();
+//   }
+// 	return parseTransform( m_transforms[id] );
+// }
+
+// TODO: to be removed when dropping Qt
 GeoTransform* ReadGeoModel::buildTransform(QString id)
 {
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "ReadGeoModel::buildTransform()";
+    qDebug() << "ReadGeoModel::buildTransform(QString)";
     muxCout.unlock();
   }
-	return parseTransform( m_transforms[id.toUInt()] );
+	// return parseTransform( m_transforms[id.toUInt()] );
+	return buildTransform( id.toUInt() );
 }
 
 
-GeoTransform* ReadGeoModel::parseTransform(QStringList values)
+// GeoTransform* ReadGeoModel::parseTransform(QStringList values)
+GeoTransform* ReadGeoModel::buildTransform(unsigned int id)
 {
+  QStringList values = m_transforms[id];
+
   muxCout.lock();
-	if (m_deepDebug) qDebug() << "ReadGeoModel::parseTransform()";
+  qDebug() << "ReadGeoModel::buildTransform(unsigned int)";
+	// if (m_deepDebug) qDebug() << "ReadGeoModel::parseTransform()";
 	if (m_deepDebug) qDebug() << "values:" << values;
   muxCout.unlock();
 
-	QString id = values.takeFirst(); // it pops out the first element, the 'id', leaving the other items in the list
-  	// printTransformationValues(values); // DEBUG
+	values.takeFirst(); // it pops out the first element, the 'id', leaving the other items in the list
+	// printTransformationValues(values); // DEBUG
 
 	// get the 12 matrix elements
 	double xx = values[0].toDouble();
@@ -2053,7 +2366,9 @@ GeoTransform* ReadGeoModel::parseTransform(QStringList values)
 	txf(2,3) = dz;
 
 	// printTrf(txf); // DEBUG
-	return new GeoTransform(txf);
+	GeoTransform* tr = new GeoTransform(txf);
+  storeBuiltTransform(id, tr);
+  return tr;
 }
 
 
@@ -2172,6 +2487,7 @@ GeoNameTag* ReadGeoModel::parseNameTag(QStringList values)
 }
 
 
+// --- methods for caching GeoShape nodes ---
 
 bool ReadGeoModel::isBuiltShape(const unsigned int id)
 {
@@ -2179,22 +2495,38 @@ bool ReadGeoModel::isBuiltShape(const unsigned int id)
   std::cout << "ReadGeoModel::isBuiltShape(): " << id << std::endl;
   return m_memMapShapes.count(id);
 }
+void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* nodePtr)
+{
+  std::lock_guard<std::mutex> lk(muxStoreShape);
+  std::cout << "ReadGeoModel::storeBuiltShape(): " << id << ", " << nodePtr << std::endl;
+  m_memMapShapes[id] = nodePtr;
+}
 GeoShape* ReadGeoModel::getBuiltShape(const unsigned int id)
 {
-	std::lock_guard<std::mutex> lk(muxGetShape);
+	std::lock_guard<std::mutex> lk(muxGetShape); // TODO: is this lock needed at all?? I guess STD containers are thread safe for read-only operations
 	std::cout << "ReadGeoModel::getBuiltShape(): " << id << std::endl;
 	return m_memMapShapes[id];
 }
-
-void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* node)
+// --- methods for caching GeoTransform nodes ---
+bool ReadGeoModel::isBuiltTransform(const unsigned int id)
 {
-	std::lock_guard<std::mutex> lk(muxStoreShape);
-	std::cout << "ReadGeoModel::storeShapeBuilt(): " << id << node << std::endl;
-	m_memMapShapes[id] = node;
+  std::lock_guard<std::mutex> lk(muxStoreTransf);
+  std::cout << "ReadGeoModel::isBuiltTransform(): " << id << std::endl;
+  return m_memMapTransforms.count(id);
 }
-
-
-
+void ReadGeoModel::storeBuiltTransform(const unsigned int id, GeoTransform* nodePtr)
+{
+  std::lock_guard<std::mutex> lk(muxStoreTransf);
+  std::cout << "ReadGeoModel::storeBuiltTransform(): " << id << ", " << nodePtr << std::endl;
+  m_memMapTransforms[id] = nodePtr;
+}
+GeoTransform* ReadGeoModel::getBuiltTransform(const unsigned int id)
+{
+	std::lock_guard<std::mutex> lk(muxGetTransf); // TODO: is this lock needed at all?? I guess STD containers are thread safe for read-only operations
+	std::cout << "ReadGeoModel::getBuiltTransform(): " << id << std::endl;
+	return m_memMapTransforms[id];
+}
+// --- methods for caching GeoPhysVol/GeoFullPhysVol nodes ---
 bool ReadGeoModel::isNodeBuilt(const QString id, const QString tableId, const QString copyNumber)
 {
 	std::lock_guard<std::mutex> lk(muxStore);
@@ -2202,22 +2534,21 @@ bool ReadGeoModel::isNodeBuilt(const QString id, const QString tableId, const QS
 	QString key = id + ":" + tableId + ":" + copyNumber;
 	return m_memMap.contains(key);
 }
-
+void ReadGeoModel::storeNode(const QString id, const QString tableId, const QString copyN, GeoGraphNode* node)
+{
+  std::lock_guard<std::mutex> lk(muxStore);
+  if (m_deepDebug) qDebug() << "ReadGeoModel::storeNode(): " << id << ", " << tableId << ", " << copyN << node;
+  QString key = id + ":" + tableId + ":" + copyN;
+  m_memMap[key] = node;
+  if (m_deepDebug) qDebug() << "Store done.";
+}
 GeoGraphNode* ReadGeoModel::getNode(const QString id, const QString tableId, const QString copyN)
 {
-	std::lock_guard<std::mutex> lk(muxGet);
-	if (m_deepDebug) qDebug() << "ReadGeoModel::getNode(): " << id << tableId << copyN;
+	std::lock_guard<std::mutex> lk(muxGet); // TODO: is this lock needed at all?? I guess STD containers are thread safe for read-only operations
+	if (m_deepDebug) qDebug() << "ReadGeoModel::getNode(): " << id << ", " << tableId << ", " << copyN;
 	QString key = id + ":" + tableId + ":" + copyN;
 	return m_memMap[key];
 }
 
-void ReadGeoModel::storeNode(const QString id, const QString tableId, const QString copyN, GeoGraphNode* node)
-{
-	std::lock_guard<std::mutex> lk(muxStore);
-	if (m_deepDebug) qDebug() << "ReadGeoModel::storeNode(): " << id << tableId << copyN << node;
-	QString key = id + ":" + tableId + ":" + copyN;
-	m_memMap[key] = node;
-	if (m_deepDebug) qDebug() << "Store done.";
-}
 
 } /* namespace GeoModelIO */

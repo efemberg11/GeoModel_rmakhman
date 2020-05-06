@@ -19,3 +19,9 @@ add_subdirectory( GeoTessellatedSolidExamples )
 
 # GeoModel <--> Geant4 examples
 # add_subdirectory( HelloGeoRead2G4 )
+
+# Make the module directory visible to CMake.
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+
+# Print Build Info on screen
+include(PrintBuildInfo)

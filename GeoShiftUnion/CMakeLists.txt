@@ -7,11 +7,8 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(GeoShiftUnion)
 
-# Make the module directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../cmake )
-
 # Print Build Info on screen
-include(PrintBuildInfo)
+include(../cmake/PrintBuildInfo.cmake)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

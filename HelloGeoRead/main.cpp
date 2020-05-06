@@ -64,7 +64,7 @@ GeoPhysVol* createTheExperiment(GeoPhysVol* world)
 
 int main(int argc, char *argv[])
 {
-  QCoreApplication app(argc, argv);
+  // QCoreApplication app(argc, argv);
 
   // GET GEOMETRY FROM LOCAL DB
   // Set valid db path before first run
@@ -158,5 +158,6 @@ int main(int argc, char *argv[])
 
   qDebug() << "Everything done.";
 
-  return app.exec();
+  // return app.exec();
+  return 0;
 }

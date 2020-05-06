@@ -17,11 +17,29 @@
 
 // C++ includes
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 int main(int argc, char** argv)
 {
-  
+   auto pManip= [] (const char * variable, const char *plus) {
+     const char *path=getenv(variable);
+     if (path) {
+       std::string newPath=std::string(path)+":"+plus;
+       setenv(variable, newPath.c_str(), true);
+     }
+     else {
+       setenv(variable, plus, true);
+     }
+   };
+   
+   // JFB Put some defaults. This depends upon architecture. The list should
+   // be expanded to include other architectures and/or passed in through the
+   // compiler. 
+   
+#ifdef __APPLE__
+   pManip("GXPLUGINPATH","/usr/local/lib/gxplugins");
+#endif
+
   QStringList arguments;
   for (int i = 0; i<=argc; i++){
     arguments << argv[i];

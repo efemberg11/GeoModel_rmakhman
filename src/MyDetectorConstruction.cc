@@ -44,7 +44,7 @@
 
 
 namespace clashdet {
-    enum typeOfClash{ withMother=0, withSister, fullyEncapsSister};
+    enum typeOfClash{ withMother=0, withSister, fullyEncapsSister, invalidSolid};
     // a simple struct to model a clash detection erro
     struct clash {
         typeOfClash clashType;
@@ -246,6 +246,33 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
         G4ThreeVector ptmp = solid->GetPointOnSurface();
         if (solid->Inside(ptmp) != kSurface)
         {
+            G4ThreeVector solidCenter(0,0,0);
+            G4VSolid* motherSolid = motherLog->GetSolid();
+            std::cout<<"**** GMClash cannot generate a point on the surface of the volume!" <<std::endl;
+            iterateFromWorld(fWorld->GetLogicalVolume(), volume, solidCenter);
+            G4ThreeVector globalPoint = localToGlobal (solidCenter, true);
+            std::cout<<"**** Center of the solid in Global Coordinates: " <<globalPoint<<" \n"<<std::endl;
+            fTree.clear();
+            
+            //fill the singleClash struct
+            singleClash.clashType = clashdet::invalidSolid;
+            singleClash.volume1Name=volume->GetName();
+            singleClash.volume1CopyNo =volume->GetCopyNo();
+            singleClash.volume1EntityType=solid->GetEntityType();
+            singleClash.volume2Name =  motherLog->GetName();
+            //singleClash.volume2CopyNo
+            singleClash.volume2EntityType = motherSolid->GetEntityType();
+            singleClash.x = globalPoint[0];
+            singleClash.y = globalPoint[1];
+            singleClash.z = globalPoint[2];
+            singleClash.distance = -999;
+            
+            //write the singleClash in the json file
+            to_json(jSingleClash, singleClash);
+            // write prettified JSON to another file
+            jlist.push_back(jSingleClash);
+            
+            
             G4String position[3] = { "outside", "surface", "inside" };
             std::ostringstream message;
             message << "Sample point is not on the surface !" << G4endl

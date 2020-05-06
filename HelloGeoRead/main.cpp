@@ -92,10 +92,10 @@ int main(int argc, char *argv[])
   }
 
   // -- testing the input database
-  std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
-  db->printAllMaterials();
-  std::cout << "Printing the list of all GeoElement nodes" << std::endl;
-  db->printAllElements();
+//  std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
+//  db->printAllMaterials();
+//  std::cout << "Printing the list of all GeoElement nodes" << std::endl;
+//  db->printAllElements();
 
   /* setup the GeoModel reader */
   GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);

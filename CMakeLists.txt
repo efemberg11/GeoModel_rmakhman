@@ -11,23 +11,24 @@ set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
    "Require the specified C++ standard for the build" )
 
-# Print Build Info on screen
-include(cmake/BuildTypeInfo.cmake)
+# Make the module directory visible to CMake.
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
-# WARNING! 
-# Building in 'Debug' mode with Clang (macOS) makes the GeoModelRead library 
-# crash when running with multiple threads. 
+# Print Build Info on screen
+include( PrintBuildInfo )
+
+# WARNING!
+# Building in 'Debug' mode with Clang (macOS) makes the GeoModelRead library
+# crash when running with multiple threads.
 # ( Details: https://its.cern.ch/jira/browse/ATLASDD-38 )
 # Thus, if we are on macOS and the build type has been set to 'Debug',
 # we send a warning message to the user
-if ( APPLE AND ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  message(STATUS "**********")
-  message(STATUS "WARNING!! You chose to build in 'Debug' mode. However, on macOS (where you appear to run), this makes multi-threaded GeoModelRead crash. Therefore, if you need debug symbols, please build with 'RelWithDebInfo'. (Details:  https://its.cern.ch/jira/browse/ATLASDD-38)")
-  message(STATUS "**********")
-endif()
+# if ( APPLE AND ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+#   message(STATUS "**********")
+#   message(STATUS "WARNING!! You chose to build in 'Debug' mode. However, on macOS (where you appear to run), this makes multi-threaded GeoModelRead crash. Therefore, if you need debug symbols, please build with 'RelWithDebInfo'. (Details:  https://its.cern.ch/jira/browse/ATLASDD-38)")
+#   message(STATUS "**********")
+# endif()
 
-# Make the module directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
 # Project's dependencies.
 find_package( GeoModelCore REQUIRED )

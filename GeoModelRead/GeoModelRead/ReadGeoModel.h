@@ -77,7 +77,7 @@ typedef const Function & TRANSFUNCTION;
 // typedef std::unordered_map<GeoShapeSubtraction*, tuple_shapes_info_type_sub> map_shapes_info_type_sub;
 // typedef std::tuple<unsigned int/*shape ID*/, GeoShape*, unsigned int/*opA ID*/, GeoShape*, unsigned int/*opB ID*/, GeoShape*> tuple_shapes_boolean_info;
 typedef std::tuple<unsigned int/*shape ID*/, GeoShape*, unsigned int/*opA ID*/, unsigned int/*opB ID*/> tuple_shapes_boolean_info;
-typedef std::deque<tuple_shapes_boolean_info> type_shapes_boolean_info;
+typedef std::vector<tuple_shapes_boolean_info> type_shapes_boolean_info;
 
 
 namespace GeoModelIO {
@@ -175,6 +175,7 @@ private:
 	GMDBManager* m_dbManager;
 	bool m_deepDebug;
 	bool m_debug;
+  bool m_timing;
   bool m_runMultithreaded;
   unsigned int m_runMultithreaded_nThreads;
 
@@ -206,7 +207,7 @@ private:
 
 
   type_shapes_boolean_info m_shapes_info_sub;
-
+  type_shapes_boolean_info::size_type m_shapes_info_sub_size;
 
   // std::vector<std::vector, std::pair<unsigned int, unsigned int>> shapeGraph;
 

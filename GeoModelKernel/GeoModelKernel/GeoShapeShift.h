@@ -10,7 +10,7 @@
 
 
 #ifndef _GeoShapePersistification_On_
-class Persistifier;
+  class Persistifier;
 #endif
 
 
@@ -18,50 +18,50 @@ class GeoShapeShift : public GeoShape
 {
  public:
   GeoShapeShift (const GeoShape* A, const GeoTrf::Transform3D &X);
-  
+
   //	Returns the volume of the shape, for mass inventory
   virtual double volume () const;
-  
+
   //	Returns the OR shape type, as a string.
   virtual const std::string & type () const;
-  
+
   //	Returns the OR shape type, as a coded integer.
   virtual ShapeType typeID () const;
-  
+
   //	Returns the first operand being ORed
   const GeoShape* getOp () const;
-  
+
   //	Returns the shift of this shape.
   const GeoTrf::Transform3D & getX () const;
-  
+
   //	Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
-  
+
   //	For type identification.
   static const std::string& getClassType ();
-  
+
   //	For type identification.
   static ShapeType getClassTypeID ();
 
  protected:
   virtual ~GeoShapeShift();
-  
+
  private:
   GeoShapeShift(const GeoShapeShift &right);
   GeoShapeShift & operator=(const GeoShapeShift &right);
-  
+
   //	The shape operand in the NOT operation.
   const GeoShape* m_op;
 
   //	Gives the amount by which the volume is shifted.
   GeoTrf::Transform3D m_shift;
-  
+
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
     //    For I/O only!
   GeoShapeShift(){}
-  friend class Persistifier;
+  friend Persistifier;
 
 };
 

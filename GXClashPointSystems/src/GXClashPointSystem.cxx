@@ -48,13 +48,15 @@ public:
 			       controller(0),
 			       switch0(nullptr),
 			       switch1(nullptr),
-			       switch2(nullptr)
+			       switch2(nullptr),
+                   switch3(nullptr)
   {}
   GXClashPointSystem *theclass;
   ClashPointSysController * controller;
   SoSwitch                * switch0;
   SoSwitch                * switch1;
   SoSwitch                * switch2;
+  SoSwitch                * switch3;
 
 
     static SbColor4f color4f(const QColor& col) {
@@ -68,8 +70,8 @@ public:
 };
 
 namespace clashdet {
-    enum typeOfClash{ withMother=0, withSister, fullyEncapsSister};
-    // a simple struct to model a clash detection erro
+    enum typeOfClash{ withMother=0, withSister, fullyEncapsSister, invalidSolid};
+    // a simple struct to model a clash detection error
     struct clash {
         typeOfClash clashType;
         std::string volume1Name;
@@ -153,40 +155,49 @@ void GXClashPointSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   SoSeparator *s0=new SoSeparator;
   SoSeparator *s1=new SoSeparator;
   SoSeparator *s2=new SoSeparator;
+  SoSeparator *s3=new SoSeparator;
 
   root->addChild(s0);
   root->addChild(s1);
   root->addChild(s2);
+  root->addChild(s3);
 
 
   SoBaseColor *red=new SoBaseColor;
   SoBaseColor *green=new SoBaseColor;
   SoBaseColor *blue=new SoBaseColor;
+  SoBaseColor *folly=new SoBaseColor;
 
   red->rgb.setValue(1,0,0);
   green->rgb.setValue(0,1,0);
   blue->rgb.setValue(0,0,1);
+  folly->rgb.setValue(1.00,0,0.37);
 
   s0->addChild(red);
   s1->addChild(green);
   s2->addChild(blue);
+  s3->addChild(folly);
 
   m_d->switch0=new SoSwitch;
   m_d->switch1=new SoSwitch;
   m_d->switch2=new SoSwitch;
+  m_d->switch3=new SoSwitch;
 
   m_d->switch0->whichChild=SO_SWITCH_ALL;
   m_d->switch1->whichChild=SO_SWITCH_ALL;
   m_d->switch2->whichChild=SO_SWITCH_ALL;
+  m_d->switch3->whichChild=SO_SWITCH_ALL;
 
 
   s0->addChild(m_d->switch0);
   s1->addChild(m_d->switch1);
   s2->addChild(m_d->switch2);
+  s3->addChild(m_d->switch3);
 
   connect(m_d->controller,SIGNAL(showClashPoints1Changed(bool)),this,SLOT(showClashPoint1(bool)));
   connect(m_d->controller,SIGNAL(showClashPoints2Changed(bool)),this,SLOT(showClashPoint2(bool)));
   connect(m_d->controller,SIGNAL(showClashPoints3Changed(bool)),this,SLOT(showClashPoint3(bool)));
+  connect(m_d->controller,SIGNAL(showClashPoints4Changed(bool)),this,SLOT(showClashPoint4(bool)));
 
 }
 
@@ -230,29 +241,29 @@ void GXClashPointSystem::selectInputFile() {
   path = QFileDialog::getOpenFileName(nullptr, tr("Open Input File"),
 				      wd,
 				      tr("Clashpoint files (*.json)"),0,QFileDialog::DontUseNativeDialog);
-  SoGroup *switches[]={m_d->switch0, m_d->switch1, m_d->switch2};
+  SoGroup *switches[]={m_d->switch0, m_d->switch1, m_d->switch2, m_d->switch3};
 
   if (path!="") {
     m_d->switch0->removeAllChildren();
     m_d->switch1->removeAllChildren();
     m_d->switch2->removeAllChildren();
+    m_d->switch3->removeAllChildren();
     std::ifstream i(path.toStdString());
     auto j=json::parse(i);
 
     try {
-      SoCoordinate3 *coords[]={new SoCoordinate3, new SoCoordinate3, new SoCoordinate3};
-      unsigned int   counter[]={0,0,0};
+      SoCoordinate3 *coords[]={new SoCoordinate3, new SoCoordinate3, new SoCoordinate3, new SoCoordinate3};
+      unsigned int   counter[]={0,0,0,0};
 
-      for (const auto& element : j["ClashesReport"])
-      {
-	clashdet::typeOfClash type=element["typeOfClash"];
-	coords[type]->point.set1Value(counter[type]++,element["x"], element["y"], element["z"]);
+      for (const auto& element : j["ClashesReport"]){
+	    clashdet::typeOfClash type=element["typeOfClash"];
+	    coords[type]->point.set1Value(counter[type]++,element["x"], element["y"], element["z"]);
       }
-      for (int i=0;i<3;i++) {
-	switches[i]->addChild(coords[i]);
-	SoPointSet *pointSet=new SoPointSet;
-	pointSet->numPoints=counter[i];
-	switches[i]->addChild(pointSet);
+      for (int i=0;i<4;i++) {
+	    switches[i]->addChild(coords[i]);
+	    SoPointSet *pointSet=new SoPointSet;
+	    pointSet->numPoints=counter[i];
+	    switches[i]->addChild(pointSet);
       }
     }
     catch (std::exception & e) {
@@ -260,9 +271,6 @@ void GXClashPointSystem::selectInputFile() {
      }
 
   }
-
-
-
 
 }
 
@@ -277,4 +285,7 @@ void GXClashPointSystem::showClashPoint2(bool flag) {
 
 void GXClashPointSystem::showClashPoint3(bool flag) {
   m_d->switch2->whichChild=flag ? SO_SWITCH_ALL:SO_SWITCH_NONE;
+}
+void GXClashPointSystem::showClashPoint4(bool flag) {
+  m_d->switch3->whichChild=flag ? SO_SWITCH_ALL:SO_SWITCH_NONE;
 }

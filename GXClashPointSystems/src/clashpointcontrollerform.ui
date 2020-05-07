@@ -46,6 +46,16 @@
        </property>
       </widget>
      </item>
+    <item>
+     <widget class="QCheckBox" name="checkBox_clashPoints_4">
+      <property name="text">
+       <string>InvalidSolid</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
     </layout>
    </item>
    <item row="0" column="1">

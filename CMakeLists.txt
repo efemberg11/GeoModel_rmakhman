@@ -52,10 +52,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 
 add_executable(fullSimLight fullSimLight.cc ${sources} ${headers})
 add_executable(gmclash geoModelClash.cc ${sources} ${headers})
+add_executable(fillHistogramExample fillHistogramExample.cc src/Histo.cc include/Histo.hh)
 
 #----------------------------------------------------------------------------
 # Link all needed libraries
 
+target_link_libraries(fillHistogramExample ${Geant4_LIBRARIES})
 
 if( nlohmann_json_FOUND )
 target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json)
@@ -94,4 +96,5 @@ endforeach()
 #
 install(TARGETS fullSimLight DESTINATION ${OUTPUT})
 install(TARGETS gmclash DESTINATION ${OUTPUT})
+install(TARGETS fillHistogramExample DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION ${OUTPUT})

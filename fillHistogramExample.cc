@@ -49,8 +49,8 @@ int main() {
     
     // ------- Histograms name
     Histo    histo;
-    histo.Add1D("1","Random numbers btw 0 - 100",nbins,xmin,xmax);
-    histo.Add1D("2","Log10 of Random numbers btw 0 - 100",nbins,std::log10(xmin),std::log10(xmax));
+    histo.Add1D("1","Random numbers btw 1 - 100",nbins,xmin,xmax);
+    histo.Add1D("2","Log10 of Random numbers btw 1 - 100",nbins,std::log10(xmin),std::log10(xmax));
     
 
     histo.SetFileName(hname);

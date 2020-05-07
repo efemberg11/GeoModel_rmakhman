@@ -157,8 +157,15 @@ private:
   GeoTransform* getBuiltTransform(const unsigned int id);
 
 	bool isNodeBuilt(const QString id, const QString tableId, const QString copyNumber);
-  void storeNode(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
-	GeoGraphNode* getNode(const QString id, const QString tableId, const QString copyNumber);
+  void storeVPhysVol(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
+	GeoGraphNode* getVPhysVol(const QString id, const QString tableId, const QString copyNumber);
+
+
+  // Thread-safe write/read methods for the container holding boolean shapes' info
+  void addShapeInfoEntry(tuple_shapes_boolean_info tt);
+  tuple_shapes_boolean_info getShapeInfoEntry(unsigned int ii);
+  unsigned int getShapeInfoSize();
+  void getShapeInfoClear();
 
 
   // Utility functions
@@ -208,6 +215,7 @@ private:
 
   type_shapes_boolean_info m_shapes_info_sub;
   type_shapes_boolean_info::size_type m_shapes_info_sub_size;
+
 
   // std::vector<std::vector, std::pair<unsigned int, unsigned int>> shapeGraph;
 

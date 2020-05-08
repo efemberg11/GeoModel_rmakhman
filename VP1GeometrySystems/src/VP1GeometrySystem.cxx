@@ -129,12 +129,12 @@ public:
   public:
     // "geomodellocation" contains name of tree tops,
     // or possible a bit more complex info in case of muons.
-    SubSystemInfo( QCheckBox* cb,const QRegExp& the_geomodeltreetopregexp,
+    SubSystemInfo( QCheckBox* cb, const std::string &systemName,
 		  VP1GeoFlags::SubSystemFlag the_flag,
 		   const std::string& the_matname)
 
       : isbuilt(false), checkbox(cb),
-        geomodeltreetopregexp(the_geomodeltreetopregexp),
+        systemName(systemName),
         matname(the_matname), flag(the_flag), soswitch(0)
     {
     }
@@ -144,7 +144,7 @@ public:
     VolumeHandle::VolumeHandleList vollist;
     QCheckBox* checkbox;
 
-    QRegExp geomodeltreetopregexp;      //For picking the geomodel treetops
+    std::string systemName;      //For picking the geomodel treetops
 
     std::string matname; //if nonempty, use this from detvisattr instead of the top volname.
     VP1GeoFlags::SubSystemFlag flag;
@@ -164,7 +164,7 @@ public:
   };
 
   QList<SubSystemInfo*> subsysInfoList;//We need to keep and ordered version also (since wildcards in regexp might match more than one subsystem info).
-  void addSubSystem(const VP1GeoFlags::SubSystemFlag&, const QString& treetopregexp, const std::string& matname="");
+  void addSubSystem(const VP1GeoFlags::SubSystemFlag&, const std::string & systemName, const std::string& matname="");
 
   DetVisAttributes *detVisAttributes;
   MatVisAttributes *matVisAttributes;
@@ -250,7 +250,7 @@ void VP1GeometrySystem::setZoomToVolumeOnClick(bool b) {
 
 //_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::addSubSystem(const VP1GeoFlags::SubSystemFlag& f,
-					  const QString& treetopregexp,
+					  const std::string & systemName,
 					  const std::string& matname)
 {
   QCheckBox * cb = controller->subSystemCheckBox(f);
@@ -258,7 +258,16 @@ void VP1GeometrySystem::Imp::addSubSystem(const VP1GeoFlags::SubSystemFlag& f,
     theclass->message(("Error: Problems retrieving checkbox for subsystem "+f).c_str());
     return;
   }
-  subsysInfoList << new SubSystemInfo(cb,QRegExp(treetopregexp),f,matname);
+  int counter(0);
+  for (auto i=subsysInfoList.begin();i!=subsysInfoList.end();i++) {
+    if (systemName==(*i)->systemName) {
+      //std::cout << "Very severe warning. You create duplicate systems! " << std::endl;
+      //... er, just bail out.  Subsystem exists, everything fine. 
+      return;
+    }
+  }
+
+  subsysInfoList << new SubSystemInfo(cb,systemName,f,matname);
   //FIXME: DELETE!!!
 }
 
@@ -364,7 +373,7 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
     //Let us see if we recognize this volume:
     bool found = false;
     foreach (Imp::SubSystemInfo * subsys, m_d->subsysInfoList) {
-      if (subsys->geomodeltreetopregexp.exactMatch(name.c_str())){
+      if (subsys->systemName==name){
 	{
 
 	  found = true;

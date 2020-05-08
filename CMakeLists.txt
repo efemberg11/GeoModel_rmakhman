@@ -2,24 +2,26 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelCore" VERSION 3.1.2 LANGUAGES CXX )
+project( "GeoModelCore" VERSION 3.2.0 LANGUAGES CXX )
 
-# Set default build options.
-set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
-set( CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard used for the build" )
-set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
+# ---------------------------
 
 # Make the module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
-# Print Build Info on screen
-include( PrintBuildInfo )
+# Set build and C++ default options
+include ( configure_cpp_options )
+
+# Use the GNU install directory names.
+include( GNUInstallDirs )
 
 # Set up how the project would use Eigen.
 include( SetupEigen3 )
 
-# Use the GNU install directory names.
-include( GNUInstallDirs )
+# Print Build Info on screen
+include( PrintBuildInfo )
+
+# ---------------------------
 
 # Set up the build of the two libraries of the project.
 add_subdirectory( GeoGenericFunctions )

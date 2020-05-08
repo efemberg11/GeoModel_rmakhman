@@ -32,7 +32,46 @@ sudo apt install geomodel-io-dev
 
 # Steering the library behavior
 
-## Verbose output
+## Number of threads
+
+At run time, you can choose to run in serial mode by set this environment variable before running any code built on top of `GeoModelIO`:
+
+```
+export GEOMODEL_ENV_IO_NTHREADS=0
+```
+
+You can also choose the number of threads for GeoModelIO to use during I/O operations. For example, if you want to use 8 threads, just set:
+
+```
+export GEOMODEL_ENV_IO_NTHREADS=8
+```
+
+You can also ask `GeoModelIO` to use exactly the number of threads supported by your platform by passing `-1` to the variable, as here below. On a quad-core CPU offering 8 native threads, 8 threads will be used by `GeoModelIO`.
+
+```
+export GEOMODEL_ENV_IO_NTHREADS=-1
+```
+
+
+----
+
+# Build
+
+If you want to work on the library code, or if you want to use the latest version of the code, you have to build it by yourself.
+
+First, install or build the [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore) dependency, by following [its instructions](https://gitlab.cern.ch/GeoModelDev/GeoModelCore/blob/master/README.md).
+
+Then, get the code of this library and compile it:
+
+```
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+mkdir build_geomodelio
+cd build_geomodelio
+cmake ../GeoModelIO
+make
+```
+
+## Build options
 
 ### Timing information
 
@@ -62,46 +101,6 @@ You can ask `GeoModelIO` to print even more debug information, by setting the `G
 cmake -DGEOMODEL_IO_DEEP_DEBUG=ON ../GeoModelIO/
 ```
 
-
-
-## Number of threads
-
-You can choose to run in serial mode by set this environment variable before running any code built on top of `GeoModelIO`:
-
-```
-export GEOMODEL_ENV_IO_NTHREADS=0
-```
-
-You can also choose the number of threads for GeoModelIO to use during I/O operations. For example, if you want to use 8 threads, just set:
-
-```
-export GEOMODEL_ENV_IO_NTHREADS=8
-```
-
-You can also ask `GeoModelIO` to use exactly the number of threads supported by your platform by passing `-1` to the variable, as here below. On a quad-core CPU offering 8 native threads, 8 threads will be used by `GeoModelIO`.
-
-```
-export GEOMODEL_ENV_IO_NTHREADS=-1
-```
-
-
-----
-
-# Build
-
-If you want to work on the library code, you have to build it by yourself.
-
-First, install or build the [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore) dependency, by following [its instructions](https://gitlab.cern.ch/GeoModelDev/GeoModelCore/blob/master/README.md).
-
-Then, get the code of this library and compile it:
-
-```
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-mkdir build_geomodelio
-cd build_geomodelio
-cmake ../GeoModelIO
-make
-```
 
 ## Local 'install' path
 

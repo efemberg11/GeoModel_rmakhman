@@ -100,19 +100,16 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 
 	#ifdef GEOMODELREAD_DEEP_DEBUG
 	  m_deepDebug = true;
-	  std::cout << "You defined the GEOMODELREAD_DEEP_DEBUG variable, so you will see a verbose output." << std::endl;
+	  std::cout << "You defined the GEOMODEL_IO_DEEP_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
 	#ifdef GEOMODELREAD_DEBUG
 	  m_debug = true;
-	  std::cout << "You defined the GEOMODELREAD_DEBUG variable, so you will see a verbose output." << std::endl;
+	  std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
 	#ifdef GEOMODELREAD_TIMING
 	  m_debug = true;
-	  std::cout << "You defined the GEOMODELREAD_TIMING variable, so you will see a timing measurement in the output." << std::endl;
+	  std::cout << "You defined the GEOMODEL_IO_TIMING variable, so you will see a timing measurement in the output." << std::endl;
  	#endif
-  // m_deepDebug = true;
-   m_debug = true;
-  m_timing = true;
 
 	if ( progress != nullptr) {
 	m_progress = progress;
@@ -128,22 +125,27 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 		return;
 	}
 
-    // Check if the user asked for running in multi-threading mode
-    if( "1" == getEnvVar("GEOMODEL_GEOMODELIO_NOT_MULTITHREADED") ) {
-        std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NOT_MULTITHREADED to '1', so we will run GeoModelIO in serial mode, without using worker threads. If you experience problems, please ask to the GeoModel developers ( --> geomodel-developers<at>cern.ch )\n\n";
-        m_runMultithreaded = false;
-    }
-    // Check if the user asked for running in multi-threading mode
-    if ( "" != getEnvVar("GEOMODEL_GEOMODELIO_NTHREADS")) {
-      unsigned int nThreads = std::stoi(getEnvVar("GEOMODEL_GEOMODELIO_NTHREADS"));
-      if( nThreads > 0 ) {
-          std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NTHREADS to " << nThreads << "; thus, that number of worker threads will be used." << std::endl;
-          m_runMultithreaded_nThreads = nThreads;
-          m_runMultithreaded = true;
-      } else if (nThreads == 0) {
-        std::cout << "\nYou set the GEOMODEL_GEOMODELIO_NTHREADS to " << nThreads << "; thus, GeoModelIO will be run in serial mode." << std::endl;
+    // // Check if the user asked for running in multi-threading mode
+    // if( "1" == getEnvVar("GEOMODEL_ENV_IO_NOT_MULTITHREADED") ) {
+    //     std::cout << "\nYou set the GEOMODEL_ENV_IO_NOT_MULTITHREADED to '1', so we will run GeoModelIO in serial mode, without using worker threads. If you experience problems, please ask to the GeoModel developers ( --> geomodel-developers<at>cern.ch )\n\n";
+    //     m_runMultithreaded = false;
+    // }
+    // Check if the user asked for running in serial or multi-threading mode
+    if ( "" != getEnvVar("GEOMODEL_ENV_IO_NTHREADS"))
+    {
+      int nThreads = std::stoi(getEnvVar("GEOMODEL_ENV_IO_NTHREADS"));
+      if (nThreads == 0) {
+        std::cout << "\nYou set the GEOMODEL_ENV_IO_NTHREADS to " << nThreads << "; thus, GeoModelIO will be run in serial mode." << std::endl;
         m_runMultithreaded_nThreads = nThreads;
         m_runMultithreaded = false;
+      } else if( nThreads > 0 ) {
+        std::cout << "\nYou set the GEOMODEL_ENV_IO_NTHREADS to " << nThreads << "; thus, GeoModelIO will use that number of worker threads." << std::endl;
+        m_runMultithreaded_nThreads = nThreads;
+        m_runMultithreaded = true;
+      } else if (nThreads == -1) {
+        std::cout << "\nYou set the GEOMODEL_ENV_IO_NTHREADS to " << nThreads << "; thus, GeoModelIO will use the number of threads supported by the platform." << std::endl;
+        m_runMultithreaded_nThreads = nThreads;
+        m_runMultithreaded = true;
       }
     }
 
@@ -267,8 +269,12 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 	}
 	// ...otherwise, let's spawn some threads to process them in bunches, parallelly!
 	else {
-		// Get Start Time
-		std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    std::chrono::system_clock::time_point start, end;
+    if (m_timing || m_debug || m_deepDebug) {
+  		// Get Start Time
+  		start = std::chrono::system_clock::now();
+    }
 
     // set number of worker threads
     unsigned int nThreads = 0;
@@ -277,12 +283,12 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
     }
     else if (m_runMultithreaded_nThreads == -1) {
       unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
-      nThreads = nThreadsPlatform * 2;
-		  if (m_debug) std::cout << "INFO - You have asked for maximum parellelism. On this platform, " << nThreadsPlatform << " concurrent threads are supported. Using " << nThreads << " threads.\n";
+      nThreads = nThreadsPlatform;
+		  if (m_debug || m_deepDebug) std::cout << "INFO - You have asked for hardware native parellelism. On this platform, " << nThreadsPlatform << " concurrent threads are supported. Thus, using " << nThreads << " threads.\n";
     }
 
 		unsigned int nBunches = nChildrenRecords / nThreads;
-		if (m_debug) std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each, plus the remainder." << std::endl;
+		if (m_debug || m_deepDebug) std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each, plus the remainder." << std::endl;
 
 		// a vector to store the "futures" of async calls
 		std::vector<std::future<void>> futures;
@@ -307,28 +313,29 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
         muxCout.unlock();
       }
 
-			// loopOverAllChildren(bunch);
 			futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildren, this, bunch) );
 		}
 
 		// wait for all async calls to complete
-		//retrieve and print the value stored in the future
+		//retrieve and print the value stored in the 'std::future'
 		muxCout.lock();
-		if (m_debug) std::cout << "Waiting for the threads to finish..." << std::flush;
+		if (m_debug || m_deepDebug) std::cout << "Waiting for the threads to finish...\n" << std::flush;
 		muxCout.unlock();
 	  	for(auto &e : futures) {
 	    	e.wait();
 	   	}
 		muxCout.lock();
-    	if (m_debug) std::cout << "Done!\n";
+    	if (m_debug || m_deepDebug) std::cout << "Done!\n";
 		muxCout.unlock();
 
-    createBooleanShapeOperands(); // TODO: move to threads somehow, but the shared container needs to be handled... maybe a dispatcher thread that gives items to the worker threads to process? 
+    createBooleanShapeOperands(); // TODO: move to threads somehow, but the shared container needs to be handled... maybe a dispatcher thread that gives items to the worker threads to process? A FIFO should work here...
 
-		// Get End Time
-		auto end = std::chrono::system_clock::now();
-		auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
-		std::cout << "(Total time taken to recreate all " << nChildrenRecords << " mother-children relationships: " << diff << " seconds)" << std::endl;
+    if (m_timing || m_debug || m_deepDebug) {
+  		// Get End Time
+  		end = std::chrono::system_clock::now();
+  		auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+  		std::cout << "(Total time taken to recreate all " << nChildrenRecords << " mother-children relationships: " << diff << " seconds)" << std::endl;
+    }
 	}
 	return;
 }

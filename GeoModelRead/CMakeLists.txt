@@ -23,8 +23,9 @@ set_target_properties( GeoModelRead PROPERTIES
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
    "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-   target_compile_definitions( GeoModelRead PUBLIC -DQT_NO_DEBUG_OUTPUT )
+   target_compile_definitions( GeoModelRead PUBLIC QT_NO_DEBUG_OUTPUT )
 endif()
+
 
 # Install the library.
 install( TARGETS GeoModelRead

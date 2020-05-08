@@ -184,7 +184,7 @@ private:
 	bool m_debug;
   bool m_timing;
   bool m_runMultithreaded;
-  unsigned int m_runMultithreaded_nThreads;
+  int m_runMultithreaded_nThreads;
 
 	// callback handles
 	unsigned long* m_progress;

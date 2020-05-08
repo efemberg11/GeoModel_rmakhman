@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelIO" VERSION 3.1.2 LANGUAGES CXX )
+project( "GeoModelIO" VERSION 3.2.0 LANGUAGES CXX )
 
 # ---------------------------
 
@@ -15,17 +15,17 @@ include ( configure_cpp_options )
 # Set optional definitions to steer the source code
 include( configure_definitions)
 
+# Use the GNU install directory names.
+include( GNUInstallDirs )
+
 # Print Build Info on screen
 include( PrintBuildInfo )
 
 # ---------------------------
 
 # Project's dependencies.
-find_package( GeoModelCore REQUIRED )
+find_package( GeoModelCore 3.2.0 REQUIRED )
 find_package( Qt5 COMPONENTS Core Sql REQUIRED )
-
-# Use the GNU install directory names.
-include( GNUInstallDirs )
 
 # Set sub-packages to build.
 add_subdirectory( GeoModelErrorHandler )

@@ -98,15 +98,15 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 {
 	qDebug() << "===> DumpGeoModelAction: constructor";
 
-	#ifdef GEOMODELREAD_DEEP_DEBUG
+	#ifdef GEOMODEL_IO_DEEP_DEBUG
 	  m_deepDebug = true;
 	  std::cout << "You defined the GEOMODEL_IO_DEEP_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
-	#ifdef GEOMODELREAD_DEBUG
+	#ifdef GEOMODEL_IO_DEBUG
 	  m_debug = true;
 	  std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
-	#ifdef GEOMODELREAD_TIMING
+	#ifdef GEOMODEL_IO_TIMING
 	  m_debug = true;
 	  std::cout << "You defined the GEOMODEL_IO_TIMING variable, so you will see a timing measurement in the output." << std::endl;
  	#endif

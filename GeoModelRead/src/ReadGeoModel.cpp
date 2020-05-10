@@ -87,7 +87,7 @@ std::mutex muxTransf;
 std::mutex muxCout;
 std::mutex muxVecOps;
 
-
+ 
 using namespace GeoGenfun;
 using namespace GeoXF;
 

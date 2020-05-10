@@ -111,7 +111,7 @@ do
     mem_max_str=$(awk 'NR==1{print $6}' time.out)
 
     time_user=$(awk -F'user' '{print $1}' <<< "$time_user_str")
-    time_elapsed=$(awk -F'user' '{print $1}' <<< "$time_elapsed_str")
+    time_elapsed=$(awk -F'elapsed' '{print $1}' <<< "$time_elapsed_str")
     mem_max=$(awk -F'maxresident' '{print $1}' <<< "$mem_max_str")
 
     date_str=$(date)

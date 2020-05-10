@@ -117,7 +117,7 @@ do
     date_str=$(date)
     date_epoch=$(date +%s)
 
-    OUT_VERBOSE="threads $n - test $m - $date_str ($date_epoch) - user $time_user_str $time_user [s] elapsed $time_elapsed_str $time_elapsed [s] maxmem $mem_max_str $mem_max [Kb]"
+    OUT_VERBOSE="threads $n - test $m - $date_str ($date_epoch) - user $time_user [s] elapsed $time_elapsed [s] maxmem $mem_max [Kb]"
     OUT="$n $m $date_epoch $time_user $time_elapsed $mem_max"
 
     # test the success status of the executable

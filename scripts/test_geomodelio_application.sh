@@ -50,6 +50,7 @@
 # Sources:
 # - https://unix.stackexchange.com/a/533451/245009 (parse `time` output)
 # - https://askubuntu.com/a/29379/830120 {get return value of a command}
+# - https://unix.stackexchange.com/a/246934/245009 (use of `|| break 2` to stop loops inside a bash script with 'ctrl-c')
 # - https://stackoverflow.com/a/16040609/320369
 # - https://stackoverflow.com/a/10959179/320369
 # - https://stackoverflow.com/a/2013573/320369
@@ -73,14 +74,15 @@ EXEC=$1   # first command line argument
 # Verify the type of input and number of value
 # Display an error message if the executable to test was not passed and
 # exit the shell script with a status of 1 using exit 1 command.
-[ $# -eq 0 ] && { echo "Usage: $0 executable"; exit 1; }
+[ $# -eq 0 ] && { echo "Usage: $0 executable [nThreadsMin] [nThreadsMax] [nTimesPerTest]"; exit 1; }
 
 
 # Variables. Assign default values if not specified by the user
-NTHREADS=${2:-8} # default value: up to 8 threads
-MTIMES=${3:-5}   # default value: 5 repetitions for each test
+NTHREADS_MIN=${2:-2} # default value: up to 8 threads
+NTHREADS_MAX=${3:-8} # default value: up to 8 threads
+MTIMES=${4:-5}   # default value: 5 repetitions for each test
 # APP=${4:-"/usr/bin/time"} # default timing application: /usr/bin/time
-APP=${4:-"gtime"} # TODO: output parsing is only for GNU tinme at the moment
+APP=${5:-"gtime"} # TODO: output parsing is only for GNU tinme at the moment
 
 function eval_command() {
   "$@";
@@ -90,19 +92,18 @@ function eval_command() {
 HEADER="ThreadsN TestN Timestamp TimeUser[s] TimeElapsed[s] MaxMem[Kb] Status"
 printf "$HEADER\n" > output.txt
 
-echo "Testing the application ${1} with up to $NTHREADS concurrent threads, $MTIMES, using the '$APP' timing application."
+echo "Testing the application ${1} with $NTHREADS_MIN-$NTHREADS_MAX concurrent threads, $MTIMES, using the '$APP' timing application."
 # Test up to N concurrent threads
-# for n in {0..${NTHREADS}}; do
-for (( n=0; n<=$NTHREADS; n++ ))
+for (( n=$NTHREADS_MIN; n<=$NTHREADS_MAX; n++ ))
 do
-  export GEOMODEL_GEOMODELIO_NTHREADS=$n;
-  echo "Using # threads: " $n;
+  export GEOMODEL_ENV_IO_NTHREADS=$n;
+  echo "Using # threads: $n - [The 'GEOMODEL_ENV_IO_NTHREADS' env var has been set to: $GEOMODEL_ENV_IO_NTHREADS]"
+
   ## run command M times
-  # for m in {1..$MTIMES};
   for (( m=1; m<=$MTIMES; m++ ))
   do
     # launch the actual command, through an 'eval function'
-    eval_command $APP $EXEC > log.out 2>time.out
+    eval_command $APP $EXEC > log.out 2>time.out || break 2
     # get the return value of the command, to check if it succeeded
     return_value=$?
 

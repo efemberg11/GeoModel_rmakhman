@@ -97,7 +97,7 @@ echo "Testing the application ${1} with $NTHREADS_MIN-$NTHREADS_MAX concurrent t
 for (( n=$NTHREADS_MIN; n<=$NTHREADS_MAX; n++ ))
 do
   export GEOMODEL_ENV_IO_NTHREADS=$n;
-  echo "Using # threads: $n - [The 'GEOMODEL_ENV_IO_NTHREADS' env var has been set to: $GEOMODEL_ENV_IO_NTHREADS]"
+  echo "Using # worker threads: $n (0 means 'serial mode') - [The 'GEOMODEL_ENV_IO_NTHREADS' env var has been set to: $GEOMODEL_ENV_IO_NTHREADS]"
 
   ## run command M times
   for (( m=1; m<=$MTIMES; m++ ))

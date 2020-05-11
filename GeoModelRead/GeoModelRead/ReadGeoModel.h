@@ -114,7 +114,7 @@ private:
 
 	GeoLogVol* buildLogVol(QString id);
 	// GeoShape* buildShape(QString id);
-	GeoShape* buildShape(const unsigned int id);
+	GeoShape* buildShape(const unsigned int id, type_shapes_boolean_info* shapes_info_sub);
 	GeoMaterial* buildMaterial(QString id);
 	GeoElement* buildElement(QString id);
 	GeoSerialDenominator* parseSerialDenominator(QStringList values);
@@ -139,11 +139,11 @@ private:
   bool isShapeOperator(const std::string type);
   bool isShapeBoolean(const unsigned int shapeId);
   bool isShapeBoolean(const std::string type);
-  void createBooleanShapeOperands();
+  void createBooleanShapeOperands(type_shapes_boolean_info* shapes_info_sub);
   std::pair<unsigned int, unsigned int> getBooleanShapeOperands(const unsigned int shape);
-  GeoShape* addEmptyBooleanShapeForCompletion(const unsigned int shapeID);
-  GeoShape* getBooleanReferencedShape(const unsigned int shapeID);
-  void assignOperandShapesToBoolean(GeoShape* boolShPtr);
+  GeoShape* addEmptyBooleanShapeForCompletion(const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub);
+  GeoShape* getBooleanReferencedShape(const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub);
+  // void assignOperandShapesToBoolean(GeoShape* boolShPtr);
 
 
 
@@ -162,10 +162,10 @@ private:
 
 
   // Thread-safe write/read methods for the container holding boolean shapes' info
-  void addShapeInfoEntry(tuple_shapes_boolean_info tt);
-  tuple_shapes_boolean_info getShapeInfoEntry(unsigned int ii);
-  unsigned int getShapeInfoSize();
-  void getShapeInfoClear();
+  // void addShapeInfoEntry(tuple_shapes_boolean_info tt);
+  // tuple_shapes_boolean_info getShapeInfoEntry(unsigned int ii);
+  // unsigned int getShapeInfoSize();
+  // void getShapeInfoClear();
 
 
   // Utility functions
@@ -213,8 +213,6 @@ private:
 	std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
 
 
-  type_shapes_boolean_info m_shapes_info_sub;
-  type_shapes_boolean_info::size_type m_shapes_info_sub_size;
 
 
   // std::vector<std::vector, std::pair<unsigned int, unsigned int>> shapeGraph;

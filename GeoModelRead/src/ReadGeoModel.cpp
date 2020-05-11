@@ -87,7 +87,7 @@ std::mutex muxTransf;
 std::mutex muxCout;
 std::mutex muxVecOps;
 
- 
+
 using namespace GeoGenfun;
 using namespace GeoXF;
 
@@ -324,11 +324,9 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 	  	for(auto &e : futures) {
 	    	e.wait();
 	   	}
-		muxCout.lock();
-    	if (m_debug || m_deepDebug) std::cout << "Done!\n";
-		muxCout.unlock();
+  	if (m_debug || m_deepDebug) std::cout << "Done!\n";
 
-    createBooleanShapeOperands(); // TODO: move to threads somehow, but the shared container needs to be handled... maybe a dispatcher thread that gives items to the worker threads to process? A FIFO should work here...
+    // createBooleanShapeOperands(); // TODO: move to threads somehow, but the shared container needs to be handled... maybe a dispatcher thread that gives items to the worker threads to process? A FIFO should work here...
 
     if (m_timing || m_debug || m_deepDebug) {
   		// Get End Time
@@ -692,7 +690,7 @@ std::string ReadGeoModel::getShapeType(const unsigned int shapeId)
 
 
 /// Recursive function, to build GeoShape nodes
-GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
+GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boolean_info* shapes_info_sub)
 {
 	if (m_deepDebug) {
      muxCout.lock();
@@ -1674,7 +1672,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       // then build it,
       // then build the boolean shape with that
       if ( !isAOperator ) {
-        const GeoShape* shapeOp = buildShape( shapeOpId );
+        const GeoShape* shapeOp = buildShape( shapeOpId, shapes_info_sub );
 
         if ( shapeOp == nullptr || transf == nullptr ) {
           std::cout << "ERROR!!! Shift - shapeOp or transfX are NULL! Exiting..." << std::endl;
@@ -1696,7 +1694,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
         // muxCout.unlock();
 
         tuple_shapes_boolean_info tt (shapeId, shapeNew, shapeOpId, transfId);
-        addShapeInfoEntry(tt);
+
+        // addShapeInfoEntry(tt);
+        shapes_info_sub->push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over
+        // shapes_info_sub_size++; // update the size of the list, so the iteration over it will continue, including the new elements we just added to it
 
         shape = shapeNew;
       }
@@ -1766,8 +1767,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
       // if both are simple/actual shapes (i.e., not booleans),
       // then build them, then build the boolean shape with them, and returns...
       if ( !isAOperator && !isBOperator) {
-        const GeoShape* shapeA = buildShape( opA );
-        const GeoShape* shapeB = buildShape( opB );
+        const GeoShape* shapeA = buildShape( opA, shapes_info_sub );
+        const GeoShape* shapeB = buildShape( opB, shapes_info_sub );
         if ( shapeA == NULL || shapeB == NULL ) {
           std::cout << "ERROR!!! shapeA or shapeB are NULL!" << std::endl;
           exit(EXIT_FAILURE);
@@ -1795,7 +1796,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
         // muxCout.unlock();
 
         tuple_shapes_boolean_info tt (shapeId, shapeNew, opA, opB);
-        addShapeInfoEntry(tt);
+
+        // addShapeInfoEntry(tt);
+        shapes_info_sub->push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over
+        // shapes_info_sub_size++; // update the size of the list, so the iteration over it will continue, including the new elements we just added to it
 
         shape = shapeNew;
       }
@@ -1907,38 +1911,42 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId)
 
 
 // TODO: move to an untilities file/class
-void inspectListShapesToBuild(type_shapes_boolean_info list)
-{
-  for (auto tuple : list) {
-    std::apply([](auto&&... args) { ( (std::cout << args << ", "), ...); }, tuple); // needs C++17
-    std::cout << std::endl;
-  }
-}
-// TODO: move to an untilities file/class
 void printTuple(tuple_shapes_boolean_info tuple)
 {
   std::apply([](auto&&... args) { ( (std::cout << args << ", "), ...); }, tuple); // needs C++17
   std::cout << std::endl;
 }
+// TODO: move to an untilities file/class
+void inspectListShapesToBuild(type_shapes_boolean_info list)
+{
+  for (auto tuple : list) {
+    printTuple(tuple);
+    std::cout << std::endl;
+  }
+}
 
 
-void ReadGeoModel::createBooleanShapeOperands()
+void ReadGeoModel::createBooleanShapeOperands(type_shapes_boolean_info* shapes_info_sub)
 {
   // if (m_shapes_info_sub.size() == 0) return;
-  if (getShapeInfoSize() == 0) return; //thread-safe
+  // if (getShapeInfoSize() == 0) return; //thread-safe
 
   // std::cout << "\ncreateBooleanShapeOperands() - start..." << std::endl;
+
+  // type_shapes_boolean_info shapes_info_sub;
+  // type_shapes_boolean_info::size_type shapes_info_sub_size;
 
 //   inspectListShapesToBuild(m_shapes_info_sub); // debug
 
 	// Iterate over the list. The size may be incremented while iterating (therefore, we cannot use iterators)
-  // m_shapes_info_sub_size = m_shapes_info_sub.size();
-  m_shapes_info_sub_size = getShapeInfoSize(); // thread-safe
-  for (type_shapes_boolean_info::size_type ii = 0; ii < m_shapes_info_sub_size; ++ii)
+  // shapes_info_sub_size = shapes_info_sub.size();
+  // shapes_info_sub_size = getShapeInfoSize(); // thread-safe
+
+  for (type_shapes_boolean_info::size_type ii = 0; ii < shapes_info_sub->size(); ++ii)
   {
     // get the tuple containing the data about the operand shapes to build
-    // tuple_shapes_boolean_info tuple = m_shapes_info_sub[ii];
-    tuple_shapes_boolean_info tuple = getShapeInfoEntry(ii); // thread-safe
+    tuple_shapes_boolean_info tuple = (*shapes_info_sub)[ii];
+    // tuple_shapes_boolean_info tuple = getShapeInfoEntry(ii); // thread-safe
     // std::cout << "tuple: "; printTuple(tuple); // debug
 
       // Initializing variables for unpacking
@@ -1976,8 +1984,8 @@ void ReadGeoModel::createBooleanShapeOperands()
           shapeB = getBuiltShape(idB); //TODO: customize for Shift as well
         } else {
           // otherwise, build the operand shapes
-          shapeA = getBooleanReferencedShape(idA);
-          shapeB = getBooleanReferencedShape(idB);
+          shapeA = getBooleanReferencedShape(idA, shapes_info_sub);
+          shapeB = getBooleanReferencedShape(idB, shapes_info_sub);
         }
         // Now, assign the new shapes to the boolean shape we're building
         if (dynamic_cast<GeoShapeIntersection*>(boolShPtr)) {
@@ -2019,7 +2027,7 @@ void ReadGeoModel::createBooleanShapeOperands()
           shiftTransf = getBuiltTransform(idB);
         } else {
           // otherwise, build the operand shapes
-          opShape = getBooleanReferencedShape(idA);
+          opShape = getBooleanReferencedShape(idA, shapes_info_sub);
           shiftTransf = buildTransform(idB);
         }
         shiftX = shiftTransf->getTransform();
@@ -2043,12 +2051,14 @@ void ReadGeoModel::createBooleanShapeOperands()
 		// it++;
 	}
   // at the end, clear the container that stores the operands to build
-  getShapeInfoClear();
+  // getShapeInfoClear();
+  // shapes_info_sub->clear();// not needed anymore, because tuple is now local to thread
+
 }
 
 
 
-GeoShape* ReadGeoModel::getBooleanReferencedShape(const unsigned int shapeID)
+GeoShape* ReadGeoModel::getBooleanReferencedShape(const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub)
 {
   if (0 == shapeID) {
     std::cout << "ERROR!! ShapeID = 0!" << std::endl;
@@ -2064,7 +2074,7 @@ GeoShape* ReadGeoModel::getBooleanReferencedShape(const unsigned int shapeID)
     // if not built and not a boolean shape, then build it
     if (!isShapeOperator(shapeID)) {
       if (m_deepDebug) std::cout << "operandA is not built and not an operator, build it..." << std::endl; // debug
-      shape = buildShape( shapeID );
+      shape = buildShape( shapeID, shapes_info_sub );
       if ( shape == NULL ) {
         std::cout << "ERROR!!! shape is NULL!" << std::endl;
         exit(EXIT_FAILURE);
@@ -2074,7 +2084,7 @@ GeoShape* ReadGeoModel::getBooleanReferencedShape(const unsigned int shapeID)
     // store it for later completion, and use that
     else {
       if (m_deepDebug) std::cout << "operandA is not built and it is an operator, add it to build it later..." << std::endl; // debug
-      shape = addEmptyBooleanShapeForCompletion(shapeID);
+      shape = addEmptyBooleanShapeForCompletion(shapeID, shapes_info_sub);
       }
   }
 
@@ -2084,7 +2094,7 @@ GeoShape* ReadGeoModel::getBooleanReferencedShape(const unsigned int shapeID)
 
 
 
-GeoShape* ReadGeoModel::addEmptyBooleanShapeForCompletion(const unsigned int shapeID)
+GeoShape* ReadGeoModel::addEmptyBooleanShapeForCompletion(const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub)
 {
   // get the operands' IDs,
   // build an empty instance of the appropriate boolean/operator shape,
@@ -2113,7 +2123,11 @@ GeoShape* ReadGeoModel::addEmptyBooleanShapeForCompletion(const unsigned int sha
   // muxCout.unlock();
 
   tuple_shapes_boolean_info tt (shapeID, shape, opA, opB);
-  addShapeInfoEntry(tt);
+
+  // addShapeInfoEntry(tt);
+  shapes_info_sub->push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over
+  // shapes_info_sub_size++; // update the size of the list, so the iteration over it will continue, including the new elements we just added to it
+
   return shape;
 }
 
@@ -2272,21 +2286,17 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
     muxCout.unlock();
   }
 
-	// build the LogVol
+	// get the parameters to build the GeoLogVol node
 	QString logVolName = values[1];
 
-	// GET LOGVOL SHAPE
+	// build the referenced GeoShape node
 	unsigned int shapeId = values[2].toUInt();
-	GeoShape* shape = buildShape(shapeId);
-
+  type_shapes_boolean_info shapes_info_sub; // tuple to store the boolean shapes to complete at a second stage
+	GeoShape* shape = buildShape(shapeId, &shapes_info_sub);
   // now, create the missing operand shapes for boolean/operator shapes
-  // muxShapeOperands.lock();
-  // createBooleanShapeOperands();
-  // muxShapeOperands.unlock();
+  createBooleanShapeOperands(&shapes_info_sub);
 
-
-
-	// GET LOGVOL MATERIAL
+	// build the referenced GeoMaterial node
 	QString matId = values[3];
 	if (m_deepDebug) {
     muxCout.lock();
@@ -2688,32 +2698,32 @@ GeoGraphNode* ReadGeoModel::getVPhysVol(const QString id, const QString tableId,
 }
 
 
-void ReadGeoModel::addShapeInfoEntry(tuple_shapes_boolean_info tt)
-{
-  std::lock_guard<std::mutex> lk(muxVecOps);
-//  std::cout << "addShapeInfoEntry - " << std::time(nullptr) << std::endl;
-  m_shapes_info_sub.push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over
-  m_shapes_info_sub_size++; // update the size of the list, so the iteration over it will continue, including the new elements we just added to it
-}
-tuple_shapes_boolean_info ReadGeoModel::getShapeInfoEntry(unsigned int ii)
-{
-  std::lock_guard<std::mutex> lk(muxVecOps);
-//  std::cout << "getShapeInfoEntry - " << std::time(nullptr) << std::endl;
-  return m_shapes_info_sub[ii];
-}
-unsigned int ReadGeoModel::getShapeInfoSize()
-{
-  std::lock_guard<std::mutex> lk(muxVecOps);
-//  std::cout << "getShapeInfoSize - " << std::time(nullptr) << std::endl;
-  return m_shapes_info_sub.size();
-}
-void ReadGeoModel::getShapeInfoClear()
-{
-  std::lock_guard<std::mutex> lk(muxVecOps);
-//  std::cout << "getShapeInfoClear - " << std::time(nullptr) << std::endl;
-  m_shapes_info_sub.clear();
-  return;
-}
+// void ReadGeoModel::addShapeInfoEntry(tuple_shapes_boolean_info tt)
+// {
+//   std::lock_guard<std::mutex> lk(muxVecOps);
+// //  std::cout << "addShapeInfoEntry - " << std::time(nullptr) << std::endl;
+//   m_shapes_info_sub.push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over
+//   m_shapes_info_sub_size++; // update the size of the list, so the iteration over it will continue, including the new elements we just added to it
+// }
+// tuple_shapes_boolean_info ReadGeoModel::getShapeInfoEntry(unsigned int ii)
+// {
+//   std::lock_guard<std::mutex> lk(muxVecOps);
+// //  std::cout << "getShapeInfoEntry - " << std::time(nullptr) << std::endl;
+//   return m_shapes_info_sub[ii];
+// }
+// unsigned int ReadGeoModel::getShapeInfoSize()
+// {
+//   std::lock_guard<std::mutex> lk(muxVecOps);
+// //  std::cout << "getShapeInfoSize - " << std::time(nullptr) << std::endl;
+//   return m_shapes_info_sub.size();
+// }
+// void ReadGeoModel::getShapeInfoClear()
+// {
+//   std::lock_guard<std::mutex> lk(muxVecOps);
+// //  std::cout << "getShapeInfoClear - " << std::time(nullptr) << std::endl;
+//   m_shapes_info_sub.clear();
+//   return;
+// }
 
 
 } /* namespace GeoModelIO */

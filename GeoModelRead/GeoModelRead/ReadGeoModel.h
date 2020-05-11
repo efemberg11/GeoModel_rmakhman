@@ -88,6 +88,8 @@ public:
 
 private:
 
+  void buildAllShapes();
+
   std::string getEnvVar( std::string const & key ) const;
 
 	GeoPhysVol* buildGeoModelByCalls();

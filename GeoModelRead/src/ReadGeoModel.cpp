@@ -78,6 +78,8 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <thread>
+
 
 // mutexes for synchronized access to containers and output streams in multi-threading mode
 std::mutex muxVPhysVol;
@@ -92,11 +94,12 @@ using namespace GeoXF;
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progress(nullptr), m_deepDebug(false), m_debug(false), m_timing(false), m_runMultithreaded(false), m_runMultithreaded_nThreads(0)
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDebug(false),
+  m_debug(false), m_timing(false), m_runMultithreaded(false),
+  m_runMultithreaded_nThreads(0), m_progress(nullptr)
 {
-	qDebug() << "===> DumpGeoModelAction: constructor";
 
-	#ifdef GEOMODEL_IO_DEEP_DEBUG
+  #ifdef GEOMODEL_IO_DEEP_DEBUG
 	  m_deepDebug = true;
 	  std::cout << "You defined the GEOMODEL_IO_DEEP_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
@@ -105,7 +108,7 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_progres
 	  std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will see a verbose output." << std::endl;
  	#endif
 	#ifdef GEOMODEL_IO_TIMING
-	  m_debug = true;
+	  m_timing = true;
 	  std::cout << "You defined the GEOMODEL_IO_TIMING variable, so you will see a timing measurement in the output." << std::endl;
  	#endif
 
@@ -193,6 +196,17 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 	// qDebug() << "physVols: " << _physVols;
 	// qDebug() << "fullPhysVols: " << _fullPhysVols;
 
+
+  // build all nodes
+  std::thread t1(&ReadGeoModel::buildAllShapes, this);
+  // std::thread t1(&ReadGeoModel::buildAllElements, this);
+  // std::thread t1(&ReadGeoModel::buildAllMaterials, this);
+  // std::thread t1(&ReadGeoModel::buildAllFunctions, this);
+
+  t1.join();
+
+
+
 	// get DB metadata
 	m_tableid_tableName = m_dbManager->getAll_TableIDsNodeTypes();
 
@@ -245,6 +259,24 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
   	muxCout.unlock();
   }
 }
+
+
+//! Iterate over the list of shapes, build them all, and store their pointers
+void ReadGeoModel::buildAllShapes()
+{
+  QHash<unsigned int, QStringList>::const_iterator i = m_shapes.constBegin();
+  while (i != m_shapes.constEnd()) {
+    // cout << i.key() << ": " << i.value() << Qt::endl;
+    unsigned int shapeID = i.key();
+    type_shapes_boolean_info shapes_info_sub; // tuple to store the boolean shapes to complete at a second stage
+    buildShape(shapeID, &shapes_info_sub);
+    createBooleanShapeOperands(&shapes_info_sub);
+    ++i;
+  }
+
+  std::cout << "\nAll shapes have been built!\n\n\n";
+}
+
 
 //----------------------------------------
 // Parallel loop over parents' children
@@ -683,6 +715,10 @@ std::string ReadGeoModel::getShapeType(const unsigned int shapeId)
 /// Recursive function, to build GeoShape nodes
 GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boolean_info* shapes_info_sub)
 {
+  if (isBuiltShape(shapeId)) {
+    return getBuiltShape(shapeId); // TODO: now this has a lock, we can remove it if we built all shapes earlier
+  }
+
 	if (m_deepDebug) {
      muxCout.lock();
      std::cout << "ReadGeoModel::buildShape()" << std::endl;
@@ -2068,7 +2104,7 @@ std::pair<unsigned int, unsigned int> ReadGeoModel::getBooleanShapeOperands(cons
 
   std::vector<std::string> paramsShape = toStdVectorStrings(m_shapes[ shapeID ]);
 
-	unsigned int id = std::stoi(paramsShape[0]); //! the ID of the boolean/operator shape
+//  unsigned int id = std::stoi(paramsShape[0]); //! the ID of the boolean/operator shape
 	std::string type = paramsShape[1]; //! the GeoModel type of the shape
 	std::string parameters = paramsShape[2];  //! the parameters defining the shape, coming from the DB
 
@@ -2136,6 +2172,8 @@ GeoBox* ReadGeoModel::buildDummyShape() {
 
 GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
 {
+
+
 	if (m_deepDebug) {
     muxCout.lock();
     qDebug() << "ReadGeoModel::buildLogVol()";
@@ -2506,7 +2544,7 @@ void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* nodePtr)
 }
 GeoShape* ReadGeoModel::getBuiltShape(const unsigned int id)
 {
-	std::lock_guard<std::mutex> lk(muxShape); // TODO: is this lock needed at all?? I guess STD containers are thread safe for read-only operations
+	std::lock_guard<std::mutex> lk(muxShape); // TODO: is this lock now needed at all??
 	// std::cout << "ReadGeoModel::getBuiltShape(): " << id << std::endl;
 	return m_memMapShapes[id];
 }

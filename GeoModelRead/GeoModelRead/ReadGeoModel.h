@@ -71,11 +71,7 @@ using namespace GeoXF;
 
 
 typedef const Function & TRANSFUNCTION;
-// containers for boolean shapes
-// pointer: [id, (pointer, id), (pointer, id)]
-// typedef std::tuple<unsigned int/*shape ID*/, unsigned int/*shapeA ID*/, GeoShape*, unsigned int/*shapeB ID*/, GeoShape*> tuple_shapes_info_type_sub;
-// typedef std::unordered_map<GeoShapeSubtraction*, tuple_shapes_info_type_sub> map_shapes_info_type_sub;
-// typedef std::tuple<unsigned int/*shape ID*/, GeoShape*, unsigned int/*opA ID*/, GeoShape*, unsigned int/*opB ID*/, GeoShape*> tuple_shapes_boolean_info;
+// containers for boolean shapes' information
 typedef std::tuple<unsigned int/*shape ID*/, GeoShape*, unsigned int/*opA ID*/, unsigned int/*opB ID*/> tuple_shapes_boolean_info;
 typedef std::vector<tuple_shapes_boolean_info> type_shapes_boolean_info;
 
@@ -113,7 +109,6 @@ private:
 	GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN);
 
 	GeoLogVol* buildLogVol(QString id);
-	// GeoShape* buildShape(QString id);
 	GeoShape* buildShape(const unsigned int id, type_shapes_boolean_info* shapes_info_sub);
 	GeoMaterial* buildMaterial(QString id);
 	GeoElement* buildElement(QString id);
@@ -143,8 +138,6 @@ private:
   std::pair<unsigned int, unsigned int> getBooleanShapeOperands(const unsigned int shape);
   GeoShape* addEmptyBooleanShapeForCompletion(const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub);
   GeoShape* getBooleanReferencedShape(const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub);
-  // void assignOperandShapesToBoolean(GeoShape* boolShPtr);
-
 
 
   // caching methods
@@ -159,13 +152,6 @@ private:
 	bool isNodeBuilt(const QString id, const QString tableId, const QString copyNumber);
   void storeVPhysVol(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
 	GeoGraphNode* getVPhysVol(const QString id, const QString tableId, const QString copyNumber);
-
-
-  // Thread-safe write/read methods for the container holding boolean shapes' info
-  // void addShapeInfoEntry(tuple_shapes_boolean_info tt);
-  // tuple_shapes_boolean_info getShapeInfoEntry(unsigned int ii);
-  // unsigned int getShapeInfoSize();
-  // void getShapeInfoClear();
 
 
   // Utility functions
@@ -211,11 +197,6 @@ private:
 	QHash<QString, GeoGraphNode*> m_memMap;
 	std::unordered_map<unsigned int, GeoShape*> m_memMapShapes;
 	std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
-
-
-
-
-  // std::vector<std::vector, std::pair<unsigned int, unsigned int>> shapeGraph;
 
 	std::set<std::string> m_unknown_shapes;
 

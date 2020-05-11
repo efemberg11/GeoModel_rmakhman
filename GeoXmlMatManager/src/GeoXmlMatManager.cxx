@@ -4,7 +4,7 @@
 
 #include "GeoXmlMatManager/GeoXmlMatManager.h"
 #include "GeoElementHandler.h"
-#include "GeoDummyHandler.h"
+#include "GeoMatDummyHandler.h"
 #include "GeoMaterialHandler.h"
 #include "GeoMatComponentHandler.h"
 #include "GeoNamespaceHandler.h"
@@ -41,11 +41,11 @@ public:
   //______________________________________________________
   // Handlers for the XML parser
   GeoElementHandler      m_elementHandler;
-  GeoDummyHandler        m_elementsHandler;
+  GeoMatDummyHandler     m_elementsHandler;
   GeoMaterialHandler     m_materialHandler;
   GeoMatComponentHandler m_matComponentHandler;
   GeoNamespaceHandler    m_namespaceHandler;
-  GeoDummyHandler        m_materialsHandler;
+  GeoMatDummyHandler     m_materialsHandler;
 
   // Map of elements indexed by Name
   typedef std::map<std::string, GeoElement*> ElementMap;

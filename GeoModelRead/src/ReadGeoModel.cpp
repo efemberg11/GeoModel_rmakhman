@@ -87,6 +87,7 @@ std::mutex muxShape;
 std::mutex muxLog;
 std::mutex muxMat;
 std::mutex muxEl;
+std::mutex muxFunc;
 std::mutex muxTransf;
 std::mutex muxCout;
 
@@ -202,12 +203,20 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 
   // build all nodes
   std::thread t1(&ReadGeoModel::buildAllShapes, this);
-  // std::thread t1(&ReadGeoModel::buildAllElements, this);
-  // std::thread t1(&ReadGeoModel::buildAllMaterials, this);
-  // std::thread t1(&ReadGeoModel::buildAllFunctions, this);
+  std::thread t2(&ReadGeoModel::buildAllElements, this);
 
-  t1.join();
+  t2.join(); // ok, Elements are built
+  std::thread t3(&ReadGeoModel::buildAllMaterials, this);
 
+  t1.join(); // ok, Shapes are built
+  t3.join(); // ok, Materials are built
+  std::thread t4(&ReadGeoModel::buildAllLogVols, this);
+
+  t4.join(); // ok, LogVols are built
+  // std::thread t5(&ReadGeoModel::buildAllPhysVols, this);
+  // std::thread t6(&ReadGeoModel::buildAllFullPhysVols, this);
+  // t5.join(); // ok, PhysVols are built
+  // t6.join(); // ok, FullPhysVols are built
 
 
 	// get DB metadata
@@ -279,6 +288,90 @@ void ReadGeoModel::buildAllShapes()
 
   std::cout << "\nAll shapes have been built!\n\n\n";
 }
+//! Iterate over the list of nodes, build them all, and store their pointers
+void ReadGeoModel::buildAllElements()
+{
+  QHash<unsigned int, QStringList>::const_iterator i = m_elements.constBegin();
+  while (i != m_elements.constEnd()) {
+    unsigned int id = i.key();
+    buildElement(id);
+    ++i;
+  }
+  std::cout << "All Elements have been built!\n";
+}
+//! Iterate over the list of nodes, build them all, and store their pointers
+void ReadGeoModel::buildAllMaterials()
+{
+  QHash<unsigned int, QStringList>::const_iterator i = m_materials.constBegin();
+  while (i != m_materials.constEnd()) {
+    unsigned int id = i.key();
+    buildMaterial(id);
+    ++i;
+  }
+  std::cout << "All Materials have been built!\n";
+}
+//! Iterate over the list of nodes, build them all, and store their pointers
+void ReadGeoModel::buildAllLogVols()
+{
+  QHash<unsigned int, QStringList>::const_iterator i = m_logVols.constBegin();
+  while (i != m_logVols.constEnd()) {
+    unsigned int id = i.key();
+    buildLogVol(id);
+    ++i;
+  }
+  std::cout << "All LogVols have been built!\n";
+}
+//! Iterate over the list of nodes, build them all, and store their pointers
+void ReadGeoModel::buildAllPhysVols()
+{
+  QHash<unsigned int, QStringList>::const_iterator i = m_physVols.constBegin();
+  while (i != m_physVols.constEnd()) {
+    unsigned int id = i.key();
+    QStringList values = i.value();
+    QString volId = values[0];
+    buildVPhysVol(volId, "1", "1");
+    ++i;
+  }
+  std::cout << "All PhysVols have been built!\n";
+}
+//! Iterate over the list of nodes, build them all, and store their pointers
+void ReadGeoModel::buildAllFullPhysVols()
+{
+  QHash<unsigned int, QStringList>::const_iterator i = m_fullPhysVols.constBegin();
+  while (i != m_fullPhysVols.constEnd()) {
+    unsigned int id = i.key();
+    QStringList values = i.value();
+    QString volId = values[0];
+    buildVPhysVol(volId, "2", "1");
+    ++i;
+  }
+  std::cout << "All FullPhysVols have been built!\n";
+}
+// //! Iterate over the list of nodes, build them all, and store their pointers
+// void ReadGeoModel::buildAllFunctions()
+// {
+//   QHash<unsigned int, QStringList>::const_iterator i = m_functions.constBegin();
+//   while (i != m_functions.constEnd()) {
+//     unsigned int id = i.key();
+//     buildFunction(id);
+//     ++i;
+//   }
+//   std::cout << "All Functions have been built!\n";
+// }
+
+// //! Iterate over the list of nodes, build them all, and store their pointers
+// void ReadGeoModel::buildAllRecords(QHash<unsigned int, QStringList> list)
+// {
+//   QHash<unsigned int, QStringList>::const_iterator i = list.constBegin();
+//   while (i != list.constEnd()) {
+//     // cout << i.key() << ": " << i.value() << Qt::endl;
+//     unsigned int shapeID = i.key();
+//     buildNode(shapeID, &shapes_info_sub);
+//     createBooleanShapeOperands(&shapes_info_sub);
+//     ++i;
+//   }
+//   std::cout << "\nAll nodes have been built!\n\n\n";
+// }
 
 
 //----------------------------------------
@@ -2471,7 +2564,7 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
   muxCout.lock();
 	if (m_deepDebug) qDebug() << "\tbuildSerialTransformer() - function Id:" << functionId;
   muxCout.unlock();
-	TRANSFUNCTION func = buildFunction(functionId);
+	TRANSFUNCTION func = buildFunction(functionId.toUInt());
 
 	// GET PHYSVOL
   muxCout.lock();
@@ -2493,17 +2586,25 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(QString nodeId)
 
 }
 
-TRANSFUNCTION ReadGeoModel::buildFunction(QString id)
-{
-  muxCout.lock();
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildFunction()";
-  muxCout.unlock();
-	QStringList values = m_functions[id.toUInt()];
-	return parseFunction( values[1].toStdString() );
-}
+// TRANSFUNCTION ReadGeoModel::buildFunction(QString id)
+// {
+//   muxCout.lock();
+// 	if (m_deepDebug) qDebug() << "ReadGeoModel::buildFunction()";
+//   muxCout.unlock();
+// 	QStringList values = m_functions[id.toUInt()];
+// 	return parseFunction( values[1].toStdString() );
+// }
 
-TRANSFUNCTION ReadGeoModel::parseFunction(const std::string& expr)
+// TRANSFUNCTION ReadGeoModel::parseFunction(const std::string& expr)
+TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int funcID)
 {
+  // if( isBuiltFunc(funcID) ) {
+  //   return getBuiltFunc(funcID);
+  // }
+
+  QStringList values = m_functions[funcID];
+	std::string expr = values[1].toStdString();
+
   muxCout.lock();
 	if (m_deepDebug) qDebug() << "ReadGeoModel::parseFunction(const std::string& expr)";
 	if (m_deepDebug) qDebug() << "expression: " << QString::fromStdString(expr);
@@ -2520,7 +2621,9 @@ TRANSFUNCTION ReadGeoModel::parseFunction(const std::string& expr)
   TransFunctionInterpreter interpreter;
 	TFPTR func=interpreter.interpret( expr );
 	// if (m_deepDebug) qDebug() << "expression interpreted";
-	return *(func.release()); // make func returns a pointer to the managed object and releases the ownership, then get the object dereferencing the pointer
+	TRANSFUNCTION tf = *(func.release()); // make func returns a pointer to the managed object and releases the ownership, then get the object dereferencing the pointer
+  // storeBuiltFunc(funcID, tf);
+  return tf;
 }
 
 GeoNameTag* ReadGeoModel::buildNameTag(QString id) // TODO: Remove the "parseABC" methods, put everything into "buildABC". The "parseABC" are there for historical reasons.
@@ -2663,6 +2766,22 @@ GeoGraphNode* ReadGeoModel::getVPhysVol(const QString id, const QString tableId,
 	QString key = id + ":" + tableId + ":" + copyN;
 	return m_memMap[key];
 }
+// --- methods for caching Functions nodes ---
+// bool ReadGeoModel::isBuiltFunc(const unsigned int id)
+// {
+// 	std::lock_guard<std::mutex> lk(muxFunc);
+// 	return m_memMapFuncs.count(id);
+// }
+// void ReadGeoModel::storeBuiltFunc(const unsigned int id, TRANSFUNCTION nodePtr)
+// {
+//   std::lock_guard<std::mutex> lk(muxFunc);
+//   m_memMapFuncs[id] = &nodePtr;
+// }
+// TRANSFUNCTION ReadGeoModel::getBuiltFunc(const unsigned int id)
+// {
+// 	std::lock_guard<std::mutex> lk(muxFunc);
+// 	return m_memMapFuncs[id];
+// }
 
 
 } /* namespace GeoModelIO */

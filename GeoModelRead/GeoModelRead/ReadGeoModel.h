@@ -89,6 +89,12 @@ public:
 private:
 
   void buildAllShapes();
+  void buildAllElements();
+  void buildAllMaterials();
+  void buildAllLogVols();
+  void buildAllPhysVols();
+  void buildAllFullPhysVols();
+  // void buildAllFunctions();
 
   std::string getEnvVar( std::string const & key ) const;
 
@@ -124,8 +130,9 @@ private:
 	GeoTransform* buildTransform(QString id); // TODO: to be dropped when removing Qt
 	GeoSerialTransformer* parseSerialTransformer(QStringList values);
 	GeoSerialTransformer* buildSerialTransformer(QString id);
-	TRANSFUNCTION parseFunction(const std::string& expr);
-	TRANSFUNCTION buildFunction(QString id);
+	// TRANSFUNCTION parseFunction(const std::string& expr);
+	TRANSFUNCTION buildFunction(const unsigned int id);
+	// TRANSFUNCTION buildFunction(QString id);
 	GeoNameTag* parseNameTag(QStringList values);
 	GeoNameTag* buildNameTag(QString id);
 
@@ -167,6 +174,10 @@ private:
   bool isBuiltElement(const unsigned int id);
   void storeBuiltElement(const unsigned int id, GeoElement* nodePtr);
   GeoElement* getBuiltElement(const unsigned int id);
+
+  bool isBuiltFunc(const unsigned int id);
+  void storeBuiltFunc(const unsigned int id, TRANSFUNCTION nodePtr);
+  TRANSFUNCTION getBuiltFunc(const unsigned int id);
 
 
   // Utility functions
@@ -215,6 +226,7 @@ private:
 	std::unordered_map<unsigned int, GeoLogVol*> m_memMapLogs;
 	std::unordered_map<unsigned int, GeoMaterial*> m_memMapMats;
 	std::unordered_map<unsigned int, GeoElement*> m_memMapEls;
+	// std::unordered_map<unsigned int, TRANSFUNCTION> m_memMapFuncs;
 
 	std::set<std::string> m_unknown_shapes;
 

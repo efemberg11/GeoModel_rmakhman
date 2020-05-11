@@ -84,6 +84,9 @@
 // mutexes for synchronized access to containers and output streams in multi-threading mode
 std::mutex muxVPhysVol;
 std::mutex muxShape;
+std::mutex muxLog;
+std::mutex muxMat;
+std::mutex muxEl;
 std::mutex muxTransf;
 std::mutex muxCout;
 
@@ -563,7 +566,7 @@ GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(QString id, QString tableId, QString
     qDebug() << "\tget LogVol...";
     muxCout.unlock();
   }
-	GeoLogVol* logVol = buildLogVol(logVolId); // TODO: For PhysVols we first check if we created the vol in memory already; but I'm not sure about other nodes. Check it...
+	GeoLogVol* logVol = buildLogVol(logVolId.toUInt()); // TODO: For PhysVols we first check if we created the vol in memory already; but I'm not sure about other nodes. Check it...
 
 	// a pointer to the VPhysVol
 	GeoVPhysVol* vol = nullptr;
@@ -610,14 +613,19 @@ GeoPhysVol* ReadGeoModel::getRootVolume()
 }
 
 
-GeoMaterial* ReadGeoModel::buildMaterial(QString id)
+// GeoMaterial* ReadGeoModel::buildMaterial(QString id)
+GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id)
 {
+  if ( isBuiltMat(id) ){
+    return getBuiltMat(id);
+  }
+
 	if (m_deepDebug) {
     muxCout.lock();
     qDebug() << "ReadGeoModel::buildMaterial()";
     muxCout.unlock();
   }
-	QStringList values = m_materials[id.toUInt()];
+	QStringList values = m_materials[id];
 
 	if (m_deepDebug) {
     muxCout.lock();
@@ -654,18 +662,22 @@ GeoMaterial* ReadGeoModel::buildMaterial(QString id)
 			QStringList vars = par.split(":");
 			QString elId = vars[0];
 			double elFraction = vars[1].toDouble();
-
-			GeoElement* el = buildElement(elId);
-
+			GeoElement* el = buildElement(elId.toUInt());
 			mat->add(el, elFraction);
 		}
 		mat->lock();
 	}
+  storeBuiltMat(id, mat);
 	return mat;
 }
 
-GeoElement* ReadGeoModel::buildElement(QString id)
+// GeoElement* ReadGeoModel::buildElement(QString id)
+GeoElement* ReadGeoModel::buildElement(const unsigned int id)
 {
+  if( isBuiltElement(id) ) {
+    return getBuiltElement(id);
+  }
+
 	if (m_deepDebug) {
     muxCout.lock();
     qDebug() << "ReadGeoModel::buildElement()";
@@ -675,7 +687,7 @@ GeoElement* ReadGeoModel::buildElement(QString id)
 	if (m_elements.size() == 0)
 		qFatal("ERROR! 'm_elements' is empty! Did you load the 'Elements' table? \n\t ==> Aborting...");
 
-	QStringList values = m_elements[id.toUInt()];
+	QStringList values = m_elements[id];
 
 	QString elId = values[0];
 	QString elName = values[1];
@@ -694,7 +706,9 @@ GeoElement* ReadGeoModel::buildElement(QString id)
     muxCout.unlock();
   }
 
-	return new GeoElement(elName.toStdString(), elSymbol.toStdString(), elZ, elA);
+	GeoElement* elem = new GeoElement(elName.toStdString(), elSymbol.toStdString(), elZ, elA);
+  storeBuiltElement(id, elem);
+  return elem;
 }
 
 
@@ -2170,9 +2184,17 @@ GeoBox* ReadGeoModel::buildDummyShape() {
 }
 
 
-GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
+// TODO: to be removed when dropping Qt
+// GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
+// {
+//   return buildLogVol(logVolId.toUInt());
+// }
+GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int logVolId)
 {
 
+  if (isBuiltLog(logVolId)) {
+    return getBuiltLog(logVolId);
+  }
 
 	if (m_deepDebug) {
     muxCout.lock();
@@ -2181,7 +2203,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
   }
 
 	// get logVol properties from the DB
-	QStringList values = m_logVols[logVolId.toUInt()];
+	QStringList values = m_logVols[logVolId];
 	if (m_deepDebug) {
     muxCout.lock();
     qDebug() << "buildLogVol() - params:" << values;
@@ -2205,10 +2227,11 @@ GeoLogVol* ReadGeoModel::buildLogVol(QString logVolId)
     qDebug() << "buildLogVol() - material Id:" << matId;
     muxCout.unlock();
   }
-	GeoMaterial* mat = buildMaterial(matId);
+	GeoMaterial* mat = buildMaterial(matId.toUInt());
 
-	return new GeoLogVol(logVolName.toStdString(), shape, mat);
-
+	GeoLogVol* logPtr = new GeoLogVol(logVolName.toStdString(), shape, mat);
+  storeBuiltLog(logVolId, logPtr);
+	return logPtr;
 }
 
 
@@ -2544,9 +2567,60 @@ void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* nodePtr)
 }
 GeoShape* ReadGeoModel::getBuiltShape(const unsigned int id)
 {
-	std::lock_guard<std::mutex> lk(muxShape); // TODO: is this lock now needed at all??
+	std::lock_guard<std::mutex> lk(muxShape); // TODO: is this lock now needed at all?? now we only use those in a single thread or read-only
 	// std::cout << "ReadGeoModel::getBuiltShape(): " << id << std::endl;
 	return m_memMapShapes[id];
+}
+// --- methods for caching GeoLogVol nodes ---
+bool ReadGeoModel::isBuiltLog(const unsigned int id)
+{
+  std::lock_guard<std::mutex> lk(muxLog);
+  // std::cout << "ReadGeoModel::isBuiltLog(): " << id << std::endl;
+  return m_memMapLogs.count(id);
+}
+void ReadGeoModel::storeBuiltLog(const unsigned int id, GeoLogVol* nodePtr)
+{
+  std::lock_guard<std::mutex> lk(muxLog);
+  // std::cout << "ReadGeoModel::storeBuiltLog(): " << id << ", " << nodePtr << std::endl;
+  m_memMapLogs[id] = nodePtr;
+}
+GeoLogVol* ReadGeoModel::getBuiltLog(const unsigned int id)
+{
+	std::lock_guard<std::mutex> lk(muxLog); // TODO: is this lock now needed at all?? now we only use those in a single thread or read-only
+	// std::cout << "ReadGeoModel::getBuiltLog(): " << id << std::endl;
+	return m_memMapLogs[id];
+}
+// --- methods for caching GeoMaterial nodes ---
+bool ReadGeoModel::isBuiltMat(const unsigned int id)
+{
+  std::lock_guard<std::mutex> lk(muxMat);
+  return m_memMapMats.count(id);
+}
+void ReadGeoModel::storeBuiltMat(const unsigned int id, GeoMaterial* nodePtr)
+{
+  std::lock_guard<std::mutex> lk(muxMat);
+  m_memMapMats[id] = nodePtr;
+}
+GeoMaterial* ReadGeoModel::getBuiltMat(const unsigned int id)
+{
+	std::lock_guard<std::mutex> lk(muxMat); // TODO: is this lock now needed at all??  now we only use those in a single thread or read-only
+	return m_memMapMats[id];
+}
+// --- methods for caching GeoElement nodes ---
+bool ReadGeoModel::isBuiltElement(const unsigned int id)
+{
+  std::lock_guard<std::mutex> lk(muxEl); // TODO: is this lock now needed at all??  now we only use those in a single thread or read-only
+  return m_memMapEls.count(id);
+}
+void ReadGeoModel::storeBuiltElement(const unsigned int id, GeoElement* nodePtr)
+{
+  std::lock_guard<std::mutex> lk(muxEl); // TODO: is this lock now needed at all??  now we only use those in a single thread or read-only
+  m_memMapEls[id] = nodePtr;
+}
+GeoElement* ReadGeoModel::getBuiltElement(const unsigned int id)
+{
+  std::lock_guard<std::mutex> lk(muxEl); // TODO: is this lock now needed at all??  now we only use those in a single thread or read-only
+	return m_memMapEls[id];
 }
 // --- methods for caching GeoTransform nodes ---
 bool ReadGeoModel::isBuiltTransform(const unsigned int id)

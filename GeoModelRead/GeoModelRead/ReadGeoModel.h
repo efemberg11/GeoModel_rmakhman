@@ -110,10 +110,11 @@ private:
 	GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber);
 	GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN);
 
-	GeoLogVol* buildLogVol(QString id);
+	// GeoLogVol* buildLogVol(QString id);
+	GeoLogVol* buildLogVol(const unsigned int id);
 	GeoShape* buildShape(const unsigned int id, type_shapes_boolean_info* shapes_info_sub);
-	GeoMaterial* buildMaterial(QString id);
-	GeoElement* buildElement(QString id);
+	GeoMaterial* buildMaterial(const unsigned id);
+	GeoElement* buildElement(const unsigned int id);
 	GeoSerialDenominator* parseSerialDenominator(QStringList values);
 	GeoSerialDenominator* buildSerialDenominator(QString id);
 	GeoAlignableTransform* parseAlignableTransform(QStringList values);
@@ -154,6 +155,18 @@ private:
 	bool isNodeBuilt(const QString id, const QString tableId, const QString copyNumber);
   void storeVPhysVol(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
 	GeoGraphNode* getVPhysVol(const QString id, const QString tableId, const QString copyNumber);
+
+  bool isBuiltLog(const unsigned int id);
+  void storeBuiltLog(const unsigned int id, GeoLogVol* nodePtr);
+  GeoLogVol* getBuiltLog(const unsigned int id);
+
+  bool isBuiltMat(const unsigned int id);
+  void storeBuiltMat(const unsigned int id, GeoMaterial* nodePtr);
+  GeoMaterial* getBuiltMat(const unsigned int id);
+
+  bool isBuiltElement(const unsigned int id);
+  void storeBuiltElement(const unsigned int id, GeoElement* nodePtr);
+  GeoElement* getBuiltElement(const unsigned int id);
 
 
   // Utility functions
@@ -199,6 +212,9 @@ private:
 	QHash<QString, GeoGraphNode*> m_memMap;
 	std::unordered_map<unsigned int, GeoShape*> m_memMapShapes;
 	std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
+	std::unordered_map<unsigned int, GeoLogVol*> m_memMapLogs;
+	std::unordered_map<unsigned int, GeoMaterial*> m_memMapMats;
+	std::unordered_map<unsigned int, GeoElement*> m_memMapEls;
 
 	std::set<std::string> m_unknown_shapes;
 

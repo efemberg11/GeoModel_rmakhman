@@ -6,8 +6,8 @@ The package contains an implementation of the generic material manager for GeoMo
 
 Make sure you have built and installed the following packages:
 
-- GeoModelCore (from GeoModelDev)
-- GeoModelTools (from GeoModelDev)
+- [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore) (from [GeoModelDev](https://gitlab.cern.ch/GeoModelDev))
+- [GeoModelTools](https://gitlab.cern.ch/GeoModelDev/GeoModelTools) (from [GeoModelDev](https://gitlab.cern.ch/GeoModelDev))
 
 After that proceed with building the package and installing it into ${INSTALL_DIR} as follows:
 

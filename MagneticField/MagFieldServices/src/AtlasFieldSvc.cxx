@@ -7,6 +7,7 @@
 ///////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <fstream>
 
 // ISF_Services include
 #include "MagFieldServices/AtlasFieldSvc.h"
@@ -39,6 +40,8 @@
 MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name/*,ISvcLocator* svc*/) :
     //base_class(name,svc),
     //base_class(name),
+    //m_fullMapAscii ("bmagatlas_10_full45Sym20400.data"),
+    m_fullMapAscii ("bmagatlas_09_fullAsym20400.data"),
     m_fullMapFilename("full_bfieldmap_7730_20400_14m.root"),
     m_soleMapFilename("solenoid_bfieldmap_7730_0_14m.root"),
     m_toroMapFilename("toroid_bfieldmap_0_20400_14m.root"),
@@ -383,6 +386,7 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
     //ALL the Magnets are ON
     if ( solenoidOn() && toroidOn() ) {
         mapFile = m_fullMapFilename;
+        //mapFile  = m_fullMapAscii;
     } else if ( solenoidOn() ) {
         mapFile = m_soleMapFilename;
     } else if ( toroidOn() ) {
@@ -398,10 +402,29 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
         std::cout<<"Field map file " << mapFile << " not found" <<std::endl;
         return false;
     }
-    // read the map file
-    if ( !readMap( resolvedMapFile.c_str() ) ) {
-        std::cout<<"Something went wrong while trying to read the field map " << resolvedMapFile <<std::endl;
-        return false;
+
+    if ( strstr(mapFile.c_str(), ".root") != 0 )
+    {
+        // read the map file
+        if ( !readMap( resolvedMapFile.c_str() ) )
+        {
+            return false;
+        }
+        
+    }else if ( strstr(mapFile.c_str(), ".data") != 0 )
+    {
+        std::filebuf fb;
+        if (fb.open (mapFile,std::ios::in))
+        {
+            std::istream is(&fb);
+            readMap(is);
+            fb.close();
+        }
+        else
+        {
+            std::cout<<"Magnetic field file cannot be opened!"<<std::endl;
+            exit (-1);
+        }
     }
     std::cout<< "Initialized the field map from " << resolvedMapFile << std::endl;
     // scale magnet current as needed
@@ -460,6 +483,7 @@ bool MagField::AtlasFieldSvc::finalize()
 /* void MagField::AtlasFieldSvc::getFieldStandard(const double *xyz, double *bxyz, double *deriv) */
 void MagField::AtlasFieldSvc::getField(const double *xyz, double *bxyz, double *deriv) const
 {
+
   const double &x(xyz[0]);
   const double &y(xyz[1]);
   const double &z(xyz[2]);
@@ -473,19 +497,15 @@ void MagField::AtlasFieldSvc::getField(const double *xyz, double *bxyz, double *
   // test if the TLS was initialized and the cache is valid
   if ( !tls.isInitialized || !cache.inside(z, r, phi) ) {
     // cache is invalid -> refresh cache
-    //std::cout<<"Cache is valid, refresh cache"<<std::endl;
     if (!fillFieldCache(z, r, phi, tls)) {
-      std::cout<<"Caching failed!!! -> outside the valid map volume"<<std::endl;
       // caching failed -> outside the valid map volume
       // return default field (0.1 gauss)
       const double defaultB(0.1*CLHEP::gauss);
       bxyz[0] = bxyz[1] = bxyz[2] = defaultB;
-      std::cout<<"Return default field: "<<bxyz[0]<<" "<<  bxyz[1] <<" "<< bxyz[2]<<std::endl;
       // return zero gradient if requested
       if ( deriv ) {
           for ( int i = 0; i < 9; i++ ) {
             deriv[i] = 0.;
-            std::cout<<"Returning zero gradient"<<std::endl;
           }
       }
       return;
@@ -535,6 +555,7 @@ void MagField::AtlasFieldSvc::getField(const double *xyz, double *bxyz, double *
 
 void MagField::AtlasFieldSvc::getFieldZR(const double *xyz, double *bxyz, double *deriv) const
 {
+
   const double &x(xyz[0]);
   const double &y(xyz[1]);
   const double &z(xyz[2]);
@@ -591,11 +612,13 @@ void MagField::AtlasFieldSvc::clearMap(AtlasFieldSvcTLS &tls)
 //
 bool MagField::AtlasFieldSvc::readMap( const char* filename )
 {
+    std::cout<<"root: "<<filename<<std::endl;
     if ( strstr(filename, ".root") == 0 ) {
         std::cout<<"input file name '" << filename << "' does not end with .root"<< std::endl;
         //ATH_MSG_ERROR("input file name '" << filename << "' does not end with .root");
         return false;
     }
+
     TFile* rootfile = new TFile(filename, "OLD");
     if ( ! rootfile ) {
         std::cout<<"failed to open " << filename<< std::endl;
@@ -620,6 +643,7 @@ bool MagField::AtlasFieldSvc::readMap( const char* filename )
 //
 bool MagField::AtlasFieldSvc::readMap( std::istream& input )
 {
+    std::cout<<"Reading the map"<<std::endl;
     const std::string myname("readMap()");
     // first line contains version, date, time
     std::string word;
@@ -674,6 +698,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     std::vector<int> jcoil(nzone), ncoil(nzone);
     std::vector<int> jfield(nzone), nfield(nzone);
     std::vector<int> jaux(nzone), naux(nzone);
+    
 
     for ( int i = 0; i < nzone; i++ )
     {
@@ -1175,6 +1200,7 @@ bool MagField::AtlasFieldSvc::translateMap (std::string inFile,
 //
 bool MagField::AtlasFieldSvc::readMap( TFile* rootfile )
 {
+    
     if ( rootfile == 0 ) {
       // no file
       //ATH_MSG_ERROR("readMap(): unable to read field map, no TFile given");

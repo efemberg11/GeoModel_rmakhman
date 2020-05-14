@@ -70,9 +70,15 @@ namespace MagField {
       virtual void getField(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
       virtual void getFieldZR(const double *xyz, double *bxyz, double *deriv = nullptr) const override final;
         
+      double GetUseSolenoidCurrent(){return m_useSoleCurrent;}
+      void   SetUseSolenoidCurrent(double current){m_useSoleCurrent = current;}
+      double GetUseToroidCurrent(){return m_useToroCurrent;}
+      void   SetUseToroidCurrent(double current){m_useToroCurrent = current;}
+        
     private:
       /** Retrieve, initialize and return a thread-local storage object */
       inline struct AtlasFieldSvcTLS &getAtlasFieldSvcTLS() const;
+        
 
       /* // Methods called to get field
          // pointer to actual function
@@ -127,8 +133,8 @@ namespace MagField {
       int memSize() const;
 
       /** Data Members **/
-
-      // field map names
+      std::string m_fullMapAscii;   // all magnets on
+      // field map names root
       std::string m_fullMapFilename; // all magnets on
       std::string m_soleMapFilename; // solenoid on / toroid off
       std::string m_toroMapFilename; // toroid on / solenoid off
@@ -265,7 +271,6 @@ MagField::AtlasFieldSvc::fillFieldCacheZR(double z, double r, AtlasFieldSvcTLS &
     // outside solenoid
     return false;
   }
-
   return true;
 }
 

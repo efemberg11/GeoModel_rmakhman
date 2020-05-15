@@ -31,7 +31,7 @@
 // forward declarations
 //class CondAttrListCollection;
 class BFieldZone;
-class TFile;
+//class TFile;
 //class Incident;
 
 namespace MagField {
@@ -57,7 +57,9 @@ namespace MagField {
 
       /** Read **/
       virtual void handle();
-      void writeMap( std::string filename ) const;
+        
+      /** writeMap, can be enabled when fROOT dependency is on **/
+      //void writeMap( std::string filename ) const;
 
       /** Call back for possible magnet current update **/
       //StatusCode updateCurrent(IOVSVC_CALLBACK_ARGS);
@@ -108,8 +110,9 @@ namespace MagField {
       // read the field map from an ASCII or ROOT file
       bool readMap( const char* filename );
       bool readMap( std::istream& input );
-      bool readMap( TFile* rootfile );
-      // write the field map to a ROOT file
+      /** readMap, can be enabled when fROOT dependency is on **/
+      //bool readMap( TFile* rootfile );
+      /** read the field map from a ROOT file, no fROOT dependency needed**/
       bool readMapRoot (std::string filename);
       
       // translate the map from root file into ascii file and write it out

@@ -36,6 +36,8 @@
 #include "TFile.h"
 #include "TTree.h"
 
+#include "g4root.hh"
+
 /** Constructor **/
 MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name , bool isAscii) :
     //base_class(name,svc),
@@ -43,9 +45,9 @@ MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name , bool isAscii) :
     //m_fullMapAscii ("bmagatlas_10_full45Sym20400.data"),
     m_fullMapAscii ("bmagatlas_09_fullAsym20400.data"),
     m_isAscii (isAscii),
-    m_fullMapFilename("full_bfieldmap_7730_20400_14m.root"),
-    m_soleMapFilename("solenoid_bfieldmap_7730_0_14m.root"),
-    m_toroMapFilename("toroid_bfieldmap_0_20400_14m.root"),
+    m_fullMapFilename("full_bfieldmap_7730_20400_14m_version5.root"),
+    m_soleMapFilename("solenoid_bfieldmap_7730_0_14m_version5.root"),
+    m_toroMapFilename("toroid_bfieldmap_0_20400_14m_version5.root"),
     m_mapSoleCurrent(7730.),
     m_mapToroCurrent(20400.),
     m_soleMinCurrent(1.0),
@@ -402,8 +404,9 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
 
     if ( strstr(mapFile.c_str(), ".root") != 0 )
     {
-        // read the map file
-        if ( !readMap( resolvedMapFile.c_str() ) )
+        // read the ROOT map file
+        //if ( !readMap( resolvedMapFile.c_str() ) )
+        if ( !readMapRoot( resolvedMapFile ) )
         {
             std::cout<<"\nERROR! Magnetic field map cannot be read!"<<std::endl;
             exit (-1);
@@ -498,9 +501,11 @@ void MagField::AtlasFieldSvc::getField(const double *xyz, double *bxyz, double *
   if ( !tls.isInitialized || !cache.inside(z, r, phi) ) {
     // cache is invalid -> refresh cache
     if (!fillFieldCache(z, r, phi, tls)) {
+
       // caching failed -> outside the valid map volume
       // return default field (0.1 gauss)
       const double defaultB(0.1*CLHEP::gauss);
+      //std::cout<<"Cache failed, return default field !"<<std::sqrt(3*defaultB*defaultB)/CLHEP::tesla<<std::endl;
       bxyz[0] = bxyz[1] = bxyz[2] = defaultB;
       // return zero gradient if requested
       if ( deriv ) {
@@ -612,6 +617,13 @@ void MagField::AtlasFieldSvc::clearMap(AtlasFieldSvcTLS &tls)
 //
 bool MagField::AtlasFieldSvc::readMap( const char* filename )
 {
+//    if ( strstr(filename, ".root") != 0 ) {
+//        std::cout<<"Sorry, ROOT map is not supported at the moment!"<<std::endl;
+//        return false;
+//    }
+//    std::cout<<"This should not be calledwriteMap!"<<std::endl;
+//    return false;
+    
     std::cout<<"root: "<<filename<<std::endl;
     if ( strstr(filename, ".root") == 0 ) {
         std::cout<<"input file name '" << filename << "' does not end with .root"<< std::endl;
@@ -891,213 +903,47 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
 //
 // wrire the map to a ROOT file
 //
-void MagField::AtlasFieldSvc::writeMap( TFile* rootfile ) const
+void MagField::AtlasFieldSvc::writeMap( std::string filename ) const
 {
-//    if ( rootfile == 0 ) return; // no file
-//    if ( rootfile->cd() == false ) return; // could not make it current directory
-//    // define the tree
-//    TTree* tree = new TTree( "BFieldMap", "BFieldMap version 5" );
-//    TTree* tmax = new TTree( "BFieldMapSize", "Buffer size information" );
-//    int id;
-//    double zmin, zmax, rmin, rmax, phimin, phimax;
-//    double bscale;
-//    int ncond;
-//    bool *finite;
-//    double *p1x, *p1y, *p1z, *p2x, *p2y, *p2z;
-//    double *curr;
-//    int nmeshz, nmeshr, nmeshphi;
-//    double *meshz, *meshr, *meshphi;
-//    int nfield;
-//    short *fieldz, *fieldr, *fieldphi;
-//
-//    // prepare arrays - need to know the maximum sizes
-//    unsigned maxcond(0), maxmeshz(0), maxmeshr(0), maxmeshphi(0), maxfield(0);
-//    for ( unsigned i = 0; i < m_zone.size(); i++ ) {
-//        maxcond = std::max( maxcond, m_zone[i].ncond() );
-//        maxmeshz = std::max( maxmeshz, m_zone[i].nmesh(0) );
-//        maxmeshr = std::max( maxmeshr, m_zone[i].nmesh(1) );
-//        maxmeshphi = std::max( maxmeshphi, m_zone[i].nmesh(2) );
-//        maxfield = std::max( maxfield, m_zone[i].nfield() );
-//    }
-//    // store the maximum sizes
-//    tmax->Branch( "maxcond", &maxcond, "maxcond/i");
-//    tmax->Branch( "maxmeshz", &maxmeshz, "maxmeshz/i");
-//    tmax->Branch( "maxmeshr", &maxmeshr, "maxmeshr/i");
-//    tmax->Branch( "maxmeshphi", &maxmeshphi, "maxmeshphi/i");
-//    tmax->Branch( "maxfield", &maxfield, "maxfield/i");
-//    tmax->Fill();
-//    // prepare buffers
-//    finite = new bool[maxcond];
-//    p1x = new double[maxcond];
-//    p1y = new double[maxcond];
-//    p1z = new double[maxcond];
-//    p2x = new double[maxcond];
-//    p2y = new double[maxcond];
-//    p2z = new double[maxcond];
-//    curr = new double[maxcond];
-//    meshz = new double[maxmeshz];
-//    meshr = new double[maxmeshr];
-//    meshphi = new double[maxmeshphi];
-//    fieldz = new short[maxfield];
-//    fieldr = new short[maxfield];
-//    fieldphi = new short[maxfield];
-//    // define the tree branches
-//    tree->Branch( "id", &id, "id/I" );
-//    tree->Branch( "zmin", &zmin, "zmin/D" );
-//    tree->Branch( "zmax", &zmax, "zmax/D" );
-//    tree->Branch( "rmin", &rmin, "rmin/D" );
-//    tree->Branch( "rmax", &rmax, "rmax/D" );
-//    tree->Branch( "phimin", &phimin, "phimin/D" );
-//    tree->Branch( "phimax", &phimax, "phimax/D" );
-//    tree->Branch( "bscale", &bscale, "bscale/D" );
-//    tree->Branch( "ncond", &ncond, "ncond/I" );
-//    tree->Branch( "finite", finite, "finite[ncond]/O" );
-//    tree->Branch( "p1x", p1x, "p1x[ncond]/D" );
-//    tree->Branch( "p1y", p1y, "p1y[ncond]/D" );
-//    tree->Branch( "p1z", p1z, "p1z[ncond]/D" );
-//    tree->Branch( "p2x", p2x, "p2x[ncond]/D" );
-//    tree->Branch( "p2y", p2y, "p2y[ncond]/D" );
-//    tree->Branch( "p2z", p2z, "p2z[ncond]/D" );
-//    tree->Branch( "curr", curr, "curr[ncond]/D" );
-//    tree->Branch( "nmeshz", &nmeshz, "nmeshz/I" );
-//    tree->Branch( "meshz", meshz, "meshz[nmeshz]/D" );
-//    tree->Branch( "nmeshr", &nmeshr, "nmeshr/I" );
-//    tree->Branch( "meshr", meshr, "meshr[nmeshr]/D" );
-//    tree->Branch( "nmeshphi", &nmeshphi, "nmeshphi/I" );
-//    tree->Branch( "meshphi", meshphi, "meshphi[nmeshphi]/D" );
-//    tree->Branch( "nfield", &nfield, "nfield/I" );
-//    tree->Branch( "fieldz", fieldz, "fieldz[nfield]/S" );
-//    tree->Branch( "fieldr", fieldr, "fieldr[nfield]/S" );
-//    tree->Branch( "fieldphi", fieldphi, "fieldphi[nfield]/S" );
-//    // loop over zones to write
-//    for ( unsigned i = 0; i < m_zone.size(); i++ ) {
-//        const BFieldZone z = m_zone[i];
-//        id = z.id();
-//        zmin = z.zmin(); zmax = z.zmax();
-//        rmin = z.rmin(); rmax = z.rmax();
-//        phimin = z.phimin(); phimax = z.phimax();
-//        bscale = z.bscale();
-//        ncond = z.ncond();
-//        for ( int j = 0; j < ncond; j++ ) {
-//            const BFieldCond c = z.cond(j);
-//            finite[j] = c.finite();
-//            p1x[j] = c.p1(0);
-//            p1y[j] = c.p1(1);
-//            p1z[j] = c.p1(2);
-//            p2x[j] = c.p2(0);
-//            p2y[j] = c.p2(1);
-//            p2z[j] = c.p2(2);
-//            curr[j] = c.curr();
-//        }
-//        nmeshz = z.nmesh(0);
-//        for ( int j = 0; j < nmeshz; j++ ) {
-//            meshz[j] = z.mesh(0,j);
-//        }
-//        nmeshr = z.nmesh(1);
-//        for ( int j = 0; j < nmeshr; j++ ) {
-//            meshr[j] = z.mesh(1,j);
-//        }
-//        nmeshphi = z.nmesh(2);
-//        for ( int j = 0; j < nmeshphi; j++ ) {
-//            meshphi[j] = z.mesh(2,j);
-//        }
-//        nfield = z.nfield();
-//        for ( int j = 0; j < nfield; j++ ) {
-//            const BFieldVector<short> f = z.field(j);
-//            fieldz[j] = f.z();
-//            fieldr[j] = f.r();
-//            fieldphi[j] = f.phi();
-//        }
-//        tree->Fill();
-//    }
-//    rootfile->Write();
-//    // clean up
-//    delete[] finite;
-//    delete[] p1x;
-//    delete[] p1y;
-//    delete[] p1z;
-//    delete[] p2x;
-//    delete[] p2y;
-//    delete[] p2z;
-//    delete[] curr;
-//    delete[] meshz;
-//    delete[] meshr;
-//    delete[] meshphi;
-//    delete[] fieldz;
-//    delete[] fieldr;
-//    delete[] fieldphi;
-}
-
-
-bool MagField::AtlasFieldSvc::translateMap (std::string inFile,
-                                            std::string outFile,
-                                            std::string outTreeName,
-                                            bool        rz,
-                                            double      bScalor,
-                                            double      lScalor) const{
     
-    std::cout << "Registering new ASCII FieldMap File : " << outFile << std::endl;
-    TFile* rootFile = TFile::Open(inFile.c_str(), "RECREATE");
-    if (!rootFile) std::cout << "Could not open '" << inFile << std::endl;
-
-    if ( rootFile->cd() == false ) {
-        std::cout<<"Error, input file is not correct!!! "<<std::endl;
-        return false;
-    }
-    // open the tree
-    TTree* tree = (TTree*)rootFile->Get("BFieldMap");
-    if ( tree == 0 ) {
-        // no tree
-        std::cout<<"Error translateMap(): TTree 'BFieldMap' does not exist in ROOT field map"<<std::endl;
-        return false;
-    }
+    TFile* rootfile = new TFile(filename.c_str(), "RECREATE");
+    //if ( rootfile == 0 ) return; // no file
+    //if ( rootfile->cd() == false ) return; // could not make it current directory
+    // define the tree
+    TTree* tree = new TTree( "BFieldMap", "BFieldMap version 5" );
+    TTree* tmax = new TTree( "BFieldMapSize", "Buffer size information" );
     int id;
     double zmin, zmax, rmin, rmax, phimin, phimax;
     double bscale;
     int ncond;
-    bool *finite;
+    //bool *finite;
+    int *finite;
     double *p1x, *p1y, *p1z, *p2x, *p2y, *p2z;
     double *curr;
     int nmeshz, nmeshr, nmeshphi;
     double *meshz, *meshr, *meshphi;
     int nfield;
-    short *fieldz, *fieldr, *fieldphi;
-    // define the fixed-sized branches first
-    tree->SetBranchAddress( "id", &id );
-    tree->SetBranchAddress( "zmin", &zmin );
-    tree->SetBranchAddress( "zmax", &zmax );
-    tree->SetBranchAddress( "rmin", &rmin );
-    tree->SetBranchAddress( "rmax", &rmax );
-    tree->SetBranchAddress( "phimin", &phimin );
-    tree->SetBranchAddress( "phimax", &phimax );
-    tree->SetBranchAddress( "bscale", &bscale );
-    tree->SetBranchAddress( "ncond", &ncond );
-    tree->SetBranchAddress( "nmeshz", &nmeshz );
-    tree->SetBranchAddress( "nmeshr", &nmeshr );
-    tree->SetBranchAddress( "nmeshphi", &nmeshphi );
-    tree->SetBranchAddress( "nfield", &nfield );
+    double *fieldz, *fieldr, *fieldphi;
+
     // prepare arrays - need to know the maximum sizes
-    // open the tree of buffer sizes (may not exist in old maps)
     unsigned maxcond(0), maxmeshz(0), maxmeshr(0), maxmeshphi(0), maxfield(0);
-    TTree* tmax = (TTree*)rootFile->Get("BFieldMapSize");
-    if ( tmax != 0 ) {
-        tmax->SetBranchAddress( "maxcond", &maxcond );
-        tmax->SetBranchAddress( "maxmeshz", &maxmeshz );
-        tmax->SetBranchAddress( "maxmeshr", &maxmeshr );
-        tmax->SetBranchAddress( "maxmeshphi", &maxmeshphi );
-        tmax->SetBranchAddress( "maxfield", &maxfield );
-        tmax->GetEntry(0);
-    } else { // "BFieldMapSize" tree does not exist
-        for ( int i = 0; i < tree->GetEntries(); i++ ) {
-            tree->GetEntry(i);
-            maxcond = std::max( maxcond, (unsigned)ncond );
-            maxmeshz = std::max( maxmeshz, (unsigned)nmeshz );
-            maxmeshr = std::max( maxmeshr, (unsigned)nmeshr );
-            maxmeshphi = std::max( maxmeshphi, (unsigned)nmeshphi );
-            maxfield = std::max( maxfield, (unsigned)nfield );
-        }
+    for ( unsigned i = 0; i < m_zone.size(); i++ ) {
+        maxcond = std::max( maxcond, m_zone[i].ncond() );
+        maxmeshz = std::max( maxmeshz, m_zone[i].nmesh(0) );
+        maxmeshr = std::max( maxmeshr, m_zone[i].nmesh(1) );
+        maxmeshphi = std::max( maxmeshphi, m_zone[i].nmesh(2) );
+        maxfield = std::max( maxfield, m_zone[i].nfield() );
     }
-    finite = new bool[maxcond];
+    // store the maximum sizes
+    tmax->Branch( "maxcond", &maxcond, "maxcond/i");
+    tmax->Branch( "maxmeshz", &maxmeshz, "maxmeshz/i");
+    tmax->Branch( "maxmeshr", &maxmeshr, "maxmeshr/i");
+    tmax->Branch( "maxmeshphi", &maxmeshphi, "maxmeshphi/i");
+    tmax->Branch( "maxfield", &maxfield, "maxfield/i");
+    tmax->Fill();
+    // prepare buffers
+    //finite = new bool[maxcond];
+    finite = new int[maxcond];
     p1x = new double[maxcond];
     p1y = new double[maxcond];
     p1z = new double[maxcond];
@@ -1108,61 +954,80 @@ bool MagField::AtlasFieldSvc::translateMap (std::string inFile,
     meshz = new double[maxmeshz];
     meshr = new double[maxmeshr];
     meshphi = new double[maxmeshphi];
-    fieldz = new short[maxfield];
-    fieldr = new short[maxfield];
-    fieldphi = new short[maxfield];
-    // define the variable length branches
-    tree->SetBranchAddress( "finite", finite );
-    tree->SetBranchAddress( "p1x", p1x );
-    tree->SetBranchAddress( "p1y", p1y );
-    tree->SetBranchAddress( "p1z", p1z );
-    tree->SetBranchAddress( "p2x", p2x );
-    tree->SetBranchAddress( "p2y", p2y );
-    tree->SetBranchAddress( "p2z", p2z );
-    tree->SetBranchAddress( "curr", curr );
-    tree->SetBranchAddress( "meshz", meshz );
-    tree->SetBranchAddress( "meshr", meshr );
-    tree->SetBranchAddress( "meshphi", meshphi );
-    tree->SetBranchAddress( "fieldz", fieldz );
-    tree->SetBranchAddress( "fieldr", fieldr );
-    tree->SetBranchAddress( "fieldphi", fieldphi );
-
-    // reserve the space for m_zone so that it won't move as the vector grows
-//    m_zone.reserve( tree->GetEntries() );
-    // read all tree and store
-//    for ( int i = 0; i < tree->GetEntries(); i++ )
-//    {
-//        tree->GetEntry(i);
-//        BFieldZone z( id, zmin, zmax, rmin, rmax, phimin, phimax, bscale );
-//        m_zone.push_back(z);
-//        m_zone.back().reserve( nmeshz, nmeshr, nmeshphi );
-//        for ( int j = 0; j < ncond; j++ ) {
-//            double p1[3], p2[3];
-//            p1[0] = p1x[j];
-//            p1[1] = p1y[j];
-//            p1[2] = p1z[j];
-//            p2[0] = p2x[j];
-//            p2[1] = p2y[j];
-//            p2[2] = p2z[j];
-//            BFieldCond cond( finite[j], p1, p2, curr[j] );
-//            m_zone.back().appendCond(cond);
-//        }
-//        for ( int j = 0; j < nmeshz; j++ ) {
-//            m_zone.back().appendMesh( 0, meshz[j] );
-//        }
-//        for ( int j = 0; j < nmeshr; j++ ) {
-//            m_zone.back().appendMesh( 1, meshr[j] );
-//        }
-//        for ( int j = 0; j < nmeshphi; j++ ) {
-//            m_zone.back().appendMesh( 2, meshphi[j] );
-//        }
-//        for ( int j = 0; j < nfield; j++ ) {
-//            BFieldVector<short> field( fieldz[j], fieldr[j], fieldphi[j] );
-//            m_zone.back().appendField( field );
-//        }
-//    }
+    fieldz = new double[maxfield];
+    fieldr = new double[maxfield];
+    fieldphi = new double[maxfield];
+    // define the tree branches
+    tree->Branch( "id", &id, "id/I" );
+    tree->Branch( "zmin", &zmin, "zmin/D" );
+    tree->Branch( "zmax", &zmax, "zmax/D" );
+    tree->Branch( "rmin", &rmin, "rmin/D" );
+    tree->Branch( "rmax", &rmax, "rmax/D" );
+    tree->Branch( "phimin", &phimin, "phimin/D" );
+    tree->Branch( "phimax", &phimax, "phimax/D" );
+    tree->Branch( "bscale", &bscale, "bscale/D" );
+    tree->Branch( "ncond", &ncond, "ncond/I" );
+    tree->Branch( "finite", finite, "finite[ncond]/I" );
+    tree->Branch( "p1x", p1x, "p1x[ncond]/D" );
+    tree->Branch( "p1y", p1y, "p1y[ncond]/D" );
+    tree->Branch( "p1z", p1z, "p1z[ncond]/D" );
+    tree->Branch( "p2x", p2x, "p2x[ncond]/D" );
+    tree->Branch( "p2y", p2y, "p2y[ncond]/D" );
+    tree->Branch( "p2z", p2z, "p2z[ncond]/D" );
+    tree->Branch( "curr", curr, "curr[ncond]/D" );
+    tree->Branch( "nmeshz", &nmeshz, "nmeshz/I" );
+    tree->Branch( "meshz", meshz, "meshz[nmeshz]/D" );
+    tree->Branch( "nmeshr", &nmeshr, "nmeshr/I" );
+    tree->Branch( "meshr", meshr, "meshr[nmeshr]/D" );
+    tree->Branch( "nmeshphi", &nmeshphi, "nmeshphi/I" );
+    tree->Branch( "meshphi", meshphi, "meshphi[nmeshphi]/D" );
+    tree->Branch( "nfield", &nfield, "nfield/I" );
+    tree->Branch( "fieldz", fieldz, "fieldz[nfield]/D" );
+    tree->Branch( "fieldr", fieldr, "fieldr[nfield]/D" );
+    tree->Branch( "fieldphi", fieldphi, "fieldphi[nfield]/D" );
+    // loop over zones to write
+    for ( unsigned i = 0; i < m_zone.size(); i++ ) {
+        const BFieldZone z = m_zone[i];
+        id = z.id();
+        zmin = z.zmin(); zmax = z.zmax();
+        rmin = z.rmin(); rmax = z.rmax();
+        phimin = z.phimin(); phimax = z.phimax();
+        bscale = z.bscale();
+        ncond = z.ncond();
+        for ( int j = 0; j < ncond; j++ ) {
+            const BFieldCond c = z.cond(j);
+            finite[j] = c.finite();
+            p1x[j] = c.p1(0);
+            p1y[j] = c.p1(1);
+            p1z[j] = c.p1(2);
+            p2x[j] = c.p2(0);
+            p2y[j] = c.p2(1);
+            p2z[j] = c.p2(2);
+            curr[j] = c.curr();
+        }
+        nmeshz = z.nmesh(0);
+        for ( int j = 0; j < nmeshz; j++ ) {
+            meshz[j] = z.mesh(0,j);
+        }
+        nmeshr = z.nmesh(1);
+        for ( int j = 0; j < nmeshr; j++ ) {
+            meshr[j] = z.mesh(1,j);
+        }
+        nmeshphi = z.nmesh(2);
+        for ( int j = 0; j < nmeshphi; j++ ) {
+            meshphi[j] = z.mesh(2,j);
+        }
+        nfield = z.nfield();
+        for ( int j = 0; j < nfield; j++ ) {
+            const BFieldVector<short> f = z.field(j);
+            fieldz[j] = f.z();
+            fieldr[j] = f.r();
+            fieldphi[j] = f.phi();
+        }
+        tree->Fill();
+    }
+    rootfile->Write();
     // clean up
-    tree->Delete();
     delete[] finite;
     delete[] p1x;
     delete[] p1y;
@@ -1177,22 +1042,313 @@ bool MagField::AtlasFieldSvc::translateMap (std::string inFile,
     delete[] fieldz;
     delete[] fieldr;
     delete[] fieldphi;
-
-    
-//    if (rz) {
-//
-//            /// [1] Read in field map file
-//            std::cout << "Opening new txt/csv input File : " << outFile << std::endl;
-//            std::ifstream map_file(inFile.c_str(), std::ios::in);
-//            // [1] Read in file and fill values
-//            std::string line;
-//            double      rpos = 0., zpos = 0.;
-//            double      br = 0., bz = 0.;
-//
-    
-
 }
 
+
+//bool MagField::AtlasFieldSvc::translateMap (std::string inFile,
+//                                            std::string outFile,
+//                                            std::string outTreeName,
+//                                            bool        rz,
+//                                            double      bScalor,
+//                                            double      lScalor) const{
+//
+//    std::cout << "Registering new ASCII FieldMap File : " << outFile << std::endl;
+//    TFile* rootFile = TFile::Open(inFile.c_str(), "RECREATE");
+//    if (!rootFile) std::cout << "Could not open '" << inFile << std::endl;
+//
+//    if ( rootFile->cd() == false ) {
+//        std::cout<<"Error, input file is not correct!!! "<<std::endl;
+//        return false;
+//    }
+//    // open the tree
+//    TTree* tree = (TTree*)rootFile->Get("BFieldMap");
+//    if ( tree == 0 ) {
+//        // no tree
+//        std::cout<<"Error translateMap(): TTree 'BFieldMap' does not exist in ROOT field map"<<std::endl;
+//        return false;
+//    }
+//    int id;
+//    double zmin, zmax, rmin, rmax, phimin, phimax;
+//    double bscale;
+//    int ncond;
+//    bool *finite;
+//    double *p1x, *p1y, *p1z, *p2x, *p2y, *p2z;
+//    double *curr;
+//    int nmeshz, nmeshr, nmeshphi;
+//    double *meshz, *meshr, *meshphi;
+//    int nfield;
+//    short *fieldz, *fieldr, *fieldphi;
+//    // define the fixed-sized branches first
+//    tree->SetBranchAddress( "id", &id );
+//    tree->SetBranchAddress( "zmin", &zmin );
+//    tree->SetBranchAddress( "zmax", &zmax );
+//    tree->SetBranchAddress( "rmin", &rmin );
+//    tree->SetBranchAddress( "rmax", &rmax );
+//    tree->SetBranchAddress( "phimin", &phimin );
+//    tree->SetBranchAddress( "phimax", &phimax );
+//    tree->SetBranchAddress( "bscale", &bscale );
+//    tree->SetBranchAddress( "ncond", &ncond );
+//    tree->SetBranchAddress( "nmeshz", &nmeshz );
+//    tree->SetBranchAddress( "nmeshr", &nmeshr );
+//    tree->SetBranchAddress( "nmeshphi", &nmeshphi );
+//    tree->SetBranchAddress( "nfield", &nfield );
+//    // prepare arrays - need to know the maximum sizes
+//    // open the tree of buffer sizes (may not exist in old maps)
+//    unsigned maxcond(0), maxmeshz(0), maxmeshr(0), maxmeshphi(0), maxfield(0);
+//    TTree* tmax = (TTree*)rootFile->Get("BFieldMapSize");
+//    if ( tmax != 0 ) {
+//        tmax->SetBranchAddress( "maxcond", &maxcond );
+//        tmax->SetBranchAddress( "maxmeshz", &maxmeshz );
+//        tmax->SetBranchAddress( "maxmeshr", &maxmeshr );
+//        tmax->SetBranchAddress( "maxmeshphi", &maxmeshphi );
+//        tmax->SetBranchAddress( "maxfield", &maxfield );
+//        tmax->GetEntry(0);
+//    } else { // "BFieldMapSize" tree does not exist
+//        for ( int i = 0; i < tree->GetEntries(); i++ ) {
+//            tree->GetEntry(i);
+//            maxcond = std::max( maxcond, (unsigned)ncond );
+//            maxmeshz = std::max( maxmeshz, (unsigned)nmeshz );
+//            maxmeshr = std::max( maxmeshr, (unsigned)nmeshr );
+//            maxmeshphi = std::max( maxmeshphi, (unsigned)nmeshphi );
+//            maxfield = std::max( maxfield, (unsigned)nfield );
+//        }
+//    }
+//    finite = new bool[maxcond];
+//    p1x = new double[maxcond];
+//    p1y = new double[maxcond];
+//    p1z = new double[maxcond];
+//    p2x = new double[maxcond];
+//    p2y = new double[maxcond];
+//    p2z = new double[maxcond];
+//    curr = new double[maxcond];
+//    meshz = new double[maxmeshz];
+//    meshr = new double[maxmeshr];
+//    meshphi = new double[maxmeshphi];
+//    fieldz = new short[maxfield];
+//    fieldr = new short[maxfield];
+//    fieldphi = new short[maxfield];
+//    // define the variable length branches
+//    tree->SetBranchAddress( "finite", finite );
+//    tree->SetBranchAddress( "p1x", p1x );
+//    tree->SetBranchAddress( "p1y", p1y );
+//    tree->SetBranchAddress( "p1z", p1z );
+//    tree->SetBranchAddress( "p2x", p2x );
+//    tree->SetBranchAddress( "p2y", p2y );
+//    tree->SetBranchAddress( "p2z", p2z );
+//    tree->SetBranchAddress( "curr", curr );
+//    tree->SetBranchAddress( "meshz", meshz );
+//    tree->SetBranchAddress( "meshr", meshr );
+//    tree->SetBranchAddress( "meshphi", meshphi );
+//    tree->SetBranchAddress( "fieldz", fieldz );
+//    tree->SetBranchAddress( "fieldr", fieldr );
+//    tree->SetBranchAddress( "fieldphi", fieldphi );
+//
+//    // reserve the space for m_zone so that it won't move as the vector grows
+////    m_zone.reserve( tree->GetEntries() );
+//    // read all tree and store
+////    for ( int i = 0; i < tree->GetEntries(); i++ )
+////    {
+////        tree->GetEntry(i);
+////        BFieldZone z( id, zmin, zmax, rmin, rmax, phimin, phimax, bscale );
+////        m_zone.push_back(z);
+////        m_zone.back().reserve( nmeshz, nmeshr, nmeshphi );
+////        for ( int j = 0; j < ncond; j++ ) {
+////            double p1[3], p2[3];
+////            p1[0] = p1x[j];
+////            p1[1] = p1y[j];
+////            p1[2] = p1z[j];
+////            p2[0] = p2x[j];
+////            p2[1] = p2y[j];
+////            p2[2] = p2z[j];
+////            BFieldCond cond( finite[j], p1, p2, curr[j] );
+////            m_zone.back().appendCond(cond);
+////        }
+////        for ( int j = 0; j < nmeshz; j++ ) {
+////            m_zone.back().appendMesh( 0, meshz[j] );
+////        }
+////        for ( int j = 0; j < nmeshr; j++ ) {
+////            m_zone.back().appendMesh( 1, meshr[j] );
+////        }
+////        for ( int j = 0; j < nmeshphi; j++ ) {
+////            m_zone.back().appendMesh( 2, meshphi[j] );
+////        }
+////        for ( int j = 0; j < nfield; j++ ) {
+////            BFieldVector<short> field( fieldz[j], fieldr[j], fieldphi[j] );
+////            m_zone.back().appendField( field );
+////        }
+////    }
+//    // clean up
+//    tree->Delete();
+//    delete[] finite;
+//    delete[] p1x;
+//    delete[] p1y;
+//    delete[] p1z;
+//    delete[] p2x;
+//    delete[] p2y;
+//    delete[] p2z;
+//    delete[] curr;
+//    delete[] meshz;
+//    delete[] meshr;
+//    delete[] meshphi;
+//    delete[] fieldz;
+//    delete[] fieldr;
+//    delete[] fieldphi;
+//
+//
+////    if (rz) {
+////
+////            /// [1] Read in field map file
+////            std::cout << "Opening new txt/csv input File : " << outFile << std::endl;
+////            std::ifstream map_file(inFile.c_str(), std::ios::in);
+////            // [1] Read in file and fill values
+////            std::string line;
+////            double      rpos = 0., zpos = 0.;
+////            double      br = 0., bz = 0.;
+////
+//
+//
+//}
+
+bool MagField::AtlasFieldSvc::readMapRoot (std::string filename)
+{
+    
+    // Create (or get) analysis reader
+    G4AnalysisReader* analysisReader = G4AnalysisReader::Instance();
+    analysisReader->SetVerboseLevel(-1);
+    
+    // Define a base file name
+    analysisReader->SetFileName(filename);
+    int ntupleId =analysisReader->GetNtuple("BFieldMap");
+    
+    if ( ntupleId < 0 ) {
+        // no tree
+        std::cout<<"readMap(): TTree 'BFieldMap' does not exist in ROOT field map"<<std::endl;
+        return false;
+    }
+    int id;
+    double zmin, zmax, rmin, rmax, phimin, phimax;
+    double bscale;
+    int ncond;
+    //int finite;
+    //double p1x, p1y, p1z, p2x, p2y, p2z;
+    //double curr;
+    int nmeshz, nmeshr, nmeshphi;
+    //double meshz, meshr, meshphi;
+    int nfield;
+    //double fieldz, fieldr, fieldphi;
+    
+    if ( ntupleId >= 0 ) {
+        
+        analysisReader->SetNtupleIColumn(ntupleId,"id", id);
+        analysisReader->SetNtupleDColumn(ntupleId,"zmin", zmin);
+        analysisReader->SetNtupleDColumn(ntupleId,"zmax", zmax);
+        analysisReader->SetNtupleDColumn(ntupleId,"rmin", rmin);
+        analysisReader->SetNtupleDColumn(ntupleId,"rmax",rmax);
+        analysisReader->SetNtupleDColumn(ntupleId,"phimin", phimin);
+        analysisReader->SetNtupleDColumn(ntupleId,"phimax", phimax);
+        analysisReader->SetNtupleDColumn(ntupleId,"bscale", bscale);
+        analysisReader->SetNtupleIColumn(ntupleId,"ncond", ncond);
+        analysisReader->SetNtupleIColumn(ntupleId,"nmeshz", nmeshz);
+        analysisReader->SetNtupleIColumn(ntupleId,"nmeshr", nmeshr);
+        analysisReader->SetNtupleIColumn(ntupleId,"nmeshphi", nmeshphi);
+        analysisReader->SetNtupleIColumn(ntupleId,"nfield", nfield);
+    }
+    
+    // prepare arrays - need to know the maximum sizes
+    // open the tree of buffer sizes (may not exist in old maps)
+    
+    int maxcond(0), maxmeshz(0), maxmeshr(0), maxmeshphi(0), maxfield(0);
+    
+    int ntupleId2 =analysisReader->GetNtuple("BFieldMapSize");
+    //TTree* tmax = (TTree*)rootfile->Get("BFieldMapSize");
+    if ( ntupleId2 >= 0 ) {
+        
+        analysisReader->SetNtupleIColumn(ntupleId2, "maxcond", maxcond);
+        analysisReader->SetNtupleIColumn(ntupleId2, "maxmeshz", maxmeshz);
+        analysisReader->SetNtupleIColumn(ntupleId2, "maxmeshr", maxmeshr );
+        analysisReader->SetNtupleIColumn(ntupleId2, "maxmeshphi", maxmeshphi);
+        analysisReader->SetNtupleIColumn(ntupleId2, "maxfield", maxfield);
+        
+        analysisReader->GetNtupleRow(ntupleId2); //Get one entry
+        std::cout<<"maxcond: "<<maxcond<<"\tmaxmeshz: "<<maxmeshz<<"\tmaxmeshr: "<<maxmeshr<<"\tmaxmeshphi: "<<maxmeshphi<<"\tmaxfield: "<<maxfield<<std::endl;
+    }
+    std::vector<int> finite(maxcond);
+    std::vector<double> p1x(maxcond);
+    std::vector<double> p1y(maxcond);
+    std::vector<double> p1z(maxcond);
+    std::vector<double> p2x(maxcond);
+    std::vector<double> p2y(maxcond);
+    std::vector<double> p2z(maxcond);
+    std::vector<double> curr(maxcond);
+    std::vector<double> meshz(maxmeshz);
+    std::vector<double> meshr (maxmeshr);
+    std::vector<double> meshphi(maxmeshphi);
+    std::vector<double> fieldz (maxfield);
+    std::vector<double> fieldr (maxfield);
+    std::vector<double> fieldphi (maxfield);
+    
+    analysisReader->SetNtupleIColumn(ntupleId,"finite", finite);
+    analysisReader->SetNtupleDColumn(ntupleId,"p1x", p1x);
+    analysisReader->SetNtupleDColumn(ntupleId,"p1y", p1y);
+    analysisReader->SetNtupleDColumn(ntupleId,"p1z", p1z);
+    analysisReader->SetNtupleDColumn(ntupleId,"p2x", p2x);
+    analysisReader->SetNtupleDColumn(ntupleId,"p2y", p2y);
+    analysisReader->SetNtupleDColumn(ntupleId,"p2z", p2z);
+    analysisReader->SetNtupleDColumn(ntupleId,"curr", curr );
+    analysisReader->SetNtupleDColumn(ntupleId,"meshz", meshz);
+    analysisReader->SetNtupleDColumn(ntupleId,"meshr", meshr);
+    analysisReader->SetNtupleDColumn(ntupleId,"meshphi", meshphi);
+    analysisReader->SetNtupleDColumn(ntupleId,"fieldz", fieldz);
+    analysisReader->SetNtupleDColumn(ntupleId,"fieldr", fieldr);
+    analysisReader->SetNtupleDColumn(ntupleId,"fieldphi", fieldphi);
+    
+    std::cout << "Ntuples reading" << std::endl;
+    // reserve the space for m_zone so that it won't move as the vector grows
+    m_zone.reserve( 406 );
+    //int counter = 0;
+    while ( analysisReader->GetNtupleRow(ntupleId) )
+    {
+//        std::cout << "  Entry: "<<counter<<std::endl;
+//        counter++;
+//        std::cout << "  id: " << id << "\tzmin: " << zmin <<"\tzmax: " << zmax <<std::endl;
+//        std::cout << "  rmin: " << rmin << "\trmax: " << rmax <<std::endl;
+//        std::cout << "  phimin: " << phimin << "\tphimax: " << phimax <<"\tbscale: "<<bscale<<std::endl;
+        
+        BFieldZone z( id, zmin, zmax, rmin, rmax, phimin, phimax, bscale );
+        m_zone.push_back(z);
+        m_zone.back().reserve( nmeshz, nmeshr, nmeshphi );
+        for ( int j = 0; j < ncond; j++ ) {
+            double p1[3], p2[3];
+            p1[0] = p1x[j];
+            p1[1] = p1y[j];
+            p1[2] = p1z[j];
+            p2[0] = p2x[j];
+            p2[1] = p2y[j];
+            p2[2] = p2z[j];
+            bool fini = (bool) finite[j];
+            BFieldCond cond( fini, p1, p2, curr[j] );
+            m_zone.back().appendCond(cond);
+        }
+        for ( int j = 0; j < nmeshz; j++ ) {
+            m_zone.back().appendMesh( 0, meshz[j] );
+        }
+        for ( int j = 0; j < nmeshr; j++ ) {
+            m_zone.back().appendMesh( 1, meshr[j] );
+        }
+        for ( int j = 0; j < nmeshphi; j++ ) {
+            m_zone.back().appendMesh( 2, meshphi[j] );
+        }
+        for ( int j = 0; j < nfield; j++ ) {
+            BFieldVector<short> field( fieldz[j], fieldr[j], fieldphi[j] );
+            m_zone.back().appendField( field );
+        }
+    }
+    
+    // build the LUTs
+    buildLUT();
+    buildZR();
+    return true;
+}
 
 //
 // read the map from a ROOT file.
@@ -1200,7 +1356,7 @@ bool MagField::AtlasFieldSvc::translateMap (std::string inFile,
 //
 bool MagField::AtlasFieldSvc::readMap( TFile* rootfile )
 {
-    
+
     if ( rootfile == 0 ) {
       // no file
       //ATH_MSG_ERROR("readMap(): unable to read field map, no TFile given");
@@ -1490,12 +1646,12 @@ void MagField::AtlasFieldSvc::buildLUT()
         sort( m_edge[j].begin(), m_edge[j].end() );
         // remove duplicates
         // must do this by hand to allow small differences due to rounding in phi
-        int i = 0;
+        int index = 0;
         for ( unsigned k = 1; k < m_edge[j].size(); k++ ) {
-            if ( fabs(m_edge[j][i] - m_edge[j][k]) < 1.0e-6 ) continue;
-            m_edge[j][++i] = m_edge[j][k];
+            if ( fabs(m_edge[j][index] - m_edge[j][k]) < 1.0e-6 ) continue;
+            m_edge[j][++index] = m_edge[j][k];
         }
-        m_edge[j].resize( i+1 );
+        m_edge[j].resize( index+1 );
         // because of the small differences allowed in the comparison above,
         // m_edge[][] values do not exactly match the m_zone[] boundaries.
         // we have to fix this up in order to avoid invalid field values
@@ -1535,6 +1691,11 @@ void MagField::AtlasFieldSvc::buildLUT()
     m_zmin=m_edge[0].front();
     m_zmax=m_edge[0].back();
     m_rmax=m_edge[1].back();
+    
+//    std::cout<<" m_zmin: "<<m_zmin<<std::endl;
+//    std::cout<<" m_zmax: "<<m_zmax<<std::endl;
+//    std::cout<<" m_rmax: "<<m_rmax<<std::endl;
+    
     // build LUT for zone finding
     m_nz = m_edge[0].size() - 1;
     m_nr = m_edge[1].size() - 1;
@@ -1556,6 +1717,7 @@ void MagField::AtlasFieldSvc::buildLUT()
         m_zone[i].buildLUT();
     }
 }
+
 
 //
 // Build the z-r 2d map for fast solenoid field

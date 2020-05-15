@@ -57,6 +57,7 @@ namespace MagField {
 
       /** Read **/
       virtual void handle();
+      void writeMap( std::string filename ) const;
 
       /** Call back for possible magnet current update **/
       //StatusCode updateCurrent(IOVSVC_CALLBACK_ARGS);
@@ -109,7 +110,8 @@ namespace MagField {
       bool readMap( std::istream& input );
       bool readMap( TFile* rootfile );
       // write the field map to a ROOT file
-      void writeMap( TFile* rootfile ) const;
+      bool readMapRoot (std::string filename);
+      
       // translate the map from root file into ascii file and write it out
       bool translateMap (std::string inFile,
                            std::string outFile,
@@ -232,6 +234,7 @@ MagField::AtlasFieldSvc::findZone( double z, double r, double phi ) const
     // use LUT to get the zone
     return m_zoneLUT[(iz*m_nr+ir)*m_nphi+iphi];
   } else {
+     // std::cout<<"z is :"<<z<<" and should be >= "<<m_zmin<<"  && z <= "<<m_zmax<< "  && r is "<<r <<" and shoud be <= "<<m_rmax<<std::endl;
     return 0;
   }
 }

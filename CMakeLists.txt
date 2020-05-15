@@ -69,12 +69,15 @@ add_executable(gmclash geoModelClash.cc ${sources} ${headers})
 add_executable(fillHistogramExample fillHistogramExample.cc src/Histo.cc include/Histo.hh)
 add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 #add_executable(plotGeantinoMaps plotGeantinoMaps.cc)
+add_executable(testMagneticField testMagneticField.cc)
+
 
 
 #----------------------------------------------------------------------------
 # Link all needed libraries
 
 target_link_libraries(fillHistogramExample ${Geant4_LIBRARIES})
+target_link_libraries(testMagneticField ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 if( nlohmann_json_FOUND )
 
@@ -130,4 +133,5 @@ install(TARGETS fullSimLight DESTINATION ${OUTPUT})
 install(TARGETS gmclash DESTINATION ${OUTPUT})
 install(TARGETS fillHistogramExample DESTINATION ${OUTPUT})
 install(TARGETS gmgeantino DESTINATION ${OUTPUT})
+install(TARGETS testMagneticField DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION ${OUTPUT})

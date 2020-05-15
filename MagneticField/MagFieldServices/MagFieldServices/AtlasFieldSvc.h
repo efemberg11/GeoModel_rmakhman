@@ -72,8 +72,8 @@ namespace MagField {
         
       double GetUseSolenoidCurrent(){return m_useSoleCurrent;}
       void   SetUseSolenoidCurrent(double current){m_useSoleCurrent = current;}
-      double GetUseToroidCurrent(){return m_useToroCurrent;}
-      void   SetUseToroidCurrent(double current){m_useToroCurrent = current;}
+      double GetUseToroidsCurrent(){return m_useToroCurrent;}
+      void   SetUseToroidsCurrent(double current){m_useToroCurrent = current;}
         
     private:
       /** Retrieve, initialize and return a thread-local storage object */

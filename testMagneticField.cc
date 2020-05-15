@@ -23,9 +23,12 @@
 
 static bool parSolenoidOff = false;
 static bool parToroidsOff = false;
+static bool parIsAscii = true;
 
 void GetInputArguments(int argc, char** argv);
 void Help();
+
+bool debug = false;
 
 int main(int argc, char** argv) {
     
@@ -62,24 +65,45 @@ int main(int argc, char** argv) {
     
     G4String baseName = "ATLAS_BField";
     
-    if(parSolenoidOff) baseName = baseName+"_solenoidOff";
-    if(parToroidsOff)  baseName = baseName+"_toroidsOff";
+    MagField::AtlasFieldSvc* myMagField = new MagField::AtlasFieldSvc("StandardFieldSvc", parIsAscii);
+    if(parIsAscii && (parSolenoidOff||parToroidsOff))
+    {
+        std::cout<<"WARNING: it's not possible to switch off the solenoid or toroids when using ascii file. \nActivating Solenoid and Toroids.\n"<<std::endl;
+        
+    }else
+    {
+        if (parSolenoidOff) {
+            baseName = baseName+"_solenoidOff";
+            myMagField->SetUseSolenoidCurrent(0);
+            std::cout<<"Solenoid current set to zero"<<std::endl;
+            
+        }
+        if (parToroidsOff) {
+            baseName = baseName+"_toroidsOff";
+            myMagField->SetUseToroidsCurrent(0);
+            std::cout<<"Toroids current set to zero"<<std::endl;
+        }
+        
+    }
     
     G4String root_fileName = baseName + ".root";
     G4AnalysisManager* analysisManager = G4Analysis::ManagerInstance("root");
     analysisManager->SetVerboseLevel(1);
-    if (analysisManager->OpenFile(root_fileName)){
-
-        std::cout<<"File opened!"<<std::endl;
-
-    } else std::cout<<"ERROR File cannot be opened!"<<std::endl;
-    
     G4String txt_fileName = baseName + ".txt";
     std::ofstream output(txt_fileName, std::ios::out);
-    if ( ! output ) {
-        std::cout << "Cannot open file. File name is not defined."<<std::endl;
+    
+    std::cout<<"\nThe magnetic field map will be written in: \n\t"<<root_fileName<<std::endl;
+    std::cout<<"\t"<<txt_fileName<<"\n"<<std::endl;
+
+    if (!analysisManager->OpenFile(root_fileName)){
+        std::cout<<"\nERROR: File cannot be opened!"<<std::endl;
         exit(-1);
     }
+    if ( ! output ) {
+        std::cout << "\nERROR: File cannot be opened! File name is not defined."<<std::endl;
+        exit(-1);
+    }
+    
     output.setf( std::ios::scientific, std::ios::floatfield );
     output << "\t    X \t\t   Y \t\t   Z \t\t   R \t\t   BField" << G4endl;
     
@@ -96,19 +120,18 @@ int main(int argc, char** argv) {
     CLHEP::HepRandomEngine*     rndmEngineMod;
     rndmEngineMod = G4Random::getTheEngine();
     
-    MagField::AtlasFieldSvc* myMagField = new MagField::AtlasFieldSvc("StandardFieldSvc");
-    if (parSolenoidOff) {
-        myMagField->SetUseSolenoidCurrent(0);
-        std::cout<<"Solenoid current set to zero"<<std::endl;
-    }
-    if (parToroidsOff) {
-        myMagField->SetUseToroidsCurrent(0);
-        std::cout<<"Toroids current set to zero"<<std::endl;
-    }
-    
+    //Initialize the magnetic field
     myMagField->handle();
     double fieldIntensity;
+    
+    std::cout<<"\nGenerating Magnetic Field maps ... hold on\n"<<std::endl;
+    //iterate over phi,Z and R
     for ( int k = 0; k < stepsPhi; k++ ) { // loop over phi
+        if(k%(stepsPhi/10)==0){
+            
+            std::cout<<"[Progress "<<k/(stepsPhi/100)+10<<"%] ...."<<std::endl;
+            
+        }
         double phi = 2.*M_PI*double(k)/double(stepsPhi);
         for ( int j = 0; j < stepsZ; j++ ) { // loop over Z
             xyzt[2] = (m_maxZ-m_minZ)*double(j)/double(stepsZ-1) + m_minZ;
@@ -147,8 +170,10 @@ int main(int argc, char** argv) {
                 << r/m << "\t"
                 << fieldIntensity/tesla << G4endl;
                 
-                std::cout<<" x:  "<<xyzt[0]/m<<" y:  "<<xyzt[1]/m<<" z:  "<<xyzt[2]/m<<" field: "<<fieldIntensity/tesla<<std::endl;
-                std::cout<<" r:  "<<r/m<<" z:  "<<xyzt[2]/m<<" phi:  "<<phi<<" field: "<<fieldIntensity/tesla<<std::endl;
+                if (debug){
+                    std::cout<<" x:  "<<xyzt[0]/m<<" y:  "<<xyzt[1]/m<<" z:  "<<xyzt[2]/m<<" field: "<<fieldIntensity/tesla<<std::endl;
+                    std::cout<<" r:  "<<r/m<<" z:  "<<xyzt[2]/m<<" phi:  "<<phi<<" field: "<<fieldIntensity/tesla<<std::endl;
+                }
                 
                 //analysisManager->FillH2(0, r, xyzt[2],fieldIntensity );
 //                analysisManager->FillNtupleDColumn(1, 0, r);
@@ -178,6 +203,7 @@ int main(int argc, char** argv) {
 }
 
 static struct option options[] = {
+    {"isAscii"      , no_argument, 0, 'a'},
     {"solenoidOff"  , no_argument, 0, 's'},
     {"toroidsOff "  , no_argument, 0, 't'},
     {"help"         , no_argument, 0, 'h'},
@@ -190,6 +216,7 @@ void Help() {
     G4cout <<"  testMagneticField application.    \n"
     << std::endl
     <<"  **** Parameters: \n\n"
+    <<"      -r :  (flag) use root field map (default : false, use ascii file)\n"
     <<"      -s :  (flag) set Solenoid Off \n"
     <<"      -t :  (flag) set Toroids Off \n"
     << std::endl;
@@ -205,7 +232,7 @@ void Help() {
 void GetInputArguments(int argc, char** argv) {
     while (true) {
         int c, optidx = 0;
-        c = getopt_long(argc, argv, "sth", options, &optidx);
+        c = getopt_long(argc, argv, "strh", options, &optidx);
         if (c == -1)
             break;
         //
@@ -218,6 +245,9 @@ void GetInputArguments(int argc, char** argv) {
                 break;
             case 't':
                 parToroidsOff   = true;
+                break;
+            case 'r':
+                parIsAscii   = false;
                 break;
             case 'h':
                 Help();

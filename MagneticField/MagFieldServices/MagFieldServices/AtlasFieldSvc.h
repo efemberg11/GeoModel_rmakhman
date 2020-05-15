@@ -43,8 +43,8 @@ namespace MagField {
   //class AtlasFieldSvc : public extends<AthService, IMagFieldSvc, IIncidentListener> {
     public:
 
-      //** Constructor with parameters */
-      AtlasFieldSvc( const std::string& name/*, ISvcLocator* pSvcLocator*/ );
+      /** Constructor with parameters */
+      AtlasFieldSvc( const std::string& name, bool isAscii=true);
 
       /** Destructor */
       virtual ~AtlasFieldSvc();
@@ -134,6 +134,7 @@ namespace MagField {
 
       /** Data Members **/
       std::string m_fullMapAscii;   // all magnets on
+      bool m_isAscii;               //read the map from ascii file if true
       // field map names root
       std::string m_fullMapFilename; // all magnets on
       std::string m_soleMapFilename; // solenoid on / toroid off
@@ -158,8 +159,6 @@ namespace MagField {
       // flag to skip current rescale and use map currents as they are
       bool m_lockMapCurrents;
         
-//      double m_toroidCurrent;
-//      double m_solenoidCurrent;
 
       // handle for COOL field map filenames
       //const DataHandle<CondAttrListCollection> m_mapHandle;

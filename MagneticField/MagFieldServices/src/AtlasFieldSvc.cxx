@@ -37,11 +37,12 @@
 #include "TTree.h"
 
 /** Constructor **/
-MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name/*,ISvcLocator* svc*/) :
+MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name , bool isAscii) :
     //base_class(name,svc),
     //base_class(name),
     //m_fullMapAscii ("bmagatlas_10_full45Sym20400.data"),
     m_fullMapAscii ("bmagatlas_09_fullAsym20400.data"),
+    m_isAscii (isAscii),
     m_fullMapFilename("full_bfieldmap_7730_20400_14m.root"),
     m_soleMapFilename("solenoid_bfieldmap_7730_0_14m.root"),
     m_toroMapFilename("toroid_bfieldmap_0_20400_14m.root"),
@@ -181,40 +182,36 @@ void MagField::AtlasFieldSvc::handle()
    AtlasFieldSvcTLS &tls = getAtlasFieldSvcTLS();
    if (! importCurrents(tls))
    {
-       std::cout<< "Failure in manual setting of currents" <<std::endl;
-       
-   } else{
-       
-       std::cout<< "Currents imported successfully" << std::endl;
+       std::cout<< "Failure in setting of currents" <<std::endl;
        
    }
 }
 
 bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
 {
-    std::cout<< "importCurrents() ..." << std::endl;
+    std::cout<< "\nImportCurrents() ..." << std::endl;
 
     // take the current values from JobOptions
     double solcur(m_useSoleCurrent);
     double torcur(m_useToroCurrent);
     if ( solcur < m_soleMinCurrent ) {
         solcur = 0.0;
-        std::cout<< "Solenoid is off" << std::endl;
+        std::cout<< "Solenoid is off." << std::endl;
     }
     if ( torcur < m_toroMinCurrent) {
         torcur = 0.0;
-        std::cout<< "Toroids are off" << std::endl;
+        std::cout<< "Toroids are off." << std::endl;
     }
     setSolenoidCurrent(solcur);
     setToroidCurrent(torcur);
     // read the map file
     if ( !initializeMap(tls)) {
         //ATH_MSG_FATAL( "Failed to initialize field map" );
-        std::cout<< "Failed to initialize field map" << std::endl;
+        std::cout<< "FATAL! Failed to initialize field map" << std::endl;
         return false;
     }
 
-    std::cout<< "Currents imported and map initialized" << std::endl;
+    std::cout<< "Currents imported and map initialized successfully!" << std::endl;
     return true;
 }
 
@@ -385,8 +382,8 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
     std::string mapFile("");
     //ALL the Magnets are ON
     if ( solenoidOn() && toroidOn() ) {
-        mapFile = m_fullMapFilename;
-        //mapFile  = m_fullMapAscii;
+        if(m_isAscii) mapFile  = m_fullMapAscii;
+        else mapFile = m_fullMapFilename;
     } else if ( solenoidOn() ) {
         mapFile = m_soleMapFilename;
     } else if ( toroidOn() ) {
@@ -408,6 +405,8 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
         // read the map file
         if ( !readMap( resolvedMapFile.c_str() ) )
         {
+            std::cout<<"\nERROR! Magnetic field map cannot be read!"<<std::endl;
+            exit (-1);
             return false;
         }
         
@@ -417,12 +416,13 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
         if (fb.open (mapFile,std::ios::in))
         {
             std::istream is(&fb);
+            std::cout<<"Reading field map from " << mapFile  <<std::endl;
             readMap(is);
             fb.close();
         }
         else
         {
-            std::cout<<"Magnetic field file cannot be opened!"<<std::endl;
+            std::cout<<"\nERROR! Magnetic field map file cannot be opened. Please make sure the file is available."<<std::endl;
             exit (-1);
         }
     }

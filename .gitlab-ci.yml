@@ -12,8 +12,6 @@ stages:
 variables:
   CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
-  CMAKE_VERSION: "3.16"
-  CMAKE_BUILD: "5"
 
 
 # TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
@@ -29,7 +27,6 @@ variables:
   image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:latest
   tags:
     - docker
-
 
 .geomodelcore-build-template-job: &geomodelcore-job
   stage: deps-geomodelcore
@@ -237,7 +234,11 @@ geomodelio-ubuntu:
 geomodelg4-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelg4-job
+<<<<<<< HEAD
   needs: ["geomodelcore-ubuntu"]
+=======
+  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu"]
+>>>>>>> 72a8938... Update CI to use docker image of ubuntu with geant4 built in
 
 nlohmann_json-ubuntu:
   <<: *ubuntu-job

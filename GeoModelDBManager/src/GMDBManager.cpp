@@ -214,6 +214,33 @@ QHash<unsigned int, QStringList> GMDBManager::getTableFromNodeType(QString nodeT
 return records;
 }
 
+std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeTypeStd(std::string nodeType)
+{
+
+	QString tableName = getTableNameFromNodeType(QString::fromStdString(nodeType));
+
+	// QHash<unsigned int, QStringList> records;
+	// QStringList nodeParams;
+  std::vector<std::vector<std::string>> records;
+  std::vector<std::string> nodeParams;
+
+	int nCols = (m_tableNames[tableName]).size();
+
+	QSqlQuery query = selectAllFromTable(tableName); // sorted by ID
+	while (query.next()) {
+		nodeParams.clear();
+//    unsigned int nodeId = query.value(0).toUInt();
+
+		for( int ii=0; ii<nCols; ++ii) {
+			// nodeParams << query.value(ii).toString();
+			nodeParams.push_back( query.value(ii).toString().toStdString() );
+		}
+		// records[nodeId] = nodeParams;
+    records.push_back(nodeParams);
+	}
+return records;
+}
+
 
 void GMDBManager::showError(const QSqlError &err) const
 {
@@ -1098,7 +1125,7 @@ QSqlQuery GMDBManager::selectAllFromTable(QString tableName) const
 {
 	QSqlQuery q;
 
-	QString queryStr = QString("SELECT * FROM %1");
+	QString queryStr = QString("SELECT * FROM %1 ORDER BY id");
 	queryStr = queryStr.arg(tableName);
 
 	if (!q.prepare(queryStr)) {

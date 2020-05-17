@@ -51,6 +51,7 @@ typedef GeoModelIO::ReadGeoModel Persistifier;
 // FWD declarations
 class GeoVPhysVol;
 class GeoPhysVol;
+class GeoFullPhysVol;
 class GeoLogVol;
 class GeoShape;
 class GeoMaterial;
@@ -95,7 +96,13 @@ private:
   void buildAllPhysVols();
   void buildAllFullPhysVols();
   // void buildAllFunctions();
+  void buildAllTransforms();
+  void buildAllAlignableTransforms();
+  void buildAllSerialDenominators();
+  void buildAllSerialTransformers();
+  void buildAllNameTags();
 
+  
   std::string getEnvVar( std::string const & key ) const;
 
 	GeoPhysVol* buildGeoModelByCalls();
@@ -111,31 +118,28 @@ private:
 	GeoPhysVol* getRootVolume();
 
 	GeoVPhysVol* parseChildren(GeoVPhysVol* vol, QMap<unsigned int, QStringList> children, int depth = 0);
-	GeoVPhysVol* parseVPhysVol(QStringList values, QString nodeType, int depth = 0);
+	// GeoVPhysVol* parseVPhysVol(QStringList values, QString nodeType, int depth = 0);
 
-	GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber);
-	GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN);
+//  GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber);
+//  GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN);
+  GeoVPhysVol* buildVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
+  GeoVPhysVol* buildNewVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
+  // GeoVPhysVol* buildActualVPhysVol(const unsigned int id, const unsigned int tableId);
+  GeoVPhysVol* buildActualVPhysVol(const unsigned int id, const unsigned int tableId, unsigned int logVol_ID=0);
 
-	// GeoLogVol* buildLogVol(QString id);
 	GeoLogVol* buildLogVol(const unsigned int id);
 	GeoShape* buildShape(const unsigned int id, type_shapes_boolean_info* shapes_info_sub);
 	GeoMaterial* buildMaterial(const unsigned id);
 	GeoElement* buildElement(const unsigned int id);
-	GeoSerialDenominator* parseSerialDenominator(QStringList values);
-	GeoSerialDenominator* buildSerialDenominator(QString id);
-	GeoAlignableTransform* parseAlignableTransform(QStringList values);
-	GeoAlignableTransform* buildAlignableTransform(QString id);
-	GeoTransform* parseTransform(QStringList values);
-	GeoTransform* buildTransform(unsigned int id);
-	GeoTransform* buildTransform(QString id); // TODO: to be dropped when removing Qt
-	GeoSerialTransformer* parseSerialTransformer(QStringList values);
-	GeoSerialTransformer* buildSerialTransformer(QString id);
-	// TRANSFUNCTION parseFunction(const std::string& expr);
+//  GeoSerialDenominator* buildSerialDenominator(const unsigned int id);
+	GeoAlignableTransform* buildAlignableTransform(const unsigned int id);
+	GeoTransform* buildTransform(const unsigned int id);
+	GeoSerialTransformer* buildSerialTransformer(const unsigned int id);
 	TRANSFUNCTION buildFunction(const unsigned int id);
-	// TRANSFUNCTION buildFunction(QString id);
-	GeoNameTag* parseNameTag(QStringList values);
-	GeoNameTag* buildNameTag(QString id);
+//  GeoNameTag* buildNameTag(const unsigned int id);
 
+
+  void checkNodePtr(GeoGraphNode* nodePtr, std::string varName="", std::string funcName="", std::string funcSignature="");//TODO: to be moved to an utility class
   void volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild);
 
   // methods for shapes
@@ -158,18 +162,22 @@ private:
   bool isBuiltTransform(const unsigned int id);
   void storeBuiltTransform(const unsigned int, GeoTransform* node);
   GeoTransform* getBuiltTransform(const unsigned int id);
+  
+  bool isBuiltAlignableTransform(const unsigned int id);
+  void storeBuiltAlignableTransform(const unsigned int, GeoAlignableTransform* node);
+  GeoAlignableTransform* getBuiltAlignableTransform(const unsigned int id);
 
-	bool isNodeBuilt(const QString id, const QString tableId, const QString copyNumber);
-  void storeVPhysVol(const QString id, const QString tableId, const QString copyNumber, GeoGraphNode* node);
-	GeoGraphNode* getVPhysVol(const QString id, const QString tableId, const QString copyNumber);
+  bool isVPhysVolBuilt(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
+  void storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber, GeoGraphNode* node);
+  GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
 
   bool isBuiltLog(const unsigned int id);
   void storeBuiltLog(const unsigned int id, GeoLogVol* nodePtr);
   GeoLogVol* getBuiltLog(const unsigned int id);
 
-  bool isBuiltMat(const unsigned int id);
-  void storeBuiltMat(const unsigned int id, GeoMaterial* nodePtr);
-  GeoMaterial* getBuiltMat(const unsigned int id);
+  bool isBuiltMaterial(const unsigned int id);
+  void storeBuiltMaterial(const unsigned int id, GeoMaterial* nodePtr);
+  GeoMaterial* getBuiltMaterial(const unsigned int id);
 
   bool isBuiltElement(const unsigned int id);
   void storeBuiltElement(const unsigned int id, GeoElement* nodePtr);
@@ -179,6 +187,26 @@ private:
   void storeBuiltFunc(const unsigned int id, TRANSFUNCTION nodePtr);
   TRANSFUNCTION getBuiltFunc(const unsigned int id);
 
+  bool isBuiltPhysVol(const unsigned int id);
+  void storeBuiltPhysVol(const unsigned int id, GeoPhysVol* nodePtr);
+  GeoPhysVol* getBuiltPhysVol(const unsigned int id);
+
+  bool isBuiltFullPhysVol(const unsigned int id);
+  void storeBuiltFullPhysVol(const unsigned int id, GeoFullPhysVol* nodePtr);
+  GeoFullPhysVol* getBuiltFullPhysVol(const unsigned int id);
+
+  bool isBuiltSerialDenominator(const unsigned int id);
+  void storeBuiltSerialDenominator(const unsigned int id, GeoSerialDenominator* nodePtr);
+  GeoSerialDenominator* getBuiltSerialDenominator(const unsigned int id);
+
+  bool isBuiltNameTag(const unsigned int id);
+  void storeBuiltNameTag(const unsigned int id, GeoNameTag* nodePtr);
+  GeoNameTag* getBuiltNameTag(const unsigned int id);
+
+  bool isBuiltSerialTransformer(const unsigned int id);
+  void storeBuiltSerialTransformer(const unsigned int id, GeoSerialTransformer* nodePtr);
+  GeoSerialTransformer* getBuiltSerialTransformer(const unsigned int id);
+
 
   // Utility functions
 	void checkInputString(QString input);
@@ -187,6 +215,7 @@ private:
 	void printTransformationValues(QStringList t);
 	QList<double> convertQstringListToDouble(QStringList listin);
   std::vector<std::string> toStdVectorStrings(QStringList qlist);
+  void printStdVectorStrings(std::vector<std::string> vec); //TODO: move it to utility class
 
 
 	// input arguments
@@ -203,32 +232,57 @@ private:
 
 	// data containers
 	QHash<QString, QMap<unsigned int, QStringList>> m_allchildren; // key = "parentId:parentTable", item = list of children parameters, inserted by child position
-	QHash<unsigned int, QStringList> m_physVols;
-	QHash<unsigned int, QStringList> m_fullPhysVols;
-	QHash<unsigned int, QStringList> m_logVols;
+//  QHash<unsigned int, QStringList> m_physVols;
+//  QHash<unsigned int, QStringList> m_fullPhysVols;
+//  QHash<unsigned int, QStringList> m_logVols;
 	QHash<unsigned int, QStringList> m_shapes;
-	QHash<unsigned int, QStringList> m_materials;
-	QHash<unsigned int, QStringList> m_elements;
-	QHash<unsigned int, QStringList> m_transforms;
-	QHash<unsigned int, QStringList> m_alignableTransforms;
-	QHash<unsigned int, QStringList> m_serialDenominators;
-	QHash<unsigned int, QStringList> m_serialTransformers;
+//  QHash<unsigned int, QStringList> m_materials;
+//  QHash<unsigned int, QStringList> m_elements;
+//  QHash<unsigned int, QStringList> m_transforms;
+//  QHash<unsigned int, QStringList> m_alignableTransforms;
+//  QHash<unsigned int, QStringList> m_serialDenominators;
+//  QHash<unsigned int, QStringList> m_serialTransformers;
 	QHash<unsigned int, QStringList> m_functions;
-	QHash<unsigned int, QStringList> m_nameTags;
+//  QHash<unsigned int, QStringList> m_nameTags;
 
-	QHash<unsigned int, QString> m_tableid_tableName;
+  std::vector<std::vector<std::string>> m_physVolsStd;
+  std::vector<std::vector<std::string>> m_fullPhysVolsStd;
+  std::vector<std::vector<std::string>> m_transformsStd;
+  std::vector<std::vector<std::string>> m_alignableTransformsStd;
+  std::vector<std::vector<std::string>> m_serialDenominatorsStd;
+  std::vector<std::vector<std::string>> m_serialTransformersStd;
+  std::vector<std::vector<std::string>> m_nameTags;
+  std::vector<std::vector<std::string>> m_logVols;
+  std::vector<std::vector<std::string>> m_materials;
+  std::vector<std::vector<std::string>> m_elements;
+  
+	QHash<unsigned int, QString> m_tableID_toTableName; // to look for node's type name starting from a table ID
+	QHash<QString, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
 
 	QStringList m_root_vol_data;
 
-	QHash<QString, GeoGraphNode*> m_memMap;
-	std::unordered_map<unsigned int, GeoShape*> m_memMapShapes;
-	std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
-	std::unordered_map<unsigned int, GeoLogVol*> m_memMapLogs;
-	std::unordered_map<unsigned int, GeoMaterial*> m_memMapMats;
-	std::unordered_map<unsigned int, GeoElement*> m_memMapEls;
+  QHash<QString, GeoGraphNode*> m_memMap; // FIXME: move to std::
+  std::unordered_map<unsigned int, GeoShape*> m_memMapShapes; // FIXME: move all these to vectors
+//  std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
+//  std::unordered_map<unsigned int, GeoLogVol*> m_memMapLogs;
+//  std::unordered_map<unsigned int, GeoMaterial*> m_memMapMats;
+//  std::unordered_map<unsigned int, GeoElement*> m_memMapEls;
+	// std::unordered_map<unsigned int, GeoPhysVol*> m_memMapPhysVols;
+	// std::unordered_map<unsigned int, GeoFullPhysVol*> m_memMapFullPhysVols;
 	// std::unordered_map<unsigned int, TRANSFUNCTION> m_memMapFuncs;
 
-	std::set<std::string> m_unknown_shapes;
+  std::vector<GeoPhysVol*> m_memMapPhysVols;
+  std::vector<GeoFullPhysVol*> m_memMapFullPhysVols;
+  std::vector<GeoTransform*> m_memMapTransforms;
+  std::vector<GeoAlignableTransform*> m_memMapAlignableTransforms;
+  std::vector<GeoSerialDenominator*> m_memMapSerialDenominators;
+  std::vector<GeoSerialTransformer*> m_memMapSerialTransformers;
+  std::vector<GeoNameTag*> m_memMapNameTags;
+  std::vector<GeoLogVol*> m_memMapLogVols;
+  std::vector<GeoMaterial*> m_memMapMaterials;
+  std::vector<GeoElement*> m_memMapElements;
+  
+  std::set<std::string> m_unknown_shapes;
 
 };
 

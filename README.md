@@ -116,6 +116,9 @@ if you want to install everything into `/usr/local`.
 If you do that, please remember that you might need to run `sudo make install` instead of `make install`,
 otherwise you will not have the correct rights to write under the path `/usr/local`.
 
+**For Ubuntu:** Ubuntu comes with an outdated version of `nlohmann`. Thus, a more recent packaged version can be used during 
+compilation of `geomodelvisualization` by adding the option `-DGEOMODEL_USE_BUILTIN_JSON=TRUE` in the `cmake` step.
+
 
 ```bash
 # build GeoModelCore

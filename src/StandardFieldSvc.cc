@@ -23,7 +23,7 @@ StandardFieldSvc::StandardFieldSvc(const std::string& name/*,
   : G4MagFieldSvcBase(name)
   // m_magFieldSvc("MagField::AtlasFieldSvc/AtlasFieldSvc", name)
 {
-    MagField::AtlasFieldSvc * atlasFieldSvs = new MagField::AtlasFieldSvc("AtlasField");
+    MagField::AtlasFieldSvc * atlasFieldSvs = new MagField::AtlasFieldSvc();
     atlasFieldSvs->handle();
     m_magFieldSvc = atlasFieldSvs;
     //declareProperty("MagneticFieldSvc", m_magFieldSvc);

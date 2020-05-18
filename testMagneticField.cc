@@ -26,6 +26,7 @@
 static bool parSolenoidOff = false;
 static bool parToroidsOff = false;
 static bool parIsAscii = true;
+static std::string parMagFieldFile = "";
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -104,8 +105,17 @@ int main(int argc, char** argv) {
 
 
     G4String baseName = "ATLAS_BField";
-
-    MagField::AtlasFieldSvc* myMagField = new MagField::AtlasFieldSvc("StandardFieldSvc", parIsAscii);
+    MagField::AtlasFieldSvc* myMagField = nullptr;
+    
+    if(parMagFieldFile!="")
+    {
+        myMagField = new MagField::AtlasFieldSvc(parMagFieldFile, parIsAscii);
+        baseName = baseName + "_custom";
+    }
+    else{
+        myMagField = new MagField::AtlasFieldSvc(parIsAscii);
+        baseName = baseName + "_default";
+    }
     if(parIsAscii && (parSolenoidOff||parToroidsOff))
     {
         std::cout<<"WARNING: it's not possible to switch off the solenoid or toroids when using ascii file. \nActivating Solenoid and Toroids.\n"<<std::endl;
@@ -258,10 +268,11 @@ int main(int argc, char** argv) {
 }
 
 static struct option options[] = {
-    {"isAscii"      , no_argument, 0, 'a'},
-    {"solenoidOff"  , no_argument, 0, 's'},
-    {"toroidsOff "  , no_argument, 0, 't'},
-    {"help"         , no_argument, 0, 'h'},
+    {"magneticFieldFile", required_argument, 0, 'f'},
+    {"isRoot"           , no_argument      , 0, 'r'},
+    {"solenoidOff"      , no_argument      , 0, 's'},
+    {"toroidsOff "      , no_argument      , 0, 't'},
+    {"help"             , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
 
@@ -271,6 +282,7 @@ void Help() {
     G4cout <<"  testMagneticField application.    \n"
     << std::endl
     <<"  **** Parameters: \n\n"
+    <<"      -f :  (optional) magnetic field filename [.data/.root]   (default : use ATLAS magnetic field maps)\n"
     <<"      -r :  (flag) use root field map (default : false, use ascii file)\n"
     <<"      -s :  (flag) set Solenoid Off \n"
     <<"      -t :  (flag) set Toroids Off \n"
@@ -287,7 +299,7 @@ void Help() {
 void GetInputArguments(int argc, char** argv) {
     while (true) {
         int c, optidx = 0;
-        c = getopt_long(argc, argv, "strh", options, &optidx);
+        c = getopt_long(argc, argv, "f:strh", options, &optidx);
         if (c == -1)
             break;
         //
@@ -295,14 +307,17 @@ void GetInputArguments(int argc, char** argv) {
             case 0:
                 c = options[optidx].val;
                 break;
+            case 'f':
+                parMagFieldFile = optarg;
+                break;
             case 's':
                 parSolenoidOff = true;
                 break;
             case 't':
-                parToroidsOff   = true;
+                parToroidsOff  = true;
                 break;
             case 'r':
-                parIsAscii   = false;
+                parIsAscii     = false;
                 break;
             case 'h':
                 Help();

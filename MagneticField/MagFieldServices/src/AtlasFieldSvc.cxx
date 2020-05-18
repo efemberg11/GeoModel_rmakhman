@@ -39,10 +39,9 @@
 #include "g4root.hh"
 
 /** Constructor **/
-MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name , bool isAscii) :
+MagField::AtlasFieldSvc::AtlasFieldSvc(bool isAscii) :
     //base_class(name,svc),
     //base_class(name),
-    //m_fullMapAscii ("bmagatlas_10_full45Sym20400.data"),
     m_fullMapAscii ("bmagatlas_09_fullAsym20400.data"),
     m_isAscii (isAscii),
     m_fullMapFilename("full_bfieldmap_7730_20400_14m_version5.root"),
@@ -77,6 +76,7 @@ MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name , bool isAscii) :
        m_doManipulation(false),
        m_manipulator("undefined") */
 {
+    
 //    declareProperty("FullMapFile", m_fullMapFilename, "File storing the full magnetic field map");
 //    declareProperty("SoleMapFile", m_soleMapFilename, "File storing the solenoid-only magnetic field map");
 //    declareProperty("ToroMapFile", m_toroMapFilename, "File storing the toroid-only magnetic field map");
@@ -94,6 +94,47 @@ MagField::AtlasFieldSvc::AtlasFieldSvc(const std::string& name , bool isAscii) :
     /* declareProperty("DoManipulation", m_doManipulation, "Apply field manipulation");
        declareProperty("ManipulatorTool", m_manipulator, "Tool handle for field manipulation"); */
 }
+
+/** Constructor **/
+MagField::AtlasFieldSvc::AtlasFieldSvc( const std::string& name, bool isAscii, bool solenoidOFF, bool toroidsOFF):
+    m_isAscii(isAscii),
+    m_mapSoleCurrent(7730.),
+    m_mapToroCurrent(20400.),
+    m_soleMinCurrent(1.0),
+    m_toroMinCurrent(1.0),
+    m_useSoleCurrent(7730.),
+    m_useToroCurrent(20400.),
+    m_lockMapCurrents(false),
+    m_zone(),
+    m_meshZR(nullptr),
+    m_edge(),
+    m_edgeLUT(),
+    m_invq(),
+    m_zoneLUT(),
+    m_zmin(0.),
+    m_zmax(0.),
+    m_nz(0),
+    m_rmax(0.),
+    m_nr(0),
+    m_nphi(0)
+    {
+        if (m_isAscii) {
+            m_fullMapAscii = name;
+            std::cout<<"Magnetic field map file is ascii, will open "<<name<<std::endl;
+        }
+        else {m_fullMapFilename = name;
+            std::cout<<"File is root, will open "<<name<<std::endl;
+        }
+        if(solenoidOFF) {
+            setSolenoidCurrent(0.);
+            m_toroMapFilename = name;
+            
+        }
+        if(toroidsOFF) {
+            setToroidsCurrent (0.);
+            m_soleMapFilename = name;
+        }
+    }
 
 MagField::AtlasFieldSvc::~AtlasFieldSvc()
 {
@@ -158,7 +199,7 @@ bool MagField::AtlasFieldSvc::initialize()
     // clear the map for zero field
     clearMap(tls);
     setSolenoidCurrent(0.0);
-    setToroidCurrent(0.0);
+    setToroidsCurrent(0.0);
 
     /* // retrieve the manipulator tool
        if (m_doManipulation) {
@@ -205,7 +246,7 @@ bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
         std::cout<< "Toroids are off." << std::endl;
     }
     setSolenoidCurrent(solcur);
-    setToroidCurrent(torcur);
+    setToroidsCurrent(torcur);
     // read the map file
     if ( !initializeMap(tls)) {
         //ATH_MSG_FATAL( "Failed to initialize field map" );
@@ -287,10 +328,10 @@ bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
 //    }
 //    // did solenoid/toroid change status between on and off?
 //    bool solWasOn( solenoidOn() );
-//    bool torWasOn( toroidOn() );
+//    bool torWasOn( toroidsOn() );
 //    setSolenoidCurrent( solcur );
-//    setToroidCurrent( torcur );
-//    if ( solenoidOn() != solWasOn || toroidOn() != torWasOn ) {
+//    setToroidsCurrent( torcur );
+//    if ( solenoidOn() != solWasOn || toroidsOn() != torWasOn ) {
 //        // get thread-local storage
 //        AtlasFieldSvcTLS &tls = getAtlasFieldSvcTLS();
 //
@@ -376,19 +417,20 @@ bool MagField::AtlasFieldSvc::importCurrents(AtlasFieldSvcTLS &tls)
 //
 bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
 {
-    std::cout<< "Initializing the field map (solenoidCurrent=" << getSolenoidCurrent() << " toroidCurrent=" << getToroidCurrent() << ")" << std::endl;
+    std::cout<< "Initializing the field map (solenoidCurrent=" << getSolenoidCurrent() << " toroidCurrent=" << getToroidsCurrent() << ")" << std::endl;
     // empty the current map first
     clearMap(tls);
 
     // determine the map to load
     std::string mapFile("");
     //ALL the Magnets are ON
-    if ( solenoidOn() && toroidOn() ) {
+    if ( solenoidOn() && toroidsOn() ) {
         if(m_isAscii) mapFile  = m_fullMapAscii;
         else mapFile = m_fullMapFilename;
+        std::cout<<"mapFile::: "<<mapFile<<std::endl;
     } else if ( solenoidOn() ) {
         mapFile = m_soleMapFilename;
-    } else if ( toroidOn() ) {
+    } else if ( toroidsOn() ) {
         mapFile = m_toroMapFilename;
     } else {
         // all magnets OFF. no need to read map
@@ -428,6 +470,11 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
             std::cout<<"\nERROR! Magnetic field map file cannot be opened. Please make sure the file is available."<<std::endl;
             exit (-1);
         }
+    }else
+    {
+        std::cout<<"ERROR: Sorry, Magnetic field map file extensions supported are .root or .data files!";
+        exit(-1);
+        
     }
     std::cout<< "Initialized the field map from " << resolvedMapFile << std::endl;
     // scale magnet current as needed
@@ -456,12 +503,12 @@ void MagField::AtlasFieldSvc::scaleField()
         }
     }
     //
-    if ( toroidOn() )
+    if ( toroidsOn() )
     {
         if ( m_mapToroCurrent > 0.0 &&
-             std::abs( getToroidCurrent()/m_mapToroCurrent - 1.0 ) > 0.001 ) {
+             std::abs( getToroidsCurrent()/m_mapToroCurrent - 1.0 ) > 0.001 ) {
             // scale the field in all zones except for the solenoid zone
-            double factor = getToroidCurrent()/m_mapToroCurrent;
+            double factor = getToroidsCurrent()/m_mapToroCurrent;
             for ( unsigned i = 0; i < m_zone.size(); i++ ) {
                 if ( &(m_zone[i]) != solezone ) {
                     m_zone[i].scaleField( factor );

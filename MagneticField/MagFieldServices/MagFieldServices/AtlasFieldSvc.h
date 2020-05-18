@@ -44,7 +44,10 @@ namespace MagField {
     public:
 
       /** Constructor with parameters */
-      AtlasFieldSvc( const std::string& name, bool isAscii=true);
+      AtlasFieldSvc(bool isAscii=true);
+    
+      /** Constructor with parameters */
+      AtlasFieldSvc( const std::string& name, bool isAscii=true, bool solenoidOFF = false, bool toroidsOFF = false);
 
       /** Destructor */
       virtual ~AtlasFieldSvc();

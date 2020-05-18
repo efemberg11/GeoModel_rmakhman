@@ -14,7 +14,7 @@
 #ifndef BFIELDCOND_H
 #define BFIELDCOND_H
 
-#include </usr/local/Cellar/eigen/3.3.7/include/eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <cmath>
 
 class BFieldCond {

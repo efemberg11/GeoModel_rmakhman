@@ -71,7 +71,7 @@ class GeoVPhysVol : public GeoGraphNode
   /// When a node is added to a parent in the graph, the node is always notified.
   /// What happens at that time is up to the node.  Most nodes do not need to do
   /// anything. Some--the alignable transforms in particular--need to take some
-  /// take some actions, such as adding the parent volume to a list.
+  /// actions, such as adding the parent volume to a list.
   virtual void dockTo(GeoVPhysVol* parent);
 
   /// Returns the id of the child.

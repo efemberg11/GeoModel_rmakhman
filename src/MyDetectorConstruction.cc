@@ -122,6 +122,7 @@ G4double MyDetectorConstruction::gFieldValue = 0.0;
 MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
   fFieldValue          = 0.0;
+  fFieldConstant       = false;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
   fReportFileName      = "gmclash_report.json";
@@ -817,7 +818,9 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
 
 void MyDetectorConstruction::ConstructSDandField()
 {
-  if (std::abs(fFieldValue) > 0.0) {
+ // if (std::abs(fFieldValue) > 0.0) {
+    
+    if (fFieldConstant && std::abs(fFieldValue) > 0.0){
     // Apply a global uniform magnetic field along the Z axis.
     // Notice that only if the magnetic field is not zero, the Geant4
     // transportation in field gets activated.
@@ -828,8 +831,12 @@ void MyDetectorConstruction::ConstructSDandField()
     G4cout << G4endl << " *** SETTING UNIFORM MAGNETIC FIELD : fieldValue = " << fFieldValue / tesla << " Tesla *** " << G4endl
            << G4endl;
 
-  } else
-  {
+    }
+    else if (fFieldConstant && fFieldValue == 0.0 ){
+        G4cout << G4endl << " *** MAGNETIC FIELD IS OFF  *** " << G4endl << G4endl;
+    }
+    else // if (!fFieldConstant)
+    {
       G4cout << G4endl << " *** MAGNETIC FIELD SET FROM FILE  *** " << G4endl << G4endl;
       if (fField.Get() == 0)
       {
@@ -837,20 +844,6 @@ void MyDetectorConstruction::ConstructSDandField()
           G4MagneticField* g4Field =  myMagField->getField();
           if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
           fField.Put(g4Field);
-          
-//          std::cout.precision(8);
-//          G4double point[3] = {0,0,0};
-//          G4double bfield[3];
-//          std::cout<<"4) Debug g4Field"<<std::endl;
-//          for(int i=0; i<10; i++){
-//              point[0]=i;
-//              point[1]=i+10;
-//              point[2]=i+100;
-//              g4Field->GetFieldValue(point,bfield);
-//
-//              std::cout<<"g4Field->GetField(" <<point[0]<<" "<<point[1]<<" "<<point[2]<<"): "<<bfield[0]/tesla<<" "<<bfield[1]/tesla<<" "<<bfield[2]/tesla<<std::endl;
-//          }
-//          exit(-1);
         
           //This is thread-local
           G4FieldManager* fieldMgr =
@@ -875,6 +868,7 @@ void MyDetectorConstruction::ConstructSDandField()
           
       }
       
+    
   }
 }
 //=============================================================================

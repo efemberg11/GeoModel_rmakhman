@@ -45,6 +45,7 @@ public:
   {
     fFieldValue = fieldValue;
     gFieldValue = fFieldValue;
+    fFieldConstant = true;
   }
 
   static G4double GetFieldValue() { return gFieldValue; }
@@ -81,6 +82,7 @@ private:
   G4String fGeometryFileName;
   G4String fReportFileName;
   G4double fFieldValue;
+  G4bool   fFieldConstant;
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;
   MyDetectorMessenger *fDetectorMessenger;

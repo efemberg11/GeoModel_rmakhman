@@ -215,6 +215,7 @@ private:
 	void printTransformationValues(QStringList t);
 	QList<double> convertQstringListToDouble(QStringList listin);
   std::vector<std::string> toStdVectorStrings(QStringList qlist);
+  QStringList toQStringList(std::vector<std::string> vec);
   void printStdVectorStrings(std::vector<std::string> vec); //TODO: move it to utility class
 
 
@@ -235,7 +236,7 @@ private:
 //  QHash<unsigned int, QStringList> m_physVols;
 //  QHash<unsigned int, QStringList> m_fullPhysVols;
 //  QHash<unsigned int, QStringList> m_logVols;
-	QHash<unsigned int, QStringList> m_shapes;
+//  QHash<unsigned int, QStringList> m_shapes;
 //  QHash<unsigned int, QStringList> m_materials;
 //  QHash<unsigned int, QStringList> m_elements;
 //  QHash<unsigned int, QStringList> m_transforms;
@@ -255,6 +256,7 @@ private:
   std::vector<std::vector<std::string>> m_logVols;
   std::vector<std::vector<std::string>> m_materials;
   std::vector<std::vector<std::string>> m_elements;
+  std::vector<std::vector<std::string>> m_shapes;
   
 	QHash<unsigned int, QString> m_tableID_toTableName; // to look for node's type name starting from a table ID
 	QHash<QString, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
@@ -262,7 +264,7 @@ private:
 	QStringList m_root_vol_data;
 
   QHash<QString, GeoGraphNode*> m_memMap; // FIXME: move to std::
-  std::unordered_map<unsigned int, GeoShape*> m_memMapShapes; // FIXME: move all these to vectors
+//  std::unordered_map<unsigned int, GeoShape*> m_memMapShapes; // FIXME: move all these to vectors
 //  std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
 //  std::unordered_map<unsigned int, GeoLogVol*> m_memMapLogs;
 //  std::unordered_map<unsigned int, GeoMaterial*> m_memMapMats;
@@ -281,6 +283,7 @@ private:
   std::vector<GeoLogVol*> m_memMapLogVols;
   std::vector<GeoMaterial*> m_memMapMaterials;
   std::vector<GeoElement*> m_memMapElements;
+  std::vector<GeoShape*> m_memMapShapes;
   
   std::set<std::string> m_unknown_shapes;
 

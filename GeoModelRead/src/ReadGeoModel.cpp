@@ -196,7 +196,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 //  m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
 //  m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
 	m_logVols = m_dbManager->getTableFromNodeTypeStd("GeoLogVol");
-	m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
+	m_shapes = m_dbManager->getTableFromNodeTypeStd("GeoShape");
 	m_materials = m_dbManager->getTableFromNodeTypeStd("GeoMaterial");
 	m_elements = m_dbManager->getTableFromNodeTypeStd("GeoElement");
 	m_functions = m_dbManager->getTableFromNodeType("Function");
@@ -230,7 +230,9 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 
   // *** build all nodes ***
 
+  // parallel mode:
   
+  if (m_runMultithreaded) {
   std::thread t2(&ReadGeoModel::buildAllElements, this);
 //  std::thread t7(&ReadGeoModel::buildAllFunctions, this);
   
@@ -267,7 +269,22 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
   t10.join(); // ok, all SerialDenominators have been built
   t11.join(); // ok, all NameTags have been built
   t12.join(); // ok, all SerialTransformers have been built
-  
+  }
+  // serial mode:
+  else {
+    buildAllElements();
+    // buildAllFunctions();
+    buildAllTransforms();
+    buildAllAlignableTransforms();
+    buildAllSerialDenominators();
+    buildAllNameTags();
+    buildAllShapes();
+    buildAllMaterials();
+    buildAllLogVols();
+    buildAllPhysVols();
+    buildAllFullPhysVols();
+    buildAllSerialTransformers();
+  }
 	loopOverAllChildrenInBunches();
 	return getRootVolume();
 }
@@ -317,24 +334,35 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
 //! Iterate over the list of shapes, build them all, and store their pointers
 void ReadGeoModel::buildAllShapes()
 {
-  std::cout << "Building all shapes...\n";
-  QHash<unsigned int, QStringList>::const_iterator i = m_shapes.constBegin();
-  while (i != m_shapes.constEnd()) {
-    // cout << i.key() << ": " << i.value() << Qt::endl;
-    unsigned int shapeID = i.key();
+  if (m_debug) std::cout << "Building all shapes...\n";
+//  QHash<unsigned int, QStringList>::const_iterator i = m_shapes.constBegin();
+//  while (i != m_shapes.constEnd()) {
+//    // cout << i.key() << ": " << i.value() << Qt::endl;
+//    unsigned int shapeID = i.key();
+//    type_shapes_boolean_info shapes_info_sub; // tuple to store the boolean shapes to complete at a second stage
+//    buildShape(shapeID, &shapes_info_sub);
+//    createBooleanShapeOperands(&shapes_info_sub);
+//    ++i;
+//  }
+  if (m_shapes.size() == 0) {
+    std::cout << "ERROR!!! input shapes are empty! Exiting..." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  size_t nSize = m_shapes.size();
+  m_memMapShapes.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
+  for (unsigned int ii=0; ii<nSize; ++ii) {
+    unsigned int shapeID = ii+1;
     type_shapes_boolean_info shapes_info_sub; // tuple to store the boolean shapes to complete at a second stage
     buildShape(shapeID, &shapes_info_sub);
     createBooleanShapeOperands(&shapes_info_sub);
-    ++i;
   }
-
-  std::cout << "All shapes have been built!\n";
+  std::cout << "All " << nSize << " shapes have been built!\n";
 }
 
 //! Iterate over the list of GeoSerialDenominator nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllSerialDenominators()
 {
-  std::cout << "Building all SerialDenominator nodes...\n";
+  if (m_debug) std::cout << "Building all SerialDenominator nodes...\n";
   if (m_serialDenominatorsStd.size() == 0) {
     std::cout << "ERROR!!! input SerialDenominator are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -347,13 +375,13 @@ void ReadGeoModel::buildAllSerialDenominators()
     GeoSerialDenominator* nodePtr = new GeoSerialDenominator(baseName);
     storeBuiltSerialDenominator(ii+1, nodePtr);
   }
-  std::cout << "All SerialDenominator have been built!\n";
+  std::cout << "All " << nSize << " SerialDenominator have been built!\n";
 }
   
 //! Iterate over the list of GeoSerialDenominator nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllNameTags()
 {
-  std::cout << "Building all NameTag nodes...\n";
+  if (m_debug) std::cout << "Building all NameTag nodes...\n";
   if (m_nameTags.size() == 0) {
     std::cout << "ERROR!!! input NameTag are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -365,13 +393,13 @@ void ReadGeoModel::buildAllNameTags()
     GeoNameTag* nodePtr = new GeoNameTag(baseName);
     storeBuiltNameTag(ii+1, nodePtr);
   }
-  std::cout << "All NameTag have been built!\n";
+  std::cout << "All " << nSize << " NameTag have been built!\n";
 }
   
 //! Iterate over the list of nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllElements()
 {
-  std::cout << "Building all Elements...\n";
+  if (m_debug) std::cout << "Building all Elements...\n";
   if (m_elements.size() == 0) {
     std::cout << "ERROR!!! input Elements are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -381,13 +409,13 @@ void ReadGeoModel::buildAllElements()
   for (unsigned int ii=0; ii<nSize; ++ii) {
     buildElement(ii+1); // nodes' IDs start from 1
   }
-  std::cout << "All Elements have been built!\n";
+  std::cout << "All " << nSize << " Elements have been built!\n";
 }
   
 //! Iterate over the list of nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllMaterials()
 {
-  std::cout << "Building all Materials...\n";
+  if (m_debug) std::cout << "Building all Materials...\n";
   if (m_materials.size() == 0) {
     std::cout << "ERROR!!! input Materials are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -397,13 +425,13 @@ void ReadGeoModel::buildAllMaterials()
   for (unsigned int ii=0; ii<nSize; ++ii) {
     buildMaterial(ii+1); // nodes' IDs start from 1
   }
-  std::cout << "All Materials have been built!\n";
+  std::cout << "All " << nSize << " Materials have been built!\n";
 }
   
 //! Iterate over the list of nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllLogVols()
 {
-  std::cout << "Building all LogVols...\n";
+  if (m_debug) std::cout << "Building all LogVols...\n";
   if (m_logVols.size() == 0) {
     std::cout << "ERROR!!! input LogVols are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -413,7 +441,7 @@ void ReadGeoModel::buildAllLogVols()
   for (unsigned int ii=0; ii<nSize; ++ii) {
     buildLogVol(ii+1); // nodes' IDs start from 1
   }
-  std::cout << "All LogVols have been built!\n";
+  std::cout << "All " << nSize << " LogVols have been built!\n";
 }
 
 // TODO: move to an utility class
@@ -427,7 +455,7 @@ void printQHashQstringUInt(QHash<QString, unsigned int> qq) {
 //! Iterate over the list of nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllPhysVols()
 {
-  std::cout << "Building all PhysVols...\n";
+  if (m_debug) std::cout << "Building all PhysVols...\n";
   if (m_physVolsStd.size() == 0) {
     std::cout << "ERROR!!! input PhysVols are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -441,13 +469,13 @@ void ReadGeoModel::buildAllPhysVols()
     // std::cout << "building PhysVol n. " << volID << " (logVol: " << logVolID << ")" << std::endl;
     buildActualVPhysVol(volID, tableID, logVolID);
   }
-  std::cout << "All PhysVols have been built!\n";
+  std::cout << "All " << nSize << " PhysVols have been built!\n";
 }
   
 //! Iterate over the list of nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllFullPhysVols()
 {
-  std::cout << "Building all FullPhysVols...\n";
+  if (m_debug) std::cout << "Building all FullPhysVols...\n";
   if (m_fullPhysVolsStd.size() == 0) {
     std::cout << "ERROR!!! input FullPhysVols are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -461,13 +489,13 @@ void ReadGeoModel::buildAllFullPhysVols()
     // std::cout << "building PhysVol n. " << volID << " (logVol: " << logVolID << ")" << std::endl;
     buildActualVPhysVol(volID, tableID, logVolID);
   }
-  std::cout << "All FullPhysVols have been built!\n";
+  std::cout << "All " << nSize << " FullPhysVols have been built!\n";
 }
   
 //! Iterate over the list of GeoAlignableTransforms nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllAlignableTransforms()
 {
-  std::cout << "Building all AlignableTransforms...\n";
+  if (m_debug) std::cout << "Building all AlignableTransforms...\n";
   if (m_alignableTransformsStd.size() == 0) {
     std::cout << "ERROR!!! input AlignableTransforms are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -477,13 +505,13 @@ void ReadGeoModel::buildAllAlignableTransforms()
   for (unsigned int ii=0; ii<nSize; ++ii) {
     buildAlignableTransform(ii+1); // nodes' IDs start from 1
   }
-  std::cout << "All AlignableTransforms have been built!\n";
+  std::cout << "All " << nSize << " AlignableTransforms have been built!\n";
 }
   
 //! Iterate over the list of GeoTransforms nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllTransforms()
 {
-  std::cout << "Building all Transforms...\n";
+  if (m_debug) std::cout << "Building all Transforms...\n";
   if (m_transformsStd.size() == 0) {
     std::cout << "ERROR!!! input AlignableTransforms are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -493,13 +521,13 @@ void ReadGeoModel::buildAllTransforms()
   for (unsigned int ii=0; ii<nSize; ++ii) {
     buildTransform(ii+1); // nodes' IDs start from 1
   }
-  std::cout << "All Transforms have been built!\n";
+  std::cout << "All " << nSize << " Transforms have been built!\n";
 }
 
 //! Iterate over the list of GeoTransforms nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllSerialTransformers()
 {
-  std::cout << "Building all SerialTransformers...\n";
+  if (m_debug) std::cout << "Building all SerialTransformers...\n";
   if (m_serialTransformersStd.size() == 0) {
     std::cout << "ERROR!!! input SerialTransformers are empty! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
@@ -509,7 +537,7 @@ void ReadGeoModel::buildAllSerialTransformers()
   for (unsigned int ii=0; ii<nSize; ++ii) {
     buildSerialTransformer(ii+1); // nodes' IDs start from 1
   }
-  std::cout << "All SerialTransformers have been built!\n";
+  std::cout << "All " << nSize << " SerialTransformers have been built!\n";
 }
   
 // //! Iterate over the list of nodes, build them all, and store their pointers
@@ -1012,12 +1040,12 @@ std::string ReadGeoModel::getShapeType(const unsigned int shapeId)
       std::cout << "ERROR!! Shape ID is larger than the container size. Exiting..." << std::endl;
       exit(EXIT_FAILURE);
     }
-  	QStringList paramsShape = m_shapes[ shapeId ];
-    // std::cout << "shapeID: " <<  shapeId << ", shapeType:" << paramsShape[1].toStdString() << std::endl; // debug
-  	QString qtype = paramsShape[1];
-    std::string type = qtype.toStdString();
-    return type;
+  std::vector<std::string> paramsShape = m_shapes[ shapeId ];
+  std::string type = paramsShape[1];
+  return type;
 }
+
+  
 
 
 /// Recursive function, to build GeoShape nodes
@@ -1036,19 +1064,23 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 //   try // TODO: implement try/catch
 //   {
 	// QStringList paramsShape = m_shapes[ shapeId.toUInt() ];
-	QStringList paramsShape = m_shapes[ shapeId ];
+  std::vector<std::string> paramsShape = m_shapes[ shapeId-1 ]; // remember: nodes' IDs start from 1
 
-	QString id = paramsShape[0];
-	QString qtype = paramsShape[1];
-	QString parameters = paramsShape[2];
+  const unsigned int id = std::stoi(paramsShape[0]);
+  std::string type = paramsShape[1];
+  std::string parameters = paramsShape[2];
 
-  std::string type = qtype.toStdString();
-
-
-
+  // Get shape's parameters from the stored string.
+  // This will be interpreted differently accordiung to the shape.
+  std::vector<std::string> std_shapePars = splitString(parameters, ';');
+  
+  // FIXME: this is a temporary, ugly shortcut to postpone the QStrinList-->vector<string> move
+  QStringList shapePars = toQStringList(std_shapePars);
+  
+  
 	if (m_deepDebug) {
      muxCout.lock();
-     std::cout << "\tShape-ID:" << id.toStdString() << ", Shape-type:" << qtype.toStdString();
+     std::cout << "\tShape-ID:" << id << ", Shape-type:" << type;
      muxCout.unlock();
   }
 
@@ -1060,7 +1092,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			double YHalfLength = 0.;
 			double ZHalfLength = 0.;
 			// get parameters from DB string
-			QStringList shapePars = parameters.split(";");
 			foreach( QString par, shapePars) {
 					QStringList vars = par.split("=");
 					QString varName = vars[0];
@@ -1081,7 +1112,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double SPhi = 0.;
 		double DPhi = 0.;
 		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
 		foreach( QString par, shapePars) {
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
@@ -1113,7 +1143,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double SPhi = 0.;
 		double DPhi = 0.;
 		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
 		foreach( QString par, shapePars) {
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
@@ -1135,7 +1164,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double Theta = 0.;
 		double Phi = 0.;
 		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
 		foreach( QString par, shapePars) {
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
@@ -1154,9 +1182,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double SPhi = 0.;
 		double DPhi = 0.;
 		unsigned int NZPlanes = 0;
-
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
 
 		bool error = 0;
 		QString par;
@@ -1274,10 +1299,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		QString varName;
 		QString varValue;
 
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
-		// qInfo() << "shapePars: " << shapePars; // debug
-
 		int sizePars = shapePars.size();
 		// check if we have more than 3 parameters
 		if (sizePars > 3) {
@@ -1385,10 +1406,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		QString varName;
 		QString varValue;
 
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
-		// qInfo() << "shapePars: " << shapePars; // debug
-
 		int sizePars = shapePars.size();
 		// check if we have more than 3 parameters
 		if (sizePars > 3) {
@@ -1479,10 +1496,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		QStringList vars;
 		QString varName;
 		QString varValue;
-
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
-		//qInfo() << "shapePars: " << shapePars; // debug
 
 		int sizePars = shapePars.size();
 		// check if we have more than 2 parameters
@@ -1576,14 +1589,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		QStringList vars;
 		QString varName;
 		QString varValue;
-
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
-    if (m_deepDebug) {
-      muxCout.lock();
-      qInfo() << "shapePars: " << shapePars; // debug
-      muxCout.unlock();
-    }
 
 		int sizePars = shapePars.size();
 		// check if we have at least 13 parameters,
@@ -1845,8 +1850,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			double Dxdyndzp = 0.;
 			double Dxdypdzp = 0.;
 			double Angleydzp = 0.;
-			// get parameters from DB string
-			QStringList shapePars = parameters.split(";");
+			// get parameters
 			foreach( QString par, shapePars) {
 					QStringList vars = par.split("=");
 					QString varName = vars[0];
@@ -1872,8 +1876,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			double YHalfLength1 = 0.;
 			double YHalfLength2 = 0.;
 			double ZHalfLength = 0.;
-			// get parameters from DB string
-			QStringList shapePars = parameters.split(";");
+			// get parameters
 			foreach( QString par, shapePars) {
 					QStringList vars = par.split("=");
 					QString varName = vars[0];
@@ -1892,8 +1895,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double RMin = 0.;
 		double RMax = 0.;
 		double ZHalfLength = 0.;
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
+		// get parameters
 		foreach( QString par, shapePars) {
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
@@ -1911,8 +1913,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double ZHalfLength = 0.;
 		double SPhi = 0.;
 		double DPhi = 0.;
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
+		// get parameters
 		foreach( QString par, shapePars) {
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
@@ -1929,8 +1930,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		// shape parameters
 		unsigned int shapeOpId = 0;
 		unsigned int transfId = 0;
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
+		// get parameters
 		foreach( QString par, shapePars) {
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
@@ -2025,8 +2025,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		// shape's operands
 		unsigned int opA = 0;
 		unsigned int opB = 0;
-		// get parameters from DB string
-		QStringList shapePars = parameters.split(";");
+		// get parameters
 		foreach( QString par, shapePars) {
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
@@ -2107,11 +2106,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
   //LAr custom shape
   else if(type == "CustomShape") {
     std::string name = "";
-    // get parameters from DB string
-  	QStringList shapePars = parameters.split(";");
-  	// qWarning() << "shapePars: " << shapePars << shapePars.size() << shapePars.isEmpty();
+    // check parameters
   	if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
   	{
+      // get parameters
   		foreach( QString par, shapePars) {
   				QStringList vars = par.split("=");
   				QString varName = vars[0];
@@ -2130,10 +2128,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
   else if (type=="UnidentifiedShape") {
     std::string name = "";
     std::string asciiData = "";
-    // get parameters from DB string
-    QStringList shapePars = parameters.split(";");
+    // check parameters
     if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
   	{
+      // get parameters
       foreach( QString par, shapePars) {
         QStringList vars = par.split("=");
         QString varName = vars[0];
@@ -2396,6 +2394,16 @@ std::vector<std::string> ReadGeoModel::splitString(const std::string& s, const c
    return tokens;
 }
 
+  // TODO: move this to utility class/file
+QStringList ReadGeoModel::toQStringList(std::vector<std::string> vec)
+  {
+    QStringList ll;
+    for ( auto& str : vec ) {
+      ll << QString::fromStdString(str);
+    }
+    return ll;
+  }
+
 // TODO: move this to utility class/file
 std::vector<std::string> ReadGeoModel::toStdVectorStrings(QStringList qlist)
 {
@@ -2420,8 +2428,9 @@ std::pair<unsigned int, unsigned int> ReadGeoModel::getBooleanShapeOperands(cons
 {
   std::pair<unsigned int, unsigned int> pair;
 
-  std::vector<std::string> paramsShape = toStdVectorStrings(m_shapes[ shapeID ]);
-
+//  std::vector<std::string> paramsShape = toStdVectorStrings(m_shapes[ shapeID ]);
+  std::vector<std::string> paramsShape = m_shapes[ shapeID ];
+  
 //  unsigned int id = std::stoi(paramsShape[0]); //! the ID of the boolean/operator shape
 	std::string type = paramsShape[1]; //! the GeoModel type of the shape
 	std::string parameters = paramsShape[2];  //! the parameters defining the shape, coming from the DB
@@ -2811,21 +2820,15 @@ TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int id)
 // --- methods for caching GeoShape nodes ---
 bool ReadGeoModel::isBuiltShape(const unsigned int id)
 {
-  std::lock_guard<std::mutex> lk(muxShape);
-  // std::cout << "ReadGeoModel::isBuiltShape(): " << id << std::endl;
-  return m_memMapShapes.count(id);
+  return (id <= m_memMapShapes.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
 void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* nodePtr)
 {
-  std::lock_guard<std::mutex> lk(muxShape);
-  // std::cout << "ReadGeoModel::storeBuiltShape(): " << id << ", " << nodePtr << std::endl;
-  m_memMapShapes[id] = nodePtr;
+  m_memMapShapes.push_back(nodePtr);
 }
 GeoShape* ReadGeoModel::getBuiltShape(const unsigned int id)
 {
-	std::lock_guard<std::mutex> lk(muxShape); // TODO: is this lock now needed at all?? now we only use those in a single thread or read-only
-	// std::cout << "ReadGeoModel::getBuiltShape(): " << id << std::endl;
-	return m_memMapShapes[id];
+	return m_memMapShapes[id-1];
 }
 // --- methods for caching GeoLogVol nodes ---
 bool ReadGeoModel::isBuiltLog(const unsigned int id)
@@ -2856,96 +2859,71 @@ GeoPhysVol* ReadGeoModel::getBuiltPhysVol(const unsigned int id)
 // --- methods for caching GeoFullPhysVol nodes ---
 bool ReadGeoModel::isBuiltFullPhysVol(const unsigned int id)
 {
-  // std::lock_guard<std::mutex> lk(muxLog);
-  // std::cout << "ReadGeoModel::isBuiltFullPhysVol(): " << id << std::endl;
-  // return m_memMapFullPhysVols.count(id); // map
   return (id <= m_memMapFullPhysVols.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 
 }
 void ReadGeoModel::storeBuiltFullPhysVol(const unsigned int id, GeoFullPhysVol* nodePtr)
 {
   // std::lock_guard<std::mutex> lk(muxLog);
-  // std::cout << "ReadGeoModel::storeBuiltFullPhysVol(): " << id << ", " << nodePtr << std::endl;
-  // m_memMapFullPhysVols[id] = nodePtr; // map
   m_memMapFullPhysVols.push_back(nodePtr); // vector, we store them in the order of IDs
-  // bool ok = m_memMapFullPhysVols.insert({id, nodePtr}).second; // map
-  // if (!ok) {
-  //   std::cout << "inserting GeoFullPhysVol " << id << " -> " << nodePtr << "failed!" << std::endl;
-  // }
 }
 GeoFullPhysVol* ReadGeoModel::getBuiltFullPhysVol(const unsigned int id)
 {
 	// std::lock_guard<std::mutex> lk(muxLog); // TODO: is this lock now needed at all?? now we only use those in a single thread or read-only
-	// std::cout << "ReadGeoModel::getBuiltFullPhysVol(): " << id << std::endl;
-	// return m_memMapFullPhysVols.at(id); // map
   return m_memMapFullPhysVols[id-1]; // vector
 
 }
 // --- methods for caching GeoMaterial nodes ---
 bool ReadGeoModel::isBuiltMaterial(const unsigned int id)
 {
-  // std::lock_guard<std::mutex> lk(muxMat);
   return (id <= m_memMapMaterials.size());
 }
 void ReadGeoModel::storeBuiltMaterial(const unsigned int id, GeoMaterial* nodePtr)
 {
-  // std::lock_guard<std::mutex> lk(muxMat);
   m_memMapMaterials.push_back(nodePtr);
 }
 GeoMaterial* ReadGeoModel::getBuiltMaterial(const unsigned int id)
 {
-	// std::lock_guard<std::mutex> lk(muxMat); // TODO: is this lock now needed at all??  now we only use those in a single thread or read-only
 	return m_memMapMaterials[id-1];
 }
 // --- methods for caching GeoElement nodes ---
 bool ReadGeoModel::isBuiltElement(const unsigned int id)
 {
-  // std::lock_guard<std::mutex> lk(muxEl); // TODO: is this lock now needed at all??  now we only use those in a single thread or read-only
   return (id <= m_memMapElements.size());
 }
 void ReadGeoModel::storeBuiltElement(const unsigned int id, GeoElement* nodePtr)
 {
-  // std::lock_guard<std::mutex> lk(muxEl); // TODO: is this lock now needed at all??  now we only use those in a single thread or read-only
   m_memMapElements.push_back(nodePtr);
 }
 GeoElement* ReadGeoModel::getBuiltElement(const unsigned int id)
 {
-  // std::lock_guard<std::mutex> lk(muxEl); // TODO: is this lock now needed at all??  now we only use those in a single thread or read-only
 	return m_memMapElements[id-1];
 }
 // --- methods for caching GeoTransform nodes ---
 bool ReadGeoModel::isBuiltTransform(const unsigned int id)
 {
-   std::lock_guard<std::mutex> lk(muxTransf);
-  // std::cout << "ReadGeoModel::isBuiltTransform(): " << id << std::endl;
-//  return m_memMapTransforms.count(id); // map
+//   std::lock_guard<std::mutex> lk(muxTransf);
   return (id <= m_memMapTransforms.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
 void ReadGeoModel::storeBuiltTransform(const unsigned int id, GeoTransform* nodePtr)
 {
-   std::lock_guard<std::mutex> lk(muxTransf);
-  // std::cout << "ReadGeoModel::storeBuiltTransform(): " << id << ", " << nodePtr << std::endl;
-//  m_memMapTransforms[id] = nodePtr; // map
+//   std::lock_guard<std::mutex> lk(muxTransf);
   m_memMapTransforms.push_back(nodePtr); // vector, we store them in the order of IDs
 
 }
 GeoTransform* ReadGeoModel::getBuiltTransform(const unsigned int id)
 {
-   std::lock_guard<std::mutex> lk(muxTransf); // TODO: is this lock needed at all?? I guess STD containers are thread safe for read-only operations
-	// std::cout << "ReadGeoModel::getBuiltTransform(): " << id << std::endl;
-//  return m_memMapTransforms[id]; // map
+//   std::lock_guard<std::mutex> lk(muxTransf); // TODO: is this lock needed at all?? I guess STD containers are thread safe for read-only operations
   return m_memMapTransforms[id-1]; // vector, but nodes' IDs start from 1
 
 }
 // --- methods for caching GeoAlignableTransform nodes ---
 bool ReadGeoModel::isBuiltAlignableTransform(const unsigned int id)
 {
-//    std::lock_guard<std::mutex> lk(muxTransf);
   return (id <= m_memMapAlignableTransforms.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
 void ReadGeoModel::storeBuiltAlignableTransform(const unsigned int id, GeoAlignableTransform* nodePtr)
 {
-//    std::lock_guard<std::mutex> lk(muxTransf);
   m_memMapAlignableTransforms.push_back(nodePtr); // vector, we store them in the order of IDs
   
 }

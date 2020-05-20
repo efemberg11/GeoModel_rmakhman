@@ -10,20 +10,24 @@
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 
 #include <algorithm>
+#include <mutex>
+
+std::mutex muxVec;
 
 GeoPhysVol::GeoPhysVol(const GeoLogVol* LogVol)
   : GeoVPhysVol(LogVol)
 {
 }
 
-
 GeoPhysVol::~GeoPhysVol()
 {
+  std::lock_guard<std::mutex> lk(muxVec);
   for(const GeoGraphNode* daughter : m_daughters) daughter->unref();
 }
 
 void GeoPhysVol::add(GeoGraphNode* graphNode)
 {
+  std::lock_guard<std::mutex> lk(muxVec);
   m_daughters.push_back(graphNode);
   graphNode->ref();
   graphNode->dockTo(this);
@@ -85,6 +89,7 @@ void GeoPhysVol::exec(GeoNodeAction *action) const
      && action->getPath()->getLength() > action->getDepthLimit()) {
   }
   else {
+    std::lock_guard<std::mutex> lk(muxVec);
     for(size_t c = 0; c < m_daughters.size (); c++) {
       m_daughters[c]->exec(action);
       if(action->shouldTerminate()) {
@@ -190,16 +195,19 @@ GeoTrf::Transform3D GeoPhysVol::getDefX(const GeoVAlignmentStore* store) const {
 
 unsigned int GeoPhysVol::getNChildNodes() const 
 {
+  std::lock_guard<std::mutex> lk(muxVec);
   return m_daughters.size();
 }
 
 const GeoGraphNode * const * GeoPhysVol::getChildNode(unsigned int i) const 
 {
+  std::lock_guard<std::mutex> lk(muxVec);
   return &(m_daughters[i]);
 }
 
 const GeoGraphNode * const * GeoPhysVol::findChildNode(const GeoGraphNode * n) const 
 {
+  std::lock_guard<std::mutex> lk(muxVec);
   std::vector<const GeoGraphNode *>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
   if (i==m_daughters.end()) {
     return nullptr;

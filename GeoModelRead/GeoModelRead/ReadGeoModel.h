@@ -95,7 +95,7 @@ private:
   void buildAllLogVols();
   void buildAllPhysVols();
   void buildAllFullPhysVols();
-  // void buildAllFunctions();
+  //  void buildAllFunctions(); // FIXME:
   void buildAllTransforms();
   void buildAllAlignableTransforms();
   void buildAllSerialDenominators();
@@ -110,33 +110,32 @@ private:
 
   GeoBox* buildDummyShape();
 
+  void loopOverAllChildrenInBunches();
+  void loopOverAllChildrenInBunchesNew();
+  
 	void loopOverAllChildren(QStringList keys);
-	void loopOverAllChildrenInBunches();
 	void processParentChildren(const QString &parentKey);
 	void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child);
+  
+  void loopOverAllChildrenRecords(std::vector<std::vector<std::string>> records);
+  void processParentChild(const std::vector<std::string> &parentchild);
 
 	GeoPhysVol* getRootVolume();
 
 	GeoVPhysVol* parseChildren(GeoVPhysVol* vol, QMap<unsigned int, QStringList> children, int depth = 0);
-	// GeoVPhysVol* parseVPhysVol(QStringList values, QString nodeType, int depth = 0);
 
-//  GeoVPhysVol* buildVPhysVol(QString id, QString tableId, QString copyNumber);
-//  GeoVPhysVol* buildNewVPhysVol(QString id, QString tableId, QString copyN);
   GeoVPhysVol* buildVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
   GeoVPhysVol* buildNewVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
-  // GeoVPhysVol* buildActualVPhysVol(const unsigned int id, const unsigned int tableId);
   GeoVPhysVol* buildActualVPhysVol(const unsigned int id, const unsigned int tableId, unsigned int logVol_ID=0);
 
 	GeoLogVol* buildLogVol(const unsigned int id);
 	GeoShape* buildShape(const unsigned int id, type_shapes_boolean_info* shapes_info_sub);
 	GeoMaterial* buildMaterial(const unsigned id);
 	GeoElement* buildElement(const unsigned int id);
-//  GeoSerialDenominator* buildSerialDenominator(const unsigned int id);
 	GeoAlignableTransform* buildAlignableTransform(const unsigned int id);
 	GeoTransform* buildTransform(const unsigned int id);
 	GeoSerialTransformer* buildSerialTransformer(const unsigned int id);
 	TRANSFUNCTION buildFunction(const unsigned int id);
-//  GeoNameTag* buildNameTag(const unsigned int id);
 
 
   void checkNodePtr(GeoGraphNode* nodePtr, std::string varName="", std::string funcName="", std::string funcSignature="");//TODO: to be moved to an utility class
@@ -233,18 +232,9 @@ private:
 
 	// data containers
 	QHash<QString, QMap<unsigned int, QStringList>> m_allchildren; // key = "parentId:parentTable", item = list of children parameters, inserted by child position
-//  QHash<unsigned int, QStringList> m_physVols;
-//  QHash<unsigned int, QStringList> m_fullPhysVols;
-//  QHash<unsigned int, QStringList> m_logVols;
-//  QHash<unsigned int, QStringList> m_shapes;
-//  QHash<unsigned int, QStringList> m_materials;
-//  QHash<unsigned int, QStringList> m_elements;
-//  QHash<unsigned int, QStringList> m_transforms;
-//  QHash<unsigned int, QStringList> m_alignableTransforms;
-//  QHash<unsigned int, QStringList> m_serialDenominators;
-//  QHash<unsigned int, QStringList> m_serialTransformers;
-	QHash<unsigned int, QStringList> m_functions;
-//  QHash<unsigned int, QStringList> m_nameTags;
+//  std::map<std::string, std::>
+  
+  QHash<unsigned int, QStringList> m_functions;
 
   std::vector<std::vector<std::string>> m_physVolsStd;
   std::vector<std::vector<std::string>> m_fullPhysVolsStd;
@@ -257,6 +247,9 @@ private:
   std::vector<std::vector<std::string>> m_materials;
   std::vector<std::vector<std::string>> m_elements;
   std::vector<std::vector<std::string>> m_shapes;
+  //  std::vector<std::vector<std::string>> m_functions; // FIXME:
+  
+  std::vector<std::vector<std::string>> m_allchildrenStd;
   
 	QHash<unsigned int, QString> m_tableID_toTableName; // to look for node's type name starting from a table ID
 	QHash<QString, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
@@ -284,6 +277,8 @@ private:
   std::vector<GeoMaterial*> m_memMapMaterials;
   std::vector<GeoElement*> m_memMapElements;
   std::vector<GeoShape*> m_memMapShapes;
+  //  std::vector<TRANSFUNCTION> m_memMapFunctions; // FIXME:
+
   
   std::set<std::string> m_unknown_shapes;
 

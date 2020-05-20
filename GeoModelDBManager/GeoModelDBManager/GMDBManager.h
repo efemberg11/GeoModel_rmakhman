@@ -172,6 +172,8 @@ public:
 
 	/// methods to dump the DB
 	QHash<QString, QMap<unsigned int, QStringList>> getChildrenTable();
+  std::vector<std::vector<std::string>> getChildrenTableStd();
+
 	QHash<unsigned int, QStringList> getTableFromNodeType(QString nodeType);
   std::vector<std::vector<std::string>> getTableFromNodeTypeStd(std::string nodeType);
 	QHash<unsigned int, QString> getAll_TableIDsNodeTypes();

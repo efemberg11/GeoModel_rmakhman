@@ -64,7 +64,7 @@
 //#include "VP1Base/VP1Msg.h"
 
 // Qt includes
-#include <QDebug>
+//#include <QDebug>
 #include <QString>
 
 // C++ includes
@@ -124,10 +124,10 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDeb
 	// set the geometry file
 	m_dbManager = db;
 	if (m_dbManager->isOpen()) {
-	  if (m_deepDebug) qDebug() << "OK! Database is open!";
+    if (m_deepDebug) std::cout << "OK! Database is open!";
 	}
 	else {
-		qWarning() << "ERROR!! Database is NOT open!";
+    std::cout << "ERROR!! Database is NOT open!";
 		return;
 	}
 
@@ -168,14 +168,14 @@ std::string ReadGeoModel::getEnvVar( std::string const & key ) const
 
 GeoPhysVol* ReadGeoModel::buildGeoModel()
 {
-  if (m_deepDebug) qDebug() << "ReadGeoModel::buildGeoModel()";
+  if (m_deepDebug) std::cout << "ReadGeoModel::buildGeoModel()" << std::endl;
 
 	// return buildGeoModelByCalls();
 	GeoPhysVol* rootVolume = buildGeoModelOneGo();
 
   // warn the user if there are unknown/unhalded shapes
 	if (m_unknown_shapes.size() > 0) {
-		qWarning() << "\tWARNING!! There were unknwon shapes:";
+		std::cout << "\tWARNING!! There were unknwon shapes:" << std::endl;
 		for ( auto it = m_unknown_shapes.begin(); it != m_unknown_shapes.end(); it++ ) {
 			std::cout << "\t\t---> " << *it << std::endl;
 		}
@@ -188,7 +188,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 
 GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 {
-  if (m_deepDebug) qDebug() << "ReadGeoModel::buildGeoModelOneGo()";
+  if (m_deepDebug) std::cout << "ReadGeoModel::buildGeoModelOneGo()" << std::endl;
 
   // *** get all data from the DB ***
 
@@ -205,8 +205,8 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
 //  m_alignableTransforms = m_dbManager->getTableFromNodeType("GeoAlignableTransform");
 //  m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
 //  m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
-	// qDebug() << "physVols: " << _physVols;
-	// qDebug() << "fullPhysVols: " << _fullPhysVols;
+	// std::cout << "physVols: " << _physVols;
+	// std::cout << "fullPhysVols: " << _fullPhysVols;
   
   m_physVolsStd = m_dbManager->getTableFromNodeTypeStd("GeoPhysVol");
   m_fullPhysVolsStd = m_dbManager->getTableFromNodeTypeStd("GeoFullPhysVol");
@@ -219,7 +219,9 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
   
   // get the children table from DB
 	m_allchildren = m_dbManager->getChildrenTable();
-
+  m_allchildrenStd = m_dbManager->getChildrenTableStd();
+  
+  
 	// get the root volume data
 	m_root_vol_data = m_dbManager->getRootPhysVol();
 
@@ -233,6 +235,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
   // parallel mode:
   
   if (m_runMultithreaded) {
+  std::cout << "Building nodes concurrently..." << std::endl;
   std::thread t2(&ReadGeoModel::buildAllElements, this);
 //  std::thread t7(&ReadGeoModel::buildAllFunctions, this);
   
@@ -272,6 +275,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
   }
   // serial mode:
   else {
+    std::cout << "Building nodes serially..." << std::endl;
     buildAllElements();
     // buildAllFunctions();
     buildAllTransforms();
@@ -285,7 +289,10 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
     buildAllFullPhysVols();
     buildAllSerialTransformers();
   }
-	loopOverAllChildrenInBunches();
+	
+//  loopOverAllChildrenInBunches();
+    loopOverAllChildrenInBunchesNew(); // FIXME: WIP
+  
 	return getRootVolume();
 }
 
@@ -309,15 +316,10 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
 	// Get Start Time
 	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-  /*
-	foreach (const QString &parentKey, keys ) {
-		// qWarning() << "parentKey" << parentKey;
-		processParentChildren(parentKey);
-	} // end loop over parent's childrenPositions records
-  */
   
-  for (unsigned int i = 0; i < keys.size(); ++i)
+  for (unsigned int i = 0; i < keys.size(); ++i) {
     processParentChildren( keys.at(i) );
+  }
 
 	// Get End Time
 	auto end = std::chrono::system_clock::now();
@@ -327,6 +329,41 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
     muxCout.lock();
   	std::cout << "Time Taken to process " << nChildrenRecords << " children = " << diff << " Seconds" << std::endl;
   	muxCout.unlock();
+  }
+}
+
+//----------------------------------------
+// loop over parent-child relationship data
+  void ReadGeoModel::loopOverAllChildrenRecords(std::vector<std::vector<std::string>> records) 
+{
+  
+  int nChildrenRecords = records.size();
+  
+  if (m_debug || m_deepDebug) {
+    muxCout.lock();
+    std::cout << "Thread " << std::this_thread::get_id() << " - processing " << nChildrenRecords << " keys..." << std::endl;
+    muxCout.unlock();
+  }
+  
+  // loop over parents' keys.
+  // It returns a list of children with positions (sorted by position)
+  
+  // Get Start Time
+  std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+  
+  for ( auto& record : records ) {
+//  for (unsigned int i = 0; i < keys.size(); ++i) {
+    processParentChild( record );
+  }
+  
+  // Get End Time
+  auto end = std::chrono::system_clock::now();
+  auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+  
+  if (m_timing || m_debug || m_deepDebug) {
+    muxCout.lock();
+    std::cout << "Time Taken to process " << nChildrenRecords << " children = " << diff << " Seconds" << std::endl;
+    muxCout.unlock();
   }
 }
 
@@ -448,7 +485,7 @@ void ReadGeoModel::buildAllLogVols()
 void printQHashQstringUInt(QHash<QString, unsigned int> qq) {
   QHash<QString, unsigned int>::const_iterator i = qq.constBegin();
   while (i != qq.constEnd()) {
-    qWarning() << i.key() << ": " << i.value();
+    std::cout << i.key().toStdString() << ": " << i.value() << std::endl;
   }
 }
 
@@ -543,6 +580,16 @@ void ReadGeoModel::buildAllSerialTransformers()
 // //! Iterate over the list of nodes, build them all, and store their pointers
 // void ReadGeoModel::buildAllFunctions()
 // {
+//   if (m_debug) std::cout << "Building all Functions...\n";
+////   if (m_serialTransformersStd.size() == 0) {
+////     std::cout << "ERROR!!! input SerialTransformers are empty! Exiting..." << std::endl;
+////     exit(EXIT_FAILURE);
+////   }
+////   size_t nSize = m_functions.size();
+////   m_memMapFunctions.reserve( nSize*2 ); // TODO: check if 2 is good or redundant...
+////   for (unsigned int ii=0; ii<nSize; ++ii) {
+////     buildFunction(ii+1); // nodes' IDs start from 1
+////   }
 //   QHash<unsigned int, QStringList>::const_iterator i = m_functions.constBegin();
 //   while (i != m_functions.constEnd()) {
 //     unsigned int id = i.key();
@@ -625,7 +672,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
         muxCout.unlock();
       }
 
-			futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildren, this, bunch) );
+      futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildren, this, bunch) );
 		}
 
 		// wait for all async calls to complete
@@ -646,9 +693,102 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 	return;
 }
 
+  void ReadGeoModel::loopOverAllChildrenInBunchesNew()
+  {
+    int nChildrenRecords = m_allchildrenStd.size();
+    if (m_debug) std::cout << "number of children to process: " << nChildrenRecords << std::endl;
+    
+    // If we have a few children, then process them serially
+    std::cout << "Running concurrently? " << m_runMultithreaded << std::endl;
+    if ( !(m_runMultithreaded) || nChildrenRecords <= 500)
+    {
+      std::cout << "Running serially...\n";
+      loopOverAllChildrenRecords(m_allchildrenStd);
+    }
+    // ...otherwise, let's spawn some threads to process them in bunches, parallelly!
+    else {
+      
+      std::cout << "Running concurrently...\n";
+      
+      std::chrono::system_clock::time_point start, end;
+      if (m_timing || m_debug || m_deepDebug) {
+        // Get Start Time
+        start = std::chrono::system_clock::now();
+      }
+      
+      // set number of worker threads
+      unsigned int nThreads = 0;
+      if(m_runMultithreaded_nThreads > 0) {
+        nThreads = m_runMultithreaded_nThreads;
+      }
+      else if (m_runMultithreaded_nThreads == -1) {
+        unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
+        nThreads = nThreadsPlatform;
+        if (m_debug || m_deepDebug) std::cout << "INFO - You have asked for hardware native parellelism. On this platform, " << nThreadsPlatform << " concurrent threads are supported. Thus, using " << nThreads << " threads.\n";
+      }
+      
+      unsigned int nBunches = nChildrenRecords / nThreads;
+      if (m_debug || m_deepDebug) std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each, plus the remainder." << std::endl;
+      
+      // a vector to store the "futures" of async calls
+      std::vector<std::future<void>> futures;
+      
+      for (unsigned int bb=0; bb<nThreads; ++bb ) {
+        
+        std::vector<std::vector<std::string>> bunch;
+        
+        unsigned int start = nBunches * bb;
+        int len = nBunches;
+        const unsigned int stop = start + len;
+        std::vector<std::vector<std::string>>::const_iterator first = m_allchildrenStd.begin() + start;
+        std::vector<std::vector<std::string>>::const_iterator last  = m_allchildrenStd.begin() + stop;
+        if ( bb == (nThreads - 1) ) { // last bunch
+           bunch = std::vector<std::vector<std::string>>(first, m_allchildrenStd.end());
+//          bunch = bunchIn;
+        } else { // all bunches but last one
+           bunch = std::vector<std::vector<std::string>>(first, last);
+        }
+        
+        
+        
+        
+        if (m_debug || m_deepDebug) {
+          muxCout.lock();
+          std::cout << "Thread " << bb+1 << " - Start: " << start << ", len: " << len << "   ['len=-1' = all remaining items]" << std::endl;
+          muxCout.unlock();
+        }
+        
+        
+        if (m_debug || m_deepDebug) {
+          muxCout.lock();
+          std::cout << "'bunch' size: " << bunch.size() << std::endl;
+          muxCout.unlock();
+        }
+        
+        futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildrenRecords, this, bunch) );
+      }
+      
+      // wait for all async calls to complete
+      //retrieve and print the value stored in the 'std::future'
+      if (m_debug || m_deepDebug) std::cout << "Waiting for the threads to finish...\n" << std::flush;
+      for(auto &e : futures) {
+        e.wait();
+      }
+      if (m_debug || m_deepDebug) std::cout << "Done!\n";
+      
+      if (m_timing || m_debug || m_deepDebug) {
+        // Get End Time
+        end = std::chrono::system_clock::now();
+        auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+        std::cout << "(Total time taken to recreate all " << nChildrenRecords << " mother-children relationships: " << diff << " seconds)" << std::endl;
+      }
+    }
+    return;
+  }
+
 void ReadGeoModel::processParentChildren(const QString &parentKey)
 {
-	if (m_deepDebug) qWarning() << "\n" << "parent: " << parentKey << ':' << m_allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]";
+//  if (m_deepDebug) std::cout << "\n" << "parent: " << parentKey << ':' << m_allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]" << std::endl;
 
 	// get the parent's details
 	QStringList parentKeyItems = parentKey.split(":");
@@ -675,89 +815,174 @@ void ReadGeoModel::processParentChildren(const QString &parentKey)
 
 	// get the parent's children
 	QMap<unsigned int, QStringList> children = m_allchildren.value(parentKey);
-	// qWarning() << "children" << children;
+	// std::cout << "children" << children;
 
 	// loop over children, sorted by child position automatically
 	// "id", "parentId", "parentTable", "parentCopyNumber", "position", "childTable", "childId", "childCopyNumber"
-	if (m_deepDebug) qDebug() << "parent volume has " << children.size() << "children. Looping over them...";
+	if (m_deepDebug) std::cout << "parent volume has " << children.size() << "children. Looping over them..." << std::endl;
 	foreach(QStringList child, children) {
 		processChild(parentVol, isRootVolume, child);
 	} // loop over all children
 }
 
+  void ReadGeoModel::processParentChild(const std::vector<std::string> &parentchild)
+  {
+    //  if (m_deepDebug) std::cout << "\n" << "parent: " << parentKey << ':' << m_allchildren.value(parentKey) << "[parentId, parentType, parentCopyNumber, childPos, childType, childId, childCopyN]" << std::endl;
+    
+    // safety check
+    if (parentchild.size() < 8) {
+      std::cout <<  "ERROR!!! Probably you are using an old geometry file. Please, get a new one. Exiting..." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    
+//    std::cout << "parentchild: "; printStdVectorStrings(parentchild);
+    
+    // get the parent's details
+    const unsigned int parentId = std::stoi(parentchild[1]);
+    const unsigned int parentTableId = std::stoi(parentchild[2]);
+    const unsigned int parentCopyN = std::stoi(parentchild[3]);
 
-void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child)
-{
-	if (m_deepDebug) {
-    muxCout.lock();
-    std::cout << "ReadGeoModel::processChild() - child: ";
-    printStdVectorStrings(toStdVectorStrings(child));
-    muxCout.unlock();
-  }
-
-	if (child.length() < 8) {
-		std::cout <<  "ERROR!!! Probably you are using an old geometry file. Please, get a new one. Exiting..." << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	// build or get child node
-	const unsigned int childTableId = child[5].toUInt();
-	const unsigned int childId = child[6].toUInt();
-	const unsigned int childCopyN = child[7].toUInt();
-
-  std::string childNodeType = m_tableID_toTableName[childTableId].toStdString();
-
-	if (m_deepDebug) {
-    muxCout.lock();
-    qDebug() << "childTableId:" << childTableId << ", type:" << childNodeType << ", childId:" << childId;
-    muxCout.unlock();
-  }
-
+    // get the child's position in the parent's children list
+    const unsigned int position = std::stoi(parentchild[4]);
+    
+    // get the child's details
+    const unsigned int childTableId = std::stoi(parentchild[5]);
+    const unsigned int childId = std::stoi(parentchild[6]);
+    const unsigned int childCopyN = std::stoi(parentchild[7]);
+    
+    std::string childNodeType = m_tableID_toTableName[childTableId].toStdString();
+    
+    
+    
+//    bool isRootVolume = false;
+//    unsigned int parentId = 0; // TODO: I should change the 'NULL' datum in the DB to something else, like 0 or -1
+//    if (sparentId == "NULL") {
+//      isRootVolume = true;
+//    } else {
+//      parentId = std::stoi(sparentId);
+//    }
+    
+    GeoVPhysVol* parentVol = nullptr;
+    
+    // build or get parent volume.
+    // Using the parentCopyNumber here, to get a given instance of the parent volume
+//    if (!isRootVolume) {
+      if (m_deepDebug) std::cout << "\nget the parent volume...\n";
+      parentVol = dynamic_cast<GeoVPhysVol*>( getVPhysVol(parentId, parentTableId, parentCopyN) );
+//    }
+    
 	if ( "" == childNodeType || 0 == childNodeType.size()) {
     std::cout << "ERROR!!! childNodeType is empty!!! Aborting..." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	if (childNodeType == "GeoPhysVol") {
-		GeoVPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
-		if (!isRootVolume) volAddHelper(parentVol, childNode);
+		GeoPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
+    volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoFullPhysVol") {
-		GeoVPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
-    if (!isRootVolume) volAddHelper(parentVol, childNode);
+		GeoFullPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
+    volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoSerialDenominator") {
-//    GeoSerialDenominator* childNode = buildSerialDenominator(childId);
     GeoSerialDenominator* childNode = getBuiltSerialDenominator(childId);
-		if (!isRootVolume) volAddHelper(parentVol, childNode);
+		volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoAlignableTransform") {
-//    GeoAlignableTransform* childNode = buildAlignableTransform(childId);
     GeoAlignableTransform* childNode = getBuiltAlignableTransform(childId);
-		if (!isRootVolume) volAddHelper(parentVol, childNode);
-    
+		volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoTransform") {
-//    GeoTransform* childNode = buildTransform(childId);
     GeoTransform* childNode = getBuiltTransform(childId);
-		if (!isRootVolume) volAddHelper(parentVol, childNode);
-    
+		volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoSerialTransformer") {
-//    GeoSerialTransformer* childNode = buildSerialTransformer(childId);
     GeoSerialTransformer* childNode = getBuiltSerialTransformer(childId);
-		if (!isRootVolume) volAddHelper(parentVol, childNode);
+		volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoNameTag") {
-//    GeoNameTag* childNode = buildNameTag(childId);
     GeoNameTag* childNode = getBuiltNameTag(childId);
-		if (!isRootVolume) volAddHelper(parentVol, childNode);
+		volAddHelper(parentVol, childNode);
   }
 	else {
     std::cout << "[" << childNodeType << "] ==> ERROR!!! - The conversion for this type of child node needs to be implemented." << std::endl;
     exit(EXIT_FAILURE);
 	}
 }
+
+  void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child)
+  {
+    if (m_deepDebug) {
+      muxCout.lock();
+      std::cout << "ReadGeoModel::processChild() - child: ";
+      printStdVectorStrings(toStdVectorStrings(child));
+      muxCout.unlock();
+    }
+    
+    if (child.length() < 8) {
+      std::cout <<  "ERROR!!! Probably you are using an old geometry file. Please, get a new one. Exiting..." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    
+    // build or get child node
+    const unsigned int childTableId = child[5].toUInt();
+    const unsigned int childId = child[6].toUInt();
+    const unsigned int childCopyN = child[7].toUInt();
+    
+    std::string childNodeType = m_tableID_toTableName[childTableId].toStdString();
+    
+    if (m_deepDebug) {
+      muxCout.lock();
+      std::cout << "childTableId:" << childTableId << ", type:" << childNodeType << ", childId:" << childId << std::endl;
+      muxCout.unlock();
+    }
+    
+    if ( "" == childNodeType || 0 == childNodeType.size()) {
+      std::cout << "ERROR!!! childNodeType is empty!!! Aborting..." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    
+    if (childNodeType == "GeoPhysVol") {
+      GeoVPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
+      if (!isRootVolume) volAddHelper(parentVol, childNode);
+    }
+    else if (childNodeType == "GeoFullPhysVol") {
+      GeoVPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVol(childId, childTableId, childCopyN));
+      if (!isRootVolume) volAddHelper(parentVol, childNode);
+    }
+    else if (childNodeType == "GeoSerialDenominator") {
+      //    GeoSerialDenominator* childNode = buildSerialDenominator(childId);
+      GeoSerialDenominator* childNode = getBuiltSerialDenominator(childId);
+      if (!isRootVolume) volAddHelper(parentVol, childNode);
+    }
+    else if (childNodeType == "GeoAlignableTransform") {
+      //    GeoAlignableTransform* childNode = buildAlignableTransform(childId);
+      GeoAlignableTransform* childNode = getBuiltAlignableTransform(childId);
+      if (!isRootVolume) volAddHelper(parentVol, childNode);
+      
+    }
+    else if (childNodeType == "GeoTransform") {
+      //    GeoTransform* childNode = buildTransform(childId);
+      GeoTransform* childNode = getBuiltTransform(childId);
+      if (!isRootVolume) volAddHelper(parentVol, childNode);
+      
+    }
+    else if (childNodeType == "GeoSerialTransformer") {
+      //    GeoSerialTransformer* childNode = buildSerialTransformer(childId);
+      GeoSerialTransformer* childNode = getBuiltSerialTransformer(childId);
+      if (!isRootVolume) volAddHelper(parentVol, childNode);
+    }
+    else if (childNodeType == "GeoNameTag") {
+      //    GeoNameTag* childNode = buildNameTag(childId);
+      GeoNameTag* childNode = getBuiltNameTag(childId);
+      if (!isRootVolume) volAddHelper(parentVol, childNode);
+    }
+    else {
+      std::cout << "[" << childNodeType << "] ==> ERROR!!! - The conversion for this type of child node needs to be implemented." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+
 
 void ReadGeoModel::volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild)
 {
@@ -772,7 +997,7 @@ void ReadGeoModel::volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild)
 	}
 }
 
-void checkNodePtr(GeoGraphNode* nodePtr, std::string varName="", std::string funcName="", std::string funcSignature="")//TODO: to be moved to an utility class
+void ReadGeoModel::checkNodePtr(GeoGraphNode* nodePtr, std::string varName, std::string funcName, std::string funcSignature)//TODO: to be moved to an utility class
 {
   if (!nodePtr) {
     muxCout.lock();
@@ -786,7 +1011,7 @@ void checkNodePtr(GeoGraphNode* nodePtr, std::string varName="", std::string fun
 void ReadGeoModel::checkInputString(QString input)
 {
 	if (input.isEmpty() || input.isNull() || input == "NULL") {
-		qWarning() << "ERROR!!! Input QString is empty or equal to 'NULL'!!! Aborting...";
+		std::cout << "ERROR!!! Input QString is empty or equal to 'NULL'!!! Aborting..." << std::endl;
 		exit(1);
 	}
 }
@@ -804,11 +1029,11 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(const unsigned int id, const unsigned i
   checkInputString(QString::number(id));
 	checkInputString(QString::number(tableId));
 
-	// if previously built, return that // FIXME: TODO: apparently this is only used for VPhysVol... check that, because it should be used for all nodes, otherwise we create new nodes in memory even if we have a copy of them already...
+	// if previously built, return that
 	if (isVPhysVolBuilt(id, tableId, copyN)) {
 		if (m_deepDebug) {
       muxCout.lock();
-      qWarning() << "getting the volume from memory...";
+      std::cout << "getting the volume from memory..." << std::endl;
       muxCout.unlock();
     }
 		return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId, copyN));
@@ -817,7 +1042,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(const unsigned int id, const unsigned i
 	GeoVPhysVol* vol = nullptr;
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "building a new volume...";
+    std::cout << "building a new volume..." << std::endl;
     muxCout.unlock();
   }
 	vol = buildNewVPhysVol(id, tableId, copyN);
@@ -913,7 +1138,7 @@ GeoVPhysVol* ReadGeoModel::buildNewVPhysVol(const unsigned int id, const unsigne
 	// storing the address of the newly built node
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "\tstoring the VPhysVol...";
+    std::cout << "\tstoring the VPhysVol..." << std::endl;
     muxCout.unlock();
   }
 	storeVPhysVol(id, tableId, copyN, vol);
@@ -926,13 +1151,15 @@ GeoPhysVol* ReadGeoModel::getRootVolume()
 {
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "ReadGeoModel::getRootVolume()";
+    std::cout << "ReadGeoModel::getRootVolume()" << std::endl;
     muxCout.unlock();
   }
 	const unsigned int id = m_root_vol_data[1].toUInt();
 	const unsigned int tableId = m_root_vol_data[2].toUInt();
 	const unsigned int copyNumber = 1; // the Root volume has only one copy by definition
-	return dynamic_cast<GeoPhysVol*>(buildVPhysVol(id, tableId, copyNumber));
+  GeoPhysVol* root = dynamic_cast<GeoPhysVol*>(buildVPhysVol(id, tableId, copyNumber));
+  checkNodePtr(root, "root", __func__, __PRETTY_FUNCTION__);
+  return root;
 }
 
 
@@ -944,16 +1171,16 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id)
 
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "ReadGeoModel::buildMaterial()";
+    std::cout << "ReadGeoModel::buildMaterial()" << std::endl;
     muxCout.unlock();
   }
   std::vector<std::string> values = m_materials[id-1];
 
-	if (m_deepDebug) {
-    muxCout.lock();
-    qDebug() << "mat values=" << values;
-    muxCout.unlock();
-  }
+//  if (m_deepDebug) {
+//    muxCout.lock();
+//    std::cout << "mat values=" << values << std::endl;
+//    muxCout.unlock();
+//  }
   const unsigned int matId = std::stoi(values[0]);
   const std::string matName = values[1];
   double matDensity = std::stod(values[2]);
@@ -961,11 +1188,11 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id)
 
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "\tMaterial - ID:" << matId
-		  << ", name:" << matName
-		  << ", density:" << matDensity
-		  << " ( " << matDensity / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3) << "[g/cm3] )"
-		  << ", elements:" << matElements;
+    std::cout << "\tMaterial - ID:" << matId
+		          << ", name:" << matName
+		          << ", density:" << matDensity
+		          << " ( " << matDensity / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3) << "[g/cm3] )"
+		          << ", elements:" << matElements;
     muxCout.unlock();
   }
 
@@ -978,7 +1205,7 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id)
 
 		  if (m_deepDebug) {
         muxCout.lock();
-        qDebug() << "par:" << par;
+        std::cout << "par:" << par;
         muxCout.unlock();
       }
       std::vector<std::string> vars = splitString(par, ':');
@@ -1002,7 +1229,7 @@ GeoElement* ReadGeoModel::buildElement(const unsigned int id)
 
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "ReadGeoModel::buildElement()";
+    std::cout << "ReadGeoModel::buildElement()" << std::endl;
     muxCout.unlock();
   }
 
@@ -1019,12 +1246,12 @@ GeoElement* ReadGeoModel::buildElement(const unsigned int id)
 
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "\tElement - ID:" << elId
-			<< ", name:" << elName
-			<< ", symbol:" << elSymbol
-			<< ", Z:" << elZ
-			<< ", A:" << elA
-			<< " ( " << elA / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole) << "[g/mole] )";
+    std::cout << "\tElement - ID:" << elId
+			        << ", name:" << elName
+			        << ", symbol:" << elSymbol
+			        << ", Z:" << elZ
+		       	  << ", A:" << elA
+			        << " ( " << elA / (SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole) << "[g/mole] )";
     muxCout.unlock();
   }
 
@@ -1116,7 +1343,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			QStringList vars = par.split("=");
 			QString varName = vars[0];
 			QString varValue = vars[1];
-      // qWarning() << "varValue Cons:" << varValue;
+      // std::cout << "varValue Cons:" << varValue;
 			if (varName == "RMin1") RMin1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "RMin2") RMin2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 			if (varName == "RMax1") RMax1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
@@ -1241,7 +1468,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 					if(error) {
             muxCout.lock();
-            qWarning() << "ERROR! GeoPcon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars;
+            // FIXME:           std::cout << "ERROR! GeoPcon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars << std::endl;
             muxCout.unlock();
           }
 
@@ -1250,7 +1477,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				} else {
 					error = 1;
           muxCout.lock();
-					qWarning() << "ERROR! GeoPcon 'ZPos' value is not at the right place! --> " << shapePars;
+          // FIXME: std::cout << "ERROR! GeoPcon 'ZPos' value is not at the right place! --> " << shapePars << std::endl;
           muxCout.unlock();
 				}
 			}
@@ -1259,19 +1486,19 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if( pcon->getNPlanes() != NZPlanes) {
 				error = 1;
         muxCout.lock();
-				qWarning() << "ERROR! GeoPcon number of planes: " << QString::number(pcon->getNPlanes()) << " is not equal to the original size! --> " << shapePars;
+        //FIXME:std::cout << "ERROR! GeoPcon number of planes: " << QString::number(pcon->getNPlanes()) << " is not equal to the original size! --> " << shapePars << std::endl;
         muxCout.unlock();
 			}
 			if(!pcon->isValid()) {
 				error = 1;
         muxCout.lock();
-        qWarning() << "ERROR! GeoPcon shape is not valid!! -- input: " << shapePars;
+      //FIXME: std::cout << "ERROR! GeoPcon shape is not valid!! -- input: " << shapePars << std::endl;
         muxCout.unlock();
 			}
 	  } // end if (size>3)
 		else {
       muxCout.lock();
-      qWarning() << "ERROR!! GeoPcon has no Z planes!! --> shape input parameters: " << shapePars;
+      //FIXME: std::cout << "ERROR!! GeoPcon has no Z planes!! --> shape input parameters: " << shapePars << std::endl;
       muxCout.unlock();
 			error = 1;
 		}
@@ -1352,7 +1579,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 					if(error) {
             muxCout.lock();
-            qWarning() << "ERROR! GeoPgon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars;
+          //FIXME: std::cout << "ERROR! GeoPgon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars << std::endl;
             muxCout.unlock();
           }
 
@@ -1361,7 +1588,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				} else {
 					error = 1;
           muxCout.lock();
-					qWarning() << "ERROR! GeoPgon 'ZPos' value is not at the right place! --> " << shapePars;
+          // FIXME: std::cout << "ERROR! GeoPgon 'ZPos' value is not at the right place! --> " << shapePars << std::endl;
           muxCout.unlock();
 				}
 			}
@@ -1370,19 +1597,19 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if( pgon->getNPlanes() != NZPlanes) {
 				error = 1;
         muxCout.lock();
-				qWarning() << "ERROR! GeoPgon number of planes: " << QString::number(pgon->getNPlanes()) << " is not equal to the original size! --> " << shapePars;
+        //FIXME: std::cout << "ERROR! GeoPgon number of planes: " << QString::number(pgon->getNPlanes()) << " is not equal to the original size! --> " << shapePars << std::endl;
         muxCout.unlock();
 			}
 			if(!pgon->isValid()) {
 				error = 1;
         muxCout.lock();
-				qWarning() << "ERROR! GeoPgon shape is not valid!! -- input: " << shapePars;
+        //FIXME: std::cout << "ERROR! GeoPgon shape is not valid!! -- input: " << shapePars << std::endl;
         muxCout.unlock();
 			}
 		} // end if (size>3)
 		else {
       muxCout.lock();
-			qWarning() << "ERROR!! GeoPgon has no Z planes!! --> shape input parameters: " << shapePars;
+      //FIXME: std::cout << "ERROR!! GeoPgon has no Z planes!! --> shape input parameters: " << shapePars << std::endl;
       muxCout.unlock();
 			error = 1;
 		}
@@ -1451,13 +1678,13 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 					}
 					if(error) {
             muxCout.lock();
-            qWarning() << "ERROR! GeoGenericTrap 'X' and 'Y' values are not at the right place! --> " << shapePars;
+            //FIXME: std::cout << "ERROR! GeoGenericTrap 'X' and 'Y' values are not at the right place! --> " << shapePars << std::endl;
             muxCout.unlock();
           }
 				} else {
 					error = 1;
           muxCout.lock();
-					qWarning() << "ERROR! GeoGenericTrap 'ZPos' value is not at the right place! --> " << shapePars;
+          //FIXME: std::cout << "ERROR! GeoGenericTrap 'ZPos' value is not at the right place! --> " << shapePars << std::endl;
           muxCout.unlock();
 				}
 			}
@@ -1471,7 +1698,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			gTrap = new GeoGenericTrap(ZHalfLength,Vertices);
 		} // end if (size>3)
 		else {
-			qWarning() << "ERROR!! GeoGenericTrap has no Z vertices!! --> shape input parameters: " << shapePars;
+      //FIXME: std::cout << "ERROR!! GeoGenericTrap has no Z vertices!! --> shape input parameters: " << shapePars << std::endl;
 			error = 1;
 		}
     if(error) {
@@ -1512,7 +1739,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				if (varName == "NVertices") NVertices = varValue.toDouble();
 				//else if (varName == "NVertices") NVertices = varValue.toDouble();
 				//else error = 1;
-				//if(error) qWarning() << "ERROR! GeoSimplePolygonBrep parameters are not correctly stored! -->" << vars;
+				//if(error) std::cout << "ERROR! GeoSimplePolygonBrep parameters are not correctly stored! -->" << vars;
 
 			}
 			// build the basic GeoSimplePolygonBrep shape
@@ -1539,7 +1766,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 				if(error) {
           muxCout.lock();
-          qWarning() << "ERROR! GeoSimplePolygonBrep 'xVertex' and 'yVertex' values are not at the right place! --> " << shapePars;
+          //FIXME: std::cout << "ERROR! GeoSimplePolygonBrep 'xVertex' and 'yVertex' values are not at the right place! --> " << shapePars << std::endl;
           muxCout.unlock();
         }
 
@@ -1550,19 +1777,19 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if( sh->getNVertices() != NVertices) {
 				error = 1;
         muxCout.lock();
-				qWarning() << "ERROR! GeoSimplePolygonBrep number of planes: " << QString::number(sh->getNVertices()) << " is not equal to the original size! --> " << shapePars;
+				//FIXME: std::cout << "ERROR! GeoSimplePolygonBrep number of planes: " << QString::number(sh->getNVertices()) << " is not equal to the original size! --> " << shapePars << std::endl;
         muxCout.unlock();
 			}
 			if(!sh->isValid()) {
 				error = 1;
         muxCout.lock();
-				qWarning() << "ERROR! GeoSimplePolygonBrep shape is not valid!! -- input: " << shapePars;
+				//FIXME: std::cout << "ERROR! GeoSimplePolygonBrep shape is not valid!! -- input: " << shapePars << std::endl;
         muxCout.unlock();
 			}
 		} // end if (size>3)
 		else {
       muxCout.lock();
-			qWarning() << "ERROR!! GeoSimplePolygonBrep has no vertices!! --> shape input parameters: " << shapePars;
+			//FIXME: std::cout << "ERROR!! GeoSimplePolygonBrep has no vertices!! --> shape input parameters: " << shapePars << std::endl;
       muxCout.unlock();
 			error = 1;
 		}
@@ -1577,7 +1804,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 	}
 	else if (type == "TessellatedSolid") {
 		// Tessellated pars example: "nFacets=1;TRI;vT=ABSOLUTE;nV=3;xV=0;yV=0;zV=1;xV=0;yV=1;zV=0;xV=1;yV=0;zV=0"
-		qInfo() << "Reading-in: TessellatedSolid: "; // debug
+    std::cout << "Reading-in: TessellatedSolid: "; // debug
 		// Facet type
 		QString facetType = "";
 		// shape parameters
@@ -1629,7 +1856,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				}
 				else {
           muxCout.lock();
-					qWarning() << "ERROR!! - GeoTessellatedSolid - Facet type is not defined! [got: '" << varName << "']";
+					//FIXME: std::cout << "ERROR!! - GeoTessellatedSolid - Facet type is not defined! [got: '" << varName << "']" << std::endl;
           muxCout.unlock();
 					error = true;
 				}
@@ -1647,7 +1874,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 					else if (varValue == "RELATIVE") isAbsolute = false;
 					else {
             muxCout.lock();
-						qWarning() << "ERROR! - GeoTessellatedSolid - Vertex type not defined!";
+						std::cout << "ERROR! - GeoTessellatedSolid - Vertex type not defined!" << std::endl;
             muxCout.unlock();
 						error=true;
 					}
@@ -1664,18 +1891,18 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				if (varName == "nV") nVertexes = varValue.toUInt();
 				else {
           muxCout.lock();
-					qWarning() << "ERROR! - GeoTessellatedSolid - nVertices not defined!";
+					std::cout << "ERROR! - GeoTessellatedSolid - nVertices not defined!" << std::endl;
           muxCout.unlock();
 					error=true;
 				}
 
 
-				// qDebug() << "it:" << it;
+				// std::cout << "it:" << it;
 				// if we get a QUAD ==> GeoQuadrangularFacet
 				if (facetType=="QUAD") {
 
           muxCout.lock();
-					qDebug() << "Handling a QUAD facet...";
+					std::cout << "Handling a QUAD facet..." << std::endl;
           muxCout.unlock();
 					// to store the 4 vertices of the GeoQuadrangularFacet
 					auto vV = std::vector<std::unique_ptr<GeoFacetVertex>>{};
@@ -1695,7 +1922,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 						if (varName == "xV") xV = varValue.toDouble();
 						else {
               muxCout.lock();
-							qWarning() << "ERROR! Got '" << varName << "' instead of 'xV'!";
+							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'xV'!" << std::endl;
               muxCout.unlock();
 							error = 1;
 						}
@@ -1710,7 +1937,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 						if (varName == "yV") yV = varValue.toDouble();
 						else {
               muxCout.lock();
-							qWarning() << "ERROR! Got '" << varName << "' instead of 'yV'!";
+							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'yV'!" << std::endl;
               muxCout.unlock();
 							error = 1;
 						}
@@ -1725,14 +1952,14 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 						if (varName == "zV") zV = varValue.toDouble();
 						else {
               muxCout.lock();
-							qWarning() << "ERROR! Got '" << varName << "' instead of 'zV'!";
+							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'zV'!" << std::endl;
               muxCout.unlock();
 							error = 1;
 						}
 
 						if(error) {
               muxCout.lock();
-              qWarning() << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars;
+              //FIXME: std::cout << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars << std::endl;
               muxCout.unlock();
             }
 
@@ -1748,7 +1975,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				else if (facetType=="TRI") {
 
           muxCout.lock();
-					qDebug() << "Handling a TRI facet...";
+					std::cout << "Handling a TRI facet..." << std::endl;
           muxCout.unlock();
 
 					// std::vector<GeoFacetVertex*> vV(3, 0); // to store the 3 vertices of the GeoTriangularFacet
@@ -1791,7 +2018,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 						if(error) {
               muxCout.lock();
-              qWarning() << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars;
+              //FIXME: std::cout << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars << std::endl;
               muxCout.unlock();
             }
 
@@ -1811,20 +2038,20 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if( sh->getNumberOfFacets() != nFacets) {
 				error = 1;
         muxCout.lock();
-				qWarning() << "ERROR! GeoTessellatedSolid number of facets: " << QString::number(sh->getNumberOfFacets()) << " is not equal to the original size! --> " << shapePars;
+				//FIXME: std::cout << "ERROR! GeoTessellatedSolid number of facets: " << QString::number(sh->getNumberOfFacets()) << " is not equal to the original size! --> " << shapePars << std::endl;
         muxCout.unlock();
 			}
 			/*
 			 * TODO: uncomment it, when the isValid() method will be implemented for GeoTessellatedSolid
 			if(!sh->isValid()) {
 				error = 1;
-				qWarning() << "ERROR! GeoTessellatedSolid shape is not valid!! -- input: " << shapePars;
+				std::cout << "ERROR! GeoTessellatedSolid shape is not valid!! -- input: " << shapePars;
 			}
 			*/
 		} // END OF if (size>13)
 		else {
       muxCout.lock();
-			qWarning() << "ERROR!! GeoTessellatedSolid has no facets!! --> shape input parameters: " << shapePars;
+			//FIXME: std::cout << "ERROR!! GeoTessellatedSolid has no facets!! --> shape input parameters: " << shapePars << std::endl;
       muxCout.unlock();
 			error = 1;
 		}
@@ -1881,7 +2108,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 					QStringList vars = par.split("=");
 					QString varName = vars[0];
 					QString varValue = vars[1];
-          // qWarning() << "varValue:" << varValue;
+          // std::cout << "varValue:" << varValue;
 					if (varName == "XHalfLength1") XHalfLength1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 					if (varName == "XHalfLength2") XHalfLength2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
 					if (varName == "YHalfLength1") YHalfLength1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
@@ -2506,7 +2733,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
 
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "ReadGeoModel::buildLogVol()";
+    std::cout << "ReadGeoModel::buildLogVol()" << std::endl;
     muxCout.unlock();
   }
 
@@ -2514,7 +2741,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
   std::vector<std::string> values = m_logVols[id-1];
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "buildLogVol() - params:" << values;
+    //FIXME: std::cout << "buildLogVol() - params:" << values << std::endl;
     muxCout.unlock();
   }
 
@@ -2532,7 +2759,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
   const unsigned int matId = std::stoi(values[3]);
 	if (m_deepDebug) {
     muxCout.lock();
-    qDebug() << "buildLogVol() - material Id:" << matId;
+    std::cout << "buildLogVol() - material Id:" << matId << std::endl;
     muxCout.unlock();
   }
 //  GeoMaterial* mat = buildMaterial(matId);
@@ -2549,14 +2776,14 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
 //
 //  if (m_deepDebug) {
 //    muxCout.lock();
-//    qDebug() << "ReadGeoModel::buildSerialDenominator()";
+//    std::cout << "ReadGeoModel::buildSerialDenominator()";
 //    muxCout.unlock();
 //  }
 //  QStringList values = m_serialDenominators[id];
 //  QString baseName = values[1];
 //  if (m_deepDebug) {
 //    muxCout.lock();
-//    qDebug() << "\buildSerialDenominator() - ID:" << id << ", base-name:" << baseName;
+//    std::cout << "\buildSerialDenominator() - ID:" << id << ", base-name:" << baseName;
 //    muxCout.unlock();
 //  }
 //  return new GeoSerialDenominator(baseName.toStdString());
@@ -2599,10 +2826,10 @@ void ReadGeoModel::printTransformationValues(QStringList values) {
 	QList<double> t = convertQstringListToDouble(values);
   muxCout.lock();
   std::cout << "transformation input values: " << std::endl;
-	qWarning() << "[[" << t[0] << "," << t[1] << "," << t[2] << "]["
+	std::cout << "[[" << t[0] << "," << t[1] << "," << t[2] << "]["
 	                   << t[3] << "," << t[4] << "," << t[5] << "]["
 	                   << t[6] << "," << t[7] << "," << t[8] << "]["
-	                   << t[9] << "," << t[10] << "," << t[11] << "]]";
+	                   << t[9] << "," << t[10] << "," << t[11] << "]]" << std::endl;
   muxCout.unlock();
 }
 
@@ -2615,7 +2842,7 @@ GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(const unsigned int 
   
 //  if (m_deepDebug) {
 //    muxCout.lock();
-//    qDebug() << "ReadGeoModel::buildAlignableTransform()";
+//    std::cout << "ReadGeoModel::buildAlignableTransform()";
 //    muxCout.unlock();
 //  }
   
@@ -2672,8 +2899,8 @@ GeoTransform* ReadGeoModel::buildTransform(const unsigned int id)
   }
   
 //  muxCout.lock();
-//  if (m_deepDebug) qDebug() << "ReadGeoModel::buildTransform(unsigned int)";
-//  if (m_deepDebug) qDebug() << "values:" << values;
+//  if (m_deepDebug) std::cout << "ReadGeoModel::buildTransform(unsigned int)";
+//  if (m_deepDebug) std::cout << "values:" << values;
 //  muxCout.unlock();
 
   std::vector<std::string> values = m_transformsStd[id-1]; // nodes' IDs start from 1
@@ -2742,10 +2969,11 @@ GeoTransform* ReadGeoModel::buildTransform(const unsigned int id)
 GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(const unsigned int id)
 {
   muxCout.lock();
-	if (m_deepDebug) qDebug() << "ReadGeoModel::buildSerialTransformer()";
+	if (m_deepDebug) std::cout << "ReadGeoModel::buildSerialTransformer()" << std::endl;
   muxCout.unlock();
 
-  std::vector<std::string> values = m_serialTransformersStd[id-1]; // nodes' IDs start from 1
+  const unsigned int nodeID = id-1; // nodes' IDs start from 1
+  std::vector<std::string> values = m_serialTransformersStd[nodeID];
 
   const unsigned int functionId = std::stoi(values[1]);
   const unsigned int physVolId = std::stoi(values[2]);
@@ -2803,14 +3031,14 @@ TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int id)
 //{
 //  if (m_deepDebug) {
 //    muxCout.lock();
-//    qDebug() << "ReadGeoModel::buildNameTag()";
+//    std::cout << "ReadGeoModel::buildNameTag()";
 //    muxCout.unlock();
 //  }
 //  QStringList values = m_nameTags[id];
 //  QString name = values[1];
 //  if (m_deepDebug) {
 //    muxCout.lock();
-//    qDebug() << "nameTag:" << name;
+//    std::cout << "nameTag:" << name;
 //    muxCout.unlock();
 //  }
 //  return new GeoNameTag(name.toStdString());
@@ -2985,21 +3213,21 @@ QString getVPhysVolKey(const unsigned int id, const unsigned int tableId, const 
 bool ReadGeoModel::isVPhysVolBuilt(const unsigned int id, const unsigned int tableId, const unsigned int copyN)
 {
 	std::lock_guard<std::mutex> lk(muxVPhysVol);
-	// qDebug() << "ReadGeoModel::isNodeBuilt(): " << id << tableId << copyNumber;
+//  std::cout << "ReadGeoModel::isVPhysVolBuilt(): " << id << ", " << tableId << ", " << copyN << std::endl;
 	QString key = getVPhysVolKey(id, tableId, copyN);
 	return m_memMap.contains(key);
 }
 void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN, GeoGraphNode* node)
 {
   std::lock_guard<std::mutex> lk(muxVPhysVol);
-  // if (m_deepDebug) qDebug() << "ReadGeoModel::storeVPhysVol(): " << id << ", " << tableId << ", " << copyN << node;
+//  std::cout << "ReadGeoModel::storeVPhysVol(): " << id << ", " << tableId << ", " << copyN << node << std::endl;
   QString key = getVPhysVolKey(id, tableId, copyN);
   m_memMap[key] = node;
 }
 GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN)
 {
 	std::lock_guard<std::mutex> lk(muxVPhysVol);
-	// if (m_deepDebug) qDebug() << "ReadGeoModel::getVPhysVol(): " << id << ", " << tableId << ", " << copyN;
+//  std::cout << "ReadGeoModel::getVPhysVol(): " << id << ", " << tableId << ", " << copyN << std::endl;
 	QString key = getVPhysVolKey(id, tableId, copyN);
 	return m_memMap[key];
 }

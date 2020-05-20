@@ -989,12 +989,50 @@ QHash<QString, QMap<unsigned int, QStringList>> GMDBManager::getChildrenTable()
 
 		QString key = parentId + ":" + parentTable + ":" + parentCopyNumber;
 
-		for( int ii=0; ii<nCols; ++ii)
+    for( int ii=0; ii<nCols; ++ii) {
 			childParams << q.value(ii).toString();
+    }
 
 		all_children[key][childPos] = childParams;
 	}
 	return all_children;
+}
+
+// Get all parent-children data from the database in one go
+std::vector<std::vector<std::string>> GMDBManager::getChildrenTableStd()
+{
+  // JFB commented: qDebug() << "GMDBManager::getChildrenTable()";
+  
+  QSqlQuery q = selectAllFromTable("ChildrenPositions");
+  
+  std::vector<std::vector<std::string>> all_children; // to store all children
+                                                                  // QMap<unsigned int, QStringList> children; // to temporarily store the children of one parent
+  std::vector<std::string> childParams; // to temporarily store the children parameters
+  
+  // get the number of columns of the DB table
+  int nCols = m_tableNames["ChildrenPositions"].size();
+  // JFB commented: qDebug() << "num of columns in childrenPos table" << nCols;
+  
+  // loop over all children's positions stored in the DB
+  while (q.next()) {
+    
+    childParams.clear();
+    
+//    const unsigned parentId = q.value(1).toString();
+//    QString parentTable = q.value(2).toString();
+//    QString parentCopyNumber = q.value(3).toString();
+//    unsigned int childPos = q.value(4).toUInt();
+//
+//    QString key = parentId + ":" + parentTable + ":" + parentCopyNumber;
+//
+    for( int ii=0; ii<nCols; ++ii) {
+      childParams.push_back( q.value(ii).toString().toStdString() );
+    }
+    
+    all_children.push_back(childParams);
+//    all_children[key][childPos] = childParams;
+  }
+  return all_children;
 }
 
 

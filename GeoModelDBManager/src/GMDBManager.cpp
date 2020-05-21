@@ -1003,10 +1003,14 @@ std::vector<std::vector<std::string>> GMDBManager::getChildrenTableStd()
 {
   // JFB commented: qDebug() << "GMDBManager::getChildrenTable()";
   
-  QSqlQuery q = selectAllFromTable("ChildrenPositions");
+  QSqlQuery q;
+  QString queryStr = QString("SELECT * FROM ChildrenPositions ORDER BY parentTable, parentId, parentCopyNumber, position");
+  if (!q.prepare(queryStr)) {
+    showError(q.lastError());
+  }
+  q.exec();
   
   std::vector<std::vector<std::string>> all_children; // to store all children
-                                                                  // QMap<unsigned int, QStringList> children; // to temporarily store the children of one parent
   std::vector<std::string> childParams; // to temporarily store the children parameters
   
   // get the number of columns of the DB table
@@ -1018,19 +1022,11 @@ std::vector<std::vector<std::string>> GMDBManager::getChildrenTableStd()
     
     childParams.clear();
     
-//    const unsigned parentId = q.value(1).toString();
-//    QString parentTable = q.value(2).toString();
-//    QString parentCopyNumber = q.value(3).toString();
-//    unsigned int childPos = q.value(4).toUInt();
-//
-//    QString key = parentId + ":" + parentTable + ":" + parentCopyNumber;
-//
     for( int ii=0; ii<nCols; ++ii) {
       childParams.push_back( q.value(ii).toString().toStdString() );
     }
     
     all_children.push_back(childParams);
-//    all_children[key][childPos] = childParams;
   }
   return all_children;
 }
@@ -1161,18 +1157,47 @@ QHash<QString, unsigned int> GMDBManager::getAll_NodeTypesTableIDs()
 
 QSqlQuery GMDBManager::selectAllFromTable(QString tableName) const
 {
-	QSqlQuery q;
-
-	QString queryStr = QString("SELECT * FROM %1 ORDER BY id");
-	queryStr = queryStr.arg(tableName);
-
-	if (!q.prepare(queryStr)) {
-		showError(q.lastError());
-		return QSqlQuery();
-	}
-	q.exec();
-	return q;
+//  QSqlQuery q;
+//
+//  QString queryStr = QString("SELECT * FROM %1 ORDER BY id");
+//  queryStr = queryStr.arg(tableName);
+//
+//  if (!q.prepare(queryStr)) {
+//    showError(q.lastError());
+//    return QSqlQuery();
+//  }
+//  q.exec();
+//  return q;
+  
+  return selectAllFromTableSortBy(tableName, "id");
 }
+
+QSqlQuery GMDBManager::selectAllFromTableSortBy(QString tableName, std::string sortColumn) const
+{
+  QSqlQuery q;
+  
+  if ("" == sortColumn || 0 == sortColumn.size()) {
+    sortColumn = "id";
+  }
+  QString qsortColumn = QString::fromStdString(sortColumn);
+  
+  QStringList args;
+  args << tableName << qsortColumn;
+  
+  QString queryStr = QString("SELECT * FROM %1 ORDER BY %2");
+//  queryStr = queryStr.arg(tableName);
+  for (int i=0; i < args.size(); ++i) {
+    queryStr = queryStr.arg( args.at(i) );
+  }
+  
+  if (!q.prepare(queryStr)) {
+    showError(q.lastError());
+    return QSqlQuery();
+  }
+  q.exec();
+  return q;
+}
+
 
 
 bool GMDBManager::initDB()
@@ -1280,7 +1305,7 @@ bool GMDBManager::createTables()
 	// PhysVols table
 	geoNode = "GeoPhysVol";
 	tableName = "PhysVols";
-	tab << tableName << "id" << "logvol" << "parent"; // FIXME: remove "parent" field, it is not used anymore
+	tab << tableName << "id" << "logvol" << "parent"; // FIXME: remove "parent" field, it is not used anymore and it's not reliable since it's not using the tableID.
 	storeTableColumnNames(tab);
 	tab.clear();
 	m_childType_tableName[geoNode] = tableName; // store type-table relation

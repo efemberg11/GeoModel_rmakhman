@@ -196,6 +196,7 @@ private:
 	QString getTableNameFromNodeType(QString nodeType);
 
 	QSqlQuery selectAllFromTable(QString tableName) const;
+  QSqlQuery selectAllFromTableSortBy(QString tableName, std::string sortColumn="") const;
 
 
 	void storeTableColumnNames(QStringList input);

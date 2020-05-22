@@ -50,7 +50,7 @@ mv coin-sources/* coin
 mkdir build_coin
 cd build_coin
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../coin
-make -j4
+make -j
 make install
 cd ..
 
@@ -59,7 +59,7 @@ hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
 mkdir build_soqt
 cd build_soqt
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../soqt
-make -j4
+make -j
 make install
 cd ..
 
@@ -68,7 +68,7 @@ git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
 mkdir build_core
 cd build_core
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
-make -j2
+make -j
 make install
 cd ..
 
@@ -77,7 +77,7 @@ git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
 mkdir build_io
 cd build_io
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
-make -j2
+make -j
 make install
 cd ..
 
@@ -86,7 +86,7 @@ git clone https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization.git
 mkdir build_viz
 cd build_viz
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
-make -j4
+make -j
 make install
 cd ..
 ```
@@ -102,7 +102,7 @@ git clone https://gitlab.cern.ch/GeoModelDev/GeoModelTools.git
 mkdir build_tools
 cd build_tools
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelTools
-make -j4
+make -j
 make install
 cd ..
 
@@ -111,7 +111,7 @@ git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers.git
 mkdir build_managers
 cd build_managers
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelDataManagers
-make -j4
+make -j
 make install
 cd ..
 
@@ -120,7 +120,7 @@ git clone https://gitlab.cern.ch/atlas/GeoModelPlugins.git
 mkdir build_plugins
 cd build_plugins
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelPlugins
-make -j4
+make -j
 make install
 cd ..
 ```

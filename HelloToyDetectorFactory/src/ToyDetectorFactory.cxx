@@ -66,10 +66,36 @@ void ToyDetectorFactory::create(GeoPhysVol *world)
 	// Get the materials that we shall use.
 	// -------------------------------------//
 
-	// Bogus densities.  Later: read from database.
-	double densityOfAir=0.1, densityOfPolystyrene=0.2;
-	const GeoMaterial *air        = new GeoMaterial("Air Two",densityOfAir);
-	const GeoMaterial *poly       = new GeoMaterial("std::Polystyrene",densityOfPolystyrene);
+  //-----------------------------------------------------------------------------------//
+  // Define the materials that we shall use.                                              //
+  // ----------------------------------------------------------------------------------//
+
+  // Define the units
+  #define gr   SYSTEM_OF_UNITS::gram
+  #define mole SYSTEM_OF_UNITS::mole
+  #define cm3  SYSTEM_OF_UNITS::cm3
+
+  // Define the chemical elements
+  GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
+  GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
+  GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
+  GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
+
+  // Define the materials
+  double densityOfAir=0.001214 *gr/cm3;
+  GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
+  air->add(Nitrogen  , 0.7494);
+  air->add(Oxygen, 0.2369);
+  air->add(Argon, 0.0129);
+  air->add(Hydrogen, 0.0008);
+  air->lock();
+
+  // Bogus densities.  Later: read from database.
+  double densityOfOxygen=0.1;
+	GeoMaterial *oxy       = new GeoMaterial("Oxygen",densityOfOxygen);
+  oxy->add(Oxygen, 1.0);
+  oxy->lock();
+
 
   //--------------------------------------//
   // Next make the box that describes
@@ -130,7 +156,7 @@ void ToyDetectorFactory::create(GeoPhysVol *world)
   //--------------------------------------//
 
   GeoBox       *sPass = new GeoBox(5.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm);
-  GeoLogVol    *lPass = new GeoLogVol("Passive", sPass, poly);
+  GeoLogVol    *lPass = new GeoLogVol("Passive", sPass, oxy);
   GeoPhysVol   *pPass = new GeoPhysVol(lPass);
 
   GeoBox       *sIPass = new GeoBox(4*SYSTEM_OF_UNITS::cm, 25*SYSTEM_OF_UNITS::cm, 25*SYSTEM_OF_UNITS::cm);

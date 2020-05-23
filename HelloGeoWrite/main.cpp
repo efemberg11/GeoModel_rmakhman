@@ -95,9 +95,9 @@ int main(int argc, char *argv[])
 
 	//------------------------------------------------------------------------------------//
 	// Now insert all of this into the world...                                           //
-	GeoNameTag *tag = new GeoNameTag("Toy");                                              //
-	world->add(tag);                                                                      //
-	world->add(toyPhys);                                                                  //
+	GeoNameTag *tag = new GeoNameTag("Toy");
+  world->add(tag);
+	world->add(toyPhys);
 	//------------------------------------------------------------------------------------//
 
 
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
         // return;
         exit(1);
   }
-	
+
 	// open the DB connection
   GMDBManager db(path);
 

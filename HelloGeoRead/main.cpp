@@ -25,37 +25,37 @@
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 
-GeoPhysVol* createTheExperiment(GeoPhysVol* world)
+GeoPhysVol* createTheWorld(GeoPhysVol* world)
 {
   if (world == nullptr)
   {
   	//-----------------------------------------------------------------------------------//
-        // Define the materials that we shall use.                                              //
-        // ----------------------------------------------------------------------------------//
+    // Define the materials that we shall use.                                              //
+    // ----------------------------------------------------------------------------------//
 
-        // Define the units
-        #define gr   SYSTEM_OF_UNITS::gram
-        #define mole SYSTEM_OF_UNITS::mole
-        #define cm3  SYSTEM_OF_UNITS::cm3
+    // Define the units
+    #define gr   SYSTEM_OF_UNITS::gram
+    #define mole SYSTEM_OF_UNITS::mole
+    #define cm3  SYSTEM_OF_UNITS::cm3
 
-        // Define the chemical elements
-        GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
-        GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
-        GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
-        GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
+    // Define the chemical elements
+    GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
+    GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
+    GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
+    GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
 
-        // Define the materials
+    // Define the materials
+    double densityOfAir=0.001214 *gr/cm3;
+    GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
+    air->add(Nitrogen  , 0.7494);
+    air->add(Oxygen, 0.2369);
+    air->add(Argon, 0.0129);
+    air->add(Hydrogen, 0.0008);
+    air->lock();
 
-        double densityOfAir=0.001214 *gr/cm3;
-        GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
-        air->add(Nitrogen  , 0.7494);
-	air->add(Oxygen, 0.2369);
-        air->add(Argon, 0.0129);
-        air->add(Hydrogen, 0.0008);
-        air->lock();
-    	const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-    	const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
-    	world = new GeoPhysVol(worldLog);
+  	const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+  	const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
+  	world = new GeoPhysVol(worldLog);
   }
   return world;
 }
@@ -73,8 +73,8 @@ int main(int argc, char *argv[])
 
   // check if DB file exists. If not, return
   if (! QFileInfo(path).exists() ) {
-        qWarning() << "ERROR!! DB '" << path << "' does not exist!!";
-        qWarning() << "Returning..." << "\n";
+        // std::cout << "ERROR!! DB '" << path << "' does not exist!! Exiting..."; // FIXME: path with std::string
+        std::cout << "ERROR!! DB does not exist!! Exiting...\n";
         // return;
         throw;
   }
@@ -83,10 +83,10 @@ int main(int argc, char *argv[])
   GMDBManager* db = new GMDBManager(path);
   /* Open database */
   if (db->isOpen()) {
-    qDebug() << "OK! Database is open!";
+    std::cout << "OK! Database is open!\n";
   }
   else {
-    qDebug() << "Database is not open!";
+    std::cout << "Database is not open!\n";
     // return;
     throw;
   }
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
   // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
   std::cout << "Getting the 'world' GeoPhysVol, i.e. the root volume of the GeoModel tree" << std::endl;
-  GeoPhysVol* world = createTheExperiment(dbPhys);
+  GeoPhysVol* world = createTheWorld(dbPhys);
   std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;
   const GeoLogVol* logVol = world->getLogVol();
   std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;

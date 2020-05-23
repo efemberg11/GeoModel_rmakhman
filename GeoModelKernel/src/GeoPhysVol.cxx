@@ -89,7 +89,9 @@ void GeoPhysVol::exec(GeoNodeAction *action) const
      && action->getPath()->getLength() > action->getDepthLimit()) {
   }
   else {
-    std::lock_guard<std::mutex> lk(muxVec);
+    // FIXME: m_daughters access is now protected in other methods, but having the lock here makes a deadlock
+    // std::lock_guard<std::mutex> lk(muxVec);
+    // TODO: Think more thouroughly about thread-safe of this class...!!
     for(size_t c = 0; c < m_daughters.size (); c++) {
       m_daughters[c]->exec(action);
       if(action->shouldTerminate()) {

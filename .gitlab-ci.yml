@@ -179,7 +179,7 @@ CLHEP-mac:
 geomodelio-mac:
   <<: *macos-job
   <<: *geomodelio-job
-  needs: ["geomodelcore-mac", "CLHEP-mac"]
+  needs: ["geomodelcore-mac"]
 
 xerces-c-mac:
   <<: *macos-job
@@ -193,7 +193,7 @@ Geant4-mac:
 geomodelg4-mac:
   <<: *macos-job
   <<: *geomodelg4-job
-  needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac"]
+  needs: ["geomodelcore-mac", "CLHEP-mac", "Geant4-mac"]
 
 nlohmann_json-mac:
   <<: *macos-job
@@ -218,7 +218,7 @@ CLHEP-ubuntu:
 geomodelio-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelio-job
-  needs: ["geomodelcore-ubuntu", "CLHEP-ubuntu"]
+  needs: ["geomodelcore-ubuntu"]
 
 xerces-c-ubuntu:
   <<: *ubuntu-job
@@ -232,7 +232,7 @@ Geant4-ubuntu:
 geomodelg4-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelg4-job
-  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu"]
+  needs: ["geomodelcore-ubuntu", "CLHEP-ubuntu", "Geant4-ubuntu"]
 
 nlohmann_json-ubuntu:
   <<: *ubuntu-job

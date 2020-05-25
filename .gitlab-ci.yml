@@ -234,11 +234,7 @@ geomodelio-ubuntu:
 geomodelg4-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelg4-job
-<<<<<<< HEAD
   needs: ["geomodelcore-ubuntu"]
-=======
-  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu"]
->>>>>>> 72a8938... Update CI to use docker image of ubuntu with geant4 built in
 
 nlohmann_json-ubuntu:
   <<: *ubuntu-job

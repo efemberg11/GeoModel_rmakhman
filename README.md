@@ -40,18 +40,7 @@ cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
 make
 make install
 ```
-## GeoModelIO:
 
-Clone the repository at this [address](https://gitlab.cern.ch/GeoModelDev/GeoModelIO).
-
-```bash
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-cd GeoModelIO
-mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
-make
-make install
-```
 
 ## GeoModelG4:
 

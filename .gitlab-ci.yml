@@ -1,7 +1,6 @@
 stages:
   - deps-geomodelcore
   - deps-CLHEP
-  - deps-geomodelio
   - deps-xerces-c
   - deps-Geant4
   - build
@@ -60,23 +59,6 @@ variables:
   artifacts:
     paths:
       - install
-
-.geomodelio-build-template-job: &geomodelio-job
-  stage: deps-geomodelio
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-    - mkdir geomodelio-build
-    - cd geomodelio-build
-    - cmake ${CMAKE_ARGS} ../GeoModelIO
-    - make -j32
-    - make install
-  artifacts:
-    paths:
-      - install
-    
 
 .xerces-c-build-template-job: &xerces-c-job
   stage: deps-xerces-c
@@ -142,11 +124,6 @@ CLHEP-mac:
   <<: *macos-job
   <<: *CLHEP-job
 
-geomodelio-mac:
-  <<: *macos-job
-  <<: *geomodelio-job
-  needs: ["geomodelcore-mac", "CLHEP-mac"]
-
 xerces-c-mac:
   <<: *macos-job
   <<: *xerces-c-job
@@ -159,7 +136,7 @@ Geant4-mac:
 geomodelg4-mac:
   <<: *macos-job
   <<: *geomodelg4-job
-  needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac"]
+  needs: ["geomodelcore-mac", "CLHEP-mac", "Geant4-mac"]
 
 
 ### UBUNTU PATH
@@ -171,10 +148,10 @@ geomodelcore-ubuntu:
 #  <<: *ubuntu-job
 #  <<: *CLHEP-job
 
-geomodelio-ubuntu:
-  <<: *ubuntu-job
-  <<: *geomodelio-job
-  needs: ["geomodelcore-ubuntu"]
+#geomodelio-ubuntu:
+#  <<: *ubuntu-job
+#  <<: *geomodelio-job
+#  needs: ["geomodelcore-ubuntu"]
 
 # xerces-c-ubuntu:
 #   <<: *ubuntu-job
@@ -188,4 +165,4 @@ geomodelio-ubuntu:
 geomodelg4-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelg4-job
-  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu"]
+  needs: ["geomodelcore-ubuntu"]

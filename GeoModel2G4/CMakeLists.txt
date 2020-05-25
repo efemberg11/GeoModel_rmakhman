@@ -12,7 +12,6 @@ find_package( Geant4 REQUIRED )
 find_package( CLHEP )
 # GeoModel dependencies
 find_package( GeoModelCore REQUIRED )
-find_package (GeoModelIO REQUIRED)
 
 ##########################################################
 # NOTE! The original package also needs this Athena stuff:

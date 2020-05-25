@@ -182,13 +182,13 @@ void ToyDetectorFactory::create(GeoPhysVol *world)
 
   GeoSerialDenominator  *pass1Name = new GeoSerialDenominator("PASSIVE-1-");
   GeoSerialTransformer *s1 = new GeoSerialTransformer(pPass,&t1, NPLATES);
-  world->add(pass1Name);
-  world->add(s1);
+  toyPhys->add(pass1Name);
+  toyPhys->add(s1);
 
   GeoSerialDenominator *pass2Name = new GeoSerialDenominator("PASSIVE-2-");
   GeoSerialTransformer *s2 = new GeoSerialTransformer(pPass,&t2, NPLATES);
-  world->add(pass2Name);
-  world->add(s2);
+  toyPhys->add(pass2Name);
+  toyPhys->add(s2);
 
 
   //--------------------------------------//

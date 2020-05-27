@@ -67,11 +67,11 @@ class GeoBox;
 
 // namespaces
 using namespace GeoGenfun;
-using namespace GeoXF;
+//using namespace GeoXF;
 
 
 // type definitions
-typedef const Function & TRANSFUNCTION;
+typedef const GeoXF::Function & TRANSFUNCTION;
 // containers for boolean shapes' information
 typedef std::tuple<unsigned int/*shape ID*/, GeoShape*, unsigned int/*opA ID*/, unsigned int/*opB ID*/> tuple_shapes_boolean_info;
 typedef std::vector<tuple_shapes_boolean_info> type_shapes_boolean_info;
@@ -176,9 +176,9 @@ private:
   void storeBuiltElement(const unsigned int id, GeoElement* nodePtr);
   GeoElement* getBuiltElement(const unsigned int id);
 
-  bool isBuiltFunc(const unsigned int id);
-  void storeBuiltFunc(const unsigned int id, TRANSFUNCTION nodePtr);
-  TRANSFUNCTION getBuiltFunc(const unsigned int id);
+  bool isBuiltFunction(const unsigned int id);
+  void storeBuiltFunction(const unsigned int id, GeoXF::Function* nodePtr);
+  GeoXF::Function* getBuiltFunction(const unsigned int id);
 
   bool isBuiltPhysVol(const unsigned int id);
   void storeBuiltPhysVol(const unsigned int id, GeoPhysVol* nodePtr);
@@ -236,8 +236,8 @@ private:
   std::vector<std::vector<std::string>> m_materials;
   std::vector<std::vector<std::string>> m_elements;
   std::vector<std::vector<std::string>> m_shapes;
-  QHash<unsigned int, QStringList> m_functions;
-  //  std::vector<std::vector<std::string>> m_functions;
+//  QHash<unsigned int, QStringList> m_functions;
+  std::vector<std::vector<std::string>> m_functions;
   std::vector<std::vector<std::string>> m_allchildren;
   
   std::unordered_map<unsigned int, std::string> m_tableID_toTableName; // to look for node's type name starting from a table ID
@@ -257,7 +257,7 @@ private:
   std::vector<GeoLogVol*> m_memMapLogVols;
   std::vector<GeoMaterial*> m_memMapMaterials;
   std::vector<GeoElement*> m_memMapElements;
-  //  std::vector<TRANSFUNCTION> m_memMapFunctions; // FIXME: implement cache for Functions
+  //  std::vector<GeoXF::Function*> m_memMapFunctions; // FIXME: 
   std::unordered_map<unsigned int, GeoShape*> m_memMapShapes; // we need keys, because shapes are not built following the ID order
   std::unordered_map<std::string, GeoGraphNode*> m_memMap; // we need keys, to keep track of the volume's copyNumber
 

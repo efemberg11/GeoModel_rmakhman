@@ -186,7 +186,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
 	m_shapes = m_dbManager->getTableFromNodeTypeStd("GeoShape");
 	m_materials = m_dbManager->getTableFromNodeTypeStd("GeoMaterial");
 	m_elements = m_dbManager->getTableFromNodeTypeStd("GeoElement");
-	m_functions = m_dbManager->getTableFromNodeType("Function");
+	m_functions = m_dbManager->getTableFromNodeTypeStd("Function");
   m_physVols = m_dbManager->getTableFromNodeTypeStd("GeoPhysVol");
   m_fullPhysVols = m_dbManager->getTableFromNodeTypeStd("GeoFullPhysVol");
   m_transforms = m_dbManager->getTableFromNodeTypeStd("GeoTransform");
@@ -386,13 +386,13 @@ void ReadGeoModel::buildAllLogVols()
   if (nSize>0) std::cout << "All " << nSize << " LogVols have been built!\n";
 }
 
-// TODO: move to an utility class
-void printQHashQstringUInt(QHash<QString, unsigned int> qq) {
-  QHash<QString, unsigned int>::const_iterator i = qq.constBegin();
-  while (i != qq.constEnd()) {
-    std::cout << i.key().toStdString() << ": " << i.value() << std::endl;
-  }
-}
+  //// FIXME: TODO: move to an utility class
+//void printQHashQstringUInt(QHash<QString, unsigned int> qq) {
+//  QHash<QString, unsigned int>::const_iterator i = qq.constBegin();
+//  while (i != qq.constEnd()) {
+//    std::cout << i.key().toStdString() << ": " << i.value() << std::endl;
+//  }
+//}
 
 //! Iterate over the list of nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllPhysVols()
@@ -491,24 +491,10 @@ void ReadGeoModel::buildAllSerialTransformers()
 //   std::cout << "All Functions have been built!\n";
 // }
 
-// //! Iterate over the list of nodes, build them all, and store their pointers
-// void ReadGeoModel::buildAllRecords(QHash<unsigned int, QStringList> list)
-// {
-//   QHash<unsigned int, QStringList>::const_iterator i = list.constBegin();
-//   while (i != list.constEnd()) {
-//     // cout << i.key() << ": " << i.value() << Qt::endl;
-//     unsigned int shapeID = i.key();
-//     buildNode(shapeID, &shapes_info_sub);
-//     createBooleanShapeOperands(&shapes_info_sub);
-//     ++i;
-//   }
-//   std::cout << "\nAll nodes have been built!\n\n\n";
-// }
 
 
-
-  void ReadGeoModel::loopOverAllChildrenInBunches()
-  {
+void ReadGeoModel::loopOverAllChildrenInBunches()
+{
     int nChildrenRecords = m_allchildren.size();
     if (m_debug) std::cout << "number of children to process: " << nChildrenRecords << std::endl;
     
@@ -982,7 +968,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 //   try // TODO: implement try/catch
 //   {
-	// QStringList paramsShape = m_shapes[ shapeId.toUInt() ];
   std::vector<std::string> paramsShape = m_shapes[ shapeId-1 ]; // remember: nodes' IDs start from 1
 
   const unsigned int id = std::stoi(paramsShape[0]);
@@ -2668,31 +2653,36 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(const unsigned int id
 
 TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int id)
 {
-  // if( isBuiltFunc(id) ) {
-  //   return getBuiltFunc(id);
-  // }
-
-  QStringList values = m_functions[id];
-  std::string expr = values[1].toStdString();
-//  std::string expr = m_functions[id][1];
-  
-
-  if (m_deepDebug) {
-    muxCout.lock();
-    std::cout << "ReadGeoModel::buildFunction(const std::string& expr)" << std::endl;
-    std::cout << "expression: " << expr << std::endl;
-    muxCout.unlock();
+  /* FIXME: see below
+  if( isBuiltFunction(id) ) {
+   GeoXF::Function* fPtr = getBuiltFunction(id);
+   TRANSFUNCTION tf = (*fPtr); // Remember: "typedef const Function & TRANSFUNCTION"
+   return tf;
   }
+   */
 
+  std::string expr = m_functions[id-1][1]; // nodes' IDs start from 1
+  
 	if (0==expr.size()) {
+    muxCout.lock();
     std::cout << "FATAL ERROR!! Function expression is empty!! Aborting..." << std::endl;
+    muxCout.unlock();
     exit(EXIT_FAILURE);
 	}
 
   TransFunctionInterpreter interpreter;
 	TFPTR func=interpreter.interpret( expr );
 	TRANSFUNCTION tf = *(func.release()); // make func returns a pointer to the managed object and releases the ownership, then get the object dereferencing the pointer
-  // storeBuiltFunc(id, tf);
+  
+  /* FIXME: At the moment, enabling this cache makes the app crash at the end, when calling the destructor. I suspect because the pointers are not correct and so removing them throws an error.
+  // Get a non-const pointer to the Function object,
+  // and store that into the cache.
+  // Remember: "typedef const Function & TRANSFUNCTION"
+  const GeoXF::Function* fPtrConst = &tf;
+  GeoXF::Function* fPtr = const_cast <GeoXF::Function*>(fPtrConst);
+  storeBuiltFunction(id, fPtr);
+   */
+  
   return tf;
 }
 
@@ -2858,9 +2848,25 @@ void ReadGeoModel::storeBuiltSerialTransformer(const unsigned int id, GeoSerialT
 }
 GeoSerialTransformer* ReadGeoModel::getBuiltSerialTransformer(const unsigned int id)
 {
-  return m_memMapSerialTransformers[id-1]; // vector, but nodes' IDs start from 1
+  return m_memMapSerialTransformers[id-1]; // remember: nodes' IDs start from 1
   
 }
+  /* FIXME: 
+  // --- methods for caching Functions nodes ---
+  bool ReadGeoModel::isBuiltFunction(const unsigned int id)
+  {
+    return (id <= m_memMapFunctions.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
+  }
+  void ReadGeoModel::storeBuiltFunction(const unsigned int id, GeoXF::Function* nodePtr)
+  {
+    m_memMapFunctions.push_back(nodePtr); // vector, we store them in the order of IDs
+    
+  }
+  GeoXF::Function* ReadGeoModel::getBuiltFunction(const unsigned int id)
+  {
+    return m_memMapFunctions[id-1]; // remember: nodes' IDs start from 1
+  }
+*/
   
 // --- methods for caching GeoPhysVol/GeoFullPhysVol nodes ---
 std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber)
@@ -2883,22 +2889,5 @@ GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned in
   }
   return m_memMap[key];
 }
-// --- methods for caching Functions nodes ---
-// bool ReadGeoModel::isBuiltFunc(const unsigned int id)
-// {
-// 	std::lock_guard<std::mutex> lk(muxFunc);
-// 	return m_memMapFuncs.count(id);
-// }
-// void ReadGeoModel::storeBuiltFunc(const unsigned int id, TRANSFUNCTION nodePtr)
-// {
-//   std::lock_guard<std::mutex> lk(muxFunc);
-//   m_memMapFuncs[id] = &nodePtr;
-// }
-// TRANSFUNCTION ReadGeoModel::getBuiltFunc(const unsigned int id)
-// {
-// 	std::lock_guard<std::mutex> lk(muxFunc);
-// 	return m_memMapFuncs[id];
-// }
-
 
 } /* namespace GeoModelIO */

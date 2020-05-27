@@ -111,10 +111,7 @@ private:
   GeoBox* buildDummyShape();
 
   void loopOverAllChildrenInBunches();
-  void loopOverAllChildrenInBunchesNew();
   
-	void loopOverAllChildren(QStringList keys);
-	void processParentChildren(const QString &parentKey);
 	void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child);
   
   void loopOverAllChildrenRecords(std::vector<std::vector<std::string>> records);
@@ -125,7 +122,6 @@ private:
 	GeoVPhysVol* parseChildren(GeoVPhysVol* vol, QMap<unsigned int, QStringList> children, int depth = 0);
 
   GeoVPhysVol* buildVPhysVolInstance(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
-//  GeoVPhysVol* buildNewVPhysVolInstance(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
   GeoVPhysVol* buildVPhysVol(const unsigned int id, const unsigned int tableId, unsigned int logVol_ID=0);
 
 	GeoLogVol* buildLogVol(const unsigned int id);
@@ -229,48 +225,29 @@ private:
 	// callback handles
 	unsigned long* m_progress;
 
-	// data containers
-//  QHash<QString, QMap<unsigned int, QStringList>> m_allchildren; // key = "parentId:parentTable", item = list of children parameters, inserted by child position
-  std::vector<std::vector<std::string>> m_allchildrenStd;
-  
-  
-  QHash<unsigned int, QStringList> m_functions;
-//  std::vector<std::vector<std::string>> m_functions;
-
-
-  std::vector<std::vector<std::string>> m_physVolsStd;
-  std::vector<std::vector<std::string>> m_fullPhysVolsStd;
-  std::vector<std::vector<std::string>> m_transformsStd;
-  std::vector<std::vector<std::string>> m_alignableTransformsStd;
-  std::vector<std::vector<std::string>> m_serialDenominatorsStd;
-  std::vector<std::vector<std::string>> m_serialTransformersStd;
+  //! containers to store the list of GeoModel nodes coming from the DB
+  std::vector<std::vector<std::string>> m_physVols;
+  std::vector<std::vector<std::string>> m_fullPhysVols;
+  std::vector<std::vector<std::string>> m_transforms;
+  std::vector<std::vector<std::string>> m_alignableTransforms;
+  std::vector<std::vector<std::string>> m_serialDenominators;
+  std::vector<std::vector<std::string>> m_serialTransformers;
   std::vector<std::vector<std::string>> m_nameTags;
   std::vector<std::vector<std::string>> m_logVols;
   std::vector<std::vector<std::string>> m_materials;
   std::vector<std::vector<std::string>> m_elements;
   std::vector<std::vector<std::string>> m_shapes;
+  QHash<unsigned int, QStringList> m_functions;
+  //  std::vector<std::vector<std::string>> m_functions;
+  std::vector<std::vector<std::string>> m_allchildren;
   
-  
-//  QHash<unsigned int, QString> m_tableID_toTableName; // to look for node's type name starting from a table ID
-//  QHash<QString, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
   std::unordered_map<unsigned int, std::string> m_tableID_toTableName; // to look for node's type name starting from a table ID
   std::unordered_map<std::string, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
 
   
-  
 	QStringList m_root_vol_data;
 
-//  QHash<QString, GeoGraphNode*> m_memMap;
-//  std::unordered_map<unsigned int, GeoShape*> m_memMapShapes;
-//  std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
-//  std::unordered_map<unsigned int, GeoLogVol*> m_memMapLogs;
-//  std::unordered_map<unsigned int, GeoMaterial*> m_memMapMats;
-//  std::unordered_map<unsigned int, GeoElement*> m_memMapEls;
-	// std::unordered_map<unsigned int, GeoPhysVol*> m_memMapPhysVols;
-	// std::unordered_map<unsigned int, GeoFullPhysVol*> m_memMapFullPhysVols;
-	// std::unordered_map<unsigned int, TRANSFUNCTION> m_memMapFuncs;
-
-  
+  //! memory chaches
   std::vector<GeoPhysVol*> m_memMapPhysVols;
   std::vector<GeoFullPhysVol*> m_memMapFullPhysVols;
   std::vector<GeoTransform*> m_memMapTransforms;
@@ -282,11 +259,10 @@ private:
   std::vector<GeoMaterial*> m_memMapMaterials;
   std::vector<GeoElement*> m_memMapElements;
   //  std::vector<TRANSFUNCTION> m_memMapFunctions; // FIXME: implement cache for Functions
-  
   std::unordered_map<unsigned int, GeoShape*> m_memMapShapes; // we need keys, because shapes are not built following the ID order
   std::unordered_map<std::string, GeoGraphNode*> m_memMap; // we need keys, to keep track of the volume's copyNumber
 
-  
+  //! container to store unknown shapes
   std::set<std::string> m_unknown_shapes;
 
 };

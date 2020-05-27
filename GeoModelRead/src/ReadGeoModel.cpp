@@ -63,10 +63,6 @@
 // TODO: we should get rid of VP1Base::VP1Msg dependency, since GeoModelRead should not depend on VP1 packages. Maybe we can move VP1Msg to a standalone package.
 //#include "VP1Base/VP1Msg.h"
 
-// Qt includes
-//#include <QDebug>
-//#include <QString>
-
 // C++ includes
 #include <stdlib.h> /* exit, EXIT_FAILURE */
 #include <stdexcept>
@@ -83,12 +79,6 @@
 
 // mutexes for synchronized access to containers and output streams in multi-threading mode
 std::mutex muxVPhysVol;
-//std::mutex muxShape;
-//std::mutex muxLog;
-//std::mutex muxMat;
-//std::mutex muxEl;
-//std::mutex muxFunc;
-//std::mutex muxTransf;
 std::mutex muxCout;
 
 
@@ -102,21 +92,6 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDeb
   m_debug(false), m_timing(false), m_runMultithreaded(false),
   m_runMultithreaded_nThreads(0), m_progress(nullptr)
 {
-
-//  // TODO: I should take out of compilation debug cout for normal builds, with ifdefs
-//  #ifdef GEOMODEL_IO_DEBUG_VERBOSE
-//    m_deepDebug = true;
-//    std::cout << "You defined the GEOMODEL_IO_DEBUG_VERBOSE variable, so you will see a verbose output." << std::endl;
-//   #endif
-//  #ifdef GEOMODEL_IO_DEBUG
-//    m_debug = true;
-//    std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will see a verbose output." << std::endl;
-//   #endif
-//  #ifdef GEOMODEL_IO_TIMING
-//    m_timing = true;
-//    std::cout << "You defined the GEOMODEL_IO_TIMING variable, so you will see a timing measurement in the output." << std::endl;
-//   #endif
-  
   // Check if the user asked for running in serial or multi-threading mode
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_DEBUG")) {
     m_debug = true;
@@ -132,8 +107,6 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDeb
     m_timing = true;
     std::cout << "You defined the GEOMODEL_IO_TIMING variable, so you will see a timing measurement in the output." << std::endl;
   }
-  
-  
 
 	if ( progress != nullptr) {
 	m_progress = progress;
@@ -211,35 +184,21 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
   // *** get all data from the DB ***
 
 	// get all GeoModel nodes from the DB
-//  m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
-//  m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
 	m_logVols = m_dbManager->getTableFromNodeTypeStd("GeoLogVol");
 	m_shapes = m_dbManager->getTableFromNodeTypeStd("GeoShape");
 	m_materials = m_dbManager->getTableFromNodeTypeStd("GeoMaterial");
 	m_elements = m_dbManager->getTableFromNodeTypeStd("GeoElement");
 	m_functions = m_dbManager->getTableFromNodeType("Function");
-//  m_serialDenominators = m_dbManager->getTableFromNodeType("GeoSerialDenominator");
-//  m_serialTransformers = m_dbManager->getTableFromNodeType("GeoSerialTransformer");
-//  m_alignableTransforms = m_dbManager->getTableFromNodeType("GeoAlignableTransform");
-//  m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
-//  m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
-	// std::cout << "physVols: " << _physVols;
-	// std::cout << "fullPhysVols: " << _fullPhysVols;
-  
-  m_physVolsStd = m_dbManager->getTableFromNodeTypeStd("GeoPhysVol");
-  m_fullPhysVolsStd = m_dbManager->getTableFromNodeTypeStd("GeoFullPhysVol");
-  m_transformsStd = m_dbManager->getTableFromNodeTypeStd("GeoTransform");
-  m_alignableTransformsStd = m_dbManager->getTableFromNodeTypeStd("GeoAlignableTransform");
-  m_serialDenominatorsStd = m_dbManager->getTableFromNodeTypeStd("GeoSerialDenominator");
-  m_serialTransformersStd = m_dbManager->getTableFromNodeTypeStd("GeoSerialTransformer");
+  m_physVols = m_dbManager->getTableFromNodeTypeStd("GeoPhysVol");
+  m_fullPhysVols = m_dbManager->getTableFromNodeTypeStd("GeoFullPhysVol");
+  m_transforms = m_dbManager->getTableFromNodeTypeStd("GeoTransform");
+  m_alignableTransforms = m_dbManager->getTableFromNodeTypeStd("GeoAlignableTransform");
+  m_serialDenominators = m_dbManager->getTableFromNodeTypeStd("GeoSerialDenominator");
+  m_serialTransformers = m_dbManager->getTableFromNodeTypeStd("GeoSerialTransformer");
   m_nameTags = m_dbManager->getTableFromNodeTypeStd("GeoNameTag");
   
-  
   // get the children table from DB
-//  m_allchildren = m_dbManager->getChildrenTable();
-  m_allchildrenStd = m_dbManager->getChildrenTableStd();
-  
-  
+  m_allchildren = m_dbManager->getChildrenTableStd();
   
 	// get the root volume data
 	m_root_vol_data = m_dbManager->getRootPhysVol();
@@ -308,48 +267,10 @@ GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
     buildAllFullPhysVols();
     buildAllSerialTransformers();
   }
-	
-//  loopOverAllChildrenInBunches();
-    loopOverAllChildrenInBunchesNew(); // FIXME: WIP
-  
+  loopOverAllChildrenInBunches();
 	return getRootVolume();
 }
 
-
-//----------------------------------------
-// Serial loop over parents' children
-void ReadGeoModel::loopOverAllChildren(QStringList keys)
-{
-
-//  int nChildrenRecords = keys.size();
-//
-//  if (m_debug || m_deepDebug) {
-//    muxCout.lock();
-//    std::cout << "Thread " << std::this_thread::get_id() << " - processing " << nChildrenRecords << " keys..." << std::endl;
-//    muxCout.unlock();
-//  }
-//
-//  // loop over parents' keys.
-//  // It returns a list of children with positions (sorted by position)
-//
-//  // Get Start Time
-//  std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-//
-//
-//  for (unsigned int i = 0; i < keys.size(); ++i) {
-//    processParentChildren( keys.at(i) );
-//  }
-//
-//  // Get End Time
-//  auto end = std::chrono::system_clock::now();
-//  auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
-//
-//  if (m_timing || m_debug || m_deepDebug) {
-//    muxCout.lock();
-//    std::cout << "Time Taken to process " << nChildrenRecords << " parent-child relationships = " << diff << " Seconds" << std::endl;
-//    muxCout.unlock();
-//  }
-}
 
 //----------------------------------------
 // loop over parent-child relationship data
@@ -364,18 +285,10 @@ void ReadGeoModel::loopOverAllChildren(QStringList keys)
     muxCout.unlock();
   }
   
-  // loop over parents' keys.
-  // It returns a list of children with positions (sorted by position)
-  
   // Get Start Time
   std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
   
   for ( auto& record : records ) {
-//    std::cout << "\nrecord: "; printStdVectorStrings(record); // debug
-
-    //    if (record[1]=="57333" && record[2]=="1" && record[6]=="185054") processParentChild( record ); // debug
-//    if (record[1]=="20602" && record[2]=="2") processParentChild( record ); // debug
-    
     processParentChild( record );
   }
   
@@ -410,12 +323,11 @@ void ReadGeoModel::buildAllShapes()
 void ReadGeoModel::buildAllSerialDenominators()
 {
   if (m_debug) std::cout << "Building all SerialDenominator nodes...\n";
-  size_t nSize = m_serialDenominatorsStd.size();
+  size_t nSize = m_serialDenominators.size();
   m_memMapSerialDenominators.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-//    buildSerialDenominator(ii+1);
-    const unsigned int nodeID = std::stoi(m_serialDenominatorsStd[ii][0]);
-    const std::string baseName = m_serialDenominatorsStd[ii][1];
+    const unsigned int nodeID = std::stoi(m_serialDenominators[ii][0]);
+    const std::string baseName = m_serialDenominators[ii][1];
     GeoSerialDenominator* nodePtr = new GeoSerialDenominator(baseName);
     storeBuiltSerialDenominator(nodeID, nodePtr);
   }
@@ -488,16 +400,16 @@ void printQHashQstringUInt(QHash<QString, unsigned int> qq) {
 void ReadGeoModel::buildAllPhysVols()
 {
   if (m_debug) std::cout << "Building all PhysVols...\n";
-  if (m_physVolsStd.size() == 0) {
+  if (m_physVols.size() == 0) {
     std::cout << "ERROR!!! No input PhysVols found! Exiting..." << std::endl;
     exit(EXIT_FAILURE);
   }
   const unsigned int tableID = m_tableName_toTableID["GeoPhysVol"];
-  size_t nSize = m_physVolsStd.size();
+  size_t nSize = m_physVols.size();
   m_memMapPhysVols.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-    const unsigned int volID = std::stoi(m_physVolsStd[ii][0]);
-    const unsigned int logVolID = std::stoi(m_physVolsStd[ii][1]);
+    const unsigned int volID = std::stoi(m_physVols[ii][0]);
+    const unsigned int logVolID = std::stoi(m_physVols[ii][1]);
     // std::cout << "building PhysVol n. " << volID << " (logVol: " << logVolID << ")" << std::endl;
     buildVPhysVol(volID, tableID, logVolID);
   }
@@ -509,11 +421,11 @@ void ReadGeoModel::buildAllFullPhysVols()
 {
   if (m_debug) std::cout << "Building all FullPhysVols...\n";
   const unsigned int tableID = m_tableName_toTableID["GeoFullPhysVol"];
-  size_t nSize = m_fullPhysVolsStd.size();
+  size_t nSize = m_fullPhysVols.size();
   m_memMapFullPhysVols.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-    const unsigned int volID = std::stoi(m_fullPhysVolsStd[ii][0]);
-    const unsigned int logVolID = std::stoi(m_fullPhysVolsStd[ii][1]);
+    const unsigned int volID = std::stoi(m_fullPhysVols[ii][0]);
+    const unsigned int logVolID = std::stoi(m_fullPhysVols[ii][1]);
     // std::cout << "building PhysVol n. " << volID << " (logVol: " << logVolID << ")" << std::endl;
     buildVPhysVol(volID, tableID, logVolID);
   }
@@ -524,10 +436,10 @@ void ReadGeoModel::buildAllFullPhysVols()
 void ReadGeoModel::buildAllAlignableTransforms()
 {
   if (m_debug) std::cout << "Building all AlignableTransforms...\n";
-  size_t nSize = m_alignableTransformsStd.size();
+  size_t nSize = m_alignableTransforms.size();
   m_memMapAlignableTransforms.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-    const unsigned int volID = std::stoi(m_alignableTransformsStd[ii][0]);
+    const unsigned int volID = std::stoi(m_alignableTransforms[ii][0]);
     buildAlignableTransform(volID);
   }
   if (nSize>0) std::cout << "All " << nSize << " AlignableTransforms have been built!\n";
@@ -537,10 +449,10 @@ void ReadGeoModel::buildAllAlignableTransforms()
 void ReadGeoModel::buildAllTransforms()
 {
   if (m_debug) std::cout << "Building all Transforms...\n";
-  size_t nSize = m_transformsStd.size();
+  size_t nSize = m_transforms.size();
   m_memMapTransforms.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-    const unsigned int volID = std::stoi(m_transformsStd[ii][0]);
+    const unsigned int volID = std::stoi(m_transforms[ii][0]);
     buildTransform(volID);
   }
   if (nSize>0) std::cout << "All " << nSize << " Transforms have been built!\n";
@@ -550,10 +462,10 @@ void ReadGeoModel::buildAllTransforms()
 void ReadGeoModel::buildAllSerialTransformers()
 {
   if (m_debug) std::cout << "Building all SerialTransformers...\n";
-  size_t nSize = m_serialTransformersStd.size();
+  size_t nSize = m_serialTransformers.size();
   m_memMapSerialTransformers.reserve( nSize*2 ); // TODO: check if 2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-    const unsigned int volID = std::stoi(m_serialTransformersStd[ii][0]);
+    const unsigned int volID = std::stoi(m_serialTransformers[ii][0]);
     buildSerialTransformer(volID);
   }
   if (nSize>0) std::cout << "All " << nSize << " SerialTransformers have been built!\n";
@@ -563,7 +475,7 @@ void ReadGeoModel::buildAllSerialTransformers()
 // void ReadGeoModel::buildAllFunctions()
 // {
 //   if (m_debug) std::cout << "Building all Functions...\n";
-////   if (m_serialTransformersStd.size() == 0) {
+////   if (m_serialTransformers.size() == 0) {
 ////     std::cout << "ERROR!!! input SerialTransformers are empty! Exiting..." << std::endl;
 ////     exit(EXIT_FAILURE);
 ////   }
@@ -596,88 +508,10 @@ void ReadGeoModel::buildAllSerialTransformers()
 // }
 
 
-//----------------------------------------
-// Parallel loop over parents' children
-void ReadGeoModel::loopOverAllChildrenInBunches()
-{
-//  int nChildrenRecords = m_allchildren.size();
-//  if (m_debug) std::cout << "number of children to process: " << nChildrenRecords << std::endl;
-//
-//  // If we have a few children, then process them serially
-//      if ( !(m_runMultithreaded) || nChildrenRecords <= 500)
-//      {
-//    loopOverAllChildren(m_allchildren.keys());
-//  }
-//  // ...otherwise, let's spawn some threads to process them in bunches, parallelly!
-//  else {
-//
-//    std::chrono::system_clock::time_point start, end;
-//    if (m_timing || m_debug || m_deepDebug) {
-//      // Get Start Time
-//      start = std::chrono::system_clock::now();
-//    }
-//
-//    // set number of worker threads
-//    unsigned int nThreads = 0;
-//    if(m_runMultithreaded_nThreads > 0) {
-//      nThreads = m_runMultithreaded_nThreads;
-//    }
-//    else if (m_runMultithreaded_nThreads == -1) {
-//      unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
-//      nThreads = nThreadsPlatform;
-//      if (m_debug || m_deepDebug) std::cout << "INFO - You have asked for hardware native parellelism. On this platform, " << nThreadsPlatform << " concurrent threads are supported. Thus, using " << nThreads << " threads.\n";
-//    }
-//
-//    unsigned int nBunches = nChildrenRecords / nThreads;
-//    if (m_debug || m_deepDebug) std::cout << "Processing " << nThreads << " bunches, with " << nBunches << " children each, plus the remainder." << std::endl;
-//
-//    // a vector to store the "futures" of async calls
-//    std::vector<std::future<void>> futures;
-//
-//    for (unsigned int bb=0; bb<nThreads; ++bb ) {
-//
-//      unsigned int start = nBunches * bb;
-//      int len = nBunches;
-//      if ( bb == (nThreads - 1) ) len = -1; // '-1' means for mid() all the elements starting from 'start'
-//
-//
-//      if (m_debug || m_deepDebug) {
-//        muxCout.lock();
-//        std::cout << "Thread " << bb+1 << " - Start: " << start << ", len: " << len << "   ['len=-1' = all remaining items]" << std::endl;
-//        muxCout.unlock();
-//      }
-//
-//      QStringList bunch = QStringList((m_allchildren.keys()).mid(start,len));
-//      if (m_debug || m_deepDebug) {
-//        muxCout.lock();
-//         std::cout << "'bunch' size: " << bunch.size() << std::endl;
-//        muxCout.unlock();
-//      }
-//
-//      futures.push_back( std::async(std::launch::async, &ReadGeoModel::loopOverAllChildren, this, bunch) );
-//    }
-//
-//    // wait for all async calls to complete
-//    //retrieve and print the value stored in the 'std::future'
-//    if (m_debug || m_deepDebug) std::cout << "Waiting for the threads to finish...\n" << std::flush;
-//      for(auto &e : futures) {
-//        e.wait();
-//       }
-//    if (m_debug || m_deepDebug) std::cout << "Done!\n";
-//
-//    if (m_timing || m_debug || m_deepDebug) {
-//      // Get End Time
-//      end = std::chrono::system_clock::now();
-//      auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
-//      std::cout << "(Total time taken to recreate all " << nChildrenRecords << " mother-children relationships: " << diff << " seconds)" << std::endl;
-//    }
-//  }
-	return;
-}
 
-  void ReadGeoModel::loopOverAllChildrenInBunchesNew()
+  void ReadGeoModel::loopOverAllChildrenInBunches()
   {
-    int nChildrenRecords = m_allchildrenStd.size();
+    int nChildrenRecords = m_allchildren.size();
     if (m_debug) std::cout << "number of children to process: " << nChildrenRecords << std::endl;
     
     // If we have a few children, then process them serially
@@ -685,7 +519,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
     if ( !(m_runMultithreaded) || nChildrenRecords <= 500)
     {
       std::cout << "Running serially...\n";
-      loopOverAllChildrenRecords(m_allchildrenStd);
+      loopOverAllChildrenRecords(m_allchildren);
     }
     // ...otherwise, let's spawn some threads to process them in bunches, parallelly!
     else {
@@ -722,17 +556,14 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
         unsigned int start = nBunches * bb;
         int len = nBunches;
         const unsigned int stop = start + len;
-        std::vector<std::vector<std::string>>::const_iterator first = m_allchildrenStd.begin() + start;
-        std::vector<std::vector<std::string>>::const_iterator last  = m_allchildrenStd.begin() + stop;
+        std::vector<std::vector<std::string>>::const_iterator first = m_allchildren.begin() + start;
+        std::vector<std::vector<std::string>>::const_iterator last  = m_allchildren.begin() + stop;
         if ( bb == (nThreads - 1) ) { // last bunch
-           bunch = std::vector<std::vector<std::string>>(first, m_allchildrenStd.end());
+           bunch = std::vector<std::vector<std::string>>(first, m_allchildren.end());
 //          bunch = bunchIn;
         } else { // all bunches but last one
            bunch = std::vector<std::vector<std::string>>(first, last);
         }
-        
-        
-        
         
         if (m_debug || m_deepDebug) {
           muxCout.lock();
@@ -768,55 +599,13 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
     return;
   }
 
-void ReadGeoModel::processParentChildren(const QString &parentKey)
-{
-//
-//  // get the parent's details
-//  QStringList parentKeyItems = parentKey.split(":");
-//  QString qparentId = parentKeyItems[0];
-//  const unsigned int parentTableId = parentKeyItems[1].toUInt();
-//  const unsigned int parentCopyN = parentKeyItems[2].toUInt();
-//
-//  bool isRootVolume = false;
-//  unsigned int parentId = 0; // TODO: I should change the 'NULL' datum in the DB to something else, like 0 or -1
-//  if (qparentId == "NULL") {
-//    isRootVolume = true;
-//  } else {
-//    parentId = qparentId.toUInt();
-//  }
-//
-//  GeoVPhysVol* parentVol = nullptr;
-//
-//  // build or get parent volume.
-//  // Using the parentCopyNumber here, to get a given instance of the parent volume
-//  if (!isRootVolume) {
-//    if (m_deepDebug) std::cout << "\nget/build the parent volume...\n";
-//    parentVol = buildVPhysVolInstance( parentId, parentTableId, parentCopyN);
-//  }
-//
-//  // get the parent's children
-//  QMap<unsigned int, QStringList> children = m_allchildren.value(parentKey);
-//  // std::cout << "children" << children;
-//
-//  // loop over children, sorted by child position automatically
-//  // "id", "parentId", "parentTable", "parentCopyNumber", "position", "childTable", "childId", "childCopyNumber"
-//  if (m_deepDebug) std::cout << "parent volume has " << children.size() << "children. Looping over them..." << std::endl;
-//  foreach(QStringList child, children) {
-//    processChild(parentVol, isRootVolume, child);
-//  } // loop over all children
-}
-
   void ReadGeoModel::processParentChild(const std::vector<std::string> &parentchild)
   {
-//    std::cout << "ReadGeoModel::processParentChild()\n";
-    
     // safety check
     if (parentchild.size() < 8) {
       std::cout <<  "ERROR!!! Probably you are using an old geometry file. Please, get a new one. Exiting..." << std::endl;
       exit(EXIT_FAILURE);
     }
-    
-//    std::cout << "parent-pos-child: "; printStdVectorStrings(parentchild);
     
     // get the parent's details
     const unsigned int parentId = std::stoi(parentchild[1]);
@@ -843,11 +632,8 @@ void ReadGeoModel::processParentChildren(const QString &parentKey)
     
     // build or get parent volume.
     // Using the parentCopyNumber here, to get a given instance of the parent volume
-      if (m_deepDebug) std::cout << "\nget the parent volume...\n";
-      parentVol = dynamic_cast<GeoVPhysVol*>( buildVPhysVolInstance(parentId, parentTableId, parentCopyN) );
-    
+    parentVol = dynamic_cast<GeoVPhysVol*>( buildVPhysVolInstance(parentId, parentTableId, parentCopyN) );
     std::string parentName = parentVol->getLogVol()->getName();
-//    std::cout << "parent vol:" << parentName << std::endl; // FibreRadiator0
 	
 	if (childNodeType == "GeoPhysVol") {
 		GeoPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVolInstance(childId, childTableId, childCopyN));
@@ -883,86 +669,10 @@ void ReadGeoModel::processParentChildren(const QString &parentKey)
 	}
 }
 
-  void ReadGeoModel::processChild(GeoVPhysVol* parentVol, bool& isRootVolume, const QStringList &child)
-  {
-    if (m_deepDebug) {
-      muxCout.lock();
-      std::cout << "ReadGeoModel::processChild() - child: ";
-      printStdVectorStrings(toStdVectorStrings(child));
-      muxCout.unlock();
-    }
-    
-    if (child.length() < 8) {
-      std::cout <<  "ERROR!!! Probably you are using an old geometry file. Please, get a new one. Exiting..." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    
-    // build or get child node
-    const unsigned int childTableId = child[5].toUInt();
-    const unsigned int childId = child[6].toUInt();
-    const unsigned int childCopyN = child[7].toUInt();
-    
-//    std::string childNodeType = m_tableID_toTableName[childTableId].toStdString();
-    std::string childNodeType = m_tableID_toTableName[childTableId];
-    
-    if (m_deepDebug) {
-      muxCout.lock();
-      std::cout << "childTableId:" << childTableId << ", type:" << childNodeType << ", childId:" << childId << std::endl;
-      muxCout.unlock();
-    }
-    
-    if ( "" == childNodeType || 0 == childNodeType.size()) {
-      std::cout << "ERROR!!! childNodeType is empty!!! Aborting..." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    
-    if (childNodeType == "GeoPhysVol") {
-      GeoVPhysVol* childNode = dynamic_cast<GeoPhysVol*>(buildVPhysVolInstance(childId, childTableId, childCopyN));
-      if (!isRootVolume) volAddHelper(parentVol, childNode);
-    }
-    else if (childNodeType == "GeoFullPhysVol") {
-      GeoVPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(buildVPhysVolInstance(childId, childTableId, childCopyN));
-      if (!isRootVolume) volAddHelper(parentVol, childNode);
-    }
-    else if (childNodeType == "GeoSerialDenominator") {
-      //    GeoSerialDenominator* childNode = buildSerialDenominator(childId);
-      GeoSerialDenominator* childNode = getBuiltSerialDenominator(childId);
-      if (!isRootVolume) volAddHelper(parentVol, childNode);
-    }
-    else if (childNodeType == "GeoAlignableTransform") {
-      //    GeoAlignableTransform* childNode = buildAlignableTransform(childId);
-      GeoAlignableTransform* childNode = getBuiltAlignableTransform(childId);
-      if (!isRootVolume) volAddHelper(parentVol, childNode);
-      
-    }
-    else if (childNodeType == "GeoTransform") {
-      //    GeoTransform* childNode = buildTransform(childId);
-      GeoTransform* childNode = getBuiltTransform(childId);
-      if (!isRootVolume) volAddHelper(parentVol, childNode);
-      
-    }
-    else if (childNodeType == "GeoSerialTransformer") {
-      //    GeoSerialTransformer* childNode = buildSerialTransformer(childId);
-      GeoSerialTransformer* childNode = getBuiltSerialTransformer(childId);
-      if (!isRootVolume) volAddHelper(parentVol, childNode);
-    }
-    else if (childNodeType == "GeoNameTag") {
-      //    GeoNameTag* childNode = buildNameTag(childId);
-      GeoNameTag* childNode = getBuiltNameTag(childId);
-      if (!isRootVolume) volAddHelper(parentVol, childNode);
-    }
-    else {
-      std::cout << "[" << childNodeType << "] ==> ERROR!!! - The conversion for this type of child node needs to be implemented." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    return;
-  }
-
-
 void ReadGeoModel::volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild)
 {
-//  checkNodePtr(vol, "vol", __func__, __PRETTY_FUNCTION__);
-//  checkNodePtr(volChild, "volChild", __func__, __PRETTY_FUNCTION__);
+  checkNodePtr(vol, "vol", __func__, __PRETTY_FUNCTION__);
+  checkNodePtr(volChild, "volChild", __func__, __PRETTY_FUNCTION__);
 	if (dynamic_cast<GeoPhysVol*>(vol)) {
 		GeoPhysVol* volume = dynamic_cast<GeoPhysVol*>(vol);
 		volume->add(volChild);
@@ -972,7 +682,8 @@ void ReadGeoModel::volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild)
 	}
 }
 
-void ReadGeoModel::checkNodePtr(GeoGraphNode* nodePtr, std::string varName, std::string funcName, std::string funcSignature)//TODO: to be moved to an utility class
+//TODO: to be moved to an utility class
+void ReadGeoModel::checkNodePtr(GeoGraphNode* nodePtr, std::string varName, std::string funcName, std::string funcSignature)
 {
   if (!nodePtr) {
     muxCout.lock();
@@ -1084,9 +795,9 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(const unsigned int id, const unsigned i
     // get the volume's parameters
     std::vector<std::string> values;
     if (nodeType == "GeoPhysVol")
-      values = m_physVolsStd[id];
+      values = m_physVols[id];
     else if (nodeType == "GeoFullPhysVol")
-      values = m_fullPhysVolsStd[id];
+      values = m_fullPhysVols[id];
     
     logVol_ID = std::stoi(values[1]);
   }
@@ -2775,24 +2486,6 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
 }
 
 
-//GeoSerialDenominator* ReadGeoModel::buildSerialDenominator(const unsigned int id)
-//{
-//
-//  if (m_deepDebug) {
-//    muxCout.lock();
-//    std::cout << "ReadGeoModel::buildSerialDenominator()";
-//    muxCout.unlock();
-//  }
-//  QStringList values = m_serialDenominators[id];
-//  QString baseName = values[1];
-//  if (m_deepDebug) {
-//    muxCout.lock();
-//    std::cout << "\buildSerialDenominator() - ID:" << id << ", base-name:" << baseName;
-//    muxCout.unlock();
-//  }
-//  return new GeoSerialDenominator(baseName.toStdString());
-//}
-
 // TODO: this should be moved to an Utilities class!
 void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
   muxCout.lock();
@@ -2844,13 +2537,7 @@ GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(const unsigned int 
     return getBuiltAlignableTransform(id);
   }
   
-//  if (m_deepDebug) {
-//    muxCout.lock();
-//    std::cout << "ReadGeoModel::buildAlignableTransform()";
-//    muxCout.unlock();
-//  }
-  
-  std::vector<std::string> values = m_alignableTransformsStd[id-1]; // nodes' IDs start from 1
+  std::vector<std::string> values = m_alignableTransforms[id-1]; // nodes' IDs start from 1
   values.erase(values.begin()); // remove the first element, that is the 'id', leaving the other items in the list
 
 	// get the 12 matrix elements
@@ -2902,31 +2589,9 @@ GeoTransform* ReadGeoModel::buildTransform(const unsigned int id)
     return getBuiltTransform(id);
   }
   
-//  muxCout.lock();
-//  if (m_deepDebug) std::cout << "ReadGeoModel::buildTransform(unsigned int)";
-//  if (m_deepDebug) std::cout << "values:" << values;
-//  muxCout.unlock();
-
-  std::vector<std::string> values = m_transformsStd[id-1]; // nodes' IDs start from 1
+  std::vector<std::string> values = m_transforms[id-1]; // nodes' IDs start from 1
   values.erase(values.begin()); // remove the first element, that is the 'id', leaving the other items in the list
   
-	// get the 12 matrix elements
-//  double xx = values[0].toDouble();
-//  double xy = values[1].toDouble();
-//  double xz = values[2].toDouble();
-//
-//  double yx = values[3].toDouble();
-//  double yy = values[4].toDouble();
-//  double yz = values[5].toDouble();
-//
-//  double zx = values[6].toDouble();
-//  double zy = values[7].toDouble();
-//  double zz = values[8].toDouble();
-//
-//  double dx = values[9].toDouble();
-//  double dy = values[10].toDouble();
-//  double dz = values[11].toDouble();
-
   // get the 12 matrix elements
   double xx = std::stod(values[0]);
   double xy = std::stod(values[1]);
@@ -2977,7 +2642,7 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(const unsigned int id
   muxCout.unlock();
 
   const unsigned int nodeID = id-1; // nodes' IDs start from 1
-  std::vector<std::string> values = m_serialTransformersStd[nodeID];
+  std::vector<std::string> values = m_serialTransformers[nodeID];
 
   const unsigned int functionId = std::stoi(values[1]);
   const unsigned int physVolId = std::stoi(values[2]);

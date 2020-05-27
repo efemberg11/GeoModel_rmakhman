@@ -16,6 +16,7 @@
 
 // include C++
 #include <iostream>
+#include <unordered_map>
 
 /**
  * \class GMDBManager
@@ -178,6 +179,9 @@ public:
   std::vector<std::vector<std::string>> getTableFromNodeTypeStd(std::string nodeType);
 	QHash<unsigned int, QString> getAll_TableIDsNodeTypes();
 	QHash<QString, unsigned int> getAll_NodeTypesTableIDs();
+  std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypesStd();
+  std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDsStd();
+  
 
 
 private:

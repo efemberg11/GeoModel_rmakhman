@@ -1001,7 +1001,7 @@ QHash<QString, QMap<unsigned int, QStringList>> GMDBManager::getChildrenTable()
 // Get all parent-children data from the database in one go
 std::vector<std::vector<std::string>> GMDBManager::getChildrenTableStd()
 {
-  // JFB commented: qDebug() << "GMDBManager::getChildrenTable()";
+//  std::cout << "GMDBManager::getChildrenTableStd()\n"; // debug
   
   QSqlQuery q;
   QString queryStr = QString("SELECT * FROM ChildrenPositions ORDER BY parentTable, parentId, parentCopyNumber, position");
@@ -1015,7 +1015,7 @@ std::vector<std::vector<std::string>> GMDBManager::getChildrenTableStd()
   
   // get the number of columns of the DB table
   int nCols = m_tableNames["ChildrenPositions"].size();
-  // JFB commented: qDebug() << "num of columns in childrenPos table" << nCols;
+  //  std::cout << "num of columns in childrenPos table" << nCols << std::endl; // debug
   
   // loop over all children's positions stored in the DB
   while (q.next()) {
@@ -1025,6 +1025,10 @@ std::vector<std::vector<std::string>> GMDBManager::getChildrenTableStd()
     for( int ii=0; ii<nCols; ++ii) {
       childParams.push_back( q.value(ii).toString().toStdString() );
     }
+    
+//    // debug
+//    if(childParams[2]=="8920")
+//      std::cout << "CoolingTube parent:"; print childParams;
     
     all_children.push_back(childParams);
   }
@@ -1134,6 +1138,25 @@ QHash<unsigned int, QString> GMDBManager::getAll_TableIDsNodeTypes()
 	return output;
 }
 
+std::unordered_map<unsigned int, std::string> GMDBManager::getAll_TableIDsNodeTypesStd()
+{
+  // JFB commented: qDebug() << "GMDBManager::getAll_TableIDsNodeTypes()";
+  
+//  QHash<unsigned int, QString> output;
+  std::unordered_map<unsigned int, std::string> output;
+  
+  QSqlQuery q = selectAllFromTable("GeoNodesTypes");
+  
+  unsigned int id;
+  QString nodeType;
+  // QString tableName;
+  while (q.next()) {
+    id = q.value(0).toUInt();
+    nodeType = q.value(1).toString();
+    output[id] = nodeType.toStdString();
+  }
+  return output;
+}
 
 QHash<QString, unsigned int> GMDBManager::getAll_NodeTypesTableIDs()
 {
@@ -1152,6 +1175,24 @@ QHash<QString, unsigned int> GMDBManager::getAll_NodeTypesTableIDs()
 		output[nodeType] = id;
 	}
 	return output;
+}
+
+std::unordered_map<std::string, unsigned int> GMDBManager::getAll_NodeTypesTableIDsStd()
+{
+//  QHash<QString, unsigned int> output;
+  std::unordered_map<std::string, unsigned int> output;
+  
+  QSqlQuery q = selectAllFromTable("GeoNodesTypes");
+  
+  unsigned int id;
+  QString nodeType;
+  // QString tableName;
+  while (q.next()) {
+    id = q.value(0).toUInt();
+    nodeType = q.value(1).toString();
+    output[nodeType.toStdString()] = id;
+  }
+  return output;
 }
 
 

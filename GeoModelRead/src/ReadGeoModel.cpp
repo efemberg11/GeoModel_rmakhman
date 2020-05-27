@@ -148,9 +148,10 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDeb
 }
 
 ReadGeoModel::~ReadGeoModel() {
-	// TODO Auto-generated destructor stub
+  // FIXME: some cleaning...??
 }
 
+  
 std::string ReadGeoModel::getEnvVar( std::string const & key ) const
 {
     char * val = std::getenv( key.c_str() );
@@ -161,8 +162,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 {
   if (m_deepDebug) std::cout << "ReadGeoModel::buildGeoModel()" << std::endl;
 
-	// return buildGeoModelByCalls();
-	GeoPhysVol* rootVolume = buildGeoModelOneGo();
+	GeoPhysVol* rootVolume = buildGeoModelPrivate();
 
   // warn the user if there are unknown/unhalded shapes
 	if (m_unknown_shapes.size() > 0) {
@@ -177,10 +177,8 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 }
 
 
-GeoPhysVol* ReadGeoModel::buildGeoModelOneGo()
+GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
 {
-  if (m_deepDebug) std::cout << "ReadGeoModel::buildGeoModelOneGo()" << std::endl;
-
   // *** get all data from the DB ***
 
 	// get all GeoModel nodes from the DB

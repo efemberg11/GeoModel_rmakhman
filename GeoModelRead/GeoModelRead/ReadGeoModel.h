@@ -34,7 +34,7 @@ typedef GeoModelIO::ReadGeoModel Persistifier;
 // ****************************************************************
 
 
-
+// local includes
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelKernel/GeoXF.h"
 
@@ -65,12 +65,12 @@ class GeoGraphNode;
 class GeoShapeSubtraction;
 class GeoBox;
 
-
+// namespaces
 using namespace GeoGenfun;
 using namespace GeoXF;
 
 
-
+// type definitions
 typedef const Function & TRANSFUNCTION;
 // containers for boolean shapes' information
 typedef std::tuple<unsigned int/*shape ID*/, GeoShape*, unsigned int/*opA ID*/, unsigned int/*opB ID*/> tuple_shapes_boolean_info;
@@ -105,8 +105,7 @@ private:
   
   std::string getEnvVar( std::string const & key ) const;
 
-	GeoPhysVol* buildGeoModelByCalls();
-	GeoPhysVol* buildGeoModelOneGo();
+	GeoPhysVol* buildGeoModelPrivate();
 
   GeoBox* buildDummyShape();
 

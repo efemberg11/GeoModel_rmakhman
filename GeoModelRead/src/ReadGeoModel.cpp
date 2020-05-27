@@ -1005,8 +1005,8 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id, const un
 	checkInputString(QString::number(tableId));
 
 	// A - if the instance has been previously built, return that
-//  if ( nullptr != getVPhysVol(id, tableId, copyN)) {
-  if (isVPhysVolBuilt(id, tableId, copyN)) {
+  if ( nullptr != getVPhysVol(id, tableId, copyN)) {
+//  if (isVPhysVolBuilt(id, tableId, copyN)) {
 		if (m_deepDebug) {
       muxCout.lock();
       std::cout << "getting the instance volume from memory..." << std::endl;
@@ -3033,40 +3033,21 @@ TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int id)
   return tf;
 }
 
-//GeoNameTag* ReadGeoModel::buildNameTag(const unsigned int id)
-//{
-//  if (m_deepDebug) {
-//    muxCout.lock();
-//    std::cout << "ReadGeoModel::buildNameTag()";
-//    muxCout.unlock();
-//  }
-//  QStringList values = m_nameTags[id];
-//  QString name = values[1];
-//  if (m_deepDebug) {
-//    muxCout.lock();
-//    std::cout << "nameTag:" << name;
-//    muxCout.unlock();
-//  }
-//  return new GeoNameTag(name.toStdString());
-//}
-
 
 // --- methods for caching GeoShape nodes ---
 bool ReadGeoModel::isBuiltShape(const unsigned int id)
 {
-//  return (id <= m_memMapShapes.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
   return ( ! (m_memMapShapes.find(id) == m_memMapShapes.end()) );
 }
 void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* nodePtr)
 {
-//  m_memMapShapes.push_back(nodePtr);
   m_memMapShapes[id] = nodePtr;
 }
 GeoShape* ReadGeoModel::getBuiltShape(const unsigned int id)
 {
-//  return m_memMapShapes[id-1];
-  return m_memMapShapes[id];
+  return m_memMapShapes[id]; // this is a map, and 'id' is the key
 }
+  
 // --- methods for caching GeoLogVol nodes ---
 bool ReadGeoModel::isBuiltLog(const unsigned int id)
 {
@@ -3078,8 +3059,9 @@ void ReadGeoModel::storeBuiltLog(const unsigned int id, GeoLogVol* nodePtr)
 }
 GeoLogVol* ReadGeoModel::getBuiltLog(const unsigned int id)
 {
-	return m_memMapLogVols[id-1];
+	return m_memMapLogVols[id-1]; // nodes' IDs start from 1
 }
+  
 // --- methods for caching GeoPhysVol nodes ---
 bool ReadGeoModel::isBuiltPhysVol(const unsigned int id)
 {
@@ -3087,12 +3069,13 @@ bool ReadGeoModel::isBuiltPhysVol(const unsigned int id)
 }
 void ReadGeoModel::storeBuiltPhysVol(const unsigned int id, GeoPhysVol* nodePtr)
 {
-  m_memMapPhysVols.push_back(nodePtr); // vector
+  m_memMapPhysVols.push_back(nodePtr);
 }
 GeoPhysVol* ReadGeoModel::getBuiltPhysVol(const unsigned int id)
 {
-	return m_memMapPhysVols[id-1]; // vector
+	return m_memMapPhysVols[id-1]; // nodes' IDs start from 1
 }
+  
 // --- methods for caching GeoFullPhysVol nodes ---
 bool ReadGeoModel::isBuiltFullPhysVol(const unsigned int id)
 {
@@ -3101,15 +3084,14 @@ bool ReadGeoModel::isBuiltFullPhysVol(const unsigned int id)
 }
 void ReadGeoModel::storeBuiltFullPhysVol(const unsigned int id, GeoFullPhysVol* nodePtr)
 {
-  // std::lock_guard<std::mutex> lk(muxLog);
   m_memMapFullPhysVols.push_back(nodePtr); // vector, we store them in the order of IDs
 }
 GeoFullPhysVol* ReadGeoModel::getBuiltFullPhysVol(const unsigned int id)
 {
-	// std::lock_guard<std::mutex> lk(muxLog); // TODO: is this lock now needed at all?? now we only use those in a single thread or read-only
-  return m_memMapFullPhysVols[id-1]; // vector
+  return m_memMapFullPhysVols[id-1]; // nodes' IDs start from 1
 
 }
+  
 // --- methods for caching GeoMaterial nodes ---
 bool ReadGeoModel::isBuiltMaterial(const unsigned int id)
 {
@@ -3123,6 +3105,7 @@ GeoMaterial* ReadGeoModel::getBuiltMaterial(const unsigned int id)
 {
 	return m_memMapMaterials[id-1];
 }
+  
 // --- methods for caching GeoElement nodes ---
 bool ReadGeoModel::isBuiltElement(const unsigned int id)
 {
@@ -3136,24 +3119,22 @@ GeoElement* ReadGeoModel::getBuiltElement(const unsigned int id)
 {
 	return m_memMapElements[id-1];
 }
+  
 // --- methods for caching GeoTransform nodes ---
 bool ReadGeoModel::isBuiltTransform(const unsigned int id)
 {
-//   std::lock_guard<std::mutex> lk(muxTransf);
   return (id <= m_memMapTransforms.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
 void ReadGeoModel::storeBuiltTransform(const unsigned int id, GeoTransform* nodePtr)
 {
-//   std::lock_guard<std::mutex> lk(muxTransf);
   m_memMapTransforms.push_back(nodePtr); // vector, we store them in the order of IDs
 
 }
 GeoTransform* ReadGeoModel::getBuiltTransform(const unsigned int id)
 {
-//   std::lock_guard<std::mutex> lk(muxTransf);
-  return m_memMapTransforms[id-1]; // vector, but nodes' IDs start from 1
-
+  return m_memMapTransforms[id-1]; // nodes' IDs start from 1
 }
+  
 // --- methods for caching GeoAlignableTransform nodes ---
 bool ReadGeoModel::isBuiltAlignableTransform(const unsigned int id)
 {
@@ -3166,9 +3147,10 @@ void ReadGeoModel::storeBuiltAlignableTransform(const unsigned int id, GeoAligna
 }
 GeoAlignableTransform* ReadGeoModel::getBuiltAlignableTransform(const unsigned int id)
 {
-  return m_memMapAlignableTransforms[id-1]; // vector, but nodes' IDs start from 1
+  return m_memMapAlignableTransforms[id-1]; // nodes' IDs start from 1
   
 }
+  
 // --- methods for caching GeoSerialDenominator nodes ---
 bool ReadGeoModel::isBuiltSerialDenominator(const unsigned int id)
 {
@@ -3181,9 +3163,10 @@ void ReadGeoModel::storeBuiltSerialDenominator(const unsigned int id, GeoSerialD
 }
 GeoSerialDenominator* ReadGeoModel::getBuiltSerialDenominator(const unsigned int id)
 {
-  return m_memMapSerialDenominators[id-1]; // vector, but nodes' IDs start from 1
+  return m_memMapSerialDenominators[id-1]; // nodes' IDs start from 1
   
 }
+  
 // --- methods for caching GeoNameTag nodes ---
 bool ReadGeoModel::isBuiltNameTag(const unsigned int id)
 {
@@ -3199,6 +3182,7 @@ GeoNameTag* ReadGeoModel::getBuiltNameTag(const unsigned int id)
   return m_memMapNameTags[id-1]; // vector, but nodes' IDs start from 1
   
 }
+  
 // --- methods for caching GeoSerialDenominator nodes ---
 bool ReadGeoModel::isBuiltSerialTransformer(const unsigned int id)
 {
@@ -3214,43 +3198,27 @@ GeoSerialTransformer* ReadGeoModel::getBuiltSerialTransformer(const unsigned int
   return m_memMapSerialTransformers[id-1]; // vector, but nodes' IDs start from 1
   
 }
+  
 // --- methods for caching GeoPhysVol/GeoFullPhysVol nodes ---
-//QString getVPhysVolKey(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber)
-//{
-//  return QString::number(id) + ":" + QString::number(tableId) + ":" + QString::number(copyNumber);
-//}
 std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber)
 {
   std::string key = std::to_string(id) + ":" + std::to_string(tableId) + ":" + std::to_string(copyNumber);
   return key;
 }
-
-bool ReadGeoModel::isVPhysVolBuilt(const unsigned int id, const unsigned int tableId, const unsigned int copyN)
+void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN, GeoGraphNode* nodePtr)
 {
   std::lock_guard<std::mutex> lk(muxVPhysVol);
-//  std::cout << "ReadGeoModel::isVPhysVolBuilt(): " << id << ", " << tableId << ", " << copyN << std::endl;
   std::string key = getVPhysVolKey(id, tableId, copyN);
-  return m_memMap.contains(QString::fromStdString(key));
-//  if (m_memMap.find(key) == m_memMap.end()) return false;
-//  return true;
-}
-void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN, GeoGraphNode* node)
-{
-  std::lock_guard<std::mutex> lk(muxVPhysVol);
-//  std::cout << "ReadGeoModel::storeVPhysVol(): " << id << ", " << tableId << ", " << copyN << node << std::endl;
-  std::string key = getVPhysVolKey(id, tableId, copyN);
-  m_memMap[QString::fromStdString(key)] = node;
+  m_memMap[key] = nodePtr;
 }
 GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN)
 {
 	std::lock_guard<std::mutex> lk(muxVPhysVol);
-//  std::cout << "ReadGeoModel::getVPhysVol(): " << id << ", " << tableId << ", " << copyN << std::endl;
   std::string key = getVPhysVolKey(id, tableId, copyN);
-//  if (m_memMap.find(key) == m_memMap.end()) {
-//    std::cout << "ERROR! VPhysVol not found in cache! Returning nullptr..." << std::endl;
-//    return nullptr;
-//  }
-  return m_memMap[QString::fromStdString(key)];
+  if (m_memMap.find(key) == m_memMap.end()) {
+    return nullptr; // if volume is not found in cache
+  }
+  return m_memMap[key];
 }
 // --- methods for caching Functions nodes ---
 // bool ReadGeoModel::isBuiltFunc(const unsigned int id)

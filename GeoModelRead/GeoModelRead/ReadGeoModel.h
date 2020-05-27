@@ -166,7 +166,6 @@ private:
   void storeBuiltAlignableTransform(const unsigned int, GeoAlignableTransform* node);
   GeoAlignableTransform* getBuiltAlignableTransform(const unsigned int id);
 
-  bool isVPhysVolBuilt(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
   void storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber, GeoGraphNode* node);
   GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
 
@@ -261,7 +260,7 @@ private:
   
 	QStringList m_root_vol_data;
 
-  QHash<QString, GeoGraphNode*> m_memMap;
+//  QHash<QString, GeoGraphNode*> m_memMap;
 //  std::unordered_map<unsigned int, GeoShape*> m_memMapShapes;
 //  std::unordered_map<unsigned int, GeoTransform*> m_memMapTransforms;
 //  std::unordered_map<unsigned int, GeoLogVol*> m_memMapLogs;
@@ -282,10 +281,10 @@ private:
   std::vector<GeoLogVol*> m_memMapLogVols;
   std::vector<GeoMaterial*> m_memMapMaterials;
   std::vector<GeoElement*> m_memMapElements;
-//  std::vector<GeoShape*> m_memMapShapes;
-  std::unordered_map<unsigned int, GeoShape*> m_memMapShapes;
   //  std::vector<TRANSFUNCTION> m_memMapFunctions; // FIXME: implement cache for Functions
-//  std::unordered_map<std::string, GeoGraphNode*> m_memMap; 
+  
+  std::unordered_map<unsigned int, GeoShape*> m_memMapShapes; // we need keys, because shapes are not built following the ID order
+  std::unordered_map<std::string, GeoGraphNode*> m_memMap; // we need keys, to keep track of the volume's copyNumber
 
   
   std::set<std::string> m_unknown_shapes;

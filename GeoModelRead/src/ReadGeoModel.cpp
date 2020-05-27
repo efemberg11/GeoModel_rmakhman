@@ -399,11 +399,7 @@ void ReadGeoModel::buildAllShapes()
   m_memMapShapes.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
     const unsigned int shapeID = std::stoi(m_shapes[ii][0]);
-//    if(shapeID!=15680) continue;
     type_shapes_boolean_info shapes_info_sub; // tuple to store the boolean shapes to complete at a second stage
-    if(shapeID==15680) {
-      std::cout<<"OK\n";
-    }
     buildShape(shapeID, &shapes_info_sub);
     createBooleanShapeOperands(&shapes_info_sub);
   }
@@ -475,7 +471,6 @@ void ReadGeoModel::buildAllLogVols()
   m_memMapLogVols.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
     const unsigned int nodeID = std::stoi(m_logVols[ii][0]);
-//    if(nodeID!=10869) continue;
     buildLogVol(nodeID);
   }
   if (nSize>0) std::cout << "All " << nSize << " LogVols have been built!\n";
@@ -1267,7 +1262,7 @@ std::string ReadGeoModel::getShapeType(const unsigned int shapeId)
 GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boolean_info* shapes_info_sub)
 {
   if (isBuiltShape(shapeId)) {
-    return getBuiltShape(shapeId); 
+    return getBuiltShape(shapeId);
   }
 
 	if (m_deepDebug) {

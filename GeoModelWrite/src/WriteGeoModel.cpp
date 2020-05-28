@@ -127,8 +127,8 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 	// check the volume position in the geometry tree
 	GeoNodePath* path = getPath();
 	unsigned int len = path->getLength();
-    const GeoVPhysVol* tailVol = path->getTail();
-    const GeoVPhysVol* headVol = path->getHead();
+//    const GeoVPhysVol* tailVol = path->getTail();
+//    const GeoVPhysVol* headVol = path->getHead();
     const GeoVPhysVol* upperVol = nullptr;
     if (len > 1)
         upperVol = path->getItem(len-2); // item(len-1) is THIS volume ==> the length is updated when visiting a VPhysVol node
@@ -186,7 +186,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 
 	if (doGetParentNode) {
 
-        bool isShared = vol->isShared();
+//        bool isShared = vol->isShared();
         //JFB Commented out: qDebug() << "is this node shared?" << isShared;
 
         //if (isShared)
@@ -212,7 +212,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 	}
 
 	// counting children
-	unsigned int nChildren = vol->getNChildVols();
+//  unsigned int nChildren = vol->getNChildVols();
 	//JFB Commented out: qDebug() << "number of child physical volumes:" << nChildren;
 	//JFB Commented out: qDebug() << "[number of PhysVol and SerialTransformer child nodes:" << vol->getNChildVolAndST() << "]";
 

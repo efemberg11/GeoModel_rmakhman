@@ -1,15 +1,15 @@
 #
 # Utility snippet to set a default build type if none was specified by the user
 # at command line.
-# 
+#
 # Source: https://blog.kitware.com/cmake-and-the-default-build-type/ by M.D.Hanwell
 #
 
 # Set a default build type if none was specified
 set(default_build_type "Release")
-# If the source folder seems to contain a .git folder, 
+# If the source folder seems to contain a .git folder,
 # then we assume the user is developing the code and
-# we set a more useful type 
+# we set a more useful type
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
   set(default_build_type "RelWithDebInfo")
 endif()

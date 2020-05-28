@@ -9,7 +9,7 @@
 
 
 #ifndef _GeoShapePersistification_On_
-class Persistifier;
+  class Persistifier;
 #endif
 
 
@@ -17,38 +17,38 @@ class GeoShapeSubtraction : public GeoShape
 {
  public:
   GeoShapeSubtraction (const GeoShape* A, const GeoShape* B);
-  
+
   //	Returns the volume of the shape, for mass inventory
   virtual double volume () const;
-  
+
   //	Returns the NOT shape type, as a string.
   virtual const std::string & type () const;
-  
+
   //	Returns the NOT shape type, as a coded integer.
   virtual ShapeType typeID () const;
-  
+
   //	Returns the first operand in the subtraction
   const GeoShape* getOpA () const;
-  
+
   //	Returns the second operand in the subtraction
   const GeoShape* getOpB () const;
-  
+
   //	Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
-  
+
   //	For type identification.
   static const std::string& getClassType ();
-  
+
   //	For type identification.
   static ShapeType getClassTypeID ();
-  
+
  protected:
   virtual ~GeoShapeSubtraction();
-  
+
  private:
   GeoShapeSubtraction(const GeoShapeSubtraction &right);
   GeoShapeSubtraction & operator=(const GeoShapeSubtraction &right);
-  
+
   //	The shape operand in the Subtraction operation
   const GeoShape* m_opA;
 
@@ -60,8 +60,8 @@ class GeoShapeSubtraction : public GeoShape
 
   //    For I/O only!
   GeoShapeSubtraction(){}
-  friend class Persistifier;
-  
+  friend Persistifier;
+
 };
 
 inline const std::string& GeoShapeSubtraction::getClassType ()

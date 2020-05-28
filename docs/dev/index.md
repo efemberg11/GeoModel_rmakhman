@@ -15,7 +15,7 @@ In the following, you will find basic strategies to effectively build the GeoMod
 
 ```bash
 # install external dependencies
-brew install cmake eigen doxygen wget boost hg xerces-c
+brew install cmake eigen doxygen wget boost hg xerces-c nlohmann-json
 
 # install and configure Qt
 brew install qt5
@@ -85,7 +85,7 @@ cd ..
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization.git
 mkdir build_viz
 cd build_viz
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelVisualization
 make -j
 make install
 cd ..

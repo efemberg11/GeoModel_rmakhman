@@ -199,7 +199,8 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
   m_allchildren = m_dbManager->getChildrenTableStd();
   
 	// get the root volume data
-	m_root_vol_data = m_dbManager->getRootPhysVol();
+//  m_root_vol_data = m_dbManager->getRootPhysVol();
+  m_root_vol_data = m_dbManager->getRootPhysVolStd();
 
   // get DB metadata
   m_tableID_toTableName = m_dbManager->getAll_TableIDsNodeTypesStd();
@@ -677,14 +678,14 @@ void ReadGeoModel::checkNodePtr(GeoGraphNode* nodePtr, std::string varName, std:
   }
 }
 
-
-void ReadGeoModel::checkInputString(QString input)
-{
-	if (input.isEmpty() || input.isNull() || input == "NULL") {
-		std::cout << "ERROR!!! Input QString is empty or equal to 'NULL'!!! Aborting..." << std::endl;
-		exit(1);
-	}
-}
+  // TODO: move it to an utility class
+//void ReadGeoModel::checkInputString(QString input)
+//{
+//  if (input.isEmpty() || input.isNull() || input == "NULL") {
+//    std::cout << "ERROR!!! Input QString is empty or equal to 'NULL'!!! Aborting..." << std::endl;
+//    exit(1);
+//  }
+//}
 
 
 // Instantiate a PhysVol and get its children
@@ -696,9 +697,6 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id, const un
     muxCout.unlock();
   }
 
-  checkInputString(QString::number(id));
-	checkInputString(QString::number(tableId));
-
 	// A - if the instance has been previously built, return that
   if ( nullptr != getVPhysVol(id, tableId, copyN)) {
 //  if (isVPhysVolBuilt(id, tableId, copyN)) {
@@ -709,7 +707,6 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id, const un
     }
 		return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId, copyN));
 	}
-
   
   // B - if not built already, then get the actual volume,
   // which should be already built by now,
@@ -831,8 +828,8 @@ GeoPhysVol* ReadGeoModel::getRootVolume()
     std::cout << "ReadGeoModel::getRootVolume()" << std::endl;
     muxCout.unlock();
   }
-	const unsigned int id = m_root_vol_data[1].toUInt();
-	const unsigned int tableId = m_root_vol_data[2].toUInt();
+  const unsigned int id = std::stoi(m_root_vol_data[1]); // TODO: GetRoot() should return integers instead of strings...
+  const unsigned int tableId = std::stoi(m_root_vol_data[2]);
 	const unsigned int copyNumber = 1; // the Root volume has only one copy by definition
   GeoPhysVol* root = dynamic_cast<GeoPhysVol*>(buildVPhysVolInstance(id, tableId, copyNumber));
   checkNodePtr(root, "root", __func__, __PRETTY_FUNCTION__);
@@ -976,10 +973,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
   // Get shape's parameters from the stored string.
   // This will be interpreted differently according to the shape.
-  std::vector<std::string> std_shapePars = splitString(parameters, ';');
+  std::vector<std::string> shapePars = splitString(parameters, ';');
   
   // FIXME: this is a temporary, ugly shortcut to postpone the QStrinList-->vector<string> move
-  QStringList shapePars = toQStringList(std_shapePars);
+//  QStringList shapePars = toQStringList(std_shapePars);
   
   
 	if (m_deepDebug) {
@@ -996,13 +993,13 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			double YHalfLength = 0.;
 			double ZHalfLength = 0.;
 			// get parameters from DB string
-			foreach( QString par, shapePars) {
-					QStringList vars = par.split("=");
-					QString varName = vars[0];
-					QString varValue = vars[1];
-					if (varName == "XHalfLength") XHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "YHalfLength") YHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+      for( auto& par : shapePars) {
+        std::vector<std::string> vars = splitString(par, '=');
+        std::string varName = vars[0];
+        std::string varValue = vars[1];
+        if (varName == "XHalfLength") XHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+        if (varName == "YHalfLength") YHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+        if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
 			}
 		shape = new GeoBox(XHalfLength, YHalfLength, ZHalfLength);
 	}
@@ -1016,18 +1013,18 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double SPhi = 0.;
 		double DPhi = 0.;
 		// get parameters from DB string
-		foreach( QString par, shapePars) {
-			QStringList vars = par.split("=");
-			QString varName = vars[0];
-			QString varValue = vars[1];
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
       // std::cout << "varValue Cons:" << varValue;
-			if (varName == "RMin1") RMin1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "RMin2") RMin2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "RMax1") RMax1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "RMax2") RMax2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "DZ") DZ = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "SPhi") SPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "DPhi") DPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+			if (varName == "RMin1") RMin1 = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "RMin2") RMin2 = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "RMax1") RMax1 = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "RMax2") RMax2 = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "DZ")    DZ = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "SPhi")  SPhi = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "DPhi")  DPhi = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
 		}
 		shape = new GeoCons (RMin1, RMin2, RMax1, RMax2, DZ, SPhi, DPhi);
 	}
@@ -1047,15 +1044,15 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double SPhi = 0.;
 		double DPhi = 0.;
 		// get parameters from DB string
-		foreach( QString par, shapePars) {
-			QStringList vars = par.split("=");
-			QString varName = vars[0];
-			QString varValue = vars[1];
-			if (varName == "Rmin") Rmin = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "Rmax") Rmax = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "Rtor") Rtor = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "SPhi") SPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "DPhi") DPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
+			if (varName == "Rmin") Rmin = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "Rmax") Rmax = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "Rtor") Rtor = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "SPhi") SPhi = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "DPhi") DPhi = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
 		}
 		shape = new GeoTorus (Rmin, Rmax, Rtor, SPhi, DPhi);
 	}
@@ -1068,16 +1065,16 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double Theta = 0.;
 		double Phi = 0.;
 		// get parameters from DB string
-		foreach( QString par, shapePars) {
-			QStringList vars = par.split("=");
-			QString varName = vars[0];
-			QString varValue = vars[1];
-			if (varName == "XHalfLength") XHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "YHalfLength") YHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "Alpha") Alpha = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "Theta") Theta = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "Phi") Phi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
+			if (varName == "XHalfLength") XHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "YHalfLength") YHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "Alpha")       Alpha = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "Theta")       Theta = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "Phi")         Phi = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
 		}
 		shape = new GeoPara (XHalfLength, YHalfLength, ZHalfLength, Alpha, Theta, Phi);
 	}
@@ -1088,10 +1085,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		unsigned int NZPlanes = 0;
 
 		bool error = 0;
-		QString par;
-		QStringList vars;
-		QString varName;
-		QString varValue;
+    std::string par;
+    std::vector<std::string> vars;
+    std::string varName;
+    std::string varValue;
 
 		GeoPcon* pcon = nullptr;
 
@@ -1102,12 +1099,12 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			// get the three first GeoPcon parameters: the SPhi and DPhi angles, plus the number of Z planes
 			for( int it=0; it < 3; it++) {
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				if (varName == "SPhi") SPhi = varValue.toDouble();
-				if (varName == "DPhi") DPhi = varValue.toDouble();
-				if (varName == "NZPlanes") NZPlanes = varValue.toDouble();
+				if (varName == "SPhi")     SPhi = std::stod(varValue);
+				if (varName == "DPhi")     DPhi = std::stod(varValue);
+				if (varName == "NZPlanes") NZPlanes = std::stoi(varValue);
 			}
 			// build the basic GeoPcon shape
 			pcon = new GeoPcon(SPhi, DPhi);
@@ -1116,31 +1113,30 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			for (int it=3; it < sizePars; it++)
 			{
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				// qInfo() << "it:" << it << "par:" << par << "varName:" << varName << "varValue:" << varValue;
 
 				if (varName == "ZPos") {
 
-					double zpos = varValue.toDouble();
+					double zpos = std::stod(varValue);
 					double rmin=0., rmax=0.;
 
 					it++; // go to next variable
 
 					par = shapePars[it];
-					vars = par.split("=");
+					vars = splitString(par, '=');
 					varName = vars[0];
 					varValue = vars[1];
-					if (varName == "ZRmin") rmin = varValue.toDouble();
+					if (varName == "ZRmin") rmin = std::stod(varValue);
 					else error = 1;
 					it++; // go to next variable
 
 					par = shapePars[it];
-					vars = par.split("=");
+					vars = splitString(par, '=');
 					varName = vars[0];
 					varValue = vars[1];
-					if (varName == "ZRmax") rmax = varValue.toDouble();
+					if (varName == "ZRmax") rmax = std::stod(varValue);
 					else error = 1;
 
 					if(error) {
@@ -1198,10 +1194,11 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 		bool error = false;
 		GeoPgon* pgon = nullptr;
-		QString par;
-		QStringList vars;
-		QString varName;
-		QString varValue;
+    
+    std::string par;
+    std::vector<std::string> vars;
+    std::string varName;
+    std::string varValue;
 
 		int sizePars = shapePars.size();
 		// check if we have more than 3 parameters
@@ -1210,14 +1207,14 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			// get the first four GeoPgon parameters: the SPhi and DPhi angles, plus the number of Z planes
 			for( int it=0; it < 4; it++) {
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
 				// qInfo() << "vars: " << vars; // for debug only
-				if (varName == "SPhi") SPhi = varValue.toDouble();
-				if (varName == "DPhi") DPhi = varValue.toDouble();
-				if (varName == "NSides") NSides = varValue.toUInt();// * SYSTEM_OF_UNITS::mm;
-				if (varName == "NZPlanes") NZPlanes = varValue.toDouble();
+				if (varName == "SPhi") SPhi = std::stod(varValue);
+				if (varName == "DPhi") DPhi = std::stod(varValue);
+				if (varName == "NSides") NSides = std::stoi(varValue);// * SYSTEM_OF_UNITS::mm;
+				if (varName == "NZPlanes") NZPlanes = std::stoi(varValue);
 
 			}
 			// build the basic GeoPgon shape
@@ -1227,31 +1224,31 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			for (int it=4; it < sizePars; it++)
 			{
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
 				// qInfo() << "it:" << it << "par:" << par << "varName:" << varName << "varValue:" << varValue;
 
 				if (varName == "ZPos") {
 
-					double zpos = varValue.toDouble();
+					double zpos = std::stod(varValue);
 					double rmin=0., rmax=0.;
 
 					it++; // go to next variable
 
 					par = shapePars[it];
-					vars = par.split("=");
+					vars = splitString(par, '=');
 					varName = vars[0];
 					varValue = vars[1];
-					if (varName == "ZRmin") rmin = varValue.toDouble();
+					if (varName == "ZRmin") rmin = std::stod(varValue);
 					else error = 1;
 					it++; // go to next variable
 
 					par = shapePars[it];
-					vars = par.split("=");
+					vars = splitString(par, '=');
 					varName = vars[0];
 					varValue = vars[1];
-					if (varName == "ZRmax") rmax = varValue.toDouble();
+					if (varName == "ZRmax") rmax = std::stod(varValue);
 					else error = 1;
 
 					if(error) {
@@ -1305,10 +1302,11 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		GeoGenericTrapVertices Vertices;
 		bool error = false;
 		GeoGenericTrap* gTrap = nullptr;
-		QString par;
-		QStringList vars;
-		QString varName;
-		QString varValue;
+		
+    std::string par;
+    std::vector<std::string> vars;
+    std::string varName;
+    std::string varValue;
 
 		int sizePars = shapePars.size();
 		// check if we have more than 3 parameters
@@ -1317,12 +1315,12 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			// get the two GeoGenericTrap parameters: the ZHalfLength plus the number of vertices
 			for( int it=0; it < 2; it++) {
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
 				// qInfo() << "vars: " << vars; // for debug only
-				if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();
-				if (varName == "NVertices") NVertices = varValue.toUInt();
+				if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);
+				if (varName == "NVertices")   NVertices = std::stoi(varValue);
 			}
 
 
@@ -1331,23 +1329,23 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			for (int it=2; it < NVertices; it++)
 			{
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
 				// qInfo() << "it:" << it << "par:" << par << "varName:" << varName << "varValue:" << varValue;
 
 				if (varName == "X") {
 
-					double x = varValue.toDouble();
+					double x = std::stod(varValue);
 
 					it++; // go to next variable
 
 					par = shapePars[it];
-					vars = par.split("=");
+					vars = splitString(par, '=');
 					varName = vars[0];
 					varValue = vars[1];
 					if (varName == "Y") {
-					  double y = varValue.toDouble();
+					  double y = std::stod(varValue);
 					  Vertices.push_back(GeoTwoVector(x,y));
 					}
 					else {
@@ -1396,10 +1394,11 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 		bool error = 0;
 		GeoSimplePolygonBrep* sh = nullptr;
-		QString par;
-		QStringList vars;
-		QString varName;
-		QString varValue;
+    
+    std::string par;
+    std::vector<std::string> vars;
+    std::string varName;
+    std::string varValue;
 
 		int sizePars = shapePars.size();
 		// check if we have more than 2 parameters
@@ -1408,12 +1407,12 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			// get the first two GeoSimplePolygonBrep parameters: DZ and the number of vertices.
 			for( int it=0; it < 2; it++) {
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
 				// qInfo() << "vars: " << vars; // for debug only
-				if (varName == "DZ") DZ = varValue.toDouble();
-				if (varName == "NVertices") NVertices = varValue.toDouble();
+				if (varName == "DZ")        DZ = std::stod(varValue);
+				if (varName == "NVertices") NVertices = std::stoi(varValue);
 				//else if (varName == "NVertices") NVertices = varValue.toDouble();
 				//else error = 1;
 				//if(error) std::cout << "ERROR! GeoSimplePolygonBrep parameters are not correctly stored! -->" << vars;
@@ -1426,19 +1425,19 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			for (int it=2; it < sizePars; it++)
 			{
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				if (varName == "xV") xV = varValue.toDouble();
+				if (varName == "xV") xV = std::stod(varValue);
 				else error = 1;
 
 				it++; // go to next variable (they come in pairs)
 
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				if (varName == "yV") yV = varValue.toDouble();
+				if (varName == "yV") yV = std::stod(varValue);
 				else error = 1;
 
 				if(error) {
@@ -1489,10 +1488,11 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 		bool error = 0;
 		GeoTessellatedSolid* sh = nullptr;
-		QString par;
-		QStringList vars;
-		QString varName;
-		QString varValue;
+		
+    std::string par;
+    std::vector<std::string> vars;
+    std::string varName;
+    std::string varValue;
 
 		int sizePars = shapePars.size();
 		// check if we have at least 13 parameters,
@@ -1502,10 +1502,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 			// get the first parameter
 			par = shapePars[0];
-			vars = par.split("=");
+			vars = splitString(par, '=');
 			varName = vars[0];
 			varValue = vars[1];
-			if (varName == "nFacets") nFacets = varValue.toInt();
+			if (varName == "nFacets") nFacets = std::stoi(varValue);
 			else {
         muxCout.lock();
         qWarning("ERROR!! - GeoTessellatedSolid - nFacets is not defined!!");
@@ -1523,7 +1523,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			{
 				// get facet type
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				if (varName == "QUAD") {
 					facetType = "QUAD";
@@ -1543,7 +1543,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				// get the type of the vertexes composing the facet
 				bool isAbsolute = true;
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
 				if (varName == "vT") {
@@ -1562,10 +1562,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 				unsigned int nVertexes = 0;
 				par = shapePars[it];
-				vars = par.split("=");
+				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				if (varName == "nV") nVertexes = varValue.toUInt();
+				if (varName == "nV") nVertexes = std::stoi(varValue);
 				else {
           muxCout.lock();
 					std::cout << "ERROR! - GeoTessellatedSolid - nVertices not defined!" << std::endl;
@@ -1593,10 +1593,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 						double xV=0.;
 						par = shapePars[it];
-						vars = par.split("=");
+						vars = splitString(par, '=');
 						varName = vars[0];
 						varValue = vars[1];
-						if (varName == "xV") xV = varValue.toDouble();
+						if (varName == "xV") xV = std::stod(varValue);
 						else {
               muxCout.lock();
 							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'xV'!" << std::endl;
@@ -1608,10 +1608,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 						double yV=0.;
 						par = shapePars[it];
-						vars = par.split("=");
+						vars = splitString(par, '=');
 						varName = vars[0];
 						varValue = vars[1];
-						if (varName == "yV") yV = varValue.toDouble();
+						if (varName == "yV") yV = std::stod(varValue);
 						else {
               muxCout.lock();
 							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'yV'!" << std::endl;
@@ -1623,10 +1623,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 						double zV=0.;
 						par = shapePars[it];
-						vars = par.split("=");
+						vars = splitString(par, '=');
 						varName = vars[0];
 						varValue = vars[1];
-						if (varName == "zV") zV = varValue.toDouble();
+						if (varName == "zV") zV = std::stod(varValue);
 						else {
               muxCout.lock();
 							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'zV'!" << std::endl;
@@ -1667,30 +1667,30 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 						double xV=0.;
 						par = shapePars[it];
-						vars = par.split("=");
+						vars = splitString(par, '=');
 						varName = vars[0];
 						varValue = vars[1];
-						if (varName == "xV") xV = varValue.toDouble();
+						if (varName == "xV") xV = std::stod(varValue);
 						else error = 1;
 
 						it++; // go to the next coordinate
 
 						double yV=0.;
 						par = shapePars[it];
-						vars = par.split("=");
+						vars = splitString(par, '=');
 						varName = vars[0];
 						varValue = vars[1];
-						if (varName == "yV") yV = varValue.toDouble();
+						if (varName == "yV") yV = std::stod(varValue);
 						else error = 1;
 
 						it++; // go to the next coordinate
 
 						double zV=0.;
 						par = shapePars[it];
-						vars = par.split("=");
+						vars = splitString(par, '=');
 						varName = vars[0];
 						varValue = vars[1];
-						if (varName == "zV") zV = varValue.toDouble();
+						if (varName == "zV") zV = std::stod(varValue);
 						else error = 1;
 
 						if(error) {
@@ -1755,21 +1755,21 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			double Dxdypdzp = 0.;
 			double Angleydzp = 0.;
 			// get parameters
-			foreach( QString par, shapePars) {
-					QStringList vars = par.split("=");
-					QString varName = vars[0];
-					QString varValue = vars[1];
-					if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Theta") Theta = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Phi") Phi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Dydzn") Dydzn = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Dxdyndzn") Dxdyndzn = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Dxdypdzn") Dxdypdzn = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Angleydzn") Angleydzn = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Dydzp") Dydzp = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Dxdyndzp") Dxdyndzp = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Dxdypdzp") Dxdypdzp = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "Angleydzp") Angleydzp = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
+					if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Theta")       Theta = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Phi")         Phi = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Dydzn")       Dydzn = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Dxdyndzn")    Dxdyndzn = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Dxdypdzn")    Dxdypdzn = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Angleydzn")   Angleydzn = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Dydzp")       Dydzp = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Dxdyndzp")    Dxdyndzp = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Dxdypdzp")    Dxdypdzp = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "Angleydzp")   Angleydzp = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
 			}
 		shape = new GeoTrap (ZHalfLength, Theta, Phi, Dydzn, Dxdyndzn, Dxdypdzn, Angleydzn, Dydzp, Dxdyndzp, Dxdypdzp, Angleydzp);
 	}
@@ -1781,16 +1781,16 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			double YHalfLength2 = 0.;
 			double ZHalfLength = 0.;
 			// get parameters
-			foreach( QString par, shapePars) {
-					QStringList vars = par.split("=");
-					QString varName = vars[0];
-					QString varValue = vars[1];
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
           // std::cout << "varValue:" << varValue;
-					if (varName == "XHalfLength1") XHalfLength1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "XHalfLength2") XHalfLength2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "YHalfLength1") YHalfLength1 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "YHalfLength2") YHalfLength2 = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-					if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+					if (varName == "XHalfLength1") XHalfLength1 = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "XHalfLength2") XHalfLength2 = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "YHalfLength1") YHalfLength1 = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "YHalfLength2") YHalfLength2 = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+					if (varName == "ZHalfLength")  ZHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
 			}
 		shape = new GeoTrd (XHalfLength1, XHalfLength2, YHalfLength1, YHalfLength2, ZHalfLength);
 	}
@@ -1800,13 +1800,13 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double RMax = 0.;
 		double ZHalfLength = 0.;
 		// get parameters
-		foreach( QString par, shapePars) {
-			QStringList vars = par.split("=");
-			QString varName = vars[0];
-			QString varValue = vars[1];
-			if (varName == "RMin") RMin = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "RMax") RMax = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
+			if (varName == "RMin")        RMin = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "RMax")        RMax = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
 		}
 		shape = new GeoTube(RMin, RMax, ZHalfLength);
 	}
@@ -1818,15 +1818,15 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		double SPhi = 0.;
 		double DPhi = 0.;
 		// get parameters
-		foreach( QString par, shapePars) {
-			QStringList vars = par.split("=");
-			QString varName = vars[0];
-			QString varValue = vars[1];
-			if (varName == "RMin") RMin = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "RMax") RMax = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "ZHalfLength") ZHalfLength = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "SPhi") SPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
-			if (varName == "DPhi") DPhi = varValue.toDouble();// * SYSTEM_OF_UNITS::mm;
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
+			if (varName == "RMin")        RMin = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "RMax")        RMax = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "SPhi")        SPhi = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+			if (varName == "DPhi")        DPhi = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
 		}
 		shape = new GeoTubs (RMin, RMax, ZHalfLength, SPhi, DPhi);
 	}
@@ -1835,12 +1835,12 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		unsigned int shapeOpId = 0;
 		unsigned int transfId = 0;
 		// get parameters
-		foreach( QString par, shapePars) {
-			QStringList vars = par.split("=");
-			QString varName = vars[0];
-			QString varValue = vars[1];
-			if (varName == "A") shapeOpId = varValue.toUInt();
-			if (varName == "X") transfId = varValue.toUInt();
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
+			if (varName == "A") shapeOpId = std::stoi(varValue);
+			if (varName == "X") transfId = std::stoi(varValue);
 		}
     if (shapeOpId == 0 || transfId == 0) {
       std::cout << "ERROR! Shift shape - input operand shapes' IDs are empty! (shapeId: " << shapeOpId << ", transfId:" << transfId << ")" << std::endl;
@@ -1930,12 +1930,12 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		unsigned int opA = 0;
 		unsigned int opB = 0;
 		// get parameters
-		foreach( QString par, shapePars) {
-			QStringList vars = par.split("=");
-			QString varName = vars[0];
-			QString varValue = vars[1];
-			if (varName == "opA") opA = varValue.toUInt();
-			if (varName == "opB") opB = varValue.toUInt();
+    for( auto& par : shapePars) {
+      std::vector<std::string> vars = splitString(par, '=');
+      std::string varName = vars[0];
+      std::string varValue = vars[1];
+			if (varName == "opA") opA = std::stoi(varValue);
+			if (varName == "opB") opB = std::stoi(varValue);
 		}
     if (opA == 0 || opB == 0) {
       std::cout << "ERROR! Subtraction/Union/Intersection shape - input operand shapes' IDs are empty! (opA: " << opA << ", opB:" << opB << ")" << std::endl;
@@ -1979,7 +1979,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
           exit(EXIT_FAILURE);
         }
         
-//        GeoShapeSubtraction* shapeNew = new GeoShapeSubtraction(shapeA, shapeB);
         GeoShape* shapeNew = nullptr;
         if ("Subtraction" == type) {
           shapeNew = new GeoShapeSubtraction(shapeA, shapeB);
@@ -1991,7 +1990,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
           shapeNew = new GeoShapeIntersection(shapeA, shapeB);
         }
         
-//        storeBuiltShape(shapeId, shapeNew);
         shape = shapeNew;
       }
       // ...otherwise, build the Subtraction operator shape without operands
@@ -2007,11 +2005,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
           shapeNew = new GeoShapeIntersection;
         }
 
-        // debug
-        // muxCout.lock();
-        // std::cout << "adding 'empty' shape (2): " << shapeId << ", " << shapeNew << ", " << opA << ", " << opB << std::endl;
-        // muxCout.unlock();
-
         tuple_shapes_boolean_info tt (shapeId, shapeNew, opA, opB);
         shapes_info_sub->push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over
 
@@ -2023,14 +2016,21 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
   else if(type == "CustomShape") {
     std::string name = "";
     // check parameters
-  	if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
+    // this complex test is needed to handle null strings in the DB records
+    bool okPars = false;
+    for( auto& par : shapePars) {
+    std::string str = par.substr( par.find("=") );     // get from "=" to the end
+      if (str.size() > 0) okPars = true;
+    }
+  	//if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
+    if ( shapePars.size() > 0 && okPars )
   	{
       // get parameters
-  		foreach( QString par, shapePars) {
-  				QStringList vars = par.split("=");
-  				QString varName = vars[0];
-  				QString varValue = vars[1];
-  				if (varName == "name") name = varValue.toStdString();
+      for( auto& par : shapePars) {
+        std::vector<std::string> vars = splitString(par, '=');
+        std::string varName = vars[0];
+        std::string varValue = vars[1];
+  				if (varName == "name") name = varValue;
   			}
   	} else {
       muxCout.lock();
@@ -2045,15 +2045,22 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
     std::string name = "";
     std::string asciiData = "";
     // check parameters
-    if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
+    // this complex test is needed to handle null strings in the DB records
+    bool okPars = false;
+    for( auto& par : shapePars) {
+      std::string str = par.substr( par.find("=") );     // get from "=" to the end
+      if (str.size() > 0) okPars = true;
+    }
+    //if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
+    if ( shapePars.size() > 0 && okPars )
   	{
       // get parameters
-      foreach( QString par, shapePars) {
-        QStringList vars = par.split("=");
-        QString varName = vars[0];
-        QString varValue = vars[1];
-        if (varName == "name") name = varValue.toStdString();
-        if (varName == "asciiData") asciiData=varValue.toStdString();
+      for( auto& par : shapePars) {
+        std::vector<std::string> vars = splitString(par, '=');
+        std::string varName = vars[0];
+        std::string varValue = vars[1];
+        if (varName == "name")      name = varValue;
+        if (varName == "asciiData") asciiData = varValue;
       }
     } else {
       // throw std::invalid_argument("UnidentifiedShape parameters' list is empty!!");
@@ -2310,25 +2317,25 @@ std::vector<std::string> ReadGeoModel::splitString(const std::string& s, const c
    return tokens;
 }
 
-  // TODO: move this to utility class/file
-QStringList ReadGeoModel::toQStringList(std::vector<std::string> vec)
-  {
-    QStringList ll;
-    for ( auto& str : vec ) {
-      ll << QString::fromStdString(str);
-    }
-    return ll;
-  }
+//  // TODO: move this to utility class/file
+//QStringList ReadGeoModel::toQStringList(std::vector<std::string> vec)
+//  {
+//    QStringList ll;
+//    for ( auto& str : vec ) {
+//      ll << QString::fromStdString(str);
+//    }
+//    return ll;
+//  }
 
-// TODO: move this to utility class/file
-std::vector<std::string> ReadGeoModel::toStdVectorStrings(QStringList qlist)
-{
-  std::vector<std::string> vec;
-  foreach(QString qstr, qlist) {
-    vec.push_back(qstr.toStdString());
-  }
-  return vec;
-}
+//// TODO: move this to utility class/file
+//std::vector<std::string> ReadGeoModel::toStdVectorStrings(QStringList qlist)
+//{
+//  std::vector<std::string> vec;
+//  foreach(QString qstr, qlist) {
+//    vec.push_back(qstr.toStdString());
+//  }
+//  return vec;
+//}
 // TODO: move this to utility class/file
 void ReadGeoModel::printStdVectorStrings(std::vector<std::string> vec)
 {
@@ -2492,26 +2499,26 @@ void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
   muxCout.unlock();
 }
 
-// TODO: should go in a QtUtils header-only class, to be used in other packages
-QList<double> ReadGeoModel::convertQstringListToDouble(QStringList listin) {
-	QList<double> listout;
-  foreach (const QString &s, listin) {
-      listout.append(s.toDouble());
-  }
-	return listout;
-}
+//// TODO: should go in a QtUtils header-only class, to be used in other packages
+//QList<double> ReadGeoModel::convertQstringListToDouble(QStringList listin) {
+//  QList<double> listout;
+//  foreach (const QString &s, listin) {
+//      listout.append(s.toDouble());
+//  }
+//  return listout;
+//}
 
-// TODO: move it to an utility class
-void ReadGeoModel::printTransformationValues(QStringList values) {
-	QList<double> t = convertQstringListToDouble(values);
-  muxCout.lock();
-  std::cout << "transformation input values: " << std::endl;
-	std::cout << "[[" << t[0] << "," << t[1] << "," << t[2] << "]["
-	                   << t[3] << "," << t[4] << "," << t[5] << "]["
-	                   << t[6] << "," << t[7] << "," << t[8] << "]["
-	                   << t[9] << "," << t[10] << "," << t[11] << "]]" << std::endl;
-  muxCout.unlock();
-}
+//// TODO: move it to an utility class
+//void ReadGeoModel::printTransformationValues(QStringList values) {
+//  QList<double> t = convertQstringListToDouble(values);
+//  muxCout.lock();
+//  std::cout << "transformation input values: " << std::endl;
+//  std::cout << "[[" << t[0] << "," << t[1] << "," << t[2] << "]["
+//                     << t[3] << "," << t[4] << "," << t[5] << "]["
+//                     << t[6] << "," << t[7] << "," << t[8] << "]["
+//                     << t[9] << "," << t[10] << "," << t[11] << "]]" << std::endl;
+//  muxCout.unlock();
+//}
 
 
 GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(const unsigned int id)

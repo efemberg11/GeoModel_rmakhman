@@ -161,13 +161,19 @@ public:
 	QString getDBFilePath();
 
 	QStringList getRootPhysVol();
+  std::vector<std::string> getRootPhysVolStd();
 
 	QStringList getItem(QString geoType, unsigned int id);
 	QStringList getItem(unsigned int tableId, unsigned int id);
-	QStringList getItemFromTableName(QString tableName, unsigned int id);
+	
+  QStringList getItemFromTableName(QString tableName, unsigned int id);
+  std::vector<std::string> getItemFromTableNameStd(QString tableName, unsigned int id);
+  
 	QStringList getItemAndType(unsigned int tableId, unsigned int id);
+  std::vector<std::string> getItemAndTypeStd(unsigned int tableId, unsigned int id);
 
 	QString getNodeTypeFromTableId(unsigned int id);
+  std::string getNodeTypeFromTableIdStd(unsigned int id);
 
 	QMap<unsigned int, QStringList> getVPhysVolChildren(const unsigned int id, const QString nodeType, const unsigned int copyN);
 
@@ -177,6 +183,7 @@ public:
 
 	QHash<unsigned int, QStringList> getTableFromNodeType(QString nodeType);
   std::vector<std::vector<std::string>> getTableFromNodeTypeStd(std::string nodeType);
+  
 	QHash<unsigned int, QString> getAll_TableIDsNodeTypes();
 	QHash<QString, unsigned int> getAll_NodeTypesTableIDs();
   std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypesStd();
@@ -195,6 +202,8 @@ private:
 	QStringList getTableColNamesFromDB(QString tableName) const;
 
 	QString getTableNameFromTableId(unsigned int tabId);
+  std::string getTableNameFromTableIdStd(unsigned int tabId);
+  
 	QVariant getTableIdFromNodeType(QString nodeType);
 	void storeNodeType(QString nodeType, QString tableName);
 	QString getTableNameFromNodeType(QString nodeType);

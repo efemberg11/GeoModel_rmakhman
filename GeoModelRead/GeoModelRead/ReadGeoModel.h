@@ -103,22 +103,17 @@ private:
   void buildAllNameTags();
 
   
-  std::string getEnvVar( std::string const & key ) const;
 
 	GeoPhysVol* buildGeoModelPrivate();
 
   GeoBox* buildDummyShape();
 
   void loopOverAllChildrenInBunches();
-  
-	void processChild(GeoVPhysVol* parentVol, bool &isRootVolume, const QStringList &child);
-  
   void loopOverAllChildrenRecords(std::vector<std::vector<std::string>> records);
   void processParentChild(const std::vector<std::string> &parentchild);
 
 	GeoPhysVol* getRootVolume();
 
-	GeoVPhysVol* parseChildren(GeoVPhysVol* vol, QMap<unsigned int, QStringList> children, int depth = 0);
 
   GeoVPhysVol* buildVPhysVolInstance(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
   GeoVPhysVol* buildVPhysVol(const unsigned int id, const unsigned int tableId, unsigned int logVol_ID=0);
@@ -202,14 +197,16 @@ private:
 
 
   // Utility functions
-	void checkInputString(QString input);
+  std::string getEnvVar( std::string const & key ) const;
   std::vector<std::string> splitString(const std::string& s, char delimiter);
 	void printTrf(GeoTrf::Transform3D t);
-	void printTransformationValues(QStringList t);
-	QList<double> convertQstringListToDouble(QStringList listin);
-  std::vector<std::string> toStdVectorStrings(QStringList qlist);
-  QStringList toQStringList(std::vector<std::string> vec);
   void printStdVectorStrings(std::vector<std::string> vec); //TODO: move it to utility class
+  
+  // void printTransformationValues(QStringList t); // TODO: move to a Qt utility class
+  // QList<double> convertQstringListToDouble(QStringList listin); // TODO: move to a Qt utility class
+  // std::vector<std::string> toStdVectorStrings(QStringList qlist); // TODO: move to a Qt utility class
+  // QStringList toQStringList(std::vector<std::string> vec); // TODO: move to a Qt utility class
+  // void checkInputString(QString input); // TODO: move to an utility class
 
 
 	// input arguments
@@ -236,7 +233,6 @@ private:
   std::vector<std::vector<std::string>> m_materials;
   std::vector<std::vector<std::string>> m_elements;
   std::vector<std::vector<std::string>> m_shapes;
-//  QHash<unsigned int, QStringList> m_functions;
   std::vector<std::vector<std::string>> m_functions;
   std::vector<std::vector<std::string>> m_allchildren;
   
@@ -244,7 +240,8 @@ private:
   std::unordered_map<std::string, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
 
   
-	QStringList m_root_vol_data;
+//  QStringList m_root_vol_data;
+  std::vector<std::string> m_root_vol_data;
 
   //! memory chaches
   std::vector<GeoPhysVol*> m_memMapPhysVols;

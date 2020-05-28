@@ -8,7 +8,7 @@ if [ "$(cat /etc/redhat-release | grep 'Scientific Linux CERN SLC release 6')" ]
   compiler=gcc62-opt
 elif [ "$(cat /etc/centos-release | grep 'CentOS Linux release 7')" ]; then
   os=centos7
-  compiler=gcc7-opt
+  compiler=gcc8-opt
 else
   echo "Unknown OS" 1>&2
   exit 1

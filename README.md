@@ -94,7 +94,7 @@ For the external dependencies, we will install them by using the package manager
 
 ```bash
 # install external dependencies
-brew install cmake eigen doxygen wget boost hg 
+brew install cmake eigen doxygen wget boost hg nlohmann-json
 
 # install Qt
 brew install qt5

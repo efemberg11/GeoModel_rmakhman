@@ -543,10 +543,11 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
         const unsigned int stop = start + len;
         std::vector<std::vector<std::string>>::const_iterator first = m_allchildren.begin() + start;
         std::vector<std::vector<std::string>>::const_iterator last  = m_allchildren.begin() + stop;
+        std::vector<std::vector<std::string>>::const_iterator end   = m_allchildren.end();
         if ( bb == (nThreads - 1) ) { // last bunch
-           bunch = std::vector<std::vector<std::string>>(first, m_allchildren.end());
-//          bunch = bunchIn;
-        } else { // all bunches but last one
+          bunch = std::vector<std::vector<std::string>>(first, end);
+        }
+        else { // all bunches but last one
            bunch = std::vector<std::vector<std::string>>(first, last);
         }
         

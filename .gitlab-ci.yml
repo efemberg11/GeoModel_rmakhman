@@ -49,7 +49,7 @@ variables:
     - mkdir build_coin
     - cd build_coin
     - cmake ${CMAKE_ARGS} ../coin
-    - make -j
+    - make -j2
     - make install
   artifacts:
     paths:
@@ -70,7 +70,7 @@ variables:
     - mkdir build_soqt
     - cd build_soqt
     - cmake ${CMAKE_ARGS} ../soqt
-    - make -j
+    - make -j2
     - make install
   artifacts:
     paths:
@@ -86,7 +86,7 @@ variables:
     - mkdir geomodelcore-build
     - cd geomodelcore-build
     - cmake ${CMAKE_ARGS} ../GeoModelCore
-    - make -j
+    - make -j2
     - make install
   artifacts:
     paths:
@@ -102,7 +102,7 @@ variables:
     - mkdir geomodelio-build
     - cd geomodelio-build
     - cmake ${CMAKE_ARGS} ../GeoModelIO
-    - make -j
+    - make -j2
     - make install
   artifacts:
     paths:

@@ -7,6 +7,13 @@
 #include "MySteppingAction.hh"
 #include "MyTrackingAction.hh"
 #include "LengthIntegrator.hh"
+#include "MyLengthIntegratorEventAction.hh"
+#include "MyLengthIntegratorSteppingAction.hh"
+
+#include "G4MultiRunAction.hh"
+#include "G4MultiEventAction.hh"
+#include "G4MultiTrackingAction.hh"
+#include "G4MultiSteppingAction.hh"
 
 
 MyActionInitialization::MyActionInitialization(bool isperformance, bool createGeantinoMaps)
@@ -36,16 +43,37 @@ void MyActionInitialization::Build() const {
 #endif
   // do not create Run,Event,Stepping and Tracking actions in case of perfomance mode
   if (!fIsPerformance) {
-    SetUserAction(new MyRunAction());
-    MyEventAction* evtact = new MyEventAction();
-    SetUserAction(evtact);
-    SetUserAction(new MyTrackingAction(evtact));
-    SetUserAction(new MySteppingAction(evtact));
-      if(fCreateGeantinoMaps){
-          std::cout<<"fCreateGeantinoMaps is true"<<std::endl;
-          G4UA::LengthIntegrator* myLenghtInt = new G4UA::LengthIntegrator("CreateGeantinoMaps");
-          SetUserAction((G4UserEventAction*)   myLenghtInt);
-          SetUserAction((G4UserSteppingAction*)myLenghtInt);
+      SetUserAction(new MyRunAction());
+      
+      if(!fCreateGeantinoMaps){
+          std::cout<<"fCreateGeantinoMaps is FALSE"<<std::endl;
+          MyEventAction* evtact = new MyEventAction();
+          SetUserAction(evtact);
+          SetUserAction(new MyTrackingAction(evtact));
+          SetUserAction(new MySteppingAction(evtact));
+          
       }
-  }
+      else
+      {
+          
+          std::cout<<"fCreateGeantinoMaps is TRUE"<<std::endl;
+          G4UA::LengthIntegrator* myLenghtInt = new G4UA::LengthIntegrator("CreateGeantinoMaps");
+          
+          G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction();
+          G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct);
+          
+         
+          //G4UA::LengthIntegrator* myLenghtInt = new G4UA::LengthIntegrator("CreateGeantinoMaps");
+          //SetUserAction((G4UserEventAction*)   myLenghtInt);
+          //SetUserAction((G4UserSteppingAction*)myLenghtInt);
+          SetUserAction(myLenghtIntEventAct);
+          SetUserAction(myLenghtIntSteppingAct);
+          //MyEventAction* evtact = new MyEventAction();
+          //SetUserAction(new MyTrackingAction(evtact));
+          //SetUserAction(new MySteppingAction(evtact));
+      }
+    
+      //MultiEventActions?? TO DO?
+  
+}
 }

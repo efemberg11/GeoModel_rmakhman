@@ -128,13 +128,13 @@ cd ..
 
 ### Post install settings
 
-
+Assuming you followed the above instructions and you used `../install` as the installation path.
 
 #### macOS
 
 ```bash
 # After compilation, you should apply two temporary fixes:
-install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # this is a temporary fix
+install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # This is a temporary fix. NOTE: in case you are developing gmex code, this should be run every time you compile and install a new version of gmex. 
 export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 ```
 
@@ -142,15 +142,16 @@ export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 
 ```bash
 # After compilation, you should apply this temporary fix:
-export GXPLUGINPATH=install/lib/gxplugins # this is a temporary fix
+export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
+export LD_LIBRARY_PATH=${PWD}/../install/lib/ # this is a temporary fix
 ```
 
 #### Linux/Fedora
 
 ```bash
 # After compilation, you should apply this temporary fix:
-export GXPLUGINPATH=install/lib/gxplugins # this is a temporary fix
-export LD_LIBRARY_PATH=install/lib:install/lib64:$LD_LIBRARY_PATH # this is a temporary fix, we will fix the installation on Fedora
+export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
+export LD_LIBRARY_PATH=../install/lib:../install/lib64:$LD_LIBRARY_PATH # this is a temporary fix, we will fix the installation on Fedora
 ```
 
 

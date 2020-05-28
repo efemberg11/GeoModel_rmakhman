@@ -501,7 +501,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
     
     // If we have a few children, then process them serially
     std::cout << "Running concurrently? " << m_runMultithreaded << std::endl;
-    if ( !(m_runMultithreaded) || nChildrenRecords <= 500)
+    if (true) // !(m_runMultithreaded) || nChildrenRecords <= 500)
     {
       std::cout << "Running serially...\n";
       loopOverAllChildrenRecords(m_allchildren);

@@ -73,85 +73,69 @@ bool GMDBManager::isOpen() const
 
 void GMDBManager::printAllMaterials() const
 {
-	// JFB commented: qDebug() << "printAllMaterials()";
 	printAllRecords("Materials");
 }
 void GMDBManager::printAllElements() const
 {
-	// JFB commented: qDebug() << "printAllElements()";
 	printAllRecords("Elements");
 }
 
 void GMDBManager::printAllShapes() const
 {
-	// JFB commented: qDebug() << "printAllShapes()";
 	printAllRecords("Shapes");
 }
 
 void GMDBManager::printAllSerialDenominators() const
 {
-	// JFB commented: qDebug() << "printAllShapes()";
 	printAllRecords("SerialDenominators");
 }
 
 void GMDBManager::printAllLogVols() const
 {
-	// JFB commented: qDebug() << "printAllLogVols()";
 	printAllRecords("LogVols");
 }
 void GMDBManager::printAllPhysVols() const
 {
-	// JFB commented: qDebug() << "printAllPhysVols()";
 	printAllRecords("PhysVols");
 }
 void GMDBManager::printAllFullPhysVols() const
 {
-	// JFB commented: qDebug() << "printAllFullPhysVols()";
 	printAllRecords("FullPhysVols");
 }
 void GMDBManager::printAllSerialTransformers() const
 {
-	// JFB commented: qDebug() << "printAllSerialTransformers()";
 	printAllRecords("SerialTransformers");
 }
 void GMDBManager::printAllFunctions() const
 {
-	// JFB commented: qDebug() << "printAllFunctions()";
 	printAllRecords("Functions");
 }
 void GMDBManager::printAllTransforms() const
 {
-	// JFB commented: qDebug() << "printAllTransforms()";
 	printAllRecords("Transforms");
 }
 void GMDBManager::printAllAlignableTransforms() const
 {
-	// JFB commented: qDebug() << "printAllAlignableTransforms()";
 	printAllRecords("AlignableTransforms");
 }
 void GMDBManager::printAllNameTags() const
 {
-	// JFB commented: qDebug() << "printAllNameTags()";
 	printAllRecords("NameTags");
 }
 void GMDBManager::printAllChildrenPositions() const
 {
-	// JFB commented: qDebug() << "printAllChildrenPositions()";
 	printAllRecords("ChildrenPositions");
 }
 void GMDBManager::printAllNodeTypes() const
 {
-	// JFB commented: qDebug() << "printAllNodeTypes()";
 	printAllRecords("GeoNodesTypes");
 }
 void GMDBManager::printRootVolumeId() const
 {
-	// JFB commented: qDebug() << "printRootVolumeId()";
 	printAllRecords("RootVolume");
 }
 void GMDBManager::printDBVersion() const
 {
-	// JFB commented: qDebug() << "printDBVersion()";
 	printAllRecords("dbversion");
 }
 

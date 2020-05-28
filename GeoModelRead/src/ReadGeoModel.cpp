@@ -757,19 +757,6 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(const unsigned int id, const unsigned i
     if (m_deepDebug) { muxCout.lock(); std::cout << "getting the actual FullPhysVol from cache...\n"; ; muxCout.unlock(); }
     return getBuiltFullPhysVol(id);
   }
-//  std::cout << "building new vol for " << id << std::endl;
-
-//  if (logVol_ID==0) {
-//    // get the volume's parameters
-//    QStringList values;
-//    if (nodeType == "GeoPhysVol")
-//      values = m_physVols[id];
-//    else if (nodeType == "GeoFullPhysVol")
-//      values = m_fullPhysVols[id];
-//
-//    QString qlogVolId = values[1];
-//    logVol_ID = qlogVolId.toUInt();
-//  }
   
   // if not built already, then get its parameters and build it now
   if (logVol_ID==0) {
@@ -784,7 +771,6 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(const unsigned int id, const unsigned i
   }
 
 	// GET LOGVOL
-//  GeoLogVol* logVol = buildLogVol(logVol_ID);
   GeoLogVol* logVol = getBuiltLog(logVol_ID);
   if (!logVol) {
     std::cout << "ERROR!!! LogVol is NULL!" << std::endl;
@@ -967,7 +953,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 //   {
   std::vector<std::string> paramsShape = m_shapes[ shapeId-1 ]; // remember: nodes' IDs start from 1
 
-  const unsigned int id = std::stoi(paramsShape[0]);
+//  const unsigned int id = std::stoi(paramsShape[0]); // unused
   std::string type = paramsShape[1];
   std::string parameters = paramsShape[2];
 
@@ -975,16 +961,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
   // This will be interpreted differently according to the shape.
   std::vector<std::string> shapePars = splitString(parameters, ';');
   
-  // FIXME: this is a temporary, ugly shortcut to postpone the QStrinList-->vector<string> move
-//  QStringList shapePars = toQStringList(std_shapePars);
-  
-  
-	if (m_deepDebug) {
-     muxCout.lock();
-     std::cout << "\tShape-ID:" << id << ", Shape-type:" << type;
-     muxCout.unlock();
-  }
-
   GeoShape* shape = nullptr;
 
 	if (type == "Box") {
@@ -1159,19 +1135,22 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if( pcon->getNPlanes() != NZPlanes) {
 				error = 1;
         muxCout.lock();
-        //FIXME:std::cout << "ERROR! GeoPcon number of planes: " << QString::number(pcon->getNPlanes()) << " is not equal to the original size! --> " << shapePars << std::endl;
+        std::cout << "ERROR! GeoPcon number of planes: " << pcon->getNPlanes() << " is not equal to the original size! --> ";
+        printStdVectorStrings(shapePars);
         muxCout.unlock();
 			}
 			if(!pcon->isValid()) {
 				error = 1;
         muxCout.lock();
-      //FIXME: std::cout << "ERROR! GeoPcon shape is not valid!! -- input: " << shapePars << std::endl;
+        std::cout << "ERROR! GeoPcon shape is not valid!! -- input: ";
+        printStdVectorStrings(shapePars);
         muxCout.unlock();
 			}
 	  } // end if (size>3)
 		else {
       muxCout.lock();
-      //FIXME: std::cout << "ERROR!! GeoPcon has no Z planes!! --> shape input parameters: " << shapePars << std::endl;
+      std::cout << "ERROR!! GeoPcon has no Z planes!! --> shape input parameters: ";
+      printStdVectorStrings(shapePars);
       muxCout.unlock();
 			error = 1;
 		}
@@ -1211,9 +1190,9 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				varName = vars[0];
 				varValue = vars[1];
 				// qInfo() << "vars: " << vars; // for debug only
-				if (varName == "SPhi") SPhi = std::stod(varValue);
-				if (varName == "DPhi") DPhi = std::stod(varValue);
-				if (varName == "NSides") NSides = std::stoi(varValue);// * SYSTEM_OF_UNITS::mm;
+				if (varName == "SPhi")     SPhi = std::stod(varValue);
+				if (varName == "DPhi")     DPhi = std::stod(varValue);
+				if (varName == "NSides")   NSides = std::stoi(varValue);
 				if (varName == "NZPlanes") NZPlanes = std::stoi(varValue);
 
 			}
@@ -1227,7 +1206,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				// qInfo() << "it:" << it << "par:" << par << "varName:" << varName << "varValue:" << varValue;
 
 				if (varName == "ZPos") {
 
@@ -1253,7 +1231,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 					if(error) {
             muxCout.lock();
-          //FIXME: std::cout << "ERROR! GeoPgon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars << std::endl;
+            std::cout << "ERROR! GeoPgon 'ZRmin' and 'ZRmax' values are not at the right place! --> ";
+            printStdVectorStrings(shapePars);
             muxCout.unlock();
           }
 
@@ -1262,7 +1241,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				} else {
 					error = 1;
           muxCout.lock();
-          // FIXME: std::cout << "ERROR! GeoPgon 'ZPos' value is not at the right place! --> " << shapePars << std::endl;
+          std::cout << "ERROR! GeoPgon 'ZPos' value is not at the right place! --> ";
+          printStdVectorStrings(shapePars);
           muxCout.unlock();
 				}
 			}
@@ -1271,19 +1251,22 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if( pgon->getNPlanes() != NZPlanes) {
 				error = 1;
         muxCout.lock();
-        //FIXME: std::cout << "ERROR! GeoPgon number of planes: " << QString::number(pgon->getNPlanes()) << " is not equal to the original size! --> " << shapePars << std::endl;
+        std::cout << "ERROR! GeoPgon number of planes: " << pgon->getNPlanes() << " is not equal to the original size! --> ";
+        printStdVectorStrings(shapePars);
         muxCout.unlock();
 			}
 			if(!pgon->isValid()) {
 				error = 1;
         muxCout.lock();
-        //FIXME: std::cout << "ERROR! GeoPgon shape is not valid!! -- input: " << shapePars << std::endl;
+        std::cout << "ERROR! GeoPgon shape is not valid!! -- input: ";
+        printStdVectorStrings(shapePars);
         muxCout.unlock();
 			}
 		} // end if (size>3)
 		else {
       muxCout.lock();
-      //FIXME: std::cout << "ERROR!! GeoPgon has no Z planes!! --> shape input parameters: " << shapePars << std::endl;
+      std::cout << "ERROR!! GeoPgon has no Z planes!! --> shape input parameters: ";
+      printStdVectorStrings(shapePars);
       muxCout.unlock();
 			error = 1;
 		}
@@ -1332,7 +1315,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				// qInfo() << "it:" << it << "par:" << par << "varName:" << varName << "varValue:" << varValue;
 
 				if (varName == "X") {
 
@@ -1353,13 +1335,15 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 					}
 					if(error) {
             muxCout.lock();
-            //FIXME: std::cout << "ERROR! GeoGenericTrap 'X' and 'Y' values are not at the right place! --> " << shapePars << std::endl;
+            std::cout << "ERROR! GeoGenericTrap 'X' and 'Y' values are not at the right place! --> ";
+            printStdVectorStrings(shapePars);
             muxCout.unlock();
           }
 				} else {
 					error = 1;
           muxCout.lock();
-          //FIXME: std::cout << "ERROR! GeoGenericTrap 'ZPos' value is not at the right place! --> " << shapePars << std::endl;
+          std::cout << "ERROR! GeoGenericTrap 'ZPos' value is not at the right place! --> ";
+          printStdVectorStrings(shapePars);
           muxCout.unlock();
 				}
 			}
@@ -1373,7 +1357,10 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			gTrap = new GeoGenericTrap(ZHalfLength,Vertices);
 		} // end if (size>3)
 		else {
-      //FIXME: std::cout << "ERROR!! GeoGenericTrap has no Z vertices!! --> shape input parameters: " << shapePars << std::endl;
+      muxCout.lock();
+      std::cout << "ERROR!! GeoGenericTrap has no Z vertices!! --> shape input parameters: ";
+      printStdVectorStrings(shapePars);
+       muxCout.unlock();
 			error = 1;
 		}
     if(error) {
@@ -1385,7 +1372,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		shape = gTrap;
 	}
 	else if (type == "SimplePolygonBrep") {
-		//qInfo() << "Reading-in: SimplePolygonBrep: "; // debug
 		// shape parameters
 		double DZ = 0.;
 		unsigned int NVertices = 0;
@@ -1410,7 +1396,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				// qInfo() << "vars: " << vars; // for debug only
 				if (varName == "DZ")        DZ = std::stod(varValue);
 				if (varName == "NVertices") NVertices = std::stoi(varValue);
 				//else if (varName == "NVertices") NVertices = varValue.toDouble();
@@ -1442,7 +1427,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 				if(error) {
           muxCout.lock();
-          //FIXME: std::cout << "ERROR! GeoSimplePolygonBrep 'xVertex' and 'yVertex' values are not at the right place! --> " << shapePars << std::endl;
+          std::cout << "ERROR! GeoSimplePolygonBrep 'xVertex' and 'yVertex' values are not at the right place! --> ";
+          printStdVectorStrings(shapePars);
           muxCout.unlock();
         }
 
@@ -1453,19 +1439,22 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if( sh->getNVertices() != NVertices) {
 				error = 1;
         muxCout.lock();
-				//FIXME: std::cout << "ERROR! GeoSimplePolygonBrep number of planes: " << QString::number(sh->getNVertices()) << " is not equal to the original size! --> " << shapePars << std::endl;
+        std::cout << "ERROR! GeoSimplePolygonBrep number of planes: " << sh->getNVertices() << " is not equal to the original size! --> ";
+        printStdVectorStrings(shapePars);
         muxCout.unlock();
 			}
 			if(!sh->isValid()) {
 				error = 1;
         muxCout.lock();
-				//FIXME: std::cout << "ERROR! GeoSimplePolygonBrep shape is not valid!! -- input: " << shapePars << std::endl;
+        std::cout << "ERROR! GeoSimplePolygonBrep shape is not valid!! -- input: ";
+        printStdVectorStrings(shapePars);
         muxCout.unlock();
 			}
 		} // end if (size>3)
 		else {
       muxCout.lock();
-			//FIXME: std::cout << "ERROR!! GeoSimplePolygonBrep has no vertices!! --> shape input parameters: " << shapePars << std::endl;
+      std::cout << "ERROR!! GeoSimplePolygonBrep has no vertices!! --> shape input parameters: ";
+      printStdVectorStrings(shapePars);
       muxCout.unlock();
 			error = 1;
 		}
@@ -1482,7 +1471,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		// Tessellated pars example: "nFacets=1;TRI;vT=ABSOLUTE;nV=3;xV=0;yV=0;zV=1;xV=0;yV=1;zV=0;xV=1;yV=0;zV=0"
     std::cout << "Reading-in: TessellatedSolid: "; // debug
 		// Facet type
-		QString facetType = "";
+    std::string facetType = "";
 		// shape parameters
 		unsigned int nFacets = 0;
 
@@ -1510,7 +1499,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
         muxCout.lock();
         qWarning("ERROR!! - GeoTessellatedSolid - nFacets is not defined!!");
         muxCout.unlock();
-				error = true; // TODO: check "error.h" functionalities and replace with that if useful
+				error = true; // TODO: check "error.h" functionalities and replace with that, if useful
 			}
 
 			// build the basic GeoTessellatedSolid shape
@@ -1533,7 +1522,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				}
 				else {
           muxCout.lock();
-					//FIXME: std::cout << "ERROR!! - GeoTessellatedSolid - Facet type is not defined! [got: '" << varName << "']" << std::endl;
+					std::cout << "ERROR!! - GeoTessellatedSolid - Facet type is not defined! [got: '" << varName << "']" << std::endl;
           muxCout.unlock();
 					error = true;
 				}
@@ -1574,7 +1563,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				}
 
 
-				// std::cout << "it:" << it;
 				// if we get a QUAD ==> GeoQuadrangularFacet
 				if (facetType=="QUAD") {
 
@@ -1599,7 +1587,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 						if (varName == "xV") xV = std::stod(varValue);
 						else {
               muxCout.lock();
-							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'xV'!" << std::endl;
+							std::cout << "ERROR! Got '" << varName << "' instead of 'xV'!" << std::endl;
               muxCout.unlock();
 							error = 1;
 						}
@@ -1614,7 +1602,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 						if (varName == "yV") yV = std::stod(varValue);
 						else {
               muxCout.lock();
-							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'yV'!" << std::endl;
+							std::cout << "ERROR! Got '" << varName << "' instead of 'yV'!" << std::endl;
               muxCout.unlock();
 							error = 1;
 						}
@@ -1629,14 +1617,15 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 						if (varName == "zV") zV = std::stod(varValue);
 						else {
               muxCout.lock();
-							//FIXME: std::cout << "ERROR! Got '" << varName << "' instead of 'zV'!" << std::endl;
+							std::cout << "ERROR! Got '" << varName << "' instead of 'zV'!" << std::endl;
               muxCout.unlock();
 							error = 1;
 						}
 
 						if(error) {
               muxCout.lock();
-              //FIXME: std::cout << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars << std::endl;
+              std::cout << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> ";
+              printStdVectorStrings(shapePars);
               muxCout.unlock();
             }
 
@@ -1695,7 +1684,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 						if(error) {
               muxCout.lock();
-              //FIXME: std::cout << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> " << shapePars << std::endl;
+              std::cout << "ERROR! GeoTessellatedSolid 'xV', 'yV', and 'zV' values are not at the right place! --> ";
+              printStdVectorStrings(shapePars);
               muxCout.unlock();
             }
 
@@ -1715,7 +1705,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if( sh->getNumberOfFacets() != nFacets) {
 				error = 1;
         muxCout.lock();
-				//FIXME: std::cout << "ERROR! GeoTessellatedSolid number of facets: " << QString::number(sh->getNumberOfFacets()) << " is not equal to the original size! --> " << shapePars << std::endl;
+        std::cout << "ERROR! GeoTessellatedSolid number of facets: " << sh->getNumberOfFacets() << " is not equal to the original size! --> ";
+        printStdVectorStrings(shapePars);
         muxCout.unlock();
 			}
 			/*
@@ -1728,7 +1719,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 		} // END OF if (size>13)
 		else {
       muxCout.lock();
-			//FIXME: std::cout << "ERROR!! GeoTessellatedSolid has no facets!! --> shape input parameters: " << shapePars << std::endl;
+      std::cout << "ERROR!! GeoTessellatedSolid has no facets!! --> shape input parameters: ";
+      printStdVectorStrings(shapePars);
       muxCout.unlock();
 			error = 1;
 		}
@@ -1883,8 +1875,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
       transfX = transf->getTransform();
       transf->unref(); // delete the transf from the heap, because we don't need the node, only the bare transformation matrix
 
-
-
       // then, check the type of the operand shape
       bool isAOperator = isShapeOperator( shapeOpId );
 
@@ -1899,7 +1889,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
           exit(EXIT_FAILURE);
         }
         GeoShapeShift* shapeNew = new GeoShapeShift(shapeOp, transfX);
-//        storeBuiltShape(shapeId, shapeNew);
         shape = shapeNew;
       }
       // ...otherwise, build the Shift operator shape without operands
@@ -1907,15 +1896,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
       // operands and shape later.
       else {
         GeoShapeShift* shapeNew = new GeoShapeShift();
-
-        // debug
-        // muxCout.lock();
-        // std::cout << "adding 'empty' shape (1): " << shapeId << ", " << shapeNew << ", " << shapeOpId << ", " << transfId << std::endl;
-        // muxCout.unlock();
-
         tuple_shapes_boolean_info tt (shapeId, shapeNew, shapeOpId, transfId);
         shapes_info_sub->push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over
-
         shape = shapeNew;
       }
     }
@@ -1959,7 +1941,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
         else if ("Intersection" == type) {
           shapeNew = new GeoShapeIntersection(shapeA, shapeB);
         }
-//        storeBuiltShape(shapeId, shapeNew);
         shape = shapeNew;
     }
     // otherwise, build the operand shapes...
@@ -2073,9 +2054,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
   }
   else {
-    // QString msg = "WARNING!! - Shape '" + type + "' not implemented yet!!! Returning a dummy cube.";
-    // qWarning(msg.toStdString().c_str());
-    // m_unknown_shapes.insert(type.toStdString()); // save unknwon shapes for later warning message
     m_unknown_shapes.insert(type); // save unknwon shapes for later warning message
     shape = buildDummyShape();
   }
@@ -2138,11 +2116,6 @@ void ReadGeoModel::createBooleanShapeOperands(type_shapes_boolean_info* shapes_i
 
       // use 'tie' to unpack the tuple values into separate variables
       std::tie(shapeID, boolShPtr, idA, idB) = tuple;
-
-      // debug
-      // muxCout.lock();
-      // std::cout << "operands' map's item: " << shapeID << ", " << boolShPtr << "," << idA << "," << idB << std::endl; // debug only!
-      // muxCout.unlock();
 
       if (shapeID == 0 || boolShPtr == nullptr || idA == 0 || idB == 0) {
         muxCout.lock();
@@ -2291,11 +2264,6 @@ GeoShape* ReadGeoModel::addEmptyBooleanShapeForCompletion(const unsigned int sha
   } else if (shType == "Union") {
     shape = new GeoShapeUnion();
   }
-
-  // debug
-  // muxCout.lock();
-  // std::cout << "adding 'empty' shape (3): " << shapeID << ", " << shape << ", " << opA << ", " << opB << std::endl;
-  // muxCout.unlock();
 
   tuple_shapes_boolean_info tt (shapeID, shape, opA, opB);
   shapes_info_sub->push_back(tt); //! Push the information about the new boolean shape at the end of the very same container we are iterating over

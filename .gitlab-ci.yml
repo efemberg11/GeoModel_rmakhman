@@ -41,6 +41,8 @@ geomodelcore-build:
 build_slc6:
   <<: *build_template
   image: cern/slc6-base
+  allow_failure: true
+  timeout: 30 minutes
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 

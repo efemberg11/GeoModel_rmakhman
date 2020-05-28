@@ -113,6 +113,7 @@ variables:
   script:
     - echo "PWD; LS"
     - pwd; ls
+    - cmake --version
     - mkdir build
     - cd build
     - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} ..
@@ -127,6 +128,7 @@ variables:
   script:
     - echo "PWD; LS"
     - pwd; ls
+    - cmake --version
     - mkdir build
     # - pwd; ls # for debug
     # - ls dependencies-install/ # for debug

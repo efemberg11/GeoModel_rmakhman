@@ -25,6 +25,9 @@
  * memory cost.
  */
 
+#include <mutex>
+
+
 class GeoPhysVol : public GeoVPhysVol
 {
  public:
@@ -72,6 +75,7 @@ class GeoPhysVol : public GeoVPhysVol
 
  private:
   std::vector<const GeoGraphNode*> m_daughters;
+  mutable std::mutex m_muxVec;
 };
 
 #endif

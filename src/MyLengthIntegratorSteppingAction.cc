@@ -43,13 +43,11 @@ namespace G4UA
   //---------------------------------------------------------------------------
   MyLengthIntegratorSteppingAction::MyLengthIntegratorSteppingAction()
     : m_g4pow(0),
-      //m_hSvc(histSvcName, "MyLengthIntegratorSteppingAction"),
-      //m_etaPrimary(0), m_phiPrimary(0),
       m_rzProfRL(nullptr), m_rzProfIL(nullptr)
   {
     // Protect concurrent access to the non-thread-safe hist svc
     std::lock_guard<std::mutex> lock(gHistSvcMutex);
-      std::cout<<" MyLengthIntegratorSteppingAction Register the RZ profiles "<<std::endl;
+    std::cout<<" MyLengthIntegratorSteppingAction Register the RZ profiles "<<std::endl;
     // Register the RZ profiles. The other profiles need to wait until the end
     // of the events as they are created only if used.
     //const char* radName = "/lengths/radLen/RZRadLen";

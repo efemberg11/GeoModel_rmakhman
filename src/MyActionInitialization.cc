@@ -56,24 +56,13 @@ void MyActionInitialization::Build() const {
       else
       {
           
-          std::cout<<"fCreateGeantinoMaps is TRUE"<<std::endl;
-          G4UA::LengthIntegrator* myLenghtInt = new G4UA::LengthIntegrator("CreateGeantinoMaps");
-          
+          std::cout<<"fCreateGeantinoMaps is TRUE, will create geantino Maps"<<std::endl;
           G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction();
           G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct);
-          
-         
-          //G4UA::LengthIntegrator* myLenghtInt = new G4UA::LengthIntegrator("CreateGeantinoMaps");
-          //SetUserAction((G4UserEventAction*)   myLenghtInt);
-          //SetUserAction((G4UserSteppingAction*)myLenghtInt);
           SetUserAction(myLenghtIntEventAct);
           SetUserAction(myLenghtIntSteppingAct);
-          //MyEventAction* evtact = new MyEventAction();
-          //SetUserAction(new MyTrackingAction(evtact));
-          //SetUserAction(new MySteppingAction(evtact));
       }
     
       //MultiEventActions?? TO DO?
-  
-}
+  }
 }

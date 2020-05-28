@@ -41,33 +41,10 @@ namespace G4UA
   // Constructor
   //---------------------------------------------------------------------------
   MyLengthIntegratorEventAction::MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction* stepAct)
-    : m_g4pow(0),
-      m_stepAct(stepAct),
-      m_etaPrimary(0), m_phiPrimary(0),
-      m_rzProfRL(nullptr), m_rzProfIL(nullptr)
-{
-    // Protect concurrent access to the non-thread-safe hist svc
-    std::lock_guard<std::mutex> lock(gHistSvcMutex);
-    std::cout<<" MyLengthIntegratorEventAction Register the RZ profiles "<<std::endl;
-    // Register the RZ profiles. The other profiles need to wait until the end
-    // of the events as they are created only if used.
-    //const char* radName = "/lengths/radLen/RZRadLen";
-    //if(!getHist(m_hSvc, radName, m_rzProfRL)) {
-      m_rzProfRL = new TProfile2D("RZRadLen","RZRadLen",1000,-25000.,25000.,2000,0.,15000.);
-    //  regHist(m_hSvc, radName, m_rzProfRL);
-    //}
-
-    //const char* intName = "/lengths/intLen/RZIntLen";
-    //if(!getHist(m_hSvc, intName, m_rzProfIL)) {
-      m_rzProfIL = new TProfile2D("RZIntLen","RZIntLen",1000,-25000.,25000.,2000,0.,15000.);
-    //  regHist(m_hSvc, intName, m_rzProfIL);
-    //}
-
-    m_g4pow = G4Pow::GetInstance();
-
-  }
-  MyLengthIntegratorEventAction::~MyLengthIntegratorEventAction()
-  {
+    :m_stepAct(stepAct),
+     m_etaPrimary(0), m_phiPrimary(0){}
+    
+  MyLengthIntegratorEventAction::~MyLengthIntegratorEventAction(){
 
     // Clear histogram maps
     m_etaMapRL.clear();

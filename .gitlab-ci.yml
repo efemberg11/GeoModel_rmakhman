@@ -16,7 +16,7 @@ variables:
   tags:
     - macos
   allow_failure: true
-  timeout: 30 minutes
+  timeout: 60 minutes
   before_script:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
 

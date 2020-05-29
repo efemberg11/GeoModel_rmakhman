@@ -12,7 +12,7 @@
 
 class G4VSolid;
 class GeoShape;
-class LArCustomShape;
+class GeoUnidentifiedShape;
 
 class Geo2G4SolidFactory
 {
@@ -31,7 +31,7 @@ public:
    //StoreGateSvc_t& detStore() const;
 private:
   G4VSolid* createLArWheelSolid(const std::string& name, const LArWheelSolidDef_t & lwsdef) const;
-  G4VSolid* createLArWheelSliceSolid(const LArCustomShape* ) const;
+  G4VSolid* createLArWheelSliceSolid(const GeoUnidentifiedShape* ) const;
 
   static const LArWheelSolid_typemap s_lwsTypes;
 

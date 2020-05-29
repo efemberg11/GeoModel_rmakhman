@@ -518,40 +518,11 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
   //
   // Custom Shapes (presently LAr shapes only)
   //
-  //LAr custom shape :: to be removed and tested with new EMEC variants .db file
-  else if(geoShape->typeID() == LArCustomShape::getClassTypeID())
-  {
-      const LArCustomShape* customShape = dynamic_cast<const LArCustomShape*> (geoShape);
-      if (nullptr==customShape) throw std::runtime_error("TypeID did not match cast for custom shape");
-     // if (customShape->name()=="LArCustomShape") {
-          //std::string customName = customShape->asciiData();
-          std::string customName = customShape->name();
-          customSolidMap::const_iterator it = customSolids.find(customName);
-          if(it!=customSolids.end())
-              theSolid = it->second;
-          else
-          {
-              std::cout<<" custom Name to find "<<customName<<" !!!"<<std::endl;
-              theSolid = nullptr;
-              
-              if(customName.find("Slice") != std::string::npos){
-                theSolid = createLArWheelSliceSolid(customShape);
-              } else {
-                std::cout<<" Name doesn't contain slice"<<customName<<" !!!"<<std::endl;
-                theSolid = createLArWheelSolid(customName, s_lwsTypes.at(customName) ); // map.at throws std::out_of_range exception on unknown shape name
-              }
-              if ( nullptr == theSolid ) {
-                std::string error = std::string("Can't create LArWheelSolid for name ") + customName + " in Geo2G4SolidFactory::Build";
-                throw std::runtime_error(error);
-              }
-          if(theSolid != nullptr) customSolids[customName] = theSolid;
-              
-          }
-    //  }
-  }
+  // GeoUnidentifiedShape - LAr custom shape
   else if(geoShape->typeID() == GeoUnidentifiedShape::getClassTypeID())
   {
       const GeoUnidentifiedShape* customShape = dynamic_cast<const GeoUnidentifiedShape*> (geoShape);
+      //std::cout<<" GeoModelG4, I found a GeoUnidentifiedShape with customShape->name()== " <<customShape->name()<<std::endl;
       //const LArCustomShape* customShape = dynamic_cast<const LArCustomShape*> (geoShape);
       if (nullptr==customShape) throw std::runtime_error("TypeID did not match cast for custom shape");
       if (customShape->name()=="LArCustomShape")
@@ -563,50 +534,10 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
           else
           {
               theSolid = nullptr;
-  //        if(customName == "LAr::EMEC::InnerWheel::Absorber" || customName == "LAr::EMEC::Pos::InnerWheel::Absorber"){
-  //          theSolid = new LArWheelSolid(customName, InnerAbsorberWheel, 1);
-  //        } else if(customName == "LAr::EMEC::OuterWheel::Absorber" ||  customName == "LAr::EMEC::Pos::OuterWheel::Absorber"){
-  //          theSolid = new LArWheelSolid(customName, OuterAbsorberWheel, 1);
-  //        } else if(customName == "LAr::EMEC::InnerWheel::Electrode" || customName == "LAr::EMEC::Pos::InnerWheel::Electrode"){
-  //          theSolid = new LArWheelSolid(customName, InnerElectrodWheel, 1);
-  //        } else if(customName == "LAr::EMEC::OuterWheel::Electrode" || customName == "LAr::EMEC::Pos::OuterWheel::Electrode"){
-  //          theSolid = new LArWheelSolid(customName, OuterElectrodWheel, 1);
-  //        } else if(customName == "LAr::EMEC::Neg::InnerWheel::Absorber"){
-  //          theSolid = new LArWheelSolid(customName, InnerAbsorberWheel, -1);
-  //        } else if(customName == "LAr::EMEC::Neg::OuterWheel::Absorber"){
-  //          theSolid = new LArWheelSolid(customName, OuterAbsorberWheel, -1);
-  //        } else if(customName == "LAr::EMEC::Neg::InnerWheel::Electrode"){
-  //          theSolid = new LArWheelSolid(customName, InnerElectrodWheel, -1);
-  //        } else if(customName == "LAr::EMEC::Neg::OuterWheel::Electrode"){
-  //          theSolid = new LArWheelSolid(customName, OuterElectrodWheel, -1);
-  //        } else if(customName == "LAr::EMEC::InnerModule::Absorber"){
-  //          theSolid = new LArWheelSolid(customName, InnerAbsorberModule, 1);
-  //        } else if(customName == "LAr::EMEC::OuterModule::Absorber"){
-  //          theSolid = new LArWheelSolid(customName, OuterAbsorberModule, 1);
-  //        } else if(customName == "LAr::EMEC::InnerModule::Electrode"){
-  //          theSolid = new LArWheelSolid(customName, InnerElectrodModule, 1);
-  //        } else if(customName == "LAr::EMEC::OuterModule::Electrode"){
-  //          theSolid = new LArWheelSolid(customName, OuterElectrodModule, 1);
-  //        } else if(customName == "LAr::EMEC::InnerWheel::Glue" ||  customName == "LAr::EMEC::Pos::InnerWheel::Glue"){
-  //          theSolid = new LArWheelSolid(customName, InnerGlueWheel, 1);
-  //        } else if(customName == "LAr::EMEC::InnerWheel::Lead" ||  customName == "LAr::EMEC::Pos::InnerWheel::Lead"){
-  //          theSolid = new LArWheelSolid(customName, InnerLeadWheel, 1);
-  //        } else if(customName == "LAr::EMEC::OuterWheel::Glue" ||  customName == "LAr::EMEC::Pos::OuterWheel::Glue"){
-  //          theSolid = new LArWheelSolid(customName, OuterGlueWheel, 1);
-  //        } else if(customName == "LAr::EMEC::OuterWheel::Lead" ||  customName == "LAr::EMEC::Pos::OuterWheel::Lead"){
-  //          theSolid = new LArWheelSolid(customName, OuterLeadWheel, 1);
-  //        } else if(customName == "LAr::EMEC::Neg::InnerWheel::Glue"){
-  //          theSolid = new LArWheelSolid(customName, InnerGlueWheel, -1);
-  //        } else if(customName == "LAr::EMEC::Neg::InnerWheel::Lead"){
-  //          theSolid = new LArWheelSolid(customName, InnerLeadWheel, -1);
-  //        } else if(customName == "LAr::EMEC::Neg::OuterWheel::Glue"){
-  //          theSolid = new LArWheelSolid(customName, OuterGlueWheel, -1);
-  //        } else if(customName == "LAr::EMEC::Neg::OuterWheel::Lead"){
-  //          theSolid = new LArWheelSolid(customName, OuterLeadWheel, -1);
-  //        }
+  
               if(customName.find("Slice") != std::string::npos){
-                  const LArCustomShape* larShape = dynamic_cast<const LArCustomShape*> (customShape);
-                  theSolid = createLArWheelSliceSolid(larShape);
+                  //const LArCustomShape* larShape = dynamic_cast<const LArCustomShape*> (customShape);
+                  theSolid = createLArWheelSliceSolid(customShape);
               } else {
                   theSolid = createLArWheelSolid(customName, s_lwsTypes.at(customName) ); // map.at throws std::out_of_range exception on unknown shape name
               }
@@ -614,11 +545,6 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
                   std::string error = std::string("Can't create LArWheelSolid for name ") + customName + " in Geo2G4SolidFactory::Build";
                   throw std::runtime_error(error);
               }
-//	    theSolid = createLArWheelSolid(customName, s_lwsTypes.at(customName) ); // map.at throws std::out_of_range exception on unknown shape name
-//	    if ( nullptr == theSolid ) {
-//	      std::string error = std::string("Can't create LArWheelSolid for name ") + customName + " in Geo2G4SolidFactory::Build";
-//	      throw std::runtime_error(error);
-//	    }
               if(theSolid != nullptr) customSolids[customName] = theSolid;
               
           }
@@ -657,9 +583,9 @@ G4VSolid* Geo2G4SolidFactory::createLArWheelSolid(const std::string& name, const
         return theLWS;
 }
 
-G4VSolid* Geo2G4SolidFactory::createLArWheelSliceSolid(const LArCustomShape* customShape) const
+G4VSolid* Geo2G4SolidFactory::createLArWheelSliceSolid(const GeoUnidentifiedShape* customShape) const
 {
-    LArWheelSliceSolid *theLWS = new LArWheelSliceSolid(customShape->name(), customShape->calculator());
+    LArWheelSliceSolid *theLWS = new LArWheelSliceSolid(customShape->asciiData() );
 
     //LArWheelSolidDDProxy *theLWS_p = new LArWheelSolidDDProxy(theLWS);
     // ownership is passed to detStore

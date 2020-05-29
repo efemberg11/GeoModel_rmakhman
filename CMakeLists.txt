@@ -21,8 +21,8 @@ include( SetupJSON )
 
 
 # Project's dependencies.
-find_package( GeoModelCore REQUIRED )
-find_package( GeoModelIO   REQUIRED )
+find_package( GeoModelCore 3.2.0 REQUIRED )
+find_package( GeoModelIO   3.2.0 REQUIRED )
 find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
 # Set sub-packages to build.
 add_subdirectory(VP1GeometryPlugin)

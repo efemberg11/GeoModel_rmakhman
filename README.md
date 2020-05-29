@@ -3,7 +3,7 @@
 Visualization of GeoModel geometry.  This project contains the code for the GeoModelExplorer, which is a super-lightweight version of VP1(Light), but without event display; i.e. it is a pure geometry visualizer.  
 
 This package is still under ferocious development; we are not releasing pre-build code at this point.  We estimate binary distribution kits for Macintosh and Ubuntu platforms by January 2020. 
-
+ 
 ## Quick installation instructions (Mac)
 
 ```bash

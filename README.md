@@ -190,6 +190,14 @@ The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are av
    wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
    wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
 ```
+You can now also get the ATLAS geometry SQLite files where the EMEC is built using 3 new different variants (Wheel, Cone, Slices):
+
+```bash
+   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Wheel.db
+   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Cone.db
+   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Slices.db
+```
+
 ## Examples
 
 During the installation a default macro file <macro.g4> will be installed in your bin directory.

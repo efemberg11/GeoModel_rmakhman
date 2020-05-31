@@ -48,7 +48,23 @@
 
 namespace GeoModelIO {
 
-
+  // TODO: should go to an utility class
+  std::string joinVectorStrings(std::vector<std::string> vec, std::string sep="") {
+    std::string s;
+    for (const auto &piece : vec) s += (piece + sep);
+    return s;
+  }
+  
+  // TODO: move this to utility class/file
+  void printStdVectorStrings(std::vector<std::string> vec)
+  {
+    for ( const auto& str : vec) {
+      std::cout << str << " ";
+    }
+    std::cout << std::endl;
+    return;
+  }
+  
 /// Get next child position available, given the parent type, id and copy number
 unsigned int WriteGeoModel::getChildPosition(const QString parentId, const QString parentType, const unsigned int copyN)
 {
@@ -631,14 +647,18 @@ QStringList WriteGeoModel::getParentNode()
 //__________________________________________________________________
 QVariant WriteGeoModel::storeShape(const GeoShape* shape)
 {
-	QString shapeType = QString::fromStdString(shape->type());
+//  QString shapeType = QString::fromStdString(shape->type());
+  std::string shapeType = shape->type();
+  
+  
 	//JFB Commented out: qDebug() << "storeShape() - shape name:" << shapeType  << ", address:" << shape;
 	
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType=="CustomShape") shapeType="UnidentifiedShape";
     
     // get shape parameters
-	QString shapePars = getShapeParameters(shape);
+//  QString shapePars = getShapeParameters(shape);
+  std::string shapePars = getShapeParameters(shape);
 	
 	// store the shape in the DB and returns the ID
 	return storeObj(shape, shapeType, shapePars);
@@ -880,32 +900,30 @@ void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 
 
 // Get shape parameters
-QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
+std::string WriteGeoModel::getShapeParameters(const GeoShape* shape)
 {
-	const QString shapeType = QString::fromStdString(shape->type());
+  const std::string shapeType = shape->type();
 	//JFB Commented out: qDebug() << "shapeType:" << shapeType;
 
-	QString shapePars = "";
+  std::string shapePars = "";
+  std::vector<std::string> pars;
 
 	if (shapeType == "Box") {
 		//JFB Commented out: qDebug() << "get GeoBox parameters";
-		QStringList pars;
 		const GeoBox* box = dynamic_cast<const GeoBox*>(shape);
-		pars << "XHalfLength=" + QString::number(box->getXHalfLength()) ;
-		pars << "YHalfLength=" + QString::number(box->getYHalfLength()) ;
-		pars << "ZHalfLength=" + QString::number(box->getZHalfLength()) ;
-		shapePars = pars.join(";");
+		pars.push_back("XHalfLength=" + std::to_string(box->getXHalfLength())) ;
+		pars.push_back("YHalfLength=" + std::to_string(box->getYHalfLength())) ;
+		pars.push_back("ZHalfLength=" + std::to_string(box->getZHalfLength())) ;
+		shapePars = joinVectorStrings(pars,";");
 	} else if (shapeType == "Cons") {
-		QStringList pars;
 		const GeoCons* shapeIn = dynamic_cast<const GeoCons*>(shape);
-		pars << "RMin1=" + QString::number(shapeIn->getRMin1()) ;
-		pars << "RMin2=" + QString::number(shapeIn->getRMin2()) ;
-		pars << "RMax1=" + QString::number(shapeIn->getRMax1()) ;
-		pars << "RMax2=" + QString::number(shapeIn->getRMax2()) ;
-		pars << "DZ=" + QString::number(shapeIn->getDZ()) ;
-		pars << "SPhi=" + QString::number(shapeIn->getSPhi()) ;
-		pars << "DPhi=" + QString::number(shapeIn->getDPhi()) ;
-		shapePars = pars.join(";");
+		pars.push_back("RMin1=" + std::to_string(shapeIn->getRMin1())) ;
+		pars.push_back("RMin2=" + std::to_string(shapeIn->getRMin2())) ;
+		pars.push_back("RMax1=" + std::to_string(shapeIn->getRMax1())) ;
+		pars.push_back("RMax2=" + std::to_string(shapeIn->getRMax2())) ;
+		pars.push_back("DZ=" + std::to_string(shapeIn->getDZ())) ;
+		pars.push_back("SPhi=" + std::to_string(shapeIn->getSPhi())) ;
+		pars.push_back("DPhi=" + std::to_string(shapeIn->getDPhi())) ;
 	} else if (shapeType == "Torus") {
 		// Member Data:
 		// * Rmax - outside radius of the torus tube
@@ -915,150 +933,133 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		// * SPhi - starting angle of the segment in radians
 		// * DPhi - delta angle of the segment in radians
 		//
-		QStringList pars;
 		const GeoTorus* shapeIn = dynamic_cast<const GeoTorus*>(shape);
-		pars << "Rmin=" + QString::number(shapeIn->getRMin()) ;
-		pars << "Rmax=" + QString::number(shapeIn->getRMax()) ;
-		pars << "Rtor=" + QString::number(shapeIn->getRTor()) ;
-		pars << "SPhi=" + QString::number(shapeIn->getSPhi()) ;
-		pars << "DPhi=" + QString::number(shapeIn->getDPhi()) ;
-		shapePars = pars.join(";");
-	} else if (shapeType == "Para") {
-		QStringList pars;
+		pars.push_back("Rmin=" + std::to_string(shapeIn->getRMin())) ;
+		pars.push_back("Rmax=" + std::to_string(shapeIn->getRMax())) ;
+		pars.push_back("Rtor=" + std::to_string(shapeIn->getRTor())) ;
+		pars.push_back("SPhi=" + std::to_string(shapeIn->getSPhi())) ;
+		pars.push_back("DPhi=" + std::to_string(shapeIn->getDPhi())) ;
+	}
+  else if (shapeType == "Para") {
 		const GeoPara* shapeIn = dynamic_cast<const GeoPara*>(shape);
-		pars << "XHalfLength=" + QString::number(shapeIn->getXHalfLength()) ;
-		pars << "YHalfLength=" + QString::number(shapeIn->getYHalfLength()) ;
-		pars << "ZHalfLength=" + QString::number(shapeIn->getZHalfLength()) ;
-		pars << "Alpha=" + QString::number(shapeIn->getAlpha()) ;
-		pars << "Theta=" + QString::number(shapeIn->getTheta()) ;
-		pars << "Phi=" + QString::number(shapeIn->getPhi()) ;
-		shapePars = pars.join(";");
-	} else if (shapeType == "Pcon") {
-		QStringList pars;
+		pars.push_back("XHalfLength=" + std::to_string(shapeIn->getXHalfLength())) ;
+		pars.push_back("YHalfLength=" + std::to_string(shapeIn->getYHalfLength())) ;
+		pars.push_back("ZHalfLength=" + std::to_string(shapeIn->getZHalfLength())) ;
+		pars.push_back("Alpha=" + std::to_string(shapeIn->getAlpha())) ;
+		pars.push_back("Theta=" + std::to_string(shapeIn->getTheta())) ;
+		pars.push_back("Phi=" + std::to_string(shapeIn->getPhi())) ;
+	}
+  else if (shapeType == "Pcon") {
 		const GeoPcon* shapeIn = dynamic_cast<const GeoPcon*>(shape);
-		pars << "SPhi=" + QString::number(shapeIn->getSPhi());
-		pars << "DPhi=" + QString::number(shapeIn->getDPhi());
+		pars.push_back("SPhi=" + std::to_string(shapeIn->getSPhi()));
+		pars.push_back("DPhi=" + std::to_string(shapeIn->getDPhi()));
 		// get number of Z planes and loop over them
 		const int nZplanes = shapeIn->getNPlanes();
-		pars << "NZPlanes=" + QString::number(nZplanes);
+		pars.push_back("NZPlanes=" + std::to_string(nZplanes));
 		for (int i=0; i<nZplanes; ++i) {
-			pars << "ZPos=" + QString::number(shapeIn->getZPlane(i));
-			pars << "ZRmin=" + QString::number(shapeIn->getRMinPlane(i));
-			pars << "ZRmax=" + QString::number(shapeIn->getRMaxPlane(i));
+			pars.push_back("ZPos=" + std::to_string(shapeIn->getZPlane(i)));
+			pars.push_back("ZRmin=" + std::to_string(shapeIn->getRMinPlane(i)));
+			pars.push_back("ZRmax=" + std::to_string(shapeIn->getRMaxPlane(i)));
 		}
-		shapePars = pars.join(";");
-	} else if (shapeType == "Pgon") {
-		QStringList pars;
+	}
+  else if (shapeType == "Pgon") {
 		const GeoPgon* shapeIn = dynamic_cast<const GeoPgon*>(shape);
-		pars << "SPhi=" + QString::number(shapeIn->getSPhi()) ;
-		pars << "DPhi=" + QString::number(shapeIn->getDPhi()) ;
-		pars << "NSides=" + QString::number(shapeIn->getNSides()) ;
+		pars.push_back("SPhi=" + std::to_string(shapeIn->getSPhi())) ;
+		pars.push_back("DPhi=" + std::to_string(shapeIn->getDPhi())) ;
+		pars.push_back("NSides=" + std::to_string(shapeIn->getNSides())) ;
 		// get number of Z planes and loop over them
 		const int nZplanes = shapeIn->getNPlanes();
-		pars << "NZPlanes=" + QString::number(nZplanes);
+		pars.push_back("NZPlanes=" + std::to_string(nZplanes));
 		for (int i=0; i<nZplanes; ++i) {
-			pars << "ZPos=" + QString::number(shapeIn->getZPlane(i));
-			pars << "ZRmin=" + QString::number(shapeIn->getRMinPlane(i));
-			pars << "ZRmax=" + QString::number(shapeIn->getRMaxPlane(i));
+			pars.push_back("ZPos=" + std::to_string(shapeIn->getZPlane(i)));
+			pars.push_back("ZRmin=" + std::to_string(shapeIn->getRMinPlane(i)));
+			pars.push_back("ZRmax=" + std::to_string(shapeIn->getRMaxPlane(i)));
 		}
-		shapePars = pars.join(";");
-	} else if (shapeType == "SimplePolygonBrep") {
-		QStringList pars;
+	}
+  else if (shapeType == "SimplePolygonBrep") {
 		const GeoSimplePolygonBrep* shapeIn = dynamic_cast<const GeoSimplePolygonBrep*>(shape);
-		pars << "DZ=" + QString::number(shapeIn->getDZ()) ;
+		pars.push_back("DZ=" + std::to_string(shapeIn->getDZ())) ;
 		// get number of vertices and loop over them
 		const int nVertices = shapeIn->getNVertices();
-		pars << "NVertices=" + QString::number(nVertices);
+		pars.push_back("NVertices=" + std::to_string(nVertices));
 		for (int i=0; i<nVertices; ++i) {
-			pars << "xV=" + QString::number(shapeIn->getXVertex(i));
-			pars << "yV=" + QString::number(shapeIn->getYVertex(i));
+			pars.push_back("xV=" + std::to_string(shapeIn->getXVertex(i)));
+			pars.push_back("yV=" + std::to_string(shapeIn->getYVertex(i)));
 		}
-		shapePars = pars.join(";");
-	} else if (shapeType == "Trap") {
-		QStringList pars;
+	}
+  else if (shapeType == "Trap") {
 		const GeoTrap* shapeIn = dynamic_cast<const GeoTrap*>(shape);
-		pars << "ZHalfLength=" + QString::number(shapeIn->getZHalfLength()) ;
-		pars << "Theta=" + QString::number(shapeIn->getTheta()) ;
-		pars << "Phi=" + QString::number(shapeIn->getPhi()) ;
-		pars << "Dydzn=" + QString::number(shapeIn->getDydzn()) ;
-		pars << "Dxdyndzn=" + QString::number(shapeIn->getDxdyndzn()) ;
-		pars << "Dxdypdzn=" + QString::number(shapeIn->getDxdypdzn()) ;
-		pars << "Angleydzn=" + QString::number(shapeIn->getAngleydzn()) ;
-		pars << "Dydzp=" + QString::number(shapeIn->getDydzp()) ;
-		pars << "Dxdyndzp=" + QString::number(shapeIn->getDxdyndzp()) ;
-		pars << "Dxdypdzp=" + QString::number(shapeIn->getDxdypdzp()) ;
-		pars << "Angleydzp=" + QString::number(shapeIn->getAngleydzp()) ;
-		shapePars = pars.join(";");
-	} else if (shapeType == "Trd") {
-		QStringList pars;
+		pars.push_back("ZHalfLength=" + std::to_string(shapeIn->getZHalfLength())) ;
+		pars.push_back("Theta=" + std::to_string(shapeIn->getTheta())) ;
+		pars.push_back("Phi=" + std::to_string(shapeIn->getPhi())) ;
+		pars.push_back("Dydzn=" + std::to_string(shapeIn->getDydzn())) ;
+		pars.push_back("Dxdyndzn=" + std::to_string(shapeIn->getDxdyndzn())) ;
+		pars.push_back("Dxdypdzn=" + std::to_string(shapeIn->getDxdypdzn())) ;
+		pars.push_back("Angleydzn=" + std::to_string(shapeIn->getAngleydzn())) ;
+		pars.push_back("Dydzp=" + std::to_string(shapeIn->getDydzp())) ;
+		pars.push_back("Dxdyndzp=" + std::to_string(shapeIn->getDxdyndzp())) ;
+		pars.push_back("Dxdypdzp=" + std::to_string(shapeIn->getDxdypdzp())) ;
+		pars.push_back("Angleydzp=" + std::to_string(shapeIn->getAngleydzp())) ;
+	}
+  else if (shapeType == "Trd") {
 		const GeoTrd* shapeIn = dynamic_cast<const GeoTrd*>(shape);
-		pars << "XHalfLength1=" + QString::number(shapeIn->getXHalfLength1()) ;
-		pars << "XHalfLength2=" + QString::number(shapeIn->getXHalfLength2()) ;
-		pars << "YHalfLength1=" + QString::number(shapeIn->getYHalfLength1()) ;
-		pars << "YHalfLength2=" + QString::number(shapeIn->getYHalfLength2()) ;
-		pars << "ZHalfLength=" + QString::number(shapeIn->getZHalfLength()) ;
-		shapePars = pars.join(";");
-	} else if (shapeType == "Tube") {
-		QStringList pars;
+		pars.push_back("XHalfLength1=" + std::to_string(shapeIn->getXHalfLength1())) ;
+		pars.push_back("XHalfLength2=" + std::to_string(shapeIn->getXHalfLength2())) ;
+		pars.push_back("YHalfLength1=" + std::to_string(shapeIn->getYHalfLength1())) ;
+		pars.push_back("YHalfLength2=" + std::to_string(shapeIn->getYHalfLength2())) ;
+		pars.push_back("ZHalfLength=" + std::to_string(shapeIn->getZHalfLength())) ;
+	}
+  else if (shapeType == "Tube") {
 		const GeoTube* tube = dynamic_cast<const GeoTube*>(shape);
-		pars << "RMin=" + QString::number(tube->getRMin()) ;
-		pars << "RMax=" + QString::number(tube->getRMax()) ;
-		pars << "ZHalfLength=" + QString::number(tube->getZHalfLength()) ;
-		shapePars = pars.join(";");
-	} else if (shapeType == "Tubs") {
-		QStringList pars;
+		pars.push_back("RMin=" + std::to_string(tube->getRMin())) ;
+		pars.push_back("RMax=" + std::to_string(tube->getRMax())) ;
+		pars.push_back("ZHalfLength=" + std::to_string(tube->getZHalfLength())) ;
+	}
+  else if (shapeType == "Tubs") {
 		const GeoTubs* shapeIn = dynamic_cast<const GeoTubs*>(shape);
-		pars << "RMin=" + QString::number(shapeIn->getRMin()) ;
-		pars << "RMax=" + QString::number(shapeIn->getRMax()) ;
-		pars << "ZHalfLength=" + QString::number(shapeIn->getZHalfLength()) ;
-		pars << "SPhi=" + QString::number(shapeIn->getSPhi()) ;
-		pars << "DPhi=" + QString::number(shapeIn->getDPhi()) ;
-		shapePars = pars.join(";");
-	} else if (shapeType == "TessellatedSolid") {
-		QStringList pars;
+		pars.push_back("RMin=" + std::to_string(shapeIn->getRMin())) ;
+		pars.push_back("RMax=" + std::to_string(shapeIn->getRMax())) ;
+		pars.push_back("ZHalfLength=" + std::to_string(shapeIn->getZHalfLength())) ;
+		pars.push_back("SPhi=" + std::to_string(shapeIn->getSPhi())) ;
+		pars.push_back("DPhi=" + std::to_string(shapeIn->getDPhi())) ;
+	}
+  else if (shapeType == "TessellatedSolid") {
 		const GeoTessellatedSolid* shapeIn = dynamic_cast<const GeoTessellatedSolid*>(shape);
 		// get number of facets
 		const size_t nFacets = shapeIn->getNumberOfFacets();
-		pars << "nFacets=" + QString::number(nFacets);
+		pars.push_back("nFacets=" + std::to_string(nFacets));
 		// loop over the facets
 		for (size_t i=0; i<nFacets; ++i) {
 			GeoFacet* facet = shapeIn->getFacet(i);
 			// get GeoFacet actual implementation
-			if (dynamic_cast<GeoTriangularFacet*>(facet))        pars << "TRI";
-			else if (dynamic_cast<GeoQuadrangularFacet*>(facet)) pars << "QUAD";
+			if (dynamic_cast<GeoTriangularFacet*>(facet))        pars.push_back("TRI");
+			else if (dynamic_cast<GeoQuadrangularFacet*>(facet)) pars.push_back("QUAD");
 			// get vertex type (ABSOLUTE/RELATIVE)
 			GeoFacet::GeoFacetVertexType facetVertexType = facet->getVertexType();
-			if (facetVertexType == GeoFacet::ABSOLUTE) pars << "vT=ABSOLUTE";
-			if (facetVertexType == GeoFacet::RELATIVE) pars << "vT=RELATIVE";
+			if (facetVertexType == GeoFacet::ABSOLUTE) pars.push_back("vT=ABSOLUTE");
+			if (facetVertexType == GeoFacet::RELATIVE) pars.push_back("vT=RELATIVE");
 			// get number of vertices and loop over them
 			const size_t nVertices = facet->getNumberOfVertices();
-			pars << "nV=" + QString::number(nVertices);
+			pars.push_back("nV=" + std::to_string(nVertices));
 			for (size_t i=0; i<nVertices; ++i) {
 				GeoFacetVertex facetVertex = facet->getVertex(i);
-				pars << "xV=" + QString::number( facetVertex[0] );
-				pars << "yV=" + QString::number( facetVertex[1] );
-				pars << "zV=" + QString::number( facetVertex[2] );
+				pars.push_back("xV=" + std::to_string( facetVertex[0] ));
+				pars.push_back("yV=" + std::to_string( facetVertex[1] ));
+				pars.push_back("zV=" + std::to_string( facetVertex[2] ));
 			}
 		}
-		shapePars = pars.join(";");
-		//qDebug() << "Tessellated pars:" << shapePars; // debug
 	}
 	else if (shapeType == "Intersection") {
-		//JFB Commented out: qDebug() << "get GeoShapeIntersection parameters";
-		QStringList pars;
 		const GeoShapeIntersection* shapeIn = dynamic_cast<const GeoShapeIntersection*>(shape);
 		// get the referenced Shape used in the 'union' operation, store it in the DB
 		const GeoShape* shapeOpA = shapeIn->getOpA();
 		QVariant shapeIdA = storeShape(shapeOpA);
 		const GeoShape* shapeOpB = shapeIn->getOpB();
 		QVariant shapeIdB = storeShape(shapeOpB);
-		pars << "opA=" + QString::number( shapeIdA.toUInt() ) ;
-		pars << "opB=" + QString::number( shapeIdB.toUInt() ) ;
-		shapePars = pars.join(";");
+		pars.push_back("opA=" + std::to_string( shapeIdA.toUInt() )) ;
+		pars.push_back("opB=" + std::to_string( shapeIdB.toUInt() )) ;
 	}
 	else if (shapeType == "Shift") {
-		//JFB Commented out: qDebug() << "get GeoShapeShift parameters";
-		QStringList pars;
 		const GeoShapeShift* shapeIn = dynamic_cast<const GeoShapeShift*>(shape);
 
 		// get the referenced Shape used in the 'shift' operation, store it in the DB
@@ -1069,26 +1070,20 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		GeoTransform* transf = new GeoTransform( shapeIn->getX() );
 		QVariant trId = storeTranform(transf);
 
-		pars << "A=" + QString::number( shapeId.toUInt() ) ;
-		pars << "X=" + QString::number( trId.toUInt() ) ;
-		shapePars = pars.join(";");
+		pars.push_back("A=" + std::to_string( shapeId.toUInt() )) ;
+		pars.push_back("X=" + std::to_string( trId.toUInt() )) ;
 	}
 	else if (shapeType == "Subtraction") {
-		//JFB Commented out: qDebug() << "get GeoShapeSubtraction parameters";
-		QStringList pars;
 		const GeoShapeSubtraction* shapeIn = dynamic_cast<const GeoShapeSubtraction*>(shape);
 		// get the referenced Shape used in the 'union' operation, store it in the DB
 		const GeoShape* shapeOpA = shapeIn->getOpA();
 		QVariant shapeIdA = storeShape(shapeOpA);
 		const GeoShape* shapeOpB = shapeIn->getOpB();
 		QVariant shapeIdB = storeShape(shapeOpB);
-		pars << "opA=" + QString::number( shapeIdA.toUInt() ) ;
-		pars << "opB=" + QString::number( shapeIdB.toUInt() ) ;
-		shapePars = pars.join(";");
+		pars.push_back("opA=" + std::to_string( shapeIdA.toUInt() )) ;
+		pars.push_back("opB=" + std::to_string( shapeIdB.toUInt() )) ;
 	}
 	else if (shapeType == "Union") {
-		//JFB Commented out: qDebug() << "get GeoShapeUnion parameters";
-		QStringList pars;
 		const GeoShapeUnion* shapeIn = dynamic_cast<const GeoShapeUnion*>(shape);
 
 		// get the referenced Shape used in the 'union' operation, store it in the DB
@@ -1097,27 +1092,22 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		const GeoShape* shapeOpB = shapeIn->getOpB();
 		QVariant shapeIdB = storeShape(shapeOpB);
 
-		pars << "opA=" + QString::number( shapeIdA.toUInt() ) ;
-		pars << "opB=" + QString::number( shapeIdB.toUInt() ) ;
-		shapePars = pars.join(";");
+		pars.push_back("opA=" + std::to_string( shapeIdA.toUInt() )) ;
+		pars.push_back("opB=" + std::to_string( shapeIdB.toUInt() )) ;
 	}
 	else if (shapeType=="GenericTrap") {
-	  QStringList pars;
 	  const GeoGenericTrap * shapeIn = dynamic_cast<const GeoGenericTrap*>(shape);
-	  pars << "ZHalfLength=" + QString::number(shapeIn->getZHalfLength());
-	  pars << "NVertices="   + QString::number(shapeIn->getVertices().size());
+	  pars.push_back("ZHalfLength=" + std::to_string(shapeIn->getZHalfLength()));
+	  pars.push_back("NVertices="   + std::to_string(shapeIn->getVertices().size()));
 	  for (int i=0; i<shapeIn->getVertices().size(); ++i) {
-	    pars << "X=" + QString::number(shapeIn->getVertices()[i](0));
-	    pars << "Y=" + QString::number(shapeIn->getVertices()[i](1));
+	    pars.push_back("X=" + std::to_string(shapeIn->getVertices()[i](0)));
+	    pars.push_back("Y=" + std::to_string(shapeIn->getVertices()[i](1)));
 	  }
-	  shapePars = pars.join(";");
 	}
 	else if (shapeType=="UnidentifiedShape") {
 	  const GeoUnidentifiedShape *shapeIn=dynamic_cast<const GeoUnidentifiedShape *> (shape);
-	  QStringList pars;
-	  pars << "name="+QString::fromStdString(shapeIn->name());
-	  pars << "asciiData="+QString::fromStdString(shapeIn->asciiData());
-	  shapePars=pars.join(";");
+	  pars.push_back("name="+shapeIn->name());
+	  pars.push_back("asciiData="+shapeIn->asciiData());
   }
   //LAr custom shape
   // else if(shapeType == "CustomShape") {
@@ -1129,9 +1119,12 @@ QString WriteGeoModel::getShapeParameters(const GeoShape* shape)
   //   shapePars=pars.join(";");
   // }
   else {
-    std::cout << "\n\tWARNING!!! - Shape '" << shapeType.toStdString() << "' needs to be persistified!!\n\n";
-    m_objectsNotPersistified << shapeType;
+    std::cout << "\n\tWARNING!!! - Shape '" << shapeType << "' needs to be persistified!!\n\n";
+    printStdVectorStrings(m_objectsNotPersistified);
   }
+                     
+
+  shapePars = joinVectorStrings(pars,";");
 
   return shapePars;
 
@@ -1256,10 +1249,8 @@ QVariant WriteGeoModel::storeObj(const GeoElement* pointer, const QString name, 
 }
 
 
-QVariant WriteGeoModel::storeObj(const GeoShape* pointer, const QString name, const QString parameters)
+  QVariant WriteGeoModel::storeObj(const GeoShape* pointer, const std::string name, const std::string parameters)
 {
-	//JFB Commented out: qDebug() << "WriteGeoModel::storeObj(GeoShape*) - name:" << name << "address:" << pointer;
-
 	QString address = getAddressStringFromPointer( pointer );
 
 	QVariant shapeId;
@@ -1499,8 +1490,9 @@ void WriteGeoModel::storeChildPosition(const QVariant parentId, const QString pa
 }
 
 
-unsigned int WriteGeoModel::addRecord(std::vector<QStringList>* container, const QStringList values) const
-{
+//unsigned int WriteGeoModel::addRecord(std::vector<QStringList>* container, const QStringList values) const
+  unsigned int WriteGeoModel::addRecord(std::vector<std::vector<std::string>>* container, const std::vector<std::string> values) const
+  {
 	container->push_back(values);
 	unsigned int idx = container->size(); // index of pushed element = size after pushing, to match ID starting at 1 in the DB
 	return idx;
@@ -1600,11 +1592,18 @@ QVariant WriteGeoModel::addSerialTransformer(const QVariant &funcId, const QVari
 	return QVariant( addRecord(container, values) );
 }
 
-QVariant WriteGeoModel::addShape(const QString &type, const QString &parameters)
+  QVariant WriteGeoModel::addShape(const std::string &type, const std::string &parameters)
 {
-	std::vector<QStringList>* container = &m_shapes;
-	QStringList values;
-	values << type << parameters;
+//  std::vector<QStringList>* container = &m_shapes;
+  std::vector<std::vector<std::string>>* container = &m_shapes;
+  
+//  QStringList values;
+  std::vector<std::string> values;
+  
+//  values << type << parameters;
+  values.push_back(type);
+  values.push_back(parameters);
+  
 	return QVariant( addRecord(container, values) );
 }
 
@@ -1689,7 +1688,9 @@ void WriteGeoModel::saveToDB()
 	m_dbManager->addRootVolume(m_rootVolume);
 
 	if ( !m_objectsNotPersistified.empty() ) {
-		qWarning() << "\n\tWARNING!! There are objects which need to be persistified! --> " << m_objectsNotPersistified << "\n\n";
+    std::cout << "\n\tWARNING!! There are shapes/nodes which need to be persistified! --> ";
+    printStdVectorStrings(m_objectsNotPersistified);
+    std::cout << "\n\n";
 	}
 
 	return;

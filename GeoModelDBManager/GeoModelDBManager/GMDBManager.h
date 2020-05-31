@@ -17,6 +17,8 @@
 // include C++
 #include <iostream>
 #include <unordered_map>
+#include <vector>
+#include <string>
 
 /**
  * \class GMDBManager
@@ -147,7 +149,11 @@ public:
 
 
 	bool addListOfRecords(const QString geoType, const std::vector<QStringList> records);
+  bool addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records);
+  
 	bool addListOfRecordsToTable(const QString tableName, const std::vector<QStringList> records);
+  bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
+  
 	bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records);
 	bool addListOfChildrenPositions(const std::vector<QStringList> records);
 
@@ -212,7 +218,9 @@ private:
   QSqlQuery selectAllFromTableSortBy(QString tableName, std::string sortColumn="") const;
 
 
-	void storeTableColumnNames(QStringList input);
+//  void storeTableColumnNames(QStringList input);
+  void storeTableColumnNames(std::vector<std::string> input);
+  
 	QStringList getTableColumnNames(QString tableName);
 	void printTableColNamesFromDB(QString tableName) const;
 
@@ -230,8 +238,10 @@ private:
 
 	bool m_deepDebug;
 
-	QMap<QString, QStringList> m_tableNames;
-	QMap<QString, QString> m_childType_tableName;
+//  QMap<QString, QStringList> m_tableNames;
+//  QMap<QString, QString> m_childType_tableName;
+  std::unordered_map<std::string, std::vector<std::string>> m_tableNames; /// stores the column names for each table
+  std::unordered_map<std::string, std::string> m_childType_tableName;
 };
 
 #endif // GMDBManager_H

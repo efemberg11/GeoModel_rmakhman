@@ -29,6 +29,10 @@
 #include <QString>
 #include <QMap>
 
+// C++ includes
+#include <vector>
+#include <string>
+
 
 namespace GeoModelIO {
 
@@ -86,7 +90,7 @@ private:
 
 	QVariant storeObj(const GeoMaterial* pointer, const QString name, const QString density, const QString elements);
 	QVariant storeObj(const GeoElement* pointer, const QString name, const QString symbol, const QString elZ, const QString elA);
-	QVariant storeObj(const GeoShape* pointer, const QString type, const QString parameters);
+  QVariant storeObj(const GeoShape* pointer, const std::string type, const std::string parameters);
 	QVariant storeObj(const GeoLogVol* pointer, const QString name, const QVariant shapeId, const QVariant materialId);
 	QVariant storeObj(const GeoPhysVol* pointer, const QVariant logvolId, const QVariant parentId = QVariant(), bool isRootVolume = false );
 	QVariant storeObj(const GeoFullPhysVol* pointer, const QVariant logvolId, const QVariant parentId = QVariant(), bool isRootVolume = false );
@@ -97,7 +101,9 @@ private:
 	QVariant storeObj(const GeoAlignableTransform* pointer, const std::vector<double> parameters);
 	QVariant storeObj(const GeoNameTag* pointer, const QString name);
 
-	unsigned int addRecord(std::vector<QStringList>* container, const QStringList values) const;
+  unsigned int addRecord(std::vector<QStringList>* container, const QStringList values) const;
+  unsigned int addRecord(std::vector<std::vector<std::string>>* container, const std::vector<std::string> values) const;
+  
 	QVariant addMaterial(const QString name, const QString density, const QString elements);
 	QVariant addElement(const QString name, const QString symbol, const QString elZ, const QString elA);
 	QVariant addNameTag(const QString name);
@@ -105,7 +111,7 @@ private:
 	QVariant addTransform(const std::vector<double> params);
 	QVariant addFunction(const QString expression);
 	QVariant addSerialTransformer(const QVariant &funcId, const QVariant &physvolId, const QString volType, const unsigned int &copies);
-	QVariant addShape(const QString &type, const QString &parameters);
+  QVariant addShape(const std::string &type, const std::string &parameters);
 	QVariant addSerialDenominator(const QString &baseName);
 	QVariant addPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);
 	QVariant addFullPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);
@@ -139,7 +145,7 @@ private:
 	QString getQStringFromOss(std::ostringstream &oss);
 
 	std::vector<double> getTransformParameters(GeoTrf::Transform3D); // TODO: to be moved to Eigen (GeoTrf) and to be moved to an Utility class, so we can use it from TransFunctionRecorder as well.
-	QString getShapeParameters(const GeoShape*);
+  std::string getShapeParameters(const GeoShape*);
 
 	QString getGeoTypeFromVPhysVol(const GeoVPhysVol* vol);
 
@@ -163,7 +169,7 @@ private:
 	std::vector<QStringList> m_logVols;
 	std::vector<QStringList> m_physVols;
 	std::vector<QStringList> m_fullPhysVols;
-	std::vector<QStringList> m_shapes;
+//  std::vector<QStringList> m_shapes;
 	std::vector<QStringList> m_materials;
 	std::vector<QStringList> m_elements;
 	std::vector<QStringList> m_transforms;
@@ -172,11 +178,15 @@ private:
 	std::vector<QStringList> m_serialTransformers;
 	std::vector<QStringList> m_functions;
 	std::vector<QStringList> m_nameTags;
-
 	std::vector<QStringList> m_childrenPositions;
-	QStringList m_rootVolume;
+  
+  std::vector<std::vector<std::string>> m_shapes;
+	
+  QStringList m_rootVolume;
+  
 
-	QStringList m_objectsNotPersistified;
+//  QStringList m_objectsNotPersistified;
+  std::vector<std::string> m_objectsNotPersistified;
 
 };
 

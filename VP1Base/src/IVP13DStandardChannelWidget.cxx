@@ -256,17 +256,6 @@ void IVP13DStandardChannelWidget::create() {
     sys->registerViewer(m_d->viewer);
 
 
-  /* We want to change the default value for the "As shown" option
-   * At the beginning the option was set to True by default, but
-   * the most used setting when creating event displays for ATLAS is
-   * False, because we want to save the full image as a snapshot,
-   * without the frame and buttons from VP1.
-   * So we now set it to False by default.
-   * (We do that with setChecked() in order to not having to change
-   * the whole logics behind.
-   */
-  m_d->uisnapshot.checkBox_as_shown->setChecked(false); // fixme: check if that works, or if it's still TRUE
-
 }
 
 //___________________________________________________________________________

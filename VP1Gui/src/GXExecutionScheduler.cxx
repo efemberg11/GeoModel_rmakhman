@@ -334,31 +334,6 @@ GXExecutionScheduler::~GXExecutionScheduler()
 //___________________________________________________________________
 GXExecutionScheduler* GXExecutionScheduler::init()
 {
-	//First we make sure the DISPLAY variable is set (importing ROOT in
-	//athena.py might cause it to be unset!).
-	//
-	//NB: The following might only be relevant in X11 build:
-	if (VP1QtUtils::environmentVariableValue("DISPLAY").isEmpty()) {
-		const bool unset(!VP1QtUtils::environmentVariableIsSet("DISPLAY"));
-		QString alternative = VP1QtUtils::environmentVariableValue("DISPLAY_ORIG");
-		if (alternative.isEmpty()) {
-			VP1Msg::message("ERROR: The DISPLAY environment variable is "+QString(unset?"not set":"empty")+".");
-			VP1Msg::message("This is likely due to perfmon being turned on (cf. https://savannah.cern.ch/bugs/?35461 ).");
-			VP1Msg::message("You can work around this problem by either disabling perfmon, or by setting "
-					"the DISPLAY_ORIG environment variable to the contents of DISPLAY before launching your job.");
-			VP1Msg::message("E.g., in bash do:");
-			VP1Msg::message("  export DISPLAY_ORIG=$DISPLAY");
-			VP1Msg::message("");
-			VP1Msg::message("For the current job, I will try with DISPLAY=\":0.0\", which is the correct value when running locally.");
-			alternative=":0.0";
-		} else {
-			VP1Msg::message("WARNING: The DISPLAY environment variable is "+QString(unset?"not set":"empty")+". Setting to value found in DISPLAY_ORIG");
-		}
-		VP1Msg::message("WARNING: Setting DISPLAY variable to '"+alternative+"'");
-		VP1QtUtils::setEnvironmentVariable("DISPLAY",alternative);
-	}
-
-
 
     QCoreApplication::setOrganizationName("ATLAS");
 	#if defined BUILDVP1LIGHT

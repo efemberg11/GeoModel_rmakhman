@@ -22,6 +22,8 @@
 #include <QPainter>
 #include <QBuffer>
 #include <QByteArray>
+#include <QScreen>
+#include <QApplication>
 
 #include <Inventor/C/errors/debugerror.h>
 #include "Inventor/Qt/SoQtRenderArea.h"
@@ -130,50 +132,17 @@ void IVP13DChannelWidget::goingToNextEvent()
 //_______________________________________________________
 QPixmap IVP13DChannelWidget::getSnapshot(bool transp, int width, bool /*batch*/)
 {
-	VP1Msg::messageVerbose("IVP13DChannelWidget::getSnapshot()");
-
-    // TODO: check if transp and width can be used in this implementation of the method
-	VP1Msg::messageVerbose("(currently, we are not using the values - transp: "+QString::number(transp)+" - width: "+QString::number(width)+")");
-
-	//Unfortunately, the renderer's areas does not render properly by a
-	//simple grabWidget. We remedy this the hard way...
-	//  m_d->it = m_d->renderareas.begin();
-	//  message("Have "+QString::number(m_d->renderareas.size())+" ras");
-	//  for (;m_d->it!=m_d->itE;++(m_d->it)) {
-	//    SoQtRenderArea* ra = *(m_d->it);
-	//    if (ra->isDoubleBuffer()) message("doublebuffer");
-	//    if (ra->isDrawToFrontBufferEnable()) message("isDrawToFrontBufferEnable");
-	//    if (ra->isQuadBufferStereo()) message("isQuadBufferStereo");
-	//    if (ra->getAccumulationBuffer()) message("getAccumulationBuffer");
-	//    if (ra->isOverlayRender()) message("isOverlayRender");
-	//    if (ra->isClearBeforeRender()) message("isClearBeforeRender");
-	//    ra->render();
-	//  }
-	//  return QPixmap::grabWidget ( this );
-
-	QPixmap pm(geometry().size());
-
-	QPainter painter;
-	painter.begin(&pm);
-	painter.drawPixmap(0,0,QPixmap::grabWidget ( this ));
 
 	m_d->it = m_d->renderareas.begin();
-	for (;m_d->it!=m_d->itE;++(m_d->it)) {
-		VP1ExaminerViewer* ra = *(m_d->it);
-		QWidget * ra_w = ra->getNormalWidget();
-		QPixmap pmra = VP1QtInventorUtils::renderToPixmap(ra, ra_w->geometry().width(),ra_w->geometry().height());
-		if (pmra.isNull()) {
-			message("Error rendering scene to QPixmap!");
-			return QPixmap();
-		}
-		QPoint pos = ra_w->mapTo( this, QPoint(0,0) );
+	VP1ExaminerViewer* ra = *(m_d->it);
+	QWidget * ra_w = ra->getNormalWidget();
 
-		painter.drawPixmap(pos.x(),pos.y(),pmra);
-
-	}
-	painter.end();
-
-	return pm;
+        QPoint  point=ra_w->mapToGlobal(ra_w->pos());
+	QPixmap p= qApp->screens().at(0)->grabWindow( winId(),
+						      point.x(),point.y(),
+						      ra_w->width(), ra_w->height());
+        return p;
+	
 }
 
 //_______________________________________________________

@@ -57,7 +57,6 @@
 #include <QScrollBar>
 
 
-
 /* FIXME: LCG does not ship QWebEngine with Qt5 at the moment,
  * but later you want to put it back again!
  */
@@ -1009,22 +1008,36 @@ QString GXMainWindow::request_saveChannelSnapshot(QString xLabel)
 	if (!xLabel.isEmpty()) {
 		guess += "_" + xLabel;
 	}
-
-
-	QString filename = QFileDialog::getSaveFileName(0, "Select target image file", guess,
-			"Image (*.png *.bmp)",
-			0,QFileDialog::DontResolveSymlinks);
+        QString filename;
+	{
+	  QFileDialog fileDialog(this);
+	  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+	  fileDialog.setNameFilter("Image (*.png *.bmp)");
+	  fileDialog.selectFile(guess);
+	  
+	  if (fileDialog.exec()) {
+	    filename=fileDialog.selectedFiles()[0];
+	  }
+	  else {
+	    return QString();
+	  }
+	  raise();
+	  qApp->sync();
+	}
+	//	QString filename = QFileDialog::getSaveFileName(0, "Select target image file", guess,
+	//			"Image (*.png *.bmp)",
+	//			0,QFileDialog::DontResolveSymlinks);
 	if(filename.isEmpty())
-		return QString();
-
+	  return QString();
+	
 	m_currentsaveimagepath = QFileInfo(filename).dir().absolutePath ();
 
 	if (!(filename.endsWith(".png",Qt::CaseInsensitive)||filename.endsWith(".bmp",Qt::CaseInsensitive)))
 		filename += ".png";
-
+	
 	VP1Msg::messageVerbose("calling snapshot");
 	QPixmap pm = m_tabmanager->selectedChannelWidget()->getSnapshot();
-
+	
 	if (pm.isNull())
 		return QString();
 

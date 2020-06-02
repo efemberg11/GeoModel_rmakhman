@@ -1010,7 +1010,7 @@ QString GXMainWindow::request_saveChannelSnapshot(QString xLabel)
 	}
         QString filename;
 	{
-	  QFileDialog fileDialog(this);
+	  QFileDialog fileDialog(0);
 	  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
 	  fileDialog.setNameFilter("Image (*.png *.bmp)");
 	  fileDialog.selectFile(guess);

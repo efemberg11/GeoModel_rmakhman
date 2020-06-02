@@ -31,6 +31,7 @@
 #include "Inventor/nodes/SoNode.h"
 #include <Inventor/actions/SoLineHighlightRenderAction.h>
 #include <iostream>
+#include <unistd.h>
 
 class IVP13DChannelWidget::Imp {
 public:
@@ -133,14 +134,29 @@ void IVP13DChannelWidget::goingToNextEvent()
 QPixmap IVP13DChannelWidget::getSnapshot(bool transp, int width, bool /*batch*/)
 {
 
-	m_d->it = m_d->renderareas.begin();
+
+	
+	QScreen *screen=qApp->primaryScreen();
+	
+        m_d->it = m_d->renderareas.begin();
 	VP1ExaminerViewer* ra = *(m_d->it);
+	bool isDecoration = ra->isDecoration();
+	ra->setDecoration(false);
+
 	QWidget * ra_w = ra->getNormalWidget();
 
-        QPoint  point=ra_w->mapToGlobal(ra_w->pos());
-	QPixmap p= qApp->screens().at(0)->grabWindow( winId(),
-						      point.x(),point.y(),
-						      ra_w->width(), ra_w->height());
+
+#ifdef __APPLE__
+	QPoint  point=ra_w->mapToGlobal(ra_w->pos());
+#else
+	QPoint  point=ra_w->pos();
+#endif
+	qApp->sync();
+	sleep(1);
+	QPixmap p= screen->grabWindow( winId(),point.x(),point.y(), ra_w->width(), ra_w->height());
+
+	ra->setDecoration(isDecoration);
+	
         return p;
 	
 }

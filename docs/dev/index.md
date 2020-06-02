@@ -22,6 +22,23 @@ brew install qt5
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 ```
 
+Also, before building the GeoModel libraries from source, as explained here below, please check if you have old versions of them installed on your system and remove them.
+
+You can check if you have GeoModel libraries which had installed with Homebrew by typing:
+
+```
+brew list
+```
+
+Then, you can remove the old GeoModel packages with, for example:
+
+```
+brew remove geomodelcore
+```
+
+Please remove **all** the `geomodel`- packages before trying to build the packages from source.
+
+
 ### Linux/Ubuntu
 
 ```bash
@@ -134,7 +151,7 @@ Assuming you followed the above instructions and you used `../install` as the in
 
 ```bash
 # After compilation, you should apply two temporary fixes:
-install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # This is a temporary fix. NOTE: in case you are developing gmex code, this should be run every time you compile and install a new version of gmex. 
+install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # This is a temporary fix. NOTE: in case you are developing gmex code, this should be run every time you compile and install a new version of gmex.
 export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 ```
 

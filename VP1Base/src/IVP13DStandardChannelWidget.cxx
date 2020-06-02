@@ -255,7 +255,7 @@ void IVP13DStandardChannelWidget::create() {
   foreach(IVP13DSystem*sys,m_d->systemsAllowedCameraList)
     sys->registerViewer(m_d->viewer);
 
-
+  snapshotgroupbox->hide();
 }
 
 //___________________________________________________________________________

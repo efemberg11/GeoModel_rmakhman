@@ -249,6 +249,15 @@ GXMainWindow::GXMainWindow(GXExecutionScheduler*sched,QWidget * parent)
   #ifndef BUILDVP1LIGHT
   	menubar->setEnabled(false);
   #endif
+	
+  // JFB DISABLES:
+  pushButton_makeEventDisplay->hide();
+  pushButton_3D->hide();
+  pushButton_saveAllChannels->hide();
+  menuConfiguration->hide();
+  menuConfiguration->setVisible(false);
+  menuConfiguration->setEnabled(false);
+  menuConfiguration->setTitle("");
 }
 
 //_________________________________________________________________________________

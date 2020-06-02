@@ -18,28 +18,36 @@
 // C++ includes
 #include <iostream>
 #include <cstdlib>
+#define STR_VALUE(arg) #arg
+#define STR_NAME(name) STR_VALUE(name)
 
 int main(int argc, char** argv)
 {
-   auto pManip= [] (const char * variable, const char *plus) {
-     const char *path=getenv(variable);
-     if (path) {
-       std::string newPath=std::string(path)+":"+plus;
-       setenv(variable, newPath.c_str(), true);
-     }
-     else {
-       setenv(variable, plus, true);
-     }
-   };
-   
-   // JFB Put some defaults. This depends upon architecture. The list should
-   // be expanded to include other architectures and/or passed in through the
-   // compiler. 
-   
-#ifdef __APPLE__
-   pManip("GXPLUGINPATH","/usr/local/lib/gxplugins");
+  auto pManip= [] (const char * variable, const char *plus) {
+		 const char *path=getenv(variable);
+		 if (path) {
+		   std::string newPath=std::string(path)+":"+plus;
+		   setenv(variable, newPath.c_str(), true);
+		 }
+		 else {
+		   setenv(variable, plus, true);
+		 }
+	       };
+  // Preprocessor:  we are passing the install directory to this
+  // class. Drivers will be loaded from this install directory.
+  // However in some cases "linux" is part of the install directory
+  // name and that may be defined in a macro to be 1. So if that is
+  // the case we temporarily undef it. 
+#ifdef linux
+#define waslinux linux
+#undef linux
+  const char * standardPlaces = STR_NAME( INSTALL_PREFIX );
+#define linux waslinux
+#else 
+  const char * standardPlaces = STR_NAME( INSTALL_PREFIX );
 #endif
-
+  std::string gxpluginpath= std::string(standardPlaces)+"/lib/gxplugins"; 
+  pManip("GXPLUGINPATH",gxpluginpath.c_str());
   QStringList arguments;
   for (int i = 0; i<=argc; i++){
     arguments << argv[i];

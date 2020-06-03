@@ -417,7 +417,7 @@ bool GMDBManager::addListOfRecords(const std::string geoType, const std::vector<
     //return addListOfRecordsToTableOld(tableName, records); // old SQLite versions
   }
   else
-  std::cout << "Info: no records to save for geoType '" << geoType << "'. Skipping...";
+  std::cout << "Info: no records to save for geoType '" << geoType << "'. Skipping..." << std::endl;
   return true;
 }
 
@@ -484,12 +484,15 @@ bool GMDBManager::addListOfRecords(const std::string geoType, const std::vector<
 // queryStr = QString("INSERT INTO Materials (id, name) VALUES  (1,'Air'), (2,'Silicon'), (368,'ShieldSteel');");
 //
 bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records)
+//bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records)
 {
   // get table columns and format them for query
   QString tableColString = "(" + QString::fromStdString(joinVectorStrings(m_tableNames.at(tableName), ", ")) + ")";
   
+  qWarning() << "tableColString:" << tableColString;
+  
   unsigned int nRecords = records.size();
-  std::cout << "number of " << tableName << "records to insert into the DB:" << nRecords;
+  std::cout << "number of " << tableName << " records to insert into the DB:" << nRecords << std::endl;
   
   // preparing the SQL query
   QString queryStr("INSERT INTO %1 %2 VALUES ");
@@ -530,6 +533,23 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
   return true;
 }
 
+
+//bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records)
+//{
+//  // get table columns and format them for query
+//  std::string tableColString = "(" + joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
+//  
+//  std::cout << "tableColString:" << tableColString << std::endl;
+//  
+//  unsigned int nRecords = records.size();
+//  std::cout << "number of " << tableName << " records to insert into the DB:" << nRecords << std::endl;
+//  
+//  // preparing the SQL query
+//  QString queryStr("INSERT INTO %1 %2 VALUES ");
+//  queryStr = queryStr.arg(QString::fromStdString(tableName)); // insert table name
+//  queryStr = queryStr.arg(tableColString); // insert table columns
+//  
+//}
 
 
 // ***Note***

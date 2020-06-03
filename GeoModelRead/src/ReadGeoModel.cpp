@@ -200,11 +200,11 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
   
 	// get the root volume data
 //  m_root_vol_data = m_dbManager->getRootPhysVol();
-  m_root_vol_data = m_dbManager->getRootPhysVolStd();
+  m_root_vol_data = m_dbManager->getRootPhysVol();
 
   // get DB metadata
-  m_tableID_toTableName = m_dbManager->getAll_TableIDsNodeTypesStd();
-  m_tableName_toTableID = m_dbManager->getAll_NodeTypesTableIDsStd();
+  m_tableID_toTableName = m_dbManager->getAll_TableIDsNodeTypes();
+  m_tableName_toTableID = m_dbManager->getAll_NodeTypesTableIDs();
 
 
   // *** build all nodes ***

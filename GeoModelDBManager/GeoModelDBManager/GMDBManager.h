@@ -14,6 +14,9 @@
 #include <QString>
 #include <QMap>
 
+#include <sqlite3.h>
+
+
 // include C++
 #include <iostream>
 #include <unordered_map>
@@ -134,6 +137,7 @@ public:
 	void printDBVersion() const;
 
 	// ADD methods
+  /* single-item adders are not efficient, so they are not used at the moment. We might want to enable them again later if we'll have specific use-cases.
 	QVariant addShape(const QString &type, const QString &parameters);
 	QVariant addMaterial(const QString &name, const QString &density, const QString &elements);
 	QVariant addElement(const QString &name, const QString &symbol, const QString &elZ, const QString &elA);
@@ -146,12 +150,12 @@ public:
 	QVariant addTransform(QVector<double> parameters);
 	QVariant addAlignableTransform(QVector<double> parameters);
 	QVariant addNameTag(const QString &name);
+   */
 
-
-	bool addListOfRecords(const QString geoType, const std::vector<QStringList> records);
+//  bool addListOfRecords(const QString geoType, const std::vector<QStringList> records);
   bool addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records);
   
-	bool addListOfRecordsToTable(const QString tableName, const std::vector<QStringList> records);
+//  bool addListOfRecordsToTable(const QString tableName, const std::vector<QStringList> records);
   bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
   
 //  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
@@ -184,27 +188,23 @@ public:
 	QHash<QString, QMap<unsigned int, QStringList>> getChildrenTable();
   std::vector<std::vector<std::string>> getChildrenTableStd();
 
-	QHash<unsigned int, QStringList> getTableFromNodeType(QString nodeType);
-  std::vector<std::vector<std::string>> getTableFromNodeTypeStd(std::string nodeType);
+//  QHash<unsigned int, QStringList> getTableFromNodeType(QString nodeType);
+  std::vector<std::vector<std::string>> getTableFromNodeType(std::string nodeType);
   
-//  QHash<unsigned int, QString> getAll_TableIDsNodeTypes();
-//  QHash<QString, unsigned int> getAll_NodeTypesTableIDs();
   std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
   std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDs();
   
-
 
 private:
 
 	bool initDB();
 	bool createTables();
 
-	void loadTestData(); // for debug only
+//  void loadTestData(); // for debug only
 
 	void loadTableNamesFromDB();
   std::vector<std::string> getTableColNamesFromDB(std::string tableName) const;
 
-//  QString getTableNameFromTableId(unsigned int tabId);
   std::string getTableNameFromTableId(unsigned int tabId);
   
   unsigned int getTableIdFromNodeType(const std::string &nodeType);
@@ -213,13 +213,9 @@ private:
   QString getTableNameFromNodeType(QString nodeType); // TODO: to be removed
   std::string getTableNameFromNodeType(std::string nodeType);
 
-  
-//  QSqlQuery selectAllFromTable(QString tableName) const;
   QSqlQuery selectAllFromTable(std::string tableName) const;
   QSqlQuery selectAllFromTableSortBy(std::string tableName, std::string sortColumn="") const;
 
-
-//  void storeTableColumnNames(QStringList input);
   void storeTableColumnNames(std::vector<std::string> input);
   
   std::vector<std::string> getTableColumnNames(const std::string &tableName);
@@ -234,13 +230,16 @@ private:
 	void showError(const QSqlError &err) const;
 
   std::string m_dbpath;
-	QSqlDatabase m_db;
+	
+  QSqlDatabase m_db;
+  /// Pointer to SQLite connection
+//  sqlite3* m_db;
+  
+  
 	bool m_dbIsOK;
 
 	bool m_deepDebug;
 
-//  QMap<QString, QStringList> m_tableNames;
-//  QMap<QString, QString> m_childType_tableName;
   std::unordered_map<std::string, std::vector<std::string>> m_tableNames; /// stores the column names for each table
   std::unordered_map<std::string, std::string> m_childType_tableName;
 };

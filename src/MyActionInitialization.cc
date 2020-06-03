@@ -16,6 +16,8 @@
 #include "G4MultiSteppingAction.hh"
 
 
+//const G4AnalysisManager* MyActionInitialization::fMasterAnalysisManager = nullptr;
+
 MyActionInitialization::MyActionInitialization(bool isperformance, bool createGeantinoMaps)
 : G4VUserActionInitialization(), fIsPerformance(isperformance), fCreateGeantinoMaps(createGeantinoMaps) {}
 
@@ -27,6 +29,11 @@ void MyActionInitialization::BuildForMaster() const {
     MyRunAction* masterRunAct = new MyRunAction();
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     SetUserAction(masterRunAct);
+    
+//    std::cout<<"MyActionInitialization::BuildForMaster(): taking the Master G4AnalysisManager::Instance"<<std::endl;
+//    fMasterAnalysisManager = G4AnalysisManager::Instance();
+//    std::cout<<"fMasterAnalysisManager: "<<fMasterAnalysisManager<<std::endl;
+    //exit(-1);
 }
 
 
@@ -43,7 +50,8 @@ void MyActionInitialization::Build() const {
 #endif
   // do not create Run,Event,Stepping and Tracking actions in case of perfomance mode
   if (!fIsPerformance) {
-      SetUserAction(new MyRunAction());
+      MyRunAction* runact = new MyRunAction();
+      SetUserAction(runact);
       
       if(!fCreateGeantinoMaps){
           std::cout<<"fCreateGeantinoMaps is FALSE"<<std::endl;
@@ -57,10 +65,12 @@ void MyActionInitialization::Build() const {
       {
           
           std::cout<<"fCreateGeantinoMaps is TRUE, will create geantino Maps"<<std::endl;
-          G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction();
-          G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct);
+          G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction(runact);
+          std::cout<<"myLenghtIntSteppingAct getting runact with runact:  "<<runact->fMasterAnalysisManager<<std::endl;
+          G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct, runact);
           SetUserAction(myLenghtIntEventAct);
           SetUserAction(myLenghtIntSteppingAct);
+          
       }
     
       //MultiEventActions?? TO DO?

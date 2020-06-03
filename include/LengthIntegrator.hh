@@ -67,12 +67,17 @@ namespace G4UA
       // Add elements and values into the map
       void addToDetThickMap(std::string, double, double);
 
-      /// Setup one set of measurement hists for a detector name.
+      /// Setup one set of measurement hists for a detector name - ROOT
       void regAndFillHist(const std::string&, const std::pair<double, double>&);
+      
+      /// Setup one set of measurement hists for a detector name - G4
+      void regAndFillHist_g4(const std::string&, const std::pair<double, double>&);
 
       /// this method checks if a histo is on THsvc already and caches a local pointer to it
       /// if the histo is not present, it creates and registers it
       TProfile2D* getOrCreateProfile(std::string regName, TString histoname, TString xtitle, int nbinsx, float xmin, float xmax,TString ytitle, int nbinsy,float ymin, float ymax,TString ztitle);
+      
+      G4int getOrCreateProfile_g4(G4String regName, G4String histoname, G4String xtitle, int nbinsx, float xmin, float xmax,G4String ytitle, int nbinsy,float ymin, float ymax,G4String ztitle);
 
       /// Handle to the histogram service
       //ServiceHandle<ITHistSvc> m_hSvc;
@@ -85,26 +90,48 @@ namespace G4UA
       /// Map of detector thickness measurements for current event
       std::map<std::string, std::pair<double, double> > m_detThickMap;
 
-      /// Rad-length profile hist in R-Z
+      /// Rad-length profile hist in R-Z - ROOT
       TProfile2D* m_rzProfRL;
-      /// Rad-length profile hist in eta
+      /// Rad-length profile hist in eta - ROOT
       std::map<std::string, TProfile*> m_etaMapRL;
-      /// Rad-length profile hist in phi
+      /// Rad-length profile hist in phi - ROOT
       std::map<std::string, TProfile*> m_phiMapRL;
 
-      /// Int-length profile hist in R-Z
+      /// Rad-length profile hist in R-Z - Geant4
+      G4int m_rzProfRL_id;
+      /// Rad-length profile hist in eta - Geant4
+      std::map<std::string, G4int> m_etaMapRL_g4;
+      /// Rad-length profile hist in phi - Geant4
+      std::map<std::string, G4int> m_phiMapRL_g4;
+      
+      
+      /// Int-length profile hist in R-Z - ROOT
       TProfile2D* m_rzProfIL;
-      /// Int-length profile hist in eta
+      /// Int-length profile hist in eta - ROOT
       std::map<std::string, TProfile*> m_etaMapIL;
-      /// Int-length profile hist in phi
+      /// Int-length profile hist in phi - ROOT
       std::map<std::string, TProfile*> m_phiMapIL;
+      
+      /// Int-length profile hist in R-Z - Geant4
+      G4int m_rzProfIL_id;
+      /// Int-length profile hist in eta - Geant4
+      std::map<std::string, G4int> m_etaMapIL_g4;
+      /// Int-length profile hist in phi - Geant4
+      std::map<std::string, G4int> m_phiMapIL_g4;
 
-      // 2D plots of rad-length and int-length
+      // 2D plots of rad-length and int-length - ROOT
       std::map<std::string,TProfile2D*,std::less<std::string> > m_rzMapRL;
       std::map<std::string,TProfile2D*,std::less<std::string> > m_xyMapRL;
 
       std::map<std::string,TProfile2D*,std::less<std::string> > m_rzMapIL;
       std::map<std::string,TProfile2D*,std::less<std::string> > m_xyMapIL;
+      
+      // 2D plots of rad-length and int-length - Geant4
+      std::map<std::string,G4int,std::less<std::string> > m_rzMapRL_g4;
+      std::map<std::string,G4int,std::less<std::string> > m_xyMapRL_g4;
+      
+      std::map<std::string,G4int,std::less<std::string> > m_rzMapIL_g4;
+      std::map<std::string,G4int,std::less<std::string> > m_xyMapIL_g4;
 
   }; // class LengthIntegrator
 

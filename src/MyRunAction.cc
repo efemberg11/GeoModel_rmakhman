@@ -1,4 +1,3 @@
-
 #include "MyRunAction.hh"
 
 #ifdef G4MULTITHREADED
@@ -17,11 +16,18 @@
 #include "G4Region.hh"
 #include "G4RegionStore.hh"
 
-MyRunAction::MyRunAction() : G4UserRunAction(), fIsPerformance(false), fRun(nullptr), fTimer(nullptr) {}
+G4AnalysisManager* MyRunAction::fMasterAnalysisManager = nullptr;
 
+MyRunAction::MyRunAction() : G4UserRunAction(), fIsPerformance(false), fRun(nullptr), fTimer(nullptr) {
+    
+}
 
-MyRunAction::~MyRunAction() {}
-
+MyRunAction::~MyRunAction() {
+    if (isMaster) {
+        G4cout<<"\n\n **************** \nMyRunAction: DELETING G4AnalysisManager " << G4endl;
+        delete G4AnalysisManager::Instance();
+    }
+}
 
 G4Run* MyRunAction::GenerateRun() {
   // don't Generate our Run in perfomance mode but return with nullptr:
@@ -35,7 +41,45 @@ G4Run* MyRunAction::GenerateRun() {
 
 
 void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/) {
-  if (isMaster) {
+    
+    // Create analysis manager
+    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+    if (isMaster) {
+        fMasterAnalysisManager = analysisManager;
+        G4cout<<"MyRunAction::BeginOfRunAction, created MASTER istance of the G4AnalysisManager: "<<fMasterAnalysisManager<<G4endl;
+        
+    } else
+        
+        G4cout<<"MyRunAction::BeginOfRunAction, created WORKER istance of the G4AnalysisManager: "<<analysisManager<<G4endl;
+    
+    G4cout << "Using G4AnalysisManager type: " << analysisManager->GetType() << G4endl;
+    analysisManager->SetVerboseLevel(1);
+    
+    // Open output root file
+    std::string fileName_g4 = "RZRadLen_g4_RunAction.root";
+    G4cout<<"\n\n ****************\n\nMyRunAction::BeginOfRunAction, create root file with the G4AnalysisManager " << G4endl;
+    if (!analysisManager->OpenFile(fileName_g4)){
+        G4cout<<"\nMyRunAction::BeginOfRunAction ERROR: File cannot be opened!"<<G4endl;
+        exit(-1);
+    } else G4cout<<"\nMyRunAction::BeginOfRunAction FILE opened!"<<G4endl;
+    
+    const char* radName = "RZRadLen";
+    
+    if(analysisManager->GetP2Id(radName, false) < 0){
+        fRadName_id = analysisManager->CreateP2(radName,radName,1000,-25000.,25000.,2000,0.,15000.);
+        G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZRadLen 2DProfile with name: "<<radName<< " and  with id: "<<fRadName_id<<G4endl;
+        
+    }
+    const char* intName = "RZIntLen";
+    if(analysisManager->GetP2Id(intName, false)< 0)
+    {
+        fIntName_id = analysisManager->CreateP2(intName,intName,1000,-25000.,25000.,2000,0.,15000.);
+        G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZIntLen 2DProfile with name: "<<intName<< " and with id: "<<fIntName_id<<G4endl;
+    }
+    if (isMaster) {
+      
+      G4cout<<"\nBeginOfRunAction isMaster, and fMasterAnalysisManager: "<<fMasterAnalysisManager<<G4endl;
+      
       std::vector<G4Region*>* regionVect =  G4RegionStore::GetInstance();
       int numRegions = regionVect->size();
       int sumNumMC = 0;
@@ -53,10 +97,10 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/) {
               }
       }
       for (int ir=0; ir<numRegions; ++ir) {
-          std::cout<< " ir = " << ir << "  region Name = " << (*regionVect)[ir]->GetName() <<" #mc = " << mcRVect[ir] << std::endl;
+          G4cout<< " ir = " << ir << "  region Name = " << (*regionVect)[ir]->GetName() <<" #mc = " << mcRVect[ir] << G4endl;
           sumNumMC += mcRVect[ir];
       }
-      std::cout<< " === Total number of MC = " << sumNumMC << " vs " << numMC << " #regions = " << numRegions << std::endl;
+      G4cout<< " === Total number of MC = " << sumNumMC << " vs " << numMC << " #regions = " << numRegions << G4endl;
       
       
 #ifdef G4MULTITHREADED
@@ -73,11 +117,23 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/) {
 #endif
     fTimer = new G4Timer();
     fTimer->Start();
-  }
+  } else G4cout<<"BeginOfRunAction isWorker, and fMasterAnalysisManager: "<<fMasterAnalysisManager<<G4endl;
 }
 
 
 void MyRunAction::EndOfRunAction(const G4Run*) {
+    
+    auto analysisManager= G4AnalysisManager::Instance();
+    //Finalize analysisManager and Write out file
+    if (analysisManager->IsOpenFile()){
+        G4cout<<"\n\n ****************\n\n EndOfRunAction, write root file with Geant4 " << G4endl;
+        G4cout<<"**************** Geant4 Write"<<G4endl;
+        analysisManager->Write();
+        G4cout<<"**************** Geant4 Close"<<G4endl;
+        analysisManager->CloseFile();
+        G4cout<<"Geant4: File successfully saved and closed! " << G4endl;
+    }
+
   if (isMaster) {
     fTimer->Stop();
     // get number of events: even in case of perfomance mode when MyRun-s are not generated in GenerateRun()
@@ -97,7 +153,7 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
     // print primary gun properties (not available at the begining of the run)
     MyPrimaryGeneratorAction::Print();
     if (!fIsPerformance) { // otherwise we do not even create any MyRun objects so fRun is nullptr
-      fRun->EndOfRun();
+        fRun->EndOfRun();
     }
   }
 }

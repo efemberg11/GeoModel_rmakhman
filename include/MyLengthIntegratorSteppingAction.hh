@@ -17,9 +17,13 @@
 #include <string>
 #include <map>
 
+//G4AnalysisManager
+#include "MyAnalysis.hh"
+
 // Forward declarations
 class TProfile;
 class TProfile2D;
+class MyRunAction;
 
 
 namespace G4UA
@@ -44,7 +48,7 @@ namespace G4UA
     public:
 
       /// Constructor takes the name of the histogram service as argument.
-      MyLengthIntegratorSteppingAction();
+      MyLengthIntegratorSteppingAction(MyRunAction* myrun);
       /// Destructor
       ~MyLengthIntegratorSteppingAction();
 
@@ -62,31 +66,41 @@ namespace G4UA
       /// this method checks if a histo is on THsvc already and caches a local pointer to it
       /// if the histo is not present, it creates and registers it
       TProfile2D* getOrCreateProfile(std::string regName, TString histoname, TString xtitle, int nbinsx, float xmin, float xmax,TString ytitle, int nbinsy,float ymin, float ymax,TString ztitle);
+      //Geant4 version
+      G4int getOrCreateProfile_g4(G4String regName, G4String histoname, G4String xtitle, int nbinsx, float xmin, float xmax,G4String ytitle, int nbinsy,float ymin, float ymax,G4String ztitle);
 
-      /// Handle to the histogram service
-      //ServiceHandle<ITHistSvc> m_hSvc;
-
-//      /// Cached eta of the current primary
-//      double m_etaPrimary;
-//      /// Cached phi of the current primary
-//      double m_phiPrimary;
 
   public:
       // TO DO: make it private again and add GetDetThickMap method
       /// Map of detector thickness measurements for current event
       std::map<std::string, std::pair<double, double> > m_detThickMap;
   private:
-      /// Rad-length profile hist in R-Z
+      /// Pointer to the MyRunAction, needed to create new Profiles
+      MyRunAction* m_run;
+      
+      /// Rad-length profile hist in R-Z - ROOT
       TProfile2D* m_rzProfRL;
-      /// Int-length profile hist in R-Z
+      /// Int-length profile hist in R-Z - ROOT
       TProfile2D* m_rzProfIL;
       
-      // 2D plots of rad-length and int-length
+      /// Rad-length profile hist in R-Z - Geant4
+      G4int m_rzProfRL_id;
+      /// Int-length profile hist in R-Z  - Geant4
+      G4int m_rzProfIL_id;
+      
+      // 2D plots of rad-length and int-length - ROOT
       std::map<std::string,TProfile2D*,std::less<std::string> > m_rzMapRL;
       std::map<std::string,TProfile2D*,std::less<std::string> > m_xyMapRL;
-
+      
       std::map<std::string,TProfile2D*,std::less<std::string> > m_rzMapIL;
       std::map<std::string,TProfile2D*,std::less<std::string> > m_xyMapIL;
+      
+      // 2D plots of rad-length and int-length - Geant4
+      std::map<std::string,G4int,std::less<std::string> > m_rzMapRL_g4;
+      std::map<std::string,G4int,std::less<std::string> > m_xyMapRL_g4;
+      
+      std::map<std::string,G4int,std::less<std::string> > m_rzMapIL_g4;
+      std::map<std::string,G4int,std::less<std::string> > m_xyMapIL_g4;
 
   }; // class MyLengthIntegratorSteppingAction
 

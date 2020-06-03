@@ -15,6 +15,7 @@
 #include "G4UserSteppingAction.hh"
 
 #include "MyLengthIntegratorSteppingAction.hh"
+#include "MyRunAction.hh"
 
 #include <string>
 #include <map>
@@ -46,7 +47,7 @@ namespace G4UA
     public:
 
       /// Constructor takes the name of the histogram service as argument.
-      MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction*);
+      MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction*, MyRunAction* run);
       /// Destructor
       ~MyLengthIntegratorEventAction();
 
@@ -56,30 +57,45 @@ namespace G4UA
 
       /// Called at end of G4 event to finalize measurements and fill hists
       virtual void EndOfEventAction(const G4Event*) override;
-
+      
+      /// Pointer to the RunAction
+      MyRunAction*  m_run;
 
     private:
       /// Pointer to MyLengthIntegratorSteppingAction
       MyLengthIntegratorSteppingAction* m_stepAct;
       
-      /// Setup one set of measurement hists for a detector name.
+      /// Setup one set of measurement hists for a detector name - ROOT
       void regAndFillHist(const std::string&, const std::pair<double, double>&);
+      
+      /// Setup one set of measurement hists for a detector name - G4
+      void regAndFillHist_g4(const std::string&, const std::pair<double, double>&);
 
       /// Cached eta of the current primary
       double m_etaPrimary;
       /// Cached phi of the current primary
       double m_phiPrimary;
 
-      /// Rad-length profile hist in eta
+      /// Rad-length profile hist in eta - ROOT
       std::map<std::string, TProfile*> m_etaMapRL;
-      /// Rad-length profile hist in phi
+      /// Rad-length profile hist in phi - ROOT
       std::map<std::string, TProfile*> m_phiMapRL;
+      
+      /// Rad-length profile hist in eta - Geant4
+      std::map<std::string, G4int> m_etaMapRL_g4;
+      /// Rad-length profile hist in phi - Geant4
+      std::map<std::string, G4int> m_phiMapRL_g4;
 
-      /// Int-length profile hist in eta
+      /// Int-length profile hist in eta - ROOT
       std::map<std::string, TProfile*> m_etaMapIL;
-      /// Int-length profile hist in phi
+      /// Int-length profile hist in phi - ROOT
       std::map<std::string, TProfile*> m_phiMapIL;
-
+      
+      /// Int-length profile hist in eta - Geant4
+      std::map<std::string, G4int> m_etaMapIL_g4;
+      /// Int-length profile hist in phi - Geant4
+      std::map<std::string, G4int> m_phiMapIL_g4;
+      
 
   }; // class MyLengthIntegratorEventAction
 

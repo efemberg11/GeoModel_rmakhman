@@ -3,6 +3,10 @@
 #define MyRunAction_h 1
 
 #include "G4UserRunAction.hh"
+#include "G4String.hh"
+
+//G4AnalysisMananager
+#include "MyAnalysis.hh"
 
 class MyRun;
 class G4Timer;
@@ -25,6 +29,13 @@ private:
   G4bool       fIsPerformance;
   MyRun*       fRun;
   G4Timer*     fTimer;
+
+    //TO DO: make private and add Get methods
+public:
+    
+    static G4AnalysisManager* fMasterAnalysisManager;
+    int fRadName_id;
+    int fIntName_id;
 };
 
 #endif

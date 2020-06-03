@@ -44,9 +44,18 @@
 namespace GeoModelIO {
 
   // TODO: should go to an utility class
+  // FIXME: should go to an utility class
   std::string joinVectorStrings(std::vector<std::string> vec, std::string sep="") {
     std::string s;
-    for (const auto &piece : vec) s += (piece + sep);
+    unsigned int ii = 0;
+    for (const auto &piece : vec) {
+      ++ii;
+      if (ii == vec.size()) {
+        s += (piece);
+      } else {
+        s += (piece + sep);
+      }
+    }
     return s;
   }
   

@@ -30,7 +30,15 @@ std::vector<std::string> toStdVectorStrings(QStringList qlist)
 // FIXME: should go to an utility class
 std::string joinVectorStrings(std::vector<std::string> vec, std::string sep="") {
   std::string s;
-  for (const auto &piece : vec) s += (piece + sep);
+  unsigned int ii = 0;
+  for (const auto &piece : vec) {
+    ++ii;
+    if (ii == vec.size()) {
+      s += (piece);
+    } else {
+      s += (piece + sep);
+    }
+  }
   return s;
 }
 
@@ -506,13 +514,15 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     //qDebug() << "rec:" << rec;
     
     ++id;
-    QStringList items;
+//    QStringList items;
+    std::vector<std::string> items;
     
     for ( const std::string& item : rec) {
-      items << '"' + QString::fromStdString(item) + '"';
+      items.push_back('"' + item + '"');
     }
-    QString values = items.join(",");
-    queryStr += " (" + QString::number(id) + "," + values + ")";
+//    QString values = items.join(",");
+    std::string values = joinVectorStrings(items, ",");
+    queryStr += " (" + QString::number(id) + "," + QString::fromStdString(values) + ")";
     if (id != nMat)
     queryStr += ",";
     else
@@ -538,17 +548,17 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
 //{
 //  // get table columns and format them for query
 //  std::string tableColString = "(" + joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
-//  
+//
 //  std::cout << "tableColString:" << tableColString << std::endl;
-//  
+//
 //  unsigned int nRecords = records.size();
 //  std::cout << "number of " << tableName << " records to insert into the DB:" << nRecords << std::endl;
-//  
+//
 //  // preparing the SQL query
 //  QString queryStr("INSERT INTO %1 %2 VALUES ");
 //  queryStr = queryStr.arg(QString::fromStdString(tableName)); // insert table name
 //  queryStr = queryStr.arg(tableColString); // insert table columns
-//  
+//
 //}
 
 

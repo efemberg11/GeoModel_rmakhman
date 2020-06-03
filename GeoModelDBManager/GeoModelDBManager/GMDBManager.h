@@ -37,7 +37,7 @@ public:
 	 * Constructor sets up connection with db and opens it
 	 * @param path - absolute path to db file
 	 */
-	GMDBManager(const QString& path);
+  GMDBManager(const std::string &path);
 
 	/**
 	 * @brief Destructor
@@ -142,7 +142,7 @@ public:
 	QVariant addFullPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);
 	QVariant addSerialDenominator(const QString &baseName);
 	QVariant addFunction(const QString expression);
-	QVariant addSerialTransformer(const QVariant &funcId, const QVariant &physvolId, const QString volType, const unsigned int &copies);
+  QVariant addSerialTransformer(const unsigned int &funcId, const unsigned int &physvolId, const std::string &volType, const unsigned int &copies);
 	QVariant addTransform(QVector<double> parameters);
 	QVariant addAlignableTransform(QVector<double> parameters);
 	QVariant addNameTag(const QString &name);
@@ -154,34 +154,31 @@ public:
 	bool addListOfRecordsToTable(const QString tableName, const std::vector<QStringList> records);
   bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
   
-	bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records);
-	bool addListOfChildrenPositions(const std::vector<QStringList> records);
+//  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
+  bool addListOfChildrenPositions(const std::vector<std::vector<std::string>> &records);
 
-	bool addRootVolume(const QStringList);
-	void addChildPosition(const QVariant parentId, const QString parentType, const QVariant childId, const unsigned int parentCopyNumber, const unsigned int childPos, const QString childType, const unsigned int childCopyN);
+	bool addRootVolume(const std::vector<std::string> &values);
+  void addChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &childId, const unsigned int &parentCopyNumber, const unsigned int &childPos, const std::string &childType, const unsigned int &childCopyN);
 
 	void addDBversion(const QString);
 
 	// GET methods
 
-	QString getDBFilePath();
+  std::string getDBFilePath();
 
-	QStringList getRootPhysVol();
-  std::vector<std::string> getRootPhysVolStd();
+  std::vector<std::string> getRootPhysVol();
 
-	QStringList getItem(QString geoType, unsigned int id);
-	QStringList getItem(unsigned int tableId, unsigned int id);
-	
-  QStringList getItemFromTableName(QString tableName, unsigned int id);
-  std::vector<std::string> getItemFromTableNameStd(QString tableName, unsigned int id);
+  std::vector<std::string> getItem(std::string geoType, unsigned int id);
+  std::vector<std::string> getItem(unsigned int tableId, unsigned int id);
   
-	QStringList getItemAndType(unsigned int tableId, unsigned int id);
-  std::vector<std::string> getItemAndTypeStd(unsigned int tableId, unsigned int id);
+	
+  std::vector<std::string> getItemFromTableName(std::string tableName, unsigned int id);
+  
+  std::vector<std::string> getItemAndType(unsigned int tableId, unsigned int id);
 
-	QString getNodeTypeFromTableId(unsigned int id);
-  std::string getNodeTypeFromTableIdStd(unsigned int id);
+  std::string getNodeTypeFromTableId(unsigned int id);
 
-	QMap<unsigned int, QStringList> getVPhysVolChildren(const unsigned int id, const QString nodeType, const unsigned int copyN);
+  QMap<unsigned int, QStringList> getVPhysVolChildren(const unsigned int &id, const std::string &nodeType, const unsigned int &copyN);
 
 	/// methods to dump the DB
 	QHash<QString, QMap<unsigned int, QStringList>> getChildrenTable();
@@ -190,10 +187,10 @@ public:
 	QHash<unsigned int, QStringList> getTableFromNodeType(QString nodeType);
   std::vector<std::vector<std::string>> getTableFromNodeTypeStd(std::string nodeType);
   
-	QHash<unsigned int, QString> getAll_TableIDsNodeTypes();
-	QHash<QString, unsigned int> getAll_NodeTypesTableIDs();
-  std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypesStd();
-  std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDsStd();
+//  QHash<unsigned int, QString> getAll_TableIDsNodeTypes();
+//  QHash<QString, unsigned int> getAll_NodeTypesTableIDs();
+  std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
+  std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDs();
   
 
 
@@ -205,34 +202,38 @@ private:
 	void loadTestData(); // for debug only
 
 	void loadTableNamesFromDB();
-	QStringList getTableColNamesFromDB(QString tableName) const;
+  std::vector<std::string> getTableColNamesFromDB(std::string tableName) const;
 
-	QString getTableNameFromTableId(unsigned int tabId);
-  std::string getTableNameFromTableIdStd(unsigned int tabId);
+//  QString getTableNameFromTableId(unsigned int tabId);
+  std::string getTableNameFromTableId(unsigned int tabId);
   
-	QVariant getTableIdFromNodeType(QString nodeType);
-	void storeNodeType(QString nodeType, QString tableName);
-	QString getTableNameFromNodeType(QString nodeType);
+  unsigned int getTableIdFromNodeType(const std::string &nodeType);
+  void storeNodeType(std::string nodeType, std::string tableName);
+	
+  QString getTableNameFromNodeType(QString nodeType); // TODO: to be removed
+  std::string getTableNameFromNodeType(std::string nodeType);
 
-	QSqlQuery selectAllFromTable(QString tableName) const;
-  QSqlQuery selectAllFromTableSortBy(QString tableName, std::string sortColumn="") const;
+  
+//  QSqlQuery selectAllFromTable(QString tableName) const;
+  QSqlQuery selectAllFromTable(std::string tableName) const;
+  QSqlQuery selectAllFromTableSortBy(std::string tableName, std::string sortColumn="") const;
 
 
 //  void storeTableColumnNames(QStringList input);
   void storeTableColumnNames(std::vector<std::string> input);
   
-	QStringList getTableColumnNames(QString tableName);
-	void printTableColNamesFromDB(QString tableName) const;
+  std::vector<std::string> getTableColumnNames(const std::string &tableName);
+  void printTableColNamesFromDB(const std::string &tableName) const;
 
-	void printAllRecords(QString tableName) const;
+  void printAllRecords(const std::string &tableName) const;
 
-	int getTableColIndex(QString tableName, QString colName);
+  int getTableColIndex(const std::string &tableName, const std::string &colName);
 
-	bool storeRootVolume(QVariant id, QString nodeType);
+  bool storeRootVolume(const unsigned int &id, const std::string &nodeType);
 
 	void showError(const QSqlError &err) const;
 
-  QString m_dbpath;
+  std::string m_dbpath;
 	QSqlDatabase m_db;
 	bool m_dbIsOK;
 

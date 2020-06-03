@@ -1,8 +1,10 @@
 /*
  * author: Riccardo.Maria.Bianchi@cern.ch, 2017
  *
- * major updates: Aug 2018 rbianchi
- *                Feb 2019 rbianchi
+ * major updates:
+ * - Aug 2018 - R.M.Bianchi
+ * - Feb 2019 - R.M.Bianchi
+ * - May 2020 - R.M.Bianchi
  */
 
 #ifndef GeoModelWrite_WriteGeoModel_H
@@ -22,16 +24,10 @@
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
-// Qt includes
-//#include <QSqlDatabase>
-#include <QStringList>
-#include <QVariant>
-#include <QString>
-#include <QMap>
-
 // C++ includes
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 
 namespace GeoModelIO {
@@ -81,83 +77,82 @@ private:
 
 	void showMemoryMap();
 
-	QStringList getParentNode();
+  std::vector<std::string> getParentNode();
 
-	QVariant storeShape(const GeoShape* shape);
-	QVariant storeMaterial(const GeoMaterial* mat);
-	QVariant storeElement(const GeoElement* el);
-	QVariant storeTranform(const GeoTransform* node);
+	unsigned int storeShape(const GeoShape* shape);
+	unsigned int storeMaterial(const GeoMaterial* mat);
+	unsigned int storeElement(const GeoElement* el);
+	unsigned int storeTranform(const GeoTransform* node);
 
-	QVariant storeObj(const GeoMaterial* pointer, const QString name, const QString density, const QString elements);
-	QVariant storeObj(const GeoElement* pointer, const QString name, const QString symbol, const QString elZ, const QString elA);
-  QVariant storeObj(const GeoShape* pointer, const std::string type, const std::string parameters);
-	QVariant storeObj(const GeoLogVol* pointer, const QString name, const QVariant shapeId, const QVariant materialId);
-	QVariant storeObj(const GeoPhysVol* pointer, const QVariant logvolId, const QVariant parentId = QVariant(), bool isRootVolume = false );
-	QVariant storeObj(const GeoFullPhysVol* pointer, const QVariant logvolId, const QVariant parentId = QVariant(), bool isRootVolume = false );
-	QVariant storeObj(const GeoSerialDenominator* pointer, const QString baseName);
-	QVariant storeObj(const GeoSerialTransformer* pointer, const QVariant functionId, const QVariant volId, const QString volType, const unsigned int copies);
-	QVariant storeObj(const GeoXF::Function* pointer, const QString expression);
-	QVariant storeObj(const GeoTransform* pointer, const std::vector<double> parameters);
-	QVariant storeObj(const GeoAlignableTransform* pointer, const std::vector<double> parameters);
-	QVariant storeObj(const GeoNameTag* pointer, const QString name);
+	unsigned int storeObj(const GeoMaterial* pointer, const std::string &name, const double &density, const std::string &elements);
+  unsigned int storeObj(const GeoElement* pointer, const std::string &name, const std::string &symbol, const double &elZ, const double &elA);
+  unsigned int storeObj(const GeoShape* pointer, const std::string &type, const std::string &parameters);
+  unsigned int storeObj(const GeoLogVol* pointer, const std::string &name, const unsigned int &shapeId, const unsigned int &materialId);
+	unsigned int storeObj(const GeoPhysVol* pointer, const unsigned int &logvolId, const unsigned int parentId = 0, const bool isRootVolume = false );
+	unsigned int storeObj(const GeoFullPhysVol* pointer, const unsigned int &logvolId, const unsigned int parentId = 0, const bool isRootVolume = false );
+  unsigned int storeObj(const GeoSerialDenominator* pointer, const std::string &baseName);
+  unsigned int storeObj(const GeoSerialTransformer* pointer, const unsigned int &functionId, const unsigned int &volId, const std::string &volType, const unsigned int &copies);
+  unsigned int storeObj(const GeoXF::Function* pointer, const std::string &expression);
+	unsigned int storeObj(const GeoTransform* pointer, const std::vector<double> &parameters);
+	unsigned int storeObj(const GeoAlignableTransform* pointer, const std::vector<double> &parameters);
+  unsigned int storeObj(const GeoNameTag* pointer, const std::string &name);
 
-  unsigned int addRecord(std::vector<QStringList>* container, const QStringList values) const;
   unsigned int addRecord(std::vector<std::vector<std::string>>* container, const std::vector<std::string> values) const;
   
-	QVariant addMaterial(const QString name, const QString density, const QString elements);
-	QVariant addElement(const QString name, const QString symbol, const QString elZ, const QString elA);
-	QVariant addNameTag(const QString name);
-	QVariant addAlignableTransform(const std::vector<double> params);
-	QVariant addTransform(const std::vector<double> params);
-	QVariant addFunction(const QString expression);
-	QVariant addSerialTransformer(const QVariant &funcId, const QVariant &physvolId, const QString volType, const unsigned int &copies);
-  QVariant addShape(const std::string &type, const std::string &parameters);
-	QVariant addSerialDenominator(const QString &baseName);
-	QVariant addPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);
-	QVariant addFullPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);
-	QVariant addLogVol(const QString &name, const QVariant &shapeId, const QVariant &materialId);
-	void addChildPosition(const QVariant parentId, const QString parentType, const QVariant childId, const unsigned int parentCopyNumber, const unsigned int childPos, const QString childType, const unsigned int childCopyN);
+  unsigned int addMaterial(const std::string &name, const double &density, const std::string &elements);
+  unsigned int addElement(const std::string &name, const std::string &symbol, const double &elZ, const double &elA);
+  unsigned int addNameTag(const std::string &name);
+	unsigned int addAlignableTransform(const std::vector<double> &params);
+	unsigned int addTransform(const std::vector<double> &params);
+  unsigned int addFunction(const std::string &expression);
+  unsigned int addSerialTransformer(const unsigned int &funcId, const unsigned int &physvolId, const std::string volType, const unsigned int &copies);
+  unsigned int addShape(const std::string &type, const std::string &parameters);
+  unsigned int addSerialDenominator(const std::string &baseName);
+	unsigned int addPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume);
+	unsigned int addFullPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume);
+  unsigned int addLogVol(const std::string &name, const unsigned int &shapeId, const unsigned int &materialId);
+  void addChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &childId, const unsigned int &parentCopyNumber, const unsigned int &childPos, const std::string &childType, const unsigned int &childCopyN);
 
-	unsigned int getChildPosition(QString parentId, QString parentType, unsigned int copyN);
+	unsigned int getChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &copyN);
 
-	unsigned int setVolumeCopyNumber(QString volId, QString volType);
-	unsigned int getLatestParentCopyNumber(QString parentId, QString parentType);
+  unsigned int setVolumeCopyNumber(const unsigned int& volId, const std::string& volType);
+  unsigned int getLatestParentCopyNumber(const unsigned int& parentId, const std::string& parentType);
 
-	void storeChildPosition(const QVariant parentId, const QString parentType, const QVariant childVol, const unsigned int parentCopyNumber, const unsigned int childPos, const QString childType, const unsigned int childCopyN);
+	void storeChildPosition(const unsigned int& parentId, const std::string& parentType, const unsigned int& childVol, const unsigned int& parentCopyNumber, const unsigned int& childPos, const std::string& childType, const unsigned int& childCopyN);
 
-	bool isAddressStored(const QString address);
-	void storeAddress(const QString address, QVariant id);
+	bool isAddressStored(const std::string &address);
+	void storeAddress(const std::string &address, const unsigned int &id);
 
-	QVariant getStoredIdFromAddress(QString address);
+  unsigned int getStoredIdFromAddress(const std::string &address);
 
-	QString getAddressStringFromPointer(const GeoMaterial* pointer);
-	QString getAddressStringFromPointer(const GeoElement* pointer);
-	QString getAddressStringFromPointer(const GeoShape* pointer);
-	QString getAddressStringFromPointer(const GeoLogVol* pointer);
-	QString getAddressStringFromPointer(const GeoPhysVol* pointer);
-	QString getAddressStringFromPointer(const GeoVPhysVol* pointer);
-	QString getAddressStringFromPointer(const GeoSerialDenominator* pointer);
-	QString getAddressStringFromPointer(const GeoSerialTransformer* pointer);
-	QString getAddressStringFromPointer(const GeoXF::Function* pointer);
-	QString getAddressStringFromPointer(const GeoTransform* pointer);
-	QString getAddressStringFromPointer(const GeoNameTag* pointer);
+	std::string getAddressStringFromPointer(const GeoMaterial* pointer);
+	std::string getAddressStringFromPointer(const GeoElement* pointer);
+	std::string getAddressStringFromPointer(const GeoShape* pointer);
+	std::string getAddressStringFromPointer(const GeoLogVol* pointer);
+	std::string getAddressStringFromPointer(const GeoPhysVol* pointer);
+	std::string getAddressStringFromPointer(const GeoVPhysVol* pointer);
+	std::string getAddressStringFromPointer(const GeoSerialDenominator* pointer);
+	std::string getAddressStringFromPointer(const GeoSerialTransformer* pointer);
+	std::string getAddressStringFromPointer(const GeoXF::Function* pointer);
+	std::string getAddressStringFromPointer(const GeoTransform* pointer);
+	std::string getAddressStringFromPointer(const GeoNameTag* pointer);
 
-	QString getQStringFromOss(std::ostringstream &oss);
+	std::string getQStringFromOss(std::ostringstream &oss);
 
 	std::vector<double> getTransformParameters(GeoTrf::Transform3D); // TODO: to be moved to Eigen (GeoTrf) and to be moved to an Utility class, so we can use it from TransFunctionRecorder as well.
   std::string getShapeParameters(const GeoShape*);
 
-	QString getGeoTypeFromVPhysVol(const GeoVPhysVol* vol);
+  std::string getGeoTypeFromVPhysVol(const GeoVPhysVol* vol);
 
-	QString getIdFromNodeType(QString nodeType);
+  unsigned int getIdFromNodeType(const std::string &nodeType);
 
-	QString m_dbpath;
+  std::string m_dbpath;
 	GMDBManager* m_dbManager;
 
-	QMap<QString, QVariant> m_memMap; // TODO: maybe move to QHash??
-	QHash<QString, unsigned int> m_memMap_Tables;
-	QMap<QString, unsigned int> m_parentChildrenMap2; // TODO: clean name!
-	QMap<QString, unsigned int> m_volumeCopiesMap;
+  std::unordered_map<std::string, unsigned int> m_parentChildrenMap;
+  std::unordered_map<std::string, unsigned int> m_volumeCopiesMap;
+  std::unordered_map<std::string, unsigned int> m_memMap;
+  std::unordered_map<std::string, unsigned int> m_memMap_Tables;
 
 	// keep track of the number of visited tree nodes
 	unsigned int m_len;
@@ -166,26 +161,21 @@ private:
 	bool m_rootVolumeFound;
 	bool m_unconnectedTree;
 
-	std::vector<QStringList> m_logVols;
-	std::vector<QStringList> m_physVols;
-	std::vector<QStringList> m_fullPhysVols;
-//  std::vector<QStringList> m_shapes;
-	std::vector<QStringList> m_materials;
-	std::vector<QStringList> m_elements;
-	std::vector<QStringList> m_transforms;
-	std::vector<QStringList> m_alignableTransforms;
-	std::vector<QStringList> m_serialDenominators;
-	std::vector<QStringList> m_serialTransformers;
-	std::vector<QStringList> m_functions;
-	std::vector<QStringList> m_nameTags;
-	std::vector<QStringList> m_childrenPositions;
-  
+  std::vector<std::vector<std::string>> m_logVols;
+	std::vector<std::vector<std::string>> m_physVols;
+	std::vector<std::vector<std::string>> m_fullPhysVols;
+	std::vector<std::vector<std::string>> m_materials;
+	std::vector<std::vector<std::string>> m_elements;
+	std::vector<std::vector<std::string>> m_transforms;
+	std::vector<std::vector<std::string>> m_alignableTransforms;
+	std::vector<std::vector<std::string>> m_serialDenominators;
+	std::vector<std::vector<std::string>> m_serialTransformers;
+	std::vector<std::vector<std::string>> m_functions;
+	std::vector<std::vector<std::string>> m_nameTags;
+	std::vector<std::vector<std::string>> m_childrenPositions;
   std::vector<std::vector<std::string>> m_shapes;
-	
-  QStringList m_rootVolume;
-  
+  std::vector<std::string> m_rootVolume;
 
-//  QStringList m_objectsNotPersistified;
   std::vector<std::string> m_objectsNotPersistified;
 
 };

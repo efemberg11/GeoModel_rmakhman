@@ -31,8 +31,8 @@
 
 static bool         parCreateGeantinoMaps = true;
 static bool         parIsPerformance   = false;
-static G4String     geometryFileName   = "geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db";
-static std::string  parMacroFileName   = "";
+static G4String     geometryFileName   = "";
+static std::string  parMacroFileName   = "geantino.g4";
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
 
@@ -47,11 +47,8 @@ int main(int argc, char** argv) {
     
     G4cout
     << " =============== Running geantinoMaps ================ "      << G4endl
-    << "   Physics list name  =  " << parPhysListName                 << G4endl
     << "   Geant4 macro       =  " << parMacroFileName                << G4endl
-    << "   Performance mode   =  " << parIsPerformance                << G4endl
     << "   Geometry file      =  " << geometryFileName                << G4endl
-    << "   Run Overlap Check  =  " << parRunOverlapCheck              << G4endl
     << " ===================================================== "      << G4endl;
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
@@ -118,11 +115,8 @@ int main(int argc, char** argv) {
 }
 
 static struct option options[] = {
-    {"macro file            "  , required_argument, 0, 'm'},
-    {"physics list name     "  , required_argument, 0, 'f'},
-    {"performance flag      "  , no_argument      , 0, 'p'},
     {"geometry file name    "  , required_argument, 0, 'g'},
-    {"overlap geometry check"  , no_argument      , 0, 'o'},
+    {"macro file            "  , required_argument, 0, 'm'},
     {"help"                    , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
@@ -130,17 +124,13 @@ static struct option options[] = {
 
 void Help() {
   std::cout <<"\n " << std::setw(100) << std::setfill('=') << "" << std::setfill(' ') << std::endl;
-  G4cout <<"  geantinoMaps Geant4 application.    \n"
+    G4cout <<" gmgeantino Geant4 application: runs geantino scans.\n"
             << std::endl
             <<"  **** Parameters: \n\n"
-            <<"      -m :   REQUIRED : the standard Geant4 macro file name \n"
-            <<"      -f :   physics list name (default: FTFP_BERT) \n"
-            <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
-            <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"
-            <<"      -g :   the Geometry file name (default: geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db)\n"
-            <<"      -o :   flag  ==> run the geometry overlap check (default: FALSE)\n"
+            <<"      -g :   [REQUIRED] the Geometry file name (supported extensions: .db/.gdml/.dylib/.so) \n"
+            <<"      -m :   [OPTIONAL] the standard Geant4 macro file name (default: geantino.g4) \n"
             << std::endl;
-  std::cout <<"\nUsage: ./geantinoMaps [OPTIONS] -m <MACRO_FILE>\n" <<std::endl;
+  std::cout <<"\nUsage: ./gmgeantino [OPTIONS] -g <geometry-file-name> \n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
     //printf("\t-%c  --%s\t%s\n", options[i].val, options[i].name, options[i].has_arg ? options[i].name : "");
     printf("\t-%c  --%s\t\n", options[i].val, options[i].name);
@@ -157,7 +147,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "pm:f:g:oh", options, &optidx);
+   c = getopt_long(argc, argv, "g:m:h", options, &optidx);
    if (c == -1)
      break;
    //
@@ -165,20 +155,11 @@ void GetInputArguments(int argc, char** argv) {
    case 0:
      c = options[optidx].val;
      break;
-   case 'p':
-     parIsPerformance = true;
-     break;
    case 'm':
      parMacroFileName = optarg;
      break;
-   case 'f':
-     parPhysListName  = optarg;
-     break;
    case 'g':
      geometryFileName = optarg;
-     break;
-   case 'o':
-     parRunOverlapCheck = true;
      break;
    case 'h':
      Help();
@@ -188,9 +169,9 @@ void GetInputArguments(int argc, char** argv) {
      errx(1, "unknown option %c", c);
    }
   }
-  // check if mandatory Geant4 macro file was provided
-  if (parMacroFileName=="") {
-    G4cout << "  *** ERROR : Geant4 macro file is required. " << G4endl;
+  // check if mandatory geometry file was provided
+  if (geometryFileName=="") {
+    G4cout << "  *** ERROR : geometry file is required (use the -g option). " << G4endl;
     Help();
     exit(-1);
   }

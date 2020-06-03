@@ -223,7 +223,7 @@ private:
   void storeTableColumnNames(std::vector<std::string> input);
   
   std::vector<std::string> getTableColumnNames(const std::string &tableName);
-  void printTableColNamesFromDB(const std::string &tableName) const;
+//  void printTableColNamesFromDB(const std::string &tableName) const;
 
   void printAllRecords(const std::string &tableName) const;
 

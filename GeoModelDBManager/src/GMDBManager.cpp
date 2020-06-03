@@ -37,8 +37,6 @@ std::string joinVectorStrings(std::vector<std::string> vec, std::string sep="") 
 
 GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbIsOK(false),  m_deepDebug(false)
 {
-	// JFB commented: qDebug() << "GMDBManager: constructor";
-
 	#ifdef GEOREAD_DEEP_DEBUG
 	  m_deepDebug = true;
  	#endif
@@ -51,13 +49,12 @@ GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbIsOK(fal
 
 	if (!m_db.open())
 	{
-		qDebug() << "Error: connection with database failed!";
+    std::cout << "Error: connection with database failed!\n";
 		showError( m_db.lastError() );
 		m_dbIsOK = false;
 	}
 	else
 	{
-		// JFB commented: qDebug() << "Database: connection ok";
 		m_dbIsOK = true;
 	}
 
@@ -253,7 +250,7 @@ void GMDBManager::showError(const QSqlError &err) const
 
 QVariant GMDBManager::addPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addPhysVol() - is root?" << isRootVolume;
+  if (m_deepDebug) std::cout << "GMDBManager::addPhysVol() - is root?" << isRootVolume << std::endl;
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into PhysVols(logvol, parent) values(?, ?)"))) {
@@ -277,7 +274,7 @@ QVariant GMDBManager::addPhysVol(const QVariant &logVolId, const QVariant &paren
 
 QVariant GMDBManager::addFullPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addFullPhysVol() - is root?" << isRootVolume;
+  if (m_deepDebug) std::cout << "GMDBManager::addFullPhysVol() - is root?" << isRootVolume << std::endl;
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into FullPhysVols(logvol, parent) values(?, ?)"))) {
@@ -303,7 +300,7 @@ QVariant GMDBManager::addFullPhysVol(const QVariant &logVolId, const QVariant &p
 
 QVariant GMDBManager::addLogVol(const QString &name, const QVariant &shapeId, const QVariant &materialId)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addLogVol()";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addLogVol()";
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into LogVols(name, shape, material) values(?, ?, ?)"))) {
@@ -320,7 +317,7 @@ QVariant GMDBManager::addLogVol(const QString &name, const QVariant &shapeId, co
 
 QVariant GMDBManager::addMaterial(const QString &name, const QString &density, const QString &elements)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addMaterial()";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addMaterial()";
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into Materials(name, density, elements) values(?, ?, ?)"))) {
@@ -337,7 +334,7 @@ QVariant GMDBManager::addMaterial(const QString &name, const QString &density, c
 
 QVariant GMDBManager::addElement(const QString &name, const QString &symbol, const QString &elZ, const QString &elA)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addElement()";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addElement()";
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into Elements(name, symbol, Z, A) values(?, ?, ?, ?)"))) {
@@ -361,7 +358,7 @@ bool GMDBManager::addListOfChildrenPositions(const std::vector<std::vector<std::
 
 bool GMDBManager::addListOfRecords(const QString geoType, const std::vector<QStringList> records)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addListOfRecords():" << geoType;
+//  if (m_deepDebug) qDebug() << "GMDBManager::addListOfRecords():" << geoType;
 
   QString tableName = QString::fromStdString(m_childType_tableName[geoType.toStdString()]);
 
@@ -446,7 +443,6 @@ bool GMDBManager::addListOfRecordsToTable(const QString tableName, const std::ve
 			queryStr += ";";
 
         }
-    // JFB commented: qDebug() << "queryStr:" << queryStr;
 
 	// executing the SQL query
 	QSqlQuery q;
@@ -456,7 +452,6 @@ bool GMDBManager::addListOfRecordsToTable(const QString tableName, const std::ve
 		return false;
 	}
 
-	// JFB commented: qDebug() << "DONE. The list of records have been inserted into the DB.";
 	return true;
 }
 
@@ -504,7 +499,6 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     queryStr += ";";
     
   }
-  // JFB commented: qDebug() << "queryStr:" << queryStr;
   
   // executing the SQL query
   QSqlQuery q;
@@ -514,7 +508,6 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     return false;
   }
   
-  // JFB commented: qDebug() << "DONE. The list of records have been inserted into the DB.";
   return true;
 }
 
@@ -708,7 +701,7 @@ bool GMDBManager::addListOfRecordsToTableOld(const QString tableName, const std:
 
 QVariant GMDBManager::addShape(const QString &type, const QString &parameters)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addShape()";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addShape()";
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into Shapes(type, parameters) values(?, ?)"))) {
@@ -724,7 +717,7 @@ QVariant GMDBManager::addShape(const QString &type, const QString &parameters)
 
 QVariant GMDBManager::addSerialDenominator(const QString &baseName)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addSerialDenominator("+baseName+")";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addSerialDenominator("+baseName+")";
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into SerialDenominators(baseName) values(?)"))) {
@@ -739,7 +732,7 @@ QVariant GMDBManager::addSerialDenominator(const QString &baseName)
 
 QVariant GMDBManager::addNameTag(const QString &name)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addNameTag("+name+")";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addNameTag("+name+")";
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into NameTags(name) values(?)"))) {
@@ -753,14 +746,12 @@ QVariant GMDBManager::addNameTag(const QString &name)
 
 QVariant GMDBManager::addFunction(const QString expression)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addFunction()";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addFunction()";
 
 	// TEST
 	std::cout << "Function - expression string len: " << expression.length();
 	std::cout << "Function - expression: " << expression.toStdString() << std::endl << std::endl;
   //-----
-
-	// JFB commented: qDebug() << "expression:" << expression;
 
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("insert into Functions(expression) values(?)"))) {
@@ -777,7 +768,7 @@ QVariant GMDBManager::addFunction(const QString expression)
 
 QVariant GMDBManager::addSerialTransformer(const unsigned int &funcId, const unsigned int &physvolId, const std::string &physvolType, const unsigned int &copies)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addSerialTransformer()" << funcId << physvolId << copies;
+//  if (m_deepDebug) qDebug() << "GMDBManager::addSerialTransformer()" << funcId << physvolId << copies;
 
 	const unsigned int volTableId = getTableIdFromNodeType(physvolType);
 
@@ -797,7 +788,7 @@ QVariant GMDBManager::addSerialTransformer(const unsigned int &funcId, const uns
 
 QVariant GMDBManager::addTransform(QVector<double> params)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addTransform()";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addTransform()";
 
 	// get the 12 matrix elements
 	double xx = params[0];
@@ -841,7 +832,7 @@ QVariant GMDBManager::addTransform(QVector<double> params)
 
 QVariant GMDBManager::addAlignableTransform(QVector<double> params)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addAlignableTransform()";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addAlignableTransform()";
 
 	// get the 12 matrix elements
 	double xx = params[0];
@@ -898,7 +889,7 @@ bool GMDBManager::addRootVolume(const std::vector<std::string> &values)
 // insert a single parent-child relationship for a given parent volume
 void GMDBManager::addChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &childId, const unsigned int &parentCopyNumber, const unsigned int &childPos, const std::string &childType, const unsigned int &childCopyN)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::addChildPosition(" << parentId << "," << parentType << "," << QString::number(parentCopyNumber) << "," <<childPos << "," << childType << ", " << childId << ", " << QString::number(childCopyN) << ")";
+//  if (m_deepDebug) qDebug() << "GMDBManager::addChildPosition(" << parentId << "," << parentType << "," << QString::number(parentCopyNumber) << "," <<childPos << "," << childType << ", " << childId << ", " << QString::number(childCopyN) << ")";
 
 	// get table name -- which the child ID refers to -- based on the child type
 	const unsigned int parentTableId = getTableIdFromNodeType(parentType);
@@ -912,13 +903,12 @@ void GMDBManager::addChildPosition(const unsigned int &parentId, const std::stri
 		if (i != 0) // skip the "id" column
 			queryStr = queryStr.arg( QString::fromStdString( cols.at(i)) );
 	}
-	if (m_deepDebug) qDebug() << "queryStr:" << queryStr;
+//  if (m_deepDebug) qDebug() << "queryStr:" << queryStr;
 	QSqlQuery q;
 	if (!q.prepare(queryStr)) {
 		showError(q.lastError());
 		return;
 	}
-	// JFB commented: qDebug() << "parent:" << parentId;
 	q.addBindValue(parentId);
 	q.addBindValue(parentTableId);
 	q.addBindValue(parentCopyNumber);
@@ -945,7 +935,7 @@ void GMDBManager::addDBversion(const QString version)
 
 std::vector<std::string> GMDBManager::getItem(std::string geoType, unsigned int id)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::getItem(geoType, id)"<< geoType << QString::number(id);
+//  if (m_deepDebug) qDebug() << "GMDBManager::getItem(geoType, id)"<< geoType << QString::number(id);
 
 	/* Get the right DB table */
   std::string tableName = getTableNameFromNodeType(geoType);
@@ -955,7 +945,7 @@ std::vector<std::string> GMDBManager::getItem(std::string geoType, unsigned int 
 
 std::vector<std::string> GMDBManager::getItem(unsigned int tableId, unsigned int id)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::getItem(tableId, id)"<< QString::number(tableId) << QString::number(id);
+//  if (m_deepDebug) qDebug() << "GMDBManager::getItem(tableId, id)"<< QString::number(tableId) << QString::number(id);
 	/* Get the right DB table */
   std::string tableName = getTableNameFromTableId(tableId);
 	return getItemFromTableName(tableName, id);
@@ -1034,7 +1024,7 @@ QStringList GMDBManager::getItemFromTableName(std::string tableName, unsigned in
 
 std::vector<std::string> GMDBManager::getItemFromTableName(std::string tableName, unsigned int id)
 {
-  if (m_deepDebug) qDebug() << "GMDBManager::getItemFromTableName(tableName, id)"<< tableName << QString::number(id);
+//  if (m_deepDebug) qDebug() << "GMDBManager::getItemFromTableName(tableName, id)"<< tableName << QString::number(id);
   /*
    * 2. Get the object from DB
    */
@@ -1070,7 +1060,7 @@ std::vector<std::string> GMDBManager::getItemFromTableName(std::string tableName
 // get the list of children for a single GeoVPhysVol (i.e., GeoPhysVol or GeoFullPhysVol)
 QMap<unsigned int, QStringList> GMDBManager::getVPhysVolChildren(const unsigned int &id, const std::string &nodeType, const unsigned int &parentCopyNumber)
 {
-	if (m_deepDebug) qDebug() << "GMDBManager::getVPhysVolChildren() - id:" << QString::number(id) << "- type:" << nodeType << "- copyN:" << QString::number(parentCopyNumber);
+  if (m_deepDebug) std::cout << "GMDBManager::getVPhysVolChildren() - id:" << id << "- type:" << nodeType << "- copyN:" << parentCopyNumber;
 
 	const unsigned int tableId = getTableIdFromNodeType(nodeType);
 
@@ -1110,8 +1100,6 @@ QMap<unsigned int, QStringList> GMDBManager::getVPhysVolChildren(const unsigned 
 // Get all parent-children data from the database in one go
 QHash<QString, QMap<unsigned int, QStringList>> GMDBManager::getChildrenTable()
 {
-	// JFB commented: qDebug() << "GMDBManager::getChildrenTable()";
-
 	QSqlQuery q = selectAllFromTable("ChildrenPositions");
 
 	QHash< QString, QMap<unsigned int, QStringList> > all_children; // to store all children
@@ -1120,7 +1108,6 @@ QHash<QString, QMap<unsigned int, QStringList>> GMDBManager::getChildrenTable()
 
 	// get the number of columns of the DB table
 	int nCols = m_tableNames["ChildrenPositions"].size();
-        // JFB commented: qDebug() << "num of columns in childrenPos table" << nCols;
 
     // loop over all children's positions stored in the DB
 	while (q.next()) {
@@ -1184,7 +1171,6 @@ std::vector<std::vector<std::string>> GMDBManager::getChildrenTableStd()
 
 unsigned int GMDBManager::getTableIdFromNodeType(const std::string &nodeType)
 {
-	// JFB commented: qDebug() << "GMDBManager::getTableIdFromNodeType("<< nodeType <<")";
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("SELECT id FROM GeoNodesTypes WHERE nodeType = (?)"))) {
 		showError(q.lastError());
@@ -1196,7 +1182,6 @@ unsigned int GMDBManager::getTableIdFromNodeType(const std::string &nodeType)
 	QVariant id;
 	while (q.next()) {
 		id = q.value(0);
-		// JFB commented: qDebug() << "id:" << id;
 	}
 
 	return id.toUInt();
@@ -1204,7 +1189,6 @@ unsigned int GMDBManager::getTableIdFromNodeType(const std::string &nodeType)
 
 QString GMDBManager::getTableNameFromNodeType(QString nodeType)
 {
-	// JFB commented: qDebug() << "GMDBManager::getTableNameFromNodeType("<< nodeType <<")";
 	QSqlQuery q;
 	if (!q.prepare(QLatin1String("SELECT tableName FROM GeoNodesTypes WHERE nodeType = (?)"))) {
 		showError(q.lastError());
@@ -1216,7 +1200,6 @@ QString GMDBManager::getTableNameFromNodeType(QString nodeType)
 	QString tableName;
 	while (q.next()) {
 		tableName = q.value(0).toString();
-		// JFB commented: qDebug() << "tableName:" << tableName;
 	}
 
 	return tableName;
@@ -1258,7 +1241,6 @@ QString GMDBManager::getTableNameFromTableId(unsigned int tabId)
 	QString tableName;
 	while (q.next()) {
 		tableName = q.value(0).toString();
-		// JFB commented: qDebug() << "tableName:" << tableName;
 	}
 
 	return tableName;
@@ -1324,7 +1306,6 @@ std::string GMDBManager::getNodeTypeFromTableId(unsigned int tabId)
 /*
 QHash<unsigned int, QString> GMDBManager::getAll_TableIDsNodeTypes()
 {
-	// JFB commented: qDebug() << "GMDBManager::getAll_TableIDsNodeTypes()";
 
 	QHash<unsigned int, QString> output;
 
@@ -1360,8 +1341,6 @@ std::unordered_map<unsigned int, std::string> GMDBManager::getAll_TableIDsNodeTy
 /*
 QHash<QString, unsigned int> GMDBManager::getAll_NodeTypesTableIDs()
 {
-	// JFB commented: qDebug() << "GMDBManager::getAll_NodeTypesTableIDs()";
-
 	QHash<QString, unsigned int> output;
 
 	QSqlQuery q = selectAllFromTable("GeoNodesTypes");
@@ -1449,11 +1428,7 @@ QSqlQuery GMDBManager::selectAllFromTable(std::string tableName) const
 
 bool GMDBManager::initDB()
 {
-	// JFB commented: qDebug() << "GMDBManager::initDB()";
-
-
 	// check if DB is empty
-	// JFB commented: qDebug() << "checking existing tables...";
 	QSqlDatabase db = QSqlDatabase::database();
 	QStringList tables = db.tables();
 	if (   tables.contains("LogVols",   Qt::CaseInsensitive)
@@ -1462,7 +1437,6 @@ bool GMDBManager::initDB()
 			|| tables.contains("Elements",  Qt::CaseInsensitive)
 			|| tables.contains("Shapes",    Qt::CaseInsensitive)
 	) {
-		// JFB commented: qDebug() << "tables are present already. Skipping tables creation. Loading tables...";
 		loadTableNamesFromDB();
 		return true;
 	}
@@ -1471,11 +1445,9 @@ bool GMDBManager::initDB()
 
   // TODO: we should create tables only if the DB is really completely empty!
 	// if DB is empty, then create tables
-	// JFB commented: qDebug() << "DB file is empty. Creating tables...";
 	bool tablesOK = createTables();
 
 	// store DB version
-	// JFB commented: qDebug() << "Storing DB version:" << QString::fromStdString(dbversion);
 	addDBversion(QString::fromStdString(dbversion));
 
 	return tablesOK;
@@ -1503,7 +1475,6 @@ bool GMDBManager::createTables()
 	for (int i=0; i < tab.size(); ++i) {
     queryStr = queryStr.arg( QString::fromStdString(tab.at(i)) );
 	}
-	//qDebug() << "query:" << queryStr;
 	if (!q.exec(queryStr)) {
 		showError(q.lastError());
 		return false;
@@ -1541,7 +1512,6 @@ bool GMDBManager::createTables()
 	for (int i=0; i < tab.size(); ++i) {
 		queryStr = queryStr.arg( QString::fromStdString(tab.at(i)) );
 	}
-	// qDebug() << "query:" << queryStr;
 	if (!q.exec(queryStr)) {
 		showError(q.lastError());
 		return false;
@@ -1880,9 +1850,6 @@ void GMDBManager::storeNodeType(std::string nodeType, std::string tableName)
 
 void GMDBManager::loadTestData()
 {
-
-	// JFB commented: qDebug() << "GMDBManager::loadTestData()";
-
 	// create test data
 	QSqlQuery q;
 	//
@@ -1891,28 +1858,21 @@ void GMDBManager::loadTestData()
 	//		showError(q.lastError());
 	//		return;
 	//	}
-	// JFB commented: qDebug() << "Loading Shapes...";
 	QVariant boxId    = addShape(QLatin1String("Box"), "");
 	QVariant coneId   = addShape(QLatin1String("Cone"), "");
 	QVariant sphereId = addShape(QLatin1String("Sphere"), "");
 
-	// JFB commented: qDebug() << "Loading Elements...";
 	qWarning() << "Sample GeoElement data --> to be implemented!";
 
-	// JFB commented: qDebug() << "Loading Materials...";
 	QVariant airId  = addMaterial(QLatin1String("Air"),QLatin1String("density"),QLatin1String("elements"));
 	QVariant ironId = addMaterial(QLatin1String("Iron"),QLatin1String("density"),QLatin1String("elements"));
 	QVariant leadId = addMaterial(QLatin1String("Lead"),QLatin1String("density"),QLatin1String("elements"));
 
-	// JFB commented: qDebug() << "Loading LogVols...";
 	QVariant worldLogId = addLogVol(QLatin1String("WorldLog"), boxId, airId);
 	QVariant toyLogId  = addLogVol(QLatin1String("ToyLog"), coneId, leadId);
 
-	// JFB commented: qDebug() << "Loading PhysVols...";
 	QVariant rootPhysId = addPhysVol(worldLogId, QVariant()); // no parent
 	QVariant childPhysId = addPhysVol(toyLogId, rootPhysId);
-
-	// JFB commented: qDebug() << "DONE. Created and loaded test data.";
 }
 
 
@@ -1934,18 +1894,16 @@ std::vector<std::string> GMDBManager::getTableColNamesFromDB(std::string tableNa
 
 
 
-void GMDBManager::printTableColNamesFromDB(const std::string &tableName) const
-{
-	// JFB commented: qDebug() << "GMDBManager::printTableColNames:" << tableName;
-
-	// fetch the driver
-	// JFB commented: qDebug() << getTableColNamesFromDB(tableName);
-}
+//void GMDBManager::printTableColNamesFromDB(const std::string &tableName) const
+//{
+//  // JFB commented: qDebug() << "GMDBManager::printTableColNames:" << tableName;
+//
+//  // fetch the driver
+//  // JFB commented: qDebug() << getTableColNamesFromDB(tableName);
+//}
 
 bool GMDBManager::storeRootVolume(const unsigned int &id, const std::string &nodeType)
 {
-	// JFB commented: qDebug() << "GMDBManager::storeRootVolume:" << id << nodeType;
-
 	const unsigned int typeId = getTableIdFromNodeType(nodeType);
 
   std::string tableName = "RootVolume";
@@ -1974,7 +1932,6 @@ bool GMDBManager::storeRootVolume(const unsigned int &id, const std::string &nod
 /*
 std::vector<std::string> GMDBManager::getRootPhysVol()
 {
-  //JFB commented: qDebug() << "GMDBManager::getRootPhysVol()";
 	// get the ID of the ROOT vol from the table "RootVolume"
 	// QSqlQuery query("SELECT * FROM RootVolume");
 	QSqlQuery query = selectAllFromTable("RootVolume");

@@ -132,7 +132,6 @@ void Help() {
             << std::endl;
   std::cout <<"\nUsage: ./gmgeantino [OPTIONS] -g <geometry-file-name> \n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
-    //printf("\t-%c  --%s\t%s\n", options[i].val, options[i].name, options[i].has_arg ? options[i].name : "");
     printf("\t-%c  --%s\t\n", options[i].val, options[i].name);
   }
   std::cout<<"\n "<<std::setw(100)<<std::setfill('=')<<""<<std::setfill(' ')<<std::endl;

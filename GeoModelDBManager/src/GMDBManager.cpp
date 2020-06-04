@@ -518,7 +518,7 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     std::vector<std::string> items;
     
     for ( const std::string& item : rec) {
-      items.push_back('"' + item + '"');
+      items.push_back("'" + item + "'");
     }
 //    QString values = items.join(",");
     std::string values = joinVectorStrings(items, ",");

@@ -3,7 +3,7 @@ stages:
   - build
 
 before_script:
-  - yum -y install cmake glibc-devel sqlite which
+  - yum -y install cmake glibc-devel sqlite libsqlite3-dev which
   - set +e && source CI/setup_lcg.sh; set -e
 
 variables:

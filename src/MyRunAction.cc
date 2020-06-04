@@ -23,9 +23,8 @@ MyRunAction::MyRunAction(bool isGeantino) : G4UserRunAction(), fIsPerformance(fa
 }
 
 MyRunAction::~MyRunAction() {
-    //if (isMaster) {
+    if(fIsGeantino)
         delete G4AnalysisManager::Instance();
-    //}
 }
 
 G4Run* MyRunAction::GenerateRun() {
@@ -58,12 +57,12 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
     
         // Open output root file
         std::string fileName_g4 = "geantinoMaps.root";
-        G4cout<<"\n\nBeginOfRunAction, create root file with the G4AnalysisManager " << G4endl;
+        G4cout<<"\n\nBeginOfRunAction: \n...create a root file using the G4AnalysisManager" << G4endl;
         if (!analysisManager->OpenFile(fileName_g4)){
             G4cout<<"\nBeginOfRunAction ERROR: File cannot be opened!"<<G4endl;
             exit(-1);
         } else
-            G4cout<<"\nBeginOfRunAction FILE "<<fileName_g4<<" opened!"<<G4endl;
+        G4cout<<"\n...output File "<<fileName_g4<<" opened!"<<G4endl;
     
         const char* radName = "RZRadLen";
     

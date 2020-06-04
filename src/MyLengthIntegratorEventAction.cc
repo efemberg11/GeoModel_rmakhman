@@ -47,8 +47,13 @@ namespace G4UA
     :m_run(run), m_stepAct(stepAct), m_etaPrimary(0), m_phiPrimary(0) {}
     
   MyLengthIntegratorEventAction::~MyLengthIntegratorEventAction(){
-
       
+      m_etaMapRL_g4.clear();
+      m_phiMapRL_g4.clear();
+      m_etaMapIL_g4.clear();
+      m_phiMapIL_g4.clear();
+
+//      //ROOT
 //      static std::mutex mutex_instance;
 //      std::lock_guard<std::mutex> lock(mutex_instance);
 //      G4cout<<"Finalizing MyLengthIntegratorEventAction" << G4endl;
@@ -85,13 +90,9 @@ namespace G4UA
 //    m_phiMapRL.clear();
 //    m_etaMapIL.clear();
 //    m_phiMapIL.clear();
+//    //~ROOT
       
-    m_etaMapRL_g4.clear();
-    m_phiMapRL_g4.clear();
-    m_etaMapIL_g4.clear();
-    m_phiMapIL_g4.clear();
 
-    G4cout<<"END of MyLengthIntegratorEventAction" << G4endl;
   }
     
     
@@ -100,19 +101,20 @@ namespace G4UA
   //---------------------------------------------------------------------------
   void MyLengthIntegratorEventAction::BeginOfEventAction(const G4Event* event)
   {
-    G4cout<<" ****** MyLengthIntegratorEventAction::BeginOfEventAction  ****** " <<G4endl;
+    std::cout << "\n ========================================================= "      <<std::endl;
+    G4cout  << " ****** MyLengthIntegratorEventAction::BeginOfEventAction  ****** " <<G4endl;
     //m_detThickMap.clear();
     G4PrimaryVertex* vert = event->GetPrimaryVertex(0);
     G4PrimaryParticle* part = vert->GetPrimary();
     G4ThreeVector mom = part->GetMomentum();
     G4cout<<" ****** Primary Particle: "<< part->GetParticleDefinition()->GetParticleName()<<" ****** " <<G4endl;
-    G4cout<<" ****** Momentum: "<< mom<<" ****** " <<G4endl;
+    G4cout<<" ****** Momentum: "<< mom <<" ****** " <<G4endl;
     m_etaPrimary = mom.eta();
     m_phiPrimary = mom.phi();
     G4cout.precision(6);
     G4cout<<" ****** Eta: "<< m_etaPrimary<<" ****** " <<G4endl;
     G4cout<<" ****** Phi: "<< m_phiPrimary<<" ****** " <<G4endl;
-    G4cout<<" ****** ****** ****** ****** ****** ******  ****** "<<G4endl;
+    std::cout  << "\n =========================================================" <<std::endl;;
       
   }
 
@@ -123,9 +125,11 @@ namespace G4UA
   {
     // Lazily protect this whole code from concurrent access
     std::lock_guard<std::mutex> lock(gHistSvcMutex);
-    G4cout<<" ****** MyLengthIntegratorEventAction::EndOfEventAction  ****** " <<G4endl;
+    std::cout << "\n ========================================================= "    << std::endl;
+    G4cout    <<" ****** MyLengthIntegratorEventAction::EndOfEventAction  ****** "  << G4endl;
     //m_stepAct
-      if (m_stepAct->m_detThickMap.size()==0){G4cout<<" size is zero"<<G4endl;
+      if (m_stepAct->m_detThickMap.size()==0){
+          G4cout<<" m_detThickMap size is zero! "<<G4endl;
           exit(-1);
       }
 
@@ -133,7 +137,7 @@ namespace G4UA
     // Loop over volumes
     for (auto& it : m_stepAct->m_detThickMap) {
 
-      G4cout<<" ****** Loop over volumes  ****** " <<it.first<<G4endl;
+      //G4cout<<" ****** Loop over volumes  ****** " <<it.first<<G4endl;
 //      //ROOT
 //      // If histos already exist, then fill them
 //      if (m_etaMapRL.find(it.first) != m_etaMapRL.end()) {
@@ -154,7 +158,7 @@ namespace G4UA
       //Geant4
       // If histos already exist, then fill them
       if (m_etaMapRL_g4.find(it.first) != m_etaMapRL_g4.end()){
-            G4cout<<"GEANT4: Histos already exist, fill them"<<G4endl;
+            //G4cout<<"GEANT4: Histos already exist, fill them"<<G4endl;
             analysisManager->FillP1(m_etaMapRL_g4[it.first], m_etaPrimary, it.second.first,  1.);
             //m_etaMapRL_g4[it.first]->Fill(m_etaPrimary, it.second.first, 1.);
             analysisManager->FillP1(m_phiMapRL_g4[it.first], m_phiPrimary, it.second.first,  1.);
@@ -167,8 +171,8 @@ namespace G4UA
       }
       // New detector volume; register it
       else {
-            G4cout<<"GEANT4: New detector volume; register it: "<<it.first<<G4endl;
-            regAndFillHist_g4(it.first, it.second);    //Geant4
+          //G4cout<<"GEANT4: New detector volume; register it: "<<it.first<<G4endl;
+          regAndFillHist_g4(it.first, it.second);    //Geant4
           
       }
       //~Geant4
@@ -206,7 +210,7 @@ namespace G4UA
     //Geant4
     G4int totalEtaRL_g4 = m_etaMapRL_g4["Total_X0"];
     int nbins_g4 = analysisManager->GetP1(totalEtaRL_g4)->axis().bins();
-    G4cout<<"Geant4: m_etaMapRL_g4 nbins: "<<nbins_g4<<G4endl;
+    //G4cout<<"Geant4: m_etaMapRL_g4 nbins: "<<nbins_g4<<G4endl;
     for (auto it : m_etaMapRL_g4){
       
        if( it.first != "Total_X0" ){
@@ -245,7 +249,7 @@ namespace G4UA
       //Geant4
       G4int totalPhiRL_g4 = m_phiMapRL_g4["Total_X0"];
       nbins_g4 = analysisManager->GetP1(totalPhiRL_g4)->axis().bins();
-      G4cout<<"Geant4: m_phiMapRL_g4 nbins: "<<nbins_g4<<G4endl;
+      //G4cout<<"Geant4: m_phiMapRL_g4 nbins: "<<nbins_g4<<G4endl;
       for (auto it : m_phiMapRL_g4){
           
           if( it.first != "Total_X0" ){
@@ -284,7 +288,7 @@ namespace G4UA
       //Geant4
       G4int totalEtaIL_g4 = m_etaMapIL_g4["Total_X0"];
       nbins_g4 = analysisManager->GetP1(totalEtaIL_g4)->axis().bins();
-      G4cout<<"Geant4: m_etaMapIL_g4 nbins: "<<nbins_g4<<G4endl;
+      //G4cout<<"Geant4: m_etaMapIL_g4 nbins: "<<nbins_g4<<G4endl;
       for (auto it : m_etaMapIL_g4){
           
           if( it.first != "Total_X0" ){
@@ -323,7 +327,7 @@ namespace G4UA
       //Geant4
       G4int totalPhiIL_g4 = m_phiMapIL_g4["Total_X0"];
       nbins_g4 = analysisManager->GetP1(totalPhiIL_g4)->axis().bins();
-      G4cout<<"Geant4: m_phiMapIL_g4 nbins: "<<nbins_g4<<G4endl;
+      //G4cout<<"Geant4: m_phiMapIL_g4 nbins: "<<nbins_g4<<G4endl;
       for (auto it : m_phiMapIL_g4){
           
           if( it.first != "Total_X0" ){
@@ -340,7 +344,8 @@ namespace G4UA
           }
       }//~Geant4
       
-      G4cout<<" ****** MyLengthIntegratorEventAction::EndOfEventAction - DONE ****** " <<G4endl;
+      G4cout    << " ****** MyLengthIntegratorEventAction::EndOfEventAction - DONE ****** " << G4endl;
+      std::cout << "\n ========================================================= "  << std::endl;
   }
 
   //---------------------------------------------------------------------------
@@ -428,7 +433,7 @@ namespace G4UA
         //
         if(m_run->fMasterAnalysisManager->GetP1Id(pathEtaRL, false)<0) {
             
-            G4cout<<"Geant4: Eta rad profile of "<<pathEtaRL<<" didn't exist, creating P1 now on MASTER:  "<<m_run->fMasterAnalysisManager<<G4endl;
+            //G4cout<<"Geant4: Eta rad profile of "<<pathEtaRL<<" didn't exist, creating P1 now on MASTER:  "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"_RL");
             id_EtaRL = m_run->fMasterAnalysisManager->CreateP1(pathEtaRL, name.c_str(), 1000, -6., 6.);
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_EtaRL, "#eta");
@@ -437,7 +442,7 @@ namespace G4UA
         }
         if(analysisManager->GetP1Id(pathEtaRL, false)<0)
         {
-            G4cout<<"Geant4: Eta rad profile of "<<pathEtaRL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
+            //G4cout<<"Geant4: Eta rad profile of "<<pathEtaRL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"_RL");
             id_EtaRL = analysisManager->CreateP1(pathEtaRL, name.c_str(), 1000, -6., 6.);
             analysisManager->SetP1XAxisTitle(id_EtaRL, "#eta");
@@ -448,7 +453,7 @@ namespace G4UA
         //
         if(m_run->fMasterAnalysisManager->GetP1Id(pathEtaIL, false)<0)
         {
-            G4cout<<"Geant4: Eta int profile of "<<pathEtaIL<<" didn't exist, creating P1 now on MASTER:  "<<m_run->fMasterAnalysisManager<<G4endl;
+            //G4cout<<"Geant4: Eta int profile of "<<pathEtaIL<<" didn't exist, creating P1 now on MASTER:  "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"_IL");
             id_EtaIL = m_run->fMasterAnalysisManager->CreateP1(pathEtaIL, name.c_str(), 1000, -6., 6.);
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_EtaIL, "#eta");
@@ -457,7 +462,7 @@ namespace G4UA
         }
         if(analysisManager->GetP1Id(pathEtaIL, false)<0)
         {
-            G4cout<<"Geant4: Eta int profile of "<<pathEtaIL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
+            //G4cout<<"Geant4: Eta int profile of "<<pathEtaIL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"_IL");
             id_EtaIL = analysisManager->CreateP1(pathEtaIL, name.c_str(), 1000, -6., 6.);
             analysisManager->SetP1XAxisTitle(id_EtaIL, "#eta");
@@ -468,7 +473,7 @@ namespace G4UA
         //
         if(m_run->fMasterAnalysisManager->GetP1Id(pathPhiRL, false)<0)
         {
-            G4cout<<"Geant4: Phi rad profile of "<<pathPhiRL<<" didn't exist, creating P1 now on MASTER: "<<m_run->fMasterAnalysisManager<<G4endl;
+            //G4cout<<"Geant4: Phi rad profile of "<<pathPhiRL<<" didn't exist, creating P1 now on MASTER: "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"Phi_RL");
             id_PhiRL = m_run->fMasterAnalysisManager->CreateP1(pathPhiRL, name.c_str(), 500, -M_PI, M_PI);
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_PhiRL, "#phi");
@@ -476,7 +481,7 @@ namespace G4UA
         }
         if(analysisManager->GetP1Id(pathPhiRL, false)<0)
         {
-            G4cout<<"Geant4: Phi rad profile of "<<pathPhiRL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
+            //G4cout<<"Geant4: Phi rad profile of "<<pathPhiRL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"Phi_RL");
             id_PhiRL = analysisManager->CreateP1(pathPhiRL, name.c_str(), 500, -M_PI, M_PI);
             analysisManager->SetP1XAxisTitle(id_PhiRL, "#phi");
@@ -486,7 +491,7 @@ namespace G4UA
         //
         if(m_run->fMasterAnalysisManager->GetP1Id(pathPhiIL, false)<0)
         {
-            G4cout<<"Geant4: Phi int profile of "<<pathPhiIL<<" didn't exist, creating P1 now on MASTER: "<<m_run->fMasterAnalysisManager<<G4endl;
+            //G4cout<<"Geant4: Phi int profile of "<<pathPhiIL<<" didn't exist, creating P1 now on MASTER: "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"Phi_IL");
             id_PhiIL = m_run->fMasterAnalysisManager->CreateP1(pathPhiIL, name.c_str(), 500, -M_PI, M_PI);
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_PhiIL, "#phi");
@@ -496,14 +501,14 @@ namespace G4UA
         //
         if(analysisManager->GetP1Id(pathPhiIL, false)<0)
         {
-            G4cout<<"Geant4: Phi int profile of "<<pathPhiIL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
+            //G4cout<<"Geant4: Phi int profile of "<<pathPhiIL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"Phi_IL");
             id_PhiIL = analysisManager->CreateP1(pathPhiIL, name.c_str(), 500, -M_PI, M_PI);
             analysisManager->SetP1XAxisTitle(id_PhiIL, "#phi");
             analysisManager->SetP1YAxisTitle(id_PhiIL, "#lambda");
             
         }
-        G4cout<<"Geant4: Assigning  id_EtaRL: "<<id_EtaRL<<", id_EtaIL: "<<id_EtaIL<<", id_PhiRL: "<<id_PhiRL<<", id_PhiIL: "<<id_PhiIL<<" to detector : "<<detName<<G4endl;
+        //G4cout<<"Geant4: Assigning  id_EtaRL: "<<id_EtaRL<<", id_EtaIL: "<<id_EtaIL<<", id_PhiRL: "<<id_PhiRL<<", id_PhiIL: "<<id_PhiIL<<" to detector : "<<detName<<G4endl;
         m_etaMapRL_g4[detName] = id_EtaRL;
         m_etaMapIL_g4[detName] = id_EtaIL;
         m_phiMapRL_g4[detName] = id_PhiRL;
@@ -517,7 +522,7 @@ namespace G4UA
         analysisManager->FillP1(id_PhiRL, m_phiPrimary, thicks.first,  1.);
         //profPhiIL->Fill(m_phiPrimary, thicks.second, 1.);
         analysisManager->FillP1(id_PhiIL, m_phiPrimary, thicks.second, 1.);
-        G4cout<<"Geant4: Filling the corresponding P1 profiles\n" <<G4endl;
+        //G4cout<<"Geant4: Filling the corresponding P1 profiles\n" <<G4endl;
         
     }
 

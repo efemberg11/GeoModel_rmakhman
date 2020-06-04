@@ -48,9 +48,12 @@ namespace G4UA
     : m_g4pow(0),
       m_run(run)
   {
-      G4cout<<"Constructor of MyLengthIntegratorSteppingAction"<<G4endl;
-//      // Protect concurrent access to the non-thread-safe hist svc
-//      std::lock_guard<std::mutex> lock(gHistSvcMutex);
+
+      m_g4pow = G4Pow::GetInstance();
+      
+//    //ROOT
+//    // Protect concurrent access to the non-thread-safe hist svc
+//    std::lock_guard<std::mutex> lock(gHistSvcMutex);
 //
 //    // Register the RZ profiles. The other profiles need to wait until the end
 //    // of the events as they are created only if used.
@@ -65,12 +68,15 @@ namespace G4UA
 //      m_rzProfIL = new TProfile2D("RZIntLen","RZIntLen",1000,-25000.,25000.,2000,0.,15000.);
 //    //  regHist(m_hSvc, intName, m_rzProfIL);
 //    //}
-
-    m_g4pow = G4Pow::GetInstance();
+//    //~ROOT
+    
 
   }
   MyLengthIntegratorSteppingAction::~MyLengthIntegratorSteppingAction()
   {
+      m_detThickMap.clear();
+      
+//    //ROOT
 //    static std::mutex mutex_instance;
 //    std::lock_guard<std::mutex> lock(mutex_instance);
 //    G4cout<<"Finalizing MyLengthIntegratorSteppingAction" << G4endl;
@@ -105,14 +111,13 @@ namespace G4UA
 //    fOut->Close();
 //    G4cout<<"ROOT File RZRadLen.root closed" << G4endl;
     
-    // Clear histogram maps
+//    // Clear histogram maps
 //    m_rzMapRL.clear();
 //    m_xyMapRL.clear();
 //    m_rzMapIL.clear();
 //    m_xyMapIL.clear();
-    m_detThickMap.clear();
+//    //~ROOT
 
-    G4cout<<"END of MyLengthIntegratorSteppingAction" << G4endl;
   }
 
   //---------------------------------------------------------------------------
@@ -120,7 +125,7 @@ namespace G4UA
   //---------------------------------------------------------------------------
   void MyLengthIntegratorSteppingAction::UserSteppingAction(const G4Step* aStep)
   {
-    G4cout<<" ****** MyLengthIntegratorSteppingAction::UserSteppingAction Accumulate results from one step  ****** " <<G4endl;
+    //G4cout<<" ****** MyLengthIntegratorSteppingAction::UserSteppingAction Accumulate results from one step  ****** " <<G4endl;
     G4TouchableHistory* touchHist =
       (G4TouchableHistory*) aStep->GetPreStepPoint()->GetTouchable();
     G4LogicalVolume* lv = touchHist->GetVolume()->GetLogicalVolume();
@@ -145,6 +150,7 @@ namespace G4UA
     std::string matName = "M_" + lv->GetMaterial()->GetName();
     std::string detName_plus_matName = "DM_" + detName + "_" + lv->GetMaterial()->GetName();
     std::string detName_d = "D_" + detName;
+    //TO DO: remove specific numbers
     double zLimit = 3512.0; // For ITk studies: 3512mm is the z-limit of the ID End-Plate Cryostat.
     double zHit = aStep->GetPreStepPoint()->GetPosition().z();
     double rLimit = 1152.0; // For ITk studies: 1150mm is the R-limit of the ITk. Note, the solenoid coil is outside of this (at an R of ~1300mm, I think)
@@ -193,9 +199,9 @@ namespace G4UA
 //      //~ROOT
         
       //GEANT4
-      G4cout<<"GEANT4: fill m_run->fRadName_id: "<<m_run->fRadName_id<<" with "<<hitPoint.z()<<" "<< hitPoint.perp()<<" "<< thickstepRL <<""<< 1.<<G4endl;
+      //G4cout<<"GEANT4: fill m_run->fRadName_id: "<<m_run->fRadName_id<<" with "<<hitPoint.z()<<" "<< hitPoint.perp()<<" "<< thickstepRL <<""<< 1.<<G4endl;
         
-      G4cout<<"GEANT4: fill m_run->fIntName_id: "<<m_run->fIntName_id<<" with "<<hitPoint.z()<<" "<< hitPoint.perp()<<" "<< thickstepIL <<""<< 1.<<G4endl;
+      //G4cout<<"GEANT4: fill m_run->fIntName_id: "<<m_run->fIntName_id<<" with "<<hitPoint.z()<<" "<< hitPoint.perp()<<" "<< thickstepIL <<""<< 1.<<G4endl;
         
       analysisManager->FillP2(m_run->fRadName_id, hitPoint.z() , hitPoint.perp() , thickstepRL , 1.);
       analysisManager->FillP2(m_run->fIntName_id, hitPoint.z() , hitPoint.perp() , thickstepIL , 1.);
@@ -264,7 +270,7 @@ namespace G4UA
 //
       // Geant4
       if(!m_rzMapRL_g4[plotstring]){
-          G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<plotstring<<" doesn't exist, I create it"<<G4endl;
+          //G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<plotstring<<" doesn't exist, I create it"<<G4endl;
           std::string rznameReg = "RZRadLen_"+plotstring;
           std::string xynameReg = "XYRadLen_"+plotstring;
           G4String rzname_g4 = "RZRadLen_"+plotstring;
@@ -273,8 +279,8 @@ namespace G4UA
           m_xyMapRL_g4[plotstring]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"%X0");
           
       }
-      else G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<plotstring<<" EXIST!"<<G4endl;
-        G4cout<<"Geant4: Filling m_rzMapRL_g4 histogram for plotstring: "<<plotstring<<"!"<<G4endl;
+      //else G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<plotstring<<" EXIST!"<<G4endl;
+      //  G4cout<<"Geant4: Filling m_rzMapRL_g4 histogram for plotstring: "<<plotstring<<"!"<<G4endl;
       analysisManager->FillP2(m_rzMapRL_g4[plotstring],  hitPoint.z() , hitPoint.perp() , thickstepRL , 1.);
       analysisManager->FillP2(m_rzMapRL_g4[plotstring],  endPoint.z() , endPoint.perp() , thickstepRL , 1.);
       analysisManager->FillP2(m_xyMapRL_g4[plotstring],  hitPoint.x() , hitPoint.y()    , thickstepRL , 1.);
@@ -310,7 +316,7 @@ namespace G4UA
         
      if(!m_rzMapIL_g4[plotstring])
      {
-         G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<plotstring<<" doesn't exist, I create it"<<G4endl;
+         //G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<plotstring<<" doesn't exist, I create it"<<G4endl;
          std::string rznameReg = "RZIntLen_"+plotstring;
          std::string xynameReg = "XYIntLen_"+plotstring;
          G4String rzname_g4 = "RZIntLen_"+plotstring;
@@ -318,8 +324,8 @@ namespace G4UA
          m_rzMapIL_g4[plotstring]= getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"#lambda");
          m_xyMapIL_g4[plotstring]= getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"#lambda");
      }
-     else G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<plotstring<<" EXIST!"<<G4endl;
-        G4cout<<"Geant4: Filling m_rzMapIL_g4 histogram for plotstring: "<<plotstring<<"!"<<G4endl;
+     //else G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<plotstring<<" EXIST!"<<G4endl;
+     //   G4cout<<"Geant4: Filling m_rzMapIL_g4 histogram for plotstring: "<<plotstring<<"!"<<G4endl;
      analysisManager->FillP2(m_rzMapIL_g4[plotstring],hitPoint.z() , hitPoint.perp() , thickstepIL , 1.);
      analysisManager->FillP2(m_rzMapIL_g4[plotstring],endPoint.z() , endPoint.perp() , thickstepIL , 1.);
      analysisManager->FillP2(m_xyMapIL_g4[plotstring],hitPoint.x() , hitPoint.y()    , thickstepIL , 1.);
@@ -357,7 +363,7 @@ namespace G4UA
 //      m_xyMapRL[elementName]->Fill( endPoint.x() , endPoint.y() , el_thickstep , 1. );
         
      if(!m_rzMapRL_g4[elementName]){
-         G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<elementName<<" doesn't exist, I create it"<<G4endl;
+         //G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<elementName<<" doesn't exist, I create it"<<G4endl;
          std::string rznameReg = "RZRadLen_"+elementName;
          std::string xynameReg = "XYRadLen_"+elementName;
          //
@@ -367,8 +373,8 @@ namespace G4UA
          m_xyMapRL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"%X0");
         
      }
-     else G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<elementName<<" EXIST!"<<G4endl;
-        G4cout<<"Geant4: Filling m_rzMapRL_g4 histogram for elementName: "<<elementName<<"!"<<G4endl;
+     //else G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<elementName<<" EXIST!"<<G4endl;
+     //   G4cout<<"Geant4: Filling m_rzMapRL_g4 histogram for elementName: "<<elementName<<"!"<<G4endl;
      analysisManager->FillP2(m_rzMapRL_g4[elementName],hitPoint.z() , hitPoint.perp() , el_thickstep , 1. );
      analysisManager->FillP2(m_rzMapRL_g4[elementName],endPoint.z() , endPoint.perp() , el_thickstep , 1. );
      analysisManager->FillP2(m_xyMapRL_g4[elementName],hitPoint.x() , hitPoint.y()    , el_thickstep , 1. );
@@ -406,7 +412,7 @@ namespace G4UA
 //      m_xyMapIL[elementName]->Fill( endPoint.x() , endPoint.y() , el_thickstep , 1. );
       
      if(!m_rzMapIL_g4[elementName]){
-         G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<elementName<<" doesn't exist, I create it"<<G4endl;
+         //G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<elementName<<" doesn't exist, I create it"<<G4endl;
          std::string rznameReg = "RZIntLen_"+elementName;
          std::string xynameReg = "XYIntLen_"+elementName;
          G4String rzname_g4 = "RZIntLen_"+elementName;
@@ -415,8 +421,8 @@ namespace G4UA
          m_xyMapIL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"#lambda");
          
      }
-     else G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<elementName<<" EXIST!"<<G4endl;
-        G4cout<<"Geant4: Filling m_rzMapIL_g4 histogram for elementName: "<<elementName<<"!"<<G4endl;
+     //else G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<elementName<<" EXIST!"<<G4endl;
+     //   G4cout<<"Geant4: Filling m_rzMapIL_g4 histogram for elementName: "<<elementName<<"!"<<G4endl;
      analysisManager->FillP2(m_rzMapIL_g4[elementName],hitPoint.z() , hitPoint.perp() , el_thickstep , 1. );
      analysisManager->FillP2(m_rzMapIL_g4[elementName],endPoint.z() , endPoint.perp() , el_thickstep , 1. );
      analysisManager->FillP2(m_xyMapIL_g4[elementName],hitPoint.x() , hitPoint.y()    , el_thickstep , 1. );
@@ -463,12 +469,12 @@ namespace G4UA
 
         auto analysisManager = G4AnalysisManager::Instance();
         G4int id = analysisManager->GetP2Id(regName, false);
-        G4cout<<"***** Looking for 2dProfile with name: "<<regName<<" and result id on analysisManager: "<<analysisManager<<"  is: "<<id<<G4endl;
-        G4cout<<"***** fMasterAnalysisManager: "<<m_run->fMasterAnalysisManager<<G4endl;
+        //G4cout<<"***** Looking for 2dProfile with name: "<<regName<<" and result id on analysisManager: "<<analysisManager<<"  is: "<<id<<G4endl;
+        //G4cout<<"***** fMasterAnalysisManager: "<<m_run->fMasterAnalysisManager<<G4endl;
         
         if(m_run->fMasterAnalysisManager->GetP2Id(regName, false)<0){
             id = m_run->fMasterAnalysisManager->CreateP2(regName,histoname,nbinsx,xmin,xmax,nbinsy,ymin,ymax);
-            G4cout<<"!!!!!! MASTER Created 2dProfile with name: "<<regName<<" and result id is: "<<id<<G4endl;
+            //G4cout<<"!!!!!! MASTER Created 2dProfile with name: "<<regName<<" and result id is: "<<id<<G4endl;
             m_run->fMasterAnalysisManager->SetP2XAxisTitle(id,xtitle);
             m_run->fMasterAnalysisManager->SetP2YAxisTitle(id,ytitle);
             m_run->fMasterAnalysisManager->SetP2ZAxisTitle(id,ztitle);
@@ -476,7 +482,7 @@ namespace G4UA
         }
         if(analysisManager->GetP2Id(regName, false)<0){
             id = analysisManager->CreateP2(regName,histoname,nbinsx,xmin,xmax,nbinsy,ymin,ymax);
-            G4cout<<"!!!!!! WORKER Created 2dProfile with name: "<<regName<<" and result id is: "<<id<<G4endl;
+            //G4cout<<"!!!!!! WORKER Created 2dProfile with name: "<<regName<<" and result id is: "<<id<<G4endl;
             analysisManager->SetP2XAxisTitle(id,xtitle);
             analysisManager->SetP2YAxisTitle(id,ytitle);
             analysisManager->SetP2ZAxisTitle(id,ztitle);

@@ -83,10 +83,10 @@ namespace G4UA
 //      /// Int-length profile hist in R-Z - ROOT
 //      TProfile2D* m_rzProfIL;
       
-      /// Rad-length profile hist in R-Z - Geant4
-      G4int m_rzProfRL_id;
-      /// Int-length profile hist in R-Z  - Geant4
-      G4int m_rzProfIL_id;
+      /// Rad-length profile hist in R-Z - Geant4  -- taken from the runAction
+      //G4int m_rzProfRL_id;
+      /// Int-length profile hist in R-Z  - Geant4 -- taken from the runAction
+      //G4int m_rzProfIL_id;
       
 //      // 2D plots of rad-length and int-length - ROOT
 //      std::map<std::string,TProfile2D*,std::less<std::string> > m_rzMapRL;

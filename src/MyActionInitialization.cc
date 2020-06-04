@@ -53,7 +53,6 @@ void MyActionInitialization::Build() const {
       SetUserAction(runact);
       
       if(!fCreateGeantinoMaps){
-          std::cout<<"fCreateGeantinoMaps is FALSE"<<std::endl;
           MyEventAction* evtact = new MyEventAction();
           SetUserAction(evtact);
           SetUserAction(new MyTrackingAction(evtact));
@@ -62,16 +61,12 @@ void MyActionInitialization::Build() const {
       }
       else
       {
-          
-          std::cout<<"fCreateGeantinoMaps is TRUE, will create geantino Maps"<<std::endl;
           G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction(runact);
-          std::cout<<"myLenghtIntSteppingAct getting runact with runact:  "<<runact->fMasterAnalysisManager<<std::endl;
           G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct, runact);
           SetUserAction(myLenghtIntEventAct);
           SetUserAction(myLenghtIntSteppingAct);
           
       }
-    
       //MultiEventActions?? TO DO?
   }
 }

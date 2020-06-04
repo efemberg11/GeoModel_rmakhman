@@ -16,7 +16,7 @@ class MyRunAction: public G4UserRunAction {
 
 public:
 
-  MyRunAction(bool isGeantino);
+  MyRunAction(bool isGeantino, G4String geantinoMapsFileName="geantinoMaps.root");
   virtual ~MyRunAction();
 
   virtual G4Run* GenerateRun();
@@ -30,6 +30,8 @@ private:
   G4bool       fIsGeantino;
   MyRun*       fRun;
   G4Timer*     fTimer;
+  G4String     fGeantinoMapsFilename;
+  
 
     //TO DO: make private and add Get methods
 public:

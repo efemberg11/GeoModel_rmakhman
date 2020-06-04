@@ -17,15 +17,15 @@
 
 //const G4AnalysisManager* MyActionInitialization::fMasterAnalysisManager = nullptr;
 
-MyActionInitialization::MyActionInitialization(bool isperformance, bool createGeantinoMaps)
-: G4VUserActionInitialization(), fIsPerformance(isperformance), fCreateGeantinoMaps(createGeantinoMaps) {}
+MyActionInitialization::MyActionInitialization(bool isperformance, bool createGeantinoMaps, G4String geantinoMapsFilename)
+: G4VUserActionInitialization(), fIsPerformance(isperformance), fCreateGeantinoMaps(createGeantinoMaps),fGeantinoMapsFilename(geantinoMapsFilename){}
 
 
 MyActionInitialization::~MyActionInitialization() {}
 
 // called in case of MT
 void MyActionInitialization::BuildForMaster() const {
-    MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps);
+    MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps,fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     SetUserAction(masterRunAct);
 }
@@ -44,7 +44,7 @@ void MyActionInitialization::Build() const {
 #endif
   // do not create Run,Event,Stepping and Tracking actions in case of perfomance mode
   if (!fIsPerformance) {
-      MyRunAction* runact = new MyRunAction(fCreateGeantinoMaps);
+      MyRunAction* runact = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
       SetUserAction(runact);
       
       if(!fCreateGeantinoMaps){

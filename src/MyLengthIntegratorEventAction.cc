@@ -4,7 +4,6 @@
 
 #include "MyLengthIntegratorEventAction.hh"
 
-
 //#include "TProfile.h"
 //#include "TProfile2D.h"
 #include "G4PrimaryVertex.hh"
@@ -102,7 +101,7 @@ namespace G4UA
   void MyLengthIntegratorEventAction::BeginOfEventAction(const G4Event* event)
   {
     std::cout << "\n ========================================================= "      <<std::endl;
-    G4cout  << " ****** MyLengthIntegratorEventAction::BeginOfEventAction  ****** " <<G4endl;
+    G4cout  << " ******  BeginOfEventAction  ****** " <<G4endl;
     //m_detThickMap.clear();
     G4PrimaryVertex* vert = event->GetPrimaryVertex(0);
     G4PrimaryParticle* part = vert->GetPrimary();
@@ -126,7 +125,7 @@ namespace G4UA
     // Lazily protect this whole code from concurrent access
     std::lock_guard<std::mutex> lock(gHistSvcMutex);
     std::cout << "\n ========================================================= "    << std::endl;
-    G4cout    <<" ****** MyLengthIntegratorEventAction::EndOfEventAction  ****** "  << G4endl;
+    G4cout    <<" ****** EndOfEventAction  ****** "  << G4endl;
     //m_stepAct
       if (m_stepAct->m_detThickMap.size()==0){
           G4cout<<" m_detThickMap size is zero! "<<G4endl;
@@ -344,7 +343,7 @@ namespace G4UA
           }
       }//~Geant4
       
-      G4cout    << " ****** MyLengthIntegratorEventAction::EndOfEventAction - DONE ****** " << G4endl;
+      //G4cout    << " ****** EndOfEventAction - DONE ****** " << G4endl;
       std::cout << "\n ========================================================= "  << std::endl;
   }
 

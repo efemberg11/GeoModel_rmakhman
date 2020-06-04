@@ -165,15 +165,15 @@ namespace G4UA
 
       const G4ElementVector* eVec = mat->GetElementVector();
       for (size_t i=0 ; i < mat->GetNumberOfElements() ; ++i) {
-	std::string elementName = "E_" + (*eVec)[i]->GetName();
-	std::string matName_plus_elementName = "ME_" + lv->GetMaterial()->GetName() + "_" + (*eVec)[i]->GetName();
-	std::string detName_plus_elementName = "DE_" + detName + "_" + (*eVec)[i]->GetName();
-	double el_thickstepRL = stepl * (mat->GetVecNbOfAtomsPerVolume())[i] * (*eVec)[i]->GetfRadTsai() * 100.0;
-	G4double lambda0 = 35*g/cm2;	
-	double el_thickstepIL = stepl * amu/lambda0 * (mat->GetVecNbOfAtomsPerVolume())[i] * m_g4pow->Z23( G4int( (*eVec)[i]->GetN() + 0.5 ) );
-	MyLengthIntegratorSteppingAction::addToDetThickMap(elementName,              el_thickstepRL, el_thickstepIL);
-	MyLengthIntegratorSteppingAction::addToDetThickMap(matName_plus_elementName, el_thickstepRL, el_thickstepIL);
-	MyLengthIntegratorSteppingAction::addToDetThickMap(detName_plus_elementName, el_thickstepRL, el_thickstepIL);
+          std::string elementName = "E_" + (*eVec)[i]->GetName();
+          std::string matName_plus_elementName = "ME_" + lv->GetMaterial()->GetName() + "_" + (*eVec)[i]->GetName();
+          std::string detName_plus_elementName = "DE_" + detName + "_" + (*eVec)[i]->GetName();
+          double el_thickstepRL = stepl * (mat->GetVecNbOfAtomsPerVolume())[i] * (*eVec)[i]->GetfRadTsai() * 100.0;
+          G4double lambda0 = 35*g/cm2;
+          double el_thickstepIL = stepl * amu/lambda0 * (mat->GetVecNbOfAtomsPerVolume())[i] * m_g4pow->Z23( G4int( (*eVec)[i]->GetN() + 0.5 ) );
+          MyLengthIntegratorSteppingAction::addToDetThickMap(elementName,              el_thickstepRL, el_thickstepIL);
+          MyLengthIntegratorSteppingAction::addToDetThickMap(matName_plus_elementName, el_thickstepRL, el_thickstepIL);
+          MyLengthIntegratorSteppingAction::addToDetThickMap(detName_plus_elementName, el_thickstepRL, el_thickstepIL);
       }
 
     }

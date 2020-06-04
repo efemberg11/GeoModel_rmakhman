@@ -32,8 +32,9 @@
 static bool         parCreateGeantinoMaps = true;
 static bool         parIsPerformance   = false;
 static G4String     geometryFileName   = "";
-static std::string  parMacroFileName   = "geantino.g4";
-static std::string  parPhysListName    = "FTFP_BERT";
+static G4String     parMacroFileName   = "geantino.g4";
+static G4String     parOutputFileName  = "geantinoMaps.root";
+static G4String     parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
 
 void GetInputArguments(int argc, char** argv);
@@ -49,6 +50,7 @@ int main(int argc, char** argv) {
     << " =============== Running geantinoMaps ================ "      << G4endl
     << "   Geant4 macro       =  " << parMacroFileName                << G4endl
     << "   Geometry file      =  " << geometryFileName                << G4endl
+    << "   Output file        =  " << parOutputFileName               << G4endl
     << " ===================================================== "      << G4endl;
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
@@ -95,7 +97,8 @@ int main(int argc, char** argv) {
     }
   
     // 3. User action
-    runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance, parCreateGeantinoMaps));
+    runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance, parCreateGeantinoMaps,parOutputFileName));
+    
   
     // 4. Run the simulation in batch mode
     G4UImanager* UI = G4UImanager::GetUIpointer();
@@ -117,6 +120,7 @@ int main(int argc, char** argv) {
 static struct option options[] = {
     {"geometry file name    "  , required_argument, 0, 'g'},
     {"macro file            "  , required_argument, 0, 'm'},
+    {"output ROOT file name "  , required_argument, 0, 'o'},
     {"help"                    , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
@@ -128,7 +132,8 @@ void Help() {
             << std::endl
             <<"  **** Parameters: \n\n"
             <<"      -g :   [REQUIRED] the Geometry file name (supported extensions: .db/.gdml/.dylib/.so) \n"
-            <<"      -m :   [OPTIONAL] the standard Geant4 macro file name (default: geantino.g4) \n"
+            <<"      -m :   [OPTIONAL] the standard Geant4 macro file name (default: 'geantino.g4') \n"
+            <<"      -o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') \n"
             << std::endl;
   std::cout <<"\nUsage: ./gmgeantino [OPTIONS] -g <geometry-file-name> \n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -146,7 +151,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:m:h", options, &optidx);
+   c = getopt_long(argc, argv, "g:m:o:h", options, &optidx);
    if (c == -1)
      break;
    //
@@ -160,6 +165,9 @@ void GetInputArguments(int argc, char** argv) {
    case 'g':
      geometryFileName = optarg;
      break;
+   case 'o':
+     parOutputFileName = optarg;
+     break;
    case 'h':
      Help();
      exit(0);
@@ -168,10 +176,16 @@ void GetInputArguments(int argc, char** argv) {
      errx(1, "unknown option %c", c);
    }
   }
-  // check if mandatory geometry file was provided
-  if (geometryFileName=="") {
-    G4cout << "  *** ERROR : geometry file is required (use the -g option). " << G4endl;
-    Help();
-    exit(-1);
+  // check if output filename has .root extension
+    if (!parOutputFileName.contains(".root")) {
+        G4cout << "  *** ERROR!!! Output file must have the .root extension. Please type a valid filename." << G4endl;
+        Help();
+        exit(-1);
+    }
+    // check if mandatory geometry file was provided
+    if (geometryFileName=="") {
+        G4cout << "  *** ERROR!!! Geometry file is required. Please use the -g option. " << G4endl;
+        Help();
+        exit(-1);
   }
 }

@@ -18,7 +18,7 @@
 
 G4AnalysisManager* MyRunAction::fMasterAnalysisManager = nullptr;
 
-MyRunAction::MyRunAction(bool isGeantino) : G4UserRunAction(), fIsPerformance(false), fIsGeantino(isGeantino), fRun(nullptr), fTimer(nullptr) {
+MyRunAction::MyRunAction(bool isGeantino, G4String geantinoMapFilename) : G4UserRunAction(), fIsPerformance(false), fIsGeantino(isGeantino), fRun(nullptr), fTimer(nullptr), fGeantinoMapsFilename(geantinoMapFilename){
     
 }
 
@@ -56,13 +56,12 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         analysisManager->SetVerboseLevel(1);
     
         // Open output root file
-        std::string fileName_g4 = "geantinoMaps.root";
         G4cout<<"\n\nBeginOfRunAction: \n...create a root file using the G4AnalysisManager" << G4endl;
-        if (!analysisManager->OpenFile(fileName_g4)){
+        if (!analysisManager->OpenFile(fGeantinoMapsFilename)){
             G4cout<<"\nBeginOfRunAction ERROR: File cannot be opened!"<<G4endl;
             exit(-1);
         } else
-        G4cout<<"\n...output File "<<fileName_g4<<" opened!"<<G4endl;
+        G4cout<<"\n...output File "<<fGeantinoMapsFilename<<" opened!"<<G4endl;
     
         const char* radName = "RZRadLen";
     

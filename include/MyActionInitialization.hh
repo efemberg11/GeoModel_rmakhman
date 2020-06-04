@@ -3,10 +3,11 @@
 #define MyActionInitialization_h 1
 
 #include "G4VUserActionInitialization.hh"
+#include "G4String.hh"
 
 class MyActionInitialization : public G4VUserActionInitialization {
 public:
-  MyActionInitialization(bool isperformance=false, bool createGeantinoMaps=false);
+  MyActionInitialization(bool isperformance=false, bool createGeantinoMaps=false, G4String geantinoMapsFilename="geantinoMaps.root");
   virtual ~MyActionInitialization();
 
   virtual void BuildForMaster() const;
@@ -17,6 +18,7 @@ public:
 private:
   bool fIsPerformance;
   bool fCreateGeantinoMaps;
+  G4String fGeantinoMapsFilename;
 
 };
 

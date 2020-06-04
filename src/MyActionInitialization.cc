@@ -25,14 +25,9 @@ MyActionInitialization::~MyActionInitialization() {}
 
 // called in case of MT
 void MyActionInitialization::BuildForMaster() const {
-    MyRunAction* masterRunAct = new MyRunAction();
+    MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     SetUserAction(masterRunAct);
-    
-//    std::cout<<"MyActionInitialization::BuildForMaster(): taking the Master G4AnalysisManager::Instance"<<std::endl;
-//    fMasterAnalysisManager = G4AnalysisManager::Instance();
-//    std::cout<<"fMasterAnalysisManager: "<<fMasterAnalysisManager<<std::endl;
-    //exit(-1);
 }
 
 
@@ -49,7 +44,7 @@ void MyActionInitialization::Build() const {
 #endif
   // do not create Run,Event,Stepping and Tracking actions in case of perfomance mode
   if (!fIsPerformance) {
-      MyRunAction* runact = new MyRunAction();
+      MyRunAction* runact = new MyRunAction(fCreateGeantinoMaps);
       SetUserAction(runact);
       
       if(!fCreateGeantinoMaps){

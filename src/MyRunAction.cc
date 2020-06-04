@@ -18,7 +18,7 @@
 
 G4AnalysisManager* MyRunAction::fMasterAnalysisManager = nullptr;
 
-MyRunAction::MyRunAction() : G4UserRunAction(), fIsPerformance(false), fRun(nullptr), fTimer(nullptr) {
+MyRunAction::MyRunAction(bool isGeantino) : G4UserRunAction(), fIsPerformance(false), fIsGeantino(isGeantino), fRun(nullptr), fTimer(nullptr) {
     
 }
 
@@ -39,49 +39,54 @@ G4Run* MyRunAction::GenerateRun() {
 }
 
 
-void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/) {
+void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
     
-    // Create analysis manager
-    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-    if (isMaster) {
-        fMasterAnalysisManager = analysisManager;
-        //G4cout<<"MyRunAction::BeginOfRunAction, created MASTER istance of the G4AnalysisManager: "<<fMasterAnalysisManager<<G4endl;
-        
-    }
-    //else
-    //    G4cout<<"MyRunAction::BeginOfRunAction, created WORKER istance of the G4AnalysisManager: "<<analysisManager<<G4endl;
-    
-    G4cout << "Using G4AnalysisManager type: " << analysisManager->GetType() << G4endl;
-    analysisManager->SetVerboseLevel(1);
-    
-    // Open output root file
-    std::string fileName_g4 = "geantinoMaps.root";
-    G4cout<<"\n\nBeginOfRunAction, create root file with the G4AnalysisManager " << G4endl;
-    if (!analysisManager->OpenFile(fileName_g4)){
-        G4cout<<"\nBeginOfRunAction ERROR: File cannot be opened!"<<G4endl;
-        exit(-1);
-    } else
-        G4cout<<"\nBeginOfRunAction FILE "<<fileName_g4<<" opened!"<<G4endl;
-    
-    const char* radName = "RZRadLen";
-    
-    if(analysisManager->GetP2Id(radName, false) < 0){
-        fRadName_id = analysisManager->CreateP2(radName,radName,1000,-25000.,25000.,2000,0.,15000.);
-        //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZRadLen 2DProfile with name: "<<radName<< " and  with id: "<<fRadName_id<<G4endl;
-        analysisManager->SetP2XAxisTitle(fRadName_id,"Z[mm]");
-        analysisManager->SetP2YAxisTitle(fRadName_id,"R[mm]");
-        analysisManager->SetP2ZAxisTitle(fRadName_id,"thickstepRL");
-        
-    }
-    const char* intName = "RZIntLen";
-    if(analysisManager->GetP2Id(intName, false)< 0)
+    if(fIsGeantino)
     {
-        fIntName_id = analysisManager->CreateP2(intName,intName,1000,-25000.,25000.,2000,0.,15000.);
-        //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZIntLen 2DProfile with name: "<<intName<< " and with id: "<<fIntName_id<<G4endl;
-        analysisManager->SetP2XAxisTitle(fIntName_id,"Z[mm]");
-        analysisManager->SetP2YAxisTitle(fIntName_id,"R[mm]");
-        analysisManager->SetP2ZAxisTitle(fIntName_id,"thickstepIL");
+        // Create analysis manager
+        G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+        if (isMaster) {
+            fMasterAnalysisManager = analysisManager;
+            //G4cout<<"MyRunAction::BeginOfRunAction, created MASTER istance of the G4AnalysisManager: "<<fMasterAnalysisManager<<G4endl;
+        
+        }
+        //else
+        //    G4cout<<"MyRunAction::BeginOfRunAction, created WORKER istance of the G4AnalysisManager: "<<analysisManager<<G4endl;
+    
+        G4cout << "Using G4AnalysisManager type: " << analysisManager->GetType() << G4endl;
+        analysisManager->SetVerboseLevel(1);
+    
+        // Open output root file
+        std::string fileName_g4 = "geantinoMaps.root";
+        G4cout<<"\n\nBeginOfRunAction, create root file with the G4AnalysisManager " << G4endl;
+        if (!analysisManager->OpenFile(fileName_g4)){
+            G4cout<<"\nBeginOfRunAction ERROR: File cannot be opened!"<<G4endl;
+            exit(-1);
+        } else
+            G4cout<<"\nBeginOfRunAction FILE "<<fileName_g4<<" opened!"<<G4endl;
+    
+        const char* radName = "RZRadLen";
+    
+        if(analysisManager->GetP2Id(radName, false) < 0){
+            fRadName_id = analysisManager->CreateP2(radName,radName,1000,-25000.,25000.,2000,0.,15000.);
+            //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZRadLen 2DProfile with name: "<<radName<< " and  with id: "<<fRadName_id<<G4endl;
+            analysisManager->SetP2XAxisTitle(fRadName_id,"Z[mm]");
+            analysisManager->SetP2YAxisTitle(fRadName_id,"R[mm]");
+            analysisManager->SetP2ZAxisTitle(fRadName_id,"thickstepRL");
+            
+        }
+        const char* intName = "RZIntLen";
+        if(analysisManager->GetP2Id(intName, false)< 0)
+        {
+            fIntName_id = analysisManager->CreateP2(intName,intName,1000,-25000.,25000.,2000,0.,15000.);
+            //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZIntLen 2DProfile with name: "<<intName<< " and with id: "<<fIntName_id<<G4endl;
+            analysisManager->SetP2XAxisTitle(fIntName_id,"Z[mm]");
+            analysisManager->SetP2YAxisTitle(fIntName_id,"R[mm]");
+            analysisManager->SetP2ZAxisTitle(fIntName_id,"thickstepIL");
+        }
+        
     }
+        
     if (isMaster) {
       
       //G4cout<<"\nBeginOfRunAction isMaster, and fMasterAnalysisManager: "<<fMasterAnalysisManager<<G4endl;
@@ -130,16 +135,19 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/) {
 
 void MyRunAction::EndOfRunAction(const G4Run*) {
     
-    auto analysisManager= G4AnalysisManager::Instance();
-    //Finalize analysisManager and Write out file
-    if (analysisManager->IsOpenFile()){
-        G4cout<<"\n\n EndOfRunAction, write output file: "<<analysisManager->GetFileName() << G4endl;
-        analysisManager->Write();
-        analysisManager->CloseFile();
-        G4cout<<"Output File successfully saved and closed! " << G4endl;
+    if(fIsGeantino){
+        
+        auto analysisManager= G4AnalysisManager::Instance();
+        //Finalize analysisManager and Write out file
+        if (analysisManager->IsOpenFile()){
+            G4cout<<"\n\n EndOfRunAction, write output file: "<<analysisManager->GetFileName() << G4endl;
+            analysisManager->Write();
+            analysisManager->CloseFile();
+            G4cout<<"Output File successfully saved and closed! " << G4endl;
+        }
+        
     }
-
-  if (isMaster) {
+    if (isMaster) {
     fTimer->Stop();
     // get number of events: even in case of perfomance mode when MyRun-s are not generated in GenerateRun()
 #ifdef G4MULTITHREADED

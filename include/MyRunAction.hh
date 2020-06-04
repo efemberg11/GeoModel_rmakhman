@@ -16,7 +16,7 @@ class MyRunAction: public G4UserRunAction {
 
 public:
 
-  MyRunAction();
+  MyRunAction(bool isGeantino);
   virtual ~MyRunAction();
 
   virtual G4Run* GenerateRun();
@@ -27,6 +27,7 @@ public:
 
 private:
   G4bool       fIsPerformance;
+  G4bool       fIsGeantino;
   MyRun*       fRun;
   G4Timer*     fTimer;
 

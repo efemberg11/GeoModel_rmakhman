@@ -6,7 +6,6 @@
 #include "MyEventAction.hh"
 #include "MySteppingAction.hh"
 #include "MyTrackingAction.hh"
-#include "LengthIntegrator.hh"
 #include "MyLengthIntegratorEventAction.hh"
 #include "MyLengthIntegratorSteppingAction.hh"
 

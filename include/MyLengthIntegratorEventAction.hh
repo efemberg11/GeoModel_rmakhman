@@ -9,7 +9,7 @@
 //#include "GaudiKernel/ServiceHandle.h"
 
 #include "G4Pow.hh"
-#include "TString.h"
+//#include "TString.h"
 
 #include "G4UserEventAction.hh"
 #include "G4UserSteppingAction.hh"
@@ -21,8 +21,8 @@
 #include <map>
 
 // Forward declarations
-class TProfile;
-class TProfile2D;
+//class TProfile;
+//class TProfile2D;
 
 
 namespace G4UA
@@ -65,8 +65,8 @@ namespace G4UA
       /// Pointer to MyLengthIntegratorSteppingAction
       MyLengthIntegratorSteppingAction* m_stepAct;
       
-      /// Setup one set of measurement hists for a detector name - ROOT
-      void regAndFillHist(const std::string&, const std::pair<double, double>&);
+//      /// Setup one set of measurement hists for a detector name - ROOT
+//      void regAndFillHist(const std::string&, const std::pair<double, double>&);
       
       /// Setup one set of measurement hists for a detector name - G4
       void regAndFillHist_g4(const std::string&, const std::pair<double, double>&);
@@ -76,20 +76,20 @@ namespace G4UA
       /// Cached phi of the current primary
       double m_phiPrimary;
 
-      /// Rad-length profile hist in eta - ROOT
-      std::map<std::string, TProfile*> m_etaMapRL;
-      /// Rad-length profile hist in phi - ROOT
-      std::map<std::string, TProfile*> m_phiMapRL;
+//      /// Rad-length profile hist in eta - ROOT
+//      std::map<std::string, TProfile*> m_etaMapRL;
+//      /// Rad-length profile hist in phi - ROOT
+//      std::map<std::string, TProfile*> m_phiMapRL;
       
       /// Rad-length profile hist in eta - Geant4
       std::map<std::string, G4int> m_etaMapRL_g4;
       /// Rad-length profile hist in phi - Geant4
       std::map<std::string, G4int> m_phiMapRL_g4;
 
-      /// Int-length profile hist in eta - ROOT
-      std::map<std::string, TProfile*> m_etaMapIL;
-      /// Int-length profile hist in phi - ROOT
-      std::map<std::string, TProfile*> m_phiMapIL;
+//      /// Int-length profile hist in eta - ROOT
+//      std::map<std::string, TProfile*> m_etaMapIL;
+//      /// Int-length profile hist in phi - ROOT
+//      std::map<std::string, TProfile*> m_phiMapIL;
       
       /// Int-length profile hist in eta - Geant4
       std::map<std::string, G4int> m_etaMapIL_g4;

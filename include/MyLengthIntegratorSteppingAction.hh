@@ -48,7 +48,7 @@ namespace G4UA
     public:
 
       /// Constructor takes the name of the histogram service as argument.
-      MyLengthIntegratorSteppingAction(MyRunAction* myrun, G4double rlimit =12500 ,G4double zlimit=23000, G4double xlimit=12500, G4double ylimit=12500);
+      MyLengthIntegratorSteppingAction(MyRunAction* myrun, G4double rlimit =12500 ,G4double zlimit=23000, G4double xlimit=12500, G4double ylimit=12500, bool createDetectorsMaps = false, bool createMaterialsMaps = false, bool createElementsMaps = false);
       /// Destructor
       ~MyLengthIntegratorSteppingAction();
 
@@ -59,6 +59,9 @@ namespace G4UA
       void SetZlimit(G4double z){fZlimit = z;}
       void SetXlimit(G4double x){fXlimit = x;}
       void SetYlimit(G4double y){fYlimit = y;}
+      void SetCreateDetectorsMaps(bool val) { fCreateDetectorsMaps = val; }
+      void SetCreateMaterialsMaps(bool val) { fCreateMaterialsMaps = val; }
+      void SetCreateElementsMaps (bool val) { fCreateElementsMaps = val; }
 
     private:
 
@@ -88,6 +91,12 @@ namespace G4UA
       G4double fZlimit;
       G4double fXlimit;
       G4double fYlimit;
+      /// Flag to create detectors geantino maps
+      bool fCreateDetectorsMaps;
+      /// Flag to create materials geantino maps
+      bool fCreateMaterialsMaps;
+      /// Flag to create elements geantino maps
+      bool fCreateElementsMaps;
     
       
       

@@ -42,8 +42,12 @@ namespace G4UA
   //---------------------------------------------------------------------------
   // Constructor
   //---------------------------------------------------------------------------
-  MyLengthIntegratorEventAction::MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction* stepAct, MyRunAction* run, bool  generateEtaPhiMaps)
-    :m_run(run), m_stepAct(stepAct), m_etaPrimary(0), m_phiPrimary(0), m_createEtaPhiMaps(generateEtaPhiMaps) {}
+  MyLengthIntegratorEventAction::MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction* stepAct, MyRunAction* run, bool createEtaPhiMaps)
+    :m_run(run),
+    m_stepAct(stepAct),
+    m_etaPrimary(0),
+    m_phiPrimary(0),
+    m_createEtaPhiMaps(createEtaPhiMaps){}
     
   MyLengthIntegratorEventAction::~MyLengthIntegratorEventAction(){
       

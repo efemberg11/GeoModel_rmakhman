@@ -29,14 +29,18 @@
 #include <iostream>
 #include <iomanip>
 
-static bool         parCreateGeantinoMaps = true;
-static bool         parIsPerformance    = false;
-static bool         parCreateEtaPhiMaps = false;
-static G4String     parGeometryFileName   = "";
+
+static bool         parCreateGeantinoMaps  = true;
+static bool         parIsPerformance       = false;
+static bool         parCreateEtaPhiMaps    = false;
+static bool         parCreateDetectorsMaps = false;
+static bool         parCreateMaterialsMaps  = false;
+static bool         parCreateElementsMaps   = false;
+static bool         parRunOverlapCheck = false;
+static G4String     parGeometryFileName= "";
 static G4String     parMacroFileName   = "geantino.g4";
 static G4String     parOutputFileName  = "geantinoMaps.root";
 static G4String     parPhysListName    = "FTFP_BERT";
-static bool         parRunOverlapCheck = false;
 static G4double     parRlimit    = 12500; //r limit in mm, for geantino maps
 static G4double     parZlimit    = 23000; //z limit in mm, for geantino maps
 static G4double     parXlimit    = 12500; //x limit in mm, for geantino maps
@@ -57,6 +61,9 @@ int main(int argc, char** argv) {
     << "   Geometry file              =  " << parGeometryFileName     << G4endl
     << "   Output file                =  " << parOutputFileName       << G4endl
     << "   Create eta-phi maps        =  " << parCreateEtaPhiMaps     << G4endl
+    << "   Create Detectors maps      =  " << parCreateDetectorsMaps  << G4endl
+    << "   Create Materials maps      =  " << parCreateMaterialsMaps  << G4endl
+    << "   Create Elements maps       =  " << parCreateElementsMaps   << G4endl
     << " ===================================================== "      << G4endl;
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
@@ -109,6 +116,9 @@ int main(int argc, char** argv) {
     myAct->SetXlimit(parXlimit);
     myAct->SetYlimit(parYlimit);
     myAct->SetCreateEtaPhiMaps(parCreateEtaPhiMaps);
+    myAct->SetCreateDetectorsMaps(parCreateDetectorsMaps);
+    myAct->SetCreateMaterialsMaps(parCreateMaterialsMaps);
+    myAct->SetCreateElementsMaps(parCreateElementsMaps);
     runManager->SetUserInitialization(myAct);
     
   
@@ -140,6 +150,9 @@ static struct option options[] = {
     {"ylimit                "  , required_argument, 0, 'y'},
     {"output ROOT file name "  , required_argument, 0, 'o'},
     {"etaphiMap             "  , no_argument      , 0, 'e'},
+    {"detectorsMap          "  , no_argument      , 0, 'd'},
+    {"materialsMap          "  , no_argument      , 0, 'a'},
+    {"elementsMap           "  , no_argument      , 0, 'l'},
     {"help"                    , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
@@ -157,7 +170,10 @@ void Help() {
             <<"      -x :   [OPTIONAL] x limit for geantino maps in mm (default: '12500') \n"
             <<"      -y :   [OPTIONAL] y limit for geantino maps in mm (default: '12500') \n"
             <<"      -o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') \n"
-            <<"      -e :   [FLAG]     use this flag to create eta-phi geantino maps (caveat: the process might run out of memory!)\n"
+            <<"      -e :   [FLAG]     use this flag to create eta-phi   geantino maps (caveat: the process might run out of memory!)\n"
+            <<"      -d :   [FLAG]     use this flag to create detectors geantino maps (caveat: the process might run out of memory!)\n"
+            <<"      -a :   [FLAG]     use this flag to create materials geantino maps (caveat: the process might run out of memory!)\n"
+            <<"      -l :   [FLAG]     use this flag to create elements  geantino maps (caveat: the process might run out of memory!)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmgeantino [OPTIONS] -g <geometry-file-name> \n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -175,7 +191,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:m:o:r:z:x:y:eh", options, &optidx);
+   c = getopt_long(argc, argv, "g:m:o:r:z:x:y:edalh", options, &optidx);
    if (c == -1)
      break;
    //
@@ -206,6 +222,15 @@ void GetInputArguments(int argc, char** argv) {
      break;
    case 'e':
      parCreateEtaPhiMaps = true;
+     break;
+   case 'd':
+     parCreateDetectorsMaps = true;
+     break;
+   case 'a':
+     parCreateMaterialsMaps = true;
+     break;
+   case 'l':
+     parCreateElementsMaps = true;
      break;
    case 'h':
      Help();

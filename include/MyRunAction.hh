@@ -37,7 +37,9 @@ private:
 public:
     
     static G4AnalysisManager* fMasterAnalysisManager;
+    // ID of the RadLen 2D Profile
     int fRadName_id;
+    // ID of the IntLen 2D Profile
     int fIntName_id;
 };
 

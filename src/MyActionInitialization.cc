@@ -56,11 +56,16 @@ void MyActionInitialization::Build() const {
       }
       else
       {
+          //Stepping action
           G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction(runact);
           myLenghtIntSteppingAct->SetRlimit(fRlimit);
           myLenghtIntSteppingAct->SetZlimit(fZlimit);
           myLenghtIntSteppingAct->SetXlimit(fXlimit);
           myLenghtIntSteppingAct->SetYlimit(fYlimit);
+          myLenghtIntSteppingAct->SetCreateDetectorsMaps(fCreateDetectorsMaps);
+          myLenghtIntSteppingAct->SetCreateMaterialsMaps(fCreateMaterialsMaps);
+          myLenghtIntSteppingAct->SetCreateElementsMaps(fCreateElementsMaps);
+          //Event action
           G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct, runact);
           myLenghtIntEventAct->SetCreateEtaPhiMaps(fCreateEtaPhiMaps);
           SetUserAction(myLenghtIntEventAct);

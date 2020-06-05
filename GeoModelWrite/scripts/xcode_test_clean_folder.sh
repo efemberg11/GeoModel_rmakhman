@@ -9,6 +9,8 @@
 #
 # $SRCROOT/GeoModelWrite/xcode_test_clean_folder.sh
 #
+# See: https://www.mokacoding.com/blog/better-build-phase-scripts/
+#
 #
 set -x
 ls $TARGET_BUILD_DIR

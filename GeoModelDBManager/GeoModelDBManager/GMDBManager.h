@@ -41,6 +41,7 @@ public:
 	 * @param path - absolute path to db file
 	 */
   GMDBManager(const std::string &path);
+//  GMDBManagerStd(const std::string &path);
 
 	/**
 	 * @brief Destructor
@@ -48,12 +49,13 @@ public:
 	 * Close the db connection
 	 */
 	~GMDBManager();
+  void DestructorGMDBManagerStd();
 
 
 	/**
 	 * @brief Returns true if the DB is correctly open
 	 */
-	bool isOpen() const;
+  bool isOpen() const;
 
 	/**
 	 * @brief Print names of all GeoPhysVol objects in db
@@ -135,6 +137,13 @@ public:
 	 * @brief Print the current version number of the DB schema
 	 */
 	void printDBVersion() const;
+  
+  
+  
+  void printAllDBTables();
+  int execQuery(std::string queryStr);
+
+
 
 	// ADD methods
   /* single-item adders are not efficient, so they are not used at the moment. We might want to enable them again later if we'll have specific use-cases.
@@ -156,6 +165,7 @@ public:
   bool addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records);
   
 //  bool addListOfRecordsToTable(const QString tableName, const std::vector<QStringList> records);
+  bool addListOfRecordsToTableStd(const std::string tableName, const std::vector<std::vector<std::string>> records);
   bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
   
 //  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
@@ -164,7 +174,10 @@ public:
 	bool addRootVolume(const std::vector<std::string> &values);
   void addChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &childId, const unsigned int &parentCopyNumber, const unsigned int &childPos, const std::string &childType, const unsigned int &childCopyN);
 
+  
 	void addDBversion(const QString);
+  void addDBversion(std::string version);
+
 
 	// GET methods
 
@@ -199,6 +212,10 @@ private:
 
 	bool initDB();
 	bool createTables();
+  bool createTablesStd();
+  
+  void checkIsDBOpen();
+
 
 //  void loadTestData(); // for debug only
 
@@ -233,7 +250,9 @@ private:
 	
   QSqlDatabase m_db;
   /// Pointer to SQLite connection
-//  sqlite3* m_db;
+  sqlite3* m_dbSqlite;
+  /// Variable to store error messages from SQLite
+  char *m_SQLiteErrMsg;
   
   
 	bool m_dbIsOK;

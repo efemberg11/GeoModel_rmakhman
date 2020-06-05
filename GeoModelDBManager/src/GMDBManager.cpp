@@ -4,6 +4,11 @@
 
 #include <GeoModelDBManager/GMDBManager.h>
 
+// fmt library
+#define FMT_HEADER_ONLY 1
+#include "fmt/format.h"
+
+
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
@@ -12,6 +17,8 @@
 
 
 #include <stdlib.h> /* exit, EXIT_FAILURE */
+#include <sstream>
+
 
 
 static std::string dbversion = "0.4.0"; // removed "parent" info from [Full]PhysVols tables (May 2020)
@@ -44,16 +51,12 @@ std::string joinVectorStrings(std::vector<std::string> vec, std::string sep="") 
 
 
 
-GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), /*m_db(nullptr),*/ m_dbIsOK(false), m_deepDebug(false)
+GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_SQLiteErrMsg(0), m_dbIsOK(false), m_deepDebug(false)
 {
   // TODO: move to a more organic way
 	#ifdef GEOREAD_DEEP_DEBUG
 	  m_deepDebug = true;
  	#endif
-  
-  
-  
-
 
   m_dbIsOK = false;
 
@@ -71,25 +74,7 @@ GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), /*m_db(nullp
     m_dbIsOK = true;
   }
 
-  
-//  // FIXME: TODO: we should check the existence of the file, otherwise SQLite will create a new file from scratch
-//  // Save the connection result
-//  int exit = 0;
-//  exit = sqlite3_open(path.c_str(), &m_db);
-//
-//  // Test if there was an error
-//  if (exit) {
-//    std::cout << "DB Open Error: " << sqlite3_errmsg(m_db) << std::endl;
-//    m_dbIsOK = false;
-//
-//  } else {
-//    std::cout << "Opened Database Successfully!" << std::endl;
-//    m_dbIsOK = true;
-//  }
-  
-
-
-  // check if DB has tables, if not create them
+//  // check if DB has tables, if not create them
   if (m_dbIsOK) {
     if ( ! (initDB()) ) {
       std::cout << "Error: database initialization failed" << std::endl;
@@ -104,14 +89,47 @@ GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), /*m_db(nullp
 GMDBManager::~GMDBManager()
 {
   m_db.close();
-//  m_db = nullptr;
 }
+
 
 bool GMDBManager::isOpen() const
 {
-	if (! m_dbIsOK )
-		return false;
-	return m_db.isOpen();
+  if (! m_dbIsOK )
+    return false;
+  return m_db.isOpen();
+}
+
+//GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbSqlite(nullptr), m_SQLiteErrMsg(0), m_dbIsOK(false), m_deepDebug(false)
+//{
+//  // TODO: move to a more organic way
+//#ifdef GEOREAD_DEEP_DEBUG
+//  m_deepDebug = true;
+//#endif
+//
+//  m_dbIsOK = false;
+//
+//  // FIXME: TODO: we should check the existence of the file, otherwise SQLite will create a new file from scratch
+//  // Save the connection result
+//  int exit = sqlite3_open(path.c_str(), &m_dbSqlite);
+//
+//  // Test if there was an error
+//  if (exit == SQLITE_OK) {
+//    std::cout << "The Geometry Database '"<< path << "' has been opened successfully!" << std::endl;
+//    m_dbIsOK = true;
+//  } else {
+//    std::cout << "DB Open Error: " << sqlite3_errmsg(m_dbSqlite) << std::endl;
+//    m_dbIsOK = false;
+//  }
+//
+//  // populate DB with fake data, only for debug
+//  //loadTestData(); // TODO: we should move initDB() here, only for debug and Write
+//}
+
+
+void GMDBManager::DestructorGMDBManagerStd()
+{
+//  sqlite3_close(m_dbSqlite);
+  m_dbSqlite = nullptr;
 }
 
 
@@ -410,15 +428,15 @@ bool GMDBManager::addListOfChildrenPositions(const std::vector<std::vector<std::
 bool GMDBManager::addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records)
 {
 //  if (m_deepDebug) qDebug() << "GMDBManager::addListOfRecords():" << geoType;
-  
+
   std::string tableName = m_childType_tableName[geoType];
-  
+
   if (tableName.size() == 0) {
     //qWarning() << "m_childType_tableName:" << m_childType_tableName;
     std::cout << "ERROR!! could not retrieve tableName for node type '" << geoType << "'!! Aborting...";
     exit(EXIT_FAILURE);
   }
-  
+
   if (records.size() > 0 ) {
     // NOTE: Choose the right function!!
     return addListOfRecordsToTable(tableName, records); // better, but needs SQLite >= 3.7.11
@@ -496,27 +514,27 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
 {
   // get table columns and format them for query
   QString tableColString = "(" + QString::fromStdString(joinVectorStrings(m_tableNames.at(tableName), ", ")) + ")";
-  
+
   qWarning() << "tableColString:" << tableColString;
-  
+
   unsigned int nRecords = records.size();
   std::cout << "number of " << tableName << " records to insert into the DB:" << nRecords << std::endl;
-  
+
   // preparing the SQL query
   QString queryStr("INSERT INTO %1 %2 VALUES ");
   queryStr = queryStr.arg(QString::fromStdString(tableName)); // insert table name
   queryStr = queryStr.arg(tableColString); // insert table columns
-  
+
   unsigned int nMat = nRecords;
   unsigned int id = 0;
 //  foreach(QStringList rec, records) {
   for( const std::vector<std::string>& rec : records) {
     //qDebug() << "rec:" << rec;
-    
+
     ++id;
 //    QStringList items;
     std::vector<std::string> items;
-    
+
     for ( const std::string& item : rec) {
       items.push_back("'" + item + "'");
     }
@@ -527,11 +545,11 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     queryStr += ",";
     else
     queryStr += ";";
-    
+
   }
-  
+
   qWarning() << "Query string:" << queryStr;
-  
+
   // executing the SQL query
   QSqlQuery q;
   if (!q.exec(queryStr)) {
@@ -539,27 +557,27 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     showError(q.lastError());
     return false;
   }
-  
+
   return true;
 }
 
 
-//bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records)
-//{
-//  // get table columns and format them for query
-//  std::string tableColString = "(" + joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
-//
-//  std::cout << "tableColString:" << tableColString << std::endl;
-//
-//  unsigned int nRecords = records.size();
-//  std::cout << "number of " << tableName << " records to insert into the DB:" << nRecords << std::endl;
-//
+bool GMDBManager::addListOfRecordsToTableStd(const std::string tableName, const std::vector<std::vector<std::string>> records)
+{
+  // get table columns and format them for query
+  std::string tableColString = "(" + joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
+
+  std::cout << "tableColString:" << tableColString << std::endl;
+
+  unsigned int nRecords = records.size();
+  std::cout << "number of " << tableName << " records to insert into the DB:" << nRecords << std::endl;
+
 //  // preparing the SQL query
 //  QString queryStr("INSERT INTO %1 %2 VALUES ");
 //  queryStr = queryStr.arg(QString::fromStdString(tableName)); // insert table name
-//  queryStr = queryStr.arg(tableColString); // insert table columns
-//
-//}
+//  queryStr = queryStr.arg(QString::fromStdString(tableColString)); // insert table columns
+
+}
 
 
 // ***Note***
@@ -584,10 +602,10 @@ bool GMDBManager::addListOfRecordsToTableOld(const QString tableName, const std:
     unsigned int nRecords = records.size();
     qInfo() << "number of " << tableName << "records to insert into the DB:" << nRecords;
 
- 
+
      // SQLite has a limit on 'union' items, set at 500. So we have to split the items if we have more.
      // See: stackoverflow.com/questions/9527851/
- 
+
     unsigned int bunchSize = 500;
     if ( nRecords > bunchSize ) {
         qWarning() << "WARNING! " << nRecords << " records of type " << tableName << "to store in the DB in one call! Call limit is " << bunchSize << " --> We split them in bunches...";
@@ -980,6 +998,36 @@ void GMDBManager::addDBversion(const QString version)
 	q.exec();
 	return;
 }
+void GMDBManager::addDBversion(std::string version)
+{
+  checkIsDBOpen();
+  std::string queryStr;
+  sqlite3_stmt * st = nullptr;
+  int rc = -1;
+  std::string sql = "INSERT INTO dbversion(version) VALUES(?)";
+  rc = sqlite3_prepare( m_dbSqlite, sql.c_str(), -1, &st, NULL);
+  if (rc != SQLITE_OK) {
+    printf( "[SQLite ERR] : Error msg: %s\n", sqlite3_errmsg(m_dbSqlite) );
+    exit(EXIT_FAILURE);
+  }
+  rc = sqlite3_bind_text(st, 1, version.c_str(), version.length(), SQLITE_TRANSIENT);
+  rc = sqlite3_step( st );
+  if (rc != SQLITE_DONE) {
+    printf( "[SQLite ERR] : Error msg: %s\n", sqlite3_errmsg(m_dbSqlite) );
+    exit(EXIT_FAILURE);
+  }
+  return;
+}
+
+void GMDBManager::checkIsDBOpen()
+{
+  if(m_dbSqlite != nullptr) {
+    return;
+  } else {
+    std::cout << "ERROR! The SQLite DB is not accessible! Exiting..." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
 
 
 std::vector<std::string> GMDBManager::getItem(std::string geoType, unsigned int id)
@@ -1022,7 +1070,7 @@ QStringList GMDBManager::getItemAndType(unsigned int tableId, unsigned int id)
 std::vector<std::string> GMDBManager::getItemAndType(unsigned int tableId, unsigned int id)
 {
   std::vector<std::string> results;
-  
+
   std::string tableName = getTableNameFromTableId(tableId);
   std::string nodeType  = getNodeTypeFromTableId(tableId);
   std::vector<std::string> item  =  getItemFromTableName(tableName, id);
@@ -1031,18 +1079,18 @@ std::vector<std::string> GMDBManager::getItemAndType(unsigned int tableId, unsig
   results.push_back( nodeType );
   // add the item
   results.insert(results.end(), item.begin(), item.end());
-  
+
   return results;
-  
+
 }
 
 /*
 QStringList GMDBManager::getItemFromTableName(std::string tableName, unsigned int id)
 {
 	if (m_deepDebug) qDebug() << "GMDBManager::getItemFromTableName(tableName, id)"<< tableName << QString::number(id);
- 
+
 	 // 2. Get the object from DB
- 
+
 	// prepare a SQL string with the right table name
 	QString queryStr = QString("SELECT * FROM %1 WHERE id = (?)").arg(tableName);
 	// prepare the query
@@ -1088,14 +1136,14 @@ std::vector<std::string> GMDBManager::getItemFromTableName(std::string tableName
   }
   q.addBindValue(id);
   q.exec();
-  
+
   std::vector<std::string> params;
-  
+
   // get the number of columns of the DB table
   int nCols = (m_tableNames.at(tableName)).size();
-  
+
   while (q.next()) {
-    
+
     for( int ii=0; ii<nCols; ++ii)
       params.push_back( q.value(ii).toString().toStdString() );
   }
@@ -1183,34 +1231,34 @@ QHash<QString, QMap<unsigned int, QStringList>> GMDBManager::getChildrenTable()
 std::vector<std::vector<std::string>> GMDBManager::getChildrenTableStd()
 {
 //  std::cout << "GMDBManager::getChildrenTableStd()\n"; // debug
-  
+
   QSqlQuery q;
   QString queryStr = QString("SELECT * FROM ChildrenPositions ORDER BY parentTable, parentId, parentCopyNumber, position");
   if (!q.prepare(queryStr)) {
     showError(q.lastError());
   }
   q.exec();
-  
+
   std::vector<std::vector<std::string>> all_children; // to store all children
   std::vector<std::string> childParams; // to temporarily store the children parameters
-  
+
   // get the number of columns of the DB table
   int nCols = m_tableNames["ChildrenPositions"].size();
   //  std::cout << "num of columns in childrenPos table" << nCols << std::endl; // debug
-  
+
   // loop over all children's positions stored in the DB
   while (q.next()) {
-    
+
     childParams.clear();
-    
+
     for( int ii=0; ii<nCols; ++ii) {
       childParams.push_back( q.value(ii).toString().toStdString() );
     }
-    
+
 //    // debug
 //    if(childParams[2]=="8920")
 //      std::cout << "CoolingTube parent:"; print childParams;
-    
+
     all_children.push_back(childParams);
   }
   return all_children;
@@ -1264,16 +1312,16 @@ QString GMDBManager::getTableNameFromNodeType(QString nodeType)
         }
         q.addBindValue(QString::fromStdString(nodeType));
         q.exec();
-        
+
         std::string tableName;
         while (q.next()) {
           tableName = q.value(0).toString().toStdString();
         }
-        
+
         return tableName;
       }
-      
-      
+
+
 
 // TODO: this and other methods could take data from in-memory maps, without asking to the DB all the times
 /*
@@ -1307,12 +1355,12 @@ std::string GMDBManager::getTableNameFromTableId(unsigned int tabId)
   }
   q.addBindValue(tabId);
   q.exec();
-  
+
   std::string tableName;
   while (q.next()) {
     tableName = q.value(0).toString().toStdString();
   }
-  
+
   return tableName;
 }
 /*
@@ -1344,12 +1392,12 @@ std::string GMDBManager::getNodeTypeFromTableId(unsigned int tabId)
   }
   q.addBindValue(tabId);
   q.exec();
-  
+
   std::string nodeType;
   while (q.next()) {
     nodeType = q.value(0).toString().toStdString();
   }
-  
+
   return nodeType;
 }
 /*
@@ -1375,7 +1423,7 @@ std::unordered_map<unsigned int, std::string> GMDBManager::getAll_TableIDsNodeTy
 {
   std::unordered_map<unsigned int, std::string> output;
   QSqlQuery q = selectAllFromTable("GeoNodesTypes");
-  
+
   unsigned int id;
   QString nodeType;
   // QString tableName;
@@ -1410,7 +1458,7 @@ std::unordered_map<std::string, unsigned int> GMDBManager::getAll_NodeTypesTable
 {
   std::unordered_map<std::string, unsigned int> output;
   QSqlQuery q = selectAllFromTable("GeoNodesTypes");
-  
+
   unsigned int id;
   QString nodeType;
   // QString tableName;
@@ -1445,26 +1493,26 @@ QSqlQuery GMDBManager::selectAllFromTable(std::string tableName) const
   return selectAllFromTableSortBy(tableName, "id");
 }
 
-      
-      
+
+
       QSqlQuery GMDBManager::selectAllFromTableSortBy(std::string tableName, std::string sortColumn) const
 {
   QSqlQuery q;
-  
+
   if ("" == sortColumn || 0 == sortColumn.size()) {
     sortColumn = "id";
   }
   QString qsortColumn = QString::fromStdString(sortColumn);
-  
+
   QStringList args;
   args << QString::fromStdString(tableName) << qsortColumn;
-  
+
   QString queryStr = QString("SELECT * FROM %1 ORDER BY %2");
 //  queryStr = queryStr.arg(tableName);
   for (int i=0; i < args.size(); ++i) {
     queryStr = queryStr.arg( args.at(i) );
   }
-  
+
   if (!q.prepare(queryStr)) {
     showError(q.lastError());
     return QSqlQuery();
@@ -1495,25 +1543,340 @@ bool GMDBManager::initDB()
   // TODO: we should create tables only if the DB is really completely empty!
 	// if DB is empty, then create tables
 	bool tablesOK = createTables();
-
+  
 	// store DB version
 	addDBversion(QString::fromStdString(dbversion));
 
+  
+  
+  // SQLITE test
+  createTablesStd();
+  addDBversion(dbversion);
+  
+  
+  
 	return tablesOK;
 
 }
 
+
+
+
+void GMDBManager::printAllDBTables()
+{
+  // declare a statement
+  sqlite3_stmt *stmt;
+  
+  std::string tableName;
+  
+  // define a query string containing the necessary SQL instructions
+  std::string queryStr = "SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';";
+  
+  // prepare the statement with the query string
+//  int rc = sqlite3_prepare_v2(m_dbSqlite, queryStr.c_str(), -1, &stmt, NULL); // new SQlite required!!!
+  int rc = sqlite3_prepare(m_dbSqlite, queryStr.c_str(), -1, &stmt, NULL);
+  if (rc != SQLITE_OK)
+  throw std::string(sqlite3_errmsg(m_dbSqlite));
+  
+  // execute the statement unti all selected records are processed
+  while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+    tableName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+    std::cout << "tableName: " << tableName << std::endl;
+  }
+  if (rc != SQLITE_DONE) {
+    std::string errmsg(sqlite3_errmsg(m_dbSqlite));
+    sqlite3_finalize(stmt);
+    throw errmsg;
+  }
+  
+  // finalize
+  sqlite3_finalize(stmt);
+}
+
+bool GMDBManager::createTablesStd()
+{
+  //-----------------------------------------------
+  //FIXME: move to constructor or initDB()!
+  std::string path = "geometry_v2.db";
+  int rc = sqlite3_open(path.c_str(), &m_dbSqlite);
+  //-----------------------------------------------
+  
+  std::string queryStr;
+
+  std::string geoNode;
+  std::string tableName;
+  std::vector<std::string> tab;
+
+  checkIsDBOpen();
+  // create a table to store the relation between the types of GeoNodes and the name of the table
+  tableName = "dbversion";
+  tab.insert(tab.begin(), {tableName, "id", "version"});
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0} ({1} integer primary key, {2} integer)", tab[0], tab[1], tab[2]);
+  execQuery(queryStr);
+  tab.clear();
+  
+  // create a table to store the relation between the types of GeoNodes and the name of the table
+  tableName = "GeoNodesTypes";
+  tab.insert(tab.begin(), {tableName, "id", "nodeType", "tableName"});
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar, {3} varchar)", tab[0], tab[1], tab[2], tab[3]);
+  execQuery(queryStr);
+  tab.clear();
+  
+  // create a table to store the mother-daughter relationships between nodes (notably, between the [Full]PhysVols as the parents and their children)
+  tableName = "ChildrenPositions";
+  //  tab << tableName << "id" << "parentId" << "parentTable" << "parentCopyNumber" << "position" << "childTable" << "childId" << "childCopyNumber";
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("parentId");
+  tab.push_back("parentTable");
+  tab.push_back("parentCopyNumber");
+  tab.push_back("position");
+  tab.push_back("childTable");
+  tab.push_back("childId");
+  tab.push_back("childCopyNumber");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer, {3} integer not null REFERENCES GeoNodesTypes(id), {4} integer, {5} integer, {6} integer not null REFERENCES GeoNodesTypes(id), {7} integer not null, {8} integer not null)", tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8]);
+  execQuery(queryStr);
+  tab.clear();
+
+  // create a table to store information about the 'root' volume (also known as the 'world' volume)
+  tableName = "RootVolume";
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("volId");
+  tab.push_back("volTable");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer not null, {3} integer not null REFERENCES GeoNodesTypes(id))", tab[0], tab[1], tab[2], tab[3]);
+  execQuery(queryStr);
+  tab.clear();
+  
+  // PhysVols table
+  geoNode = "GeoPhysVol";
+  tableName = "PhysVols";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("logvol");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer not null)", tab[0], tab[1], tab[2]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // FullPhysVols table
+  geoNode = "GeoFullPhysVol";
+  tableName = "FullPhysVols";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("logvol");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer not null)", tab[0], tab[1], tab[2]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // LogVols table
+  geoNode = "GeoLogVol";
+  tableName = "LogVols";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("name");
+  tab.push_back("shape");
+  tab.push_back("material");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar, {3} integer not null, {4} integer not null)", tab[0], tab[1], tab[2], tab[3], tab[4]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // Materials table
+  geoNode = "GeoMaterial";
+  tableName = "Materials";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("name");
+  tab.push_back("density");
+  tab.push_back("elements");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar, {3} varchar, {4} varchar)", tab[0], tab[1], tab[2], tab[3], tab[4]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // Elements table
+  geoNode = "GeoElement";
+  tableName = "Elements";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("name");
+  tab.push_back("symbol");
+  tab.push_back("Z");
+  tab.push_back("A");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar, {3} varchar, {4} varchar, {5} varchar)", tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // Shapes table
+  geoNode = "GeoShape";
+  tableName = "Shapes";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("type");
+  tab.push_back("parameters");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar, {3} varchar)", tab[0], tab[1], tab[2], tab[3]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // SerialDenominators table
+  geoNode = "GeoSerialDenominator";
+  tableName = "SerialDenominators";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("baseName");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar)", tab[0], tab[1], tab[2]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+
+  // Functions table
+  geoNode = "Function";
+  tableName = "Functions";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("expression");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar)", tab[0], tab[1], tab[2]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // SerialDenominators table
+  geoNode = "GeoSerialTransformer";
+  tableName = "SerialTransformers";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("funcId");
+  tab.push_back("volId");
+  tab.push_back("volTable");
+  tab.push_back("copies");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer not null REFERENCES Functions(id), {3} integer not null, {4} integer not null REFERENCES GeoNodesTypes(id), {5} integer)", tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // Transforms table
+  geoNode = "GeoTransform";
+  tableName = "Transforms";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("xx");
+  tab.push_back("xy");
+  tab.push_back("xz");
+  tab.push_back("yx");
+  tab.push_back("yy");
+  tab.push_back("yz");
+  tab.push_back("zx");
+  tab.push_back("zy");
+  tab.push_back("zz");
+  tab.push_back("dx");
+  tab.push_back("dy");
+  tab.push_back("dz");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real, {8} real, {9} real, {10} real, {11} real, {12} real, {13} real)", tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8], tab[9], tab[10], tab[11], tab[12], tab[13]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // Transforms table
+  geoNode = "GeoAlignableTransform";
+  tableName = "AlignableTransforms";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("xx");
+  tab.push_back("xy");
+  tab.push_back("xz");
+  tab.push_back("yx");
+  tab.push_back("yy");
+  tab.push_back("yz");
+  tab.push_back("zx");
+  tab.push_back("zy");
+  tab.push_back("zz");
+  tab.push_back("dx");
+  tab.push_back("dy");
+  tab.push_back("dz");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real, {8} real, {9} real, {10} real, {11} real, {12} real, {13} real)", tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8], tab[9], tab[10], tab[11], tab[12], tab[13]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  // NameTags table
+  geoNode = "GeoNameTag";
+  tableName = "NameTags";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("name");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar)", tab[0], tab[1], tab[2]);
+  if (execQuery(queryStr)) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+  
+  std::cout << "All these tables have been successfully created:" << std::endl;
+  printAllDBTables();
+  return rc;
+}
+
+
+int GMDBManager::execQuery(std::string queryStr)
+{
+  //  std::cout << "queryStr to execute: " << queryStr << std::endl; // debug
+  checkIsDBOpen();
+  int result = -1;
+  if( (result = sqlite3_exec(m_dbSqlite, queryStr.c_str(), NULL, 0, &m_SQLiteErrMsg)) )
+  {
+    printf( "[ERR] : \t> CMD: %s , Error: %d\n" , queryStr.c_str() , result );
+    if ( m_SQLiteErrMsg )
+    {
+      printf( "[ERR] : Error msg: %s\n", m_SQLiteErrMsg );
+      sqlite3_free(m_SQLiteErrMsg);
+    }
+  }
+  return result;
+}
+
+
 bool GMDBManager::createTables()
 {
 //  QStringList tab;
-	QSqlQuery q;
+  QSqlQuery q;
   QString queryStr;
-  
+
+
   std::string geoNode;
   std::string tableName;
   std::vector<std::string> tab;
 //  std::vector<std::string>::iterator it;
-  
+
   // create a table to store the relation between the types of GeoNodes and the name of the table
 	tableName = "dbversion";
 //  tab << tableName << "id" << "version";
@@ -1597,10 +1960,11 @@ bool GMDBManager::createTables()
   tab.push_back(tableName);
   tab.push_back("id");
   tab.push_back("logvol");
-  tab.push_back("parent");
+  //tab.push_back("parent");
 	storeTableColumnNames(tab);
 	tab.clear();
-	if (!q.exec(QLatin1String("create table PhysVols(id integer primary key, logvol integer not null, parent integer)"))) {
+//  if (!q.exec(QLatin1String("create table PhysVols(id integer primary key, logvol integer not null, parent integer)"))) {
+  if (!q.exec(QLatin1String("create table PhysVols(id integer primary key, logvol integer not null)"))) {
 		showError(q.lastError());
 		return false;
 	} else {
@@ -1615,10 +1979,11 @@ bool GMDBManager::createTables()
   tab.push_back(tableName);
   tab.push_back("id");
   tab.push_back("logvol");
-  tab.push_back("parent");
+//  tab.push_back("parent");
 	storeTableColumnNames(tab);
 	tab.clear();
-	if (!q.exec(QLatin1String("create table FullPhysVols(id integer primary key, logvol integer not null, parent integer)"))) {
+//  if (!q.exec(QLatin1String("create table FullPhysVols(id integer primary key, logvol integer not null, parent integer)"))) {
+  if (!q.exec(QLatin1String("create table FullPhysVols(id integer primary key, logvol integer not null)"))) {
 		showError(q.lastError());
 		return false;
 	} else {
@@ -1999,7 +2364,7 @@ std::vector<std::string> GMDBManager::getRootPhysVol()
 {
   // get the ID of the ROOT vol from the table "RootVolume"
   QSqlQuery query = selectAllFromTable("RootVolume");
-  
+
   unsigned int id;
   unsigned int typeId;
   while (query.next()) {
@@ -2032,5 +2397,3 @@ int GMDBManager::getTableColIndex(const std::string &tableName, const std::strin
   std::vector<std::string> colFields = m_tableNames.at(tableName);
 	return lastIndexOf(colFields, colName);
 }
-
-

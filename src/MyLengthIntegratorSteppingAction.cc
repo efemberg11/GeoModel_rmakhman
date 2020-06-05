@@ -155,13 +155,11 @@ namespace G4UA
     std::string matName = "M_" + lv->GetMaterial()->GetName();
     std::string detName_plus_matName = "DM_" + detName + "_" + lv->GetMaterial()->GetName();
     std::string detName_d = "D_" + detName;
-    //TO DO: remove specific numbers
-    double zLimit = 3512.0; // For ITk studies: 3512mm is the z-limit of the ID End-Plate Cryostat.
-    double zHit = aStep->GetPreStepPoint()->GetPosition().z();
-    double rLimit = 1152.0; // For ITk studies: 1150mm is the R-limit of the ITk. Note, the solenoid coil is outside of this (at an R of ~1300mm, I think)
-    double rHit = aStep->GetPreStepPoint()->GetPosition().perp();
 
-    if(fabs(zHit) < zLimit && rHit < rLimit){
+    double zHit = aStep->GetPreStepPoint()->GetPosition().z();
+    double rHit = aStep->GetPreStepPoint()->GetPosition().perp();
+      
+    if(fabs(zHit) < fZlimit && rHit < fRlimit){
 
       MyLengthIntegratorSteppingAction::addToDetThickMap(detName_d,            thickstepRL, thickstepIL);
       MyLengthIntegratorSteppingAction::addToDetThickMap(matName,              thickstepRL, thickstepIL);

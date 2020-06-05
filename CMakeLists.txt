@@ -65,7 +65,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 add_executable(fullSimLight fullSimLight.cc ${sources} ${headers})
 add_executable(gmclash geoModelClash.cc ${sources} ${headers})
 add_executable(fillHistogramExample fillHistogramExample.cc src/Histo.cc include/Histo.hh)
-add_executable(geantinoMaps geantinoMaps.cc ${sources} ${headers})
+add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 add_executable(plotGeantinoMaps plotGeantinoMaps.cc)
 
 #----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBMana
 
 target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json ${ROOT_LIBRARIES})
 
-target_link_libraries(geantinoMaps Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json ${ROOT_LIBRARIES})
+target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json ${ROOT_LIBRARIES})
 
 target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
@@ -91,7 +91,7 @@ target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager G
 
 target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
-target_link_libraries(geantinoMaps Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
@@ -107,6 +107,7 @@ ROOT_GENERATE_DICTIONARY(G__geantinoMaps ${headers} LINKDEF geantinoMapsLinkDef.
 # scripts being in the current working directory.
 #
 set(FULLSIMLIGHT_SCRIPTS
+  geantino.g4
   macro.g4
   README.md
   )
@@ -126,4 +127,5 @@ endforeach()
 install(TARGETS fullSimLight DESTINATION ${OUTPUT})
 install(TARGETS gmclash DESTINATION ${OUTPUT})
 install(TARGETS fillHistogramExample DESTINATION ${OUTPUT})
+install(TARGETS gmgeantino DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION ${OUTPUT})

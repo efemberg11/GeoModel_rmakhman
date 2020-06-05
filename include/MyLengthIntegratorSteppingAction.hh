@@ -48,12 +48,17 @@ namespace G4UA
     public:
 
       /// Constructor takes the name of the histogram service as argument.
-      MyLengthIntegratorSteppingAction(MyRunAction* myrun);
+      MyLengthIntegratorSteppingAction(MyRunAction* myrun, G4double rlimit =12500 ,G4double zlimit=23000, G4double xlimit=12500, G4double ylimit=12500);
       /// Destructor
       ~MyLengthIntegratorSteppingAction();
 
       /// Called at every particle step to accumulate thickness.
       virtual void UserSteppingAction(const G4Step*) override;
+      
+      void SetRlimit(G4double r){fRlimit = r;}
+      void SetZlimit(G4double z){fZlimit = z;}
+      void SetXlimit(G4double x){fXlimit = x;}
+      void SetYlimit(G4double y){fYlimit = y;}
 
     private:
 
@@ -77,6 +82,14 @@ namespace G4UA
   private:
       /// Pointer to the MyRunAction, needed to create new Profiles
       MyRunAction* m_run;
+      
+      ///R,Z,X,Y limits for geantino maps
+      G4double fRlimit;
+      G4double fZlimit;
+      G4double fXlimit;
+      G4double fYlimit;
+    
+      
       
 //      /// Rad-length profile hist in R-Z - ROOT
 //      TProfile2D* m_rzProfRL;

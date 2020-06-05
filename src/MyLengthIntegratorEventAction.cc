@@ -101,7 +101,7 @@ namespace G4UA
   void MyLengthIntegratorEventAction::BeginOfEventAction(const G4Event* event)
   {
     std::cout << "\n ========================================================= "      <<std::endl;
-    G4cout  << " ******  BeginOfEventAction  ****** " <<G4endl;
+    G4cout  << " ****** BeginOfEventAction  ****** " <<G4endl;
     //m_detThickMap.clear();
     G4PrimaryVertex* vert = event->GetPrimaryVertex(0);
     G4PrimaryParticle* part = vert->GetPrimary();
@@ -113,7 +113,6 @@ namespace G4UA
     G4cout.precision(6);
     G4cout<<" ****** Eta: "<< m_etaPrimary<<" ****** " <<G4endl;
     G4cout<<" ****** Phi: "<< m_phiPrimary<<" ****** " <<G4endl;
-    std::cout  << "\n =========================================================" <<std::endl;;
       
   }
 
@@ -124,7 +123,6 @@ namespace G4UA
   {
     // Lazily protect this whole code from concurrent access
     std::lock_guard<std::mutex> lock(gHistSvcMutex);
-    std::cout << "\n ========================================================= "    << std::endl;
     G4cout    <<" ****** EndOfEventAction  ****** "  << G4endl;
     //m_stepAct
       if (m_stepAct->m_detThickMap.size()==0){
@@ -343,7 +341,6 @@ namespace G4UA
           }
       }//~Geant4
       
-      //G4cout    << " ****** EndOfEventAction - DONE ****** " << G4endl;
       std::cout << "\n ========================================================= "  << std::endl;
   }
 

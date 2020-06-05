@@ -57,6 +57,10 @@ void MyActionInitialization::Build() const {
       else
       {
           G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction(runact);
+          myLenghtIntSteppingAct->SetRlimit(fRlimit);
+          myLenghtIntSteppingAct->SetZlimit(fZlimit);
+          myLenghtIntSteppingAct->SetXlimit(fXlimit);
+          myLenghtIntSteppingAct->SetYlimit(fYlimit);
           G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct, runact);
           SetUserAction(myLenghtIntEventAct);
           SetUserAction(myLenghtIntSteppingAct);

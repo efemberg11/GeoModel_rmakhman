@@ -44,9 +44,14 @@ namespace G4UA
   //---------------------------------------------------------------------------
   // Constructor
   //---------------------------------------------------------------------------
-  MyLengthIntegratorSteppingAction::MyLengthIntegratorSteppingAction(MyRunAction* run)
+  MyLengthIntegratorSteppingAction::MyLengthIntegratorSteppingAction(MyRunAction* run, G4double rlimit,G4double zlimit,G4double xlimit,G4double ylimit)
     : m_g4pow(0),
-      m_run(run)
+      m_run(run),
+      fRlimit(rlimit),
+      fZlimit(zlimit),
+      fXlimit(xlimit),
+      fYlimit(ylimit)
+  
   {
 
       m_g4pow = G4Pow::GetInstance();
@@ -275,8 +280,10 @@ namespace G4UA
           std::string xynameReg = "XYRadLen_"+plotstring;
           G4String rzname_g4 = "RZRadLen_"+plotstring;
           G4String xyname_g4 = "XYRadLen_"+plotstring;
-          m_rzMapRL_g4[plotstring]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"%X0");
-          m_xyMapRL_g4[plotstring]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"%X0");
+//          m_rzMapRL_g4[plotstring]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"%X0");
+//          m_xyMapRL_g4[plotstring]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"%X0");
+          m_rzMapRL_g4[plotstring]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-fZlimit,fZlimit,"R [mm]",1000,0.,fRlimit,"%X0");
+          m_xyMapRL_g4[plotstring]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-fXlimit,fXlimit,"Y [mm]",1000,-fYlimit,fYlimit,"%X0");
           
       }
       //else G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<plotstring<<" EXIST!"<<G4endl;
@@ -321,8 +328,10 @@ namespace G4UA
          std::string xynameReg = "XYIntLen_"+plotstring;
          G4String rzname_g4 = "RZIntLen_"+plotstring;
          G4String xyname_g4 = "XYIntLen_"+plotstring;
-         m_rzMapIL_g4[plotstring]= getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"#lambda");
-         m_xyMapIL_g4[plotstring]= getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"#lambda");
+         //m_rzMapIL_g4[plotstring]= getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"#lambda");
+         //m_xyMapIL_g4[plotstring]= getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"#lambda");
+         m_rzMapIL_g4[plotstring]= getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-fZlimit,fZlimit,"R [mm]",1000,0.,fRlimit,"#lambda");
+         m_xyMapIL_g4[plotstring]= getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-fXlimit,fXlimit,"Y [mm]",1000,-fYlimit,fYlimit,"#lambda");
      }
      //else G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<plotstring<<" EXIST!"<<G4endl;
      //   G4cout<<"Geant4: Filling m_rzMapIL_g4 histogram for plotstring: "<<plotstring<<"!"<<G4endl;
@@ -369,9 +378,10 @@ namespace G4UA
          //
          G4String rzname_g4 = "RZRadLen_"+elementName;
          G4String xyname_g4 = "XYRadLen_"+elementName;
-         m_rzMapRL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"%X0");
-         m_xyMapRL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"%X0");
-        
+//         m_rzMapRL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"%X0");
+//         m_xyMapRL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"%X0");
+         m_rzMapRL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-fZlimit,fZlimit,"R [mm]",1000,0.,fRlimit,"%X0");
+         m_xyMapRL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-fXlimit,fXlimit,"Y [mm]",1000,-fYlimit,fYlimit,"%X0");
      }
      //else G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<elementName<<" EXIST!"<<G4endl;
      //   G4cout<<"Geant4: Filling m_rzMapRL_g4 histogram for elementName: "<<elementName<<"!"<<G4endl;
@@ -417,8 +427,10 @@ namespace G4UA
          std::string xynameReg = "XYIntLen_"+elementName;
          G4String rzname_g4 = "RZIntLen_"+elementName;
          G4String xyname_g4 = "XYIntLen_"+elementName;
-         m_rzMapIL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"#lambda");
-         m_xyMapIL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"#lambda");
+//         m_rzMapIL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"#lambda");
+//         m_xyMapIL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"#lambda");
+         m_rzMapIL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-fZlimit,fZlimit,"R [mm]",1000,0.,fRlimit,"#lambda");
+         m_xyMapIL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-fXlimit, fXlimit,"Y [mm]",1000,-fYlimit,fYlimit,"#lambda");
          
      }
      //else G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<elementName<<" EXIST!"<<G4endl;

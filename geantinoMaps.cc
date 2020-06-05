@@ -31,11 +31,15 @@
 
 static bool         parCreateGeantinoMaps = true;
 static bool         parIsPerformance   = false;
-static G4String     geometryFileName   = "";
+static G4String     parGeometryFileName   = "";
 static G4String     parMacroFileName   = "geantino.g4";
 static G4String     parOutputFileName  = "geantinoMaps.root";
 static G4String     parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
+static G4double     parRlimit    = 12500; //r limit in mm, for geantino maps
+static G4double     parZlimit    = 23000; //z limit in mm, for geantino maps
+static G4double     parXlimit    = 12500; //x limit in mm, for geantino maps
+static G4double     parYlimit    = 12500; //y limit in mm, for geantino maps
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -49,7 +53,7 @@ int main(int argc, char** argv) {
     G4cout
     << " =============== Running geantinoMaps ================ "      << G4endl
     << "   Geant4 macro       =  " << parMacroFileName                << G4endl
-    << "   Geometry file      =  " << geometryFileName                << G4endl
+    << "   Geometry file      =  " << parGeometryFileName                << G4endl
     << "   Output file        =  " << parOutputFileName               << G4endl
     << " ===================================================== "      << G4endl;
     
@@ -80,7 +84,7 @@ int main(int argc, char** argv) {
     
     if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
         
-    detector->SetGeometryFileName (geometryFileName);
+    detector->SetGeometryFileName (parGeometryFileName);
     runManager->SetUserInitialization(detector);
   
     // 2. Physics list
@@ -97,7 +101,12 @@ int main(int argc, char** argv) {
     }
   
     // 3. User action
-    runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance, parCreateGeantinoMaps,parOutputFileName));
+    MyActionInitialization* myAct = new MyActionInitialization(parIsPerformance, parCreateGeantinoMaps,parOutputFileName);
+    myAct->SetRlimit(parRlimit);
+    myAct->SetZlimit(parZlimit);
+    myAct->SetXlimit(parXlimit);
+    myAct->SetYlimit(parYlimit);
+    runManager->SetUserInitialization(myAct);
     
   
     // 4. Run the simulation in batch mode
@@ -114,12 +123,18 @@ int main(int argc, char** argv) {
     //
     // Delete the RunManager
     delete runManager;
+    G4cout
+    << " =============== Running geantinoMaps: DONE! ================ "      << G4endl;
     return 0;
 }
 
 static struct option options[] = {
     {"geometry file name    "  , required_argument, 0, 'g'},
     {"macro file            "  , required_argument, 0, 'm'},
+    {"r limit               "  , required_argument, 0, 'r'},
+    {"z limit               "  , required_argument, 0, 'z'},
+    {"x limit               "  , required_argument, 0, 'x'},
+    {"y limit               "  , required_argument, 0, 'y'},
     {"output ROOT file name "  , required_argument, 0, 'o'},
     {"help"                    , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
@@ -133,6 +148,10 @@ void Help() {
             <<"  **** Parameters: \n\n"
             <<"      -g :   [REQUIRED] the Geometry file name (supported extensions: .db/.gdml/.dylib/.so) \n"
             <<"      -m :   [OPTIONAL] the standard Geant4 macro file name (default: 'geantino.g4') \n"
+            <<"      -r :   [OPTIONAL] r limit for geantino maps in mm (default: '12500') \n"
+            <<"      -z :   [OPTIONAL] z limit for geantino maps in mm (default: '23000') \n"
+            <<"      -x :   [OPTIONAL] x limit for geantino maps in mm (default: '12500') \n"
+            <<"      -y :   [OPTIONAL] y limit for geantino maps in mm (default: '12500') \n"
             <<"      -o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') \n"
             << std::endl;
   std::cout <<"\nUsage: ./gmgeantino [OPTIONS] -g <geometry-file-name> \n" <<std::endl;
@@ -151,7 +170,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:m:o:h", options, &optidx);
+   c = getopt_long(argc, argv, "g:m:o:r:z:x:y:h", options, &optidx);
    if (c == -1)
      break;
    //
@@ -163,10 +182,22 @@ void GetInputArguments(int argc, char** argv) {
      parMacroFileName = optarg;
      break;
    case 'g':
-     geometryFileName = optarg;
+     parGeometryFileName = optarg;
      break;
    case 'o':
      parOutputFileName = optarg;
+     break;
+   case 'r':
+     parRlimit = atof(optarg);
+     break;
+   case 'z':
+     parZlimit = atof(optarg);
+     break;
+   case 'x':
+     parXlimit = atof(optarg);
+     break;
+   case 'y':
+     parYlimit = atof(optarg);
      break;
    case 'h':
      Help();
@@ -183,7 +214,7 @@ void GetInputArguments(int argc, char** argv) {
         exit(-1);
     }
     // check if mandatory geometry file was provided
-    if (geometryFileName=="") {
+    if (parGeometryFileName=="") {
         G4cout << "  *** ERROR!!! Geometry file is required. Please use the -g option. " << G4endl;
         Help();
         exit(-1);

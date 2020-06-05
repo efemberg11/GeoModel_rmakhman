@@ -23,7 +23,7 @@ FullSimLight project depends on [GeoModelCore](https://gitlab.cern.ch/GeoModelDe
 Following are the instructions to install them. 
 
 ## GeoModelCore:
-First, install GeoModelCore dependencies: [Eigen](http://eigen.tuxfamily.org/)and (optional) [Doxygen](http://www.doxygen.nl/index.html).
+First, install GeoModelCore dependencies: [Eigen](http://eigen.tuxfamily.org/) and  [Doxygen](http://www.doxygen.nl/index.html) (optional).
 Then, clone the repository at [GeoModelCore repo](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), then:
 
 ```bash

@@ -12,6 +12,7 @@ MyEventDataPerPrimary::MyEventDataPerPrimary() {
   fNGamma       = 0.;
   fNElec        = 0.;
   fNPosit       = 0.;
+  fNGeantino    = 0.;
 }
 
 
@@ -27,6 +28,7 @@ void MyEventDataPerPrimary::Clear() {
   fNGamma       = 0.;
   fNElec        = 0.;
   fNPosit       = 0.;
+  fNGeantino    = 0.;
 }
 
 
@@ -42,7 +44,8 @@ std::ostream& operator<<(std::ostream& flux, const MyEventDataPerPrimary& evtdat
        << "    Steps (neutral)        = " << evtdata.fNeutralStep  << "       \n"
        << "    Secondary Gammas       = " << evtdata.fNGamma       << "       \n"
        << "    Secondary Electrons    = " << evtdata.fNElec        << "       \n"
-       << "    Secondary Positrons    = " << evtdata.fNPosit       << "       \n";
+       << "    Secondary Positrons    = " << evtdata.fNPosit       << "       \n"
+       << "    Secondary Geantinos    = " << evtdata.fNGeantino    << "       \n";
   flux.precision(prec);
   flux.setf(mode,std::ios::floatfield);
   return flux;

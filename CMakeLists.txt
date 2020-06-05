@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------
 # Setup the project
 #
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(fullSimLight)
 
 # Compile with C++17
@@ -11,6 +11,8 @@ set(CMAKE_CXX_EXTENSIONS ON)
  
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+add_subdirectory(MagneticField)
 
 # Dependencies.
 ## GeoModel dependencies.
@@ -67,19 +69,23 @@ add_executable(gmclash geoModelClash.cc ${sources} ${headers})
 add_executable(fillHistogramExample fillHistogramExample.cc src/Histo.cc include/Histo.hh)
 add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 #add_executable(plotGeantinoMaps plotGeantinoMaps.cc)
+add_executable(testMagneticField testMagneticField.cc)
+
+
 
 #----------------------------------------------------------------------------
 # Link all needed libraries
 
 target_link_libraries(fillHistogramExample ${Geant4_LIBRARIES})
+target_link_libraries(testMagneticField ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 if( nlohmann_json_FOUND )
 
-target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json )
+target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces  nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json )
+target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} nlohmann_json::nlohmann_json )
+target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
@@ -87,18 +93,17 @@ else()
 
 message(STATUS "'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
 
-target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
 endif()
 
 #ROOT_GENERATE_DICTIONARY(G__geantinoMaps ${headers} LINKDEF geantinoMapsLinkDef.h)
-
 
 
 #----------------------------------------------------------------------------
@@ -128,4 +133,5 @@ install(TARGETS fullSimLight DESTINATION ${OUTPUT})
 install(TARGETS gmclash DESTINATION ${OUTPUT})
 install(TARGETS fillHistogramExample DESTINATION ${OUTPUT})
 install(TARGETS gmgeantino DESTINATION ${OUTPUT})
+install(TARGETS testMagneticField DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION ${OUTPUT})

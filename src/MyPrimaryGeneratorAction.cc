@@ -145,7 +145,7 @@ void  MyPrimaryGeneratorAction::Print() {
   if (magFValue>0.) {
     str += "  Magnetic field           : constant " + std::to_string(magFValue/tesla) + " [ Tesla] field \n";
   } else {
-    str += "  Magnetic field           : without magnetic field \n";
+    str += "  Magnetic field           : non constant \n";
   }
   str   += "  Primaries were generated : \n";
   if (gNumPrimaryPerEvt<0) {

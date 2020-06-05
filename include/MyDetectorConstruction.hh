@@ -9,11 +9,17 @@
 #include "G4Timer.hh"
 #include <nlohmann/json.hpp>
 
+#include "G4Cache.hh"
+#include "G4MagneticField.hh"
+
 using json = nlohmann::json;
 
 class G4VPhysicalVolume;
 class G4FieldManager;
 class G4UniformMagField;
+class G4MagneticField;
+class G4VIntegrationDriver;
+class G4MagIntegratorStepper;
 class MyDetectorMessenger;
 class GeoPhysVol;
 
@@ -31,10 +37,15 @@ public:
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
 
+  /// Common method to construct a driver with a stepper of requested type.
+  G4VIntegrationDriver*
+  createDriverAndStepper(std::string stepperType) const;
+
   void SetMagFieldValue(const G4double fieldValue)
   {
     fFieldValue = fieldValue;
     gFieldValue = fFieldValue;
+    fFieldConstant = true;
   }
 
   static G4double GetFieldValue() { return gFieldValue; }
@@ -67,13 +78,16 @@ private:
   // this static member is for the print out
   static G4double gFieldValue;
   G4bool   fRunOverlapCheck;
+  G4double fMinStep;
   G4String fGeometryFileName;
   G4String fReportFileName;
   G4double fFieldValue;
+  G4bool   fFieldConstant;
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;
   MyDetectorMessenger *fDetectorMessenger;
   std::vector<G4VPhysicalVolume*> fTree;
+  G4Cache<G4MagneticField*> fField; //pointer to the thread-local fields
 };
 
 #endif

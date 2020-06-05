@@ -451,6 +451,7 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
         if ( !readMapRoot( resolvedMapFile ) )
         {
             std::cout<<"\nERROR! Magnetic field map cannot be read!"<<std::endl;
+            std::cout<<"Alternatively, you can set a constant Magnetic Field through the macro.g4 file."<<std::endl;
             exit (-1);
             return false;
         }
@@ -468,11 +469,14 @@ bool MagField::AtlasFieldSvc::initializeMap(AtlasFieldSvcTLS &tls)
         else
         {
             std::cout<<"\nERROR! Magnetic field map file cannot be opened. Please make sure the file is available."<<std::endl;
+            std::cout<<"Alternatively, you can set a constant Magnetic Field through the macro.g4 file."<<std::endl;
+            
             exit (-1);
         }
     }else
     {
         std::cout<<"ERROR: Sorry, Magnetic field map file extensions supported are .root or .data files!";
+        std::cout<<"Alternatively, you can set a constant Magnetic Field through the macro.g4 file."<<std::endl;
         exit(-1);
         
     }
@@ -522,11 +526,9 @@ void MagField::AtlasFieldSvc::scaleField()
 /** framework methods */
 bool MagField::AtlasFieldSvc::finalize()
 {
-    //std::cout<< "finalize() ..." << std::endl;
-    //
     // finalization code would go here
     //
-    std::cout<< "finalize() successful" << std::endl;
+    std::cout<< "Finalize() AtlasFieldSvc successful!" << std::endl;
     return true;
 }
 
@@ -711,7 +713,7 @@ bool MagField::AtlasFieldSvc::readMap( std::istream& input )
     int time;
     input >> word >> version;
     if ( word != "FORMAT-VERSION" ) {
-        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'FORMAT-VERION'"<<std::endl;
+        std::cout<<"ERROR: "<< myname << ": found '" << word << "' instead of 'FORMAT-VERSION'"<<std::endl;
         return false;
     }
     if ( version < 5 || version > 6) {

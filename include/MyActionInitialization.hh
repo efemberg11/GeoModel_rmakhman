@@ -14,6 +14,8 @@ public:
   virtual void Build() const;
 
   void SetPerformanceModeFlag(bool val) { fIsPerformance = val; }
+  void SetCreateGeantinoMaps (bool val) { fCreateGeantinoMaps = val; }
+  void SetCreateEtaPhiMaps   (bool val) { fCreateEtaPhiMaps = val; }
   void SetRlimit(G4double r) { fRlimit = r; }
   void SetZlimit(G4double z) { fZlimit = z; }
   void SetXlimit(G4double x) { fXlimit = x; }
@@ -22,6 +24,7 @@ public:
 private:
   bool fIsPerformance;
   bool fCreateGeantinoMaps;
+  bool fCreateEtaPhiMaps;
   G4String fGeantinoMapsFilename;
   G4double fRlimit;
   G4double fZlimit;

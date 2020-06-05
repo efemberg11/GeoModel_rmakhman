@@ -42,8 +42,8 @@ namespace G4UA
   //---------------------------------------------------------------------------
   // Constructor
   //---------------------------------------------------------------------------
-  MyLengthIntegratorEventAction::MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction* stepAct, MyRunAction* run)
-    :m_run(run), m_stepAct(stepAct), m_etaPrimary(0), m_phiPrimary(0) {}
+  MyLengthIntegratorEventAction::MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction* stepAct, MyRunAction* run, bool  generateEtaPhiMaps)
+    :m_run(run), m_stepAct(stepAct), m_etaPrimary(0), m_phiPrimary(0), m_createEtaPhiMaps(generateEtaPhiMaps) {}
     
   MyLengthIntegratorEventAction::~MyLengthIntegratorEventAction(){
       
@@ -121,18 +121,20 @@ namespace G4UA
   //---------------------------------------------------------------------------
   void MyLengthIntegratorEventAction::EndOfEventAction(const G4Event*)
   {
-    // Lazily protect this whole code from concurrent access
-    std::lock_guard<std::mutex> lock(gHistSvcMutex);
     G4cout    <<" ****** EndOfEventAction  ****** "  << G4endl;
-    //m_stepAct
-      if (m_stepAct->m_detThickMap.size()==0){
-          G4cout<<" m_detThickMap size is zero! "<<G4endl;
-          exit(-1);
-      }
+    if(m_createEtaPhiMaps){
+        // Lazily protect this whole code from concurrent access
+        std::lock_guard<std::mutex> lock(gHistSvcMutex);
+    
+        //m_stepAct
+        if (m_stepAct->m_detThickMap.size()==0){
+            G4cout<<" m_detThickMap size is zero! "<<G4endl;
+            exit(-1);
+        }
 
-    auto analysisManager = G4AnalysisManager::Instance();
-    // Loop over volumes
-    for (auto& it : m_stepAct->m_detThickMap) {
+        auto analysisManager = G4AnalysisManager::Instance();
+        // Loop over volumes
+        for (auto& it : m_stepAct->m_detThickMap) {
 
       //G4cout<<" ****** Loop over volumes  ****** " <<it.first<<G4endl;
 //      //ROOT
@@ -154,27 +156,27 @@ namespace G4UA
       
       //Geant4
       // If histos already exist, then fill them
-      if (m_etaMapRL_g4.find(it.first) != m_etaMapRL_g4.end()){
-            //G4cout<<"GEANT4: Histos already exist, fill them"<<G4endl;
-            analysisManager->FillP1(m_etaMapRL_g4[it.first], m_etaPrimary, it.second.first,  1.);
-            //m_etaMapRL_g4[it.first]->Fill(m_etaPrimary, it.second.first, 1.);
-            analysisManager->FillP1(m_phiMapRL_g4[it.first], m_phiPrimary, it.second.first,  1.);
-            //m_phiMapRL_g4[it.first]->Fill(m_phiPrimary, it.second.first, 1.);
-            analysisManager->FillP1(m_etaMapIL_g4[it.first], m_etaPrimary, it.second.second, 1.);
-            //m_etaMapIL_g4[it.first]->Fill(m_etaPrimary, it.second.second, 1.);
-            analysisManager->FillP1(m_phiMapIL_g4[it.first], m_phiPrimary, it.second.second, 1.);
-            //m_phiMapIL_g4[it.first]->Fill(m_phiPrimary, it.second.second, 1.);
-          
-      }
-      // New detector volume; register it
-      else {
-          //G4cout<<"GEANT4: New detector volume; register it: "<<it.first<<G4endl;
-          regAndFillHist_g4(it.first, it.second);    //Geant4
-          
-      }
-      //~Geant4
-
-    } // Loop over detectors
+            if (m_etaMapRL_g4.find(it.first) != m_etaMapRL_g4.end()){
+                //G4cout<<"GEANT4: Histos already exist, fill them"<<G4endl;
+                analysisManager->FillP1(m_etaMapRL_g4[it.first], m_etaPrimary, it.second.first,  1.);
+                //m_etaMapRL_g4[it.first]->Fill(m_etaPrimary, it.second.first, 1.);
+                analysisManager->FillP1(m_phiMapRL_g4[it.first], m_phiPrimary, it.second.first,  1.);
+                //m_phiMapRL_g4[it.first]->Fill(m_phiPrimary, it.second.first, 1.);
+                analysisManager->FillP1(m_etaMapIL_g4[it.first], m_etaPrimary, it.second.second, 1.);
+                //m_etaMapIL_g4[it.first]->Fill(m_etaPrimary, it.second.second, 1.);
+                analysisManager->FillP1(m_phiMapIL_g4[it.first], m_phiPrimary, it.second.second, 1.);
+                //m_phiMapIL_g4[it.first]->Fill(m_phiPrimary, it.second.second, 1.);
+                
+            }
+            // New detector volume; register it
+            else {
+                //G4cout<<"GEANT4: New detector volume; register it: "<<it.first<<G4endl;
+                regAndFillHist_g4(it.first, it.second);    //Geant4
+                
+            }
+            //~Geant4
+            
+        } // Loop over detectors
 
     /////////////////////////////////////////////////
     // Putting this here, as normally I'd add the following code into a finalize function (as has been done above for the Athena(non-MP) code), but I'm not sure if overloading the finalize function in AthenaMP will break the histogram merging at the end of the job. If it wont, then the following code can be put in a finalize function, which will speed up AthenaMP jobs.
@@ -205,24 +207,24 @@ namespace G4UA
 //    }//~ROOT
     
     //Geant4
-    G4int totalEtaRL_g4 = m_etaMapRL_g4["Total_X0"];
-    int nbins_g4 = analysisManager->GetP1(totalEtaRL_g4)->axis().bins();
-    //G4cout<<"Geant4: m_etaMapRL_g4 nbins: "<<nbins_g4<<G4endl;
-    for (auto it : m_etaMapRL_g4){
+        G4int totalEtaRL_g4 = m_etaMapRL_g4["Total_X0"];
+        int nbins_g4 = analysisManager->GetP1(totalEtaRL_g4)->axis().bins();
+        //G4cout<<"Geant4: m_etaMapRL_g4 nbins: "<<nbins_g4<<G4endl;
+        for (auto it : m_etaMapRL_g4){
       
-       if( it.first != "Total_X0" ){
-           G4int plot = m_etaMapRL_g4[it.first];
-           for(int i=0 ; i<=nbins_g4 ; i++){
-               double x_value = analysisManager->GetP1(plot)->bin_center(i);
-               int n_enties_plot = analysisManager->GetP1(plot)->bin_entries(i);
-               int n_enties_ref  = analysisManager->GetP1(totalEtaRL_g4)->bin_entries(i);
-               int n_zeros_to_be_added = n_enties_ref - n_enties_plot;
-               for(int j=0 ; j<n_zeros_to_be_added ; j++){
-                   analysisManager->FillP1(plot,x_value,0.0);
-               }
-           }
-       }
-    }//~Geant4
+            if( it.first != "Total_X0" ){
+                G4int plot = m_etaMapRL_g4[it.first];
+                for(int i=0 ; i<=nbins_g4 ; i++){
+                    double x_value = analysisManager->GetP1(plot)->bin_center(i);
+                    int n_enties_plot = analysisManager->GetP1(plot)->bin_entries(i);
+                    int n_enties_ref  = analysisManager->GetP1(totalEtaRL_g4)->bin_entries(i);
+                    int n_zeros_to_be_added = n_enties_ref - n_enties_plot;
+                    for(int j=0 ; j<n_zeros_to_be_added ; j++){
+                        analysisManager->FillP1(plot,x_value,0.0);
+                    }
+                }
+            }
+        }//~Geant4
 
 //    //ROOT
 //    TProfile* totalPhiRL = m_phiMapRL["Total_X0"];
@@ -340,8 +342,8 @@ namespace G4UA
               }
           }
       }//~Geant4
-      
-      std::cout << "\n ========================================================= "  << std::endl;
+    }
+    std::cout << "\n ========================================================= "  << std::endl;
   }
 
   //---------------------------------------------------------------------------

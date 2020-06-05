@@ -47,7 +47,7 @@ namespace G4UA
     public:
 
       /// Constructor takes the name of the histogram service as argument.
-      MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction*, MyRunAction* run);
+      MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction*, MyRunAction* run, bool generateEtaPhiMaps = true);
       /// Destructor
       ~MyLengthIntegratorEventAction();
 
@@ -60,6 +60,7 @@ namespace G4UA
       
       /// Pointer to the RunAction
       MyRunAction*  m_run;
+      void SetCreateEtaPhiMaps   (bool val) { m_createEtaPhiMaps = val; }
 
     private:
       /// Pointer to MyLengthIntegratorSteppingAction
@@ -75,6 +76,8 @@ namespace G4UA
       double m_etaPrimary;
       /// Cached phi of the current primary
       double m_phiPrimary;
+      /// Flag to create eta-phi geantino maps
+      bool m_createEtaPhiMaps;
 
 //      /// Rad-length profile hist in eta - ROOT
 //      std::map<std::string, TProfile*> m_etaMapRL;

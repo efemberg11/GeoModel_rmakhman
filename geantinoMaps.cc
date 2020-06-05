@@ -30,7 +30,8 @@
 #include <iomanip>
 
 static bool         parCreateGeantinoMaps = true;
-static bool         parIsPerformance   = false;
+static bool         parIsPerformance    = false;
+static bool         parCreateEtaPhiMaps = false;
 static G4String     parGeometryFileName   = "";
 static G4String     parMacroFileName   = "geantino.g4";
 static G4String     parOutputFileName  = "geantinoMaps.root";
@@ -52,9 +53,10 @@ int main(int argc, char** argv) {
     
     G4cout
     << " =============== Running geantinoMaps ================ "      << G4endl
-    << "   Geant4 macro       =  " << parMacroFileName                << G4endl
-    << "   Geometry file      =  " << parGeometryFileName                << G4endl
-    << "   Output file        =  " << parOutputFileName               << G4endl
+    << "   Geant4 macro               =  " << parMacroFileName        << G4endl
+    << "   Geometry file              =  " << parGeometryFileName     << G4endl
+    << "   Output file                =  " << parOutputFileName       << G4endl
+    << "   Create eta-phi maps        =  " << parCreateEtaPhiMaps     << G4endl
     << " ===================================================== "      << G4endl;
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
@@ -106,6 +108,7 @@ int main(int argc, char** argv) {
     myAct->SetZlimit(parZlimit);
     myAct->SetXlimit(parXlimit);
     myAct->SetYlimit(parYlimit);
+    myAct->SetCreateEtaPhiMaps(parCreateEtaPhiMaps);
     runManager->SetUserInitialization(myAct);
     
   
@@ -131,11 +134,12 @@ int main(int argc, char** argv) {
 static struct option options[] = {
     {"geometry file name    "  , required_argument, 0, 'g'},
     {"macro file            "  , required_argument, 0, 'm'},
-    {"r limit               "  , required_argument, 0, 'r'},
-    {"z limit               "  , required_argument, 0, 'z'},
-    {"x limit               "  , required_argument, 0, 'x'},
-    {"y limit               "  , required_argument, 0, 'y'},
+    {"rlimit                "  , required_argument, 0, 'r'},
+    {"zlimit                "  , required_argument, 0, 'z'},
+    {"xlimit                "  , required_argument, 0, 'x'},
+    {"ylimit                "  , required_argument, 0, 'y'},
     {"output ROOT file name "  , required_argument, 0, 'o'},
+    {"etaphiMap             "  , no_argument      , 0, 'e'},
     {"help"                    , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
@@ -153,6 +157,7 @@ void Help() {
             <<"      -x :   [OPTIONAL] x limit for geantino maps in mm (default: '12500') \n"
             <<"      -y :   [OPTIONAL] y limit for geantino maps in mm (default: '12500') \n"
             <<"      -o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') \n"
+            <<"      -e :   [FLAG]     use this flag to create eta-phi geantino maps (caveat: the process might run out of memory!)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmgeantino [OPTIONS] -g <geometry-file-name> \n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -170,7 +175,7 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:m:o:r:z:x:y:h", options, &optidx);
+   c = getopt_long(argc, argv, "g:m:o:r:z:x:y:eh", options, &optidx);
    if (c == -1)
      break;
    //
@@ -198,6 +203,9 @@ void GetInputArguments(int argc, char** argv) {
      break;
    case 'y':
      parYlimit = atof(optarg);
+     break;
+   case 'e':
+     parCreateEtaPhiMaps = true;
      break;
    case 'h':
      Help();

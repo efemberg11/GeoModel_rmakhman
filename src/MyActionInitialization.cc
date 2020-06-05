@@ -62,6 +62,7 @@ void MyActionInitialization::Build() const {
           myLenghtIntSteppingAct->SetXlimit(fXlimit);
           myLenghtIntSteppingAct->SetYlimit(fYlimit);
           G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct, runact);
+          myLenghtIntEventAct->SetCreateEtaPhiMaps(fCreateEtaPhiMaps);
           SetUserAction(myLenghtIntEventAct);
           SetUserAction(myLenghtIntSteppingAct);
           

@@ -7,7 +7,6 @@ find_package( GeoModelCore REQUIRED )
 find_package( GeoModelTools REQUIRED )
 find_package( XercesC REQUIRED )
 find_package( Eigen3 REQUIRED )
-find_package( CLHEP REQUIRED )
 find_package( AGDD REQUIRED )
 
 

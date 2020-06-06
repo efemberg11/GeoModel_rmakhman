@@ -26,6 +26,7 @@
 #include <string>
 #include <fstream>
 #include <ctime>
+#include <iostream>
 
 std::vector<const GeoLogVol*> volumeMap;
 

@@ -1,15 +1,13 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "AGDDHandlers/snake_pointHandler.h"
 
-#include "CLHEP/Vector/ThreeVector.h"
-
 #include <iostream>
 #include <vector>
 
-CLHEP::Hep3Vector snake_pointHandler::s_point(0.,0.);
+GeoTrf::Vector3D snake_pointHandler::s_point(GeoTrf::Vector3D::Identity());
 
 snake_pointHandler::snake_pointHandler(std::string s):XMLHandler(s)
 {
@@ -21,7 +19,5 @@ void snake_pointHandler::ElementHandle()
 	bool res;
 	std::vector<double> vvv;
 	vvv=getAttributeAsVector("X_Y_Z",res);
-	s_point.setX(vvv[0]);
-	s_point.setY(vvv[1]);
-	s_point.setZ(vvv[2]);
+	s_point = GeoTrf::Vector3D(vvv[0], vvv[1], vvv[2]);
 }

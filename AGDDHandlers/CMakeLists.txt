@@ -4,7 +4,6 @@ cmake_minimum_required( VERSION 3.1 )
 project( "AGDDHandlers" VERSION 1.0.0 LANGUAGES CXX )
 
 find_package( GeoModelCore REQUIRED )
-find_package( CLHEP REQUIRED )
 find_package( GeoModelTools REQUIRED )
 find_package( XercesC REQUIRED )
 
@@ -24,7 +23,7 @@ file( GLOB HEADERS AGDDHandlers/*.h )
 add_library( AGDDHandlers SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET AGDDHandlers
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( AGDDHandlers PUBLIC AGDDKernel AGDDModel GeoModelTools::GeoModelXMLParser GeoModelCore::GeoModelKernel GeoModelTools::ExpressionEvaluator XercesC::XercesC CLHEP::CLHEP )
+target_link_libraries( AGDDHandlers PUBLIC AGDDKernel AGDDModel GeoModelTools::GeoModelXMLParser GeoModelCore::GeoModelKernel GeoModelTools::ExpressionEvaluator XercesC::XercesC )
 target_include_directories( AGDDHandlers SYSTEM PUBLIC )
 target_include_directories( AGDDHandlers PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

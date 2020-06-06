@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "AGDDHandlers/chamberPositionerHandler.h"
@@ -7,11 +7,6 @@
 #include "AGDDKernel/AGDDDetectorPositioner.h"
 #include "AGDDKernel/AGDDDetector.h"
 #include <iostream>
-
-#include "CLHEP/Vector/Rotation.h"
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Geometry/Transform3D.h"
-
 
 chamberPositionerHandler::chamberPositionerHandler(std::string s):XMLHandler(s)
 {
@@ -61,22 +56,17 @@ void chamberPositionerHandler::ElementHandle()
 		if (zLayout!="Z_NEGATIVE")
 		{
 			double Wedge=dPhi*i+phi0;
-			CLHEP::Hep3Vector cvec;
-			CLHEP::HepRotation crot;
+			GeoTrf::Transform3D crot = GeoTrf::Transform3D::Identity();
 			if (type=="ENDCAP") 
 			{
 				//	fix to ensure right order of planes			
-				crot.rotateZ(180.*degrad);
-				//
-				crot.rotateY(90*degrad);
-				crot.rotateZ(Wedge*degrad);
+				crot = crot*GeoTrf::RotateZ3D(Wedge*degrad)*GeoTrf::RotateY3D(90*degrad)*GeoTrf::RotateZ3D(180.*degrad);
 			}
-			else 
-				crot.rotateZ(Wedge*degrad);
+			else crot = crot*GeoTrf::RotateZ3D(Wedge*degrad);
  			double x=radius*cos(Wedge*degrad);
  			double y=radius*sin(Wedge*degrad);
  			double zpos=zPos;
- 			cvec=CLHEP::Hep3Vector(x,y,zpos);
+ 			GeoTrf::Vector3D cvec=GeoTrf::Vector3D(x,y,zpos);
  			AGDDDetectorPositioner *p __attribute__((__unused__));
  			p=new AGDDDetectorPositioner(volume,crot,cvec);
 			p->SensitiveDetector(true);
@@ -96,23 +86,17 @@ void chamberPositionerHandler::ElementHandle()
 		if (zLayout!="Z_POSITIVE")
         {
 			double Wedge=dPhi*i+phi0;
-            CLHEP::Hep3Vector cvec;
-            CLHEP::HepRotation crot;
+            GeoTrf::Transform3D crot = GeoTrf::Transform3D::Identity();
             if (type=="ENDCAP")
             {
-				//	fix to ensure right order of planes			
-				crot.rotateZ(180.*degrad);
-				//
-                crot.rotateY(90*degrad);
-                crot.rotateZ(-Wedge*degrad);
-				crot.rotateX(180.*degrad);
+				//	fix to ensure right order of planes
+				crot = crot*GeoTrf::RotateX3D(180.*degrad)*GeoTrf::RotateZ3D(-Wedge*degrad)*GeoTrf::RotateY3D(90*degrad)*GeoTrf::RotateZ3D(180.*degrad);
             }
-            else
-                crot.rotateZ(Wedge*degrad);
+            else crot = crot*GeoTrf::RotateZ3D(Wedge*degrad);
             double x=radius*cos(Wedge*degrad);
             double y=radius*sin(Wedge*degrad);
             double zpos=zPos;
-            cvec=CLHEP::Hep3Vector(x,y,-zpos);
+            GeoTrf::Vector3D cvec=GeoTrf::Vector3D(x,y,-zpos);
             AGDDDetectorPositioner *p __attribute__((__unused__));
             p=new AGDDDetectorPositioner(volume,crot,cvec);
 			p->SensitiveDetector(true);

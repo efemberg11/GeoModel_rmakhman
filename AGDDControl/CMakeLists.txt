@@ -5,7 +5,6 @@ project( "AGDDControl" VERSION 1.0.0 LANGUAGES CXX )
 
 find_package( GeoModelCore REQUIRED )
 find_package( Eigen3 REQUIRED )
-find_package( CLHEP REQUIRED )
 find_package( GeoModelTools REQUIRED )
 
 
@@ -25,7 +24,7 @@ file( GLOB HEADERS AGDDControl/*.h )
 add_library( AGDDControl SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET AGDDControl
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( AGDDControl PUBLIC  AGDDKernel AGDDModel AGDDHandlers GeoModelCore::GeoModelKernel CLHEP::CLHEP )
+target_link_libraries( AGDDControl PUBLIC  AGDDKernel AGDDModel AGDDHandlers GeoModelCore::GeoModelKernel )
 target_include_directories( AGDDControl SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} )
 target_include_directories( AGDDControl PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

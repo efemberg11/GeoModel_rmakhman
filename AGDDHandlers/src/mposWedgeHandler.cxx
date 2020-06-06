@@ -1,14 +1,11 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "AGDDHandlers/mposWedgeHandler.h"
 #include "AGDDKernel/AGDDPositioner.h"
-#include <iostream>
 
-#include "CLHEP/Vector/Rotation.h"
-#include "CLHEP/Vector/ThreeVector.h"
-#include "CLHEP/Geometry/Transform3D.h"
+#include <iostream>
 #include <vector>
 
 mposWedgeHandler::mposWedgeHandler(std::string s):XMLHandler(s),p(0)
@@ -23,9 +20,6 @@ void mposWedgeHandler::ElementHandle()
 	std::vector<double> iSectors=getAttributeAsVector("sectors",res);
 		
 	double dWedge=360./iWedge;
-	
-	CLHEP::Hep3Vector cvec;
-	CLHEP::HepRotation crot;
 
 	const double degrad=M_PI/180.;
 	
@@ -34,13 +28,11 @@ void mposWedgeHandler::ElementHandle()
 	{
 		double Wedge=dWedge*i;
 		if ((int)iSectors[i]==0) continue;
-	    CLHEP::Hep3Vector cvec;
-	    CLHEP::HepRotation crot;
-		crot.rotateZ(Wedge*degrad);
+	    GeoTrf::Transform3D crot = GeoTrf::RotateZ3D(Wedge*degrad);
 		double x=radius*cos(Wedge*degrad);
 		double y=radius*sin(Wedge*degrad);
 		double zpos=0;
-		cvec=CLHEP::Hep3Vector(x,y,zpos);
+		GeoTrf::Vector3D cvec=GeoTrf::Vector3D(x,y,zpos);
 
 		p=new AGDDPositioner(volume,crot,cvec);
 	}

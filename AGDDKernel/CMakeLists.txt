@@ -5,8 +5,6 @@ project( "AGDDKernel" VERSION 1.0.0 LANGUAGES CXX )
 
 find_package( GeoModelCore REQUIRED )
 find_package( Eigen3 REQUIRED )
-find_package( CLHEP REQUIRED )
-
 
 # Set default build options.
 set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
@@ -24,7 +22,7 @@ file( GLOB HEADERS AGDDKernel/*.h )
 add_library( AGDDKernel SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET AGDDKernel
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( AGDDKernel PUBLIC GeoModelCore::GeoModelKernel CLHEP::CLHEP )
+target_link_libraries( AGDDKernel PUBLIC GeoModelCore::GeoModelKernel )
 #  target_include_directories( AGDDKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ) )
 target_include_directories( AGDDKernel PUBLIC ${EIGEN3_INCLUDE_DIR}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

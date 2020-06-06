@@ -4,8 +4,6 @@ cmake_minimum_required( VERSION 3.1 )
 project( "AGDDModel" VERSION 1.0.0 LANGUAGES CXX )
 
 find_package( GeoModelCore REQUIRED )
-find_package( CLHEP REQUIRED )
-
 
 # Set default build options.
 set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
@@ -23,7 +21,7 @@ file( GLOB HEADERS AGDDModel/*.h )
 add_library( AGDDModel SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET AGDDModel
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( AGDDModel PUBLIC AGDDKernel GeoModelCore::GeoModelKernel CLHEP::CLHEP )
+target_link_libraries( AGDDModel PUBLIC AGDDKernel GeoModelCore::GeoModelKernel )
 target_include_directories( AGDDModel SYSTEM PUBLIC )
 target_include_directories( AGDDModel PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

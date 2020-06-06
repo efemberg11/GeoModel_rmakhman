@@ -5,7 +5,6 @@ project( "MuonGeoModel" VERSION 1.0.0 LANGUAGES CXX )
 
 find_package( GeoModelCore REQUIRED )
 find_package( Eigen3 REQUIRED )
-find_package( CLHEP REQUIRED )
 find_package( AGDD REQUIRED )
 
 
@@ -25,7 +24,7 @@ file( GLOB HEADERS MuonGeoModel/*.h )
 add_library( MuonGeoModel SHARED ${HEADERS} ${SOURCES} )
 set_property( TARGET MuonGeoModel
    PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( MuonGeoModel PUBLIC GeoModelCore::GeoModelKernel AGDDKernel CLHEP::CLHEP )
+target_link_libraries( MuonGeoModel PUBLIC GeoModelCore::GeoModelKernel AGDDKernel )
 #  target_include_directories( AGDDKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ) )
 target_include_directories( MuonGeoModel PUBLIC ${EIGEN3_INCLUDE_DIR}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

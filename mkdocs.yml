@@ -25,6 +25,7 @@ nav:
     - Reference:  'reference/reference.md'
     - For Developers:
         - 'Build the Libraries': 'dev/index.md'
+        - 'Troubleshooting': 'dev/troubleshooting.md'
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
     - Team & History: 'team.md'
     - Contacts: 'contacts.md'

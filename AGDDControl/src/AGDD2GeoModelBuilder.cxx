@@ -56,19 +56,6 @@
 #include <vector>
 #include <cmath>
 
-// from GaudiKernel/SystemOfUnits.h
-namespace {
-static constexpr double const& mole = 1.;
-static constexpr double const& millimeter = 1.;
-static constexpr double const& centimeter = 10. * millimeter;
-static constexpr double const& cm3 = centimeter * centimeter * centimeter;
-static constexpr double const& meter = 1000. * millimeter;
-static constexpr double const& kilometer = 1000. * meter;
-static constexpr double const& degree = M_PI/180;
-static constexpr double const& second = 1.e+9;
-static constexpr double const& joule = 1.e-6 / 1.60217733e-19; // joule = 6.24150 e+12 * MeV
-static constexpr double const& gram = 1e-3 * joule * second * second / ( meter * meter );
-}
 
 AGDD2GeoModelBuilder::AGDD2GeoModelBuilder():AGDDBuilder(),m_mother(0)
 {
@@ -88,7 +75,7 @@ GeoElement* AGDD2GeoModelBuilder::CreateElement(std::string name)
 			el->Created(true);
 			GeoElement *g4el;
 			g4el=new GeoElement(el->GetName(),el->GetSymbol(),
-					    double(el->GetZ()),el->GetA()*(gram/mole));
+					    double(el->GetZ()),el->GetA()*(GeoModelKernelUnits::gram/GeoModelKernelUnits::mole));
 			el->SetElement(g4el);
 			return g4el;
 		}
@@ -125,7 +112,7 @@ const GeoMaterial* AGDD2GeoModelBuilder::CreateMaterial(std::string name)
                                   std::cout<<"something is wrong, nmat=0!!!"<<std::endl;
                                   return 0;
                                 }
-				g4mat=new GeoMaterial(nmat->GetName(),nmat->GetDensity()*(gram/cm3));
+				g4mat=new GeoMaterial(nmat->GetName(),nmat->GetDensity()*(GeoModelKernelUnits::gram/GeoModelKernelUnits::cm3));
 				AGDDElement *el=ms->GetElement(nmat->GetName());
 				if (el) 
 				{
@@ -143,7 +130,7 @@ const GeoMaterial* AGDD2GeoModelBuilder::CreateMaterial(std::string name)
                                   std::cout<<"something is wrong, nmat=0!!!"<<std::endl;
                                   return 0;
                                 }
-				g4mat=new GeoMaterial(nmat->GetName(),nmat->GetDensity()*(gram/cm3));
+				g4mat=new GeoMaterial(nmat->GetName(),nmat->GetDensity()*(GeoModelKernelUnits::gram/GeoModelKernelUnits::cm3));
 				for (int i=0;i<nmat->NComponents();i++)
 				{
 					AGDDElement *el=nmat->Element(i);
@@ -163,7 +150,7 @@ const GeoMaterial* AGDD2GeoModelBuilder::CreateMaterial(std::string name)
 					std::cout<<"can't get the mixture, returning!"<<std::endl;
 					return 0;
 				}
-				g4mat=new GeoMaterial(nmat->GetName(),nmat->GetDensity()*(gram/cm3));
+				g4mat=new GeoMaterial(nmat->GetName(),nmat->GetDensity()*(GeoModelKernelUnits::gram/GeoModelKernelUnits::cm3));
 				for (int i=0;i<nmat->NComponents();i++)
 				{
 					AGDDSimpleMaterial *el=nmat->Material(i);
@@ -224,9 +211,9 @@ void AGDD2GeoModelBuilder::CreateTrd(AGDDTrd* v)
 void AGDD2GeoModelBuilder::CreateSnake(AGDDSnake* v)
 {
 // here begins a nasty piece of code
-	static GeoBox *box1=new GeoBox(1.*kilometer,1*kilometer,1*kilometer);
-	GeoTrf::Vector3D v1(0,0,-1*kilometer);
-	GeoTrf::Vector3D v2(0,0,+1*kilometer);
+	static GeoBox *box1=new GeoBox(1.*GeoModelKernelUnits::kilometer,1*GeoModelKernelUnits::kilometer,1*GeoModelKernelUnits::kilometer);
+	GeoTrf::Vector3D v1(0,0,-1*GeoModelKernelUnits::kilometer);
+	GeoTrf::Vector3D v2(0,0,+1*GeoModelKernelUnits::kilometer);
 	GeoTrf::Transform3D ttt1 = GeoTrf::Transform3D::Identity()*GeoTrf::Translation3D(v1);
 	GeoTrf::Transform3D ttt2 = GeoTrf::Transform3D::Identity()*GeoTrf::Translation3D(v2);
 	static GeoShape *s1=new GeoShapeShift(box1,ttt1);
@@ -446,7 +433,7 @@ void AGDD2GeoModelBuilder::CreatePcon(AGDDPcon* v)
 	if (!p)
 	{
 		int nPlanes=v->NrOfPlanes();
-		GeoPcon* solid=new GeoPcon(v->Phi0()*degree,v->Dphi()*degree);
+		GeoPcon* solid=new GeoPcon(v->Phi0()*GeoModelKernelUnits::degree,v->Dphi()*GeoModelKernelUnits::degree);
 		for (int i=0;i<nPlanes;i++)
 		{
 			double ri=v->Rin(i);
@@ -464,7 +451,7 @@ void AGDD2GeoModelBuilder::CreatePgon(AGDDPgon* v)
 	if (!p)
 	{
 		int nPlanes=v->NrOfPlanes();
-		GeoPgon* solid=new GeoPgon(v->Phi0()*degree,v->Dphi()*degree,v->_nbPhi);
+		GeoPgon* solid=new GeoPgon(v->Phi0()*GeoModelKernelUnits::degree,v->Dphi()*GeoModelKernelUnits::degree,v->_nbPhi);
 		for (int i=0;i<nPlanes;i++)
 		{
 			double ri=v->Rin(i);

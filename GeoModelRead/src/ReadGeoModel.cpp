@@ -103,7 +103,7 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDeb
     std::cout << "You defined the GEOMODEL_IO_READ_DEBUG_VERBOSE variable, so you will see a verbose output." << std::endl;
   }
   // Check if the user asked for timing output
-  if ( "" != getEnvVar("GEOMODEL_ENV_IO_TIMING")) {
+  if ( "" != getEnvVar("GEOMODEL_ENV_IO_READ_TIMING")) {
     m_timing = true;
     std::cout << "You defined the GEOMODEL_IO_READ_TIMING variable, so you will see a timing measurement in the output." << std::endl;
   }
@@ -112,30 +112,33 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDeb
 	m_progress = progress;
 	}
 
-	// set the geometry file
+	// open the geometry file
 	m_dbManager = db;
-	if (m_dbManager->isOpen()) {
-    if (m_deepDebug) std::cout << "OK! Database is open!";
+	if (m_dbManager->checkIsDBOpen()) {
+    if (m_debug) std::cout << "OK! Database is open!";
 	}
 	else {
     std::cout << "ERROR!! Database is NOT open!";
 		return;
 	}
+  // build caches
+  m_dbManager->loadGeoNodeTypesAndBuildCache();
+  
 
   // Check if the user asked for running in serial or multi-threading mode
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_NTHREADS"))
   {
     int nThreads = std::stoi(getEnvVar("GEOMODEL_ENV_IO_NTHREADS"));
     if (nThreads == 0) {
-      std::cout << "\nYou set the GEOMODEL_ENV_IO_NTHREADS to " << nThreads << "; thus, GeoModelIO will be run in serial mode." << std::endl;
+      std::cout << "Info: You set the GEOMODEL_ENV_IO_NTHREADS to '" << nThreads << "'; thus, GeoModelIO will be run in serial mode." << std::endl;
       m_runMultithreaded_nThreads = nThreads;
       m_runMultithreaded = false;
     } else if( nThreads > 0 ) {
-      std::cout << "\nYou set the GEOMODEL_ENV_IO_NTHREADS to " << nThreads << "; thus, GeoModelIO will use that number of worker threads." << std::endl;
+      std::cout << "Info: You set the GEOMODEL_ENV_IO_NTHREADS to '" << nThreads << "'; thus, GeoModelIO will use that number of worker threads." << std::endl;
       m_runMultithreaded_nThreads = nThreads;
       m_runMultithreaded = true;
     } else if (nThreads == -1) {
-      std::cout << "\nYou set the GEOMODEL_ENV_IO_NTHREADS to " << nThreads << "; thus, GeoModelIO will use the number of threads supported by the platform." << std::endl;
+      std::cout << "Info: You set the GEOMODEL_ENV_IO_NTHREADS to '" << nThreads << "'; thus, GeoModelIO will use the number of threads supported by the platform." << std::endl;
       m_runMultithreaded_nThreads = nThreads;
       m_runMultithreaded = true;
     }
@@ -151,7 +154,7 @@ ReadGeoModel::~ReadGeoModel() {
   // FIXME: some cleaning...??
 }
 
-  
+  // FIXME: TODO: move to an utility class
 std::string ReadGeoModel::getEnvVar( std::string const & key ) const
 {
     char * val = std::getenv( key.c_str() );
@@ -180,7 +183,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModel()
 GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
 {
   // *** get all data from the DB ***
-
+  std::chrono::system_clock::time_point start = std::chrono::system_clock::now(); // timing: get start time
 	// get all GeoModel nodes from the DB
 	m_logVols = m_dbManager->getTableFromNodeType("GeoLogVol");
 	m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
@@ -194,27 +197,27 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
   m_serialDenominators = m_dbManager->getTableFromNodeType("GeoSerialDenominator");
   m_serialTransformers = m_dbManager->getTableFromNodeType("GeoSerialTransformer");
   m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
-  
   // get the children table from DB
-  m_allchildren = m_dbManager->getChildrenTableStd();
-  
+  m_allchildren = m_dbManager->getChildrenTable();
 	// get the root volume data
-//  m_root_vol_data = m_dbManager->getRootPhysVol();
   m_root_vol_data = m_dbManager->getRootPhysVol();
-
   // get DB metadata
   m_tableID_toTableName = m_dbManager->getAll_TableIDsNodeTypes();
   m_tableName_toTableID = m_dbManager->getAll_NodeTypesTableIDs();
-
+  
+  auto end = std::chrono::system_clock::now(); // timing: get end time
+  auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+  if (m_timing || m_debug || m_deepDebug) {
+    std::cout << "*** Time taken to fetch GeoModel data from the database: " << diff << " [s]" << std::endl;
+  }
 
   // *** build all nodes ***
-
+  start = std::chrono::system_clock::now(); // timing: get start time
   // parallel mode:
-  
   if (m_runMultithreaded) {
   std::cout << "Building nodes concurrently..." << std::endl;
   std::thread t2(&ReadGeoModel::buildAllElements, this);
-//  std::thread t7(&ReadGeoModel::buildAllFunctions, this);
+    //  std::thread t7(&ReadGeoModel::buildAllFunctions, this); // FIXME: implement cache for Functions
   
   std::thread t8(&ReadGeoModel::buildAllTransforms, this);
   std::thread t9(&ReadGeoModel::buildAllAlignableTransforms, this);
@@ -266,7 +269,21 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
     buildAllFullPhysVols();
     buildAllSerialTransformers();
   }
+  end = std::chrono::system_clock::now(); // timing: get end time
+  diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+  if (m_timing || m_debug || m_deepDebug) {
+    std::cout << "*** Time taken to build all GeoModel nodes: " << diff << " [s]" << std::endl;
+  }
+  
+  // *** recreate all mother-daughter relatioships between nodes ***
+  start = std::chrono::system_clock::now(); // timing: get start time
   loopOverAllChildrenInBunches();
+  end = std::chrono::system_clock::now(); // timing: get end time
+  diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+  if (m_timing || m_debug || m_deepDebug) {
+    std::cout << "*** Time taken to recreate all mother-daughter relationships between nodes of the GeoModel tree: " << diff << " [s]" << std::endl;
+  }
+  
 	return getRootVolume();
 }
 
@@ -284,22 +301,22 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
     muxCout.unlock();
   }
   
-  // Get Start Time
-  std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+//  // Get Start Time
+//  std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
   
   for ( auto& record : records ) {
     processParentChild( record );
   }
   
-  // Get End Time
-  auto end = std::chrono::system_clock::now();
-  auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
-  
-  if (m_timing || m_debug || m_deepDebug) {
-    muxCout.lock();
-    std::cout << "Time Taken to process " << nChildrenRecords << " parent-child relationships = " << diff << " Seconds" << std::endl;
-    muxCout.unlock();
-  }
+//  // Get End Time
+//  auto end = std::chrono::system_clock::now();
+//  auto diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();
+//
+//  if (m_timing || m_debug || m_deepDebug) {
+//    muxCout.lock();
+//    std::cout << "Time Taken to process " << nChildrenRecords << " parent-child relationships = " << diff << " Seconds" << std::endl;
+//    muxCout.unlock();
+//  }
 }
 
 
@@ -470,6 +487,7 @@ void ReadGeoModel::buildAllSerialTransformers()
   if (nSize>0) std::cout << "All " << nSize << " SerialTransformers have been built!\n";
 }
   
+  // FIXME: implement build function and cache for Functions
 // //! Iterate over the list of nodes, build them all, and store their pointers
 // void ReadGeoModel::buildAllFunctions()
 // {
@@ -599,7 +617,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
     const unsigned int parentCopyN = std::stoi(parentchild[3]);
 
     // get the child's position in the parent's children list
-    const unsigned int position = std::stoi(parentchild[4]);
+    //const unsigned int position = std::stoi(parentchild[4]); // unused
     
     // get the child's details
     const unsigned int childTableId = std::stoi(parentchild[5]);
@@ -815,7 +833,7 @@ GeoPhysVol* ReadGeoModel::getRootVolume()
     std::cout << "ReadGeoModel::getRootVolume()" << std::endl;
     muxCout.unlock();
   }
-  const unsigned int id = std::stoi(m_root_vol_data[1]); // TODO: GetRoot() should return integers instead of strings...
+  const unsigned int id = std::stoi(m_root_vol_data[1]); // TODO: GeoModel GetRoot() should return integers instead of strings...
   const unsigned int tableId = std::stoi(m_root_vol_data[2]);
 	const unsigned int copyNumber = 1; // the Root volume has only one copy by definition
   GeoPhysVol* root = dynamic_cast<GeoPhysVol*>(buildVPhysVolInstance(id, tableId, copyNumber));
@@ -837,11 +855,6 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id)
   }
   std::vector<std::string> values = m_materials[id-1];
 
-//  if (m_deepDebug) {
-//    muxCout.lock();
-//    std::cout << "mat values=" << values << std::endl;
-//    muxCout.unlock();
-//  }
   const unsigned int matId = std::stoi(values[0]);
   const std::string matName = values[1];
   double matDensity = std::stod(values[2]);
@@ -936,7 +949,7 @@ std::string ReadGeoModel::getShapeType(const unsigned int shapeId)
 
   
 
-
+  //TODO: move shapes in different files, so code here is more managable
 /// Recursive function, to build GeoShape nodes
 GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boolean_info* shapes_info_sub)
 {
@@ -1118,7 +1131,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 					if(error) {
             muxCout.lock();
-            // FIXME:           std::cout << "ERROR! GeoPcon 'ZRmin' and 'ZRmax' values are not at the right place! --> " << shapePars << std::endl;
+            std::cout << "ERROR! GeoPcon 'ZRmin' and 'ZRmax' values are not at the right place! --> ";
+            printStdVectorStrings(shapePars);
             muxCout.unlock();
           }
 
@@ -1127,7 +1141,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 				} else {
 					error = 1;
           muxCout.lock();
-          // FIXME: std::cout << "ERROR! GeoPcon 'ZPos' value is not at the right place! --> " << shapePars << std::endl;
+          std::cout << "ERROR! GeoPcon 'ZPos' value is not at the right place! --> ";
+          printStdVectorStrings(shapePars);
           muxCout.unlock();
 				}
 			}
@@ -1857,7 +1872,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
     // otherwise, build the operands
     else {
 
-      // TODO: IMPORTANT!!! --> check how the transf used in shift are saved into the DB, because they are bare transf and not GeoTransform nodes... I fear thay are wrongly stored...
+      // TODO: IMPORTANT!!! --> check how the transf used in shift are saved into the DB, because they are bare transf and not GeoTransform nodes...
 
       // first, check if the transform is built;
       // if so, use that;
@@ -2305,6 +2320,9 @@ std::vector<std::string> ReadGeoModel::splitString(const std::string& s, const c
 //  }
 //  return vec;
 //}
+  
+  
+  
 // TODO: move this to utility class/file
 void ReadGeoModel::printStdVectorStrings(std::vector<std::string> vec)
 {
@@ -2404,21 +2422,12 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
 
 	// get logVol properties from the DB
   std::vector<std::string> values = m_logVols[id-1];
-	if (m_deepDebug) {
-    muxCout.lock();
-    //FIXME: std::cout << "buildLogVol() - params:" << values << std::endl;
-    muxCout.unlock();
-  }
 
 	// get the parameters to build the GeoLogVol node
   std::string logVolName = values[1];
 
 	// build the referenced GeoShape node
   const unsigned int shapeId = std::stoi(values[2]);
-//  type_shapes_boolean_info shapes_info_sub; // tuple to store the boolean shapes to complete at a second stage
-//  GeoShape* shape = buildShape(shapeId, &shapes_info_sub);
-  // now, create the missing operand shapes for boolean/operator shapes
-//  createBooleanShapeOperands(&shapes_info_sub);
   GeoShape* shape = getBuiltShape(shapeId);
   if(!shape) {
     std::cout << "ERROR!! While building a LogVol, Shape is NULL! Exiting..." <<std::endl;
@@ -2432,7 +2441,6 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
     std::cout << "buildLogVol() - material Id:" << matId << std::endl;
     muxCout.unlock();
   }
-//  GeoMaterial* mat = buildMaterial(matId);
   GeoMaterial* mat = getBuiltMaterial(matId);
   if(!mat) {
     std::cout << "ERROR!! While building a LogVol, Material is NULL! Exiting..." <<std::endl;

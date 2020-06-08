@@ -51,6 +51,10 @@ public:
 	~GMDBManager();
   void DestructorGMDBManagerStd();
 
+  bool initDB();
+
+  int loadGeoNodeTypesAndBuildCache();
+
 
 	/**
 	 * @brief Returns true if the DB is correctly open
@@ -145,35 +149,14 @@ public:
   int execQuery(std::string queryStr);
 
 
-	// ADD methods
-  /* single-item adders are not efficient, so they are not used at the moment. We might want to enable them again later if we'll have specific use-cases.
-	QVariant addShape(const QString &type, const QString &parameters);
-	QVariant addMaterial(const QString &name, const QString &density, const QString &elements);
-	QVariant addElement(const QString &name, const QString &symbol, const QString &elZ, const QString &elA);
-	QVariant addLogVol(const QString &name, const QVariant &shapeId, const QVariant &materialId);
-	QVariant addPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);
-	QVariant addFullPhysVol(const QVariant &logVolId, const QVariant &parentPhysVolId, bool isRootVolume = false);
-	QVariant addSerialDenominator(const QString &baseName);
-	QVariant addFunction(const QString expression);
-  QVariant addSerialTransformer(const unsigned int &funcId, const unsigned int &physvolId, const std::string &volType, const unsigned int &copies);
-	QVariant addTransform(QVector<double> parameters);
-	QVariant addAlignableTransform(QVector<double> parameters);
-	QVariant addNameTag(const QString &name);
-   */
-
-//  bool addListOfRecords(const QString geoType, const std::vector<QStringList> records);
   bool addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records);
   
-//  bool addListOfRecordsToTable(const QString tableName, const std::vector<QStringList> records);
-//  bool addListOfRecordsToTableStd(const std::string tableName, const std::vector<std::vector<std::string>> records);
   bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
   
 //  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
   bool addListOfChildrenPositions(const std::vector<std::vector<std::string>> &records);
 
 	bool addRootVolume(const std::vector<std::string> &values);
-//  void addChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &childId, const unsigned int &parentCopyNumber, const unsigned int &childPos, const std::string &childType, const unsigned int &childCopyN);
-
   
 	// GET methods
 
@@ -181,9 +164,6 @@ public:
 
   std::vector<std::string> getRootPhysVol();
 
-//  std::vector<std::string> getItem(std::string geoType, unsigned int id);
-//  std::vector<std::string> getItem(unsigned int tableId, unsigned int id);
-//
 	
   std::vector<std::string> getItemFromTableName(std::string tableName, unsigned int id);
   
@@ -191,13 +171,10 @@ public:
 
   std::string getNodeTypeFromTableId(unsigned int id);
 
-//  QMap<unsigned int, QStringList> getVPhysVolChildren(const unsigned int &id, const std::string &nodeType, const unsigned int &copyN);
 
 	/// methods to dump the DB
-//  QHash<QString, QMap<unsigned int, QStringList>> getChildrenTable();
   std::vector<std::vector<std::string>> getChildrenTable();
 
-//  QHash<unsigned int, QStringList> getTableFromNodeType(QString nodeType);
   std::vector<std::vector<std::string>> getTableFromNodeType(std::string nodeType);
   
   std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
@@ -208,7 +185,6 @@ public:
 
 private:
 
-	bool initDB();
 	bool createTables();
   
 
@@ -218,17 +194,11 @@ private:
 
 //  void loadTestData(); // for debug only
 
-//  void loadTableNamesFromDB();
-//  std::vector<std::string> getTableColNamesFromDB(std::string tableName) const;
-
-  int loadGeoNodeTypesAndBuildCache();
-
   std::string getTableNameFromTableId(unsigned int tabId);
   
   unsigned int getTableIdFromNodeType(const std::string &nodeType);
   void storeNodeType(std::string nodeType, std::string tableName);
 	
-//  QString getTableNameFromNodeType(QString nodeType); // TODO: to be removed
   std::string getTableNameFromNodeType(const std::string &nodeType);
 
   sqlite3_stmt* selectAllFromTable(std::string tableName) const;
@@ -238,7 +208,6 @@ private:
   void storeTableColumnNames(std::vector<std::string> input);
   
   std::vector<std::string> getTableColumnNames(const std::string &tableName);
-//  void printTableColNamesFromDB(const std::string &tableName) const;
 
   void printAllRecords(const std::string &tableName) const;
 

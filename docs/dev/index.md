@@ -38,6 +38,8 @@ brew remove geomodelcore
 
 Please remove **all** the `geomodel`- packages before trying to build the packages from source.
 
+See also the [Troubleshooting](troubleshooting.md) page for additional help.
+
 
 ### Linux/Ubuntu
 

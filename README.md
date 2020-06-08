@@ -1,16 +1,13 @@
  FullSimLight Project
  ==========================
 
- In this directory you can find the FullSimLight project,
- a [Geant4](https://geant4.web.cern.ch) based simulation that can be run on multiple geometries.
+FullSimLight project consists of different tools based on [Geant4] (https://geant4.web.cern.ch) toolkit, that can be run on multiple geometries: 
 
- Any  geometry can be given as input to FullSimLight and be simulated. The supported formats are SQLite (.db), GDML (.gdml) and dual-use plugins as the ones described in  the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins) (.dylib/.so).
- The ATLAS detector geometry description can be imported via a SQLite or a GDML file. 
+- fullSimLight: a Geant4 based light simulation (geometry, transport in magnetic field and basic physics scoring)
+- gmclash: a tool that runs clash detection on your input geometry, producing a json file report
+- gmgeantino: a tool to generate geantino maps from your input geometry
 
- An installation of Geant4 including the GDML extension (which requires
- the XercesC package installed in the system) is required i.e. the
- Geant4 toolkit must be built with the -DGEANT4_USE_GDML=ON CMake option.
-
+The supported geometry formats are SQLite (.db), GDML (.gdml) and dual-use plugins (.dylib/.so) as the ones described in the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins). The ATLAS detector geometry description can be imported via a SQLite or a GDML file. If the ATLAS magnetic field map is available to the user, it can be used in fullSimLight.
 
 # Installation
 
@@ -51,7 +48,7 @@ make install
 
 Before installing Geant4, check at the Geant4 website the pre-requisites needed:
 http://geant4-userdoc.web.cern.ch/geant4-userdoc/UsersGuides/InstallationGuide/html/gettingstarted.html
-Note in particular that to enable the use of geometry reading/writing from GDML XML files, the Xerces-C++ headers and library >=3 must be installed.
+An installation of Geant4 including the GDML extension (which requires the XercesC version >=3 package installed in the system) is required, i.e. the Geant4 toolkit must be built with the -DGEANT4_USE_GDML=ON CMake option.
 Clone the repository at [Geant4 repo](https://gitlab.cern.ch/geant4/geant4.git), then:
 
 ```bash
@@ -68,11 +65,26 @@ cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../  -DGEA
 make
 make install
 ```
-NB: Before running ./fullSimLight make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
+Before running ./fullSimLight and ./gmgeantino make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
 ```bash
 source <path_to_geant4_install_dir>/bin/geant4.sh
 ```
-
+Alternatively, you can modifiy the .bash_profile file in the following way:
+```bash
+#GEANT4
+export G4INSTALL=<full_path_to_Geant4_install_dir>
+export G4NEUTRONHPDATA=$G4INSTALL/data/G4NDL4.6
+export G4LEDATA=$G4INSTALL/data/G4EMLOW7.9.1
+export G4LEVELGAMMADATA=$G4INSTALL/data/PhotonEvaporation5.5
+export G4RADIOACTIVEDATA=$G4INSTALL/data/RadioactiveDecay5.4
+export G4PARTICLEXSDATA=$G4INSTALL/data/G4PARTICLEXS2.1
+export G4PIIDATA=$G4INSTALL/data/G4PII1.3
+export G4REALSURFACEDATA=$G4INSTALL/data/RealSurface2.1.1
+export G4SAIDXSDATA=$G4INSTALL/data/G4SAIDDATA2.0
+export G4ABLADATA=$G4INSTALL/data/G4ABLA3.1
+export G4INCLDATA=$G4INSTALL/data/G4INCL1.0
+export G4ENSDFSTATEDATA=$G4INSTALL/data/G4ENSDFSTATE2.2
+```
 ## GeoModelG4:
 First, install GeoModelG4 dependency: [CLHEP](https://gitlab.cern.ch/CLHEP/CLHEP.git)
 
@@ -86,7 +98,7 @@ make
 make install
 ```
 
-Then, clone the repository at [GeoModelG4 repo](https://gitlab.cern.ch/GeoModelDev/GeoModelG4), then:
+Then, clone the repository at [GeoModelG4 repo](https://gitlab.cern.ch/GeoModelDev/GeoModelG4):
 
 ```bash
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelG4.git
@@ -138,6 +150,31 @@ Alternatively, you can source the Geant4 setup, before running cmake:
 source <path_to_geant4_install_dir>/bin/geant4.sh
 cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
 ```
+# Detector Construction
+
+
+## Geometry:
+
+The detector can be built starting from a SQLite .db file, from a GDML file or from a dual-use plugin like the ones in the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins). Use the -g flag to specify the name of the input geometry file. Alternatively, a GDML file can be set through the macro file by using the:
+
+```bash
+/mydet/setGdmlFile <gdml-file-name.gdml>
+```    
+
+## ATLAS Geometry Files:
+
+The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are available at: 
+```bash
+wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
+wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
+```
+The new ATLAS geometry SQLite files where the EMEC is built using 3 new different variants (Wheel, Cone, Slices) are available at:
+
+```bash
+wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Wheel.db
+wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Cone.db
+wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Slices.db
+```
 
 # FullSimLight: Build, run and options
 
@@ -171,33 +208,6 @@ start and stop a timer at the beginning and the end of the simulation
 (initialization time won't be included). Therefore, there is no scoring
 in this case.
 
-## Detector Construction
-
-
-### Geometry:
-
-The detector can be built starting from a SQLite .db file, from a GDML file or from a dual-use plugin like the ones in the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins).
-The -g flag will be used to specify the name of the geometry file. Any GDML file can be set from the macro file by using the:
-
-```bash
-     /mydet/setGdmlFile <gdml-file-name.gdml>
-```    
-     
-### ATLAS Geometry Files:
-     
-The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are available at: 
-```bash
-   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
-   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
-```
-You can now also get the ATLAS geometry SQLite files where the EMEC is built using 3 new different variants (Wheel, Cone, Slices):
-
-```bash
-   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Wheel.db
-   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Cone.db
-   wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Slices.db
-```
-
 ## Examples
 
 During the installation a default macro file <macro.g4> will be installed in your bin directory.
@@ -224,7 +234,40 @@ To execute the application using the <macro.g4> macro file and building the dete
 ``` bash
      /mydet/setField <field-value> <unit>
 ```
-The default value is zero i.e. no magnetic field is created.
+The default value is a uniform magnetic field of 4 Tesla.
+
+## ATLAS Magnetic Field
+
+The ATLAS magnetic field is integrated in FullSimLight and can be used from it.  The Magnetic field map file used and supported are:
+- full_bfieldmap_7730_20400_14m_version5.root
+- solenoid_bfieldmap_7730_0_14m_version5.root
+- toroid_bfieldmap_0_20400_14m_version5.root
+- bmagatlas_09_fullAsym20400.data
+
+If the magnetic field maps are not available, a constant magnetic field can be set through the macro file. The test application "testMagneticField" can be used to test the different magnetic field maps and produce Maps in 2D histograms that are saved in a ROOT file (i.e 'ATLAS_BField_default.root') .
+However there is no dependency on ROOT, because the histograms are created, filled and saved using the G4AnalysisManager.
+
+### testMagneticField examples:
+Run the application with the --help flag to see the options:
+``` bash
+./testMagneticField --help
+
+-f :  OPTIONAL: magnetic field filename [.data/.root]   (default : use ATLAS magnetic field maps)
+-r :  FLAG:     use root field map (default : false, use .data file)
+-s :  FLAG:     set Solenoid Off 
+-t :  FLAG:     set Toroids Off 
+```
+By default the file tested is the bmagatlas_09_fullAsym20400.data. Use the -r option to test the ROOT file maps, add the -s flag to set the solenoid off and use the toroid_bfieldmap_0_20400_14m_version5.root:
+
+``` bash
+./testMagneticField -r -s 
+```
+
+Use the -t to set the Toroids off, and test the solenoid_bfieldmap_7730_0_14m_version5.root file. 
+
+``` bash
+./testMagneticField -r -t 
+```
 
 
 ## Primary Generator
@@ -279,7 +322,7 @@ By default, i.e. if it is not specified by the above command, the type will be r
  and used in the corresponding GeantV application with exactly the same
  settings). In order to use it one need to specify -f GV as input parameter. 
 
-# GeoModelClash: Build, run and options
+# GeoModelClash: run and options
 
 GeoModelClash (gmclash) allows to run geometry overlap checks on a geometry file specified as input with the -g flag. It supports SQLite and GDML formats. The geometry can also be described with a dual-plugin (.dylib or .so) as the ones available at the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins). The clashes report is given in an output json file (default: gmclash_report.json).
 
@@ -307,7 +350,7 @@ The output json file format is the following:
 ``` 
 where:
 * *distance* is the minimum estimated distance of the overlap
-* *typeOfClash* can be 0 for *withMother*, 1 for *withSister* and 2 for *fullyEncapsSister*
+* *typeOfClash* can be 0 for *withMother*, 1 for *withSister*, 2 for *fullyEncapsSister*, 3 for *invalidSolid*
 * *x,y,z* are the global coordinates of the point of impact
 
 ## Examples
@@ -325,6 +368,41 @@ To execute a clash detection on a geometry described with one of the [GeoModelPl
 ./gmclash -g libHGTDPlugin.1.0.0.dylib -o cr_HGTD.json 
 ``` 
 
+# GeoModelGeantino: run and options
+
+GeoModelGeantino (gmgeantino) is a Geant4 based application that allows you to produce geantino maps for the geometry specified as input. It supports .db/.gdml/.dylib/.so geomtry formats and it writes out the geantino maps in a ROOT file. However, it does not depend on ROOT, cause it uses the G4AnalysisManager to create/fill/write 1D and 2D Profiles.
+The 1D and 2D profiles are filled during the simulation, per Event or per Step. The creation of different profiles can be tunes with command line flags. In general XY,ZR,etaPhi RadiationLength/InteractionLength profiles can be created per DetectorVolume/Material/Element.
+
+Run the executable with the --help option to see the available options:
+
+``` bash
+./gmgeantino --help
+
+-g :   [REQUIRED] the Geometry file name (supported extensions: .db/.gdml/.dylib/.so) 
+-m :   [OPTIONAL] the standard Geant4 macro file name (default: 'geantino.g4') 
+-r :   [OPTIONAL] r limit for geantino maps in mm (default: '12500') 
+-z :   [OPTIONAL] z limit for geantino maps in mm (default: '23000') 
+-x :   [OPTIONAL] x limit for geantino maps in mm (default: '12500') 
+-y :   [OPTIONAL] y limit for geantino maps in mm (default: '12500') 
+-o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') 
+-e :   [FLAG]     use this flag to create eta-phi   geantino maps (caveat: the process might run out of memory!)
+-d :   [FLAG]     use this flag to create detectors geantino maps (caveat: the process might run out of memory!)
+-a :   [FLAG]     use this flag to create materials geantino maps (caveat: the process might run out of memory!)
+-l :   [FLAG]     use this flag to create elements  geantino maps (caveat: the process might run out of memory!)
+``` 
+
+
+## Examples
+
+To run GeoModelGeantino one has to specify with the -g flag the geometry file (this is mandatory). By default a 'geantinoMaps.root' is created and it containts RZ RadiationLenght and Interaction Lenght 2D profiles. To run gmgeantino on *LArBarrel.db* geometry, with the default geantino.g4 macro file, and producing eta-phi maps and detector maps:
+``` bash
+./gmgeantino -g LArBarrel.db -e -d
+``` 
+
+To produce geantino maps of a geometry described by one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin*, activate detectors/materials and elements maps, and write out the geantino maps in the  in the *geantinoMaps_HGTD.root* file :
+``` bash
+./gmgeantino -g libHGTDPlugin.1.0.0.dylib -d -a -l -o geantinoMaps_HGTD.root 
+``` 
 
 # Final Remark
 

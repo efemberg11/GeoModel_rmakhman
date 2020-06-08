@@ -183,6 +183,12 @@ Then, you can run your local copy of `gmex` with:
 
 ----
 
+## Troubleshooting
+
+For a collection of suggestions on how to fix potential errors and glitches, please refer to the dedicated [Troubleshooting](troubleshooting.md) page.
+
+----
+
 ## Build the single libraries
 
 ### GeoModelCore

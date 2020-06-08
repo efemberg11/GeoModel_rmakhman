@@ -262,7 +262,7 @@ void VP1GeometrySystem::Imp::addSubSystem(const VP1GeoFlags::SubSystemFlag& f,
   for (auto i=subsysInfoList.begin();i!=subsysInfoList.end();i++) {
     if (systemName==(*i)->systemName) {
       //std::cout << "Very severe warning. You create duplicate systems! " << std::endl;
-      //... er, just bail out.  Subsystem exists, everything fine. 
+      //... er, just bail out.  Subsystem exists, everything fine.
       return;
     }
   }
@@ -545,8 +545,8 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
     }
     if (path.contains(".db")) {
       // open the DB
-      GMDBManager* db = new GMDBManager(path);
-      if (!db->isOpen()) throw std::runtime_error ("Error, database is not open ");
+      GMDBManager* db = new GMDBManager(path.toStdString());
+      if (!db->checkIsDBOpen()) throw std::runtime_error ("Error, database is not open ");
 
       /* set the GeoModel reader */
       GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
@@ -791,11 +791,15 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 #endif
     if (path.isEmpty()) return;
 
-    GMDBManager db(path);
+    GMDBManager db(path.toStdString());
 
     // check the DB connection
-    if (!db.isOpen())
-      qDebug() << "OK! Database is open!";
+    if (db.checkIsDBOpen()) {
+      std::cout << "OK! Database is created: " << path.toStdString() << std::endl;
+    } else {
+      std::cout << "ERROR! Database could not be created! Returning..." << std::endl;
+      return;
+    }
 
     GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
     PVConstLink pV=volhandle->geoPVConstLink();
@@ -1429,6 +1433,9 @@ void VP1GeometrySystem::loadMaterialsFromFile(QString filename)
   m_d->controller->setLastSelectedVolume(lastsel);
 }
 
+
+
+
 void VP1GeometrySystem::saveTrees() {
 #ifdef __APPLE__
   char buffer[1024];
@@ -1444,13 +1451,13 @@ void VP1GeometrySystem::saveTrees() {
 #endif
   if (path.isEmpty()) return;
 
-  GMDBManager db(path);
+  GMDBManager db(path.toStdString());
 
   // check the DB connection
-  if (db.isOpen())
-    qDebug() << "OK! Database is open!";
+  if (db.checkIsDBOpen())
+    std::cout << "OK! Local GeoModel database has been created: " << path.toStdString() << std::endl;
   else {
-    qDebug() << "Database ERROR!! Exiting...";
+    std::cout << "GeoModel database ERROR!! Exiting...";
     return;
   }
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);

@@ -5,6 +5,52 @@
 
 ### macOS / Homebrew
 
+#### General error
+
+Sometimes, cleaning the system from old packages helps in resolving "brew"-related issues.
+
+Also, please clean your system from old packages before installing new packages, or new versions of the packages.
+
+To do so, just type:
+
+```bash
+brew remove geomodelexplorer geomodelio geomodelcore
+brew remove soqt-bb coin-bb simage
+```
+
+Also, check the Taps that are installed on your systems; please, type:
+
+```
+brew tap
+```
+
+You should see at least:
+
+```
+atlas/geomodel
+homebrew/cask
+homebrew/core
+homebrew/services
+```
+
+plus any other tap you installed on your own for other reasons.
+
+In particular, if you see taps like the ones here below:
+
+```
+ric-bianchi/coin3d
+ric-bianchi/vp1light
+```
+
+those are old repositories containing old formulas, which conflict with the latest version of the formulas hosted in the `atlas/geomodel` tap.
+
+Please remove those taps by typing:
+
+```
+brew untap ric-bianchi/coin3d  ric-bianchi/vp1light
+```
+
+
 #### Error: SHA256 mismatch
 
 If you see an output similar to the one below:

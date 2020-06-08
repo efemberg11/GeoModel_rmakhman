@@ -25,7 +25,7 @@ include( PrintBuildInfo )
 
 # Project's dependencies.
 find_package( GeoModelCore 3.2.0 REQUIRED )
-find_package( SQLite3 REQUIRED )
+find_package( SQLite3 )
 
 # Set sub-packages to build.
 # add_subdirectory( GeoModelErrorHandler ) // unused at the moment.

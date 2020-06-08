@@ -25,7 +25,6 @@ include( PrintBuildInfo )
 
 # Project's dependencies.
 find_package( GeoModelCore 3.2.0 REQUIRED )
-# find_package( Qt5 COMPONENTS Core Sql REQUIRED )
 find_package( SQLite3 REQUIRED )
 
 # Set sub-packages to build.
@@ -83,7 +82,8 @@ install(
 # updating the code, which results in keeping running the same old code even if
 # we modified our source code.
 #export(EXPORT ${PROJECT_NAME}-export NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake)
-export(TARGETS GeoModelErrorHandler GeoModelDBManager TFPersistification GeoModelRead GeoModelWrite NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Targets.cmake)
+#export(TARGETS GeoModelErrorHandler GeoModelDBManager TFPersistification GeoModelRead GeoModelWrite NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Targets.cmake)
+export(TARGETS GeoModelDBManager TFPersistification GeoModelRead GeoModelWrite NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Targets.cmake)
 
 
 

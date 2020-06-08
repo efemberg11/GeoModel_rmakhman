@@ -649,7 +649,7 @@ GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
         Air->add(Nitrogen, .8);
         Air->add(Oxigen, .2);
         Air->lock();
-        const GeoBox* worldBox = new GeoBox(1300*SYSTEM_OF_UNITS::cm, 1300*SYSTEM_OF_UNITS::cm, 1300*SYSTEM_OF_UNITS::cm);
+        const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 4000*SYSTEM_OF_UNITS::cm);
         const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Air);
         world = new GeoPhysVol(worldLog);
     }

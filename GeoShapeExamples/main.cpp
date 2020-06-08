@@ -157,13 +157,13 @@ int main(int argc, char *argv[])
 	}
 
 	// open the DB connection
-	GMDBManager db(path);
+	GMDBManager db(path.toStdString());
 
 	// check the DB connection
-	if (db.isOpen())
-		qDebug() << "OK! Database is open!";
+	if (db.checkIsDBOpen())
+		std::cout << "OK! Database is open!\n";
 	else {
-		qDebug() << "Database ERROR!! Exiting...";
+		std::cout << "Database ERROR!! Exiting...\n";
 		return 1;
 	}
 

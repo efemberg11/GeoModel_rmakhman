@@ -20,15 +20,15 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Dependencies.
 ## GeoModel dependencies.
-find_package( GeoModelCore REQUIRED )
-find_package( GeoModelIO REQUIRED )
+find_package( GeoModelCore 3.2.0 REQUIRED )
+find_package( GeoModelIO 3.2.0 REQUIRED )
 find_package( GeoModelG4 REQUIRED )
 ## External dependencies.
 find_package( Geant4 REQUIRED )
 
 ### External Dependencies
 # Find the Qt5 libraries, used e.g. to interface with the SQlite DB
-find_package(Qt5 COMPONENTS Core Sql Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
+find_package(Qt5 COMPONENTS Core Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
 # Instruct CMake to run Qt5 moc automatically when needed
 set(CMAKE_AUTOMOC ON) # TODO: do we need this here??
 
@@ -42,4 +42,4 @@ set( SRCS main.cpp )
 add_executable( hellogeoRead2G4 ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoRead2G4 Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4  ${Geant4_LIBRARIES})
+target_link_libraries( hellogeoRead2G4 Qt5::Core GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4  ${Geant4_LIBRARIES})

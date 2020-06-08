@@ -68,11 +68,11 @@ int main(int argc, char *argv[])
 
   // GET GEOMETRY FROM LOCAL DB
   // Set valid db path before first run
-  static const QString path = "../geometry.db";
+  const std::string path = "../geometry.db";
   qDebug() << "Using this DB file:" << path;
 
   // check if DB file exists. If not, return
-  if (! QFileInfo(path).exists() ) {
+  if (! QFileInfo(QString::fromStdString(path)).exists() ) {
         // std::cout << "ERROR!! DB '" << path << "' does not exist!! Exiting..."; // FIXME: path with std::string
         std::cout << "ERROR!! DB does not exist!! Exiting...\n";
         // return;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   // open the DB
   GMDBManager* db = new GMDBManager(path);
   /* Open database */
-  if (db->isOpen()) {
+  if (db->checkIsDBOpen()) {
     std::cout << "OK! Database is open!\n";
   }
   else {

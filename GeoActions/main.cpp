@@ -14,10 +14,6 @@
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
-//#include "GeoModelDBManager/GMDBManager.h"
-
-//#include "GeoModelWrite/WriteGeoModel.h"
-
 #include <QDebug>
 #include <QFileInfo>
 

@@ -7,8 +7,8 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(HelloGeoWrite)
 
-# Compile with C++14
-set(CMAKE_CXX_STANDARD 14)
+# Compile with C++17
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -20,11 +20,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Dependencies.
 ## GeoModel dependencies.
-find_package( GeoModelCore REQUIRED )
-find_package( GeoModelIO REQUIRED )
+find_package( GeoModelCore 3.2.0 REQUIRED )
+find_package( GeoModelIO 3.2.0 REQUIRED )
 find_package( Eigen3 REQUIRED )
 ## External Dependencies.
-find_package(Qt5 COMPONENTS Core Sql Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
+find_package(Qt5 COMPONENTS Core Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
 
 # Populate a CMake variable with the sources
 set(SRCS main.cpp )
@@ -33,4 +33,4 @@ set(SRCS main.cpp )
 add_executable( hellogeoWrite ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoWrite GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite Qt5::Core Qt5::Sql )
+target_link_libraries( hellogeoWrite GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite Qt5::Core )

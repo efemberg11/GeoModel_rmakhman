@@ -18,6 +18,8 @@
 #include <QFileInfo>
 
 #include <iostream>
+#include <fstream>
+
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -106,26 +108,26 @@ int main(int argc, char *argv[])
 	//------------------------------------------------------------------------------------//
 	// Writing the geometry to file
 	//------------------------------------------------------------------------------------//
-	QString path = "geometry.db";
+  std::string path = "geometry.db";
 
 	// check if DB file exists. If not, return.
-  // TODO: this check should go in the 'GMDBManager' constructor.
-  if ( QFileInfo(path).exists() ) {
-        qWarning() << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove it before running this program.";
-        qWarning() << "\tReturning..." << "\n";
-        // return;
-        exit(1);
+  // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
+  std::ifstream infile(path.c_str());
+    if ( infile.good() ) {
+      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
+        exit(EXIT_FAILURE);
   }
+  infile.close();
 
 	// open the DB connection
   GMDBManager db(path);
 
   // check the DB connection
-  if (db.isOpen())
-      qDebug() << "OK! Database is open!";
-  else {
-      qDebug() << "Database ERROR!! Exiting...";
-      return 1;
+  if (db.checkIsDBOpen()) {
+    std::cout << "OK! Database is open!" << std::endl;
+  } else {
+    std::cout << "Database ERROR!! Exiting..." << std::endl;
+    exit(EXIT_FAILURE);
   }
 
   // Dump the tree volumes to a local file

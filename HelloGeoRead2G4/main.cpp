@@ -65,13 +65,13 @@ int main(int argc, char *argv[])
   }
 
   // open the DB
-  GMDBManager* db = new GMDBManager(path);
+  GMDBManager* db = new GMDBManager(path.toStdString());
   /* Open database */
-  if (db->isOpen()) {
-    qDebug() << "OK! Database is open!";
+  if (db->checkIsDBOpen()) {
+    std::cout << "OK! Database is open!\n";
   }
   else {
-    qDebug() << "Database is not open!";
+    std::cout << "Database is not open!\n";
     // return;
     throw;
   }

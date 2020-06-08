@@ -1446,7 +1446,7 @@ unsigned int WriteGeoModel::addFullPhysVol(const unsigned int &logVolId, const u
 {
 	std::vector<std::vector<std::string>>* container = &m_fullPhysVols;
 	std::vector<std::string> values;
-  values.push_back( std::to_string(logVolId) ); 
+  values.push_back( std::to_string(logVolId) );
 	unsigned int idx = addRecord(container, values);
 	if (isRootVolume) {
 		std::vector<std::string> rootValues;

@@ -8,18 +8,11 @@
 
 #include <GeoModelDBManager/GMDBManager.h>
 
-// fmt library
-#define FMT_HEADER_ONLY 1
+// include the 'fmt' library, which is hosted locally as header-only
+#define FMT_HEADER_ONLY 1 // to use 'fmt' header-only
 #include "fmt/format.h"
 
-
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QSqlRecord>
-#include <QSqlDriver>
-#include <QDebug>
-
-
+// C++ includes
 #include <stdlib.h> /* exit, EXIT_FAILURE */
 #include <sstream>
 

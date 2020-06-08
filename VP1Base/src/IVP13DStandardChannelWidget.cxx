@@ -40,7 +40,8 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-
+#include <QScreen>
+#include <QApplication> 
 #include <cassert>
 
 class IVP13DStandardChannelWidget::Imp {
@@ -254,18 +255,7 @@ void IVP13DStandardChannelWidget::create() {
   foreach(IVP13DSystem*sys,m_d->systemsAllowedCameraList)
     sys->registerViewer(m_d->viewer);
 
-
-  /* We want to change the default value for the "As shown" option
-   * At the beginning the option was set to True by default, but
-   * the most used setting when creating event displays for ATLAS is
-   * False, because we want to save the full image as a snapshot,
-   * without the frame and buttons from VP1.
-   * So we now set it to False by default.
-   * (We do that with setChecked() in order to not having to change
-   * the whole logics behind.
-   */
-  m_d->uisnapshot.checkBox_as_shown->setChecked(false); // fixme: check if that works, or if it's still TRUE
-
+  snapshotgroupbox->hide();
 }
 
 //___________________________________________________________________________
@@ -438,33 +428,16 @@ void IVP13DStandardChannelWidget::stopSpinning()
   if (m_d->viewer->isAnimating())
     m_d->viewer->stopAnimating();
 }
-
 //___________________________________________________________________________
 QPixmap IVP13DStandardChannelWidget::getSnapshot(bool transp, int width, bool batch)
 {
-	VP1Msg::messageDebug("IVP13DStandardChannelWidget::getSnapshot()  - transparent bkg: "+QString::number(transp)+" , width: "+QString::number(width)+" , batch: "+QString::number(batch));
-  //   SoToVRML2Action tovrml2;
-  //   tovrml2.apply(m_d->selection);
-  //   SoVRMLGroup *newroot = tovrml2.getVRML2SceneGraph();
-  //   newroot->ref();
-  //   SoOutput out;
-  //   out.openFile("out.wrl");
-  //   out.setHeaderString("#VRML V2.0 utf8");
-  //   SoWriteAction wra(&out);
-  //   wra.apply(newroot);
-  //   out.closeFile();
+ 
 
-
-  VP1Msg::messageVerbose("checkBox_as_shown: " + QString::number(m_d->uisnapshot.checkBox_as_shown->isChecked()) );
-  VP1Msg::messageVerbose("spinBox_width: " + QString::number(m_d->uisnapshot.spinBox_width->value()) );
-  VP1Msg::messageVerbose("spinBox_height: " + QString::number(m_d->uisnapshot.spinBox_height->value()) );
-  VP1Msg::messageVerbose("checkBox_transp: " + QString::number(m_d->uisnapshot.checkBox_transp->isChecked()) );
-
+ 
   if (m_d->uisnapshot.checkBox_as_shown->isChecked()) {
-	  VP1Msg::messageVerbose("'As shown' option checked - using IVP13DChannelWidget::getSnapshot()");
-	  return IVP13DChannelWidget::getSnapshot();
+    return IVP13DChannelWidget::getSnapshot();
   }
-  VP1Msg::messageVerbose("'As shown' option NOT checked");
+
 
   // if width is set programmatically, we set the new value in the GUI field
   int original_width = 0;

@@ -246,20 +246,31 @@ void VisAttributes::overrideTransparencies(float transpfact)
 DetVisAttributes::DetVisAttributes() {
 
   //
-  // We look for: ${GXSHAREDIR}/gmexDetVisAttributes, or 
+  // We look for: ${GXSHAREDIR}/gmexDetVisAttributes, or
+  //              `pwd`, or
   //              ~/.gmexDetVisAttributes, or
   //               /usr/local/share/gmex/gmexDetVisAttributes, or  
   //               /usr/share/gmex/gmexDetVisAttributes.
   //
+
+#ifdef __APPLE__
+  char buffer[1024];
+  char *wdLocation=getcwd(buffer,1024);
+#else
+  char *wdLocation=get_current_dir_name();
+#endif
+    
   struct passwd *pw = getpwuid(getuid());
   std::string homedir = pw->pw_dir;
-  std::vector<std::string> locations= {homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
+  std::vector<std::string> locations={homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
   char * gxShareDir=getenv("GXSHAREDIR");
+  if (wdLocation) locations.insert(locations.begin(), wdLocation+std::string("/"));
   if (gxShareDir) locations.insert(locations.begin(), gxShareDir+std::string("/"));
-  
+
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexDetVisAttributes.json");
     if (access(userFile.c_str(),R_OK)==0) {
+      std::cout << "Reading detector vis attributes from file " << userFile << std::endl;
       std::ifstream in(userFile);
       auto j=json::parse(in);
       for (const json & element : j["DetVisAttributes"]) {
@@ -291,9 +302,15 @@ MatVisAttributes::MatVisAttributes() {
     SoMaterial *m = new SoMaterial;
     add("DEFAULT",m);
   }
-
+#ifdef __APPLE__
+  char buffer[1024];
+  char *wdLocation=getcwd(buffer,1024);
+#else
+  char *wdLocation=get_current_dir_name();
+#endif
   //
-  // We look for: ${GXSHAREDIR}/gmexMatVisAttributes, or 
+  // We look for: ${GXSHAREDIR}/gmexMatVisAttributes, or,
+  //              `pwd`, or
   //              ~/.gmexMatVisAttributes, or
   //               /usr/local/share/gmex/gmexMatVisAttributes, or  
   //               /usr/share/gmex/gmexMatVisAttributes.
@@ -302,11 +319,13 @@ MatVisAttributes::MatVisAttributes() {
   std::string homedir = pw->pw_dir;
   std::vector<std::string> locations= {homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
   char * gxShareDir=getenv("GXSHAREDIR");
+  if (wdLocation) locations.insert(locations.begin(), wdLocation+std::string("/"));
   if (gxShareDir) locations.insert(locations.begin(), gxShareDir+std::string("/"));
   
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexMatVisAttributes.json");
     if (access(userFile.c_str(),R_OK)==0) {
+      std::cout << "Reading material vis attributes from file " << userFile << std::endl;
       std::ifstream in(userFile);
       auto j=json::parse(in);
       for (const json & element : j["MatVisAttributes"]) {
@@ -333,21 +352,30 @@ MatVisAttributes::MatVisAttributes() {
 //////////////////////////////// Attributes for volumes ////////////////////////////////
 
 VolVisAttributes::VolVisAttributes() {
- //
-  // We look for: ${GXSHAREDIR}/gmexVolVisAttributes, or 
+  //
+  // We look for: ${GXSHAREDIR}/gmexVolVisAttributes, or
+  //              `pwd`, or
   //              ~/.gmexVolVisAttributes, or
   //               /usr/local/share/gmex/gmexVolVisAttributes, or  
   //               /usr/share/gmex/gmexVolVisAttributes.
   //
+#ifdef __APPLE__
+  char buffer[1024];
+  char *wdLocation=getcwd(buffer,1024);
+#else
+  char *wdLocation=get_current_dir_name();
+#endif
   struct passwd *pw = getpwuid(getuid());
   std::string homedir = pw->pw_dir;
   std::vector<std::string> locations= {homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
   char * gxShareDir=getenv("GXSHAREDIR");
+  if (wdLocation) locations.insert(locations.begin(), wdLocation+std::string("/"));
   if (gxShareDir) locations.insert(locations.begin(), gxShareDir+std::string("/"));
   
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexVolVisAttributes.json");
     if (access(userFile.c_str(),R_OK)==0) {
+      std::cout << "Reading volume vis attributes from file " << userFile << std::endl;
       std::ifstream in(userFile);
       auto j=json::parse(in);
       for (const json & element : j["VolVisAttributes"]) {

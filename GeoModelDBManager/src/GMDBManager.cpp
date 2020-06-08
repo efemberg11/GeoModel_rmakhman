@@ -21,15 +21,15 @@
 static std::string dbversion = "0.4.0"; // removed "parent" info from [Full]PhysVols tables (May 2020)
 
 
-// FIXME: move this to utility class/file
-std::vector<std::string> toStdVectorStrings(QStringList qlist)
-{
-  std::vector<std::string> vec;
-  foreach(QString qstr, qlist) {
-    vec.push_back(qstr.toStdString());
-  }
-  return vec;
-}
+//// FIXME: move this to utility class/file
+//std::vector<std::string> toStdVectorStrings(QStringList qlist)
+//{
+//  std::vector<std::string> vec;
+//  foreach(QString qstr, qlist) {
+//    vec.push_back(qstr.toStdString());
+//  }
+//  return vec;
+//}
 
 // FIXME: TODO: move to an utility class
 std::string getEnvVar( std::string const & key )

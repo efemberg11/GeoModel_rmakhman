@@ -908,7 +908,7 @@ GeoElement* ReadGeoModel::buildElement(const unsigned int id)
   }
 
 	if (m_elements.size() == 0)
-		qFatal("ERROR! 'm_elements' is empty! Did you load the 'Elements' table? \n\t ==> Aborting...");
+  std::cout << "ERROR! 'm_elements' is empty! Did you load the 'Elements' table? \n\t ==> Aborting...\n" << std::endl;
 
   std::vector<std::string> values = m_elements[id-1];
 
@@ -1513,7 +1513,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			if (varName == "nFacets") nFacets = std::stoi(varValue);
 			else {
         muxCout.lock();
-        qWarning("ERROR!! - GeoTessellatedSolid - nFacets is not defined!!");
+//        qWarning("ERROR!! - GeoTessellatedSolid - nFacets is not defined!!");
         muxCout.unlock();
 				error = true; // TODO: check "error.h" functionalities and replace with that, if useful
 			}

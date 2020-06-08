@@ -32,7 +32,7 @@ variables:
 .ubuntu-template-job-default: &ubuntu-job
   <<: *ubuntu-job-base
   before_script:
-    - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev
+    - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
 
 
 

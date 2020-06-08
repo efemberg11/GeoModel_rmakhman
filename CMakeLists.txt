@@ -66,6 +66,7 @@ add_executable(fillHistogramExample fillHistogramExample.cc src/Histo.cc include
 add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 #add_executable(plotGeantinoMaps plotGeantinoMaps.cc)
 add_executable(testMagneticField testMagneticField.cc)
+add_executable(gmtogdml geoModeltoGDML.cc ${sources} ${headers})
 
 
 
@@ -83,6 +84,8 @@ target_link_libraries(gmclash GeoModelIO::GeoModelDBManager GeoModelIO::GeoModel
 
 target_link_libraries(gmgeantino GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
+target_link_libraries(gmtogdml Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
+
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
 else()
@@ -94,6 +97,8 @@ target_link_libraries(gmclash GeoModelIO::GeoModelDBManager GeoModelIO::GeoModel
 target_link_libraries(fullSimLight GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 target_link_libraries(gmgeantino GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+
+target_link_libraries(gmtogdml Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
@@ -130,4 +135,5 @@ install(TARGETS gmclash DESTINATION ${OUTPUT})
 install(TARGETS fillHistogramExample DESTINATION ${OUTPUT})
 install(TARGETS gmgeantino DESTINATION ${OUTPUT})
 install(TARGETS testMagneticField DESTINATION ${OUTPUT})
+install(TARGETS gmtogdml DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION ${OUTPUT})

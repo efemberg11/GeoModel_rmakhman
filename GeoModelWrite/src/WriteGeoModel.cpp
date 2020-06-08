@@ -297,7 +297,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 
     // Now we get the 'copy number' for this volume,
     // to distinguish this volume from the other volumes created from the same shared node (if any)
-    if (volTypeStr == "NULL") qFatal("ERROR!! volTypeStr is 'NULL'!!!");
+  if (volTypeStr == "NULL") std::cout << "ERROR!! volTypeStr is 'NULL'!!!\n";
     const unsigned int volCopyN = setVolumeCopyNumber(physId, volTypeStr);
     //JFB Commented out: qDebug() << "physId: " << physId << "- volume copy number: " << volCopyN;
 
@@ -418,8 +418,8 @@ void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
     std::string expression = persistifier.getCodedString();
 
 		if (expression.size() == 0) {
-				qFatal("FATAL ERROR!! Function expression is empty!! Aborting...");
-				abort();
+      std::cout << "FATAL ERROR!! Function expression is empty!! Aborting...\n";
+      exit(EXIT_FAILURE);
 		}
 
 

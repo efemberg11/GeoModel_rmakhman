@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
   // GET GEOMETRY FROM LOCAL DB
   // Set valid db path before first run
   const std::string path = "../geometry.db";
-  qDebug() << "Using this DB file:" << path;
+  std::cout << "Using this DB file:" << path << std::endl;
 
   // check if DB file exists. If not, return
   if (! QFileInfo(QString::fromStdString(path)).exists() ) {

@@ -11,7 +11,7 @@ file( GLOB HEADERS GeoModelRead/*.h )
 
 # Set up the library.
 add_library( GeoModelRead SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoModelRead PUBLIC 
+target_link_libraries( GeoModelRead PUBLIC
 GeoModelCore::GeoModelKernel GeoModelDBManager TFPersistification )
 target_include_directories( GeoModelRead PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -21,11 +21,6 @@ source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoModelRead PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
-if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-   "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-   target_compile_definitions( GeoModelRead PUBLIC QT_NO_DEBUG_OUTPUT )
-endif()
-
 
 # Install the library.
 install( TARGETS GeoModelRead

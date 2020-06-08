@@ -16,11 +16,6 @@ source_group( "src" FILES ${SOURCES} )
 set_target_properties( TFPersistification PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
-if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-   "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
-   target_compile_definitions( TFPersistification PUBLIC
-      -DQT_NO_DEBUG_OUTPUT )
-endif()
 
 # Install the library.
 install( TARGETS TFPersistification

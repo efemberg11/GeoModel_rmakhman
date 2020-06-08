@@ -1124,7 +1124,7 @@ WriteGeoModel::WriteGeoModel(GMDBManager &db)
 
 	// init anche check the database handle
 	m_dbManager = &db;
-	if (m_dbManager->isOpen()) {
+	if (m_dbManager->checkIsDBOpen()) { 
 		//JFB Commented out: qDebug() << "OK! Database is open!";
 	}
 	else {

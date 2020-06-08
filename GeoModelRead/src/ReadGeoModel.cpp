@@ -92,20 +92,20 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDeb
   m_debug(false), m_timing(false), m_runMultithreaded(false),
   m_runMultithreaded_nThreads(0), m_progress(nullptr)
 {
-  // Check if the user asked for running in serial or multi-threading mode
-  if ( "" != getEnvVar("GEOMODEL_ENV_IO_DEBUG")) {
+  // Check if the user asked for debug messages
+  if ( "" != getEnvVar("GEOMODEL_ENV_IO_READ_DEBUG")) {
     m_debug = true;
     std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will see a verbose output." << std::endl;
   }
-  // Check if the user asked for running in serial or multi-threading mode
+  // Check if the user asked for verbose debug messages
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_DEBUG_VERBOSE")) {
     m_deepDebug = true;
-    std::cout << "You defined the GEOMODEL_IO_DEBUG_VERBOSE variable, so you will see a verbose output." << std::endl;
+    std::cout << "You defined the GEOMODEL_IO_READ_DEBUG_VERBOSE variable, so you will see a verbose output." << std::endl;
   }
-  // Check if the user asked for running in serial or multi-threading mode
+  // Check if the user asked for timing output
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_TIMING")) {
     m_timing = true;
-    std::cout << "You defined the GEOMODEL_IO_TIMING variable, so you will see a timing measurement in the output." << std::endl;
+    std::cout << "You defined the GEOMODEL_IO_READ_TIMING variable, so you will see a timing measurement in the output." << std::endl;
   }
 
 	if ( progress != nullptr) {
@@ -182,18 +182,18 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
   // *** get all data from the DB ***
 
 	// get all GeoModel nodes from the DB
-	m_logVols = m_dbManager->getTableFromNodeTypeStd("GeoLogVol");
-	m_shapes = m_dbManager->getTableFromNodeTypeStd("GeoShape");
-	m_materials = m_dbManager->getTableFromNodeTypeStd("GeoMaterial");
-	m_elements = m_dbManager->getTableFromNodeTypeStd("GeoElement");
-	m_functions = m_dbManager->getTableFromNodeTypeStd("Function");
-  m_physVols = m_dbManager->getTableFromNodeTypeStd("GeoPhysVol");
-  m_fullPhysVols = m_dbManager->getTableFromNodeTypeStd("GeoFullPhysVol");
-  m_transforms = m_dbManager->getTableFromNodeTypeStd("GeoTransform");
-  m_alignableTransforms = m_dbManager->getTableFromNodeTypeStd("GeoAlignableTransform");
-  m_serialDenominators = m_dbManager->getTableFromNodeTypeStd("GeoSerialDenominator");
-  m_serialTransformers = m_dbManager->getTableFromNodeTypeStd("GeoSerialTransformer");
-  m_nameTags = m_dbManager->getTableFromNodeTypeStd("GeoNameTag");
+	m_logVols = m_dbManager->getTableFromNodeType("GeoLogVol");
+	m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
+	m_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
+	m_elements = m_dbManager->getTableFromNodeType("GeoElement");
+	m_functions = m_dbManager->getTableFromNodeType("Function");
+  m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
+  m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
+  m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
+  m_alignableTransforms = m_dbManager->getTableFromNodeType("GeoAlignableTransform");
+  m_serialDenominators = m_dbManager->getTableFromNodeType("GeoSerialDenominator");
+  m_serialTransformers = m_dbManager->getTableFromNodeType("GeoSerialTransformer");
+  m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
   
   // get the children table from DB
   m_allchildren = m_dbManager->getChildrenTableStd();

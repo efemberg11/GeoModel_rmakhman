@@ -22,7 +22,7 @@
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoXF.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
-#include "GeoModelKernel/GeoDefinitions.h"
+#include "GeoModelKernel/GeoDefinitions.h" 
 
 // C++ includes
 #include <vector>

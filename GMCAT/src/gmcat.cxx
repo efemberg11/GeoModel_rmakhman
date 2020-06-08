@@ -31,21 +31,21 @@ int main(int argc, char ** argv) {
   //
   // Usage message:
   //
-  
+
   std::string gmcat= argv[0];
   std::string usage= "usage: " + gmcat + " [plugin1"+shared_obj_extension
     + "] [plugin2" + shared_obj_extension
-    + "] ...[file1.db] [file2.db].. -o outputFile]"; 
+    + "] ...[file1.db] [file2.db].. -o outputFile]";
   //
   // Print usage message if no args given:
-  // 
+  //
   if (argc==1) {
     std::cerr << usage << std::endl;
     return 0;
   }
   //
   // Parse the command line:
-  // 
+  //
   std::vector<std::string> inputFiles;
   std::vector<std::string> inputPlugins;
   std::string outputFile;
@@ -88,21 +88,21 @@ int main(int argc, char ** argv) {
     }
   }
 
-  
+
   //
   // Create elements and materials:
-  // 
-  
+  //
+
   const double  gr =   SYSTEM_OF_UNITS::gram;
   const double  mole = SYSTEM_OF_UNITS::mole;
   const double  cm3 =  SYSTEM_OF_UNITS::cm3;
-  
+
   // Define the chemical elements
   GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
   GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
   GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
   GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
-  
+
   double densityOfAir=0.001214 *gr/cm3;
   GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
   air->add(Nitrogen  , 0.7494);
@@ -131,26 +131,25 @@ int main(int argc, char ** argv) {
     }
     factory->create(world);
   }
-  
+
   //
   // Loop over files, create the geometry and put it under the world:
   //
   for (const std::string & file : inputFiles) {
-    QString fString=file.c_str();
-    GMDBManager* db = new GMDBManager(fString);
-    if (!db->isOpen()){
+    GMDBManager* db = new GMDBManager(file);
+    if (!db->checkIsDBOpen()){
       std::cerr << "Error opening input file " << file << std::endl;
       return 6;
     }
-      
+
     /* set the GeoModel reader */
     GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-      
+
     /* build the GeoModel geometry */
     GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
     GeoVolumeCursor aV(dbPhys);
-	
+
     while (!aV.atEnd()) {
       GeoNameTag *nameTag=new GeoNameTag(aV.getName());
       GeoTransform *transform= new GeoTransform(aV.getTransform());
@@ -164,11 +163,11 @@ int main(int argc, char ** argv) {
   //
   // Open a new database:
   //
-  GMDBManager db(outputFile.c_str());
-  //   
+  GMDBManager db(outputFile);
+  //
   // check the DB connection
   //
-  if (!db.isOpen()) {
+  if (!db.checkIsDBOpen()) {
     std::cerr << "Error opening output file " << outputFile << std::endl;
     return 7;
   }
@@ -176,10 +175,9 @@ int main(int argc, char ** argv) {
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
   dumpGeoModelGraph.saveToDB();
-   
+
   world->unref();
-  
-  
+
+
   return 0;
 }
-

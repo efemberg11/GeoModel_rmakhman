@@ -14,7 +14,7 @@ variables:
 # TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
 .macos-template-job: &macos-job
   tags:
-    - macos
+    - macos-geomodeldev
   allow_failure: true
   timeout: 60 minutes
   before_script:

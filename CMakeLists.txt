@@ -39,10 +39,6 @@ find_package( nlohmann_json QUIET )
 #
 find_package(Geant4 REQUIRED)
 #----------------------------------------------------------------------------
-# Find the Qt5 libraries, used e.g. to interface with the SQlite DB
-find_package(Qt5 COMPONENTS Core Sql Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
-# Instruct CMake to run Qt5 moc automatically when needed
-#set(CMAKE_AUTOMOC ON) # TODO: do we need this here??
 
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
@@ -81,11 +77,11 @@ target_link_libraries(testMagneticField ${Geant4_LIBRARIES} MagFieldServices Mag
 
 if( nlohmann_json_FOUND )
 
-target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces  nlohmann_json::nlohmann_json )
+target_link_libraries(fullSimLight GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
+target_link_libraries(gmclash GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
+target_link_libraries(gmgeantino GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
@@ -93,11 +89,11 @@ else()
 
 message(STATUS "'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
 
-target_link_libraries(gmclash Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(gmclash GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(fullSimLight Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(fullSimLight GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(gmgeantino Qt5::Core Qt5::Sql GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(gmgeantino GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 

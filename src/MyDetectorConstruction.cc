@@ -62,13 +62,6 @@
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 
-
-#include <QCoreApplication>
-#include <QString>
-#include <QDebug>
-#include <QFileInfo>
-
-
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
@@ -676,9 +669,9 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         world = CreateTheWorld(nullptr);
         factory->create(world);
 
-        qDebug() << "ReadGeoModel::buildGeoModel() done.";
+        G4cout << "ReadGeoModel::buildGeoModel() done." << G4endl;
         fTimer.Stop();
-        G4cout << "First step done. GeoModelTree built from the SQLite file."<<G4endl;
+        G4cout << "First step done. GeoModelTree built from the SQLite file." << G4endl;
         G4cout << "*** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
         G4cout << "*** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
         G4cout << "*** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
@@ -718,10 +711,10 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         GMDBManager* db = new GMDBManager(fGeometryFileName.data());
         /* Open database */
         if (db->checkIsDBOpen()) {
-            qDebug() << "OK! Database is open!";
+            G4cout << "Database is open!" << G4endl;
         }
         else{
-            qDebug() << "Database is not open!";
+            G4cout << "ERROR! Database is not open." << G4endl;
             // return;
             throw;
             
@@ -732,15 +725,15 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         //db->printAllMaterials();
         /* setup the GeoModel reader */
         GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-        qDebug() << "ReadGeoModel set.";
+        G4cout << "ReadGeoModel set.";
         
         
         /* build the GeoModel geometry */
         //GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
         world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
-        qDebug() << "ReadGeoModel::buildGeoModel() done.";
+        G4cout << "ReadGeoModel::buildGeoModel() done." << G4endl;
         fTimer.Stop();
-        G4cout << "First step done. GeoModelTree built from the SQLite file."<<G4endl;
+        G4cout << "First step done. GeoModelTree built from the SQLite file." << G4endl;
         G4cout << "*** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
         G4cout << "*** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
         G4cout << "*** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;

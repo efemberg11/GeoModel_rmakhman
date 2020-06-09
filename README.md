@@ -6,6 +6,7 @@ FullSimLight project consists of different tools based on [Geant4] (https://gean
 - fullSimLight: a Geant4 based light simulation (geometry, transport in magnetic field and basic physics scoring)
 - gmclash: a tool that runs clash detection on your input geometry, producing a json file report
 - gmgeantino: a tool to generate geantino maps from your input geometry
+- gmtogdml: a tool to convert geometries and dump them in gdml format.
 
 The supported geometry formats are SQLite (.db), GDML (.gdml) and dual-use plugins (.dylib/.so) as the ones described in the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins). The ATLAS detector geometry description can be imported via a SQLite or a GDML file. If the ATLAS magnetic field map is available to the user, it can be used in fullSimLight.
 
@@ -403,6 +404,38 @@ To produce geantino maps of a geometry described by one of the [GeoModelPlugins 
 ``` bash
 ./gmgeantino -g libHGTDPlugin.1.0.0.dylib -d -a -l -o geantinoMaps_HGTD.root 
 ``` 
+
+# GeoModelToGDML: run and options
+
+GeoModelToGDML (gmtogdml) is a command line tool based on Geant4, to convert geometries and dump them in gdml.
+The geometry is first built in GeoModel, converted in Geant4 and dumped in gdml format.
+The supported input geometries are : sqlite (.db), plugin (.so/dylib) and gdml.
+Before the dump operation the geometry is revised and the unidentified volumes are pulled from the geometry.
+Run the executable with the --help option to see the available options:
+
+``` bash
+./gmtogdml --help
+
+ **** Parameters: 
+-g :   [MANDATORY] input  geometry file name [.db/.gdml/.dylib/.so] 
+-o :   [OPTIONAL]  output GDML geometry file name (default: geometry.gdml)
+
+``` 
+
+
+## Examples
+
+To run GeoModelToGDML one has to specify with the -g flag the geometry file (this is mandatory). By default a 'geometry.gdml' output file is created, but the name of the file can be changed using the -o option. 
+To run gmtogdml on *LArBarrel.db* geometry, and dump the output gdml file in the *LArBarrel.gdml* file:
+``` bash
+./gmtogdml -g LArBarrel.db -o LArBarrel.gdml
+``` 
+
+To dump your geometry described with a plugin, i.e.  *HGTDPlugin*, and write out the geometry file in the *HGTDPlugin.gdml* file :
+``` bash
+./gmtogdml -g libHGTDPlugin.1.0.0.dylib -o HGTDPlugin.gdml
+``` 
+
 
 # Final Remark
 

@@ -16,8 +16,8 @@ add_subdirectory(MagneticField)
 
 # Dependencies.
 ## GeoModel dependencies.
-find_package( GeoModelCore REQUIRED )
-find_package( GeoModelIO REQUIRED )
+find_package( GeoModelCore 3.2.0 REQUIRED )
+find_package( GeoModelIO 3.2.0 REQUIRED )
 find_package( GeoModelG4 REQUIRED )
 find_package( nlohmann_json QUIET )
 

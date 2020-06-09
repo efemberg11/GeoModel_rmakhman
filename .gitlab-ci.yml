@@ -40,7 +40,7 @@ variables:
     - mkdir geomodelcore-build
     - cd geomodelcore-build
     - cmake ${CMAKE_ARGS} ../GeoModelCore
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -59,7 +59,7 @@ variables:
     - mkdir CLHEP-build
     - cd CLHEP-build
     - cmake ${CMAKE_ARGS} ../CLHEP
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -75,7 +75,7 @@ variables:
     - mkdir geomodelio-build
     - cd geomodelio-build
     - cmake ${CMAKE_ARGS} ../GeoModelIO
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -93,7 +93,7 @@ variables:
     - mkdir xerces-c-build
     - cd xerces-c-build
     - cmake ${CMAKE_ARGS} ../xerces-c-3.2.2
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -113,7 +113,7 @@ variables:
     - mkdir Geant4-build
     - cd Geant4-build
     - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install/xerces-c/ ../geant4
-    - make -j32
+    - make -j16
     - make install
   artifacts:
     paths:
@@ -129,7 +129,7 @@ variables:
     - mkdir GeoModelG4-build
     - cd GeoModelG4-build
     - cmake ${CMAKE_ARGS} ../GeoModelG4
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -145,7 +145,7 @@ variables:
     - mkdir nlohmann_json-build
     - cd nlohmann_json-build
     - cmake ${CMAKE_ARGS} ../json
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -161,7 +161,7 @@ variables:
     - mkdir build
     - cd build
     - cmake ${CMAKE_ARGS} ..
-    - cmake --build . -- -j32
+    - cmake --build . -- -j4
     - cmake --build . -- install
 
 # ACTUAL JOBS

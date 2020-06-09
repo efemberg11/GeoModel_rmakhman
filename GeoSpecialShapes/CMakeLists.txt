@@ -6,7 +6,7 @@
 ################################################################################
 
 find_package(CLHEP)
-find_package(GeoModelCore)
+find_package(GeoModelCore 3.2.0 REQUIRED)
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )  # it defines CMAKE_INSTALL_LIBDIR

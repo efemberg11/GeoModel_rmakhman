@@ -7,7 +7,7 @@ project( "GeoMaterial2G4" VERSION 1.0.0 LANGUAGES CXX )
 
 # External dependencies:
 find_package( Geant4 REQUIRED )
-find_package( GeoModelCore REQUIRED )
+find_package( GeoModelCore 3.2.0 REQUIRED )
 
 # Project's Settings
 set(CMAKE_CXX_STANDARD 17)

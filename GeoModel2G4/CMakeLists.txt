@@ -11,7 +11,7 @@ project( "GeoModel2G4" VERSION 1.0.0 LANGUAGES CXX )
 find_package( Geant4 REQUIRED )
 find_package( CLHEP )
 # GeoModel dependencies
-find_package( GeoModelCore REQUIRED )
+find_package( GeoModelCore 3.2.0 REQUIRED )
 
 ##########################################################
 # NOTE! The original package also needs this Athena stuff:

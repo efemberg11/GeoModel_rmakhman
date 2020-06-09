@@ -128,9 +128,16 @@ void GetInputArguments(int argc, char** argv) {
   }
   // check if mandatory Geometry file was provided
   if (inputGeometryFileName=="") {
-      G4cout << "  *** ERROR : Input geometry file is required! " << G4endl;
+      G4cout << "\n  *** ERROR : Input geometry file is required! " << G4endl;
       Help();
       exit(-1);
       
   }
+  // check that the output file as .gdml extention
+  if (!outputGDMLFileName.contains(".gdml")) {
+        G4cout << "\n  *** ERROR : Output geometry file must have .gdml extension! " << G4endl;
+        Help();
+        exit(-1);
+        
+    }
 }

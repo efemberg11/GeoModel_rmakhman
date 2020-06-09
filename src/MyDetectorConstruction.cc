@@ -812,6 +812,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         //fParser.SetRegionExport(true);
         //fParser.SetEnergyCutsExport(true);
         PullUnidentifiedVolumes(fWorld->GetLogicalVolume());
+        G4cout << "\n" << G4endl;
         fParser.Write(fOutputGDMLFileName, fWorld->GetLogicalVolume());
         G4cout << "\n =================== Geometry exported in GDML, DONE!  =================== \n" << G4endl;
         exit(0);
@@ -1013,6 +1014,6 @@ void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
     for (unsigned int j=0;j<pv_to_remove.size();++j){
         v->RemoveDaughter( pv_to_remove[j] );
     }
-    std::cout<<"\n"<<std::endl;
+    
     
 }

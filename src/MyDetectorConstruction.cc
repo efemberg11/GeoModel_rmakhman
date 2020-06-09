@@ -811,6 +811,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         //G4GDMLParser parser;
         //fParser.SetRegionExport(true);
         //fParser.SetEnergyCutsExport(true);
+        PullUnidentifiedVolumes(fWorld->GetLogicalVolume());
         fParser.Write(fOutputGDMLFileName, fWorld->GetLogicalVolume());
         G4cout << "\n =================== Geometry exported in GDML, DONE!  =================== \n" << G4endl;
         exit(0);
@@ -977,3 +978,41 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
         }
         return driver;
     }
+
+void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
+    
+    if (v==0) return;
+    std::vector<G4VPhysicalVolume*> pv_to_remove;
+    for (size_t i=0;i<v->GetNoDaughters();++i){
+        
+        G4VPhysicalVolume * n_v = v->GetDaughter(i);
+        
+        if (n_v->GetName() == "LAr::EMEC::Pos::InnerWheel" ||
+            n_v->GetName() == "LAr::EMEC::Neg::InnerWheel" ||
+            n_v->GetName() == "LAr::EMEC::Pos::OuterWheel" ||
+            n_v->GetName() == "LAr::EMEC::Neg::OuterWheel" ||
+            n_v->GetName() == "LAr::EMEC::Pos::InnerCone"  ||
+            n_v->GetName() == "LAr::EMEC::Neg::InnerCone"  ||
+            n_v->GetName() == "LAr::EMEC::Pos::OuterFrontCone" ||
+            n_v->GetName() == "LAr::EMEC::Neg::OuterFrontCone" ||
+            n_v->GetName() == "LAr::EMEC::Pos::OuterBackCone"  ||
+            n_v->GetName() == "LAr::EMEC::Neg::OuterBackCone"  ||
+            n_v->GetName() == "LAr::EMEC::Pos::InnerSlice00"   ||
+            n_v->GetName() == "LAr::EMEC::Neg::InnerSlice00"   ||
+            n_v->GetName() == "LAr::EMEC::Pos::OuterSlice00"   ||
+            n_v->GetName() == "LAr::EMEC::Neg::OuterSlice00"   ||
+            n_v->GetName() == "UnidentifiedShape"){
+            // This is one to remove
+            std::cout<<" !REMOVING: "<< n_v->GetName()<<", shape is not supported in GDML!"<<std::endl;
+            pv_to_remove.push_back(n_v);
+        } else {
+            // Recurse
+            PullUnidentifiedVolumes( n_v->GetLogicalVolume() );
+        }
+    }
+    for (unsigned int j=0;j<pv_to_remove.size();++j){
+        v->RemoveDaughter( pv_to_remove[j] );
+    }
+    std::cout<<"\n"<<std::endl;
+    
+}

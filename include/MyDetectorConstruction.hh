@@ -71,7 +71,10 @@ public:
   // 'volume', populating the fTree vector of G4VPhysicalVolumes
   bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
   
-    GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
+  GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
+
+  /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
+  void PullUnidentifiedVolumes( G4LogicalVolume* v );
 
 protected:
   G4Timer fTimer;

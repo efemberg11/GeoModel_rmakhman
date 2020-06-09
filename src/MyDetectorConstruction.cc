@@ -62,6 +62,7 @@
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 
+
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
@@ -118,9 +119,11 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
   fFieldConstant       = false;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
+  fDumpGDML            = false;
   fReportFileName      = "gmclash_report.json";
   fMinStep             = 1.0e-2;
   fField.Put(0);
+  fOutputGDMLFileName = "geometry.gdml";
 }
 
 MyDetectorConstruction::~MyDetectorConstruction()
@@ -697,11 +700,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout << "Detector Construction from the plugin file " << fGeometryFileName.data() <<", done!"<<G4endl;
 
         
-//        G4GDMLParser parser;
-//        parser.SetRegionExport(true);
-//        //     parser.SetEnergyCutsExport(true);
-//        parser.Write("accordion.gdml", fWorld->GetLogicalVolume());
-//        G4cout << "Geometry exported in GDML, done!"<<G4endl;
+
         
     }
     else if (fGeometryFileName.contains(".db")){
@@ -804,6 +803,18 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         outJsonFile.close();
         
         G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
+        exit(0);
+    }
+    if (fDumpGDML){
+        
+        G4cout << "\n ===================  Dump geometry in GDML format  =================== \n" << G4endl;
+        //G4GDMLParser parser;
+        //fParser.SetRegionExport(true);
+        //fParser.SetEnergyCutsExport(true);
+        PullUnidentifiedVolumes(fWorld->GetLogicalVolume());
+        G4cout << "\n" << G4endl;
+        fParser.Write(fOutputGDMLFileName, fWorld->GetLogicalVolume());
+        G4cout << "\n =================== Geometry exported in GDML, DONE!  =================== \n" << G4endl;
         exit(0);
     }
     return fWorld;
@@ -968,3 +979,41 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
         }
         return driver;
     }
+
+void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
+    
+    if (v==0) return;
+    std::vector<G4VPhysicalVolume*> pv_to_remove;
+    for (size_t i=0;i<v->GetNoDaughters();++i){
+        
+        G4VPhysicalVolume * n_v = v->GetDaughter(i);
+        
+        if (n_v->GetName() == "LAr::EMEC::Pos::InnerWheel" ||
+            n_v->GetName() == "LAr::EMEC::Neg::InnerWheel" ||
+            n_v->GetName() == "LAr::EMEC::Pos::OuterWheel" ||
+            n_v->GetName() == "LAr::EMEC::Neg::OuterWheel" ||
+            n_v->GetName() == "LAr::EMEC::Pos::InnerCone"  ||
+            n_v->GetName() == "LAr::EMEC::Neg::InnerCone"  ||
+            n_v->GetName() == "LAr::EMEC::Pos::OuterFrontCone" ||
+            n_v->GetName() == "LAr::EMEC::Neg::OuterFrontCone" ||
+            n_v->GetName() == "LAr::EMEC::Pos::OuterBackCone"  ||
+            n_v->GetName() == "LAr::EMEC::Neg::OuterBackCone"  ||
+            n_v->GetName() == "LAr::EMEC::Pos::InnerSlice00"   ||
+            n_v->GetName() == "LAr::EMEC::Neg::InnerSlice00"   ||
+            n_v->GetName() == "LAr::EMEC::Pos::OuterSlice00"   ||
+            n_v->GetName() == "LAr::EMEC::Neg::OuterSlice00"   ||
+            n_v->GetName() == "UnidentifiedShape"){
+            // This is one to remove
+            std::cout<<" !REMOVING: "<< n_v->GetName()<<", shape is not supported in GDML!"<<std::endl;
+            pv_to_remove.push_back(n_v);
+        } else {
+            // Recurse
+            PullUnidentifiedVolumes( n_v->GetLogicalVolume() );
+        }
+    }
+    for (unsigned int j=0;j<pv_to_remove.size();++j){
+        v->RemoveDaughter( pv_to_remove[j] );
+    }
+    
+    
+}

@@ -36,6 +36,8 @@ public:
   void SetRunOverlapCheck(const bool runOvCheck)     { fRunOverlapCheck = runOvCheck; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
+  void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
+  void SetDumpGDML(const bool dumpGDML)              {fDumpGDML=dumpGDML;}
 
   /// Common method to construct a driver with a stepper of requested type.
   G4VIntegrationDriver*
@@ -69,7 +71,10 @@ public:
   // 'volume', populating the fTree vector of G4VPhysicalVolumes
   bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
   
-    GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
+  GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
+
+  /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
+  void PullUnidentifiedVolumes( G4LogicalVolume* v );
 
 protected:
   G4Timer fTimer;
@@ -78,9 +83,11 @@ private:
   // this static member is for the print out
   static G4double gFieldValue;
   G4bool   fRunOverlapCheck;
+  G4bool   fDumpGDML;
   G4double fMinStep;
   G4String fGeometryFileName;
   G4String fReportFileName;
+  G4String fOutputGDMLFileName;
   G4double fFieldValue;
   G4bool   fFieldConstant;
   G4GDMLParser fParser;

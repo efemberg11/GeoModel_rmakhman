@@ -717,7 +717,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         // open the DB
         GMDBManager* db = new GMDBManager(fGeometryFileName.data());
         /* Open database */
-        if (db->isOpen()) {
+        if (db->checkIsDBOpen()) {
             qDebug() << "OK! Database is open!";
         }
         else{

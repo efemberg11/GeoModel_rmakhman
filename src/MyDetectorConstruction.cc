@@ -62,6 +62,7 @@
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 
+
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
@@ -118,9 +119,11 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
   fFieldConstant       = false;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
+  fDumpGDML            = false;
   fReportFileName      = "gmclash_report.json";
   fMinStep             = 1.0e-2;
   fField.Put(0);
+  fOutputGDMLFileName = "geometry.gdml";
 }
 
 MyDetectorConstruction::~MyDetectorConstruction()
@@ -697,11 +700,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout << "Detector Construction from the plugin file " << fGeometryFileName.data() <<", done!"<<G4endl;
 
         
-//        G4GDMLParser parser;
-//        parser.SetRegionExport(true);
-//        //     parser.SetEnergyCutsExport(true);
-//        parser.Write("accordion.gdml", fWorld->GetLogicalVolume());
-//        G4cout << "Geometry exported in GDML, done!"<<G4endl;
+
         
     }
     else if (fGeometryFileName.contains(".db")){
@@ -804,6 +803,16 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         outJsonFile.close();
         
         G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
+        exit(0);
+    }
+    if (fDumpGDML){
+        
+        G4cout << "\n ===================  Dump geometry in GDML format  =================== \n" << G4endl;
+        //G4GDMLParser parser;
+        //fParser.SetRegionExport(true);
+        //fParser.SetEnergyCutsExport(true);
+        fParser.Write(fOutputGDMLFileName, fWorld->GetLogicalVolume());
+        G4cout << "\n =================== Geometry exported in GDML, DONE!  =================== \n" << G4endl;
         exit(0);
     }
     return fWorld;

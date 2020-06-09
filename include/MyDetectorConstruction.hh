@@ -36,6 +36,8 @@ public:
   void SetRunOverlapCheck(const bool runOvCheck)     { fRunOverlapCheck = runOvCheck; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
+  void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
+  void SetDumpGDML(const bool dumpGDML)              {fDumpGDML=dumpGDML;}
 
   /// Common method to construct a driver with a stepper of requested type.
   G4VIntegrationDriver*
@@ -78,9 +80,11 @@ private:
   // this static member is for the print out
   static G4double gFieldValue;
   G4bool   fRunOverlapCheck;
+  G4bool   fDumpGDML;
   G4double fMinStep;
   G4String fGeometryFileName;
   G4String fReportFileName;
+  G4String fOutputGDMLFileName;
   G4double fFieldValue;
   G4bool   fFieldConstant;
   G4GDMLParser fParser;

@@ -17,6 +17,7 @@
 #include "Randomize.hh"
 #include "g4analysis.hh"
 #include "fstream"
+#include <sstream>
 
 #include "MagFieldServices/AtlasFieldSvc.h"
 #include "StandardFieldSvc.h"
@@ -32,6 +33,15 @@ void GetInputArguments(int argc, char** argv);
 void Help();
 
 bool debug = false;
+G4double m_minZ = -15*m;
+G4double m_maxZ = 15*m;
+
+G4double m_minR = -15*m;
+G4double m_maxR = 15*m;
+
+G4double slice_z1=3.5*m, slice_z2=4*m, slice_z3=4.5*m;
+G4double slice_x1=0*m, slice_x2=3*m, slice_x3=5*m;
+
 
 int main(int argc, char** argv) {
     
@@ -55,15 +65,15 @@ int main(int argc, char** argv) {
     
     G4String mname("G4_Random");              // material
     G4String hname = "hist_" + mname;
-    //G4int stepsPhi = 1000;
     G4int stepsZ = 1000;
-    //G4int stepsR = 100;
     G4int stepsX = 1000;
     G4int stepsY = 1000;
-    G4double m_maxZ = 15*m, m_minZ = -15 *m;
+    
+    //G4double m_maxZ = 15*m, m_minZ = -15 *m;
+    
     //G4double m_minR = 0.  , m_maxR = 12.5*m;
     G4double m_minX = -10*m, m_maxX = 10*m;
-    G4double m_minY = -10*m, m_maxY = 10*m;
+    G4double m_minY = -5*m, m_maxY = 5*m;
     G4double xyzt[3];
     G4double field[3];
     G4double deriv[3];
@@ -172,18 +182,42 @@ int main(int argc, char** argv) {
     analysisManager->FinishNtuple();
     
     //create 2D xy histograms at z = 0,5,10 meters
-    G4int h2ID_z0 = analysisManager->CreateH2("TH2_xy_z0", "TH2_xy_z0",stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
-    G4int h2ID_z5 = analysisManager->CreateH2("TH2_xy_z5", "TH2_xy_z5",stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
-    G4int h2ID_z10 = analysisManager->CreateH2("TH2_xy_z10", "TH2_xy_z10",stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
-    //create 2D zy histograms at x = 0,3 meters
-    G4int h2ID_x0 = analysisManager->CreateH2("TH2_zy_x0", "TH2_zy_x0",stepsZ, m_minZ/m, m_maxZ/m, stepsY, m_minY/m,m_maxY/m);
-    G4int h2ID_x3 = analysisManager->CreateH2("TH2_zy_x3", "TH2_zy_x3",stepsZ, m_minZ/m, m_maxZ/m, stepsY, m_minY/m,m_maxY/m);
+    //create 2D zy histograms at x = 0,3,5 meters
+    std::ostringstream strs;
+    strs << slice_z1;
+    G4String name_z1 = "BField_xy_z" + strs.str();
+
+    std::ostringstream strs2;
+    strs2 << slice_z2;
+    G4String name_z2 = "BField_xy_z" + strs2.str();
+
+    std::ostringstream strs3;
+    strs3 << slice_z3;
+    G4String name_z3 = "BField_xy_z" + strs3.str();
     
-    //G4int h3ID = analysisManager->CreateH3("TH3_xyz", "TH3_xyz",stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m,stepsZ, m_minZ/m,m_maxZ/m);
+    G4int h2ID_z1 = analysisManager->CreateH2("BField_xy_z1", name_z1, stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
+    G4int h2ID_z2 = analysisManager->CreateH2("BField_xy_z2", name_z2, stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
+    G4int h2ID_z3 = analysisManager->CreateH2("BField_xy_z3", name_z3, stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
+    //create 2D zy histograms at x = 0,3,5 meters
+    std::ostringstream strs_x1;
+    strs_x1 << slice_x1;
+    G4String name_x1 = "BField_zy_x" + strs_x1.str();
+    //std::cout<<"name_x1: "<<name_x1<<std::endl;
     
-//    CLHEP::HepRandomEngine*     rndmEngineMod;
-//    rndmEngineMod = G4Random::getTheEngine();
-    
+    std::ostringstream strs_x2;
+    strs_x2 << slice_x2;
+    G4String name_x2 = "BField_zy_x" + strs_x2.str();
+    //std::cout<<"name_x2: "<<name_x2<<std::endl;
+
+    std::ostringstream strs_x3;
+    strs_x3 << slice_x3;
+    G4String name_x3 = "BField_zy_x" + strs_x3.str();
+   
+    //std::cout<<"name_x3: "<<name_x3<<std::endl;
+    G4int h2ID_x1 = analysisManager->CreateH2("BField_zy_x1", name_x1,stepsZ, m_minZ/m, m_maxZ/m, stepsY, m_minY/m,m_maxY/m);
+    G4int h2ID_x2 = analysisManager->CreateH2("BField_zy_x2", name_x2,stepsZ, m_minZ/m, m_maxZ/m, stepsY, m_minY/m,m_maxY/m);
+    G4int h2ID_x3 = analysisManager->CreateH2("BField_zy_x3", name_x3,stepsZ, m_minZ/m, m_maxZ/m, stepsY, m_minY/m,m_maxY/m);
+  
     //Initialize the magnetic field
     myMagField->handle();
     
@@ -263,8 +297,8 @@ int main(int argc, char** argv) {
     //
     //        }
     
-    //fill 2D xy histogram at z = 0 meters
-    xyzt[2] = 0;
+    //fill 2D xy histogram at slice_z1 meters
+    xyzt[2] = slice_z1;
     for ( int j = 0; j < stepsY; j++ )
     { // loop over Y
         xyzt[1] = (m_maxY-m_minY)*double(j)/double(stepsY-1) + m_minY;
@@ -281,13 +315,13 @@ int main(int argc, char** argv) {
             }
             fieldIntensity =std::sqrt(field[0]*field[0]+field[1]*field[1]+field[2]*field[2]);
             
-            analysisManager->FillH2(h2ID_z0, xyzt[0]/m, xyzt[1]/m,fieldIntensity/tesla);
+            analysisManager->FillH2(h2ID_z1, xyzt[0]/m, xyzt[1]/m,fieldIntensity/tesla);
             //  analysisManager->FillH3(h3ID, xyzt[0]/m, xyzt[1]/m,xyzt[2]/m,fieldIntensity/tesla);
         }
         
     }
-    //fill 2D xy histogram at z = 5 meters
-    xyzt[2] = 5*m;
+    //fill 2D xy histogram at slice_2 meters
+    xyzt[2] = slice_z2;
     for ( int j = 0; j < stepsY; j++ )
     { // loop over Y
         xyzt[1] = (m_maxY-m_minY)*double(j)/double(stepsY-1) + m_minY;
@@ -304,13 +338,13 @@ int main(int argc, char** argv) {
             }
             fieldIntensity =std::sqrt(field[0]*field[0]+field[1]*field[1]+field[2]*field[2]);
             
-            analysisManager->FillH2(h2ID_z5, xyzt[0]/m, xyzt[1]/m,fieldIntensity/tesla);
+            analysisManager->FillH2(h2ID_z2, xyzt[0]/m, xyzt[1]/m,fieldIntensity/tesla);
             // analysisManager->FillH3(h3ID, xyzt[0]/m, xyzt[1]/m,xyzt[2]/m,fieldIntensity/tesla);
         }
         
     }
-    //fill 2D xy histogram at z = 0 meters
-    xyzt[2] = 10*m;
+    //fill 2D xy histogram at slice_z3 meters
+    xyzt[2] = slice_z3;
     for ( int j = 0; j < stepsY; j++ )
     { // loop over Y
         xyzt[1] = (m_maxY-m_minY)*double(j)/double(stepsY-1) + m_minY;
@@ -327,13 +361,13 @@ int main(int argc, char** argv) {
             }
             fieldIntensity =std::sqrt(field[0]*field[0]+field[1]*field[1]+field[2]*field[2]);
             
-            analysisManager->FillH2(h2ID_z10, xyzt[0]/m, xyzt[1]/m,fieldIntensity/tesla);
+            analysisManager->FillH2(h2ID_z3, xyzt[0]/m, xyzt[1]/m,fieldIntensity/tesla);
             // analysisManager->FillH3(h3ID, xyzt[0]/m, xyzt[1]/m,xyzt[2]/m,fieldIntensity/tesla);
         }
         
     }
     //create 2D zy histogram at x = 0 meters
-    xyzt[0] = 0.*m;
+    xyzt[0] = slice_x1;
     for ( int j = 0; j < stepsY; j++ )
     { // loop over Y
         xyzt[1] = (m_maxY-m_minY)*double(j)/double(stepsY-1) + m_minY;
@@ -350,13 +384,36 @@ int main(int argc, char** argv) {
             }
             fieldIntensity =std::sqrt(field[0]*field[0]+field[1]*field[1]+field[2]*field[2]);
             
-            analysisManager->FillH2(h2ID_x0, xyzt[2]/m, xyzt[1]/m,fieldIntensity/tesla);
+            analysisManager->FillH2(h2ID_x1, xyzt[2]/m, xyzt[1]/m,fieldIntensity/tesla);
             //analysisManager->FillH3(h3ID, xyzt[0]/m, xyzt[1]/m,xyzt[2]/m,fieldIntensity/tesla);
         }
         
     }
     //fill 2D zy histogram at x = 3 meters
-    xyzt[0] = 3*m;
+    xyzt[0] = slice_x2;
+    for ( int j = 0; j < stepsY; j++ )
+    {   // loop over Y
+        xyzt[1] = (m_maxY-m_minY)*double(j)/double(stepsY-1) + m_minY;
+        for ( int i = 0; i < stepsZ; i++ )
+        {
+            // loop over X
+            xyzt[2] = (m_maxZ-m_minZ)*double(i)/double(stepsZ-1) + m_minZ;
+            // compute the field
+            if ( useFullField ) {
+                if ( derivatives )
+                    myMagField->getField( xyzt, field, deriv );
+                else
+                    myMagField->getField( xyzt, field, 0 );
+            }
+            fieldIntensity =std::sqrt(field[0]*field[0]+field[1]*field[1]+field[2]*field[2]);
+            
+            analysisManager->FillH2(h2ID_x2, xyzt[2]/m, xyzt[1]/m,fieldIntensity/tesla);
+            //analysisManager->FillH3(h3ID, xyzt[0]/m, xyzt[1]/m,xyzt[2]/m,fieldIntensity/tesla);
+        }
+        
+    }
+    //fill 2D zy histogram at slice_x3 meters
+    xyzt[0] = slice_x3;
     for ( int j = 0; j < stepsY; j++ )
     {   // loop over Y
         xyzt[1] = (m_maxY-m_minY)*double(j)/double(stepsY-1) + m_minY;
@@ -374,7 +431,6 @@ int main(int argc, char** argv) {
             fieldIntensity =std::sqrt(field[0]*field[0]+field[1]*field[1]+field[2]*field[2]);
             
             analysisManager->FillH2(h2ID_x3, xyzt[2]/m, xyzt[1]/m,fieldIntensity/tesla);
-            //analysisManager->FillH3(h3ID, xyzt[0]/m, xyzt[1]/m,xyzt[2]/m,fieldIntensity/tesla);
         }
         
     }
@@ -383,10 +439,6 @@ int main(int argc, char** argv) {
     
     analysisManager->Write();
     analysisManager->CloseFile();
-    
-//    G4cout << "... write txt file : "<<txt_fileName<<" - done" << G4endl;
-//    output.close();
-//    G4cout << "... close txt file : "<<txt_fileName<<" - done" << G4endl;
     
     G4cout << "\n###### End of test #####" << G4endl;
     return 0;
@@ -397,6 +449,16 @@ static struct option options[] = {
     {"isRoot"           , no_argument      , 0, 'r'},
     {"solenoidOff"      , no_argument      , 0, 's'},
     {"toroidsOff "      , no_argument      , 0, 't'},
+    {"minZ "            , required_argument, 0, 'a'},
+    {"maxZ "            , required_argument, 0, 'b'},
+    {"minR "            , required_argument, 0, 'c'},
+    {"maxR "            , required_argument, 0, 'd'},
+    {"sliceX1 "         , required_argument, 0, '1'},
+    {"sliceX2 "         , required_argument, 0, '2'},
+    {"sliceX3 "         , required_argument, 0, '3'},
+    {"sliceZ1 "         , required_argument, 0, '4'},
+    {"sliceZ2 "         , required_argument, 0, '5'},
+    {"sliceZ3 "         , required_argument, 0, '6'},
     {"help"             , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
@@ -411,6 +473,16 @@ void Help() {
     <<"      -r :  (flag) use root field map (default : false, use ascii file)\n"
     <<"      -s :  (flag) set Solenoid Off \n"
     <<"      -t :  (flag) set Toroids Off \n"
+    <<"      -a :  (optional) set minZ \n"
+    <<"      -b :  (optional) set maxZ \n"
+    <<"      -c :  (optional) set minR \n"
+    <<"      -d :  (optional) set maxR \n"
+    <<"      -1 :  (optional) set sliceX1 \n"
+    <<"      -2 :  (optional) set sliceX2 \n"
+    <<"      -3 :  (optional) set sliceX3 \n"
+    <<"      -4 :  (optional) set sliceZ1 \n"
+    <<"      -5 :  (optional) set sliceZ2 \n"
+    <<"      -6 :  (optional) set sliceZ3 \n"
     << std::endl;
     
     std::cout <<"\nUsage: ./testMagneticField [OPTIONS]\n" <<std::endl;
@@ -424,7 +496,7 @@ void Help() {
 void GetInputArguments(int argc, char** argv) {
     while (true) {
         int c, optidx = 0;
-        c = getopt_long(argc, argv, "f:strh", options, &optidx);
+        c = getopt_long(argc, argv, "f:str:a:b:c:d:1:2:3:4:5:6:h", options, &optidx);
         if (c == -1)
             break;
         //
@@ -444,6 +516,37 @@ void GetInputArguments(int argc, char** argv) {
             case 'r':
                 parIsAscii     = false;
                 break;
+            case 'a':
+                m_minZ     = atof(optarg);
+                break;
+            case 'b':
+                m_maxZ     = atof(optarg);
+                break;
+            case 'c':
+                m_minR     = atof(optarg);
+                break;
+            case 'd':
+                m_maxR     = atof(optarg);
+                break;
+            case '1':
+                slice_x1     = atof(optarg);
+                break;
+            case '2':
+                slice_x2     = atof(optarg);
+                break;
+            case '3':
+                slice_x3     = atof(optarg);
+                break;
+            case '4':
+                slice_z1     = atof(optarg);
+                break;
+            case '5':
+                slice_z2     = atof(optarg);
+                break;
+            case '6':
+                slice_z3     = atof(optarg);
+                break;
+                
             case 'h':
                 Help();
                 exit(0);

@@ -24,6 +24,8 @@ variables:
   image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:latest
   tags:
     - docker
+  before_script: 
+    - apt-get update -qq && apt-get install -y -qq libeigen3-dev libsqlite3-dev
 
 .geomodelcore-build-template-job: &geomodelcore-job
   stage: deps-geomodelcore

@@ -27,6 +27,10 @@ if( APPLE )
   find_package(OpenGL REQUIRED)
 endif()
 
+# If we use standalone-build of nlohmann_json parser
+if( GEOMODEL_USE_BUILTIN_JSON )
+   add_dependencies( GeoModelJSONParser JSON )
+endif()
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )

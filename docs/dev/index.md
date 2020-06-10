@@ -6,7 +6,7 @@ Here below, you will find instructions on how to compile the GeoModel libraries 
 - you want to test the latest version of the code
 - you want to contribute to the development of the libraries
 
-In the following, you will find basic strategies to effectively build the GeoModel libraries, based on different use cases. For more details, you can find updated and additional instructions inside the `README` file of the [GeoModelVisualization/README.md](https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization/README.md) specific package.
+In the following, you will find basic strategies to effectively build the GeoModel libraries, based on different use cases. For more details, you can find updated and additional instructions inside the `README` file of the [GeoModelVisualization/README.md](https://gitlab.cern.ch/GeoModelDev/geomodelvisualization/README.md) specific package.
 
 ## System Dependencies
 

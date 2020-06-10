@@ -23,7 +23,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 # Use the GNU install directory names.
-#include( GNUInstallDirs )  # it defines CMAKE_INSTALL_LIBDIR
+include( GNUInstallDirs )  # it defines CMAKE_INSTALL_LIBDIR
 
 
 # Find the header and source files.

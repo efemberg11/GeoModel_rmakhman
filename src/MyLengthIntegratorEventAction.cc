@@ -106,7 +106,8 @@ namespace G4UA
   {
     std::cout << "\n ========================================================= "      <<std::endl;
     G4cout  << " ****** BeginOfEventAction  ****** " <<G4endl;
-    //m_detThickMap.clear();
+    //clear the detThickMap for the event that begins
+    m_stepAct->m_detThickMap.clear();
     G4PrimaryVertex* vert = event->GetPrimaryVertex(0);
     G4PrimaryParticle* part = vert->GetPrimary();
     G4ThreeVector mom = part->GetMomentum();
@@ -137,10 +138,11 @@ namespace G4UA
         }
 
         auto analysisManager = G4AnalysisManager::Instance();
+        
         // Loop over volumes
         for (auto& it : m_stepAct->m_detThickMap) {
 
-      //G4cout<<" ****** Loop over volumes  ****** " <<it.first<<G4endl;
+        //G4cout<<" ****** Loop over volumes  ****** " <<it.first<<G4endl;
 //      //ROOT
 //      // If histos already exist, then fill them
 //      if (m_etaMapRL.find(it.first) != m_etaMapRL.end()) {
@@ -424,56 +426,56 @@ namespace G4UA
         auto pathPhiRL = detName + "Phi_RL";
         auto pathPhiIL = detName + "Phi_IL";
         
-        int id_EtaRL = -1;
-        int id_EtaIL = -1;
-        int id_PhiRL = -1;
-        int id_PhiIL = -1;
-        
         //MOM
         auto analysisManager = G4AnalysisManager::Instance();
         // Eta rad profile
         //
-        if(m_run->fMasterAnalysisManager->GetP1Id(pathEtaRL, false)<0) {
+        int id_EtaRL = m_run->fMasterAnalysisManager->GetP1Id(pathEtaRL, false);
+        if(id_EtaRL<0) {
             
             //G4cout<<"Geant4: Eta rad profile of "<<pathEtaRL<<" didn't exist, creating P1 now on MASTER:  "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"_RL");
-            id_EtaRL = m_run->fMasterAnalysisManager->CreateP1(pathEtaRL, name.c_str(), 1000, -6., 6.);
+            id_EtaRL = m_run->fMasterAnalysisManager->CreateP1(pathEtaRL, name.c_str(), 500, -6., 6.);
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_EtaRL, "#eta");
             m_run->fMasterAnalysisManager->SetP1YAxisTitle(id_EtaRL, "%X0");
             
         }
-        if(analysisManager->GetP1Id(pathEtaRL, false)<0)
+        id_EtaRL=analysisManager->GetP1Id(pathEtaRL, false);
+        if(id_EtaRL<0)
         {
             //G4cout<<"Geant4: Eta rad profile of "<<pathEtaRL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"_RL");
-            id_EtaRL = analysisManager->CreateP1(pathEtaRL, name.c_str(), 1000, -6., 6.);
+            id_EtaRL = analysisManager->CreateP1(pathEtaRL, name.c_str(), 500, -6., 6.);
             analysisManager->SetP1XAxisTitle(id_EtaRL, "#eta");
             analysisManager->SetP1YAxisTitle(id_EtaRL, "%X0");
             
         }
         // Eta int profile
         //
-        if(m_run->fMasterAnalysisManager->GetP1Id(pathEtaIL, false)<0)
+        int id_EtaIL=m_run->fMasterAnalysisManager->GetP1Id(pathEtaIL, false);
+        if(id_EtaIL<0)
         {
             //G4cout<<"Geant4: Eta int profile of "<<pathEtaIL<<" didn't exist, creating P1 now on MASTER:  "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"_IL");
-            id_EtaIL = m_run->fMasterAnalysisManager->CreateP1(pathEtaIL, name.c_str(), 1000, -6., 6.);
+            id_EtaIL = m_run->fMasterAnalysisManager->CreateP1(pathEtaIL, name.c_str(), 500, -6., 6.);
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_EtaIL, "#eta");
             m_run->fMasterAnalysisManager->SetP1YAxisTitle(id_EtaIL, "#lambda");
             
         }
-        if(analysisManager->GetP1Id(pathEtaIL, false)<0)
+        id_EtaIL=analysisManager->GetP1Id(pathEtaIL, false);
+        if(id_EtaIL<0)
         {
             //G4cout<<"Geant4: Eta int profile of "<<pathEtaIL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"_IL");
-            id_EtaIL = analysisManager->CreateP1(pathEtaIL, name.c_str(), 1000, -6., 6.);
+            id_EtaIL = analysisManager->CreateP1(pathEtaIL, name.c_str(), 500, -6., 6.);
             analysisManager->SetP1XAxisTitle(id_EtaIL, "#eta");
             analysisManager->SetP1YAxisTitle(id_EtaIL, "#lambda");
             
         }
         // Phi rad profile
         //
-        if(m_run->fMasterAnalysisManager->GetP1Id(pathPhiRL, false)<0)
+        int id_PhiRL=m_run->fMasterAnalysisManager->GetP1Id(pathPhiRL, false);
+        if(id_PhiRL<0)
         {
             //G4cout<<"Geant4: Phi rad profile of "<<pathPhiRL<<" didn't exist, creating P1 now on MASTER: "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"Phi_RL");
@@ -481,7 +483,8 @@ namespace G4UA
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_PhiRL, "#phi");
             m_run->fMasterAnalysisManager->SetP1YAxisTitle(id_PhiRL, "%X0");
         }
-        if(analysisManager->GetP1Id(pathPhiRL, false)<0)
+        id_PhiRL=analysisManager->GetP1Id(pathPhiRL, false);
+        if(id_PhiRL<0)
         {
             //G4cout<<"Geant4: Phi rad profile of "<<pathPhiRL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"Phi_RL");
@@ -491,7 +494,8 @@ namespace G4UA
         }
         // Phi int profile
         //
-        if(m_run->fMasterAnalysisManager->GetP1Id(pathPhiIL, false)<0)
+        int id_PhiIL=m_run->fMasterAnalysisManager->GetP1Id(pathPhiIL, false);
+        if(id_PhiIL<0)
         {
             //G4cout<<"Geant4: Phi int profile of "<<pathPhiIL<<" didn't exist, creating P1 now on MASTER: "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"Phi_IL");
@@ -501,7 +505,8 @@ namespace G4UA
             
         }
         //
-        if(analysisManager->GetP1Id(pathPhiIL, false)<0)
+        id_PhiIL=analysisManager->GetP1Id(pathPhiIL, false);
+        if(id_PhiIL<0)
         {
             //G4cout<<"Geant4: Phi int profile of "<<pathPhiIL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"Phi_IL");
@@ -524,7 +529,6 @@ namespace G4UA
         analysisManager->FillP1(id_PhiRL, m_phiPrimary, thicks.first,  1.);
         //profPhiIL->Fill(m_phiPrimary, thicks.second, 1.);
         analysisManager->FillP1(id_PhiIL, m_phiPrimary, thicks.second, 1.);
-        //G4cout<<"Geant4: Filling the corresponding P1 profiles\n" <<G4endl;
         
     }
 

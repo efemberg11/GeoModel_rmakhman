@@ -28,10 +28,6 @@ if( APPLE )
   find_package(OpenGL REQUIRED)
 endif()
 
-# If we use standalone-build of nlohmann_json parser
-if( GEOMODEL_USE_BUILTIN_JSON )
-   add_dependencies( GeoModelJSONParser JSON )
-endif()
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -53,7 +49,13 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
+
 add_library ( GXGeometrySystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
+
+# If we use standalone-build of nlohmann_json parser, add explicit dependency
+if( GEOMODEL_USE_BUILTIN_JSON )
+   add_dependencies( GXGeometrySystems JSON )
+endif()
 
 # External dependencies:
 include_directories(${Qt5Core_INCLUDE_DIRS} )

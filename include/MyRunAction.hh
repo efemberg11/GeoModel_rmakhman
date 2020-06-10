@@ -41,6 +41,10 @@ public:
     int fRadName_id;
     // ID of the IntLen 2D Profile
     int fIntName_id;
+    // ID of the Eta RadLen 1D Profile
+    int fEtaRad_id;
+    // ID of the Eta IntLen 1D Profile
+    int fEtaInt_id;
 };
 
 #endif

@@ -170,10 +170,10 @@ void Help() {
             <<"      -x :   [OPTIONAL] x limit for geantino maps in mm (default: '12500') \n"
             <<"      -y :   [OPTIONAL] y limit for geantino maps in mm (default: '12500') \n"
             <<"      -o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') \n"
-            <<"      -e :   [FLAG]     use this flag to create eta-phi   geantino maps (caveat: the process might run out of memory!)\n"
-            <<"      -d :   [FLAG]     use this flag to create detectors geantino maps (caveat: the process might run out of memory!)\n"
-            <<"      -a :   [FLAG]     use this flag to create materials geantino maps (caveat: the process might run out of memory!)\n"
-            <<"      -l :   [FLAG]     use this flag to create elements  geantino maps (caveat: the process might run out of memory!)\n"
+            <<"      -e :   [FLAG]     use this flag to create eta-phi radiation-interaction length 1D profile histograms (caveat: the process might run out of memory!)\n"
+            <<"      -d :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'detectors' (caveat: the process might run out of memory!)\n"
+            <<"      -a :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'materials' (caveat: the process might run out of memory!)\n"
+            <<"      -l :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'elements'  (caveat: the process might run out of memory!)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmgeantino [OPTIONS] -g <geometry-file-name> \n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {

@@ -35,9 +35,9 @@ void MyActionInitialization::Build() const {
   SetUserAction(new MyPrimaryGeneratorAction());
 #ifndef G4MULTITHREADED
 // in sequential mode the BuildForMaster method is not called:
-// - create the only one run action with perfomance flag true i.e. only time is measued
+// - create the only one run action with perfomance flag true i.e. only time is measured
   if (fIsPerformance) {
-    MyRunAction* masterRunAct = new MyRunAction();
+    MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     SetUserAction(masterRunAct);
   }

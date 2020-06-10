@@ -127,17 +127,25 @@ namespace G4UA
     void MyLengthIntegratorEventAction::EndOfEventAction(const G4Event*)
     {
         G4cout    <<" ****** EndOfEventAction  ****** "  << G4endl;
-        if(m_createEtaPhiMaps){
-            // Lazily protect this whole code from concurrent access
-            std::lock_guard<std::mutex> lock(gHistSvcMutex);
-            
-            //m_stepAct
-            if (m_stepAct->m_detThickMap.size()==0){
-                G4cout<<" m_detThickMap size is zero! "<<G4endl;
-                exit(-1);
+        auto analysisManager = G4AnalysisManager::Instance();
+        // Lazily protect this whole code from concurrent access
+        std::lock_guard<std::mutex> lock(gHistSvcMutex);
+        
+        //m_stepAct
+        if (m_stepAct->m_detThickMap.size()==0){
+            G4cout<<" m_detThickMap size is zero! "<<G4endl;
+            exit(-1);
+        }
+        // Loop over volumes
+        for (auto& it : m_stepAct->m_detThickMap) {
+            if(it.first=="Total_X0"){
+                analysisManager->FillP1(m_run->fEtaRad_id, m_etaPrimary, it.second.first, 1.);
+                analysisManager->FillP1(m_run->fEtaInt_id, m_etaPrimary, it.second.second, 1.);
             }
-            
-            auto analysisManager = G4AnalysisManager::Instance();
+        }
+        
+        
+        if(m_createEtaPhiMaps){
             
             // Loop over volumes
             for (auto& it : m_stepAct->m_detThickMap) {
@@ -159,6 +167,8 @@ namespace G4UA
                 //        regAndFillHist(it.first, it.second);
                 //      }
                 //      //~ROOT
+                
+                
                 
                 //Geant4
                 // If histos already exist, then fill them

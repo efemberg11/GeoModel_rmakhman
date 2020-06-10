@@ -64,7 +64,6 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
             G4cout<<"\n...output File "<<fGeantinoMapsFilename<<" opened!"<<G4endl;
         
         const char* radName = "RZRadLen";
-        
         if(analysisManager->GetP2Id(radName, false) < 0){
             fRadName_id = analysisManager->CreateP2(radName,radName,1000,-25000.,25000.,2000,0.,15000.);
             //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZRadLen 2DProfile with name: "<<radName<< " and  with id: "<<fRadName_id<<G4endl;
@@ -81,6 +80,21 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
             analysisManager->SetP2XAxisTitle(fIntName_id,"Z[mm]");
             analysisManager->SetP2YAxisTitle(fIntName_id,"R[mm]");
             analysisManager->SetP2ZAxisTitle(fIntName_id,"thickstepIL");
+        }
+        const char* etaRadName = "etaRadLen";
+        if(analysisManager->GetP1Id(etaRadName, false)< 0)
+        {
+            fEtaRad_id = analysisManager->CreateP1(etaRadName,etaRadName,500,-6,6);
+            analysisManager->SetP1XAxisTitle(fEtaRad_id,"#eta");
+            analysisManager->SetP1YAxisTitle(fEtaRad_id,"Radiation Length %X0");
+           
+        }
+        const char* etaIntName = "etaIntLen";
+        if(analysisManager->GetP1Id(etaIntName, false)< 0)
+        {
+            fEtaInt_id = analysisManager->CreateP1(etaIntName,etaIntName,500,-6,6);
+            analysisManager->SetP1XAxisTitle(fEtaInt_id,"#eta");
+            analysisManager->SetP1YAxisTitle(fEtaInt_id,"Interaction Length #lambda");
         }
         
     }

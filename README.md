@@ -23,6 +23,11 @@ cd ..
 
 ## Running gmex with AGDD
 
+Running the AGDDPlugin executes the xerces parser to parse the xml file. The expression evaluator only works if the system language is set to USEnglish, thus do:
+```bash
+export LANG=en_US.UTF-8
+```
+
 ```bash
 mkdir run; cd run
 cp ../agdd/AGDDPlugin/data/AMDC.xml .

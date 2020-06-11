@@ -67,6 +67,10 @@ set_property( TARGET GeoModel2G4 PROPERTY PUBLIC_HEADER ${HEADERS} )
 # # Install a CMake description of the project/library.
 # install( EXPORT GeoModel2G4Config DESTINATION cmake )
 
+set_target_properties( GeoModel2G4 PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
+
 # new test GeoModelG4
 install( TARGETS GeoModel2G4 EXPORT GeoModel2G4-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModel2G4 )

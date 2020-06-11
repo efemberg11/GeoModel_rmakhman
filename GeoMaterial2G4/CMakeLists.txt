@@ -35,6 +35,10 @@ target_include_directories( GeoMaterial2G4 PUBLIC
 # Set installation of library headers
 set_property( TARGET GeoMaterial2G4 PROPERTY PUBLIC_HEADER ${HEADERS} )
 
+set_target_properties( GeoMaterial2G4 PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
+ 
 # new test GeoModelG4
 install( TARGETS GeoMaterial2G4 EXPORT GeoMaterial2G4-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoMaterial2G4 )

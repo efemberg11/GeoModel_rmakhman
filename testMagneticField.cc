@@ -33,13 +33,20 @@ void GetInputArguments(int argc, char** argv);
 void Help();
 
 bool debug = false;
+//min-max z
 G4double m_minZ = -15*m;
-G4double m_maxZ = 15*m;
-
+G4double m_maxZ =  15*m;
+//min-max r
 G4double m_minR = -15*m;
-G4double m_maxR = 15*m;
+G4double m_maxR =  15*m;
+//min-max x
+G4double m_minX = -10*m;
+G4double m_maxX =  10*m;
+//min-max y
+G4double m_minY = m_minX;
+G4double m_maxY = m_maxX;
 
-G4double slice_z1=3.5*m, slice_z2=4*m, slice_z3=4.5*m;
+G4double slice_z1=0*m, slice_z2=5*m, slice_z3=10*m;
 G4double slice_x1=0*m, slice_x2=3*m, slice_x3=5*m;
 
 
@@ -69,11 +76,6 @@ int main(int argc, char** argv) {
     G4int stepsX = 1000;
     G4int stepsY = 1000;
     
-    //G4double m_maxZ = 15*m, m_minZ = -15 *m;
-    
-    //G4double m_minR = 0.  , m_maxR = 12.5*m;
-    G4double m_minX = -10*m, m_maxX = 10*m;
-    G4double m_minY = -5*m, m_maxY = 5*m;
     G4double xyzt[3];
     G4double field[3];
     G4double deriv[3];
@@ -184,34 +186,34 @@ int main(int argc, char** argv) {
     //create 2D xy histograms at z = 0,5,10 meters
     //create 2D zy histograms at x = 0,3,5 meters
     std::ostringstream strs;
-    strs << slice_z1;
-    G4String name_z1 = "BField_xy_z" + strs.str();
+    strs << slice_z1/m;
+    G4String name_z1 = "BField_xy_z " + strs.str() + " m";
 
     std::ostringstream strs2;
-    strs2 << slice_z2;
-    G4String name_z2 = "BField_xy_z" + strs2.str();
+    strs2 << slice_z2/m;
+    G4String name_z2 = "BField_xy_z " + strs2.str()+ " m";
 
     std::ostringstream strs3;
-    strs3 << slice_z3;
-    G4String name_z3 = "BField_xy_z" + strs3.str();
+    strs3 << slice_z3/m;
+    G4String name_z3 = "BField_xy_z " + strs3.str()+ " m";
     
     G4int h2ID_z1 = analysisManager->CreateH2("BField_xy_z1", name_z1, stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
     G4int h2ID_z2 = analysisManager->CreateH2("BField_xy_z2", name_z2, stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
     G4int h2ID_z3 = analysisManager->CreateH2("BField_xy_z3", name_z3, stepsX, m_minX/m,m_maxX/m,stepsY, m_minY/m, m_maxY/m);
     //create 2D zy histograms at x = 0,3,5 meters
     std::ostringstream strs_x1;
-    strs_x1 << slice_x1;
-    G4String name_x1 = "BField_zy_x" + strs_x1.str();
+    strs_x1 << slice_x1/m;
+    G4String name_x1 = "BField_zy_x " + strs_x1.str()+ " m";
     //std::cout<<"name_x1: "<<name_x1<<std::endl;
     
     std::ostringstream strs_x2;
-    strs_x2 << slice_x2;
-    G4String name_x2 = "BField_zy_x" + strs_x2.str();
+    strs_x2 << slice_x2/m;
+    G4String name_x2 = "BField_zy_x " + strs_x2.str()+ " m";
     //std::cout<<"name_x2: "<<name_x2<<std::endl;
 
     std::ostringstream strs_x3;
-    strs_x3 << slice_x3;
-    G4String name_x3 = "BField_zy_x" + strs_x3.str();
+    strs_x3 << slice_x3/m;
+    G4String name_x3 = "BField_zy_x " + strs_x3.str()+ " m";
    
     //std::cout<<"name_x3: "<<name_x3<<std::endl;
     G4int h2ID_x1 = analysisManager->CreateH2("BField_zy_x1", name_x1,stepsZ, m_minZ/m, m_maxZ/m, stepsY, m_minY/m,m_maxY/m);
@@ -453,6 +455,8 @@ static struct option options[] = {
     {"maxZ "            , required_argument, 0, 'b'},
     {"minR "            , required_argument, 0, 'c'},
     {"maxR "            , required_argument, 0, 'd'},
+    {"minXY "           , required_argument, 0, 'e'},
+    {"maxXY "           , required_argument, 0, 'f'},
     {"sliceX1 "         , required_argument, 0, '1'},
     {"sliceX2 "         , required_argument, 0, '2'},
     {"sliceX3 "         , required_argument, 0, '3'},
@@ -469,20 +473,22 @@ void Help() {
     G4cout <<"  testMagneticField application.    \n"
     << std::endl
     <<"  **** Parameters: \n\n"
-    <<"      -f :  (optional) magnetic field filename [.data/.root]   (default : use ATLAS magnetic field maps)\n"
+    <<"      -m :  (optional) magnetic field filename [.data/.root]   (default : use ATLAS magnetic field maps)\n"
     <<"      -r :  (flag) use root field map (default : false, use ascii file)\n"
     <<"      -s :  (flag) set Solenoid Off \n"
     <<"      -t :  (flag) set Toroids Off \n"
-    <<"      -a :  (optional) set minZ \n"
-    <<"      -b :  (optional) set maxZ \n"
-    <<"      -c :  (optional) set minR \n"
-    <<"      -d :  (optional) set maxR \n"
-    <<"      -1 :  (optional) set sliceX1 \n"
-    <<"      -2 :  (optional) set sliceX2 \n"
-    <<"      -3 :  (optional) set sliceX3 \n"
-    <<"      -4 :  (optional) set sliceZ1 \n"
-    <<"      -5 :  (optional) set sliceZ2 \n"
-    <<"      -6 :  (optional) set sliceZ3 \n"
+    <<"      -a :  (optional) set minZ [m] \n"
+    <<"      -b :  (optional) set maxZ [m]\n"
+    <<"      -c :  (optional) set minR [m]\n"
+    <<"      -d :  (optional) set maxR [m]\n"
+    <<"      -e :  (optional) set minX/minY [m]\n"
+    <<"      -f :  (optional) set maxX/maxY [m]\n"
+    <<"      -1 :  (optional) set sliceX1 [m] \n"
+    <<"      -2 :  (optional) set sliceX2 [m]\n"
+    <<"      -3 :  (optional) set sliceX3 [m]\n"
+    <<"      -4 :  (optional) set sliceZ1 [m]\n"
+    <<"      -5 :  (optional) set sliceZ2 [m]\n"
+    <<"      -6 :  (optional) set sliceZ3 [m]\n"
     << std::endl;
     
     std::cout <<"\nUsage: ./testMagneticField [OPTIONS]\n" <<std::endl;
@@ -496,7 +502,7 @@ void Help() {
 void GetInputArguments(int argc, char** argv) {
     while (true) {
         int c, optidx = 0;
-        c = getopt_long(argc, argv, "f:str:a:b:c:d:1:2:3:4:5:6:h", options, &optidx);
+        c = getopt_long(argc, argv, "m:str:a:b:c:d:1:2:3:4:5:6:h", options, &optidx);
         if (c == -1)
             break;
         //
@@ -504,7 +510,7 @@ void GetInputArguments(int argc, char** argv) {
             case 0:
                 c = options[optidx].val;
                 break;
-            case 'f':
+            case 'm':
                 parMagFieldFile = optarg;
                 break;
             case 's':
@@ -517,34 +523,42 @@ void GetInputArguments(int argc, char** argv) {
                 parIsAscii     = false;
                 break;
             case 'a':
-                m_minZ     = atof(optarg);
+                m_minZ     = atof(optarg)*m;
                 break;
             case 'b':
-                m_maxZ     = atof(optarg);
+                m_maxZ     = atof(optarg)*m;
                 break;
             case 'c':
-                m_minR     = atof(optarg);
+                m_minR     = atof(optarg)*m;
                 break;
             case 'd':
-                m_maxR     = atof(optarg);
+                m_maxR     = atof(optarg)*m;
+                break;
+            case 'e':
+                m_minX     = atof(optarg)*m;
+                m_minY     = m_minX;
+                break;
+            case 'f':
+                m_maxX     = atof(optarg)*m;
+                m_maxY     = m_maxX;
                 break;
             case '1':
-                slice_x1     = atof(optarg);
+                slice_x1     = atof(optarg)*m;
                 break;
             case '2':
-                slice_x2     = atof(optarg);
+                slice_x2     = atof(optarg)*m;
                 break;
             case '3':
-                slice_x3     = atof(optarg);
+                slice_x3     = atof(optarg)*m;
                 break;
             case '4':
-                slice_z1     = atof(optarg);
+                slice_z1     = atof(optarg)*m;
                 break;
             case '5':
-                slice_z2     = atof(optarg);
+                slice_z2     = atof(optarg)*m;
                 break;
             case '6':
-                slice_z3     = atof(optarg);
+                slice_z3     = atof(optarg)*m;
                 break;
                 
             case 'h':

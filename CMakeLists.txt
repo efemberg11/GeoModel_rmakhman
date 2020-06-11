@@ -115,6 +115,7 @@ endif()
 set(FULLSIMLIGHT_SCRIPTS
   geantino.g4
   macro.g4
+  drawMagField.C
   README.md
   )
 

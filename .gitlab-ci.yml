@@ -54,7 +54,7 @@ variables:
     - pwd; ls
     - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
     - cd CLHEP
-    - git checkout CLHEP_2_4_1_0
+    - git checkout CLHEP_2_4_1_3
     - cd ../
     - mkdir CLHEP-build
     - cd CLHEP-build

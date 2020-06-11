@@ -183,6 +183,27 @@ The application can be built and used both with sequential and multithreaded
 Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will
 run in proper multithreaded mode.
 
+NB: Before running fullSimLight make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
+```bash
+source <path_to_geant4_install_dir>/bin/geant4.sh
+```
+Alternatively, you can modifiy the .bash_profile file in the following way:
+```bash
+#GEANT4
+export G4INSTALL=<full_path_to_Geant4_install_dir>
+export G4NEUTRONHPDATA=$G4INSTALL/data/G4NDL4.6
+export G4LEDATA=$G4INSTALL/data/G4EMLOW7.9.1
+export G4LEVELGAMMADATA=$G4INSTALL/data/PhotonEvaporation5.5
+export G4RADIOACTIVEDATA=$G4INSTALL/data/RadioactiveDecay5.4
+export G4PARTICLEXSDATA=$G4INSTALL/data/G4PARTICLEXS2.1
+export G4PIIDATA=$G4INSTALL/data/G4PII1.3
+export G4REALSURFACEDATA=$G4INSTALL/data/RealSurface2.1.1
+export G4SAIDXSDATA=$G4INSTALL/data/G4SAIDDATA2.0
+export G4ABLADATA=$G4INSTALL/data/G4ABLA3.1
+export G4INCLDATA=$G4INSTALL/data/G4INCL1.0
+export G4ENSDFSTATEDATA=$G4INSTALL/data/G4ENSDFSTATE2.2
+```
+
 Run the executable with the --help option to see the available options:
 
 ``` bash
@@ -227,6 +248,10 @@ To execute the application using the <macro.g4> macro file and building the dete
 ``` bash
 ./fullSimLight -m macro.g4  -g libHGTDPlugin.1.0.0.dylib
 ``` 
+
+## Parameters settings via geant4 macro
+
+fullsimlight and in general Geant4 based simulations, need a geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the <install-path>/bin directory and under the <path-to-fullsimlight-repo-source>/build/bin. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
 
 ## Magnetic field
  
@@ -374,6 +399,32 @@ To execute a clash detection on a geometry described with one of the [GeoModelPl
 GeoModelGeantino (gmgeantino) is a Geant4 based application that allows you to produce geantino maps for the geometry specified as input. It supports .db/.gdml/.dylib/.so geomtry formats and it writes out the geantino maps in a ROOT file. However, it does not depend on ROOT, cause it uses the G4AnalysisManager to create/fill/write 1D and 2D Profiles.
 The 1D and 2D profiles are filled during the simulation, per Event or per Step. The creation of different profiles can be tunes with command line flags. In general XY,ZR,etaPhi RadiationLength/InteractionLength profiles can be created per DetectorVolume/Material/Element.
 
+gmgeantino uses a default geant4 macro to take some input parameters. You should find this macro under your <install-path>/bin directory and under your <path-to-fullsimlight-repo-source>/build/bin. You can edit this macro to change some parameters, like the verbosity, the n. of threads, the n. of primaries per event, the primary particle energy.. etc. By default the primary particles shot by 'gmgeantino' are geantinos (this parameter should not be changed). By default the number of simulated geantinos is set to 1000. To increase the resolution of the maps, the n. of simulated events can be increased, editing the geantino.g4 macro and changing value at the following line:
+```bash
+/run/beamOn <n. of events>
+```
+
+NB: Before running gmgeantino make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
+```bash
+source <path_to_geant4_install_dir>/bin/geant4.sh
+```
+Alternatively, you can modifiy the .bash_profile file in the following way:
+```bash
+#GEANT4
+export G4INSTALL=<full_path_to_Geant4_install_dir>
+export G4NEUTRONHPDATA=$G4INSTALL/data/G4NDL4.6
+export G4LEDATA=$G4INSTALL/data/G4EMLOW7.9.1
+export G4LEVELGAMMADATA=$G4INSTALL/data/PhotonEvaporation5.5
+export G4RADIOACTIVEDATA=$G4INSTALL/data/RadioactiveDecay5.4
+export G4PARTICLEXSDATA=$G4INSTALL/data/G4PARTICLEXS2.1
+export G4PIIDATA=$G4INSTALL/data/G4PII1.3
+export G4REALSURFACEDATA=$G4INSTALL/data/RealSurface2.1.1
+export G4SAIDXSDATA=$G4INSTALL/data/G4SAIDDATA2.0
+export G4ABLADATA=$G4INSTALL/data/G4ABLA3.1
+export G4INCLDATA=$G4INSTALL/data/G4INCL1.0
+export G4ENSDFSTATEDATA=$G4INSTALL/data/G4ENSDFSTATE2.2
+```
+
 Run the executable with the --help option to see the available options:
 
 ``` bash
@@ -386,23 +437,23 @@ Run the executable with the --help option to see the available options:
 -x :   [OPTIONAL] x limit for geantino maps in mm (default: '12500') 
 -y :   [OPTIONAL] y limit for geantino maps in mm (default: '12500') 
 -o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') 
--e :   [FLAG]     use this flag to create eta-phi   geantino maps (caveat: the process might run out of memory!)
--d :   [FLAG]     use this flag to create detectors geantino maps (caveat: the process might run out of memory!)
--a :   [FLAG]     use this flag to create materials geantino maps (caveat: the process might run out of memory!)
--l :   [FLAG]     use this flag to create elements  geantino maps (caveat: the process might run out of memory!)
+-e :   [FLAG]     use this flag to create eta-phi radiation-interaction length 1D profile histograms (caveat: the process might run out of memory!)
+-d :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'detectors' (caveat: the process might run out of memory!)
+-a :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'materials' (caveat: the process might run out of memory!)
+-l :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'elements'  (caveat: the process might run out of memory!)
 ``` 
 
 
 ## Examples
 
-To run GeoModelGeantino one has to specify with the -g flag the geometry file (this is mandatory). By default a 'geantinoMaps.root' is created and it containts RZ RadiationLenght and Interaction Lenght 2D profiles. To run gmgeantino on *LArBarrel.db* geometry, with the default geantino.g4 macro file, and producing eta-phi maps and detector maps:
+To run GeoModelGeantino one has to specify with the -g flag the geometry file (this is mandatory). By default a 'geantinoMaps.root' is created and it containts RZ RadiationLenght and Interaction Lenght 2D profiles. To run gmgeantino on *LArBarrel.db* geometry, with the default *geantino.g4* macro file, and producing eta-phi maps and detector maps:
 ``` bash
 ./gmgeantino -g LArBarrel.db -e -d
 ``` 
 
-To produce geantino maps of a geometry described by one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin*, activate detectors/materials and elements maps, and write out the geantino maps in the  in the *geantinoMaps_HGTD.root* file :
+To produce geantino maps of a geometry described by one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin*, using a custom macro file *mymacro.g4*, activate detectors/materials and elements maps, and write out the geantino maps in the *geantinoMaps_HGTD.root* file :
 ``` bash
-./gmgeantino -g libHGTDPlugin.1.0.0.dylib -d -a -l -o geantinoMaps_HGTD.root 
+./gmgeantino -m mymacro.g4 -g libHGTDPlugin.1.0.0.dylib -d -a -l -o geantinoMaps_HGTD.root 
 ``` 
 
 # GeoModelToGDML: run and options
@@ -448,4 +499,4 @@ To dump your geometry described with a plugin, i.e.  *HGTDPlugin*, and write out
  -DGEANT4_BUILD_STORE_TRAJECTORY=OFF
 ``` 
  Then set the number of threads in the macro.g4 macro to the maximum available
- and execute the fullSimLight application with the -p flag.
+and execute the fullSimLight application with the -p flag.

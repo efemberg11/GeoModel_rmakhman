@@ -1,6 +1,6 @@
 stages:
   - deps-geomodelcore
-  - deps-CLHEP
+#  - deps-CLHEP
   - deps-geomodelio
   - deps-xerces-c
   - deps-Geant4
@@ -46,24 +46,24 @@ variables:
     paths:
       - install
 
-.CLHEP-build-template-job: &CLHEP-job
-  stage: deps-CLHEP
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
-    - cd CLHEP
-    - git checkout CLHEP_2_4_1_3
-    - cd ../
-    - mkdir CLHEP-build
-    - cd CLHEP-build
-    - cmake ${CMAKE_ARGS} ../CLHEP
-    - make -j4
-    - make install
-  artifacts:
-    paths:
-      - install
+#.CLHEP-build-template-job: &CLHEP-job
+#  stage: deps-CLHEP
+#  variables:
+#    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#  script:
+#    - pwd; ls
+#    - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
+#    - cd CLHEP
+#    - git checkout CLHEP_2_4_1_3
+#    - cd ../
+#    - mkdir CLHEP-build
+#    - cd CLHEP-build
+#    - cmake ${CMAKE_ARGS} ../CLHEP
+#    - make -j4
+#    - make install
+#  artifacts:
+#    paths:
+#      - install
 
 .geomodelio-build-template-job: &geomodelio-job
   stage: deps-geomodelio
@@ -172,10 +172,10 @@ geomodelcore-mac:
   <<: *geomodelcore-job
   needs: []
 
-CLHEP-mac:
-  <<: *macos-job
-  <<: *CLHEP-job
-  needs: []
+#CLHEP-mac:
+#  <<: *macos-job
+#  <<: *CLHEP-job
+#  needs: []
 
 geomodelio-mac:
   <<: *macos-job
@@ -190,12 +190,12 @@ xerces-c-mac:
 Geant4-mac:
   <<: *macos-job
   <<: *Geant4-job
-  needs: ["CLHEP-mac", "xerces-c-mac"]
+  needs: ["xerces-c-mac"]
 
 geomodelg4-mac:
   <<: *macos-job
   <<: *geomodelg4-job
-  needs: ["geomodelcore-mac", "CLHEP-mac", "Geant4-mac"]
+  needs: ["geomodelcore-mac", "Geant4-mac"]
 
 nlohmann_json-mac:
   <<: *macos-job
@@ -205,7 +205,7 @@ nlohmann_json-mac:
 fullsimlight-mac:
   <<: *macos-job
   <<: *fullsimlight-job
-  needs: ["geomodelcore-mac", "geomodelio-mac", "CLHEP-mac", "Geant4-mac", "geomodelg4-mac", "nlohmann_json-mac"]
+  needs: ["geomodelcore-mac", "geomodelio-mac", "Geant4-mac", "geomodelg4-mac", "nlohmann_json-mac"]
 
 
 

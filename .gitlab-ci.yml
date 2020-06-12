@@ -1,6 +1,5 @@
 stages:
   - deps-geomodelcore
-  - deps-CLHEP
   - deps-xerces-c
   - deps-Geant4
   - build
@@ -21,7 +20,7 @@ variables:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
 
 .ubuntu-template-job: &ubuntu-job
-  image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:latest
+  image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:1.1
   tags:
     - docker
   before_script: 
@@ -37,26 +36,7 @@ variables:
     - mkdir geomodelcore-build
     - cd geomodelcore-build
     - cmake ${CMAKE_ARGS} ../GeoModelCore
-    - make -j32
-    - make install
-  artifacts:
-    paths:
-      - install
-
-.CLHEP-build-template-job: &CLHEP-job
-  stage: deps-CLHEP
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
-    - cd CLHEP
-    - git checkout CLHEP_2_4_1_0
-    - cd ../
-    - mkdir CLHEP-build
-    - cd CLHEP-build
-    - cmake ${CMAKE_ARGS} ../CLHEP
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -73,7 +53,7 @@ variables:
     - mkdir xerces-c-build
     - cd xerces-c-build
     - cmake ${CMAKE_ARGS} ../xerces-c-3.2.2
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -93,7 +73,7 @@ variables:
     - mkdir Geant4-build
     - cd Geant4-build
     - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install/xerces-c/ ../geant4
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -105,11 +85,10 @@ variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
-    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelG4.git
-    - mkdir GeoModelG4-build
-    - cd GeoModelG4-build
-    - cmake ${CMAKE_ARGS} ../GeoModelG4
-    - make -j32
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ..
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -122,10 +101,6 @@ geomodelcore-mac:
   <<: *macos-job
   <<: *geomodelcore-job
 
-CLHEP-mac:
-  <<: *macos-job
-  <<: *CLHEP-job
-
 xerces-c-mac:
   <<: *macos-job
   <<: *xerces-c-job
@@ -133,22 +108,18 @@ xerces-c-mac:
 Geant4-mac:
   <<: *macos-job
   <<: *Geant4-job
-  needs: ["CLHEP-mac", "xerces-c-mac"]
+  needs: ["xerces-c-mac"]
 
 geomodelg4-mac:
   <<: *macos-job
   <<: *geomodelg4-job
-  needs: ["geomodelcore-mac", "CLHEP-mac", "Geant4-mac"]
+  needs: ["geomodelcore-mac", "Geant4-mac"]
 
 
 ### UBUNTU PATH
 geomodelcore-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelcore-job
-
-#CLHEP-ubuntu:
-#  <<: *ubuntu-job
-#  <<: *CLHEP-job
 
 #geomodelio-ubuntu:
 #  <<: *ubuntu-job
@@ -162,7 +133,7 @@ geomodelcore-ubuntu:
 # Geant4-ubuntu:
 #   <<: *ubuntu-job
 #   <<: *Geant4-job
-#   needs: ["CLHEP-ubuntu", "xerces-c-ubuntu"]
+#   needs: ["xerces-c-ubuntu"]
 
 geomodelg4-ubuntu:
   <<: *ubuntu-job

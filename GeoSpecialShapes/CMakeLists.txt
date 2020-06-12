@@ -24,7 +24,7 @@ target_link_libraries( GeoSpecialShapes PUBLIC
 PRIVATE GeoModelCore::GeoModelKernel ${Geant4_LIBRARIES})
 target_include_directories( GeoSpecialShapes PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:include> ${GEANT4_INCLUDE_DIRS})
 source_group( "GeoSpecialShapes" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoSpecialShapes PROPERTIES

@@ -71,6 +71,13 @@ target_include_directories( MagFieldServices PUBLIC ${EIGEN3_INCLUDE_DIR}
 # Set installation of library headers
 set_property( TARGET MagFieldServices PROPERTY PUBLIC_HEADER ${HEADERS} )
 
+
+set_target_properties( MagFieldServices PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
+
+
+
 # new test MagFieldServices
 install( TARGETS MagFieldServices EXPORT MagFieldServices-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/MagFieldServices )

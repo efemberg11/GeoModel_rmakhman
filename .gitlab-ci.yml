@@ -36,7 +36,7 @@ variables:
     - mkdir geomodelcore-build
     - cd geomodelcore-build
     - cmake ${CMAKE_ARGS} ../GeoModelCore
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -53,7 +53,7 @@ variables:
     - mkdir xerces-c-build
     - cd xerces-c-build
     - cmake ${CMAKE_ARGS} ../xerces-c-3.2.2
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -73,7 +73,7 @@ variables:
     - mkdir Geant4-build
     - cd Geant4-build
     - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install/xerces-c/ ../geant4
-    - make -j32
+    - make -j4
     - make install
   artifacts:
     paths:
@@ -85,10 +85,10 @@ variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
-    - mkdir GeoModelG4-build
-    - cd GeoModelG4-build
-    - cmake ${CMAKE_ARGS} ../GeoModelG4
-    - make -j32
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ..
+    - make -j4
     - make install
   artifacts:
     paths:

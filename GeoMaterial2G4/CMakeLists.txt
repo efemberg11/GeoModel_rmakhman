@@ -2,7 +2,7 @@
 # Package: GeoMaterial2G4
 ################################################################################
 cmake_minimum_required(VERSION 3.10)
-project( "GeoMaterial2G4" VERSION 1.0.0 LANGUAGES CXX )
+project( "GeoMaterial2G4" VERSION 1.1.0 LANGUAGES CXX )
 
 
 # External dependencies:

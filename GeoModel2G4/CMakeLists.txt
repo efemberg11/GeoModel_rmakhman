@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Declare the package name
-project( "GeoModel2G4" VERSION 1.0.0 LANGUAGES CXX )
+project( "GeoModel2G4" VERSION 1.1.0 LANGUAGES CXX )
 
 # External dependencies:
 find_package( Geant4 REQUIRED )

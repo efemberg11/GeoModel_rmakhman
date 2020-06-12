@@ -1,6 +1,5 @@
 stages:
   - deps-geomodelcore
-#  - deps-CLHEP
   - deps-geomodelio
   - deps-xerces-c
   - deps-Geant4
@@ -24,7 +23,7 @@ variables:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
 
 .ubuntu-template-job: &ubuntu-job
-  image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:latest
+  image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:1.1
   tags:
     - docker
   before_script: 
@@ -45,25 +44,6 @@ variables:
   artifacts:
     paths:
       - install
-
-#.CLHEP-build-template-job: &CLHEP-job
-#  stage: deps-CLHEP
-#  variables:
-#    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#  script:
-#    - pwd; ls
-#    - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
-#    - cd CLHEP
-#    - git checkout CLHEP_2_4_1_3
-#    - cd ../
-#    - mkdir CLHEP-build
-#    - cd CLHEP-build
-#    - cmake ${CMAKE_ARGS} ../CLHEP
-#    - make -j4
-#    - make install
-#  artifacts:
-#    paths:
-#      - install
 
 .geomodelio-build-template-job: &geomodelio-job
   stage: deps-geomodelio
@@ -172,11 +152,6 @@ geomodelcore-mac:
   <<: *geomodelcore-job
   needs: []
 
-#CLHEP-mac:
-#  <<: *macos-job
-#  <<: *CLHEP-job
-#  needs: []
-
 geomodelio-mac:
   <<: *macos-job
   <<: *geomodelio-job
@@ -215,10 +190,6 @@ geomodelcore-ubuntu:
   <<: *geomodelcore-job
   needs: []
 
-#CLHEP-ubuntu:
-#  <<: *ubuntu-job
-#  <<: *CLHEP-job
-
 geomodelio-ubuntu:
   <<: *ubuntu-job
   <<: *geomodelio-job
@@ -231,7 +202,7 @@ geomodelio-ubuntu:
 # Geant4-ubuntu:
 #   <<: *ubuntu-job
 #   <<: *Geant4-job
-#   needs: ["CLHEP-ubuntu", "xerces-c-ubuntu"]
+#   needs: ["xerces-c-ubuntu"]
 
 geomodelg4-ubuntu:
   <<: *ubuntu-job

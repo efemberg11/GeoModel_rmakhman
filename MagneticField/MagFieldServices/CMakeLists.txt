@@ -8,7 +8,6 @@ cmake_minimum_required(VERSION 3.15)
 project( "MagFieldServices" VERSION 1.0.0 LANGUAGES CXX )
 
 # External dependencies:
-find_package( CLHEP )
 find_package( Eigen3 REQUIRED )
 
 if( Eigen3_FOUND )
@@ -61,8 +60,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 
 # Set target and properties
 add_library( MagFieldServices SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( MagFieldServices PUBLIC ${CLHEP_LIBRARIES} ${Geant4_LIBRARIES} MagFieldInterfaces)
-target_include_directories( MagFieldServices PUBLIC ${CLHEP_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR}
+target_link_libraries( MagFieldServices PUBLIC ${Geant4_LIBRARIES} MagFieldInterfaces)
+target_include_directories( MagFieldServices PUBLIC ${EIGEN3_INCLUDE_DIR}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
 

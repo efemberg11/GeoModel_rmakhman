@@ -1,6 +1,6 @@
 stages:
   - deps-geomodelcore
-  - deps-CLHEP
+#  - deps-CLHEP
   - deps-xerces-c
   - deps-Geant4
   - build
@@ -43,24 +43,24 @@ variables:
     paths:
       - install
 
-.CLHEP-build-template-job: &CLHEP-job
-  stage: deps-CLHEP
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
-    - cd CLHEP
-    - git checkout CLHEP_2_4_1_0
-    - cd ../
-    - mkdir CLHEP-build
-    - cd CLHEP-build
-    - cmake ${CMAKE_ARGS} ../CLHEP
-    - make -j32
-    - make install
-  artifacts:
-    paths:
-      - install
+#.CLHEP-build-template-job: &CLHEP-job
+#  stage: deps-CLHEP
+#  variables:
+#    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#  script:
+#    - pwd; ls
+#    - git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
+#    - cd CLHEP
+#    - git checkout CLHEP_2_4_1_0
+#    - cd ../
+#    - mkdir CLHEP-build
+#    - cd CLHEP-build
+#    - cmake ${CMAKE_ARGS} ../CLHEP
+#    - make -j32
+#    - make install
+#  artifacts:
+#    paths:
+#      - install
 
 .xerces-c-build-template-job: &xerces-c-job
   stage: deps-xerces-c
@@ -122,9 +122,9 @@ geomodelcore-mac:
   <<: *macos-job
   <<: *geomodelcore-job
 
-CLHEP-mac:
-  <<: *macos-job
-  <<: *CLHEP-job
+#CLHEP-mac:
+#  <<: *macos-job
+#  <<: *CLHEP-job
 
 xerces-c-mac:
   <<: *macos-job
@@ -133,12 +133,12 @@ xerces-c-mac:
 Geant4-mac:
   <<: *macos-job
   <<: *Geant4-job
-  needs: ["CLHEP-mac", "xerces-c-mac"]
+  needs: ["xerces-c-mac"]
 
 geomodelg4-mac:
   <<: *macos-job
   <<: *geomodelg4-job
-  needs: ["geomodelcore-mac", "CLHEP-mac", "Geant4-mac"]
+  needs: ["geomodelcore-mac", "Geant4-mac"]
 
 
 ### UBUNTU PATH

@@ -40,6 +40,7 @@ In particular, if you see taps like the ones here below:
 ```
 ric-bianchi/coin3d
 ric-bianchi/vp1light
+jfb3615/repo
 ```
 
 those are old repositories containing old formulas, which conflict with the latest version of the formulas hosted in the `atlas/geomodel` tap.

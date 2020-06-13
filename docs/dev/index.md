@@ -6,7 +6,7 @@ Here below, you will find instructions on how to compile the GeoModel libraries 
 - you want to test the latest version of the code
 - you want to contribute to the development of the libraries
 
-In the following, you will find basic strategies to effectively build the GeoModel libraries, based on different use cases. For more details, you can find updated and additional instructions inside the `README` file of the [GeoModelVisualization/README.md](https://gitlab.cern.ch/GeoModelDev/geomodelvisualization/README.md) specific package.
+In the following, you will find basic strategies to effectively build the GeoModel libraries, based on different use cases. For more details, you can find updated and additional instructions inside the `README` file of the [GeoModelVisualization/README.md](https://gitlab.cern.ch/GeoModelDev/geomodelvisualization/-/blob/master/README.md) specific package.
 
 ## System Dependencies
 
@@ -15,7 +15,7 @@ In the following, you will find basic strategies to effectively build the GeoMod
 
 ```bash
 # install external dependencies
-brew install cmake eigen doxygen wget boost hg xerces-c nlohmann-json
+brew install cmake eigen doxygen wget boost hg xerces-c nlohmann-json sqlite
 
 # install and configure Qt
 brew install qt5
@@ -44,7 +44,10 @@ See also the [Troubleshooting](troubleshooting.md) page for additional help.
 ### Linux/Ubuntu
 
 ```bash
-apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libxerces-c-dev
+sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libxerces-c-dev
+
+sudo apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
+
 ```
 
 ### Linux/Fedora

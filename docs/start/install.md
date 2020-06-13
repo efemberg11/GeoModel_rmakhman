@@ -30,10 +30,14 @@ brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-ge
 brew install geomodelexplorer
 ```
 
-The first command will set the Homebrew repository storing the "recipes" to install the ATLAS GeoModel libraries on macOS. The second command install all the libraries.
+The first command will set the Homebrew repository (a "Tap" in Homebrew jargon) storing the "recipes" to install the ATLAS GeoModel libraries on macOS. The second command install all the libraries.
 
-Pre-compiled packages ("Bottles", in the Homebrew jargon) are provided for the latest macOS release. That speeds up the installation a lot.
+Pre-compiled packages ("Bottles", in the Homebrew jargon) are provided for the latest macOS release(s). That speeds up the installation a lot.
+
 For older macOS releases, Homebrew will try to compile the packages from source. If that fails, you will have to compile from source by yourself by following the instructions provided in the [dev](/dev/index.md) section.
+
+!!! tip
+    If you experience problems in installing GeoModel packages with brew or using them, please try to clean your system from old packages or repositories. For that, please refer to the [Troubleshooting page](dev/troubleshooting.md).
 
 ## Ubuntu
 

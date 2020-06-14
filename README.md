@@ -9,7 +9,6 @@ This package is still under ferocious development; we are not releasing pre-buil
 ```bash
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
 brew install geomodelexplorer
-export GXPLUGINPATH=/usr/local/lib/gxplugins # this is a temporary fix
 gmex # or, `gmex -d inputFile.db`
 ```
 

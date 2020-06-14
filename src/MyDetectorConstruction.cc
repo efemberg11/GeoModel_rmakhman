@@ -92,19 +92,18 @@ namespace clashdet {
     }
     
     void from_json(const json& j, clash& p) {
-        j.at("clashType").get_to(p.clashType);
-        j.at("volume1Name").get_to(p.volume1Name);
-        j.at("volume1CopyNo").get_to(p.volume1CopyNo);
-        j.at("volume1EntityType").get_to(p.volume1EntityType);
-        j.at("volume2Name").get_to(p.volume2Name);
-        j.at("volume2CopyNo").get_to(p.volume2CopyNo);
-        j.at("volume2EntityType").get_to(p.volume2EntityType);
-        j.at("x").get_to(p.x);
-        j.at("y").get_to(p.y);
-        j.at("z").get_to(p.z);
-        j.at("distance[mm]").get_to(p.distance);
- 
-    }
+      p.clashType=j.at("clashType").get<typeOfClash>();
+      p.volume1Name=j.at("volume1Name").get<std::string>();
+      p.volume1CopyNo=j.at("volume1CopyNo").get<int>();
+      p.volume1EntityType=j.at("volume1EntityType").get<std::string>();
+      p.volume2Name=j.at("volume2Name").get<std::string>();
+      p.volume2CopyNo=j.at("volume2CopyNo").get<int>();
+      p.volume2EntityType=j.at("volume2EntityType").get<std::string>();
+      p.x=j.at("x").get<double>();
+      p.y=j.at("y").get<double>();
+      p.z=j.at("z").get<double>();
+      p.distance=j.at("distance[mm]").get<double>();
+     }
 } // namespace clashdet
 
 

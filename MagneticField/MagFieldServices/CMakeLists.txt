@@ -2,7 +2,7 @@
 # Package: MagFieldServices
 ################################################################################
 
-cmake_minimum_required(VERSION 3.15) 
+cmake_minimum_required(VERSION 3.1) 
 
 # Declare the package name:
 project( "MagFieldServices" VERSION 1.0.0 LANGUAGES CXX )

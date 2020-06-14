@@ -28,7 +28,7 @@
 #include <err.h>
 #include <iostream>
 #include <iomanip>
-
+#include <unistd.h>
 
 static bool         parCreateGeantinoMaps  = true;
 static bool         parIsPerformance       = false;
@@ -65,6 +65,28 @@ int main(int argc, char** argv) {
     << "   Create Materials maps      =  " << parCreateMaterialsMaps  << G4endl
     << "   Create Elements maps       =  " << parCreateElementsMaps   << G4endl
     << " ===================================================== "      << G4endl;
+    
+    // JFB: Check that the macro file exists and is readable:
+    if (access(parMacroFileName,R_OK)) {
+      G4cout << G4endl;
+      G4cout << "INFO: Macro file " << parMacroFileName << " does not exist" << G4endl;
+      G4cout << "INFO: Possible locations: /usr/share/FullSimLight or /usr/local/share/FullSimLight" << G4endl;
+      G4cout << "INFO: Use the -m option or make a local copy" << G4endl;
+      G4cout << "INFO: Exiting" <<G4endl;
+      return 1;
+    }
+
+        // JFB: Check that the macro file exists and is readable:
+    if (!getenv("G4ENSDFSTATEDATA")) {
+      G4cout << G4endl;
+      G4cout << "INFO: It appears that your Geant4 environment is not set up" << G4endl;
+      G4cout << "INFO: Please source the script geant4.sh" << G4endl;
+      G4cout << "INFO: Possible locations: /usr/bin or /usr/local/bin" << G4endl;
+      G4cout << "INFO: Exiting" <<G4endl;
+      return 1;
+    }
+
+    // JFB Check that the 
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
     G4Random::setTheEngine(new CLHEP::MixMaxRng);
@@ -120,7 +142,8 @@ int main(int argc, char** argv) {
     myAct->SetCreateMaterialsMaps(parCreateMaterialsMaps);
     myAct->SetCreateElementsMaps(parCreateElementsMaps);
     runManager->SetUserInitialization(myAct);
-    
+
+
   
     // 4. Run the simulation in batch mode
     G4UImanager* UI = G4UImanager::GetUIpointer();

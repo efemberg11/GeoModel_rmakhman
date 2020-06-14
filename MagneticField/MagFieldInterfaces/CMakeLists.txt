@@ -2,7 +2,7 @@
 # Package: MagFieldInterfaces
 ################################################################################
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.1)
 
 # Declare the package name
 project( "MagFieldInterfaces" VERSION 1.0.0)
@@ -41,7 +41,7 @@ target_include_directories( MagFieldInterfaces INTERFACE
    $<INSTALL_INTERFACE:include> )
 
 # Set installation of library headers
-set_property( TARGET MagFieldInterfaces PROPERTY PUBLIC_HEADER ${HEADERS} )
+#set_property( TARGET MagFieldInterfaces PROPERTY PUBLIC_HEADER ${HEADERS} )
 
 # new test MagFieldServices
 install( TARGETS MagFieldInterfaces EXPORT MagFieldInterfaces-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

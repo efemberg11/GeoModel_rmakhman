@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------
 # Setup the project
 #
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 project(fullSimLight)
 
 # Compile with C++17
@@ -116,13 +116,12 @@ set(FULLSIMLIGHT_SCRIPTS
   geantino.g4
   macro.g4
   drawMagField.C
-  README.md
   )
 
 foreach(_script ${FULLSIMLIGHT_SCRIPTS})
   configure_file(
     ${_script}
-    ${CMAKE_BINARY_DIR}/${OUTPUT}/${_script}
+    ${CMAKE_BINARY_DIR}/share/${_script}
     COPYONLY
     )
 endforeach()
@@ -137,4 +136,4 @@ install(TARGETS fillHistogramExample DESTINATION ${OUTPUT})
 install(TARGETS gmgeantino DESTINATION ${OUTPUT})
 install(TARGETS testMagneticField DESTINATION ${OUTPUT})
 install(TARGETS gmtogdml DESTINATION ${OUTPUT})
-install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION ${OUTPUT})
+install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION share/FullSimLight)

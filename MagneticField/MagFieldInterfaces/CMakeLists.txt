@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 # Declare the package name
-project( "MagFieldInterfaces" VERSION 1.0.0)
+project( "MagFieldInterfaces" VERSION 1.0.1)
 
 
 

@@ -1,7 +1,7 @@
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
 
-project( "MagneticField" VERSION 1.0.0 LANGUAGES CXX )
+project( "MagneticField" VERSION 1.0.1 LANGUAGES CXX )
 
 # Set up the build of the three libraries of the project.
 add_subdirectory(MagFieldInterfaces)

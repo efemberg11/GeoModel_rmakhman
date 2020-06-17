@@ -90,7 +90,7 @@ bool XercesParser::ParseFile(std::string s)
     	{
         	XERCES_STD_QUALIFIER cerr << "An error occurred during parsing\n " << XERCES_STD_QUALIFIER endl;
         	errorsOccured = true;
-    	}  
+    	}
 		m_doc=m_parser->getDocument();
 		return errorsOccured;
 	}
@@ -148,7 +148,7 @@ bool XercesParser::ParseString(std::string s)
     {
     	XERCES_STD_QUALIFIER cerr << "An error occurred during parsing\n " << XERCES_STD_QUALIFIER endl;
     	errorsOccured = true;
-    }  
+    }
 	m_doc=m_parser->getDocument();
 	return errorsOccured;
 }
@@ -187,7 +187,7 @@ bool XercesParser::WriteToFile(std::string s)
 
 void XercesParser::navigateTree()
 {
-	if (!m_doc) 
+	if (!m_doc)
 	{
 		std::cout<<" something is wrong! no document set!"<<std::endl;
 		std::cout<<" doing nothing!"<<std::endl;
@@ -235,6 +235,7 @@ void XercesParser::elementLoop(DOMNode *e)
 				elementLoop(child);
 			}
 		}
+		if (h) h->postLoopHandling();
 	}
 //	XMLHandler *h=XMLHandlerStore::GetHandlerStore()->GetHandler(element);
 //	bool stopLoop=false;
@@ -245,8 +246,8 @@ void XercesParser::elementLoop(DOMNode *e)
 //	}
 //	TiXmlElement* subelement;
 //	subelement=element->FirstChildElement();
-//	
-//	if (!stopLoop && subelement) 
+//
+//	if (!stopLoop && subelement)
 //	do
 //	{
 //	   // std::cout<<" \telement  "<<subelement->Value()<<std::endl;

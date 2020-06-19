@@ -235,8 +235,8 @@ void XercesParser::elementLoop(DOMNode *e)
 				elementLoop(child);
 			}
 		}
-		if (h) h->postLoopHandling();
 	}
+	if (h) h->postLoopHandling();
 //	XMLHandler *h=XMLHandlerStore::GetHandlerStore()->GetHandler(element);
 //	bool stopLoop=false;
 //	if (h)

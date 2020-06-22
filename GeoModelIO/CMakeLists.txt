@@ -6,20 +6,21 @@ project( "GeoModelIO" VERSION 3.2.0 LANGUAGES CXX )
 
 # ---------------------------
 
-# Make the module directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+# Make the local module directory visible to CMake.
+# list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 
-# Set build and C++ default options
-include ( configure_cpp_options )
-
-# Set optional definitions to steer the source code
-include( configure_definitions)
-
-# Use the GNU install directory names.
-include( GNUInstallDirs )
-
-# Print Build Info on screen
-include( PrintBuildInfo )
+# # Set build and C++ default options
+# include ( configure_cpp_options )
+#
+# # Set optional definitions to steer the source code
+# include( configure_definitions)
+#
+# # Use the GNU install directory names.
+# include( GNUInstallDirs )
+#
+# # Print Build Info on screen
+# include( PrintBuildInfo )
 
 # ---------------------------
 
@@ -55,7 +56,7 @@ install( EXPORT ${PROJECT_NAME}-export
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 
 # Install the hand-written project configuration.
-configure_file( ${CMAKE_SOURCE_DIR}/cmake/GeoModelIOConfig.cmake.in
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GeoModelIOConfig.cmake.in
    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
    @ONLY )
 install(

@@ -11,19 +11,21 @@ set    (OpenGL_GL_PREFERENCE GLVND)
 
 
 # Make the module directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
 # Set up the "optional" dependencies.
-include( SetupJSON )
+# include( SetupJSON )
 
 
 # Project's dependencies.
 find_package( GeoModelCore 3.2.0 REQUIRED )
 find_package( GeoModelIO   3.2.0 REQUIRED )
-find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
+find_package( Qt5 COMPONENTS Core Gui Widgets REQUIRED )
+find_package( nlohmann_json REQUIRED )
+
 # Set sub-packages to build.
 add_subdirectory(VP1GeometryPlugin)
 add_subdirectory(VP1GeometrySystems)

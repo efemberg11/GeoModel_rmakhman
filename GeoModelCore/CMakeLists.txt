@@ -1,25 +1,26 @@
 # Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 
 # Set up the project.
-cmake_minimum_required( VERSION 3.1 )
+# cmake_minimum_required( VERSION 3.1 )
 project( "GeoModelCore" VERSION 3.2.0 LANGUAGES CXX )
 
 # ---------------------------
 
-# Make the module directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
-
-# Set build and C++ default options
-include ( configure_cpp_options )
-
-# Use the GNU install directory names.
-include( GNUInstallDirs )
-
-# Set up how the project would use Eigen.
-include( SetupEigen3 )
-
-# Print Build Info on screen
-include( PrintBuildInfo )
+# # Make the local module directory visible to CMake.
+# list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
+#
+# # Set build and C++ default options
+# include ( configure_cpp_options )
+#
+# # Use the GNU install directory names.
+# include( GNUInstallDirs )
+#
+# # Set up how the project would use Eigen.
+# include( SetupEigen3 )
+#
+# # Print Build Info on screen
+# include( PrintBuildInfo )
 
 # ---------------------------
 
@@ -47,7 +48,7 @@ install( EXPORT ${PROJECT_NAME}-export
    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 
 # Install the hand-written project configuration.
-configure_file( ${CMAKE_SOURCE_DIR}/cmake/GeoModelCoreConfig.cmake.in
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GeoModelCoreConfig.cmake.in
    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
    @ONLY )
 install(

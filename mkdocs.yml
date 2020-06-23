@@ -1,0 +1,41 @@
+site_name: GeoModel - A Detector Description Toolkit for HEP
+site_description: GeoModel - An experiment-agnostic Detector Description Toolkit for HEP
+site_author: ATLAS Collaboration & Contributors
+site_url: https://cern.ch/geomodel/home
+repo_name: GitLab
+repo_url: https://gitlab.cern.ch/GeoModelDev/Documentation
+theme:
+    name: material
+nav:
+    - Home: 'index.md'
+    - Getting Started:
+        - 'Intro': 'start/index.md'
+        - 'Install the Libraries': 'start/install.md'
+        - 'The Basic Concepts': 'start/basic_concepts.md'
+        - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
+    - How To:
+        - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
+        - 'Build a simple detector': 'how/how_simple_detector_cpp.md'
+        - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
+        - 'Load a geometry from a file': 'how/how_load_geo.md'
+        - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
+    - Papers & Presentations:
+        - 'Public': 'papers/public.md'
+        - 'Internal': 'papers/internal.md'
+    - Reference:  'reference/reference.md'
+    - For Developers:
+        - 'Build the Libraries': 'dev/index.md'
+        - 'Troubleshooting': 'dev/troubleshooting.md'
+        - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
+    - Team & History: 'team.md'
+    - Contacts: 'contacts.md'
+extra_css:
+    - material_nested_lists_rendering.css
+markdown_extensions:
+    - admonition
+    - footnotes
+    - pymdownx.superfences
+    - toc:
+        permalink: true
+    - markdown_include.include:
+        base_path: docs

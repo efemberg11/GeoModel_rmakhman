@@ -1,0 +1,26 @@
+stages:
+    - build
+    - deploy
+
+building:
+    stage: build
+    image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
+    before_script:
+        - pip install markdown-include
+    script:
+        - mkdocs build --clean --site-dir public
+        - cp .htaccess public/papers/internal/
+    artifacts:
+        paths:
+            - public
+        expire_in: 1 hour
+
+deploying:
+    stage: deploy
+    variables:
+      "EOS_PATH": "/eos/project/g/geomodel/www/home"
+    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+    only:
+        - master
+    script:
+        - deploy-eos

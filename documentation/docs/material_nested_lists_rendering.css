@@ -1,0 +1,9 @@
+/* <https://github.com/squidfunk/mkdocs-material/issues/508> */
+
+article ul ul {
+  list-style-type:  circle !important;
+}
+
+article ul ul ul {
+  list-style-type:  square !important;
+}

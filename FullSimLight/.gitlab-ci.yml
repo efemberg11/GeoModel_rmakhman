@@ -1,0 +1,220 @@
+stages:
+  - deps-geomodelcore
+  - deps-geomodelio
+  - deps-xerces-c
+  - deps-Geant4
+  - deps-geomodelg4
+  - deps-nlohmann_json
+  - build
+
+
+variables:
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=../install
+  GIT_SUBMODULE_STRATEGY: recursive
+
+
+# TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
+.macos-template-job: &macos-job
+  tags:
+    - macos-geomodeldev
+  allow_failure: true
+  timeout: 60 minutes
+  before_script:
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+
+.ubuntu-template-job: &ubuntu-job
+  image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:1.1
+  tags:
+    - docker
+  before_script: 
+    - apt-get update -qq && apt-get install -y -qq libeigen3-dev libsqlite3-dev
+
+.geomodelcore-build-template-job: &geomodelcore-job
+  stage: deps-geomodelcore
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - mkdir geomodelcore-build
+    - cd geomodelcore-build
+    - cmake ${CMAKE_ARGS} ../GeoModelCore
+    - make -j4
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodelio-build-template-job: &geomodelio-job
+  stage: deps-geomodelio
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - mkdir geomodelio-build
+    - cd geomodelio-build
+    - cmake ${CMAKE_ARGS} ../GeoModelIO
+    - make -j4
+    - make install
+  artifacts:
+    paths:
+      - install
+    
+
+.xerces-c-build-template-job: &xerces-c-job
+  stage: deps-xerces-c
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
+    - tar -xf xerces-c-3.2.2.tar.gz
+    - mkdir xerces-c-build
+    - cd xerces-c-build
+    - cmake ${CMAKE_ARGS} ../xerces-c-3.2.2
+    - make -j4
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+.Geant4-build-template-job: &Geant4-job
+  stage: deps-Geant4
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/geant4/geant4.git
+    - cd geant4
+    - git checkout tags/v10.6.0
+    - cd ../
+    - mkdir Geant4-build
+    - cd Geant4-build
+    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install/xerces-c/ ../geant4
+    - make -j16
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodelg4-build-template: &geomodelg4-job
+  stage: deps-geomodelg4
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelG4.git
+    - mkdir GeoModelG4-build
+    - cd GeoModelG4-build
+    - cmake ${CMAKE_ARGS} ../GeoModelG4
+    - make -j4
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.nlohmann_json-build-template: &nlohmann_json-job
+  stage: deps-nlohmann_json
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://github.com/nlohmann/json.git
+    - mkdir nlohmann_json-build
+    - cd nlohmann_json-build
+    - cmake ${CMAKE_ARGS} ../json
+    - make -j4
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.fullsimlight-build-template: &fullsimlight-job
+  stage: build
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - echo "PWD; LS"
+    - pwd; ls
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ..
+    - cmake --build . -- -j4
+    - cmake --build . -- install
+
+# ACTUAL JOBS
+
+### MACOS PATH
+geomodelcore-mac:
+  <<: *macos-job
+  <<: *geomodelcore-job
+  needs: []
+
+geomodelio-mac:
+  <<: *macos-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-mac"]
+
+xerces-c-mac:
+  <<: *macos-job
+  <<: *xerces-c-job
+  needs: []
+
+Geant4-mac:
+  <<: *macos-job
+  <<: *Geant4-job
+  needs: ["xerces-c-mac"]
+
+geomodelg4-mac:
+  <<: *macos-job
+  <<: *geomodelg4-job
+  needs: ["geomodelcore-mac", "Geant4-mac"]
+
+nlohmann_json-mac:
+  <<: *macos-job
+  <<: *nlohmann_json-job
+  needs: []
+
+fullsimlight-mac:
+  <<: *macos-job
+  <<: *fullsimlight-job
+  needs: ["geomodelcore-mac", "geomodelio-mac", "Geant4-mac", "geomodelg4-mac", "nlohmann_json-mac"]
+
+
+
+### UBUNTU PATH
+geomodelcore-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelcore-job
+  needs: []
+
+geomodelio-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-ubuntu"]
+
+# xerces-c-ubuntu:
+#   <<: *ubuntu-job
+#   <<: *xerces-c-job
+
+# Geant4-ubuntu:
+#   <<: *ubuntu-job
+#   <<: *Geant4-job
+#   needs: ["xerces-c-ubuntu"]
+
+geomodelg4-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelg4-job
+  needs: ["geomodelcore-ubuntu"]
+
+nlohmann_json-ubuntu:
+  <<: *ubuntu-job
+  <<: *nlohmann_json-job
+  needs: []
+  
+fullsimlight-ubuntu:
+  <<: *ubuntu-job
+  <<: *fullsimlight-job
+  needs: ["geomodelcore-ubuntu", "geomodelio-ubuntu", "geomodelg4-ubuntu", "nlohmann_json-ubuntu"]

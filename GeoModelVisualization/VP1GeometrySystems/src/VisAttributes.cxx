@@ -1,34 +1,46 @@
 /*
-  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
+// local includes
 #include "VP1GeometrySystems/VisAttributes.h"
-
 #include "VP1Base/VP1QtInventorUtils.h"
+
+// Coin3D includes
 #include <Inventor/nodes/SoMaterial.h>
-#include <iostream>
+
+// Qt includes
 #include <QBuffer>
+
+// nlohmann_json includes
+#include "nlohmann/json.hpp"
+
+// C++ includes
+#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <map>
+
+// utility functions to get preprocessor variables' values
+#define STR_VALUE(arg) #arg
+#define STR_NAME(name) STR_VALUE(name)
+
+using namespace nlohmann;
 
 
-#include "nlohmann/json.hpp"
 /////////////////////////////////////// Base class ///////////////////////////////////////
 
-#include <map>
-#include <iostream>
-using namespace nlohmann;
 namespace GeoModelVis {
-  
+
   struct Triplet {
     double R;
     double G;
     double B;
   };
-  
+
   struct Material {
     std::vector<std::string> name;
     Triplet     diffuse;
@@ -42,7 +54,7 @@ namespace GeoModelVis {
   void to_json(json& j, const Triplet & t) {
     j=json{{"R",t.R},{"G",t.G},{"B",t.B}};
   }
-  
+
   void to_json(json& j, const Material & m) {
     j=json{{"name",m.name},
 	   {"diffuse",m.diffuse},
@@ -90,8 +102,8 @@ void VisAttributes::init()
 
 
   //
-  // This block of code is now skipped. It was originally used to generate 
-  // json files from memory. I keep it here in case it is ever needed. 
+  // This block of code is now skipped. It was originally used to generate
+  // json files from memory. I keep it here in case it is ever needed.
   //
   if (0) {
     std::vector<json> jlist;
@@ -119,13 +131,13 @@ void VisAttributes::init()
       jlist.push_back(jMat);
     }
     static int i=0;
-    
+
     json jReport={{"DetVisAttributes",jlist}};
     std::ofstream outJsonFile("/tmp/visReport"+std::to_string(i++)+".json");
     outJsonFile << std::setw(4) << jReport << std::endl;
     outJsonFile.close();
   }
-  // End of disabled part. 
+  // End of disabled part.
 
 
 }
@@ -246,12 +258,16 @@ void VisAttributes::overrideTransparencies(float transpfact)
 DetVisAttributes::DetVisAttributes() {
 
   //
-  // We look for: ${GXSHAREDIR}/gmexDetVisAttributes, or
-  //              `pwd`, or
-  //              ~/.gmexDetVisAttributes, or
-  //               /usr/local/share/gmex/gmexDetVisAttributes, or  
-  //               /usr/share/gmex/gmexDetVisAttributes.
+  // TODO: document this!!
+  // We look for `gmexDetVisAttributes.json` in these folder and in this order:
+  // 1) ${GXSHAREDIR}/gmexDetVisAttributes.json
+  // 2) `pwd`
+  // 3) ~/.gmexDetVisAttributes.json  (hiden file inside the user's home folder)
+  // 4) ${GEOMODEL_INSTALL_PREFIX}/share/gmex/gmexDetVisAttributes.json
+  // 5) /usr/local/share/gmex/gmexDetVisAttributes.json
+  // 6) /usr/share/gmex/gmexDetVisAttributes.json
   //
+
 
 #ifdef __APPLE__
   char buffer[1024];
@@ -259,13 +275,32 @@ DetVisAttributes::DetVisAttributes() {
 #else
   char *wdLocation=get_current_dir_name();
 #endif
-    
+
+  // struct passwd *pw = getpwuid(getuid());
+  // std::string homedir = pw->pw_dir;
+  // std::vector<std::string> locations={homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
+  // char * gxShareDir=getenv("GXSHAREDIR");
+  // if (wdLocation) locations.insert(locations.begin(), wdLocation+std::string("/"));
+  // if (gxShareDir) locations.insert(locations.begin(), gxShareDir+std::string("/"));
+
+  // TODO: this snippet could go in one single place and used from all three places
   struct passwd *pw = getpwuid(getuid());
   std::string homedir = pw->pw_dir;
-  std::vector<std::string> locations={homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
+  // Init with case 3)
+  std::vector<std::string> locations= {homedir+"/."};
   char * gxShareDir=getenv("GXSHAREDIR");
+  // Add 2)
   if (wdLocation) locations.insert(locations.begin(), wdLocation+std::string("/"));
+  // Add 1)
   if (gxShareDir) locations.insert(locations.begin(), gxShareDir+std::string("/"));
+  // Add 4)
+  const char * installPath = STR_NAME( GEOMODEL_INSTALL_PREFIX );
+  std::string installedShare = installPath + std::string("/share/gmex/");
+  locations.push_back(installedShare);
+  // Add 5) and 6)
+  locations.push_back("/usr/local/share/gmex/");
+  locations.push_back("/usr/share/gmex/");
+
 
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexDetVisAttributes.json");
@@ -288,10 +323,10 @@ DetVisAttributes::DetVisAttributes() {
       break;
     }
   }
-  
+
   init();
 
-  
+
 }
 
 //////////////////////////////// Attributes for materials ////////////////////////////////
@@ -308,20 +343,36 @@ MatVisAttributes::MatVisAttributes() {
 #else
   char *wdLocation=get_current_dir_name();
 #endif
+
   //
-  // We look for: ${GXSHAREDIR}/gmexMatVisAttributes, or,
-  //              `pwd`, or
-  //              ~/.gmexMatVisAttributes, or
-  //               /usr/local/share/gmex/gmexMatVisAttributes, or  
-  //               /usr/share/gmex/gmexMatVisAttributes.
+  // TODO: document this!!
+  // We look for `gmexMatVisAttributes.json` in these folder and in this order:
+  // 1) ${GXSHAREDIR}/gmexMatVisAttributes.json
+  // 2) `pwd`
+  // 3) ~/.gmexMatVisAttributes.json  (hiden file inside the user's home folder)
+  // 4) ${GEOMODEL_INSTALL_PREFIX}/share/gmex/gmexMatVisAttributes.json
+  // 5) /usr/local/share/gmex/gmexMatVisAttributes.json
+  // 6) /usr/share/gmex/gmexMatVisAttributes.json
   //
+
+  // TODO: this snippet could go in one single place and used from all three places
   struct passwd *pw = getpwuid(getuid());
   std::string homedir = pw->pw_dir;
-  std::vector<std::string> locations= {homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
+  // Init with case 3)
+  std::vector<std::string> locations= {homedir+"/."};
   char * gxShareDir=getenv("GXSHAREDIR");
+  // Add 2)
   if (wdLocation) locations.insert(locations.begin(), wdLocation+std::string("/"));
+  // Add 1)
   if (gxShareDir) locations.insert(locations.begin(), gxShareDir+std::string("/"));
-  
+  // Add 4)
+  const char * installPath = STR_NAME( GEOMODEL_INSTALL_PREFIX );
+  std::string installedShare = installPath + std::string("/share/gmex/");
+  locations.push_back(installedShare);
+  // Add 5) and 6)
+  locations.push_back("/usr/local/share/gmex/");
+  locations.push_back("/usr/share/gmex/");
+
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexMatVisAttributes.json");
     if (access(userFile.c_str(),R_OK)==0) {
@@ -329,16 +380,16 @@ MatVisAttributes::MatVisAttributes() {
       std::ifstream in(userFile);
       auto j=json::parse(in);
       for (const json & element : j["MatVisAttributes"]) {
-	GeoModelVis::Material mat;
-	GeoModelVis::from_json(element, mat);
-	SoMaterial *m = new SoMaterial;
-	m->ambientColor.setValue(mat.ambient.R, mat.ambient.G, mat.ambient.B);
-	m->diffuseColor.setValue(mat.diffuse.R, mat.diffuse.G, mat.diffuse.B);
-	m->specularColor.setValue(mat.specular.R, mat.specular.G, mat.specular.B);
-	m->emissiveColor.setValue(mat.emissive.R, mat.emissive.G, mat.emissive.B);
-	m->shininess.setValue(mat.shininess);
-	m->transparency.setValue(mat.transparency);
-	for (const std::string & s  : mat.name) add(s,m);
+      	GeoModelVis::Material mat;
+      	GeoModelVis::from_json(element, mat);
+      	SoMaterial *m = new SoMaterial;
+      	m->ambientColor.setValue(mat.ambient.R, mat.ambient.G, mat.ambient.B);
+      	m->diffuseColor.setValue(mat.diffuse.R, mat.diffuse.G, mat.diffuse.B);
+      	m->specularColor.setValue(mat.specular.R, mat.specular.G, mat.specular.B);
+      	m->emissiveColor.setValue(mat.emissive.R, mat.emissive.G, mat.emissive.B);
+      	m->shininess.setValue(mat.shininess);
+      	m->transparency.setValue(mat.transparency);
+      	for (const std::string & s  : mat.name) add(s,m);
       }
       break;
     }
@@ -353,11 +404,14 @@ MatVisAttributes::MatVisAttributes() {
 
 VolVisAttributes::VolVisAttributes() {
   //
-  // We look for: ${GXSHAREDIR}/gmexVolVisAttributes, or
-  //              `pwd`, or
-  //              ~/.gmexVolVisAttributes, or
-  //               /usr/local/share/gmex/gmexVolVisAttributes, or  
-  //               /usr/share/gmex/gmexVolVisAttributes.
+  // TODO: document this!!
+  // We look for `gmexMatVisAttributes.json` in these folder and in this order:
+  // 1) ${GXSHAREDIR}/gmexVolVisAttributes.json
+  // 2) `pwd`
+  // 3) ~/.gmexVolVisAttributes.json  (hiden file inside the user's home folder)
+  // 4) ${GEOMODEL_INSTALL_PREFIX}/share/gmex/gmexVolVisAttributes.json
+  // 5) /usr/local/share/gmex/gmexVolVisAttributes.json
+  // 6) /usr/share/gmex/gmexVolVisAttributes.json
   //
 #ifdef __APPLE__
   char buffer[1024];
@@ -365,13 +419,33 @@ VolVisAttributes::VolVisAttributes() {
 #else
   char *wdLocation=get_current_dir_name();
 #endif
+
+  // struct passwd *pw = getpwuid(getuid());
+  // std::string homedir = pw->pw_dir;
+  // std::vector<std::string> locations= {homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
+  // char * gxShareDir=getenv("GXSHAREDIR");
+  // if (wdLocation) locations.insert(locations.begin(), wdLocation+std::string("/"));
+  // if (gxShareDir) locations.insert(locations.begin(), gxShareDir+std::string("/"));
+
+  // TODO: this snippet could go in one single place and used from all three places
   struct passwd *pw = getpwuid(getuid());
   std::string homedir = pw->pw_dir;
-  std::vector<std::string> locations= {homedir+"/.","/usr/local/share/gmex/", "/usr/share/gmex/"};
+  // Init with case 3)
+  std::vector<std::string> locations= {homedir+"/."};
   char * gxShareDir=getenv("GXSHAREDIR");
+  // Add 2)
   if (wdLocation) locations.insert(locations.begin(), wdLocation+std::string("/"));
+  // Add 1)
   if (gxShareDir) locations.insert(locations.begin(), gxShareDir+std::string("/"));
-  
+  // Add 4)
+  const char * installPath = STR_NAME( GEOMODEL_INSTALL_PREFIX );
+  std::string installedShare = installPath + std::string("/share/gmex/");
+  locations.push_back(installedShare);
+  // Add 5) and 6)
+  locations.push_back("/usr/local/share/gmex/");
+  locations.push_back("/usr/share/gmex/");
+
+
   for (const std::string & s : locations ) {
     std::string userFile=s+std::string("gmexVolVisAttributes.json");
     if (access(userFile.c_str(),R_OK)==0) {

@@ -45,7 +45,7 @@ On request, additional packages, libraries, and tools can be built:
 **Note:**
 Some of the optional packages bring in additional dependencies, for example libraries to handle 3D graphics and Geant4 for standalone detector simulations.
 In particular, these are the additional dependencies and the packages that bring them:
-    
+
 - GeoModelVisualization: Qt5, Coin3D, SoQt
 - Examples about the classes handling the GeoModel->Geant4 translation: Geant4
 - GeoModelG4: Geant4
@@ -106,13 +106,13 @@ will build the Geant4-based application which let users run standalone simulatio
 
 
 
-!!! note
-    When used during the CMake configuration step, all the variables must be prefixed by `-D`, like in the first example of this section.
+**Note:**
+When used during the CMake configuration step, all the variables must be prefixed by `-D`, like in the first example of this section.
 
-    For example,
+For example,
 
-    ```
-    cmake -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel
-    ```
+```
+cmake -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel
+```
 
-    will build the base classes, the visualization tool (`gmex`), and the examples (the ones that not require Geant4).
+will build the base classes, the visualization tool (`gmex`), and the examples (the ones that not require Geant4).

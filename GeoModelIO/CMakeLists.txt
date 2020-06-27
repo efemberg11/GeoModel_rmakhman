@@ -25,7 +25,7 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 # ---------------------------
 
 # Project's dependencies.
-find_package( GeoModelCore 3.2.0 REQUIRED )
+# find_package( GeoModelCore 3.2.0 REQUIRED )
 find_package( SQLite3 QUIET )
 
 # Set sub-packages to build.

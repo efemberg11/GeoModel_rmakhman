@@ -10,6 +10,14 @@ In the following, you will find basic strategies to effectively build the GeoMod
 
 ## System Dependencies
 
+### Compilers
+
+In the GeoModel packages, we use modern C++ constructs (C++ 14 and sometimes C++17). Thus, before trying to compile the GeoModel libraries, be sure your compiler supports C++17.
+
+!!! note
+
+    If you use GCC, we successfully tested the build of GeoModel packages on GCC 6.2 and beyond (GCC 7, GCC 8).
+
 
 ### macOS
 
@@ -36,7 +44,7 @@ Then, you can remove the old GeoModel packages with, for example:
 brew remove geomodelcore
 ```
 
-Please remove **all** the `geomodel`- packages before trying to build the packages from source.
+Please remove **all** the `geomodel`-packages before trying to build the packages from source.
 
 See also the [Troubleshooting](troubleshooting.md) page for additional help.
 
@@ -64,6 +72,11 @@ With these instructions you will build the whole the software stack for GeoModel
 
 ### Build and Install locally
 
+#### Build the dependencies for graphics (only needed for GeoModelVisualization)
+
+If you are working
+
+
 ```bash
 # Build Coin3D
 wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
@@ -84,6 +97,7 @@ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../soqt
 make -j
 make install
 cd ..
+```
 
 # Build GeoModelCore
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git

@@ -1,31 +1,31 @@
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 /*
  * main.cpp
  *
+ *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Sep, 2019
- *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ *
  */
 
-// GeoShape nodes
+// GeoModel includes
+//   GeoModel GeoShape nodes
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
-
-// Geo core classes
+//   GeoModel classes
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoTransform.h"
-
-// Geo I/O
+//   GeoModel I/O
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelWrite/WriteGeoModel.h"
 
-// Qt5
-#include <QDebug>
-#include <QFileInfo>
-
 // C++
 #include <iostream>
+#include <fstream>
+#include <cstdlib> // EXIT_FAILURE
 
 
 // Units
@@ -37,39 +37,38 @@ int main(int argc, char *argv[])
 {
 
 
-  	//-----------------------------------------------------------------------------------//
-        // Define the materials that we shall use.                                              //
-        // ----------------------------------------------------------------------------------//
+	//-----------------------------------------------------------------------------------//
+  // Define the materials that we shall use.                                              //
+  // ----------------------------------------------------------------------------------//
 
-        // Define the units
-        #define gr   SYSTEM_OF_UNITS::gram
-        #define mole SYSTEM_OF_UNITS::mole
-        #define cm3  SYSTEM_OF_UNITS::cm3
+  // Define the units
+  #define gr   SYSTEM_OF_UNITS::gram
+  #define mole SYSTEM_OF_UNITS::mole
+  #define cm3  SYSTEM_OF_UNITS::cm3
 
-        // Define the chemical elements
-        GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
-        GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
-        GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
-        GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
-        GeoElement*  Iron     = new GeoElement ("Iron"     ,"Fe" , 26.0 ,  55.847  *gr/mole);
-        GeoElement*  Carbon   = new GeoElement ("Carbon"   ,"C"  ,  6.0 ,  12.0107 *gr/mole);
-        GeoElement*  Sillicon = new GeoElement ("Silicon"  ,"Si" , 14.0 ,  28.085  *gr/mole);
+  // Define the chemical elements
+  GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
+  GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
+  GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
+  GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
+  GeoElement*  Iron     = new GeoElement ("Iron"     ,"Fe" , 26.0 ,  55.847  *gr/mole);
+  GeoElement*  Carbon   = new GeoElement ("Carbon"   ,"C"  ,  6.0 ,  12.0107 *gr/mole);
+  GeoElement*  Sillicon = new GeoElement ("Silicon"  ,"Si" , 14.0 ,  28.085  *gr/mole);
 
-        // Define the materials
+  // Define the materials
 
-        double densityOfAir=0.001214 *gr/cm3;
-        GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
-        air->add(Nitrogen  , 0.7494);
-	air->add(Oxygen, 0.2369);
-        air->add(Argon, 0.0129);
-        air->add(Hydrogen, 0.0008);
-        air->lock();
+  double densityOfAir=0.001214 *gr/cm3;
+  GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
+  air->add(Nitrogen  , 0.7494);
+  air->add(Oxygen, 0.2369);
+  air->add(Argon, 0.0129);
+  air->add(Hydrogen, 0.0008);
+  air->lock();
 
-        GeoMaterial* steel  = new GeoMaterial("Steel", 7.9 *gr/cm3);
-        steel->add(Iron  , 0.98);
-        steel->add(Carbon, 0.02);
-        steel->lock();
-
+  GeoMaterial* steel  = new GeoMaterial("Steel", 7.9 *gr/cm3);
+  steel->add(Iron  , 0.98);
+  steel->add(Carbon, 0.02);
+  steel->lock();
 
 	//-----------------------------------------------------------------------------------//
 	// create the world volume container and
@@ -234,19 +233,19 @@ int main(int argc, char *argv[])
 
 	//------------------------------------//
 	// Writing the geometry to file
-	QString path = "geometry.db";
+	std::string path = "geometry.db";
 
-	// check if DB file exists. If not, return.
-	// TODO: this check should go in the 'GMDBManager' constructor.
-	if ( QFileInfo(path).exists() ) {
-		qWarning() << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove it before running this program.";
-		qWarning() << "\tReturning..." << "\n";
-		// return;
-		exit(1);
-	}
+  // check if DB file exists. If not, return.
+  // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
+  std::ifstream infile(path.c_str());
+    if ( infile.good() ) {
+      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
+        exit(EXIT_FAILURE);
+  }
+  infile.close();
 
 	// open the DB connection
-	GMDBManager db(path.toStdString());
+	GMDBManager db(path);
 
 	// check the DB connection
 	if (db.checkIsDBOpen())

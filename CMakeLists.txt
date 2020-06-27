@@ -9,10 +9,14 @@ project( "GeoModel" VERSION 1.0.0 LANGUAGES CXX )
 # === Project wide setup ===
 # Make the module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+# Define color codes for CMake messages
+include( cmake_colors_defs )
 # Set build and C++ default options
-include ( configure_cpp_options )
+include( configure_cpp_options )
 # Use the GNU install directory names.
 include( GNUInstallDirs )
+# Set a default build type
+include( BuildType )
 # Print Build Info on screen
 include( PrintBuildInfo )
 
@@ -20,8 +24,15 @@ include( PrintBuildInfo )
 add_subdirectory(dependencies)
 
 # === Main targets built by this project ===
-option(GEOMODEL_BUILD_VISUALIZATION "Enable building GeoModelVisualization" OFF)
 
+# switches to let users build specific packages on request
+option(GEOMODEL_BUILD_EXAMPLES "Enable the build of GeoModelExamples" OFF)
+option(GEOMODEL_BUILD_EXAMPLES_W_GEANT4 "Enable the build of GeoModelExamples, including the ones concerning the interface GeoModel->Geant4" OFF)
+option(GEOMODEL_BUILD_VISUALIZATION "Enable the build of GeoModelVisualization" OFF)
+option(GEOMODEL_BUILD_GEOMODELG4 "Enable the build of GeoModelG4" OFF)
+option(GEOMODEL_BUILD_FULLSIMLIGHT "Enable the build of FullSimLight" OFF)
+
+# a list to keep track of the packages we build
 set(BUILT_PACKAGES "")
 
 add_subdirectory(GeoModelCore)
@@ -30,17 +41,38 @@ add_subdirectory(GeoModelIO)
 list( APPEND BUILT_PACKAGES "GeoModelIO")
 add_subdirectory(GeoModelTools)
 list( APPEND BUILT_PACKAGES "GeoModelTools")
+
 if(GEOMODEL_BUILD_VISUALIZATION)
   add_subdirectory(GeoModelVisualization)
   list( APPEND BUILT_PACKAGES "GeoModelVisualization")
 endif()
 
-message(STATUS "-----")
+if(GEOMODEL_BUILD_EXAMPLES)
+  add_subdirectory(GeoModelExamples)
+  list( APPEND BUILT_PACKAGES "GeoModelExamples")
+endif()
+
+
+if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
+  add_subdirectory(GeoModelG4)
+  list( APPEND BUILT_PACKAGES "GeoModelG4")
+endif()
+
+if(GEOMODEL_BUILD_FULLSIMLIGHT)
+  add_subdirectory(GeoModelG4)
+  list( APPEND BUILT_PACKAGES "GeoModelG4")
+  add_subdirectory(FullSimLight)
+  list( APPEND BUILT_PACKAGES "FullSimLight")
+endif()
+
+
+
+# Let the users know which and how many packages they are building
 list(LENGTH BUILT_PACKAGES BUILT_PACKAGES_LENGTH)
 list(JOIN BUILT_PACKAGES ", " BUILT_PACKAGES_STR)
-message( STATUS "Building the following ${BUILT_PACKAGES_LENGTH} packages: ${BUILT_PACKAGES_STR}")
-message(STATUS "-----")
-
+message(STATUS "${BoldWhite}-----${ColourReset}")
+message( STATUS "${BoldGreen}Building the following ${BUILT_PACKAGES_LENGTH} packages: ${BUILT_PACKAGES_STR}${ColourReset}")
+message(STATUS "${BoldWhite}-----${ColourReset}")
 
 # === Things typically only needed if we are the top level project ===
 # if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)

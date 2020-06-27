@@ -2,8 +2,8 @@
 
 if( COLOR_DEFS )
   message(STATUS "-----")
-  message(STATUS "${Blue}Building with type: ${CMAKE_BUILD_TYPE}${ColourReset}")
-  message(STATUS "${Blue}Using C++ standard: ${CMAKE_CXX_STANDARD}${ColourReset}")
+  message(STATUS "${BoldYellow}Building with type: ${CMAKE_BUILD_TYPE}${ColourReset}")
+  message(STATUS "${BoldYellow}Using C++ standard: ${CMAKE_CXX_STANDARD}${ColourReset}")
   message(STATUS "-----")
 else()
   message(STATUS "-----")

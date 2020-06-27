@@ -1,10 +1,10 @@
-/*
-  Copyright (C) 2002-2018 CERN for the benefit of the ATLAS collaboration
-*/
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
+// local includes
 #include "ToyDetectorFactory.h"
 #include "CentralScrutinizer.h"
 
+// GeoModel includes
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
@@ -17,13 +17,12 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
 #include "GeoGenericFunctions/Sin.h"
 #include "GeoGenericFunctions/Cos.h"
 
-// #include "GaudiKernel/SystemOfUnits.h"
+
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'

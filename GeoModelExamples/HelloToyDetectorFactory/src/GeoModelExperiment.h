@@ -1,6 +1,4 @@
-/*
-  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
-*/
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 //-------------------------------------------------------------------------------------------//
 //                                                                                           //
@@ -15,7 +13,10 @@
 #ifndef GEOMODELSVC_GEOMODELEXPERIMENT_H
 #define GEOMODELSVC_GEOMODELEXPERIMENT_H
 
+// GeoModel includes
 #include "GeoModelKernel/GeoVPhysVol.h"
+
+// C++ includes
 #include <set>
 #include <string>
 #include <vector>

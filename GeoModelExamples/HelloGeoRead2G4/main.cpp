@@ -1,28 +1,30 @@
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 /*
  * HelloGeo.cpp
  *
+ *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Nov, 2018
- *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ *
  */
 
+// GeoModel includes
+#include "GeoModel2G4/ExtParameterisedVolumeBuilder.h"
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
-#include "GeoModel2G4/ExtParameterisedVolumeBuilder.h"
-#include "G4LogicalVolume.hh"
-
-// #include "GeoModelUtilities/GeoModelExperiment.h"
-
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 
-#include <QCoreApplication>
-#include <QString>
-#include <QDebug>
-#include <QFileInfo>
+// Geant4 includes
+#include "G4LogicalVolume.hh"
 
+// C++ includes
 #include <iostream>
+#include <fstream>
+#include <cstdlib> // EXIT_FAILURE
+
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -47,33 +49,34 @@
 
 
 
-int main(int argc, char *argv[])
+// TODO: int main(int argc, char *argv[])
+int main()
 {
-  QCoreApplication app(argc, argv);
 
-  // GET GEOMETRY FROM LOCAL DB
-  // Set valid db path before first run
-  static const QString path = "../geometry.db";
-  qDebug() << "Using this DB file:" << path;
+  // Set a valid local geometry db path before first run
+  static const std::string path = "../geometry.db";
 
-  // check if DB file exists. If not, return
-  if (! QFileInfo(path).exists() ) {
-        qWarning() << "ERROR!! DB '" << path << "' does not exist!!";
-        qWarning() << "Returning..." << "\n";
-        // return;
-        throw;
+  std::cout << "Using this DB file:" << path << std::endl;
+
+  // check if DB file exists. If not, return.
+  // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
+  std::ifstream infile(path.c_str());
+    if ( infile.good() ) {
+      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
+        exit(EXIT_FAILURE);
   }
+  infile.close();
 
   // open the DB
-  GMDBManager* db = new GMDBManager(path.toStdString());
+  GMDBManager* db = new GMDBManager(path);
+
   /* Open database */
   if (db->checkIsDBOpen()) {
     std::cout << "OK! Database is open!\n";
   }
   else {
     std::cout << "Database is not open!\n";
-    // return;
-    throw;
+    exit(EXIT_FAILURE);
   }
 
   // -- testing the input database
@@ -82,12 +85,12 @@ int main(int argc, char *argv[])
 
   /* setup the GeoModel reader */
   GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-  qDebug() << "ReadGeoModel set.";
+  std::cout << "ReadGeoModel set.\n";
 
 
   /* build the GeoModel geometry */
   GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
-  qDebug() << "ReadGeoModel::buildGeoModel() done.";
+  std::cout << "ReadGeoModel::buildGeoModel() done.\n";
 
 
 
@@ -124,7 +127,7 @@ int main(int argc, char *argv[])
             std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
 		}
         } else if ( dynamic_cast<const GeoNameTag*>( &(*( nodeLink ))) ) {
-		qDebug() << "\t" << "the child n. " << idx << " is a GeoNameTag";
+		std::cout << "\t" << "the child n. " << idx << " is a GeoNameTag\n";
 		const GeoNameTag *childVol = dynamic_cast<const GeoNameTag*>(&(*( nodeLink )));
 		std::cout << "\t\tGeoNameTag's name: " << childVol->getName() << std::endl;
         //std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes\n";
@@ -136,7 +139,9 @@ int main(int argc, char *argv[])
   std::cout << "Building G4 geometry."<<std::endl;
   G4LogicalVolume* g4World = builder->Build(world);
 
-  qDebug() << "Everything done.";
+  std::cout << "This is the newly-created Geant4 G4LogicalVolume, ready to be used: " << g4World << std::endl;
 
-  return app.exec();
+  std::cout << "Everything done.\n";
+
+  return 0;
 }

@@ -7,7 +7,7 @@ file( GLOB HEADERS GeoModelWrite/*.h )
 # Set up the library.
 add_library( GeoModelWrite SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModelWrite PUBLIC
-   GeoModelCore::GeoModelKernel GeoModelDBManager TFPersistification )
+   GeoModelKernel GeoModelDBManager TFPersistification )
 target_include_directories( GeoModelWrite PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

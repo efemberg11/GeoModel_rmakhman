@@ -20,8 +20,8 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 # include( SetupJSON )
 #
 # # Find the externals needed by the project.
-find_package( GeoModelCore 3.2.0 REQUIRED )
-find_package( GeoModelIO 3.2.0 REQUIRED )
+# find_package( GeoModelCore 3.2.0 REQUIRED )
+# find_package( GeoModelIO 3.2.0 REQUIRED )
 find_package( XercesC )
 
 # Set up the build of the libraries of the project.

@@ -1,8 +1,9 @@
 /*
-  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
-// Author: Joe Boudreau, repurposed from orginal work from 
-//              Riccardo.Maria.Bianchi@cern.ch, Apr 2017
+// Author: Joe Boudreau, repurposed from orginal work from
+//              - Riccardo Maria Bianchi, Apr 2017
+//              - Sebastian Andreas Merkt, 2018
 // Update: Nov 2019
 //
 // Qt includes
@@ -18,6 +19,8 @@
 // C++ includes
 #include <iostream>
 #include <cstdlib>
+
+
 #define STR_VALUE(arg) #arg
 #define STR_NAME(name) STR_VALUE(name)
 
@@ -34,19 +37,20 @@ int main(int argc, char** argv)
 		 }
 	       };
   // Preprocessor:  we are passing the install directory to this
-  // class. Drivers will be loaded from this install directory.
+  // class, from the CMake configuration.
+  // Drivers will be loaded from this install directory.
   // However in some cases "linux" is part of the install directory
   // name and that may be defined in a macro to be 1. So if that is
-  // the case we temporarily undef it. 
+  // the case we temporarily undef it.
 #ifdef linux
 #define waslinux linux
 #undef linux
-  const char * standardPlaces = STR_NAME( INSTALL_PREFIX );
+  const char * standardPlaces = STR_NAME( GEOMODEL_INSTALL_PREFIX );
 #define linux waslinux
-#else 
-  const char * standardPlaces = STR_NAME( INSTALL_PREFIX );
+#else
+  const char * standardPlaces = STR_NAME( GEOMODEL_INSTALL_PREFIX );
 #endif
-  std::string gxpluginpath= std::string(standardPlaces)+"/lib/gxplugins"; 
+  std::string gxpluginpath= std::string(standardPlaces)+"/lib/gxplugins";
   pManip("GXPLUGINPATH",gxpluginpath.c_str());
   QStringList arguments;
   for (int i = 0; i<=argc; i++){
@@ -65,7 +69,8 @@ int main(int argc, char** argv)
   bool helpIsSet = parser.isSet(helpOption);
 
   QStringList inputList=parser.positionalArguments();
-  
+
+  // This handles the input geometry files and the plugins
   int NGeomFiles=0;
   for (int i=0;i<inputList.size()-1;i++) {
     std::string input=inputList[i].toStdString();
@@ -76,14 +81,13 @@ int main(int argc, char** argv)
       setenv((std::string("GX_GEOMETRY_FILE")+std::to_string(NGeomFiles++)).c_str(),inputList[i].toStdString().c_str(), true);
     }
   }
-  
 
-  
+  // This handles the JSON files containing the geometry clash information
   int NJsonFiles=0;
   for (int i=0;i<inputList.size()-1;i++) {
     std::string input=inputList[i].toStdString();
     if (input.find(".json")!=std::string::npos){
-     
+
       setenv((std::string("GX_JSON_FILE")+std::to_string(NJsonFiles++)).c_str(),inputList[i].toStdString().c_str(), true);
     }
   }
@@ -100,7 +104,7 @@ int main(int argc, char** argv)
   }
 
   // Save settings
-  QSettings settings("ATLAS", "VP1Light");
+  QSettings settings("ATLAS", "VP1Light"); // TODO: update labels!
   // Disable expert settings by default
   if(settings.value("ExpertSettings/notFirstStart").toString().isEmpty()){
     settings.setValue("ExpertSettings/notFirstStart","1");
@@ -110,5 +114,5 @@ int main(int argc, char** argv)
   GXExecutionScheduler *scheduler=GXExecutionScheduler::init();
   while (scheduler->interact())
   GXExecutionScheduler::cleanup(scheduler);
-  
+
 }

@@ -1,12 +1,14 @@
-/*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
-*/
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 #ifndef ToyDetectorFactory_h
 #define ToyDetectorFactory_h 1
-#include "GeoModelKernel/GeoVDetectorFactory.h"
+
+// local includes
 #include "ToyDetectorManager.h"
-// class StoreGateSvc;
+
+// GeoModel includes
+#include "GeoModelKernel/GeoVDetectorFactory.h"
+
 
 
 class ToyDetectorFactory : public GeoVDetectorFactory  {

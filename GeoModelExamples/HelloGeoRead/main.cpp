@@ -1,24 +1,26 @@
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 /*
  * HelloGeo.cpp
  *
+ *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Nov, 2018
- *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ *
  */
 
+// GeoModel includes
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
-
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 
-#include <QCoreApplication>
-#include <QString>
-#include <QDebug>
-#include <QFileInfo>
-
+// C++ includes
 #include <iostream>
+#include <fstream>
+#include <cstdlib> // EXIT_FAILURE
+
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -71,13 +73,23 @@ int main(int argc, char *argv[])
   const std::string path = "../geometry.db";
   std::cout << "Using this DB file:" << path << std::endl;
 
-  // check if DB file exists. If not, return
-  if (! QFileInfo(QString::fromStdString(path)).exists() ) {
-        // std::cout << "ERROR!! DB '" << path << "' does not exist!! Exiting..."; // FIXME: path with std::string
-        std::cout << "ERROR!! DB does not exist!! Exiting...\n";
-        // return;
-        throw;
+  // // check if DB file exists. If not, return
+  // if (! QFileInfo(QString::fromStdString(path)).exists() ) {
+  //       // std::cout << "ERROR!! DB '" << path << "' does not exist!! Exiting..."; // FIXME: path with std::string
+  //       std::cout << "ERROR!! DB does not exist!! Exiting...\n";
+  //       // return;
+  //       throw;
+  // }
+
+  // check if DB file exists. If not, return.
+  // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
+  std::ifstream infile(path.c_str());
+    if ( infile.good() ) {
+      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
+        exit(EXIT_FAILURE);
   }
+  infile.close();
+
 
   // open the DB
   GMDBManager* db = new GMDBManager(path);
@@ -99,12 +111,12 @@ int main(int argc, char *argv[])
 
   /* setup the GeoModel reader */
   GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
-  qDebug() << "OK! ReadGeoModel is set.";
+  std::cout << "OK! ReadGeoModel is set." << std::endl;
 
 
   /* build the GeoModel geometry */
   GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
-  qDebug() << "ReadGeoModel::buildGeoModel() done.";
+  std::cout << "ReadGeoModel::buildGeoModel() done." << std::endl;
 
   // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
@@ -144,19 +156,19 @@ int main(int argc, char *argv[])
 		  }
 	  }
 	  else if ( dynamic_cast<const GeoNameTag*>( &(*( nodeLink ))) ) {
-		  qDebug() << "\t" << "the child n. " << idx << " is a GeoNameTag";
+		  std::cout << "\t" << "the child n. " << idx << " is a GeoNameTag" << std::endl;
 		  const GeoNameTag *childVol = dynamic_cast<const GeoNameTag*>(&(*( nodeLink )));
 		  std::cout << "\t\t GeoNameTag's name: " << childVol->getName() << std::endl;
 	  }
 	  else if ( dynamic_cast<const GeoMaterial*>( &(*( nodeLink ))) ) {
-		  qDebug() << "\t" << "the child n. " << idx << " is a GeoMaterial";
+		  std::cout << "\t" << "the child n. " << idx << " is a GeoMaterial" << std::endl;
 		  const GeoMaterial *childVol = dynamic_cast<const GeoMaterial*>(&(*( nodeLink )));
 		  std::cout << "\t\t GeoMaterial's name: " << childVol->getName() << std::endl;
 		  std::cout << "\t\t GeoMaterial's number of elements: " << childVol->getNumElements() << std::endl;
 	  }
   }
 
-  qDebug() << "Everything done.";
+  std::cout << "Everything done." << std::endl;
 
   // return app.exec();
   return 0;

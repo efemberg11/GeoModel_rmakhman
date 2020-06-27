@@ -7,10 +7,10 @@ project ( "GXBase" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB
 
 find_package( Coin REQUIRED )
 find_package( SoQt REQUIRED )
+find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport )
 if ( APPLE )
 	find_package(OpenGL REQUIRED)
 endif()
-find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport )
 
 
 

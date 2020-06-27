@@ -1,15 +1,17 @@
-/*
-  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
-*/
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
+// local includes
 #include "GeoModelExperiment.h"
 
+// GeoModel includes
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoVDetectorManager.h"
 
+// C++ includes
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
+
 /**
  ** Constructor(s)
  **/

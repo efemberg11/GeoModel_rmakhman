@@ -1,8 +1,11 @@
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 /*
  * main.cpp
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Oct, 2019
+ *
  */
 
 #include "MyVolAction.h"
@@ -14,10 +17,8 @@
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
-#include <QDebug>
-#include <QFileInfo>
-
 #include <iostream>
+
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -117,7 +118,6 @@ int main(int argc, char *argv[])
 	std::string re = "Inner.*";
 	MyVolActionFilter actionFilter(re);
 	world->apply(&actionFilter);
-
 
 
   return 0;

@@ -8,7 +8,7 @@ project(fullSimLight)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
- 
+
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -16,9 +16,9 @@ add_subdirectory(MagneticField)
 
 # Dependencies.
 ## GeoModel dependencies.
-find_package( GeoModelCore 3.2.0 REQUIRED )
-find_package( GeoModelIO 3.2.0 REQUIRED )
-find_package( GeoModelG4 REQUIRED )
+# find_package( GeoModelCore 3.2.0 REQUIRED )
+# find_package( GeoModelIO 3.2.0 REQUIRED )
+# find_package( GeoModelG4 REQUIRED )
 find_package( nlohmann_json QUIET )
 
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
@@ -78,27 +78,27 @@ target_link_libraries(testMagneticField ${Geant4_LIBRARIES} MagFieldServices Mag
 
 if( nlohmann_json_FOUND )
 
-target_link_libraries(fullSimLight GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
+target_link_libraries(fullSimLight GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmclash GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
+target_link_libraries(gmclash GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmgeantino GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
+target_link_libraries(gmgeantino GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
-target_link_libraries(gmtogdml GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
+target_link_libraries(gmtogdml GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
 else()
 
-message(STATUS "'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
+message(STATUS "WARNING - 'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
 
-target_link_libraries(gmclash GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(gmclash GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(fullSimLight GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(fullSimLight GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(gmgeantino GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(gmgeantino GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
-target_link_libraries(gmtogdml GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(gmtogdml GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 

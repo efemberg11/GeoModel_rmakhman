@@ -7,11 +7,9 @@ GeoModel is a user-friendly C++ Toolkit and Suite for HEP Detector Description w
 
 The philosophy of the whole GeoModel Suite is to keep the external dependencies at the minimum.
 
-Currently, these are the dependencies:
+_list of all the dependencies coming soon_
 
-- GeoModel base classes (GeoModelCore, GeoModelIO):
-  - Eigen -- a math library
-  -
+
 
 ## Build
 

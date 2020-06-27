@@ -1,29 +1,19 @@
-# $Id: CMakeLists.txt 732131 2016-03-24 11:03:29Z krasznaa $
 ################################################################################
 # Package: VP1GuideLinePlugin
 ################################################################################
-
-
-set(CMAKE_BUILD_TYPE DEBUG)
-set(CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
 
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
 set(MYLIB_VERSION_PATCH 0)
 project ( "GXGuideLineSystems" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-if ( APPLE )
-	find_package(OpenGL REQUIRED)
-endif()
 find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-
 find_package( Coin REQUIRED )
 find_package( SoQt REQUIRED )
-#find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
-find_package( GeoModelCore REQUIRED )
-if( APPLE )
+if ( APPLE )
   find_package(OpenGL REQUIRED)
 endif()
+
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -58,9 +48,9 @@ include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 
 if ( APPLE )
   target_link_directories (GXGuideLineSystems PUBLIC ${Coin_LIB_DIR} )
-  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
   else()
-  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 endif()
 
 

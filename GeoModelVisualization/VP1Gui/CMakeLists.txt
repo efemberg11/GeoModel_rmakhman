@@ -1,17 +1,16 @@
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
 set(MYLIB_VERSION_PATCH 0)
-set (CMAKE_BUILD_TYPE DEBUG)
-set (CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
 
 project ( "GXGui" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
+
 find_package( Coin REQUIRED )
 find_package( SoQt REQUIRED )
+find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
 if ( APPLE )
 	find_package(OpenGL REQUIRED)
 endif()
-find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
 
 
 

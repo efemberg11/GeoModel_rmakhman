@@ -1,28 +1,30 @@
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 /*
  * HelloGeo.cpp
  *
+ *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Nov, 2018
- *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ *
  */
 
-
+// local includes
 #include "GeoModelExperiment.h"
 #include "ToyDetectorFactory.h"
 
+// GeoModel includes
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
-
 #include "GeoModelDBManager/GMDBManager.h"
-
 #include "GeoModelWrite/WriteGeoModel.h"
 
-#include <QDebug>
-#include <QString>
-#include <QFileInfo>
-
+// C++ includes
 #include <iostream>
+#include <fstream>
+#include <cstdlib> // EXIT_FAILURE
+
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -136,19 +138,19 @@ int main(int argc, char *argv[])
 
   //------------------------------------------------------------//
   // --- writing the newly created Geometry to a local file --- //
-  QString path = "geometry.db";
+  std::string path = "geometry.db";
 
   // check if DB file exists. If not, return.
-  // TODO: this check should go in the 'GMDBManager' constructor.
-  if ( QFileInfo(path).exists() ) {
-        qWarning() << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove it before running this program.";
-        qWarning() << "\tReturning..." << "\n";
-        // return;
-        exit(1);
+  // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
+  std::ifstream infile(path.c_str());
+    if ( infile.good() ) {
+      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
+        exit(EXIT_FAILURE);
   }
+  infile.close();
 
 	// open the DB connection
-  GMDBManager db(path.toStdString());
+  GMDBManager db(path);
 
   // check the DB connection
   if (db.checkIsDBOpen())
@@ -163,9 +165,7 @@ int main(int argc, char *argv[])
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db); // init the GeoModel node action
   world->exec(&dumpGeoModelGraph); // visit all nodes in the GeoModel tree
   dumpGeoModelGraph.saveToDB(); // save to the local SQlite DB file
-  std::cout << "DONE. Geometry saved to the file '" << path.toStdString() << "'.\n" <<std::endl;
-
-
+  std::cout << "DONE. Geometry saved to the file '" << path << "'.\n" <<std::endl;
 
   return 0; //app.exec();
 }

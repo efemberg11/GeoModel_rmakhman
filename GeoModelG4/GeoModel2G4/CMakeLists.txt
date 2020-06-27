@@ -7,11 +7,11 @@ cmake_minimum_required(VERSION 3.10)
 # Declare the package name
 project( "GeoModel2G4" VERSION 1.1.0 LANGUAGES CXX )
 
-# External dependencies:
-find_package( Geant4 REQUIRED )
+# # External dependencies:
+# find_package( Geant4 REQUIRED )
 
 # GeoModel dependencies
-find_package( GeoModelCore 3.2.0 REQUIRED )
+# find_package( GeoModelCore 3.2.0 REQUIRED )
 
 ##########################################################
 # NOTE! The original package also needs this Athena stuff:

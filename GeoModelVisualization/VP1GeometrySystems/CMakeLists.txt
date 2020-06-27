@@ -1,33 +1,21 @@
-# $Id: CMakeLists.txt 732131 2016-03-24 11:03:29Z krasznaa $
 ################################################################################
 # Package: VP1GeometryPlugin
 ################################################################################
 
-
-set(CMAKE_BUILD_TYPE DEBUG)
-set(CMAKE_CXX_FLAGS "-g -O0 -gdwarf-2")
 
 set(MYLIB_VERSION_MAJOR 1)
 set(MYLIB_VERSION_MINOR 0)
 set(MYLIB_VERSION_PATCH 0)
 project ( "GXGeometrySystems" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-if ( APPLE )
-	find_package(OpenGL REQUIRED)
-endif()
 find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-
 find_package( Coin REQUIRED )
 find_package( SoQt REQUIRED )
-#find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
-find_package( GeoModelCore REQUIRED )
-find_package( GeoModelIO REQUIRED )
-find_package( Eigen3 REQUIRED )
+# find_package( Eigen3 REQUIRED )
 find_package(nlohmann_json QUIET)
-if( APPLE )
+if ( APPLE )
   find_package(OpenGL REQUIRED)
 endif()
-
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -78,12 +66,17 @@ endif()
 
 if ( APPLE )
   target_link_directories (GXGeometrySystems PUBLIC ${Coin_LIB_DIR} )
-  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelRead GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
   else()
-  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelCore::GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelRead GeoModelWrite ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 endif()
 
 
+# Set a variable storing the CMake install prefix.
+# -- It is passed to the C++ preprocessor to load, from the C++ code,
+# -- the JSON files storing the default materials and volume attributes
+# -- for Coin3D.
+add_definitions ( -DGEOMODEL_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX})
 
 
 

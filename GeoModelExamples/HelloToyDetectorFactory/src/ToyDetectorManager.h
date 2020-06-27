@@ -1,12 +1,14 @@
-/*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
-*/
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 #ifndef ToyDetectorManager_h
 #define ToyDetectorManager_h 1
+
+// GeoModel includes
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoVDetectorManager.h"
 
+
+// FWD declarations
 class CentralScrutinizer;
 class ForwardScrutinizer;
 

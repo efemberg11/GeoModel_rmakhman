@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 #
 # This module is used to set up Eigen3 for the project. Either by looking for
 # it on the build machine, or by downloading it during the build itself.

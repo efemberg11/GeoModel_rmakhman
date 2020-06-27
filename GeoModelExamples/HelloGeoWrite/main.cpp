@@ -1,24 +1,25 @@
+// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 /*
  * HelloGeo.cpp
  *
+ *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Apr, 2019
- *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ *
  */
 
+// GeoModel includes
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
-
 #include "GeoModelDBManager/GMDBManager.h"
-
 #include "GeoModelWrite/WriteGeoModel.h"
 
-#include <QDebug>
-#include <QFileInfo>
-
+// C++ includes
 #include <iostream>
 #include <fstream>
+#include <cstdlib> // EXIT_FAILURE
 
 
 // Units

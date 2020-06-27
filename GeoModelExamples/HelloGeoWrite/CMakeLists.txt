@@ -1,30 +1,16 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 ################################################################################
-# Package: HelloGeo
-# author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - Nov, 2018
+# Package: HelloGeoWrite
+# author: Riccardo Maria BIANCHI @ CERN - Nov, 2018
 ################################################################################
 
 cmake_minimum_required(VERSION 3.1.0)
 
 project(HelloGeoWrite)
 
-# Compile with C++17
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Print Build Info on screen
-include(../cmake/PrintBuildInfo.cmake)
-
-# Find includes in corresponding build directories
+# Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# Dependencies.
-## GeoModel dependencies.
-find_package( GeoModelCore 3.2.0 REQUIRED )
-find_package( GeoModelIO 3.2.0 REQUIRED )
-find_package( Eigen3 REQUIRED )
-## External Dependencies.
-find_package(Qt5 COMPONENTS Core Widgets REQUIRED) # TODO: remove Qt dependency, which comes from GeoModelDBManager
 
 # Populate a CMake variable with the sources
 set(SRCS main.cpp )
@@ -33,4 +19,4 @@ set(SRCS main.cpp )
 add_executable( hellogeoWrite ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoWrite GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite Qt5::Core )
+target_link_libraries( hellogeoWrite GeoModelKernel GeoModelDBManager GeoModelWrite )

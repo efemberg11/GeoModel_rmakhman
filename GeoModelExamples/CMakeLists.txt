@@ -1,4 +1,9 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+################################################################################
+# Package: GeoModelExamples
+# author: Riccardo Maria BIANCHI @ CERN - Nov, 2018
+################################################################################
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
@@ -17,11 +22,8 @@ add_subdirectory( GeoShapeExamples )
 add_subdirectory( GeoShiftUnion )
 add_subdirectory( GeoTessellatedSolidExamples )
 
-# GeoModel <--> Geant4 examples
-# add_subdirectory( HelloGeoRead2G4 )
-
-# Make the module directory visible to CMake.
-# list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
-
-# Print Build Info on screen
-include(cmake/PrintBuildInfo.cmake)
+# GeoModel <--> Geant4 examples are built on explicit request only
+if(GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
+  add_subdirectory( HelloGeoRead2G4 )
+  # list( APPEND BUILT_PACKAGES "HelloGeoRead2G4")
+endif()

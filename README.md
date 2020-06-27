@@ -59,57 +59,61 @@ cmake -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel/
 ```
 
 
-#### Visualization
+#### Build the visualization tools
 
 ```
-GEOMODEL_BUILD_VISUALIZATION=1
+cmake -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel
 ```
 
-will enable the build of the geometry visualization tool, `GeoModelExplorer`, or `gmex`. This brings in additional dependencies for the GUI and to handle 3D graphics: Qt5, Coin3D, and SoQt.
+will enable the build of the geometry visualization tool, `GeoModelExplorer` (`gmex`) and of all the base classes. This brings in additional dependencies for the GUI and to handle 3D graphics: Qt5, Coin3D, and SoQt.
 
 
-#### Examples
+#### Build the examples
 
-
-There are other variables to control the build. In particular:
 
 ```
-GEOMODEL_BUILD_EXAMPLES=1
+cmake -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel
 ```
 
-will enable the build of all the examples, except those requiring Geant4.
+will enable the build of all the examples, except those requiring Geant4, and of all the base classes.
+
+While this:
 
 ```
-GEOMODEL_BUILD_EXAMPLES_W_GEANT4=1
+cmake  -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=1 ../GeoModel
 ```
 
-will enable the build of the examples requiring Geant4 as well.
+will enable the build of all the examples, also those requiring Geant4. This option will also build `GeoModelG4`, the interface between GeoModel and GEant4, and brings in the dependency on a Geant4 installation.
 
 
-#### GeoModel --> Geant4 interface
+#### Build the GeoModel --> Geant4 interface
 
-```
-GEOMODEL_BUILD_GEOMODELG4=1
-```
-
-will build the interface classes which translate GeoModel nodes into Geant4 entities.
-This brings in an additional dependency on Geant4.
-
-
-#### Standalone detector simulation
+This CMake command
 
 ```
-GEOMODEL_BUILD_FULLSIMLIGHT=1
+cmake  -DGEOMODEL_BUILD_GEOMODELG4=1 ../GeoModel
 ```
 
-will build the Geant4-based application which let users run standalone simulations on a complete detector geometry or on a piece of that. This brings in an additional dependency on Geant4.
+will build the interface classes which translate GeoModel nodes into Geant4 entities, as well as all the base GeoModel classes.
+This also brings in an additional dependency on a Geant4 installation.
+
+
+#### Build the standalone Geant4-based detector simulation application
+
+This CMake command
+
+```
+cmake  -DGEOMODEL_BUILD_FULLSIMLIGHT=1 ../GeoModel
+```
+
+will build `FullSimLight`, the Geant4-based application which let users run standalone simulations on a complete detector geometry or on a piece of that, as well as `GeoModelG4` and all the base classes. This also brings in an additional dependency on a Geant4 installation.
 
 
 
 **Note:**
-When used during the CMake configuration step, all the variables must be prefixed by `-D`, like in the first example of this section.
+When used during the CMake configuration step, all the variables must be prefixed by `-D`, like in the first example of this section. You can also combine them.
 
-For example,
+For example, this CMake command:
 
 ```
 cmake -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel

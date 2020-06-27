@@ -17,7 +17,7 @@ Currently, these are the dependencies:
 
 ### Build tree
 
-By default, only the base classes will be built:
+By default, only the base classes are built:
 
 - GeoModelCore
   - GeoModelKernel
@@ -42,13 +42,13 @@ On request, additional packages, libraries, and tools can be built:
   - GeoModel2G4
 - FullSimLight
 
-!!! note
-    Some of the optional packages bring in additional dependencies, for example libraries to handle 3D graphics and Geant4 for standalone detector simulations.
-    In particular, these are the additional dependencies and the packages that bring them:
-
-    - GeoModelVisualization: Qt5, Coin3D, SoQt
-    - Examples about the classes handling the GeoModel->Geant4 translation: Geant4
-    - GeoModelG4: Geant4
+**Note:**
+Some of the optional packages bring in additional dependencies, for example libraries to handle 3D graphics and Geant4 for standalone detector simulations.
+In particular, these are the additional dependencies and the packages that bring them:
+    
+- GeoModelVisualization: Qt5, Coin3D, SoQt
+- Examples about the classes handling the GeoModel->Geant4 translation: Geant4
+- GeoModelG4: Geant4
 
 ### Build options
 

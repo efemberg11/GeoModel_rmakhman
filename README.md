@@ -50,11 +50,7 @@ In particular, these are the additional dependencies and the packages that bring
 
 ### Build options
 
-While configuring the build, you can enable the build of the optional packages. For example, if you want to build the examples, you can set the variable `GEOMODEL_BUILD_EXAMPLES` to `1` at CMake configuration time, in this way:
-
-```
-cmake -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel/
-```
+While configuring the build, you can enable the build of the optional packages, as explained in the following.
 
 
 #### Build the visualization tools

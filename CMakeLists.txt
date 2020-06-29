@@ -52,18 +52,17 @@ if(GEOMODEL_BUILD_EXAMPLES)
   list( APPEND BUILT_PACKAGES "GeoModelExamples")
 endif()
 
+if(GEOMODEL_BUILD_FULLSIMLIGHT)
+  set(GEOMODEL_BUILD_GEOMODELG4 TRUE) # FullSimLight needs GeoModelG4
+  add_subdirectory(FullSimLight)
+  list( APPEND BUILT_PACKAGES "FullSimLight")
+endif()
 
 if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
   add_subdirectory(GeoModelG4)
   list( APPEND BUILT_PACKAGES "GeoModelG4")
 endif()
 
-if(GEOMODEL_BUILD_FULLSIMLIGHT)
-  add_subdirectory(GeoModelG4)
-  list( APPEND BUILT_PACKAGES "GeoModelG4")
-  add_subdirectory(FullSimLight)
-  list( APPEND BUILT_PACKAGES "FullSimLight")
-endif()
 
 
 

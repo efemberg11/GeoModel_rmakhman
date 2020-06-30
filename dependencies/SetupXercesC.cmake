@@ -14,6 +14,13 @@ if( GEOMODEL_USE_BUILTIN_XERCESC )
    # Tell the user what's happening.
    message( STATUS "Building XercesC as part of the project" )
 
+   # Tell the user what's happening.
+   if( COLOR_DEFS )
+     message( STATUS "${BoldMagenta}'GEOMODEL_USE_BUILTIN_XERCESC' was set to 'true' ==> Building XercesC as part of the project${ColourReset}" )
+   else()
+     message( STATUS "'GEOMODEL_USE_BUILTIN_XERCESC' was set to 'true' ==> Building XercesC as part of the project" )
+   endif()
+
    # The include directory and library that will be produced.
    set( XercesC_INCLUDE_DIR
       "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/XercesCInstall/${CMAKE_INSTALL_INCLUDEDIR}" )

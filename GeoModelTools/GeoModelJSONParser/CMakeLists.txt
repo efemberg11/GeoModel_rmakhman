@@ -1,5 +1,12 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
+# Make the top 'dependencies' directory visible to CMake.
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/dependencies )
+# This has been included already at the root level,
+# but apparently it needs to be included here again,
+# otherwise the nlohmann_json CMake config file is not found properly
+include(SetupJSON)
+
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS GeoModelJSONParser/*.h )
@@ -7,17 +14,24 @@ file( GLOB HEADERS GeoModelJSONParser/*.h )
 # Create the library.
 add_library( GeoModelJSONParser SHARED ${HEADERS} ${SOURCES} )
 
-# If we use standalone-build of nlohmann_json parser
+# If the in-house build of the nlohmann_json library is used, add explicit dependency
 if( GEOMODEL_USE_BUILTIN_JSON )
-   add_dependencies( GeoModelJSONParser JSON )
+  add_dependencies( GeoModelJSONParser JSONExt )
+  # Acquire Installation Directory of JSONExt
+  ExternalProject_Get_Property (JSONExt install_dir)
+  # Include the installed 'include' PATH
+  include_directories (${install_dir}/include)
 endif()
 
-# We link to `nlohmann_json` only  if we use a version of nlohmann_json installed through CMake;
-# this is not needed if the single-header library is installed in a regular
-# system include folder (e.g., '/usr/local/include')
-if ( nlohmann_json_FOUND OR GEOMODEL_USE_BUILTIN_JSON )
+# We link to `nlohmann_json` only  if we use a version of nlohmann_json
+# that provides a CMake config file (i.e., either built from source, or also
+# installed with Homebrew on macOS).
+# This is not needed if the single-header library is installed in a regular
+# system include folder (e.g., '/usr/local/include', '/usr/include', ...)
+if ( nlohmann_json_FOUND )
   target_link_libraries( GeoModelJSONParser PUBLIC nlohmann_json::nlohmann_json )
 endif()
+
 
 target_include_directories( GeoModelJSONParser PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

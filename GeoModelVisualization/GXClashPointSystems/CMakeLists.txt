@@ -39,10 +39,15 @@ include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 
 add_library ( GXClashPointSystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 
-# If we use standalone-build of nlohmann_json parser, add explicit dependency
+# If we use standalone-build of the nlohmann_json library, add explicit dependency
 if( GEOMODEL_USE_BUILTIN_JSON )
-   add_dependencies( GXClashPointSystems JSON )
+  add_dependencies( GXClashPointSystems JSONExt )
+  # Acquire Installation Directory of JSONExt
+  ExternalProject_Get_Property (JSONExt install_dir)
+  # Include the installed 'include' PATH
+  include_directories (${install_dir}/include)
 endif()
+
 
 # External dependencies:
 include_directories(${Qt5Core_INCLUDE_DIRS} )
@@ -61,14 +66,11 @@ endif()
 
 target_link_libraries (GXClashPointSystems PRIVATE SoQt::SoQt Coin::Coin  ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 
-if( GEOMODEL_USE_BUILTIN_JSON )
-   add_dependencies( GXClashPointSystems JSON )
-endif()
 
 # we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
 # this is not needed if the single-header library is installed in a regular
 # system include folder (e.g., '/usr/local/include')
-if( nlohmann_json_FOUND OR GEOMODEL_USE_BUILTIN_JSON )
+if( nlohmann_json_FOUND )
   target_link_libraries( GXClashPointSystems PUBLIC nlohmann_json::nlohmann_json )
 endif()
 

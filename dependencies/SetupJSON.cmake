@@ -13,7 +13,11 @@ option( GEOMODEL_USE_BUILTIN_JSON
 if( GEOMODEL_USE_BUILTIN_JSON )
 
    # Tell the user what's happening.
-   message( STATUS "'GEOMODEL_USE_BUILTIN_JSON' was set to 'true' ==> Building nlohmann_json as part of the project" )
+   if( COLOR_DEFS )
+     message( STATUS "${BoldMagenta}'GEOMODEL_USE_BUILTIN_JSON' was set to 'true' ==> Building nlohmann_json as part of the project${ColourReset}" )
+   else()
+     message( STATUS "'GEOMODEL_USE_BUILTIN_JSON' was set to 'true' ==> Building nlohmann_json as part of the project" )
+   endif()
 
    # The include directory and library that will be produced.
    set( nlohmann_json_INCLUDE_DIR
@@ -27,7 +31,7 @@ if( GEOMODEL_USE_BUILTIN_JSON )
 
    # Build/install nlohmann_json using ExternalProject_Add(...).
    include( ExternalProject )
-   ExternalProject_Add( JSON
+   ExternalProject_Add( JSONExt
       PREFIX ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/JSONBuild
       INSTALL_DIR ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/JSONInstall
       URL "https://cern.ch/lcgpackages/tarFiles/sources/json-3.6.1.tar.gz"
@@ -49,11 +53,12 @@ if( GEOMODEL_USE_BUILTIN_JSON )
       INTERFACE_INCLUDE_DIRECTORIES "${nlohmann_json_INCLUDE_DIR}" )
 
 else()
-
    # Just find an existing installation of nlohmann_json.
    find_package( nlohmann_json QUIET)
    if( NOT nlohmann_json_FOUND )
-     message(STATUS "WARNING! 'nlohmann_json' was not found by CMake!! However, if you installed this single-header library in a standard system include dir (e.g., '/usr/local/include'), I will be able to use it.")
+     message(STATUS "SetupJSON - WARNING! 'nlohmann_json' was not found by CMake!! However, if you installed this single-header library in a standard system include dir (e.g., '/usr/local/include'), I will be able to use it.")
+   else()
+     message(STATUS "SetupJSON - Found 'nlohmann_json' at: ${nlohmann_json_DIR}")
    endif()
 
 endif()

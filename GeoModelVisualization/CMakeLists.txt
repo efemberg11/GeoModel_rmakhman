@@ -12,13 +12,13 @@ set( OpenGL_GL_PREFERENCE GLVND )
 
 
 # Make the module directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
+# list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
 # External dependencies.
-find_package( nlohmann_json REQUIRED )
+# find_package( nlohmann_json REQUIRED )
 
 # Set sub-packages to build.
 add_subdirectory(VP1GeometryPlugin)

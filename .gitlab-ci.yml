@@ -79,7 +79,6 @@ variables:
 
 
 .geomodel-build-template: &geomodel-job
-  stage: step-A
   script:
     - echo "PWD; LS"
     - pwd; ls
@@ -143,10 +142,12 @@ mac-soqt:
 mac-geomodel-base:
   <<: *macos-job
   <<: *geomodel-job
+  stage: step-A
 
 mac-geomodel-visualization:
   <<: *macos-job
   <<: *geomodel-job
+  stage: step-C
   needs: ["mac-coin", "mac-soqt"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
@@ -167,6 +168,7 @@ ubuntu-soqt:
 ubuntu-geomodel-base:
   <<: *ubuntu-job
   <<: *geomodel-job
+  stage: step-A
 
 
 # NOTE
@@ -184,6 +186,7 @@ ubuntu-geomodeL-visualization:
   <<: *ubuntu-job
   <<: *geomodel-job
   needs: ["ubuntu-coin", "ubuntu-soqt"]
+  stage: step-C
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE

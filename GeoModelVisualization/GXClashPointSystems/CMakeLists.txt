@@ -66,11 +66,12 @@ endif()
 
 target_link_libraries (GXClashPointSystems PRIVATE SoQt::SoQt Coin::Coin  ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 
-
-# we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
-# this is not needed if the single-header library is installed in a regular
-# system include folder (e.g., '/usr/local/include')
-if( nlohmann_json_FOUND )
+# We link to `nlohmann_json` only  if we use a version of nlohmann_json
+# that provides a CMake config file (i.e., either built from source, or also
+# installed with Homebrew on macOS).
+# This is not needed if the single-header library is installed in a regular
+# system include folder (e.g., '/usr/local/include', '/usr/include', ...)
+if ( nlohmann_json_FOUND )
   target_link_libraries( GXClashPointSystems PUBLIC nlohmann_json::nlohmann_json )
 endif()
 

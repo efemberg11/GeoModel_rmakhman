@@ -59,7 +59,7 @@ else()
      message(STATUS "SetupJSON - WARNING! 'nlohmann_json' was not found by CMake!! However, if you installed this single-header library in a standard system include dir (e.g., '/usr/local/include'), I will be able to use it.")
    else()
      message(STATUS "SetupJSON - Found 'nlohmann_json' at: ${nlohmann_json_DIR}")
-     set( SetupJSON_nlohmann_json_FOUND TRUE CACHE BOOL "True if nlohmann_json has been found by the SetupJSON module" FORCE )
+     # set( SetupJSON_nlohmann_json_FOUND TRUE CACHE BOOL "True if nlohmann_json has been found by the SetupJSON module" FORCE )
    endif()
 
 endif()

@@ -62,10 +62,12 @@ include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 
 
-# we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
-# this is not needed if the single-header library is installed in a regular
-# system include folder (e.g., '/usr/local/include')
-if( nlohmann_json_FOUND )
+# We link to `nlohmann_json` only  if we use a version of nlohmann_json
+# that provides a CMake config file (i.e., either built from source, or also
+# installed with Homebrew on macOS).
+# This is not needed if the single-header library is installed in a regular
+# system include folder (e.g., '/usr/local/include', '/usr/include', ...)
+if ( nlohmann_json_FOUND )
   target_link_libraries( GXGeometrySystems nlohmann_json::nlohmann_json )
 endif()
 
@@ -79,8 +81,8 @@ endif()
 
 # Set a variable storing the CMake install prefix.
 # -- It is passed to the C++ preprocessor to load, from the C++ code,
-# -- the JSON files storing the default materials and volume attributes
-# -- for Coin3D.
+#    the JSON files storing the default materials and volume attributes
+#    for Coin3D.
 add_definitions ( -DGEOMODEL_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX})
 
 

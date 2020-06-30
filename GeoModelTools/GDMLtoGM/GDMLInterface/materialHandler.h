@@ -5,6 +5,7 @@
 #include "GDMLInterface/GDMLHandler.h"
 #include "GDMLInterface/GDMLController.h"
 #include "GDMLInterface/fraction.h"
+#include "GDMLInterface/densityHandler.h"
 
 #include "GeoModelKernel/GeoMaterial.h"
 
@@ -25,16 +26,20 @@ public:
 		for (child=XercesParser::GetCurrentElement()->getFirstChild();child!=0;child=child->getNextSibling())
 		{
 			if (child->getNodeType()==xercesc::DOMNode::ELEMENT_NODE) {
+				XercesParser::elementLoop(child);
 				XMLHandler *h=theController->XMLStore()->GetHandler(child);
 				std::string nH=h->GetName();
 				//std::cout<<" handler name "<<nH<<std::endl;
 				if (nH=="fraction") {
 					fractionHandler* fH=dynamic_cast<fractionHandler*>(h);
 					if (!fH) std::cout<<" something is wrong! can not retrieve fractionHandler!!!"<<std::endl;
-					XercesParser::elementLoop(child);
 					addFraction(fH->getFraction());
 				}
-				// else if (nH=="D") {std::cout<<" handling for density"<<std::endl;XercesParser::elementLoop(child);}
+				else if (nH=="D") {
+					densityHandler* dH=dynamic_cast<densityHandler*>(h);
+					if (!dH) std::cout<<" something is wrong! can not retrieve densityHandler!!!"<<std::endl;
+					density=dH->getDensity();
+				}
 			}
 		}
 	}

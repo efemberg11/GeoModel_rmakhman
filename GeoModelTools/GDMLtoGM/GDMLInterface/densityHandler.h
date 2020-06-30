@@ -18,15 +18,9 @@ public:
 		unit=getAttributeAsDouble("unit");
 		value=getAttributeAsDouble("value");
 		density=unit*value;
+		// std::cout<<" this is densityHandler: density= "<<density<<std::endl;
 	}
-	void postLoopHandling()
-	{
-		XMLHandler* h=theController->XMLStore()->GetHandler(s_currentElement->getParentNode());
-		// if (h) std::cout<<h->GetName();
-		materialHandler* theParentHandler=dynamic_cast<materialHandler*> (h);
-		if (theParentHandler) theParentHandler->setDensity(density);
-		else std::cout<<" densityHandler: Help!!!! wrong type of Handler!!!!"<<std::endl;
-	}
+	double getDensity() {return density;}
 private:
 	double unit;
 	double value;

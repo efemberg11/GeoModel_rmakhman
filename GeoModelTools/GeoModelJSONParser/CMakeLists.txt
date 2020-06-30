@@ -1,11 +1,5 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
-# Make the top 'dependencies' directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/dependencies )
-# This has been included already at the root level,
-# but apparently it needs to be included here again,
-# otherwise the nlohmann_json CMake config file is not found properly
-include(SetupJSON)
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -28,7 +22,15 @@ endif()
 # installed with Homebrew on macOS).
 # This is not needed if the single-header library is installed in a regular
 # system include folder (e.g., '/usr/local/include', '/usr/include', ...)
-if ( nlohmann_json_FOUND )
+# Also, note that nlohmann_json has been found (or not) at the root level already,
+# but apparently it needs to be "found" here again,
+# otherwise the nlohmann_json CMake config file is not found properly.
+# Thus, in case SetupJSON.cmake finds it at root level, the variable
+# SetupJSON_nlohmann_json_FOUND is set to true, and here we "find" nlohmann_json
+# again. (TODO: to be investigated if we can simplify all that: ideally,
+# finding it at root level inside SetupJSON.cmake should be enough.)
+if ( nlohmann_json_FOUND OR SetupJSON_nlohmann_json_FOUND )
+  find_package(nlohmann_json QUIET)
   target_link_libraries( GeoModelJSONParser PUBLIC nlohmann_json::nlohmann_json )
 endif()
 

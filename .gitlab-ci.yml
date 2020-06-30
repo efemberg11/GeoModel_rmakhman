@@ -166,7 +166,7 @@ ubuntu-soqt:
 
 ubuntu-geomodel-base:
   <<: *ubuntu-job
-  <<: **geomodel-job
+  <<: *geomodel-job
 
 # ubuntu-geomodeL-visualization:
 #   <<: *ubuntu-job

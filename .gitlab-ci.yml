@@ -86,7 +86,7 @@ variables:
     - mkdir build
     - cd build
     - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} ..
-    - cmake --build . #-- -j
+    - cmake --build . -- -j2 # using too many threads will cause weird compilation errors on the Ubuntu docker images...
     - cmake --build . -- install
   artifacts:
     paths:

@@ -7,7 +7,7 @@ project( "GeoModel" VERSION 1.0.0 LANGUAGES CXX )
 
 
 # === Project wide setup ===
-# Make the module directory visible to CMake.
+# Make the 'cmake' module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 # Define color codes for CMake messages
 include( cmake_colors_defs )
@@ -21,7 +21,9 @@ include( BuildType )
 include( PrintBuildInfo )
 
 # === Externally provided content ===
-add_subdirectory(dependencies)
+# Make the 'dependencies' module directory visible to CMake.
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/dependencies )
+include(Dependencies)
 
 # === Main targets built by this project ===
 

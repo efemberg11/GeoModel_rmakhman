@@ -146,7 +146,7 @@ mac-geomodel-base:
 
 mac-geomodel-visualization:
   <<: *macos-job
-  <<: *geomodel-visualization-job
+  <<: *geomodel-job
   needs: ["mac-coin", "mac-soqt"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
@@ -168,10 +168,6 @@ ubuntu-geomodel-base:
   <<: *ubuntu-job
   <<: *geomodel-job
 
-# ubuntu-geomodeL-visualization:
-#   <<: *ubuntu-job
-#   <<: *geomodel-job
-#   needs: ["ubuntu-geomodelcore"]
 
 # NOTE
 # The Ubuntu package 'nlohmann-json-dev' is version 2.x, too old for us.

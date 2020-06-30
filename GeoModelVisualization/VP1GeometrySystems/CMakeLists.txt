@@ -62,10 +62,20 @@ include_directories(${SoQt_INCLUDE_DIRS} )
 include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 
 
-# we link to nlohmann_json only  if we use a version of nlohmann_json installed through CMake;
-# this is not needed if the single-header library is installed in a regular
-# system include folder (e.g., '/usr/local/include')
-if( nlohmann_json_FOUND )
+# We link to `nlohmann_json` only  if we use a version of nlohmann_json
+# that provides a CMake config file (i.e., either built from source, or also
+# installed with Homebrew on macOS).
+# This is not needed if the single-header library is installed in a regular
+# system include folder (e.g., '/usr/local/include', '/usr/include', ...)
+# Also, note that nlohmann_json has been found (or not) at the root level already,
+# but apparently it needs to be "found" here again,
+# otherwise the nlohmann_json CMake config file is not found properly.
+# Thus, in case SetupJSON.cmake finds it at root level, the variable
+# SetupJSON_nlohmann_json_FOUND is set to true, and here we "find" nlohmann_json
+# again. (TODO: to be investigated if we can simplify all that: ideally,
+# finding it at root level inside SetupJSON.cmake should be enough.)
+if ( nlohmann_json_FOUND OR SetupJSON_nlohmann_json_FOUND )
+  find_package(nlohmann_json QUIET)
   target_link_libraries( GXGeometrySystems nlohmann_json::nlohmann_json )
 endif()
 

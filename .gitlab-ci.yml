@@ -86,7 +86,7 @@ variables:
     - mkdir build
     - cd build
     - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} ..
-    - cmake --build . -- -j
+    - cmake --build . #-- -j
     - cmake --build . -- install
   artifacts:
     paths:

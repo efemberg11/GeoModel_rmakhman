@@ -91,6 +91,9 @@ include( GeoModelCorePackaging )
 # We want to build the documentation only if we run "make doc"
 
 # first we can indicate the documentation build as an option and set it to ON by default
+# TODO: this option is not used at the moment; the doc target is called through 'make doc';
+#       do we want to build the doxygen as 'cmake -DBUILD_DOC ..' ?
+#       If not, probably we can remove this option...
 option(BUILD_DOC "Build documentation" ON)
 
 # check if Doxygen is installed
@@ -106,7 +109,7 @@ if (DOXYGEN_FOUND)
   # note:
   # - `make doc` builds the Doxygen docs on request
   # - `make all` allows to build the docs together with the application
-  add_custom_target( doc
+  add_custom_target( doxy
       COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Generating API documentation with Doxygen"

@@ -84,13 +84,13 @@ variables:
   script:
     - echo "PWD; LS"
     - pwd; ls
+    - ls ../
+    - ls ../../
     - cmake --version
     - mkdir build
     - cd build
     - echo "CMAKE_ARGS - ${CMAKE_ARGS}"
     - echo "CMAKE_EXTRA_FLAGS - ${CMAKE_EXTRA_FLAGS}"
-    - ls ../dependencies-install
-    - ls ../../dependencies-install
     - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} ..
     - cmake --build . -- -j2 # using too many threads will cause weird compilation errors on the Ubuntu docker images...
     - cmake --build . -- install

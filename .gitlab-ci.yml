@@ -75,6 +75,9 @@ variables:
     - cmake ${CMAKE_ARGS} ../soqt
     - make -j2
     - make install
+    - pwd; ls # CI debug only
+    - ls ../ # CI debug only
+    - ls ../../ # CI debug only
   artifacts:
     paths:
       - dependencies-install/
@@ -82,11 +85,11 @@ variables:
 
 .geomodel-build-template: &geomodel-job
   script:
-    - echo "PWD; LS"
-    - pwd; ls
-    - ls ../
-    - ls ../../
-    - cmake --version
+    - echo "PWD; LS" # CI debug only
+    - pwd; ls # CI debug only
+    - ls ../ # CI debug only
+    - ls ../../ # CI debug only
+    - cmake --version # CI debug only
     - mkdir build
     - cd build
     - echo "CMAKE_ARGS - ${CMAKE_ARGS}"
@@ -94,6 +97,10 @@ variables:
     - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} ..
     - cmake --build . -- -j2 # using too many threads will cause weird compilation errors on the Ubuntu docker images...
     - cmake --build . -- install
+    - pwd; ls # CI debug only
+    - ls ../ # CI debug only
+    - ls ../../ # CI debug only
+
   artifacts:
     paths:
       - install

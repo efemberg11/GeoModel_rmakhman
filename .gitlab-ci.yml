@@ -70,6 +70,8 @@ variables:
     - hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
     - mkdir build_soqt
     - cd build_soqt
+    - echo "CMAKE_ARGS - ${CMAKE_ARGS}"
+    - echo "CMAKE_EXTRA_FLAGS - ${CMAKE_EXTRA_FLAGS}"
     - cmake ${CMAKE_ARGS} ../soqt
     - make -j2
     - make install
@@ -94,40 +96,7 @@ variables:
     paths:
       - install
 
-# .geomodel-base-build-template: &geomodel-visualization-job
-#   stage: step-C
-#   script:
-#     - echo "PWD; LS"
-#     - pwd; ls
-#     - cmake --version
-#     - mkdir build
-#     - cd build
-#     - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} ..
-#     - cmake --build . -- -j
-#     - cmake --build . -- install
-#   artifacts:
-#     paths:
-#       - install
 
-# .geomodelvisualization-build-template-mac: &geomodelvisualization-job-mac
-#   stage: build
-#   script:
-#     - echo "PWD; LS"
-#     - pwd; ls
-#     - cmake --version
-#     - mkdir build
-#     # - pwd; ls # for debug
-#     # - ls dependencies-install/ # for debug
-#     # - ls ../../; # for debug
-#     # - ls ../../../; # for debug
-#     # - ls ../../../../ # for debug
-#     - cd build
-#     - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ../
-#     - cmake --build . -- -j
-#     - cmake --build . -- install
-#   artifacts:
-#     paths:
-#       - install
 
 # ACTUAL JOBS
 
@@ -167,7 +136,7 @@ ubuntu-soqt:
   <<: *soqt-job
   needs: ["ubuntu-coin"]
 
-ubuntu-geomodel-base:
+ubuntu-geomodel-base-builtinNlohmannXercesC:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
@@ -176,18 +145,7 @@ ubuntu-geomodel-base:
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-# NOTE
-# The Ubuntu package 'nlohmann-json-dev' is version 2.x, too old for us.
-# Thus, we now build nlohmann_json as part of the build,
-# by using the 'standalone' job only
-# ubuntu-gmex:
-#   <<: *ubuntu-job
-#   <<: *geomodelvisualization-job
-#   needs: ["ubuntu-coin", "ubuntu-soqt", "ubuntu-geomodelcore", "ubuntu-geomodelio"]
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-
-ubuntu-geomodeL-visualization:
+ubuntu-geomodeL-visualization-builtinNlohmannXercesC:
   <<: *ubuntu-job
   <<: *geomodel-job
   needs: ["ubuntu-coin", "ubuntu-soqt"]

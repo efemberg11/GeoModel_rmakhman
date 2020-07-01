@@ -237,6 +237,10 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 #include "GDMLInterface/subtractionHandler.h"
 #include "GDMLInterface/intersectionHandler.h"
 #include "GDMLInterface/booleanHandler.h"
+#include "GDMLInterface/trapHandler.h"
+#include "GDMLInterface/tessellatedHandler.h"
+#include "GDMLInterface/triangularHandler.h"
+#include "GDMLInterface/quadrangularHandler.h"
 
 void GDMLController::registerHandlers()
 {
@@ -284,4 +288,8 @@ void GDMLController::registerHandlers()
 	new unionHandler("union",this);
 	new subtractionHandler("subtraction",this);
 	new intersectionHandler("intersection",this);
+	new trapHandler("trap",this);
+	new tessellatedHandler("tessellated",this);
+	new triangularHandler("triangular",this);
+	new quadrangularHandler("quadrangular",this);
 }

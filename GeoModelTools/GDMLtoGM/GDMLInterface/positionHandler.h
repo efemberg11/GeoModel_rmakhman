@@ -24,7 +24,6 @@ public:
 			p.z=unit*getAttributeAsDouble("z");
 			
 			p.v3d=GeoTrf::Vector3D(p.x,p.y,p.z);
-			//  p.v3d=GeoTrf::Translation3D(v3d);
 		
 			theController->savePosition(p.name,p);
 		}

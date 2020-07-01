@@ -47,7 +47,7 @@ void volumeHandler::ElementHandle()
 			else std::cout<<" handler not defined "<<nH<<std::endl;
 		}
 	}
-	//std::cout << "Creating logical volume "<<name<< 
+	std::cout << "Creating logical volume "<<name<<" shape "<<shape<<" mat "<<material<<std::endl;
 	GeoLogVol* tempLV=new GeoLogVol(name,shape,material);
 	GeoPhysVol* tempPV=new GeoPhysVol(tempLV);
 	theVolume=std::make_pair(tempLV,tempPV);

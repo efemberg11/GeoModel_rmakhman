@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2002-2018 CERN for the benefit of the ATLAS collaboration
 */
-
+#include <fileSystem>
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 
@@ -53,13 +53,24 @@ GDMLtoGM::~GDMLtoGM()
 //## Other Operations (implementation)
 void GDMLtoGM::create(GeoPhysVol *world, GeoVStore*)
 {
-
-  	std::cout<< "creating a GDMLController and the XercesParser"<<std::endl;
-    GDMLController controller("GDMLController");
-	  XercesParser xercesParser;
-  	xercesParser.ParseFileAndNavigate("gdmlfile.xml");
+	char* fPath=getenv("GDML_FILE_NAME");
+	std::string fileName;
+	if (fPath!=NULL) fileName=std::string(fPath);
+	else fileName="gdmlfile.xml";
+	bool exists=std::filesystem::exists(fileName);
+	if (!exists) {
+		std::cout <<"GDMLtoGeo: input file "<<fileName<<" does not exist. quitting and returning nicely! "<<std::endl;
+		return;
+	}
+	
+  	std::cout<< "GDMLtoGeo: GDML to GeoModel Interface. Parsing gdml file "<<fileName<<" and setting world volume"<<std::endl;
+	GDMLController controller("GDMLController");
+	XercesParser xercesParser;
+  	xercesParser.ParseFileAndNavigate(fileName);
 	GeoPhysVol* w=controller.getWorld();
-	GeoNameTag* gdmlTag=new GeoNameTag("GDML setup");
+	const std::string nameTag=stripPointer(w->getLogVol()->getName());
+	std::cout<< "GDMLtoGeo: setting top volume name to: "<<nameTag<<std::endl;
+	GeoNameTag* gdmlTag=new GeoNameTag(nameTag);
 	world->add(gdmlTag);
 	world->add(w);
 }

@@ -41,7 +41,7 @@ variables:
 .coin-build-template: &coin-job
   stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_DEPS_ARGS}
+    CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
   script:
     - pwd; ls
     - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
@@ -59,7 +59,7 @@ variables:
 .soqt-build-template: &soqt-job
   stage: step-B
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_DEPS_ARGS}
+    CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
   script:
     - pwd; ls
     # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip

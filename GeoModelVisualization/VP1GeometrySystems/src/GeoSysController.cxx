@@ -228,7 +228,7 @@ QCheckBox * GeoSysController::subSystemCheckBox(VP1GeoFlags::SubSystemFlag f) co
 {
   std::map<VP1GeoFlags::SubSystemFlag,QCheckBox*>::const_iterator it = m_d->subSysCheckBoxMap.find(f);
   if (it==m_d->subSysCheckBoxMap.end()) {
-    std::cout << "Adding " << f << std::endl;
+    //std::cout << "Adding " << f << std::endl;
     QCheckBox *checkBox=new QCheckBox(m_d->ui.groupBox_Subsystems);
     checkBox->setText(f.c_str());
     checkBox->setEnabled(false);

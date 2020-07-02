@@ -19,13 +19,16 @@ void tessellatedHandler::ElementHandle()
 
 void tessellatedHandler::addFacet(GeoFacet* f)
 {
+	static int nEntry=0;
+	//std::cout<<" adding facet "<<nEntry<<std::endl;
 	facets.push_back(f);
+	nEntry++;
 }
 
 void tessellatedHandler::postLoopHandling() 
 {
   GeoTessellatedSolid* tessellated=new GeoTessellatedSolid();
-  std::cout<<" tessellated solid "<<name<<" nr. of facets: "<<facets.size()<<std::endl;
+  //std::cout<<" tessellated solid "<<name<<" nr. of facets: "<<facets.size()<<std::endl;
   for (auto facet: facets)
   	tessellated->addFacet(facet);
   theController->saveSolid(name,tessellated);

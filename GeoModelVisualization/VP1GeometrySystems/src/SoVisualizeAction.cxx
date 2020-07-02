@@ -198,11 +198,11 @@ void SoVisualizeAction::handleSimplePolygonBrep(const GeoSimplePolygonBrep *brep
 
 void SoVisualizeAction::handleTessellatedSolid (const GeoTessellatedSolid* geoTessellated)
 {
-  std::cout << "SoVisualizeAction::handleTessellatedSolid" << std::endl;
+  //std::cout << "SoVisualizeAction::handleTessellatedSolid" << std::endl;
 
   SoTessellated * soTessellated = new SoTessellated;
 
-  std::cout << "\tn. facets: " << geoTessellated->getNumberOfFacets() << std::endl;
+  //std::cout << "\tn. facets: " << geoTessellated->getNumberOfFacets() << std::endl;
   for(size_t i=0; i<geoTessellated->getNumberOfFacets();++i) {
     GeoFacet* facet = geoTessellated->getFacet(i);
     if(facet->getNumberOfVertices()==3) {

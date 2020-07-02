@@ -67,9 +67,10 @@ void GDMLtoGM::create(GeoPhysVol *world, GeoVStore*)
 	GDMLController controller("GDMLController");
 	XercesParser xercesParser;
   	xercesParser.ParseFileAndNavigate(fileName);
+	//std::cout << "done parsing "<<std::endl;
 	GeoPhysVol* w=controller.getWorld();
 	const std::string nameTag=stripPointer(w->getLogVol()->getName());
-	std::cout<< "GDMLtoGeo: setting top volume name to: "<<nameTag<<std::endl;
+	//std::cout<< "GDMLtoGeo: setting top volume name to: "<<nameTag<<std::endl;
 	GeoNameTag* gdmlTag=new GeoNameTag(nameTag);
 	world->add(gdmlTag);
 	world->add(w);

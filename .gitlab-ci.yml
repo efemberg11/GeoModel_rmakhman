@@ -87,6 +87,29 @@ variables:
   script:
     - echo "PWD; LS" # CI debug only
     - pwd; ls # CI debug only
+    - ls ../ # CI debug only
+    - ls ../../ # CI debug only
+    - cmake --version # CI debug only
+    - mkdir build
+    - cd build
+    - echo "CMAKE_ARGS - ${CMAKE_ARGS}"
+    - echo "CMAKE_EXTRA_FLAGS - ${CMAKE_EXTRA_FLAGS}"
+    - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} ..
+    # - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=../dependencies-install -DGEOMODEL_BUILD_VISUALIZATION=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE ..
+    - cmake --build . -- -j2 # using too many threads will cause weird compilation errors on the Ubuntu docker images...
+    - cmake --build . -- install
+    - pwd; ls # CI debug only
+    - ls ../ # CI debug only
+    - ls ../../ # CI debug only
+  artifacts:
+    paths:
+      - install
+
+# temp template
+.geomodel-build-template-viz: &geomodel-viz-job
+  script:
+    - echo "PWD; LS" # CI debug only
+    - pwd; ls # CI debug only
     - ls dependencies-install
     - ls ../ # CI debug only
     - ls ../../ # CI debug only
@@ -102,7 +125,6 @@ variables:
     - pwd; ls # CI debug only
     - ls ../ # CI debug only
     - ls ../../ # CI debug only
-
   artifacts:
     paths:
       - install
@@ -158,7 +180,7 @@ ubuntu-geomodel-base-builtinNlohmannXercesC:
 
 ubuntu-geomodeL-visualization-builtinNlohmannXercesC:
   <<: *ubuntu-job
-  <<: *geomodel-job
+  <<: *geomodel-viz-job
   needs: ["ubuntu-coin", "ubuntu-soqt"]
   stage: step-C
   variables:

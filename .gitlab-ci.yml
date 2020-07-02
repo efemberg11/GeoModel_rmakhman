@@ -6,8 +6,10 @@ stages:
 
 # List global variables
 variables:
-  CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install
-  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install
+  # CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install
+  CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  # CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   GIT_SUBMODULE_STRATEGY: recursive
 
 
@@ -54,7 +56,7 @@ variables:
     - make install
   artifacts:
     paths:
-      - dependencies-install/
+      - install
 
 .soqt-build-template: &soqt-job
   stage: step-B
@@ -80,7 +82,7 @@ variables:
     - ls ../../ # CI debug only
   artifacts:
     paths:
-      - dependencies-install/
+      - install
 
 
 .geomodel-build-template: &geomodel-job
@@ -185,5 +187,5 @@ ubuntu-geomodeL-visualization-builtinNlohmannXercesC:
   needs: ["ubuntu-coin", "ubuntu-soqt"]
   stage: step-C
   variables:
-    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=../dependencies-install/lib/cmake/
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE

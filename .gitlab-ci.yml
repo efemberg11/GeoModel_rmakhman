@@ -87,6 +87,7 @@ variables:
   script:
     - echo "PWD; LS" # CI debug only
     - pwd; ls # CI debug only
+    - ls dependencies-install
     - ls ../ # CI debug only
     - ls ../../ # CI debug only
     - cmake --version # CI debug only

@@ -206,11 +206,11 @@ void SoVisualizeAction::handleTessellatedSolid (const GeoTessellatedSolid* geoTe
   for(size_t i=0; i<geoTessellated->getNumberOfFacets();++i) {
     GeoFacet* facet = geoTessellated->getFacet(i);
     if(facet->getNumberOfVertices()==3) {
-    	std::cout << "\tfacet " << i << " is a TRI - vertexType: " << facet->getVertexType()
-    			<< " - " << facet->getVertex(0).x() << "," << facet->getVertex(0).y() << "," << facet->getVertex(0).z()
-    			<< " - " << facet->getVertex(1).x() << "," << facet->getVertex(1).y() << "," << facet->getVertex(1).z()
-    			<< " - " << facet->getVertex(2).x() << "," << facet->getVertex(2).y() << "," << facet->getVertex(2).z()
-				<< std::endl;
+    	//std::cout << "\tfacet " << i << " is a TRI - vertexType: " << facet->getVertexType()
+    	//		<< " - " << facet->getVertex(0).x() << "," << facet->getVertex(0).y() << "," << facet->getVertex(0).z()
+    	//		<< " - " << facet->getVertex(1).x() << "," << facet->getVertex(1).y() << "," << facet->getVertex(1).z()
+    	//		<< " - " << facet->getVertex(2).x() << "," << facet->getVertex(2).y() << "," << facet->getVertex(2).z()
+	//			<< std::endl;
       if(facet->getVertexType()==GeoFacet::ABSOLUTE) {
 	soTessellated->addTriangularFacet(facet->getVertex(0).x(),facet->getVertex(0).y(),facet->getVertex(0).z(),
 					  facet->getVertex(1).x(),facet->getVertex(1).y(),facet->getVertex(1).z(),
@@ -226,12 +226,12 @@ void SoVisualizeAction::handleTessellatedSolid (const GeoTessellatedSolid* geoTe
     }
     } // end of "TRI"
     else {
-    	std::cout << "\tfacet " << i << " is a QUAD - vertexType: " << facet->getVertexType()
-    			<< " - " << facet->getVertex(0).x() << "," << facet->getVertex(0).y() << "," << facet->getVertex(0).z()
-    			<< " - " << facet->getVertex(1).x() << "," << facet->getVertex(1).y() << "," << facet->getVertex(1).z()
-    			<< " - " << facet->getVertex(2).x() << "," << facet->getVertex(2).y() << "," << facet->getVertex(2).z()
-    			<< " - " << facet->getVertex(3).x() << "," << facet->getVertex(3).y() << "," << facet->getVertex(3).z()
-				<< std::endl;
+    	//std::cout << "\tfacet " << i << " is a QUAD - vertexType: " << facet->getVertexType()
+    	//		<< " - " << facet->getVertex(0).x() << "," << facet->getVertex(0).y() << "," << facet->getVertex(0).z()
+    	//		<< " - " << facet->getVertex(1).x() << "," << facet->getVertex(1).y() << "," << facet->getVertex(1).z()
+    	//		<< " - " << facet->getVertex(2).x() << "," << facet->getVertex(2).y() << "," << facet->getVertex(2).z()
+    	//		<< " - " << facet->getVertex(3).x() << "," << facet->getVertex(3).y() << "," << facet->getVertex(3).z()
+	//			<< std::endl;
       if(facet->getVertexType()==GeoFacet::ABSOLUTE) {
 	soTessellated->addQuadrangularFacet(facet->getVertex(0).x(),facet->getVertex(0).y(),facet->getVertex(0).z(),
 					    facet->getVertex(1).x(),facet->getVertex(1).y(),facet->getVertex(1).z(),

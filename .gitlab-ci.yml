@@ -185,5 +185,5 @@ ubuntu-geomodeL-visualization-builtinNlohmannXercesC:
   needs: ["ubuntu-coin", "ubuntu-soqt"]
   stage: step-C
   variables:
-    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=../dependencies-install
+    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=../dependencies-install/lib/cmake/
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE

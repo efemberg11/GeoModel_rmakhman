@@ -165,34 +165,38 @@ ubuntu-geomodel-visualization-builtinNlohmannXercesC:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubuntu-geomodel-examples:
+ubuntu-geomodel-examples-builtinNlohmannXercesC:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
+    CMAKE_EXTRA_FLAGS:  -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubuntu-geomodel-examples-gmg4:
+ubuntu-geomodel-examples-gmg4-builtinNlohmannXercesC:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubuntu-geomodel-gmg4:
+ubuntu-geomodel-gmg4-builtinNlohmannXercesC:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubuntu-geomodel-fullsimlight:
+ubuntu-geomodel-fullsimlight-builtinNlohmannXercesC:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE

@@ -145,7 +145,7 @@ ubu-coin:
 ubu-soqt:
   <<: *ubuntu-job
   <<: *soqt-job
-  needs: ["ubuntu-coin"]
+  needs: ["ubu-coin"]
 
 ubu-gm-base-builtin:
   <<: *ubuntu-job
@@ -159,7 +159,7 @@ ubu-gm-base-builtin:
 ubu-gm-visualization-builtin:
   <<: *ubuntu-job
   <<: *geomodel-job
-  needs: ["ubuntu-coin", "ubuntu-soqt"]
+  needs: ["ubu-coin", "ubu-soqt"]
   stage: step-C
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}

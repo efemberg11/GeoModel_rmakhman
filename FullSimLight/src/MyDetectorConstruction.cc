@@ -286,7 +286,11 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
             G4VSolid* motherSolid = motherLog->GetSolid();
             std::cout<<"**** GMClash cannot generate a point on the surface of the volume!" <<std::endl;
             iterateFromWorld(fWorld->GetLogicalVolume(), volume, solidCenter);
-            G4ThreeVector globalPoint = localToGlobal (solidCenter, true);
+            
+            // Convert from local to global coordinate system.
+            // NB: we put the flag to false cause we are not in the mother volume
+            // coordinate system, so we don't need to skip the first iteration
+            G4ThreeVector globalPoint = localToGlobal (solidCenter, false);
             std::cout<<"**** Center of the solid in Global Coordinates: " <<globalPoint<<" \n"<<std::endl;
             fTree.clear();
             

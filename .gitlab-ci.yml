@@ -109,9 +109,9 @@ variables:
 
 
 
-# ACTUAL JOBS
+# ACTUAL BUILD JOBS
 
-### MACOS PATH
+### MACOS BUILD JOBS
 mac-coin:
   <<: *macos-job
   <<: *coin-job
@@ -137,17 +137,17 @@ mac-geomodel-visualization:
 
 
 
-### UBUNTU PATH
-ubuntu-coin:
+### UBUNTU BUILD JOBS
+ubu-coin:
   <<: *ubuntu-job
   <<: *coin-job
 
-ubuntu-soqt:
+ubu-soqt:
   <<: *ubuntu-job
   <<: *soqt-job
   needs: ["ubuntu-coin"]
 
-ubuntu-geomodel-base-builtinNlohmannXercesC:
+ubu-gm-base-builtin:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
@@ -156,7 +156,7 @@ ubuntu-geomodel-base-builtinNlohmannXercesC:
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-ubuntu-geomodel-visualization-builtinNlohmannXercesC:
+ubu-gm-visualization-builtin:
   <<: *ubuntu-job
   <<: *geomodel-job
   needs: ["ubuntu-coin", "ubuntu-soqt"]
@@ -165,7 +165,7 @@ ubuntu-geomodel-visualization-builtinNlohmannXercesC:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubuntu-geomodel-examples-builtinNlohmannXercesC:
+ubu-gm-examples-builtin:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
@@ -174,7 +174,7 @@ ubuntu-geomodel-examples-builtinNlohmannXercesC:
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
     CMAKE_EXTRA_FLAGS:  -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubuntu-geomodel-examples-gmg4-builtinNlohmannXercesC:
+ubu-gm-examples-gmg4-builtin:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
@@ -183,7 +183,7 @@ ubuntu-geomodel-examples-gmg4-builtinNlohmannXercesC:
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubuntu-geomodel-gmg4-builtinNlohmannXercesC:
+ubu-gm-gmg4-builtin:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
@@ -192,7 +192,7 @@ ubuntu-geomodel-gmg4-builtinNlohmannXercesC:
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubuntu-geomodel-fullsimlight-builtinNlohmannXercesC:
+ubu-gm-fullsimlight-builtin:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A

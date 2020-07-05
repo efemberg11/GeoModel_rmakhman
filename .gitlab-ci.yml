@@ -38,12 +38,12 @@ variables:
     - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
 
 
-.ubuntu-template-job-registry: &ubuntu-job-registry
-  image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:1.1
-  tags:
-    - docker
-  before_script:
-    - apt-get update -qq && apt-get install -y -qq libeigen3-dev libsqlite3-dev
+# .ubuntu-template-job-registry: &ubuntu-job-registry
+#   image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:1.1
+#   tags:
+#     - docker
+#   before_script:
+#     - apt-get update -qq && apt-get install -y -qq libeigen3-dev libsqlite3-dev
 
 
 # TEMPLATES FOR BUILDING PACKAGES
@@ -91,6 +91,46 @@ variables:
   artifacts:
     paths:
       - install
+      
+      
+.xercesc-build-template-job: &xercesc-job
+  stage: step-A
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
+    - tar -xf xerces-c-3.2.2.tar.gz
+    - mkdir xerces-c-build
+    - cd xerces-c-build
+    - cmake ${CMAKE_ARGS} ../xerces-c-3.2.2
+    - make -j4
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+.geant4-build-template-job: &geant4-job
+  stage: step-B
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/geant4/geant4.git
+    - cd geant4
+    - git checkout tags/v10.6.0
+    - cd ../
+    - mkdir Geant4-build
+    - cd Geant4-build
+    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install/xerces-c/ ../geant4 -DGEANT4_USE_SYSTEM_EXPAT=OFF
+    - make -j4
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
 
 
 .geomodel-build-template: &geomodel-job
@@ -183,10 +223,22 @@ ubu-gm-examples-builtin:
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
     CMAKE_EXTRA_FLAGS:  -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
+
+ubu-XercesC:
+  <<: *ubuntu-job
+  <<: *xercesc-job
+
+ubu-geant4:
+  <<: *ubuntu-job
+  <<: *geant4-job
+  needs: ["ubu-XercesC"]
+
+
 ubu-gm-examples-gmg4-builtin:
   <<: *ubuntu-job-registry
   <<: *geomodel-job
-  stage: step-A
+  stage: step-C
+  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
@@ -195,7 +247,8 @@ ubu-gm-examples-gmg4-builtin:
 ubu-gm-gmg4-builtin:
   <<: *ubuntu-job-registry
   <<: *geomodel-job
-  stage: step-A
+  stage: step-C
+  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
@@ -204,7 +257,8 @@ ubu-gm-gmg4-builtin:
 ubu-gm-fullsimlight-builtin:
   <<: *ubuntu-job-registry
   <<: *geomodel-job
-  stage: step-A
+  stage: step-C
+  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE

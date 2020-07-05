@@ -235,7 +235,7 @@ ubu-geant4:
 
 
 ubu-gm-examples-gmg4-builtin:
-  <<: *ubuntu-job-registry
+  <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
   needs: ["ubu-geant4"]
@@ -245,7 +245,7 @@ ubu-gm-examples-gmg4-builtin:
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 ubu-gm-gmg4-builtin:
-  <<: *ubuntu-job-registry
+  <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
   needs: ["ubu-geant4"]
@@ -255,7 +255,7 @@ ubu-gm-gmg4-builtin:
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 ubu-gm-fullsimlight-builtin:
-  <<: *ubuntu-job-registry
+  <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
   needs: ["ubu-geant4"]

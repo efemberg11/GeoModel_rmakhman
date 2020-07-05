@@ -23,7 +23,7 @@ int GeoInpRecord::getInt(const std::string& field) const
   auto recIt = checkField(field,GEOINP_INT);
   return std::get<int>(recIt->second);
 }
-/*
+
 long GeoInpRecord::getLong(const std::string& field) const
 {
   auto recIt = checkField(field,GEOINP_LONG);
@@ -35,7 +35,7 @@ float GeoInpRecord::getFloat(const std::string& field) const
   auto recIt = checkField(field,GEOINP_FLOAT);
   return std::get<float>(recIt->second);
 }
-*/
+
 double GeoInpRecord::getDouble(const std::string& field) const
 {
   auto recIt = checkField(field,GEOINP_DOUBLE);
@@ -67,12 +67,12 @@ void GeoInpRecord::dump() const
     case GEOINP_INT:
       std::cout << "INT " << std::get<int>(element.second) << "], ";
       break;
-/*    case GEOINP_LONG:
+    case GEOINP_LONG:
       std::cout << "LONG " << std::get<long>(element.second) << "], ";
       break;
     case GEOINP_FLOAT:
       std::cout << "FLOAT " << std::get<float>(element.second) << "], ";
-      break; */
+      break; 
     case GEOINP_DOUBLE:
       std::cout << "DOUBLE " << std::get<double>(element.second) << "], ";
       break;

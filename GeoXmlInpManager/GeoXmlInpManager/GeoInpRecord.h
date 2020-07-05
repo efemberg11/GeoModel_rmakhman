@@ -13,15 +13,15 @@
 enum GeoInpType
 {
  GEOINP_INT
-// , GEOINP_LONG
-// , GEOINP_FLOAT
+ , GEOINP_LONG
+ , GEOINP_FLOAT
  , GEOINP_DOUBLE
  , GEOINP_STRING
 };
 
 typedef std::variant<int
-//		     , long
-//		     , float
+		     , long
+		     , float
 		     , double
 		     , std::string> GeoInp;
 
@@ -37,8 +37,8 @@ public:
   bool isFieldNull(const std::string& field) const;
   
   int         getInt    (const std::string& field) const;
-//  long        getLong   (const std::string& field) const;
-//  float       getFloat  (const std::string& field) const;
+  long        getLong   (const std::string& field) const;
+  float       getFloat  (const std::string& field) const;
   double      getDouble (const std::string& field) const;
   std::string getString (const std::string& field) const;
 

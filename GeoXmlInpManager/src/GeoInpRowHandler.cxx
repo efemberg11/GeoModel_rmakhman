@@ -20,8 +20,8 @@ void GeoInpRowHandler::ElementHandle()
   GeoInpDef_ptr defPtr = newRecord.getDef();
 
   int intVal{0};
-//  long longVal{0};
-//  float floatVal{0.0};
+  long longVal{0};
+  float floatVal{0.0};
   double doubleVal{0.0};
   std::string stringVal{""};
   
@@ -36,14 +36,14 @@ void GeoInpRowHandler::ElementHandle()
 	intVal = getAttributeAsInt(fieldName);
 	val = intVal;
 	break;
-/*      case GEOINP_LONG:
+      case GEOINP_LONG:
 	longVal = getAttributeAsLong(fieldName);
 	val = longVal;
 	break;
       case GEOINP_FLOAT:
 	floatVal = getAttributeAsFloat(fieldName);
 	val = floatVal;
-	break;  */
+	break;  
       case GEOINP_DOUBLE:
 	doubleVal = getAttributeAsDouble(fieldName);
 	val = doubleVal;

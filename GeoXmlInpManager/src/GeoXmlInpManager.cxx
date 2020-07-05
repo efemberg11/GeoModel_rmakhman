@@ -149,12 +149,12 @@ void GeoXmlInpManager::addColDef(const std::string& name
   if(type.compare("INT")==0) {
     inpType = GEOINP_INT;
   }
-/*  else if(type.compare("LONG")==0) {
+  else if(type.compare("LONG")==0) {
     inpType = GEOINP_LONG;
   }
   else if(type.compare("FLOAT")==0) {
     inpType = GEOINP_FLOAT;
-  }  */
+  }  
   else if(type.compare("DOUBLE")==0) {
     inpType = GEOINP_DOUBLE;
   }

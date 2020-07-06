@@ -14,12 +14,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_subdirectory(MagneticField)
 
-# Dependencies.
-## GeoModel dependencies.
-# find_package( GeoModelCore 3.2.0 REQUIRED )
-# find_package( GeoModelIO 3.2.0 REQUIRED )
-# find_package( GeoModelG4 REQUIRED )
-find_package( nlohmann_json QUIET )
 
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
 #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
@@ -69,43 +63,51 @@ add_executable(testMagneticField testMagneticField.cc)
 add_executable(gmtogdml geoModeltoGDML.cc ${sources} ${headers})
 
 
+#----------------------------------------------------------------------------
+# Add extra 'include' directories
+#
+# If the in-house build of the nlohmann_json library is used, add explicit dependency
+if( GEOMODEL_USE_BUILTIN_JSON )
+  add_dependencies( fullSimLight JSONExt )
+  add_dependencies( gmclash JSONExt )
+  add_dependencies( fillHistogramExample JSONExt )
+  add_dependencies( gmgeantino JSONExt )
+  # add_dependencies( plotGeantinoMaps JSONExt )
+  add_dependencies( testMagneticField JSONExt )
+  add_dependencies( gmtogdml JSONExt )
+  # Acquire Installation Directory of JSONExt
+  ExternalProject_Get_Property (JSONExt install_dir)
+  # Include the installed 'include' PATH
+  include_directories (${install_dir}/include)
+endif()
 
 #----------------------------------------------------------------------------
 # Link all needed libraries
-
+#
 target_link_libraries(fillHistogramExample ${Geant4_LIBRARIES})
 target_link_libraries(testMagneticField ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-
-if( nlohmann_json_FOUND )
-
-target_link_libraries(fullSimLight GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
-
-target_link_libraries(gmclash GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
-
-target_link_libraries(gmgeantino GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
-
-target_link_libraries(gmtogdml GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces nlohmann_json::nlohmann_json )
-
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
-else()
-
-message(STATUS "WARNING - 'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
-
+# targets that need 'nlohmann_json'
+# NOTE: We link to `nlohmann_json` only  if we use a version of nlohmann_json
+# that provides a CMake config file (i.e., either built from source, or also
+# installed with Homebrew on macOS).
+# This is not needed if the single-header library is installed in a regular
+# system include folder (e.g., '/usr/local/include', '/usr/include', ...)
 target_link_libraries(gmclash GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-
 target_link_libraries(fullSimLight GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-
 target_link_libraries(gmgeantino GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-
 target_link_libraries(gmtogdml GeoModelDBManager GeoModelRead GeoModelKernel GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-
-#target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
-
+if( nlohmann_json_FOUND )
+  target_link_libraries( gmclash PUBLIC nlohmann_json::nlohmann_json )
+  target_link_libraries( fullSimLight PUBLIC nlohmann_json::nlohmann_json )
+  target_link_libraries( gmgeantino PUBLIC nlohmann_json::nlohmann_json )
+  target_link_libraries( gmtogdml PUBLIC nlohmann_json::nlohmann_json )
+else()
+  message(STATUS "WARNING - 'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
 endif()
 
 #ROOT_GENERATE_DICTIONARY(G__geantinoMaps ${headers} LINKDEF geantinoMapsLinkDef.h)
-
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build/OUTPUT directory. This is so that, after

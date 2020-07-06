@@ -160,20 +160,20 @@ variables:
 # ACTUAL BUILD JOBS
 
 ### MACOS BUILD JOBS
-# mac-coin:
-#   <<: *macos-job
-#   <<: *coin-job
-#
-# mac-soqt:
-#   <<: *macos-job
-#   <<: *soqt-job
-#   needs: ["mac-coin"]
-#
-# mac-geomodel-base:
-#   <<: *macos-job
-#   <<: *geomodel-job
-#   stage: step-A
-#
+mac-coin:
+  <<: *macos-job
+  <<: *coin-job
+
+mac-soqt:
+  <<: *macos-job
+  <<: *soqt-job
+  needs: ["mac-coin"]
+
+mac-geomodel-base:
+  <<: *macos-job
+  <<: *geomodel-job
+  stage: step-A
+
 # mac-geomodel-visualization:
 #   <<: *macos-job
 #   <<: *geomodel-job

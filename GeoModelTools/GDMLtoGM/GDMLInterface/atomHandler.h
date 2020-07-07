@@ -15,7 +15,7 @@ public:
 	atomHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
 	void ElementHandle() {
 		unit=value=atomic_weight=0;
-		unit=getAttributeAsDouble("unit");
+		unit=getAttributeAsDouble("unit", GeoModelKernelUnits::g/GeoModelKernelUnits::mole);
 		value=getAttributeAsDouble("value");
 		atomic_weight=unit*value;
 	}

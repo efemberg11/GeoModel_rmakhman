@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2002-2018 CERN for the benefit of the ATLAS collaboration
 */
-#include <fileSystem>
+#include <fstream>
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 
@@ -14,6 +14,11 @@
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 #include <iostream>
+
+inline bool exists (const std::string& name) {
+    std::ifstream f(name.c_str());
+    return f.good();
+}
 
 class GDMLtoGM : public GeoVGeometryPlugin  {
 
@@ -57,8 +62,7 @@ void GDMLtoGM::create(GeoPhysVol *world, GeoVStore*)
 	std::string fileName;
 	if (fPath!=NULL) fileName=std::string(fPath);
 	else fileName="gdmlfile.xml";
-	bool exists=std::filesystem::exists(fileName);
-	if (!exists) {
+	if (!exists(fileName)) {
 		std::cout <<"GDMLtoGeo: input file "<<fileName<<" does not exist. quitting and returning nicely! "<<std::endl;
 		return;
 	}

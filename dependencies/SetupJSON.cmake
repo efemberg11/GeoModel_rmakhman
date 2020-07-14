@@ -7,7 +7,7 @@
 
 # Configuration option for how "nlohmann_json" should be used.
 option( GEOMODEL_USE_BUILTIN_JSON
-   "Download a version of nlohmann_json during the build" FALSE )
+"Download and compile a version of nlohmann_json during the build" FALSE )
 
 # Now do what was requested.
 if( GEOMODEL_USE_BUILTIN_JSON )

@@ -11,7 +11,7 @@ set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 # Make the module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 #
-find_package( XercesC )
+# find_package( XercesC )
 
 # Set up the build of the libraries of the project.
 add_subdirectory( GeoModelXMLParser )

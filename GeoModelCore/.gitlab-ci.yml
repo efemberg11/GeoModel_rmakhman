@@ -2,7 +2,7 @@ stages:
   - build
   - deploy
 
-# we want this to be used only in the build stage, not deploy, 
+# we want this to be used only in the build stage, not deploy,
 # so we make it part of the build template
 .before_script_template: &build_setup-build
   before_script:
@@ -27,9 +27,9 @@ variables:
     - cmake ${CMAKE_ARGS}  ..
     - cmake --build . -- -j$(nproc)
     - cmake --build . -- install
-    - cmake --build . -- doc
+    - cmake --build . -- doxy
     - cp -r doc_doxygen/html ../public
-  
+
 
 build_slc6:
   <<: *build_template

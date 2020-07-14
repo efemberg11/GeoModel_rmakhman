@@ -1,7 +1,7 @@
 # Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 
 # === Preamble ===
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 project( "GeoModel" VERSION 1.0.0 LANGUAGES CXX )
 # enable_testing()
 
@@ -66,11 +66,27 @@ if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
 endif()
 
 
+# A function to get a string with comma-separated package names from a list of packages
+# NOTE: We could make use of list(JOIN ...) on CMake >= 3.12,
+# but Ubuntu 18 pat package installs 3.10 instead
+function(getCSVStringFromList inputList outputString)
+  message("input: ${inputList}")
+  set(tempList "")
+  foreach( item ${inputList})
+    list(APPEND tempList ${item})
+  endforeach()
+  string (REPLACE ";" ", " outStr "${tempList}")
+  message("string: ${outStr}")
+  set( ${outputString} ${outStr} PARENT_SCOPE)
+endfunction()
 
 
 # Let the users know which and how many packages they are building
 list(LENGTH BUILT_PACKAGES BUILT_PACKAGES_LENGTH)
-list(JOIN BUILT_PACKAGES ", " BUILT_PACKAGES_STR)
+#
+# list(JOIN BUILT_PACKAGES ", " BUILT_PACKAGES_STR) # list(JOIN) needs /CMake 3.12, which is missing on Ubuntu 18 by default
+getCSVStringFromList( "${BUILT_PACKAGES}" BUILT_PACKAGES_STR )
+#
 message(STATUS "${BoldWhite}-----${ColourReset}")
 message( STATUS "${BoldGreen}Building the following ${BUILT_PACKAGES_LENGTH} packages: ${BUILT_PACKAGES_STR}${ColourReset}")
 message(STATUS "${BoldWhite}-----${ColourReset}")

@@ -11,4 +11,4 @@ include( SetupXercesC )
 include( SetupJSON )
 
 # Find the project's dependencies
-# find_package( SQLite3 QUIET )
+find_package( SQLite3 QUIET )

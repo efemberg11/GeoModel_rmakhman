@@ -24,7 +24,7 @@ variables:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
   after_script:
     - brew remove nlohmann-json xerces-c
-    
+
 
 .ubuntu-template-job-base: &ubuntu-job-base
   image: ubuntu:18.04
@@ -166,25 +166,27 @@ variables:
 mac-coin:
   <<: *macos-job
   <<: *coin-job
+  stage: step-A
 
 mac-soqt:
   <<: *macos-job
   <<: *soqt-job
   needs: ["mac-coin"]
+  stage: step-B
 
 mac-geomodel-base:
   <<: *macos-job
   <<: *geomodel-job
   stage: step-A
 
-# mac-geomodel-visualization:
-#   <<: *macos-job
-#   <<: *geomodel-job
-#   stage: step-C
-#   needs: ["mac-coin", "mac-soqt"]
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
+mac-geomodel-visualization:
+  <<: *macos-job
+  <<: *geomodel-job
+  stage: step-C
+  needs: ["mac-coin", "mac-soqt"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
 
 
 

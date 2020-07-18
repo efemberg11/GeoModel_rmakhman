@@ -79,9 +79,27 @@ double XMLHandler::getAttributeAsDouble(const std::string name) const
         res=ExpressionEvaluator::GetEvaluator()->Eval(temp.c_str());
         return res;
 }
+float XMLHandler::getAttributeAsFloat(const std::string name) const
+{
+        float res=0.;
+        bool isPresent;
+        std::string temp=getAttribute(name,isPresent);
+	if (!isPresent) throw;
+        res=ExpressionEvaluator::GetEvaluator()->Eval(temp.c_str());
+        return res;
+}
 int XMLHandler::getAttributeAsInt(const std::string name) const
 {
         int res=0;
+        bool isPresent;
+        std::string temp=getAttribute(name,isPresent);
+	if (!isPresent) throw;
+        res=ExpressionEvaluator::GetEvaluator()->Eval(temp.c_str());
+        return res;
+}
+long XMLHandler::getAttributeAsLong(const std::string name) const
+{
+        long res=0;
         bool isPresent;
         std::string temp=getAttribute(name,isPresent);
 	if (!isPresent) throw;
@@ -131,9 +149,29 @@ double XMLHandler::getAttributeAsDouble(const std::string name, bool& isPresent)
 	}
 	return res;
 }
+float XMLHandler::getAttributeAsFloat(const std::string name, bool& isPresent) const
+{
+	float res=0.;
+	std::string temp=getAttribute(name,isPresent);
+	if (isPresent) 
+	{
+		res=ExpressionEvaluator::GetEvaluator()->Eval(temp.c_str());
+	}
+	return res;
+}
 int XMLHandler::getAttributeAsInt(const std::string name, bool& isPresent) const
 {
 	int res=0;
+	std::string temp=getAttribute(name,isPresent);
+	if (isPresent) 
+	{
+		res=ExpressionEvaluator::GetEvaluator()->Eval(temp.c_str());
+	}
+	return res;
+}
+long XMLHandler::getAttributeAsLong(const std::string name, bool& isPresent) const
+{
+	long res=0;
 	std::string temp=getAttribute(name,isPresent);
 	if (isPresent) 
 	{
@@ -190,10 +228,34 @@ double XMLHandler::getAttributeAsDouble(const std::string name, const double def
 	}
 	return def;
 }
+float XMLHandler::getAttributeAsFloat(const std::string name, const float def) const
+{
+	bool isPresent;
+	float res=0.;
+	std::string temp=getAttribute(name,isPresent);
+	if (isPresent) 
+	{
+		res=ExpressionEvaluator::GetEvaluator()->Eval(temp.c_str());
+		return res;
+	}
+	return def;
+}
 int XMLHandler::getAttributeAsInt(const std::string name, const int def) const
 {
 	bool isPresent;
 	int res=0;
+	std::string temp=getAttribute(name,isPresent);
+	if (isPresent) 
+	{
+		res=ExpressionEvaluator::GetEvaluator()->Eval(temp.c_str());
+		return res;
+	}
+	return def;
+}
+long XMLHandler::getAttributeAsLong(const std::string name, const long def) const
+{
+	bool isPresent;
+	long res=0;
 	std::string temp=getAttribute(name,isPresent);
 	if (isPresent) 
 	{

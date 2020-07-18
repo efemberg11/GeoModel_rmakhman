@@ -9,7 +9,7 @@ The philosophy of the whole GeoModel Suite is to keep the external dependencies 
 
 _list of all the dependencies coming soon_
 
-
+**NOTE:** Please note that you can build some of the dependencies as part of the main build. This is useful for platforms where the versions installed by the system package managers are old. See [here below](#building-dependencies-as-part-of-the-main-build) for instructions.
 
 ## Build
 
@@ -114,3 +114,36 @@ cmake -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel
 ```
 
 will build the base classes, the visualization tool (`gmex`), and the examples (the ones that not require Geant4).
+
+
+## Building dependencies as part of the main build
+
+You can use CMake compilation flags to configure a built-in build of some of the dependencies. That options will download and build a tested version of those dependencies as part of the build process of GeoModel.
+
+This is especially useful on platforms where the version of those dependencies installed by the system package manager is old, like on Ubuntu.
+
+*Note:* You don't need to use those options on macOS, where the versions installed by the `brew` package manager are often the latest.
+
+### nlohmann_json
+
+You can enable the built-in build of `nlohmann_json` by using the CMake option:
+
+```
+-DGEOMODEL_USE_BUILTIN_JSON=TRUE
+```
+
+### Xerces-C
+
+You can enable the built-in build of `Xerces-C` by using the CMake option:
+
+```
+-DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
+```
+
+### Examples
+
+For example, you can build the base GeoModel packages, plus the GeoModelVisualization (`gmex`), and a built-in version of nlohmann_json and Xerces-C by configuring the build with:
+
+```
+cmake -DCMAKE_INSTALL_PREFIX=../install/ -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE ../GeoModel/
+```

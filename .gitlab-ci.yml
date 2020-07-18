@@ -20,10 +20,10 @@ variables:
   allow_failure: true
   timeout: 30 minutes
   before_script:
-    - brew install nlohmann-json xerces-c
+    - brew install nlohmann-json xerces-c atlas/geomodel/geant4 #TODO: we don't want to install/remove Geant4 when not needed by the packages...
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
   after_script:
-    - brew remove nlohmann-json xerces-c
+    - brew remove nlohmann-json xerces-c atlas/geomodel/geant4
 
 # TODO: install and remove our customized build of Geant4 every time
 # .macos-template-job-g4: &macos-job-g4

@@ -25,6 +25,17 @@ variables:
   after_script:
     - brew remove nlohmann-json xerces-c
 
+# TODO: install and remove our customized build of Geant4 every time
+# .macos-template-job-g4: &macos-job-g4
+#   tags:
+#     - macos
+#   allow_failure: true
+#   timeout: 30 minutes
+#   before_script:
+#     - brew install atlas/geomodel/geant4 nlohmann-json xerces-c
+#     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+#   after_script:
+#     - brew remove atlas/geomodel/geant4 nlohmann-json xerces-c
 
 .ubuntu-template-job-base: &ubuntu-job-base
   image: ubuntu:18.04

@@ -145,5 +145,5 @@ You can enable the built-in build of `Xerces-C` by using the CMake option:
 For example, you can build the base GeoModel packages, plus the GeoModelVisualization (`gmex`), and a built-in version of nlohmann_json and Xerces-C by configuring the build with:
 
 ```
-cmake -DCMAKE_INSTALL_PREFIX=../install/ -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE ../GeoModel/
+cmake -DCMAKE_INSTALL_PREFIX=../install/ -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE ../GeoModel/
 ```

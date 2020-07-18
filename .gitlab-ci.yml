@@ -174,20 +174,51 @@ mac-soqt:
   needs: ["mac-coin"]
   stage: step-B
 
-mac-geomodel-base:
+mac-gm-base:
   <<: *macos-job
   <<: *geomodel-job
   stage: step-A
 
-mac-geomodel-visualization:
+mac-gm-visualization:
   <<: *macos-job
   <<: *geomodel-job
   stage: step-C
   needs: ["mac-coin", "mac-soqt"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
 
+mac-gm-examples:
+  <<: *macos-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
+
+# mac-gm-gmg4:
+#   <<: *mac-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
+#
+# mac-gm-examples-gmg4:
+#   <<: *mac-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
+#
+# mac-gm-fullsimlight:
+#   <<: *mac-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
 
 
 ### UBUNTU BUILD JOBS
@@ -207,7 +238,6 @@ ubu-gm-base-builtin:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
-
 
 ubu-gm-visualization-builtin:
   <<: *ubuntu-job

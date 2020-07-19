@@ -84,9 +84,9 @@ int main(int argc, char *argv[])
   // check if DB file exists. If not, return.
   // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
   std::ifstream infile(path.c_str());
-    if ( infile.good() ) {
-      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
-        exit(EXIT_FAILURE);
+    if ( ! infile.good() ) {
+      std::cout << "\n\tERROR!! A '" << path << "' file does not exist!! Please, check the path of the input file before running this program. Exiting...";
+      exit(EXIT_FAILURE);
   }
   infile.close();
 

@@ -28,11 +28,11 @@ public:
 
   unsigned int size() const { return m_records.size(); }
   std::string nodeName() const { return m_nodeName; }
-  const GeoInpRecord& operator[](unsigned int index) { return m_records[index]; }
+  const GeoInpRecord& operator[](unsigned int index) const { return m_records[index]; }
   const_iterator begin() const { return m_records.cbegin(); }
   const_iterator end() const { return m_records.cend(); }
 
-  void dump();
+  void dump() const;
 protected:
   GeoInpRecord& addRecord();
   
@@ -48,11 +48,11 @@ inline GeoInpRecord& GeoInpRecordset::addRecord()
   return *it;
 }
 
-inline void GeoInpRecordset::dump()
+inline void GeoInpRecordset::dump() const
 {
   std::cout << " *** GeoInpRecordset " << m_nodeName << " ***" << std::endl;
   std::cout << " *** *** *** *** *** *** *** *** *** *** ***" << std::endl;
-  for(GeoInpRecord& record : m_records) {
+  for(const GeoInpRecord& record : m_records) {
     record.dump();
   }
   std::cout << " *** *** *** *** *** *** *** *** *** *** ***" << std::endl;

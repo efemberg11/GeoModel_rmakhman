@@ -28,6 +28,8 @@ class AGDDBolt;
 class AGDDIbeam;
 class AGDDUbeam;
 
+class GeoXmlMatManager;
+
 #include "AGDDKernel/AGDDBuilder.h"
 
 #include <string>
@@ -85,6 +87,8 @@ private:
         if (vec.rows() < 3) return 0.;
         return std::atan2(std::hypot(vec[0],vec[1]),vec[2]);
     }
+    
+    const GeoXmlMatManager* materialManager=0;
 
 //	std::map<std::string, GeoFullPhysVol*>* m_detectors;
 

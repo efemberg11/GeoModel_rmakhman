@@ -51,6 +51,8 @@
 #include "GeoModelKernel/GeoTransform.h"
 #include "GeoModelKernel/GeoNameTag.h"
 
+#include "GeoXmlMatManager/GeoXmlMatManager.h"
+
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -59,9 +61,7 @@
 
 AGDD2GeoModelBuilder::AGDD2GeoModelBuilder():AGDDBuilder(),m_mother(0)
 {
-//	std::cout << "Creating AGDD2GeoModel Builder"<<std::endl;
-//  m_detectors = new std::map<std::string, GeoFullPhysVol*>;
-//  m_detectors->clear();
+	materialManager=GeoXmlMatManager::getManager();
 }
 GeoElement* AGDD2GeoModelBuilder::CreateElement(std::string name)
 {
@@ -86,11 +86,15 @@ const GeoMaterial* AGDD2GeoModelBuilder::CreateMaterial(std::string name)
 {
 
 //  give priority to GeoModel's Material Manager in retrieving materials
+	
         const GeoMaterial* mmMaterial=GetMMMaterial(name);
 	if (mmMaterial)
 	{
-//		std::cout<<"material "<<name<<" found in Material Manager "<<std::endl;
 		return mmMaterial;
+	}
+	else 
+	{
+		std::cout<<" GetMMMaterial returned null pointer "<<std::endl;
 	}
 	
 //  oh well... too bad....
@@ -767,18 +771,8 @@ void AGDD2GeoModelBuilder::CreateUbeam(AGDDUbeam *b)
 
 const GeoMaterial* AGDD2GeoModelBuilder::GetMMMaterial(std::string name)
 {
-// 	StoreGateSvc* pDetStore=0;
-// 	ISvcLocator* svcLocator = Gaudi::svcLocator();
-// 	StatusCode sc=svcLocator->service("DetectorStore",pDetStore);
-// 	if(sc.isSuccess())
-// 	{
-//                 const StoredMaterialManager* theMaterialManager = nullptr;
-// 		sc = pDetStore->retrieve(theMaterialManager, "MATERIALS");
-// 		if(sc.isSuccess())
-//         {
-// 			return theMaterialManager->getMaterial(name);
-//         }
-// 	}
+	
+
 	static int iEntry=1;
 	static GeoMaterial *dummy=0,*ether=0;
 	if (iEntry)
@@ -792,9 +786,17 @@ const GeoMaterial* AGDD2GeoModelBuilder::GetMMMaterial(std::string name)
 		ether->lock();
 		iEntry=0;
 	}
+	
 	//std::cout<<" returning a null material pointer !!!! "<<std::endl;
-	std::cout<<" material name "<<name<<std::endl;
-	if (name=="special::Ether") return ether;	
+	//std::cout<<" material name "<<name<<std::endl;
+
+	const GeoMaterial* mat=materialManager->getMaterial(name);
+	if (mat) 
+	{
+		// std::cout <<" found material "<<name<<" in the material manager. returning "<<std::endl;
+		return mat;
+	}
+	
 	return dummy;
 }
 

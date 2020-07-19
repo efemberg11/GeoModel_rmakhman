@@ -122,38 +122,16 @@ const GeoXmlMatManager* GeoXmlMatManager::getManager()
   return s_instance;
 }
 
-GeoMaterial* GeoXmlMatManager::getMaterial(const std::string& name)
-{
-  auto materialIt = m_pImpl->m_materials.find(name);
-  return materialIt==m_pImpl->m_materials.end() ? nullptr : materialIt->second;
-}
-
 const GeoMaterial* GeoXmlMatManager::getMaterial(const std::string & name) const
 {
   auto materialIt = m_pImpl->m_materials.find(name);
   return materialIt==m_pImpl->m_materials.end() ? nullptr : materialIt->second;  
 }
 
-GeoElement* GeoXmlMatManager::getElement(const std::string & name)
-{
-  auto elementIt = m_pImpl->m_elements.find(name);
-  return elementIt==m_pImpl->m_elements.end() ? nullptr : elementIt->second;
-}
-
 const GeoElement* GeoXmlMatManager::getElement(const std::string & name) const
 {
   auto elementIt = m_pImpl->m_elements.find(name);
   return elementIt==m_pImpl->m_elements.end() ? nullptr : elementIt->second;
-}
-
-GeoElement* GeoXmlMatManager::getElement(unsigned int atomicNumber)
-{
-  for(auto element : m_pImpl->m_elements) {
-    if((unsigned)(element.second->getZ())==atomicNumber) {
-      return element.second;
-    }
-  }
-  return nullptr;
 }
 
 const GeoElement* GeoXmlMatManager::getElement(unsigned int atomicNumber) const

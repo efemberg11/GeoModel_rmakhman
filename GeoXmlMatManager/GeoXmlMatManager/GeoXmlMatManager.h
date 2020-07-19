@@ -22,13 +22,8 @@ class GeoXmlMatManager {
  public:
   static const GeoXmlMatManager* getManager();
   
-  GeoMaterial *getMaterial(const std::string & name);
   const GeoMaterial *getMaterial(const std::string & name) const;
-
-  GeoElement *getElement(const std::string & name);
   const GeoElement *getElement(const std::string & name) const;
-
-  GeoElement *getElement(unsigned int atomicNumber);
   const GeoElement *getElement(unsigned int atomicNumber) const;
 
   std::ostream & printAll(std::ostream & o=std::cout) const;

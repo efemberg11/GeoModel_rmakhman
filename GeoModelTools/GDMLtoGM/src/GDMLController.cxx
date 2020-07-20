@@ -241,6 +241,8 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 #include "GDMLInterface/tessellatedHandler.h"
 #include "GDMLInterface/triangularHandler.h"
 #include "GDMLInterface/quadrangularHandler.h"
+#include "GDMLInterface/xtruHandler.h"
+#include "GDMLInterface/arb8Handler.h"
 
 void GDMLController::registerHandlers()
 {
@@ -292,4 +294,6 @@ void GDMLController::registerHandlers()
 	new tessellatedHandler("tessellated",this);
 	new triangularHandler("triangular",this);
 	new quadrangularHandler("quadrangular",this);
+	new xtruHandler("xtru",this);
+	new arb8Handler("arb8",this);
 }

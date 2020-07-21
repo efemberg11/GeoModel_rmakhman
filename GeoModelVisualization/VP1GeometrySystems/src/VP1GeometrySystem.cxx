@@ -488,7 +488,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoPhysVol* world)
     // Setup the 'World' volume from which everything else will be suspended
     double densityOfAir=0.1;
     const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
-    const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+    const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2500*SYSTEM_OF_UNITS::cm);
     const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
     // GeoPhysVol* worldPhys = new GeoPhysVol(worldLog);
     world = new GeoPhysVol(worldLog);
@@ -1503,7 +1503,7 @@ GeoPhysVol *VP1GeometrySystem::newWorld()  const {
   air->add(Hydrogen, 0.0008);
   air->lock();
 
-  const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+  const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2500*SYSTEM_OF_UNITS::cm);
   const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
   GeoPhysVol* world = new GeoPhysVol(worldLog);
   return world;

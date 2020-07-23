@@ -48,7 +48,7 @@ void volumeHandler::ElementHandle()
                 else std::cout<<" handler name not defined "<<nH<<std::endl;
             }
             
-        } else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
+        } //else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
 	}
 	//std::cout << "Creating logical volume "<<name<<" shape "<<shape<<" mat "<<material<<std::endl;
 	GeoLogVol* tempLV=new GeoLogVol(name,shape,material);

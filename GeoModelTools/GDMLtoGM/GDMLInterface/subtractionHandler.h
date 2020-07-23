@@ -45,58 +45,62 @@ public:
 			if (child->getNodeType()==xercesc::DOMNode::ELEMENT_NODE) {
 				XercesParser::elementLoop(child);
 				XMLHandler *h=theController->XMLStore()->GetHandler(child);
-				std::string nH=h->GetName();
-				//std::cout<<" handler name "<<nH<<std::endl;
-				if (nH=="first") {
-					booleanHandler* fH=dynamic_cast<booleanHandler*>(h);
-					if (!fH) std::cout<<" something is wrong! can not retrieve firstHandler!!!"<<std::endl;
-					else firstSolid=(fH->getSolid());
-					//if (firstSolid) std::cout<<" retrieved firstSolid! "<<std::endl;
-				}
-				else if (nH=="second") {
-					booleanHandler* sH=dynamic_cast<booleanHandler*>(h);
-					if (!sH) std::cout<<" something is wrong! can not retrieve secondHandler!!!"<<std::endl;
-					else secondSolid=(sH->getSolid());
-					//if (secondSolid) std::cout<<" retrieved secondSolid! "<<std::endl;
-				}
-				else if (nH=="positionref" || nH=="position") {
-					positionHandler* pH=dynamic_cast<positionHandler*>(h);
-					if (!pH) std::cout<<" something is wrong! can not retrieve positionHandler!!!"<<std::endl;
-					else {
-						//std::cout<<"-----> "<<pH->getPosition().y<<std::endl;
-						secondTranslation=pH->getPosition().v3d;
-					}
-					secondTrf=true;
+                if(h){
+                    std::string nH=h->GetName();
+                    //std::cout<<" handler name "<<nH<<std::endl;
+                    if (nH=="first") {
+                        booleanHandler* fH=dynamic_cast<booleanHandler*>(h);
+                        if (!fH) std::cout<<" something is wrong! can not retrieve firstHandler!!!"<<std::endl;
+                        else firstSolid=(fH->getSolid());
+                        //if (firstSolid) std::cout<<" retrieved firstSolid! "<<std::endl;
+                    }
+                    else if (nH=="second") {
+                        booleanHandler* sH=dynamic_cast<booleanHandler*>(h);
+                        if (!sH) std::cout<<" something is wrong! can not retrieve secondHandler!!!"<<std::endl;
+                        else secondSolid=(sH->getSolid());
+                        //if (secondSolid) std::cout<<" retrieved secondSolid! "<<std::endl;
+                    }
+                    else if (nH=="positionref" || nH=="position") {
+                        positionHandler* pH=dynamic_cast<positionHandler*>(h);
+                        if (!pH) std::cout<<" something is wrong! can not retrieve positionHandler!!!"<<std::endl;
+                        else {
+                            //std::cout<<"-----> "<<pH->getPosition().y<<std::endl;
+                            secondTranslation=pH->getPosition().v3d;
+                        }
+                        secondTrf=true;
 					
-				}
-				else if (nH=="rotationref" || nH=="rotation" ) {
-					rotationHandler* rH=dynamic_cast<rotationHandler*>(h);
-					if (!rH) std::cout<<" something is wrong! can not retrieve rotationHandler!!!"<<std::endl;
-					else {
-						rotation r=rH->getRotation();
-						secondRotation=GeoTrf::RotateX3D(r.rotx)*GeoTrf::RotateY3D(r.roty)*GeoTrf::RotateZ3D(r.rotz);
-					}
-					secondTrf=true;
-				}
-				else if (nH=="firstpositionref" || nH=="firstposition") {
-					positionHandler* pH=dynamic_cast<positionHandler*>(h);
-					if (!pH) std::cout<<" something is wrong! can not retrieve positionHandler!!!"<<std::endl;
-					else {
-						firstTranslation=pH->getPosition().v3d;
-					}
-					firstTrf=true;
-				}
-				else if (nH=="firstrotationref" || nH=="firstrotation" ) {
-					rotationHandler* rH=dynamic_cast<rotationHandler*>(h);
-					if (!rH) std::cout<<" something is wrong! can not retrieve rotationHandler!!!"<<std::endl;
-					else {
-						rotation r=rH->getRotation();
-						firstRotation=GeoTrf::RotateX3D(r.rotx)*GeoTrf::RotateY3D(r.roty)*GeoTrf::RotateZ3D(r.rotz);
-					}
-					firstTrf=true;
-				}
-				else std::cout<<" handler not defined "<<nH<<std::endl;
-			}
+                    }
+                    else if (nH=="rotationref" || nH=="rotation" ) {
+                        rotationHandler* rH=dynamic_cast<rotationHandler*>(h);
+                        if (!rH) std::cout<<" something is wrong! can not retrieve rotationHandler!!!"<<std::endl;
+                        else {
+                            rotation r=rH->getRotation();
+                            secondRotation=GeoTrf::RotateX3D(r.rotx)*GeoTrf::RotateY3D(r.roty)*GeoTrf::RotateZ3D(r.rotz);
+                        }
+                        secondTrf=true;
+                    }
+                    else if (nH=="firstpositionref" || nH=="firstposition") {
+                        positionHandler* pH=dynamic_cast<positionHandler*>(h);
+                        if (!pH) std::cout<<" something is wrong! can not retrieve positionHandler!!!"<<std::endl;
+                        else {
+                            firstTranslation=pH->getPosition().v3d;
+                        }
+                        firstTrf=true;
+                    }
+                    else if (nH=="firstrotationref" || nH=="firstrotation" ) {
+                        rotationHandler* rH=dynamic_cast<rotationHandler*>(h);
+                        if (!rH) std::cout<<" something is wrong! can not retrieve rotationHandler!!!"<<std::endl;
+                        else {
+                            rotation r=rH->getRotation();
+                            firstRotation=GeoTrf::RotateX3D(r.rotx)*GeoTrf::RotateY3D(r.roty)*GeoTrf::RotateZ3D(r.rotz);
+                        }
+                        firstTrf=true;
+                    }
+                    else std::cout<<" Name of the handler not defined "<<nH<<std::endl;
+                }
+                else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
+                
+            }
 			
 		}
 		

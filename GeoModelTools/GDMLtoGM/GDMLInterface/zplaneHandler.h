@@ -15,7 +15,7 @@ class zplaneHandler:public GDMLHandler {
 public:
 	zplaneHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
 	void ElementHandle() {
-		std::cout<<"handling zplane "<<std::endl;
+		//std::cout<<"handling zplane "<<std::endl;
 		p.rmin=getAttributeAsDouble("rmin");
 		p.rmax=getAttributeAsDouble("rmax");
 		p.z=getAttributeAsDouble("z");

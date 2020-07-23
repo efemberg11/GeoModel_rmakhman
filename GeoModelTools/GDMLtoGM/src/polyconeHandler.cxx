@@ -35,12 +35,15 @@ void polyconeHandler::ElementHandle()
 	{
 		XercesParser::elementLoop(child);
 		XMLHandler *h=theController->XMLStore()->GetHandler(child);
-		zplaneHandler* zplH=dynamic_cast<zplaneHandler*>(h);
-		if (zplH)
-		{
-			zPlane p=zplH->getZPlane();
-			pcone->addPlane(lunit*p.z,lunit*p.rmin,lunit*p.rmax);
-		}
+        if(h){
+            zplaneHandler* zplH=dynamic_cast<zplaneHandler*>(h);
+            if (zplH)
+            {
+                zPlane p=zplH->getZPlane();
+                pcone->addPlane(lunit*p.z,lunit*p.rmin,lunit*p.rmax);
+            }
+        }
+        else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
 	}
   }
   

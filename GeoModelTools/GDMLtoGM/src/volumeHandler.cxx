@@ -23,29 +23,32 @@ void volumeHandler::ElementHandle()
 		if (child->getNodeType()==xercesc::DOMNode::ELEMENT_NODE) {
 			XercesParser::elementLoop(child);
 			XMLHandler *h=theController->XMLStore()->GetHandler(child);
-			std::string nH=h->GetName();
-			//std::cout<<" handler name "<<nH<<std::endl;
-			if (nH=="materialref") {
-				materialrefHandler* mH=dynamic_cast<materialrefHandler*>(h);
-				if (!mH) std::cout<<" something is wrong! can not retrieve materialrefHandler!!!"<<std::endl;
-				else material=mH->getMaterial();
-			}
-			else if (nH=="solidref") {
-				solidrefHandler* sH=dynamic_cast<solidrefHandler*>(h);
-				if (!sH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
-				else shape=sH->getSolid();
-			}
-			else if (nH=="physvol") {
-				physvolHandler* pH=dynamic_cast<physvolHandler*>(h);
-				if (!pH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
-				else 
-				{
-					tempPhys.push_back(pH->getPhysicalVolume());
-					tempTransform.push_back(pH->getTransform());
-				}
-			}
-			else std::cout<<" handler not defined "<<nH<<std::endl;
-		}
+            if (h){
+                std::string nH=h->GetName();
+                //std::cout<<" handler name "<<nH<<std::endl;
+                if (nH=="materialref") {
+                    materialrefHandler* mH=dynamic_cast<materialrefHandler*>(h);
+                    if (!mH) std::cout<<" something is wrong! can not retrieve materialrefHandler!!!"<<std::endl;
+                    else material=mH->getMaterial();
+                }
+                else if (nH=="solidref") {
+                    solidrefHandler* sH=dynamic_cast<solidrefHandler*>(h);
+                    if (!sH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
+                    else shape=sH->getSolid();
+                }
+                else if (nH=="physvol") {
+                    physvolHandler* pH=dynamic_cast<physvolHandler*>(h);
+                    if (!pH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
+                    else
+                    {
+                        tempPhys.push_back(pH->getPhysicalVolume());
+                        tempTransform.push_back(pH->getTransform());
+                    }
+                }
+                else std::cout<<" handler name not defined "<<nH<<std::endl;
+            }
+            
+        } //else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
 	}
 	//std::cout << "Creating logical volume "<<name<<" shape "<<shape<<" mat "<<material<<std::endl;
 	GeoLogVol* tempLV=new GeoLogVol(name,shape,material);

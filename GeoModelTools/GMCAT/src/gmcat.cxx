@@ -115,7 +115,7 @@ int main(int argc, char ** argv) {
   // Create a huge world volume made of Air:
   //
 
-  const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm);
+  const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2500*SYSTEM_OF_UNITS::cm);
   const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
   GeoPhysVol *world=new GeoPhysVol(worldLog);
   world->ref();

@@ -141,13 +141,13 @@ void LArWheelSolid::get_point_on_accordion_surface(G4ThreeVector &p) const
     d1 *= 2.;
 
     G4ThreeVector B = p + D * d1;
-    G4double dphi = B.phi();
+    G4double Bphi = B.phi();
     int B_fan = 0;
     GetCalculator()->DistanceToTheNearestFan(B, B_fan);
-    dphi -= B.phi();
+    Bphi -= B.phi();
 
     B[0] = GetCalculator()->AmplitudeOfSurface(B, side, B_fan);
-    B.rotateZ(dphi);
+    B.rotateZ(Bphi);
     EInside Bi = m_BoundingShape->Inside(B);
     if(Bi == kSurface){
       p = B;
@@ -621,10 +621,14 @@ double LArWheelSolid_get_dl(double *x, double *par, G4int side)
   return dl;
 }
 
+// ADA - following function declared unused, commented out to reduce warnings
+
+/*
 static double fcn_length(double *x, double *p)
 {
   return LArWheelSolid_get_dl(x, p, 1) + LArWheelSolid_get_dl(x, p, -1);
 }
+*/
 
 double LArWheelSolid_fcn_side_area(double *x, double *p)
 {

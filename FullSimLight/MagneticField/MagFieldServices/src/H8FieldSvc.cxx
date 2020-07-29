@@ -27,7 +27,7 @@
 #include "CLHEP/Units/SystemOfUnits.h"
 
 /** Constructor **/
-MagField::H8FieldSvc::H8FieldSvc( const std::string& name/*,ISvcLocator* svc */) :
+MagField::H8FieldSvc::H8FieldSvc( const std::string& /* name,ISvcLocator* svc */) :
     //base_class(name,svc),
     m_H8MapFilename("MagneticFieldMaps/mbps1-all-id-800-mbps2-muons-800x4.data"),
     m_dx1(0),

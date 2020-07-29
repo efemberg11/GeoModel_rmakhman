@@ -85,7 +85,7 @@ IVP1System::~IVP1System()
   assert(m_d->state==UNCREATED||m_d->state==CONSTRUCTED);
   assert(!m_d->controller);
 
-  if(!m_d==0) {
+  if(m_d) {
 	  delete m_d;
 	  m_d=0;
   }

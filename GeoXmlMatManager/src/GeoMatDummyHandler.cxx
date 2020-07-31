@@ -2,15 +2,15 @@
   Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "GeoDummyHandler.h"
+#include "GeoMatDummyHandler.h"
 #include <iostream>
 
-GeoDummyHandler::GeoDummyHandler(std::string s)
+GeoMatDummyHandler::GeoMatDummyHandler(std::string s)
   : XMLHandler(s)
 {
 }
 
-void GeoDummyHandler::ElementHandle()
+void GeoMatDummyHandler::ElementHandle()
 {
   // Do nothing
 }

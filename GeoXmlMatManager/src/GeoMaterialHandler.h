@@ -2,8 +2,8 @@
   Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef GEOMODELSVC_GEOMATERIALHANDLER_H
-#define GEOMODELSVC_GEOMATERIALHANDLER_H
+#ifndef GEOXMLMATMANAGER_GEOMATERIALHANDLER_H
+#define GEOXMLMATMANAGER_GEOMATERIALHANDLER_H
 
 #include "GeoModelXMLParser/XMLHandler.h"
 #include <string>

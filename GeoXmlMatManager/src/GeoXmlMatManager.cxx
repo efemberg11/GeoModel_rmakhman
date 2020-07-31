@@ -4,7 +4,7 @@
 
 #include "GeoXmlMatManager/GeoXmlMatManager.h"
 #include "GeoElementHandler.h"
-#include "GeoDummyHandler.h"
+#include "GeoMatDummyHandler.h"
 #include "GeoMaterialHandler.h"
 #include "GeoMatComponentHandler.h"
 #include "GeoNamespaceHandler.h"
@@ -41,11 +41,11 @@ public:
   //______________________________________________________
   // Handlers for the XML parser
   GeoElementHandler      m_elementHandler;
-  GeoDummyHandler        m_elementsHandler;
+  GeoMatDummyHandler     m_elementsHandler;
   GeoMaterialHandler     m_materialHandler;
   GeoMatComponentHandler m_matComponentHandler;
   GeoNamespaceHandler    m_namespaceHandler;
-  GeoDummyHandler        m_materialsHandler;
+  GeoMatDummyHandler     m_materialsHandler;
 
   // Map of elements indexed by Name
   typedef std::map<std::string, GeoElement*> ElementMap;
@@ -122,38 +122,16 @@ const GeoXmlMatManager* GeoXmlMatManager::getManager()
   return s_instance;
 }
 
-GeoMaterial* GeoXmlMatManager::getMaterial(const std::string& name)
-{
-  auto materialIt = m_pImpl->m_materials.find(name);
-  return materialIt==m_pImpl->m_materials.end() ? nullptr : materialIt->second;
-}
-
 const GeoMaterial* GeoXmlMatManager::getMaterial(const std::string & name) const
 {
   auto materialIt = m_pImpl->m_materials.find(name);
   return materialIt==m_pImpl->m_materials.end() ? nullptr : materialIt->second;  
 }
 
-GeoElement* GeoXmlMatManager::getElement(const std::string & name)
-{
-  auto elementIt = m_pImpl->m_elements.find(name);
-  return elementIt==m_pImpl->m_elements.end() ? nullptr : elementIt->second;
-}
-
 const GeoElement* GeoXmlMatManager::getElement(const std::string & name) const
 {
   auto elementIt = m_pImpl->m_elements.find(name);
   return elementIt==m_pImpl->m_elements.end() ? nullptr : elementIt->second;
-}
-
-GeoElement* GeoXmlMatManager::getElement(unsigned int atomicNumber)
-{
-  for(auto element : m_pImpl->m_elements) {
-    if((unsigned)(element.second->getZ())==atomicNumber) {
-      return element.second;
-    }
-  }
-  return nullptr;
 }
 
 const GeoElement* GeoXmlMatManager::getElement(unsigned int atomicNumber) const

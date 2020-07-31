@@ -2,15 +2,15 @@
   Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef GEOMODELSVC_GEODUMMYHANDLER_H
-#define GEOMODELSVC_GEODUMMYHANDLER_H
+#ifndef GEOXMLMATMANAGER_GEOMATDUMMYHANDLER_H
+#define GEOXMLMATMANAGER_GEOMATDUMMYHANDLER_H
 
 #include "GeoModelXMLParser/XMLHandler.h"
 #include <string>
 
-class GeoDummyHandler : public XMLHandler {
+class GeoMatDummyHandler : public XMLHandler {
  public:
-  GeoDummyHandler(std::string);
+  GeoMatDummyHandler(std::string);
   void ElementHandle();
 };
 

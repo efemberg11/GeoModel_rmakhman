@@ -1,6 +1,6 @@
 # GeoModelPlugins
 
-This repository contains plugins that create GeoModel geometries.  They are dual use in the sense that they function completely outside of Athena, but also are able to function within Athena. 
+This repository contains plugins that create GeoModel geometries.
 
 ## Build from source.
 
@@ -37,8 +37,12 @@ make -j4
 make instal
 ```
       
-* Your plugin is ready!  Run it with gmex (see <https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization> )
+* Your plugins are ready!  Run them with gmex (see <https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization> )
 
 ## ToyGeometryPlugin
 
 ToyGeometryPlugin reads material definitions form XML files, which are found in the ToyGeometryPlugin/data directory. In order to access these files - elements.xml and material.xml - at runtime, they need to be placed in the run directory of gmex. This is considered a temporary solution. In the long term we need to design a special mechanism allowing GeoModel applications (e.g. plugins) to access input XML files.
+
+## LAr Plugin
+
+LAr plugin builds GeoModel description of the ATLAS Liquid Argon Calorimeter. For more details about this plugin see LArPlugin/README.md

@@ -21,7 +21,7 @@ void posXYZHandler::ElementHandle()
 	std::string  sym=getAttributeAsString("sym",res);
 	if (res) std::cout<<" symmetry implemented for "<<volume<<std::endl;
 	std::string sRot="";
-	GeoTrf::Vector3D cvec = GeoTrf::Vector3D::Identity();
+	GeoTrf::Vector3D cvec = GeoTrf::Vector3D(0,0,0);
 	GeoTrf::Transform3D crot = GeoTrf::Transform3D::Identity();
 	std::vector<double> X_Y_Z=getAttributeAsVector("X_Y_Z",posRet);
 	if (posRet) 

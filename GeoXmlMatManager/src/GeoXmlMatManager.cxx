@@ -15,14 +15,12 @@
 #include "GeoModelKernel/Units.h"
 
 #include <cstdlib>
-#include <filesystem>
 #include <iomanip>
+#include <stdio.h>
 
 #define PATH_ENV_NAME      "GEOMODEL_XML_DIR"
 #define MATERIALS_FILENAME "materials.xml"
 #define ELEMENTS_FILENAME  "elements.xml"
-
-namespace fs=std::filesystem;
 
 GeoXmlMatManager* GeoXmlMatManager::s_instance{nullptr};
 
@@ -79,14 +77,17 @@ GeoXmlMatManager::GeoXmlMatManager()
     throw std::runtime_error(errorMessage);
   }
 
-  fs::path fsPath(path);
-  std::vector<fs::path> paths { fsPath
-				, fsPath / std::string(ELEMENTS_FILENAME)
-				, fsPath / std::string(MATERIALS_FILENAME) };
+  std::string strPath(path);
+  std::vector<std::string> paths { strPath + "/" + std::string(ELEMENTS_FILENAME)
+				, strPath + "/" + std::string(MATERIALS_FILENAME) };
 
-  for(fs::path p : paths) {
-    if(!fs::exists(p)) {
-      errorMessage = std::string(p) + " does not exist!";
+  for(const std::string& p : paths) {
+    FILE* pFile = fopen(p.c_str(),"r");
+    if(pFile) {
+      fclose(pFile);
+    }
+    else {
+      errorMessage = p + " does not exist!";
       break;
     }
   }
@@ -95,8 +96,8 @@ GeoXmlMatManager::GeoXmlMatManager()
   }
 
   XercesParser xercesParser;
-  xercesParser.ParseFileAndNavigate(paths[1]); // Parse elements
-  xercesParser.ParseFileAndNavigate(paths[2]); // Parse materials
+  xercesParser.ParseFileAndNavigate(paths[0]); // Parse elements
+  xercesParser.ParseFileAndNavigate(paths[1]); // Parse materials
   // The last material needs to be locked
   lockMaterial();
   // Build special materials

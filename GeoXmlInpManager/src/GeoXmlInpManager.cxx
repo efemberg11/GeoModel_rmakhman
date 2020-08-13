@@ -13,13 +13,14 @@
 #include "GeoInpDummyHandler.h"
 
 #include <cstdlib>
-#include <filesystem>
 #include <iomanip>
 #include <iostream>
 
-#define PATH_ENV_NAME "GEOMODEL_XML_DIR"
+#include <sys/types.h>
+#include <dirent.h>
+#include <stdio.h>
 
-namespace fs=std::filesystem;
+#define PATH_ENV_NAME "GEOMODEL_XML_DIR"
 
 GeoXmlInpManager* GeoXmlInpManager::s_instance{nullptr};
 
@@ -49,7 +50,7 @@ public:
 
   //______________________________________________________
   // Top of the XML input files directory tree
-  fs::path m_path;
+  std::string m_path;
 
   //______________________________________________________
   // Container of table defs  
@@ -73,12 +74,16 @@ GeoXmlInpManager::GeoXmlInpManager()
     throw std::runtime_error(errorMessage.c_str());
   }
 
-  fs::path fsPath(path);
-  if(!fs::exists(fsPath)) {
-    errorMessage = std::string(path) + " does not exist!";
+  DIR* pDir = opendir(path);
+  if(pDir) {
+    closedir(pDir);
+  }
+  else {
+    errorMessage = "Unable to open " + std::string(path) + " directory!";
     throw std::runtime_error(errorMessage.c_str());
   }
-  m_pImpl->m_path = fsPath;  
+  
+  m_pImpl->m_path = std::string(path);  
 }
 
 GeoXmlInpManager::~GeoXmlInpManager()
@@ -102,12 +107,16 @@ GeoXmlInpManager* GeoXmlInpManager::getManager()
 
 void GeoXmlInpManager::parse(const std::string& filename)
 {
-  fs::path path = m_pImpl->m_path / filename;
-  if(!fs::exists(path)) {
-    std::string errorMessage(std::string(path) + " does not exist!");
+  std::string path = m_pImpl->m_path + "/" + filename;
+  FILE* pFile = fopen(path.c_str(),"r");
+  if(pFile) {
+    fclose(pFile);
+  }
+  else {
+    std::string errorMessage(path + " does not exist!");
     throw std::runtime_error(errorMessage.c_str());
   }
-  
+
   XercesParser xercesParser;
   xercesParser.ParseFileAndNavigate(path);
 }

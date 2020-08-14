@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2018 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -35,8 +35,8 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
 
  public:
 
-  // Constructor:
-  ToyGeometryPlugin();
+  // Constructor:  (no default constructor)
+  ToyGeometryPlugin( std::string pluginName ) : GeoVGeometryPlugin( pluginName ) {};
 
   // Destructor:
   ~ToyGeometryPlugin();
@@ -44,22 +44,27 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
   // Creation of geometry:
   virtual void create(GeoPhysVol *world, GeoVStore* store);
 
+ 
  private:
 
   // Illegal operations:
+  // we prohibit default constructor, copy constructor, and assignment operator
+  ToyGeometryPlugin()=delete;
   const ToyGeometryPlugin & operator=(const ToyGeometryPlugin &right)=delete;
   ToyGeometryPlugin(const ToyGeometryPlugin &right) = delete;
 
+  // Plugin's name.
+  // It is also used to publish the list of FullPhysVol and AlignableTransform nodes
+  std::string m_pluginName;
+ 
 };
 
 
-
-
-
+/* default constructor is prohibited
 ToyGeometryPlugin::ToyGeometryPlugin()
 {
 }
-
+*/
 
 ToyGeometryPlugin::~ToyGeometryPlugin()
 {
@@ -75,7 +80,9 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
   
   const GeoMaterial *air        = matman->getMaterial("std::Air");
   const GeoMaterial *poly       = matman->getMaterial("std::Polystyrene");
-  
+  const GeoMaterial *silicon    = matman->getMaterial("std::Silicon");
+  const GeoMaterial *copper    = matman->getMaterial("std::Copper");
+ 
   //--------------------------------------//
   // Next make the box that describes
   // the shape of the toy volume:
@@ -100,13 +107,15 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
   
   // Bundle this with a material //
   // into a logical volume:      //
-  const GeoLogVol   *ringLog  = new  GeoLogVol("RingLog", ringTube, air);
+  const GeoLogVol   *ringLog  = new  GeoLogVol("RingLog", ringTube, copper);
   
   // Make 100 of these              //
   // within the volume of the toy:  //
   GeoSerialDenominator *ringName = new GeoSerialDenominator("RING");
   toyPhys->add(ringName);
-  
+ 
+  std::string pluginName = "ToyPlugin";
+ 
   for (int i=0;i<100;i++) {
     GeoFullPhysVol         *ringPhys = new GeoFullPhysVol(ringLog);
     GeoAlignableTransform  *xform    = new GeoAlignableTransform(GeoTrf::TranslateZ3D((i-50)*20*SYSTEM_OF_UNITS::cm));
@@ -131,7 +140,7 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
   GeoPhysVol   *pPass = new GeoPhysVol(lPass);
 
   GeoBox       *sIPass = new GeoBox(4*SYSTEM_OF_UNITS::cm, 25*SYSTEM_OF_UNITS::cm, 25*SYSTEM_OF_UNITS::cm);
-  GeoLogVol    *lIPass = new GeoLogVol("InnerPassive", sIPass, air);
+  GeoLogVol    *lIPass = new GeoLogVol("InnerPassive", sIPass, silicon);
   GeoPhysVol   *pIPass = new GeoPhysVol(lIPass);
 
   pPass->add(pIPass);
@@ -172,5 +181,8 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
 }
 
 extern "C" ToyGeometryPlugin *createToyGeometryPlugin() {
-  return new ToyGeometryPlugin;
+  ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPlugin");
+  std::cout << "Plugin's name: " << toy->getName() << std::endl;
+  return toy;
+  //return new ToyGeometryPlugin("ToyGeometryPlugin");
 }

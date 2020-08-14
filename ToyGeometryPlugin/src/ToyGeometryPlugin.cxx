@@ -182,7 +182,7 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
 
 extern "C" ToyGeometryPlugin *createToyGeometryPlugin() {
   ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPlugin");
-  std::cout << "Plugin's name: " << toy->getName() << std::endl;
+  std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
   //return new ToyGeometryPlugin("ToyGeometryPlugin");
 }

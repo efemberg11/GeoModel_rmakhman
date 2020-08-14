@@ -24,8 +24,8 @@ class GDMLtoGM : public GeoVGeometryPlugin  {
 
  public:
 
-  // Constructor:
-  GDMLtoGM();
+  // Constructor:  (no default constructor)
+  GDMLtoGM( std::string pluginName ) : GeoVGeometryPlugin( pluginName ) {}
 
   // Destructor:
   ~GDMLtoGM();
@@ -44,11 +44,11 @@ class GDMLtoGM : public GeoVGeometryPlugin  {
 
 
 
-
+/*
 GDMLtoGM::GDMLtoGM()
 {
 }
-
+*/
 
 GDMLtoGM::~GDMLtoGM()
 {
@@ -81,5 +81,5 @@ void GDMLtoGM::create(GeoPhysVol *world, GeoVStore*)
 }
 
 extern "C" GDMLtoGM *createGDMLtoGM() {
-  return new GDMLtoGM;
+  return new GDMLtoGM("GDMLtoGM");
 }

@@ -10,6 +10,7 @@ set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 
 find_package( Eigen3 REQUIRED )
 find_package( GeoModelCore REQUIRED )
+find_package( GeoModelTools REQUIRED )
 find_package( GeoModelDataManagers REQUIRED )
 
 # Find the header and source files.

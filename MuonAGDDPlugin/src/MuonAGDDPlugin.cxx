@@ -22,6 +22,8 @@
 
 #include <iostream>
 
+#include "GeoXmlMatManager/GeoXmlMatManager.h" // needed since GeoXmlMatManager is forward declared in AGDD2GeoModelBuilder.h
+
 class MuonAGDDPlugin : public GeoVGeometryPlugin  {
 
  public:

@@ -114,8 +114,6 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
   GeoSerialDenominator *ringName = new GeoSerialDenominator("RING");
   toyPhys->add(ringName);
  
-  std::string pluginName = "ToyPlugin";
- 
   for (int i=0;i<100;i++) {
     GeoFullPhysVol         *ringPhys = new GeoFullPhysVol(ringLog);
     GeoAlignableTransform  *xform    = new GeoAlignableTransform(GeoTrf::TranslateZ3D((i-50)*20*SYSTEM_OF_UNITS::cm));

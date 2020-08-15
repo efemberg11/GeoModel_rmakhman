@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 /////////////////////////////////////////////////////////////////////////
@@ -12,6 +12,7 @@
 //  Origins of initial version dates back to ~1996, initial VP1        //
 //  version by TK (May 2007) and almost entirely rewritten Oct 2007.   //
 //  Major refactoring october 2008.                                    //
+//                                                                     //
 //  Updates:                                                           //
 //  - Aug 2019, Riccardo.Maria.Bianchi@cern.ch                         //
 //                                                                     //
@@ -580,7 +581,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       GeoGeometryPluginLoader loader;
       GeoVGeometryPlugin *factory=loader.load(path.toStdString());
       if (!factory) {
-	QMessageBox::warning(0, "Error!","Cannot load geometry from factory. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
+	QMessageBox::warning(0, "Error!","The factory could not be created (hint: probably the plugin is missing. Check that). Cannot load geometry from factory. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
 	exit(0);
       }
 

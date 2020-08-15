@@ -18,9 +18,9 @@
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
+// local includes
 #include "VP1GeometrySystems/VP1GeometrySystem.h"
 #include "VP1GeometrySystems/GeoSysController.h"
-
 #include "VP1GeometrySystems/VP1GeoTreeView.h"
 #include "VP1GeometrySystems/VolumeHandle.h"
 #include "VP1GeometrySystems/VolumeHandleSharedData.h"
@@ -29,12 +29,14 @@
 #include "VP1GeometrySystems/VisAttributes.h"
 #include "VP1GeometrySystems/DumpShape.h"
 #include "VP1GeometrySystems/PhiSectorManager.h"
-
 #include "VP1Base/VP1CameraHelper.h"
 #include "VP1Base/VP1QtInventorUtils.h"
 #include "VP1Base/VP1Serialise.h"
 #include "VP1Base/VP1Deserialise.h"
 #include "VP1Base/VP1Msg.h"
+
+
+// Coin/OpenInventor includes
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/nodes/SoMaterial.h>
@@ -54,28 +56,35 @@
 #include <Inventor/nodes/SoTransform.h>
 #include <Inventor/nodes/SoScale.h>
 
-
+// GeoModelCore includes
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelKernel/GeoPrintGraphAction.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoPVLink.h"
-
-
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
+#include "GeoModelKernel/Units.h"
+#include "GeoModelKernel/GeoNameTag.h"
+#include "GeoModelKernel/GeoGeometryPluginLoader.h"
+
+// GeoModelIO includes
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModelWrite/WriteGeoModel.h"
+#include "GeoModelPublish/GeoStore.h"
 
+// WARNING: classes making use of 'Persistifier' should be included AFTER 'GeoModelIO/ReadGeoModel'
+#include "GeoModelKernel/GeoShapeUnion.h"
+#include "GeoModelKernel/GeoShapeShift.h"
+
+// Qt includes
 #include <QStack>
 #include <QString>
 #include <QSettings>
-
-
 #include <QDebug>
 #include <QRegExp>
 #include <QByteArray>
@@ -87,16 +96,13 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QPushButton>
+
+// C++ includes
 #include <map>
 #include <unistd.h>
 #include <stdexcept>
-#include "GeoModelKernel/Units.h"
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
-#include "GeoModelKernel/GeoShapeUnion.h"
-#include "GeoModelKernel/GeoShapeShift.h"
-#include "GeoModelKernel/GeoNameTag.h"
-#include "GeoModelKernel/GeoGeometryPluginLoader.h"
 
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 
 static QString m_existingGeoInput;
 
@@ -586,7 +592,10 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       }
 
       if (!world) world=createTheWorld(nullptr);
-      factory->create(world);
+      
+      //factory->create(world);
+      GeoModelIO::GeoStore* store = new GeoModelIO::GeoStore; 
+      factory->create(world, store);
     }
 
     g++;

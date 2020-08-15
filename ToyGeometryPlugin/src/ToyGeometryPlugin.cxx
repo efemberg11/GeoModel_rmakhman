@@ -16,6 +16,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
+#include "GeoModelKernel/GeoVStore.h"
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -26,7 +27,7 @@
 
 #include "GeoXmlMatManager/GeoXmlMatManager.h"
 
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'SYSTEM_OF_UNITS::cm'
 
 using namespace GeoGenfun;
 using namespace GeoXF;
@@ -72,7 +73,7 @@ ToyGeometryPlugin::~ToyGeometryPlugin()
 
 
 //## Other Operations (implementation)
-void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
+void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* store)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
@@ -81,7 +82,7 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
   const GeoMaterial *air        = matman->getMaterial("std::Air");
   const GeoMaterial *poly       = matman->getMaterial("std::Polystyrene");
   const GeoMaterial *silicon    = matman->getMaterial("std::Silicon");
-  const GeoMaterial *copper    = matman->getMaterial("std::Copper");
+  const GeoMaterial *copper     = matman->getMaterial("std::Copper");
  
   //--------------------------------------//
   // Next make the box that describes
@@ -119,6 +120,11 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore*)
     GeoAlignableTransform  *xform    = new GeoAlignableTransform(GeoTrf::TranslateZ3D((i-50)*20*SYSTEM_OF_UNITS::cm));
     toyPhys->add(xform);
     toyPhys->add(ringPhys);
+    // store nodes
+    //std::string key = m_pluginName + "-" + std::to_string(i);
+    std::string key = this->getName() + "-" + std::to_string(i);
+    store->storeFPV( ringPhys, key );
+    store->storeAXF( xform, key );
   }
 
 

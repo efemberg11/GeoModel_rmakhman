@@ -11,13 +11,14 @@ find_package( AGDD REQUIRED )
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelTools REQUIRED )
 find_package( XercesC REQUIRED )
+find_package( GeoModelDataManagers REQUIRED )
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 
 # Set up the library.
 add_library( MuonAGDDPlugin SHARED ${SOURCES} )
-target_link_libraries( MuonAGDDPlugin PUBLIC GeoModelCore::GeoModelKernel AGDDHandlers AGDDControl GeoModelTools::GeoModelXMLParser MuonAGDDBase )
+target_link_libraries( MuonAGDDPlugin PUBLIC GeoModelCore::GeoModelKernel AGDDHandlers AGDDControl GeoModelTools::GeoModelXMLParser MuonAGDDBase GeoXmlMatManager )
 target_include_directories( MuonAGDDPlugin PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

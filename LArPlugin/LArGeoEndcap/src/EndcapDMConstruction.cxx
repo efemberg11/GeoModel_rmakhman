@@ -7,12 +7,6 @@
 
 #include "EndcapDMConstruction.h"
 
-#include "GaudiKernel/ISvcLocator.h"
-#include "GaudiKernel/MsgStream.h"
-#include "GaudiKernel/IMessageSvc.h"
-#include "GaudiKernel/SystemOfUnits.h"
-#include "StoreGate/StoreGateSvc.h"
-
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -28,10 +22,12 @@
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-#include "GeoModelInterfaces/StoredMaterialManager.h"
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits
 
-#include "LArInpManTest/GeoXmlInpManager.h"
-#include "LArInpManTest/GeoInpRecordset.h"
+#include "GeoXmlMatManager/GeoXmlMatManager.h"
+#include "GeoXmlInpManager/GeoXmlInpManager.h"
+#include "GeoXmlInpManager/GeoInpRecordset.h"
 
 #include "GeoGenericFunctions/Variable.h"
 
@@ -46,22 +42,8 @@ LArGeo::EndcapDMConstruction::~EndcapDMConstruction()
 
 void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
 {
-  ISvcLocator* svcLocator = Gaudi::svcLocator();
-  IMessageSvc* msgSvc(0);
-  if(svcLocator->service("MessageSvc", msgSvc, true)==StatusCode::FAILURE)
-    throw std::runtime_error("Error in EndcapDMConstruction, cannot access MessageSvc");
-  MsgStream log(msgSvc, "EndcapDMConstruction");
-  log << MSG::INFO << "Start building EC electronics geometry" << endmsg;
-
-  StoreGateSvc* detStore(0);
-  if(svcLocator->service("DetectorStore", detStore, false)==StatusCode::FAILURE)
-    throw std::runtime_error("Error in EndcapDMConstruction, cannot access DetectorStore");
-
-  const StoredMaterialManager* materialManager = nullptr;
-  if(StatusCode::SUCCESS != detStore->retrieve(materialManager, std::string("MATERIALS")))
-    throw std::runtime_error("Error in EndcapDMConstruction, stored MaterialManager is not found");
-
-  GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
+  GeoXmlInpManager*       inpman          = GeoXmlInpManager::getManager();
+  const GeoXmlMatManager* materialManager = GeoXmlMatManager::getManager();
 
   GeoInpRecordset_ptr LArEndcapCrate = inpman->getRecordsetPtr("LArEndcapCrate");
   GeoInpRecordset_ptr LArEndcapCratePhiPos = inpman->getRecordsetPtr("LArEndcapCratePhiPos");
@@ -178,9 +160,9 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
   GeoTube    *Ped2     = new GeoTube(ped2minr, ped2maxr, ped2zhlen);
   GeoTube    *Ped3     = new GeoTube(ped3minr,ped3maxr , ped3zhlen);
   const GeoShape & CratePed=((*Pedestal).subtract(*Ped1).
-			     subtract((*Ped2)  <<GeoTrf::TranslateY3D(-ped2ytr)*GeoTrf::RotateY3D(90*Gaudi::Units::deg)).
+			     subtract((*Ped2)  <<GeoTrf::TranslateY3D(-ped2ytr)*GeoTrf::RotateY3D(90*SYSTEM_OF_UNITS::deg)).
 			     subtract((*Ped3)  <<GeoTrf::TranslateX3D(-ped3xtr)).
-			     subtract((*Ped2)  <<GeoTrf::TranslateY3D(ped2ytr)*GeoTrf::RotateY3D(90*Gaudi::Units::deg)));
+			     subtract((*Ped2)  <<GeoTrf::TranslateY3D(ped2ytr)*GeoTrf::RotateY3D(90*SYSTEM_OF_UNITS::deg)));
 
   GeoLogVol  *lvped   = new GeoLogVol("LAr::DM::Ped",&CratePed,alu);
   GeoPhysVol *pedestal   = new GeoPhysVol(lvped);
@@ -206,7 +188,7 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
   GeoTransform* xfBoardEBase2(new GeoTransform(GeoTrf::TranslateY3D(-BoardEytr)*GeoTrf::TranslateX3D(BoardExtr)*GeoTrf::TranslateZ3D(BoardEztr)));
 
   for(unsigned i(0); i<LArEndcapCratePhiPos->size(); ++i) {
-    double phiPos = (*LArEndcapCratePhiPos)[i].getDouble("PHIPOS")*Gaudi::Units::deg;
+    double phiPos = (*LArEndcapCratePhiPos)[i].getDouble("PHIPOS")*SYSTEM_OF_UNITS::deg;
     GeoTransform* xfPhiPos(new GeoTransform(GeoTrf::RotateZ3D(phiPos)));
 
     envelope->add(xfPhiPos);
@@ -232,17 +214,17 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
 
     const GeoMaterial* iron = materialManager->getMaterial("std::Iron");
 
-    const double wflange_height = 37.*Gaudi::Units::mm;
-    const double wflange_R = 0.5*360.*Gaudi::Units::mm;
+    const double wflange_height = 37.*SYSTEM_OF_UNITS::mm;
+    const double wflange_R = 0.5*360.*SYSTEM_OF_UNITS::mm;
     const GeoMaterial* wflange_mat = materialManager->getMaterial("LAr::FT::WarmFlange");
 
     GeoShape* wflange = new GeoTube(0., wflange_R, wflange_height/2);
     GeoLogVol* wflangeLV = new GeoLogVol(name + "WarmFlange", wflange, wflange_mat);
     GeoPhysVol* wflangePV = new GeoPhysVol(wflangeLV);
 
-    const double bellow_height = 225.*Gaudi::Units::mm;
-    const double bellow_Router = 0.5*299.*Gaudi::Units::mm; // this also to be cut in warm wall
-    const double bellow_wall = 15.*Gaudi::Units::mm;
+    const double bellow_height = 225.*SYSTEM_OF_UNITS::mm;
+    const double bellow_Router = 0.5*299.*SYSTEM_OF_UNITS::mm; // this also to be cut in warm wall
+    const double bellow_wall = 15.*SYSTEM_OF_UNITS::mm;
     const GeoMaterial* bellow_mat = materialManager->getMaterial("LAr::FT::Bellow");
 
     const double bellow_Rinner = bellow_Router - bellow_wall;
@@ -256,21 +238,21 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
     GeoLogVol* vcablesLV = new GeoLogVol(name + "VacuumCables", vcables, vcables_mat);
     GeoPhysVol* vcablesPV = new GeoPhysVol(vcablesLV);
 
-    const double cflange_height = 35.*Gaudi::Units::mm;
-    const double cflange_Router = 0.5*283.*Gaudi::Units::mm;
+    const double cflange_height = 35.*SYSTEM_OF_UNITS::mm;
+    const double cflange_Router = 0.5*283.*SYSTEM_OF_UNITS::mm;
     const GeoMaterial* cflange_mat = materialManager->getMaterial("LAr::FT::ColdFlange");
     GeoShape* cflange = new GeoTube(0., cflange_Router, cflange_height/2);
     GeoLogVol* cflangeLV = new GeoLogVol(name + "ColdFlange", cflange, cflange_mat);
     GeoPhysVol* cflangePV = new GeoPhysVol(cflangeLV);
 
     const double coldbox1_Router = cflange_Router;
-    const double coldbox1_wall = 0.134*2.54*Gaudi::Units::cm;
-    const double coldbox1_height = 90.*Gaudi::Units::mm;
-    const double coldbox2_height = 16.*Gaudi::Units::mm;
-    const double hole_r = 0.5*133.*Gaudi::Units::mm;
-    const double hole_shift = -31.*Gaudi::Units::mm;
-    const double coldbox3_Router = 0.5*140.*Gaudi::Units::mm; // this also to be cut in cold wall
-    const double coldbox3_height = 220.*Gaudi::Units::mm;
+    const double coldbox1_wall = 0.134*2.54*SYSTEM_OF_UNITS::cm;
+    const double coldbox1_height = 90.*SYSTEM_OF_UNITS::mm;
+    const double coldbox2_height = 16.*SYSTEM_OF_UNITS::mm;
+    const double hole_r = 0.5*133.*SYSTEM_OF_UNITS::mm;
+    const double hole_shift = -31.*SYSTEM_OF_UNITS::mm;
+    const double coldbox3_Router = 0.5*140.*SYSTEM_OF_UNITS::mm; // this also to be cut in cold wall
+    const double coldbox3_height = 220.*SYSTEM_OF_UNITS::mm;
     const GeoMaterial* coldbox_mat = iron;
     GeoShape* coldbox1 = new GeoTube(coldbox1_Router - coldbox1_wall, coldbox1_Router, coldbox1_height/2); // wide part
     GeoShape* coldbox11 = new GeoTube(0., coldbox1_Router, coldbox1_height/2); // wide part for FTenvelope
@@ -359,23 +341,23 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
     FTPV->add(pigtailPV);
 
     // total lenght should be 28.5 cm
-    const double ocable_len = 10.*Gaudi::Units::cm;
-    const double ocable_R = (1.1/2)*sqrt(1920*2.85)*Gaudi::Units::mm;
+    const double ocable_len = 10.*SYSTEM_OF_UNITS::cm;
+    const double ocable_R = (1.1/2)*sqrt(1920*2.85)*SYSTEM_OF_UNITS::mm;
     const GeoMaterial* ocable_mat = materialManager->getMaterial("LAr::FT::Cable");
     GeoShape* ocable = new GeoTube(0., ocable_R, ocable_len / 2);
     GeoLogVol* ocableLV = new GeoLogVol("LAr::Endcap::FTCables", ocable, ocable_mat);
     GeoPhysVol* ocablePV = new GeoPhysVol(ocableLV);
 
-    const double chimney_height = 277.*Gaudi::Units::mm;
-    const double chimney_wall = 5.*Gaudi::Units::mm;
-    const double chimney_Router = 0.5*351.*Gaudi::Units::mm;
+    const double chimney_height = 277.*SYSTEM_OF_UNITS::mm;
+    const double chimney_wall = 5.*SYSTEM_OF_UNITS::mm;
+    const double chimney_Router = 0.5*351.*SYSTEM_OF_UNITS::mm;
     const GeoMaterial* chimney_mat = iron;
     GeoShape* chimney1 = new GeoTube(chimney_Router - chimney_wall, chimney_Router, chimney_height/2);
-    const double ch_lowring_h = 30.*Gaudi::Units::mm;
-    const double ch_lowring_r = 20.*Gaudi::Units::mm;
+    const double ch_lowring_h = 30.*SYSTEM_OF_UNITS::mm;
+    const double ch_lowring_r = 20.*SYSTEM_OF_UNITS::mm;
     GeoShape* chimney2 = new GeoTube(chimney_Router, chimney_Router + ch_lowring_r, ch_lowring_h/2);
-    const double ch_upring_r = 5.*Gaudi::Units::mm;
-    const double ch_upring_h = 20.*Gaudi::Units::mm;
+    const double ch_upring_r = 5.*SYSTEM_OF_UNITS::mm;
+    const double ch_upring_h = 20.*SYSTEM_OF_UNITS::mm;
     GeoShape* chimney3 = new GeoTube(bellow_Router, chimney_Router + ch_upring_r, ch_upring_h/2);
     const GeoShape& chimney = chimney1->add(
       (*chimney2) << GeoTrf::TranslateZ3D(-chimney_height/2 + ch_lowring_h/2)
@@ -386,8 +368,8 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
     GeoPhysVol* chimneyPV = new GeoPhysVol(chimneyLV);
 
     // todo: take cryostat parameters from DB
-    const double cryo_Router = 2475.*Gaudi::Units::mm; // cryo warm wall outer radius
-    const double z_pos = -(472 - 412 + 247)*Gaudi::Units::mm;
+    const double cryo_Router = 2475.*SYSTEM_OF_UNITS::mm; // cryo warm wall outer radius
+    const double z_pos = -(472 - 412 + 247)*SYSTEM_OF_UNITS::mm;
     const double r0 = cryo_Router + chimney_height + wflange_height/2;
     const double r1 = cryo_Router + chimney_height/2;
     const double r2 = cryo_Router + chimney_height + wflange_height + ocable_len/2;
@@ -395,8 +377,8 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
     {
       envelope->add(new GeoTransform(
         GeoTrf::Translate3D(r*cos(phi), r*sin(phi), z_pos) *
-        GeoTrf::RotateX3D(90.*Gaudi::Units::deg) *
-        GeoTrf::RotateY3D(phi + 90.*Gaudi::Units::deg)
+        GeoTrf::RotateX3D(90.*SYSTEM_OF_UNITS::deg) *
+        GeoTrf::RotateY3D(phi + 90.*SYSTEM_OF_UNITS::deg)
       ));
       envelope->add(object);
     };
@@ -408,10 +390,10 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
       put1(ocablePV, r2, phi);
     };
 
-    const double dphi = 5.*Gaudi::Units::deg;
+    const double dphi = 5.*SYSTEM_OF_UNITS::deg;
     for(unsigned int i{0}; i < LArEndcapCratePhiPos->size(); ++ i){
       const int num = (*LArEndcapCratePhiPos)[i].getInt("CRATENUM");
-      const double phi = (*LArEndcapCratePhiPos)[i].getDouble("PHIPOS")*Gaudi::Units::deg;
+      const double phi = (*LArEndcapCratePhiPos)[i].getDouble("PHIPOS")*SYSTEM_OF_UNITS::deg;
       if(num == 10){ // the topmost crate has one FT, positioned assymetrically
           put(phi + dphi);
       } else {

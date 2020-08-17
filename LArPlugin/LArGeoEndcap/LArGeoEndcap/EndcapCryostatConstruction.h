@@ -18,8 +18,8 @@
 #include "LArGeoEndcap/EMECConstruction.h"
 
 class GeoInpRecord;
-class LArGeoMaterialManager;
 class GeoXmlMatManager;
+class LArGeoMaterialManager;
 
 namespace LArGeo {
 
@@ -46,12 +46,13 @@ namespace LArGeo {
     void setFCALVisLimit(int limit) {m_fcalVisLimit=limit;}
 
   private:
-    int                 m_fcalVisLimit;
+    LArGeoMaterialManager*  m_matman;
+    int                     m_fcalVisLimit;
 
-    EMECConstruction          m_emec;
-//    FCALConstruction          m_fcal;
+    EMECConstruction        m_emec;
+//    FCALConstruction        m_fcal;
 
-    bool                      m_fullGeo;  // true->FULL, false->RECO
+    bool                    m_fullGeo;  // true->FULL, false->RECO
     std::string m_EMECVariantInner;
     std::string m_EMECVariantOuter;
 

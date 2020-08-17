@@ -61,25 +61,25 @@
 #include "GeoModelKernel/GeoTransform.h"
 #include "GeoModelKernel/GeoIdentifierTag.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-#include "GeoModelUtilities/StoredPhysVol.h"
-#include "GeoModelInterfaces/StoredMaterialManager.h"
-#include "StoreGate/StoreGateSvc.h"
-#include "GaudiKernel/IService.h"
-#include "GaudiKernel/ISvcLocator.h"
-#include "GaudiKernel/PhysicalConstants.h"
+#include "GeoModelKernel/GeoUnidentifiedShape.h"
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits
 
-#include "LArInpManTest/GeoXmlInpManager.h"
-#include "LArInpManTest/GeoInpRecordset.h"
-#include "LArGeoMaterialManager/LArGeoMaterialManager.h"
+#include "GeoXmlMatManager/GeoXmlMatManager.h"
+#include "GeoXmlInpManager/GeoXmlInpManager.h"
+#include "GeoXmlInpManager/GeoInpRecordset.h"
 
 #include "GeoSpecialShapes/LArCustomShape.h"
 #include "GeoSpecialShapes/LArWheelCalculator.h"
 
 #include "LArGeoEndcap/EMECConstruction.h"
 #include "LArGeoEndcap/EMECSupportConstruction.h"
-#include "GeoModelKernel/GeoUnidentifiedShape.h"
+#include "LArGeoUtils/LArGeoMaterialManager.h"
 
-LArGeo::EMECConstruction::EMECConstruction(LArGeoMaterialManager* matman, bool is_tb, bool has_inner, bool has_outer)
+LArGeo::EMECConstruction::EMECConstruction(LArGeoMaterialManager* matman
+					   , bool is_tb
+					   , bool has_inner
+					   , bool has_outer)
   : m_matman(matman)
   , m_fullGeo(true)
   , m_isTB(is_tb)
@@ -96,22 +96,8 @@ LArGeo::EMECConstruction::~EMECConstruction()
 
 GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
 {
-  ISvcLocator *svcLocator = Gaudi::svcLocator();
-  StoreGateSvc *detStore;
-  if(svcLocator->service("DetectorStore", detStore, false)==StatusCode::FAILURE) {
-    throw std::runtime_error("Error in EndcapCryostatConstruction, cannot access DetectorStore");
-  }
-
-  IMessageSvc* msgSvc;
-  MsgStream *msg;
-  StatusCode status = svcLocator->service("MessageSvc", msgSvc);
-  if(!status.isFailure()){
-    msg = new MsgStream(msgSvc, "EMECConstruction");
-  } else {
-    throw std::runtime_error("EMECConstruction: cannot access message service");
-  }
-
-  GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
+  GeoXmlInpManager*       inpman          = GeoXmlInpManager::getManager();
+  const GeoXmlMatManager* materialManager = GeoXmlMatManager::getManager();
 
   // Flag for building detailed absorber. Default=false
   int multilayered_absorbers = 0;
@@ -125,13 +111,10 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
   }
 
   if(multilayered_absorbers > 0){
-    (*msg) << MSG::INFO << "multi-layered version of absorbers activated, "
-           << "parameter value is " << multilayered_absorbers
-           << endmsg;
+    std::cout << "multi-layered version of absorbers activated, "
+	      << "parameter value is " << multilayered_absorbers
+	      << std::endl;
   }
-
-  const StoredMaterialManager* materialManager = nullptr;
-  if(StatusCode::SUCCESS != detStore->retrieve(materialManager, std::string("MATERIALS"))) return 0;
 
   //////////////////////////////////////////////////////////////////
   // Get materials from the manager
@@ -199,19 +182,19 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
   double phiPosition, phiSize;
 
   if(m_isTB) {
-    phiPosition = Gaudi::Units::halfpi*Gaudi::Units::rad;
-    phiSize = M_PI*Gaudi::Units::rad / 8. + 0.065*Gaudi::Units::rad; // half-angle of inner part of module
+    phiPosition = SYSTEM_OF_UNITS::halfpi*SYSTEM_OF_UNITS::rad;
+    phiSize = M_PI*SYSTEM_OF_UNITS::rad / 8. + 0.065*SYSTEM_OF_UNITS::rad; // half-angle of inner part of module
   }
   else {
-    phiPosition = M_PI*Gaudi::Units::rad;
-    phiSize = M_PI*Gaudi::Units::rad; // half-angle of a full wheel
+    phiPosition = M_PI*SYSTEM_OF_UNITS::rad;
+    phiSize = M_PI*SYSTEM_OF_UNITS::rad; // half-angle of a full wheel
   }
 
   // Define the mother volume for the emec.  Everything
   // else in the emec (wheels,structure, etc.) should be
   // placed inside here.
 
-   //double emecMotherZplan[] = {3641.*Gaudi::Units::mm,4273.*Gaudi::Units::mm};           //warm
+   //double emecMotherZplan[] = {3641.*SYSTEM_OF_UNITS::mm,4273.*SYSTEM_OF_UNITS::mm};           //warm
 
   // 21-Jul-2005, C.S. : above line valid in warm, below is in cold.
   // The latter one should apply, othervise SupportMotherVolumes cross
@@ -221,11 +204,11 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
 
   GeoInpRecordset_ptr cryoPcons = inpman->getRecordsetPtr("CryoPcons");
 
-  //double emecMotherZplan[] = {3639.5*Gaudi::Units::mm,3639.5*Gaudi::Units::mm+630.*Gaudi::Units::mm};    //cold (J.T)
-  //                                  // Zplane[0]=endg_z0*Gaudi::Units::cm-50*Gaudi::Units::mm
-  //                                  // Zplane[1]=Zplane[0]+endg_dzende*Gaudi::Units::cm-2.Gaudi::Units::mm
-  //double emecMotherRin[]   = { 279.*Gaudi::Units::mm, 324*Gaudi::Units::mm};	//{  302.*Gaudi::Units::mm,  302.*Gaudi::Units::mm };
-  //double emecMotherRout[]  = {(2077.-7)*Gaudi::Units::mm,(2077.-7)*Gaudi::Units::mm};  	// -7 for cold
+  //double emecMotherZplan[] = {3639.5*SYSTEM_OF_UNITS::mm,3639.5*SYSTEM_OF_UNITS::mm+630.*SYSTEM_OF_UNITS::mm};    //cold (J.T)
+  //                                  // Zplane[0]=endg_z0*SYSTEM_OF_UNITS::cm-50*SYSTEM_OF_UNITS::mm
+  //                                  // Zplane[1]=Zplane[0]+endg_dzende*SYSTEM_OF_UNITS::cm-2.SYSTEM_OF_UNITS::mm
+  //double emecMotherRin[]   = { 279.*SYSTEM_OF_UNITS::mm, 324*SYSTEM_OF_UNITS::mm};	//{  302.*SYSTEM_OF_UNITS::mm,  302.*SYSTEM_OF_UNITS::mm };
+  //double emecMotherRout[]  = {(2077.-7)*SYSTEM_OF_UNITS::mm,(2077.-7)*SYSTEM_OF_UNITS::mm};  	// -7 for cold
   //int lastPlaneEmec = (sizeof(emecMotherZplan) / sizeof(double));
 
   std::string emecMotherName = baseName + "::Mother"; //+ extension;
@@ -240,10 +223,10 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
     if(currentRecord.getString("PCON") == "EMEC::Mother"){
       if(!refSystemTransform){
         if(m_isTB){
-          zTrans = -3700.5*Gaudi::Units::mm;
+          zTrans = -3700.5*SYSTEM_OF_UNITS::mm;
           zMSTrans = zTrans;
         } else {
-          zTrans = currentRecord.getDouble("ZPLANE") - 3639.5*Gaudi::Units::mm;
+          zTrans = currentRecord.getDouble("ZPLANE") - 3639.5*SYSTEM_OF_UNITS::mm;
           zMSTrans = 0.;
         }
         refSystemTransform =  new GeoTransform(GeoTrf::TranslateZ3D(zTrans));
@@ -256,8 +239,8 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
 
     GeoInpRecordset_ptr DB_EmecGeometry = inpman->getRecordsetPtr("EmecGeometry");
 
-    double zWheelRefPoint = (*DB_EmecGeometry)[0].getDouble("Z0")*Gaudi::Units::cm;
-    double LArTotalThickness = (*DB_EmecGeometry)[0].getDouble("ETOT") *Gaudi::Units::cm;
+    double zWheelRefPoint = (*DB_EmecGeometry)[0].getDouble("Z0")*SYSTEM_OF_UNITS::cm;
+    double LArTotalThickness = (*DB_EmecGeometry)[0].getDouble("ETOT") *SYSTEM_OF_UNITS::cm;
 
     const GeoLogVol* emecMotherLogical =
         new GeoLogVol(emecMotherName, emecMotherShape, LAr);
@@ -292,8 +275,8 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
              && slice < 100 // slice number limited by two digits
             );
             if(slice >= 100){
-                (*msg) << MSG::ERROR << "too many LArWheel slices, something"
-                       << " goes wrong in EMECConstruction" << endmsg;
+	      std::cerr << "too many LArWheel slices, something"
+			<< " goes wrong in EMECConstruction" << std::endl;
             }
             innerName += "s";
         } else { // it is a Polycone
@@ -301,10 +284,10 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
             absorbers.push_back(new LArCustomShape(innerName + "::Absorber"));
             electrodes.push_back(new LArCustomShape(innerName + "::Electrode"));
         }
-        (*msg) << MSG::INFO << "activating " << innerName << endmsg;
-        (*msg) << MSG::DEBUG << absorbers.size() << " absorber, "
+	std::cout << "activating " << innerName << std::endl;
+	std::cout << absorbers.size() << " absorber, "
                              << electrodes.size() << " electrode shapes created"
-                             << endmsg;
+                             << std::endl;
 
         const LArWheelCalculator *lwc = absorbers.front()->calculator();
 
@@ -369,8 +352,8 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
              && slice < 100 // slice number limited by two digits
             );
             if(slice >= 100){
-                (*msg) << MSG::ERROR << "too many LArWheel slices, something"
-                       << " goes wrong in EMECConstruction" << endmsg;
+	      std::cerr << "too many LArWheel slices, something"
+			<< " goes wrong in EMECConstruction" << std::endl;
             }
             outerName += "s";
         } else { // it is Polycone
@@ -378,10 +361,10 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
             absorbers.push_back(new LArCustomShape(outerName + "::Absorber"));
             electrodes.push_back(new LArCustomShape(outerName + "::Electrode"));
         }
-        (*msg) << MSG::INFO << "activating " << outerName << endmsg;
-        (*msg) << MSG::DEBUG << absorbers.size() << " absorber, "
-                             << electrodes.size() << " electrode shapes created"
-                             << endmsg;
+	std::cout << "activating " << outerName << std::endl;
+	std::cout << absorbers.size() << " absorber, "
+		  << electrodes.size() << " electrode shapes created"
+		  << std::endl;
 
         const LArWheelCalculator *lwc = absorbers.back()->calculator();
 
@@ -448,30 +431,30 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
                 std::string object = (*DMpcons)[i].getString("PCONNAME");
                 if(object == "FrontSupportMother"){
                     int zplane = (*DMpcons)[i].getInt("NZPLANE");
-                    if(zplane == 0) front_shift += (*DMpcons)[i].getDouble("ZPOS")*Gaudi::Units::mm;
-                    else if(zplane == 1) front_shift -= (*DMpcons)[i].getDouble("ZPOS")*Gaudi::Units::mm;
+                    if(zplane == 0) front_shift += (*DMpcons)[i].getDouble("ZPOS")*SYSTEM_OF_UNITS::mm;
+                    else if(zplane == 1) front_shift -= (*DMpcons)[i].getDouble("ZPOS")*SYSTEM_OF_UNITS::mm;
                     else continue;
                 } else if(object == "BackSupportMother"){
                     int zplane = (*DMpcons)[i].getInt("NZPLANE");
-                    if(zplane == 0) back_shift -= 0.;//(*DMpcons)[i]->getDouble("ZPOS")*Gaudi::Units::mm;
-                    else if(zplane == 1) back_shift += (*DMpcons)[i].getDouble("ZPOS")*Gaudi::Units::mm;
+                    if(zplane == 0) back_shift -= 0.;//(*DMpcons)[i]->getDouble("ZPOS")*SYSTEM_OF_UNITS::mm;
+                    else if(zplane == 1) back_shift += (*DMpcons)[i].getDouble("ZPOS")*SYSTEM_OF_UNITS::mm;
                     else continue;
                 }
             }
-            double reftoactive = (*DB_EMECmn)[0].getDouble("REFTOACTIVE")*Gaudi::Units::mm;
+            double reftoactive = (*DB_EMECmn)[0].getDouble("REFTOACTIVE")*SYSTEM_OF_UNITS::mm;
             front_shift += reftoactive;
             back_shift += LArTotalThickness - reftoactive;
         }
         catch (...){
-            front_shift = -50.*Gaudi::Units::mm; // start of EMEC envelop in the cryo.(length of env=630.)
-            back_shift = 580.*Gaudi::Units::mm;
+            front_shift = -50.*SYSTEM_OF_UNITS::mm; // start of EMEC envelop in the cryo.(length of env=630.)
+            back_shift = 580.*SYSTEM_OF_UNITS::mm;
             std::cout << "EMECConstruction: WARNING: cannot get front|back_shift from DB"
                     << std::endl;
         }
 //std::cout << "EMECConstruction : " << front_shift << " " << back_shift << std::endl;
         z0 = zWheelRefPoint + front_shift;
         EMECSupportConstruction *fsc = 0;
-        if(m_isTB) fsc = new EMECSupportConstruction(m_matman,FrontSupp, bPos, true, "LAr::EMEC::", Gaudi::Units::halfpi*Gaudi::Units::rad);
+        if(m_isTB) fsc = new EMECSupportConstruction(m_matman,FrontSupp, bPos, true, "LAr::EMEC::", SYSTEM_OF_UNITS::halfpi*SYSTEM_OF_UNITS::rad);
         else fsc = new EMECSupportConstruction(m_matman,FrontSupp, bPos);
         GeoPhysVol* physicalFSM = fsc->GetEnvelope();
         emecMotherPhysical->add(new GeoTransform(GeoTrf::TranslateZ3D(z0)));
@@ -481,7 +464,7 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
 
         z0 = zWheelRefPoint + back_shift; // end of EMEC envelop in the cryo.
         EMECSupportConstruction *bsc = 0;
-        if(m_isTB) bsc = new EMECSupportConstruction(m_matman,BackSupp, bPos, true, "LAr::EMEC::", Gaudi::Units::halfpi*Gaudi::Units::rad);
+        if(m_isTB) bsc = new EMECSupportConstruction(m_matman,BackSupp, bPos, true, "LAr::EMEC::", SYSTEM_OF_UNITS::halfpi*SYSTEM_OF_UNITS::rad);
         else bsc = new EMECSupportConstruction(m_matman,BackSupp, bPos);
         GeoPhysVol *physicalBSM = bsc->GetEnvelope();
         GeoTrf::Transform3D rotBSM(GeoTrf::RotateX3D(-M_PI));
@@ -493,7 +476,7 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
 
         z0 = zWheelRefPoint + LArTotalThickness * 0.5; //dist. to middle of sens vol. along z  from WRP
         EMECSupportConstruction *osc = 0;
-        if(m_isTB) osc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Outer, bPos, true, "LAr::EMEC::", Gaudi::Units::halfpi*Gaudi::Units::rad);
+        if(m_isTB) osc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Outer, bPos, true, "LAr::EMEC::", SYSTEM_OF_UNITS::halfpi*SYSTEM_OF_UNITS::rad);
         else osc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Outer, bPos);
         GeoPhysVol *physicalOSM = osc->GetEnvelope();
         emecMotherPhysical->add(refSystemTransform);
@@ -503,7 +486,7 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
 
         z0 = zWheelRefPoint + LArTotalThickness * 0.5;
         EMECSupportConstruction *isc = 0;
-        if(m_isTB) isc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Inner, bPos, true, "LAr::EMEC::", Gaudi::Units::halfpi*Gaudi::Units::rad);
+        if(m_isTB) isc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Inner, bPos, true, "LAr::EMEC::", SYSTEM_OF_UNITS::halfpi*SYSTEM_OF_UNITS::rad);
         else isc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Inner, bPos);
         GeoPhysVol *physicalISM = isc->GetEnvelope();
         emecMotherPhysical->add(refSystemTransform);
@@ -513,7 +496,7 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
 
         z0 = zWheelRefPoint + LArTotalThickness * 0.5;
         EMECSupportConstruction *msc = 0;
-        if(m_isTB) msc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Middle, bPos, true, "LAr::EMEC::", Gaudi::Units::halfpi*Gaudi::Units::rad);
+        if(m_isTB) msc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Middle, bPos, true, "LAr::EMEC::", SYSTEM_OF_UNITS::halfpi*SYSTEM_OF_UNITS::rad);
         else msc = new EMECSupportConstruction(m_matman,EMECSupportConstruction::Middle, bPos);
         GeoPhysVol *physicalMSM = msc->GetEnvelope();
         emecMotherPhysical->add(refSystemTransform);
@@ -531,14 +514,14 @@ void LArGeo::EMECConstruction::setFullGeo(bool flag)
 }
 
 // Place the custom accordion volumes into the liquid argon
-void LArGeo::EMECConstruction::place_custom_solids(
-    GeoFullPhysVol *fullPV,
-    std::vector<LArCustomShape *> &absorbers,
-    std::vector<LArCustomShape *> &electrodes,
-    int multilayered_absorbers,
-    const GeoMaterial *Absorber, const GeoMaterial *Electrode,
-    const GeoMaterial *Glue, const GeoMaterial *Lead
-)
+void LArGeo::EMECConstruction::place_custom_solids(GeoFullPhysVol *fullPV
+						   , std::vector<LArCustomShape *> &absorbers
+						   , std::vector<LArCustomShape *> &electrodes
+						   , int multilayered_absorbers
+						   , const GeoMaterial *Absorber
+						   , const GeoMaterial *Electrode
+						   , const GeoMaterial *Glue
+						   , const GeoMaterial *Lead)
 {
 
   // This lambda function creates a proxy for the LArCustomShape:
@@ -592,4 +575,38 @@ void LArGeo::EMECConstruction::place_custom_solids(
       fullPV->add(phys_volume);
       shape->ref(); shape->unref();
     }
+}
+
+void LArGeo::EMECConstruction::getWheelCalculatorParameters(const GeoXmlInpManager* inpman
+							    , LArWheelCalculatorParameters& params)
+{
+  GeoInpRecordset_ptr emecGeometry = inpman->getRecordsetPtr("EmecGeometry");
+  GeoInpRecordset_ptr emecWheelParameters = inpman->getRecordsetPtr("EmecWheelParameters");
+  GeoInpRecordset_ptr emecMagicNumbers = inpman->getRecordsetPtr("EmecMagicNumbers");
+  GeoInpRecordset_ptr emecParams = inpman->getRecordsetPtr("EMECParams");
+
+  params.m_zWheelRefPoint = (*emecGeometry)[0].getDouble("Z0")*SYSTEM_OF_UNITS::cm;
+  params.m_dMechFocaltoWRP = (*emecGeometry)[0].getDouble("Z1")*SYSTEM_OF_UNITS::cm;
+  params.m_dElecFocaltoWRP = (*emecGeometry)[0].getDouble("DCF")*SYSTEM_OF_UNITS::cm;
+  params.m_HalfGapBetweenWheels = (*emecGeometry)[0].getDouble("DCRACK")*SYSTEM_OF_UNITS::cm;
+  params.m_rOuterCutoff = (*emecGeometry)[0].getDouble("RLIMIT")*SYSTEM_OF_UNITS::cm;
+  params.m_zShift = (*emecGeometry)[0].getDouble("ZSHIFT")*SYSTEM_OF_UNITS::cm;
+
+  params.m_eta_hi = (*emecWheelParameters)[0].getDouble("ETAINT");
+  params.m_eta_mid = (*emecWheelParameters)[0].getDouble("ETAEXT");
+  params.m_eta_low = (*emecWheelParameters)[1].getDouble("ETAEXT");
+  params.m_NumberOfFans1 = (*emecWheelParameters)[0].getInt("NABS");
+  params.m_NumberOfWaves1 = (*emecWheelParameters)[0].getInt("NACC");
+  params.m_NumberOfFans2 = (*emecWheelParameters)[1].getInt("NABS");
+  params.m_NumberOfWaves2 = (*emecWheelParameters)[1].getInt("NACC");
+
+
+  params.m_ActiveLength = (*emecMagicNumbers)[0].getDouble("ACTIVELENGTH")*SYSTEM_OF_UNITS::mm;
+  params.m_StraightStartSection = (*emecMagicNumbers)[0].getDouble("STRAIGHTSTARTSECTION")*SYSTEM_OF_UNITS::mm;
+  params.m_dWRPtoFrontFace = (*emecMagicNumbers)[0].getDouble("REFTOACTIVE")*SYSTEM_OF_UNITS::mm;
+
+  params.m_pr_opt_value = (*emecParams)[0].getString("PHIROTATION");
+  params.m_sagging_opt_value = (*emecParams)[0].getString("SAGGING");
+  params.m_slant_params_inner = (*emecParams)[0].getString("INNERSLANTPARAM");
+  params.m_slant_params_outer = (*emecParams)[0].getString("OUTERSLANTPARAM");
 }

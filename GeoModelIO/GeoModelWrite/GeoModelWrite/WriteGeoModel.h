@@ -1,10 +1,15 @@
 /*
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+*/
+
+/*
  * author: Riccardo.Maria.Bianchi@cern.ch, 2017
  *
  * major updates:
  * - Aug 2018 - R.M.Bianchi
  * - Feb 2019 - R.M.Bianchi
  * - May 2020 - R.M.Bianchi
+ * - Aug 2020 - R.M.Bianchi // added support for GeoStore
  */
 
 #ifndef GeoModelWrite_WriteGeoModel_H
@@ -29,6 +34,8 @@
 #include <string>
 #include <unordered_map>
 
+// FWD declarations
+namespace GeoModelIO { class GeoStore; }
 
 namespace GeoModelIO {
 
@@ -61,7 +68,7 @@ public:
 	virtual void handleTransform (const GeoTransform *);
 	virtual void handleNameTag (const GeoNameTag *);
 
-	void saveToDB();
+	void saveToDB(GeoModelIO::GeoStore* store = nullptr);
 
 
 private:

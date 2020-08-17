@@ -1,8 +1,14 @@
+/*
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+*/
+
 // author: Riccardo.Maria.Bianchi@cern.ch, 2017
 // major updates:
 // - Aug 2018 - Riccardo Maria Bianchi
 // - Feb 2019 - Riccardo Maria Bianchi
 // - May 2020 - Riccardo Maria Bianchi
+// - Aug 2020 - Riccardo Maria Bianchi
+//
 
 // local includes
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -1480,7 +1486,10 @@ unsigned int WriteGeoModel::addLogVol(const std::string &name, const unsigned in
 }
 
 
-void WriteGeoModel::saveToDB()
+/*
+ * The store parameter is optional, by default it is set to 'nullptr' in the header.
+ */
+void WriteGeoModel::saveToDB( GeoModelIO::GeoStore* store )
 {
     std::cout << "Saving the GeoModel tree to file: '" << m_dbpath << "'" << std::endl;
 
@@ -1500,6 +1509,10 @@ void WriteGeoModel::saveToDB()
 	m_dbManager->addListOfChildrenPositions(m_childrenPositions);
 	m_dbManager->addRootVolume(m_rootVolume);
 
+    if(store) {
+	    std::cout << "\nA pointer to a GeoStore instance has been provided, so we dump the published list of FullPhysVol and AlignableTransforms\n" << std::endl;
+	}
+
 	if ( !m_objectsNotPersistified.empty() ) {
     std::cout << "\n\tWARNING!! There are shapes/nodes which need to be persistified! --> ";
     printStdVectorStrings(m_objectsNotPersistified);
@@ -1507,6 +1520,11 @@ void WriteGeoModel::saveToDB()
 	}
 
 	return;
+}
+
+void WriteGeoModel::storePublishedNodes()
+{
+    m_alignableTransforms;
 }
  
 

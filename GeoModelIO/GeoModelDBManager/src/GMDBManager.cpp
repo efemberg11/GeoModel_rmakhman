@@ -1,9 +1,14 @@
+/*
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+*/
+
 
 /*
-* author: Riccardo.Maria.Bianchi@cern.ch - 2017
+* author: Riccardo Maria Bianchi @ CERN - 2017
 * major updates:
 *  - Aug 2018, R.M.Bianchi
 *  - Jun 2020, R.M.Bianchi
+*  - Aug 2020, R.M.Bianchi
 */
 
 #include <GeoModelDBManager/GMDBManager.h>
@@ -18,7 +23,7 @@
 
 
 
-static std::string dbversion = "0.4.0"; // removed "parent" info from [Full]PhysVols tables (May 2020)
+static std::string dbversion = "0.5.0"; // Added two new tables to store the list of published FullPhysVols and AlignableTransforms
 
 
 //// FIXME: move this to utility class/file
@@ -868,6 +873,28 @@ bool GMDBManager::createTables()
   tab.push_back("volTable");
   storeTableColumnNames(tab);
   queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer not null, {3} integer not null REFERENCES GeoNodesTypes(id))", tab[0], tab[1], tab[2], tab[3]);
+  rc = execQuery(queryStr);
+  tab.clear();
+  
+  // create a table to store the list of published GeoFullPhysVol node
+  tableName = "PublishedFullPhysVols";
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("key");
+  tab.push_back("volId");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar not null, {3} integer not null REFERENCES FullPhysVols(id))", tab[0], tab[1], tab[2], tab[3]);
+  rc = execQuery(queryStr);
+  tab.clear();
+  
+  // create a table to store the list of published GeoAlignableTransform node
+  tableName = "PublishedAlignableTransforms";
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("key");
+  tab.push_back("volId");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar not null, {3} integer not null REFERENCES AlignableTransforms(id))", tab[0], tab[1], tab[2], tab[3]);
   rc = execQuery(queryStr);
   tab.clear();
   

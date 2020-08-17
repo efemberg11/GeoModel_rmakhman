@@ -25,22 +25,35 @@
 
 // C++ includes
 #include <any> // C++17
+#include <map>
+#include <string>
+
 
 class GeoAlignableTransform;
 class GeoVFullPhysVol;
 
 namespace GeoModelIO {
+
 class GeoStore : public GeoVStore 
 {
  public:
   GeoStore() {}
   virtual ~GeoStore() {}
 
-  void storeAXF(GeoAlignableTransform* axf, std::any key);
-  void storeFPV(GeoVFullPhysVol* fpv, std::any key);
+  std::string storeAXF(GeoAlignableTransform* axf, std::string key) override;
+  std::string storeFPV(GeoVFullPhysVol* fpv, std::string key) override;
 
-};
+  GeoVFullPhysVol* getPointerFPV(std::string key);
+  GeoAlignableTransform* getPointerAXF(std::string key);
 
-} // end of GeoModelIO
+ private:
+  std::map<std::string, GeoVFullPhysVol*> m_mapFPV;
+  std::map<std::string, GeoAlignableTransform*> m_mapAXF;
+
+  template<typename Iter> void printInsertionStatus(Iter it, bool success);
+
+}; 
+
+} // end of the GeoModelIO namespace
 
 #endif

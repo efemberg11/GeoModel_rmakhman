@@ -68,7 +68,7 @@ endif()
 
 # A function to get a string with comma-separated package names from a list of packages
 # NOTE: We could make use of list(JOIN ...) on CMake >= 3.12,
-# but Ubuntu 18 pat package installs 3.10 instead
+# but on Ubuntu 18 the apt package installs 3.10 instead
 function(getCSVStringFromList inputList outputString)
   #message("input: ${inputList}") # for debug
   set(tempList "")

@@ -31,8 +31,10 @@ class GeoVStore
   GeoVStore() {}
   virtual ~GeoVStore() {}
 
-  virtual void storeAXF(GeoAlignableTransform* axf, std::any key) = 0;
-  virtual void storeFPV(GeoVFullPhysVol* fpv, std::any key) = 0;
+  //virtual void storeAXF(GeoAlignableTransform* axf, std::any key) = 0;
+  //virtual void storeFPV(GeoVFullPhysVol* fpv, std::any key) = 0;
+  virtual std::string storeAXF(GeoAlignableTransform* axf, std::string key) = 0;
+  virtual std::string storeFPV(GeoVFullPhysVol* fpv, std::string key) = 0;
 
 };
 

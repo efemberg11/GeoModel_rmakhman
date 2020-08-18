@@ -20,7 +20,8 @@
  * alignment corrections
  */
 
-#include <any>
+#include <any> // needs C++17
+#include <map> 
 
 class GeoAlignableTransform;
 class GeoVFullPhysVol;
@@ -31,10 +32,11 @@ class GeoVStore
   GeoVStore() {}
   virtual ~GeoVStore() {}
 
-  //virtual void storeAXF(GeoAlignableTransform* axf, std::any key) = 0;
-  //virtual void storeFPV(GeoVFullPhysVol* fpv, std::any key) = 0;
-  virtual std::string storeAXF(GeoAlignableTransform* axf, std::string key) = 0;
-  virtual std::string storeFPV(GeoVFullPhysVol* fpv, std::string key) = 0;
+  virtual void storeAXF(GeoAlignableTransform* axf, std::any key) = 0;
+  virtual void storeFPV(GeoVFullPhysVol* fpv, std::any key) = 0;
+
+  virtual std::map<GeoAlignableTransform*, std::any> getStoreAXF() = 0;
+  virtual std::map<GeoVFullPhysVol*, std::any> getStoreFPV() = 0;
 
 };
 

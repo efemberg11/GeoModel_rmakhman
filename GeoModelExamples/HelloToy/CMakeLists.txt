@@ -22,4 +22,4 @@ set(SRCS main.cpp )
 add_executable( helloToy ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( helloToy GeoModelKernel GeoModelDBManager GeoModelWrite GeoModelPublish )
+target_link_libraries( helloToy GeoModelKernel GeoModelDBManager GeoModelWrite )

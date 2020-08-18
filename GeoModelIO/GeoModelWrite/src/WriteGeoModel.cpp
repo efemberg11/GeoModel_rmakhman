@@ -40,6 +40,7 @@
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
+#include "GeoModelKernel/GeoVStore.h"
 
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
@@ -1489,7 +1490,7 @@ unsigned int WriteGeoModel::addLogVol(const std::string &name, const unsigned in
 /*
  * The store parameter is optional, by default it is set to 'nullptr' in the header.
  */
-void WriteGeoModel::saveToDB( GeoModelIO::GeoStore* store )
+void WriteGeoModel::saveToDB( GeoVStore* store )
 {
     std::cout << "Saving the GeoModel tree to file: '" << m_dbpath << "'" << std::endl;
 
@@ -1510,7 +1511,8 @@ void WriteGeoModel::saveToDB( GeoModelIO::GeoStore* store )
 	m_dbManager->addRootVolume(m_rootVolume);
 
     if(store) {
-	    std::cout << "\nA pointer to a GeoStore instance has been provided, so we dump the published list of FullPhysVol and AlignableTransforms\n" << std::endl;
+	    std::cout << "\nA pointer to a GeoVStore instance has been provided, so we dump the published list of FullPhysVol and AlignableTransforms\n" << std::endl;
+        storePublishedNodes(store);
 	}
 
 	if ( !m_objectsNotPersistified.empty() ) {
@@ -1522,9 +1524,55 @@ void WriteGeoModel::saveToDB( GeoModelIO::GeoStore* store )
 	return;
 }
 
-void WriteGeoModel::storePublishedNodes()
+
+void WriteGeoModel::storePublishedNodes(GeoVStore* store)
 {
-    m_alignableTransforms;
+    std::cout << "Storing published FPV and AXF nodes...\n";
+    
+    // loop over the published AXF nodes
+    std::map<GeoAlignableTransform*, std::any> storeAXF = store->getStoreAXF();
+    std::map<GeoAlignableTransform*, std::any>::iterator it = storeAXF.begin();
+    for( std::pair<GeoAlignableTransform*, std::any> record : storeAXF ) {
+        //accessing FPV pointer
+        GeoAlignableTransform* vol = record.first;
+        //accessing key 
+        std::any key = record.second;
+        //accessing key type
+        auto& keyType = key.type();
+
+        std::string keyStr;
+        std::string keyTypeStr;
+        if ( typeid(std::string) == keyType ) {
+            keyTypeStr = "string";
+            keyStr = std::any_cast<std::string>(key);
+        }
+        else if ( typeid(int) == keyType ) {
+            keyTypeStr = "int";
+            keyStr = std::any_cast<int>(key);
+        }
+        else {
+            std::cout << "ERROR! The type of the key used to publish FPV and AXF nodes is not std::string, nor integer. Format not supported.\n"
+                      << "If in doubt, please ask to 'geomodel-developers@cern.ch'. Exiting...\n\n";
+            exit(EXIT_FAILURE);
+        }
+
+        // check if address is stored already; and get the ID associated with it. 
+        // NOTE: All of the addresses should be stored already, at this stage. 
+        //       If not, there's a serious bug!
+        unsigned int volID = 0;
+        std::string volStr = getAddressStringFromPointer( vol );
+        if( isAddressStored(volStr) ) {
+            volID = getStoredIdFromAddress(volStr);
+        } else {
+            std::cout << "ERROR!!! Address of node is not stored, but it should! Ask 'geomodel-developers@cern.ch'. Exiting...\n\n";
+            exit(EXIT_FAILURE);
+        }
+
+        // debug msg
+        //std::cout << vol << "::" << key << "::" << keyType << std::endl;
+        std::cout << vol << "::" << keyStr << "[" << keyTypeStr << "] --> " << volID << std::endl;
+
+    }
 }
  
 

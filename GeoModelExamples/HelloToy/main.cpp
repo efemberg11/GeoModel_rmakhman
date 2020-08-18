@@ -24,6 +24,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
+#include "GeoModelKernel/GeoStore.h"
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -33,8 +34,6 @@
 #include "GeoModelDBManager/GMDBManager.h"
 
 #include "GeoModelWrite/WriteGeoModel.h"
-
-#include "GeoModelPublish/GeoStore.h"
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -145,7 +144,7 @@ int main(int argc, char *argv[])
   toyPhys->add(ringName);
  
   // Instanciate a GeoStore, to publish the list of FullPhysVol and AlignableTransforms nodes
-  GeoModelIO::GeoStore* store = new GeoModelIO::GeoStore;
+  GeoModelKernel::GeoStore* store = new GeoModelKernel::GeoStore;
 
   for (int i=0;i<100;i++) {
     GeoFullPhysVol         *ringPhys = new GeoFullPhysVol(ringLog);
@@ -154,7 +153,7 @@ int main(int argc, char *argv[])
     toyPhys->add(ringPhys);
     
     // publish the list of FPV and AXF nodes
-    std::string key = "HelloToy-" + std::to_string(i);
+    std::string key = "HelloToy-" + std::to_string(i+1);
     store->storeFPV( ringPhys, key );
     store->storeAXF( xform, key );
   }

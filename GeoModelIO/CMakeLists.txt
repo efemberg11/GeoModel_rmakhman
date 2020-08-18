@@ -34,7 +34,7 @@ add_subdirectory( GeoModelDBManager )
 add_subdirectory( TFPersistification )
 add_subdirectory( GeoModelRead )
 add_subdirectory( GeoModelWrite )
-add_subdirectory( GeoModelPublish )
+#add_subdirectory( GeoModelPublish )
 #
 
 # Create and install the version description of the project.
@@ -85,7 +85,8 @@ install(
 # we modified our source code.
 #export(EXPORT ${PROJECT_NAME}-export NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake)
 #export(TARGETS GeoModelErrorHandler GeoModelDBManager TFPersistification GeoModelRead GeoModelWrite NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Targets.cmake)
-export(TARGETS GeoModelDBManager TFPersistification GeoModelRead GeoModelWrite GeoModelPublish NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Targets.cmake)
+#export(TARGETS GeoModelDBManager TFPersistification GeoModelRead GeoModelWrite GeoModelPublish NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Targets.cmake)
+export(TARGETS GeoModelDBManager TFPersistification GeoModelRead GeoModelWrite NAMESPACE "${PROJECT_NAME}::" FILE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Targets.cmake)
 
 
 

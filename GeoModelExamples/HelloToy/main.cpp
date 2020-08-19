@@ -153,8 +153,9 @@ int main(int argc, char *argv[])
     toyPhys->add(ringPhys);
     
     // publish the list of FPV and AXF nodes
-    std::string key = "HelloToyExample-" + std::to_string(i+1);
+    std::string key = "HelloToyExample-FPV-" + std::to_string(i+1);
     store->storeFPV( ringPhys, key );
+    key = "HelloToyExample-AXF-" + std::to_string(i+1);
     store->storeAXF( xform, key );
   }
 
@@ -254,6 +255,7 @@ int main(int argc, char *argv[])
 
   std::cout << "DONE. Geometry saved." <<std::endl;
 
+  /* UNCOMMENT to see test messages
   std::cout << "\nTest - list of all the GeoMaterial nodes in the persistified geometry:" << std::endl;
   db.printAllMaterials();
   std::cout << "\nTest - list of all the GeoElement nodes in the persistified geometry:" << std::endl;
@@ -262,6 +264,7 @@ int main(int argc, char *argv[])
   db.printAllFullPhysVols();
   std::cout << "\nTest - list of all the GeoAlignableTransform nodes in the persistified geometry:" << std::endl;
   db.printAllAlignableTransforms();
+  */
 
   // cleaning
   delete store;

@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
     toyPhys->add(ringPhys);
     
     // publish the list of FPV and AXF nodes
-    std::string key = "HelloToy-" + std::to_string(i+1);
+    std::string key = "HelloToyExample-" + std::to_string(i+1);
     store->storeFPV( ringPhys, key );
     store->storeAXF( xform, key );
   }

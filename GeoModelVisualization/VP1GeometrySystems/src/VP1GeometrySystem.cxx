@@ -14,7 +14,8 @@
 //  Major refactoring october 2008.                                    //
 //                                                                     //
 //  Updates:                                                           //
-//  - Aug 2019, Riccardo.Maria.Bianchi@cern.ch                         //
+//  - Aug 2019, Riccardo Maria Bianchi @ CERN                          //
+//  - Aug 2020, Riccardo Maria Bianchi @ CERN                          //
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
@@ -70,12 +71,12 @@
 #include "GeoModelKernel/Units.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
+#include "GeoModelKernel/GeoStore.h"
 
 // GeoModelIO includes
 #include "GeoModelDBManager/GMDBManager.h"
-#include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModelWrite/WriteGeoModel.h"
-#include "GeoModelPublish/GeoStore.h"
+#include "GeoModelRead/ReadGeoModel.h"
 
 // WARNING: classes making use of 'Persistifier' should be included AFTER 'GeoModelIO/ReadGeoModel'
 #include "GeoModelKernel/GeoShapeUnion.h"
@@ -593,8 +594,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 
       if (!world) world=createTheWorld(nullptr);
       
-      //factory->create(world);
-      GeoModelIO::GeoStore* store = new GeoModelIO::GeoStore; 
+      GeoVStore* store = factory->getStore(); 
       factory->create(world, store);
     }
 

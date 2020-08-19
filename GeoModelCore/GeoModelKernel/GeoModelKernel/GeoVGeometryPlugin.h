@@ -21,7 +21,7 @@ class GeoVGeometryPlugin
 {
  public:
   // no default constructor. We prohibit it in the 'private' session 
-  GeoVGeometryPlugin(std::string name) : m_pluginName( name ) {} // must enforce derived to call this.
+  GeoVGeometryPlugin(std::string name, GeoVStore* store = nullptr) : m_pluginName( name ), m_store(store) {} // must enforce derived to call this.
   virtual ~GeoVGeometryPlugin();
 
   // Create the system.
@@ -32,6 +32,8 @@ class GeoVGeometryPlugin
   // Get the plugin's name
   std::string getName() { return m_pluginName; };
 
+  // Get the stor that publishes the GeoFullPhysVol and AlignableTransform nodes
+  GeoVStore* getStore() {return m_store; };
 
  private:
 
@@ -44,6 +46,9 @@ class GeoVGeometryPlugin
   // It will be used to keep track of the FullPhysVol 
   // and AlignableTransform nodes used in the plugin.
   std::string m_pluginName;
+
+  // a pointer to an instance of a class inheriting from GeoVStore
+  GeoVStore* m_store;
 
 };
 

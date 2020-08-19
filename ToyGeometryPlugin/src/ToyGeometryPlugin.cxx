@@ -16,7 +16,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-#include "GeoModelKernel/GeoVStore.h"
+#include "GeoModelKernel/GeoStore.h"
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -37,7 +37,7 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:  (no default constructor)
-  ToyGeometryPlugin( std::string pluginName ) : GeoVGeometryPlugin( pluginName ) {};
+  ToyGeometryPlugin( std::string pluginName, GeoVStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
 
   // Destructor:
   ~ToyGeometryPlugin();
@@ -120,11 +120,13 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* store)
     GeoAlignableTransform  *xform    = new GeoAlignableTransform(GeoTrf::TranslateZ3D((i-50)*20*SYSTEM_OF_UNITS::cm));
     toyPhys->add(xform);
     toyPhys->add(ringPhys);
-    // store nodes
-    //std::string key = m_pluginName + "-" + std::to_string(i);
-    std::string key = this->getName() + "-" + std::to_string(i);
-    store->storeFPV( ringPhys, key );
-    store->storeAXF( xform, key );
+
+    // store nodes, if a pointer to a GeoStore is provided
+    if (store) {
+    	std::string key = this->getName() + "-" + std::to_string(i);
+    	store->storeFPV( ringPhys, key );
+    	store->storeAXF( xform, key );
+    }
   }
 
 
@@ -185,7 +187,8 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* store)
 }
 
 extern "C" ToyGeometryPlugin *createToyGeometryPlugin() {
-  ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPlugin");
+  GeoVStore* store = new GeoModelKernel::GeoStore();
+  ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPlugin", store);
   std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
   //return new ToyGeometryPlugin("ToyGeometryPlugin");

@@ -121,7 +121,7 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* store)
     toyPhys->add(xform);
     toyPhys->add(ringPhys);
 
-    // store nodes, if a pointer to a GeoStore is provided
+    // publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoStore is provided
     if (store) {
     	std::string key = this->getName() + "-" + std::to_string(i);
     	store->storeFPV( ringPhys, key );

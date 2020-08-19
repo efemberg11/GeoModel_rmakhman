@@ -154,7 +154,7 @@ private:
   unsigned int getIdFromNodeType(const std::string &nodeType);
 
   void storePublishedNodes(GeoVStore* store);
-
+  template <typename TT> void storeRecordPublishedNodes(const TT storeMap, std::vector<std::vector<std::string>>* cachePublishedNodes);
 
   std::string m_dbpath;
 	GMDBManager* m_dbManager;

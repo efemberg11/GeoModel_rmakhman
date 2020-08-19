@@ -1534,16 +1534,24 @@ void WriteGeoModel::storePublishedNodes(GeoVStore* store)
 {
     std::cout << "Storing published FPV and AXF nodes...\n";
     
-    // loop over the published AXF nodes
+    // loop over the published AlignableTransform nodes
     std::map<GeoAlignableTransform*, std::any> storeAXF = store->getStoreAXF();
-    std::map<GeoAlignableTransform*, std::any>::iterator it = storeAXF.begin();
-    for( std::pair<GeoAlignableTransform*, std::any> record : storeAXF ) 
+    storeRecordPublishedNodes<std::map<GeoAlignableTransform*, std::any>>(storeAXF, &m_publishedAlignableTransforms_String);   
+
+    // loop over the published GeoVFullPhysVol nodes
+    std::map<GeoVFullPhysVol*, std::any> storeFPV = store->getStoreFPV();
+    storeRecordPublishedNodes<std::map<GeoVFullPhysVol*, std::any>>(storeFPV, &m_publishedFullPhysVols_String);   
+
+    // save the list of matching published nodes to the DB
+    m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String);
+    m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String);
+
+}
+
+template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT storeMap, std::vector<std::vector<std::string>>* cachePublishedNodes   )
+{
+    for( const auto& [vol, key ] : storeMap ) 
     {
-        //accessing FPV pointer
-        GeoAlignableTransform* vol = record.first;
-        //accessing key 
-        std::any key = record.second;
-        //accessing key type
         auto& keyType = key.type();
 
         // get key type and convert to std::string to store into the cache
@@ -1576,22 +1584,17 @@ void WriteGeoModel::storePublishedNodes(GeoVStore* store)
         }
 
         // debug msg
-        //std::cout << vol << "::" << key << "::" << keyType << std::endl;
-        std::cout << vol << "::" << keyStr << "[" << keyTypeStr << "] --> " << volID << std::endl;
+        //std::cout << vol << "::" << keyStr << "[" << keyTypeStr << "] --> " << volID << std::endl;
 
         // prepare the vector containing the pieces of information to be stored in the DB table
         std::vector<std::string> values;
         values.push_back(keyStr);
         values.push_back(std::to_string(volID));
 
-        unsigned int recordID = addRecord(&m_publishedAlignableTransforms_String, values);
-
+        unsigned int recordID = addRecord(cachePublishedNodes, values);
+        std::cout << "Pushed record: " << recordID << std::endl;
     }
-
-    m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String);
-
 }
- 
 
   void WriteGeoModel::storeAddress(const std::string &address, const unsigned int &id)
 {

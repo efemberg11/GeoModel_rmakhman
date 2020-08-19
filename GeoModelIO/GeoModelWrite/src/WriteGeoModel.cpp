@@ -1322,6 +1322,8 @@ unsigned int WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, const
 	return id;
 }
 
+
+
   void WriteGeoModel::storeChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &childId, const unsigned int &parentCopyN, const unsigned int &childPos, const std::string &childType, const unsigned int &childCopyN)
 {
 	addChildPosition(parentId, parentType, childId, parentCopyN, childPos, childType, childCopyN); // FIXME: change the positions of the parameters to a more logical order, like: parentID, parentType, parentCopyN, childPos, ChildType, childId, childCopyN
@@ -1336,6 +1338,7 @@ unsigned int WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, const
 	return idx;
 }
 
+
   unsigned int WriteGeoModel::addMaterial(const std::string &name, const double &density, const std::string &elements)
 {
   std::vector<std::vector<std::string>>* container = &m_materials;
@@ -1345,6 +1348,8 @@ unsigned int WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, const
   values.push_back( elements );
 	return addRecord(container, values);
 }
+
+
 
 
 unsigned int WriteGeoModel::addElement(const std::string &name, const std::string &symbol, const double &elZ, const double &elA)
@@ -1532,7 +1537,8 @@ void WriteGeoModel::storePublishedNodes(GeoVStore* store)
     // loop over the published AXF nodes
     std::map<GeoAlignableTransform*, std::any> storeAXF = store->getStoreAXF();
     std::map<GeoAlignableTransform*, std::any>::iterator it = storeAXF.begin();
-    for( std::pair<GeoAlignableTransform*, std::any> record : storeAXF ) {
+    for( std::pair<GeoAlignableTransform*, std::any> record : storeAXF ) 
+    {
         //accessing FPV pointer
         GeoAlignableTransform* vol = record.first;
         //accessing key 
@@ -1540,6 +1546,7 @@ void WriteGeoModel::storePublishedNodes(GeoVStore* store)
         //accessing key type
         auto& keyType = key.type();
 
+        // get key type and convert to std::string to store into the cache
         std::string keyStr;
         std::string keyTypeStr;
         if ( typeid(std::string) == keyType ) {
@@ -1572,7 +1579,17 @@ void WriteGeoModel::storePublishedNodes(GeoVStore* store)
         //std::cout << vol << "::" << key << "::" << keyType << std::endl;
         std::cout << vol << "::" << keyStr << "[" << keyTypeStr << "] --> " << volID << std::endl;
 
+        // prepare the vector containing the pieces of information to be stored in the DB table
+        std::vector<std::string> values;
+        values.push_back(keyStr);
+        values.push_back(std::to_string(volID));
+
+        unsigned int recordID = addRecord(&m_publishedAlignableTransforms_String, values);
+
     }
+
+    m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String);
+
 }
  
 

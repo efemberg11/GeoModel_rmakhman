@@ -265,6 +265,21 @@ bool GMDBManager::addListOfChildrenPositions(const std::vector<std::vector<std::
 	//return addListOfRecordsToTableOld("ChildrenPositions", records); // old SQLite versions
 }
 
+bool GMDBManager::addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records)
+{
+    // NOTE: Choose the right function for your version of SQLite!!
+	return addListOfRecordsToTable("PublishedAlignableTransforms", records); // needs SQLite >= 3.7.11
+	//return addListOfRecordsToTableOld("PublishedAlignableTransforms", records); // old SQLite versions
+}
+bool GMDBManager::addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records)
+{
+    // NOTE: Choose the right function for your version of SQLite!!
+	return addListOfRecordsToTable("PublishedFullPhysVols", records); // needs SQLite >= 3.7.11
+	//return addListOfRecordsToTableOld("PublishedFullPhysVols", records); // old SQLite versions
+}
+
+
+
 
 bool GMDBManager::addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records)
 {

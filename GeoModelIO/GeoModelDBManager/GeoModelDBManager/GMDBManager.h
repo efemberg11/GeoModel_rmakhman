@@ -144,10 +144,10 @@ public:
 
   bool addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records);
 
-  bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
 
-//  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
   bool addListOfChildrenPositions(const std::vector<std::vector<std::string>> &records);
+  bool addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records);
+  bool addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records);
 
 	bool addRootVolume(const std::vector<std::string> &values);
 
@@ -180,6 +180,9 @@ private:
 
 	bool createTables();
 
+
+  bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
+//  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
 
   void addDBversion(std::string version);
 

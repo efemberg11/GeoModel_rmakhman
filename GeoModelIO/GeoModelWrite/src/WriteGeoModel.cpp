@@ -40,7 +40,7 @@
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
-#include "GeoModelKernel/GeoVStore.h"
+#include "GeoModelKernel/GeoStore.h"
 
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
@@ -1530,8 +1530,19 @@ void WriteGeoModel::saveToDB( GeoVStore* store )
 }
 
 
-void WriteGeoModel::storePublishedNodes(GeoVStore* store)
+void WriteGeoModel::storePublishedNodes(GeoVStore* storePtr)
 {
+    if( !(dynamic_cast<GeoModelKernel::GeoStore*>(storePtr)) )
+    {
+        std::cout << "ERROR!!! " 
+            << "The implemntation class of GeoVStore you are using is not targeted to publish nodes wth GeoModelIO. "
+            << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting..."
+            << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    GeoModelKernel::GeoStore* store = dynamic_cast<GeoModelKernel::GeoStore*>(storePtr);
+
     std::cout << "Storing published FPV and AXF nodes...\n";
     
     // loop over the published AlignableTransform nodes
@@ -1543,8 +1554,10 @@ void WriteGeoModel::storePublishedNodes(GeoVStore* store)
     storeRecordPublishedNodes<std::map<GeoVFullPhysVol*, std::any>>(storeFPV, &m_publishedFullPhysVols_String);   
 
     // save the list of matching published nodes to the DB
-    m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String);
-    m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String);
+    std::string suffixAXF = store->getTableSuffixAXF();
+    std::string suffixFPV = store->getTableSuffixFPV();
+    m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String, suffixAXF);
+    m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String, suffixFPV);
 
 }
 

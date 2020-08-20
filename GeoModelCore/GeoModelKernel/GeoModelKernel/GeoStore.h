@@ -47,23 +47,32 @@ class GeoStore : public GeoVStore
   void storeAXF(GeoAlignableTransform* axf, std::any key) override final;
   void storeFPV(GeoVFullPhysVol* fpv, std::any key) override final;
 
-  std::map<GeoVFullPhysVol*, std::any> getStoreFPV() override final;;
-  std::map<GeoAlignableTransform*, std::any> getStoreAXF() override final;
+  //std::map<GeoVFullPhysVol*, std::any> getStoreFPV() override final;
+  //std::map<GeoAlignableTransform*, std::any> getStoreAXF() override final;
+  std::map<GeoVFullPhysVol*, std::any> getStoreFPV();
+  std::map<GeoAlignableTransform*, std::any> getStoreAXF();
 
-  void setTableSuffixAXF(std::string suffix) override final { suffixTableAXF = suffix; }
-  void setTableSuffixFPV(std::string suffix) override final { suffixTableFPV = suffix; }
+  //void setTableSuffixAXF(std::string suffix) override final { suffixTableAXF = suffix; }
+  //void setTableSuffixFPV(std::string suffix) override final { suffixTableFPV = suffix; }
+  void setTableSuffixAXF(std::string suffix); 
+  void setTableSuffixFPV(std::string suffix);
   
-  std::string getTableSuffixAXF() override final { return suffixTableAXF; }
-  std::string getTableSuffixFPV() override final { return suffixTableFPV; }
+  //std::string getTableSuffixAXF() override final { return suffixTableAXF; }
+  //std::string getTableSuffixFPV() override final { return suffixTableFPV; }
+  std::string getTableSuffixAXF() { return m_suffixTableAXF; }
+  std::string getTableSuffixFPV() { return m_suffixTableFPV; }
 
+  //bool isValidTableSuffix(std::string suffix) override final;
+  bool isValidTableSuffix(std::string suffix);
+  void printSuffixErrMsg(std::string suffix);
 
  private:
 
   std::map<GeoVFullPhysVol*, std::any> m_storeFPV;
   std::map<GeoAlignableTransform*, std::any> m_storeAXF;
 
-  std::string suffixTableFPV;
-  std::string suffixTableAXF;
+  std::string m_suffixTableFPV;
+  std::string m_suffixTableAXF;
 
   template<typename Iter> void printInsertionStatus(Iter it, bool success);
 

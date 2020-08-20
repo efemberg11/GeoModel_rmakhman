@@ -160,8 +160,8 @@ int main(int argc, char *argv[])
     unsigned int keyInt = i+1;
     store->storeAXF( xform, keyInt );
     // we set a suffix for the name of the DB table that hosts our published AXF and FPV nodes
-    store->setTableSuffixFPV("ToyPlugin-StringKey");
-    store->setTableSuffixAXF("ToyPlugin-IntegerKey");
+    store->setTableSuffixFPV("ToyPlugin_StringKey");
+    store->setTableSuffixAXF("ToyPlugin_IntegerKey");
   }
 
 
@@ -272,9 +272,9 @@ int main(int argc, char *argv[])
   */
   
   std::cout << "\nTest - list of all the 'published' GeoFullPhysVol nodes in the persistified geometry:" << std::endl;
-  db.printAllPublishedFullPhysVols();
+  db.printAllPublishedFullPhysVols( store->getTableSuffixFPV() );
   std::cout << "\nTest - list of all the 'published' GeoAlignableTransform nodes in the persistified geometry:" << std::endl;
-  db.printAllPublishedAlignableTransforms();
+  db.printAllPublishedAlignableTransforms( store->getTableSuffixAXF() );
 
   // cleaning
   delete store;

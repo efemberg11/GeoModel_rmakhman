@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <typeindex> // std::type_index, needs C++11
 
 /**
  * \class GMDBManager
@@ -122,14 +123,21 @@ public:
 	void printAllChildrenPositions() const;
 
 	/**
-	 * @brief Print the db table storing all the 'published' GeoVFullPhysVol nodes
+	 * @brief Print the db table storing all the 'published' GeoVFullPhysVol nodes.
+     * @details By default, the method prints out the table 'PublishedGeoFullPhysVols'.
+     * @param suffix If 'suffix' is provided, then the table 'PublishedGeoFullPhysVols-suffix' will be printed.
+     * @param suffix Optional parameter. If 'suffix' is provided, then the table 'PublishedGeoFullPhysVols-suffix' will be printed. Of course, developers must be first checked the related DB table has been created (e.g., through the tools offered by GeoModelKernel::GeoVStore and its implementation).
+     * @note The 'suffix' parameter is optional. If not provided, the default table will be printed.
 	 */
-	void printAllPublishedFullPhysVols(std::string suffix = "") const;
+	void printAllPublishedFullPhysVols(const std::string suffix = "") const;
 	
 	/**
 	 * @brief Print the db table storing all the 'published' GeoAlignableTransform nodes
+     * @details By default, the method prints out the table 'GeoAlignableTransforms'.
+     * @param suffix Optional parameter. If 'suffix' is provided, then the table 'GeoAlignableTransforms-suffix' will be printed. Of course, developers must be first checked the related DB table has been created (e.g., through the tools offered by GeoModelKernel::GeoVStore and its implementation).
+     * @note The 'suffix' parameter is optional. If not provided, the default table will be printed.
 	 */
-	void printAllPublishedAlignableTransforms(std::string suffix = "") const;
+	void printAllPublishedAlignableTransforms(const std::string suffix = "") const;
 	
     /**
 	 * @brief Print the db table storing all the children positions per parent
@@ -156,8 +164,21 @@ public:
 
 
   bool addListOfChildrenPositions(const std::vector<std::vector<std::string>> &records);
-  bool addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records);
-  bool addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records);
+  
+  /**
+   * @brief Save the list of 'published' GeoAlignableTransform nodes to the DB.
+   * @details The method gets a list of records and stores them in the default table 'PublishedAlignableTransforms".
+   * @parameter suffix Optional parameter. If provided, the list of records will be saved in a new table named 'PublishedAlignableTransforms-suffix'.
+     * @note The 'suffix' parameter is optional. If not provided, the records will be saved in the default table.
+   */
+  bool addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records, std::string suffix = "");
+  /**
+   * @brief Save the list of 'published' GeoVFullPhysVol nodes to the DB.
+   * @details The method gets a list of records and stores them in the default table 'PublishedFullPhysVols".
+   * @parameter suffix Optional parameter. If provided, the list of records will be saved in a new table named 'PublishedFullPhysVols-suffix'.
+     * @note The 'suffix' parameter is optional. If not provided, the records will be saved in the default table.
+   */
+  bool addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records, std::string suffix = "");
 
 	bool addRootVolume(const std::vector<std::string> &values);
 
@@ -188,8 +209,17 @@ public:
 
 private:
 
+  /**
+   * @brief Create all the default DB tables.
+   */
 	bool createTables();
 
+  /**
+   * @brief Create a custom DB table to store a list of published nodes. 
+   * @param tableName The table's name.
+   * @param keyType The type of the 'key' that identifies the linked node. 
+   */
+  bool createTableCustomPublishedNodes(const std::string tableName, const std::string nodeType, const std::type_info* keyType);
 
   bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
 //  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only

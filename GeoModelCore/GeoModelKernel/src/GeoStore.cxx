@@ -17,6 +17,30 @@
 
 namespace GeoModelKernel {
 
+void GeoStore::printSuffixErrMsg(std::string suffix)
+{
+    std::cout << "ERROR!! The provided table name's suffix ('" << suffix << "') is not valid. \n"
+        << "Please, use only alphanumeric characters and the underscore ('_') symbol.\n"
+        << "Exiting..."
+        << std::endl;
+    exit(EXIT_FAILURE);
+}
+
+void GeoStore::setTableSuffixAXF(std::string suffix) 
+{
+    if(isValidTableSuffix(suffix))
+        m_suffixTableAXF = suffix;
+    else 
+        printSuffixErrMsg(suffix);
+}
+
+void GeoStore::setTableSuffixFPV(std::string suffix) 
+{
+    if(isValidTableSuffix(suffix))
+        m_suffixTableFPV = suffix;
+    else 
+        printSuffixErrMsg(suffix);
+}
 
 template<typename Iter>
 void GeoStore::printInsertionStatus(Iter it, bool success)
@@ -49,5 +73,10 @@ std::map<GeoAlignableTransform*, std::any> GeoStore::getStoreAXF()
     return m_storeAXF;
 }
 
+bool GeoStore::isValidTableSuffix(std::string suffix)
+{
+    return find_if(suffix.begin(), suffix.end(), 
+                    [](char c) { return !(isalnum(c) || (c == '_')); }) == suffix.end();
+}
 
 }; // end of GeoModelKernel namespace

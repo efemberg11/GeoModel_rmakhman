@@ -35,6 +35,7 @@ class GeoVStore
   virtual void storeAXF(GeoAlignableTransform* axf, std::any key) = 0;
   virtual void storeFPV(GeoVFullPhysVol* fpv, std::any key) = 0;
 
+  /*
   virtual std::map<GeoAlignableTransform*, std::any> getStoreAXF() = 0;
   virtual std::map<GeoVFullPhysVol*, std::any> getStoreFPV() = 0;
 
@@ -44,6 +45,8 @@ class GeoVStore
   virtual std::string getTableSuffixAXF() = 0;
   virtual std::string getTableSuffixFPV() = 0;
 
+  virtual bool isValidTableSuffix(std::string suffix) = 0;
+  */
 };
 
 

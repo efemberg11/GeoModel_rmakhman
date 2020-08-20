@@ -594,7 +594,13 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 
       if (!world) world=createTheWorld(nullptr);
       
-      GeoVStore* store = factory->getStore(); 
+      if(!(dynamic_cast<GeoModelKernel::GeoStore*>(factory->getStore()))) {
+        std::cout << "ERROR!! The implementation of the GeoVStore provided with the plugin is not tailored to be used with GeoModelIO/GeoModelVisualzation. \n"
+            << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting..."
+            << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      GeoModelKernel::GeoStore* store = dynamic_cast<GeoModelKernel::GeoStore*>(factory->getStore()); 
       factory->create(world, store);
     }
 

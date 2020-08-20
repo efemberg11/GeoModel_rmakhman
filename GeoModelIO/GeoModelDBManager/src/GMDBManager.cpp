@@ -152,6 +152,22 @@ void GMDBManager::printAllNameTags() const
 {
 	printAllRecords("NameTags");
 }
+void GMDBManager::printAllPublishedFullPhysVols(std::string suffix) const 
+{
+    if( "" == suffix ) printAllRecords("PublishedFullPhysVols");
+    else {
+        std::string tableName = "PublishedFullPhysVols-";
+        printAllRecords( tableName+suffix ); 
+    }
+}
+void GMDBManager::printAllPublishedAlignableTransforms(std::string suffix) const 
+{
+    if( "" == suffix ) printAllRecords("PublishedAlignableTransforms");
+    else {
+        std::string tableName = "PublishedAlignableTransforms-";
+        printAllRecords( tableName+suffix ); 
+    }
+}
 void GMDBManager::printAllChildrenPositions() const
 {
 	printAllRecords("ChildrenPositions");

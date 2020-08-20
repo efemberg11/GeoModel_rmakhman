@@ -38,6 +38,12 @@ class GeoVStore
   virtual std::map<GeoAlignableTransform*, std::any> getStoreAXF() = 0;
   virtual std::map<GeoVFullPhysVol*, std::any> getStoreFPV() = 0;
 
+  virtual void setTableSuffixAXF(std::string prefix) = 0;
+  virtual void setTableSuffixFPV(std::string prefix) = 0;
+  
+  virtual std::string getTableSuffixAXF() = 0;
+  virtual std::string getTableSuffixFPV() = 0;
+
 };
 
 

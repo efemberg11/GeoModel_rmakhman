@@ -1563,7 +1563,13 @@ template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT st
         }
         else if ( typeid(int) == keyType ) {
             keyTypeStr = "int";
-            keyStr = std::any_cast<int>(key);
+            //keyStr = std::any_cast<int>(key); // TODO: remove to_string and add support for int/unsigned keys
+            keyStr = std::to_string( std::any_cast<int>(key) );
+        }
+        else if ( typeid(unsigned) == keyType ) {
+            keyTypeStr = "uint";
+            //keyStr = std::any_cast<unsigned>(key); // TODO: remove to_string and add support for int/unsigned keys
+            keyStr = std::to_string( std::any_cast<unsigned>(key) );
         }
         else {
             std::cout << "ERROR! The type of the key used to publish FPV and AXF nodes is not std::string, nor integer. Format not supported.\n"
@@ -1584,7 +1590,7 @@ template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT st
         }
 
         // debug msg
-        //std::cout << vol << "::" << keyStr << "[" << keyTypeStr << "] --> " << volID << std::endl;
+        std::cout << vol << "::" << keyStr << " [" << keyTypeStr << "] --> " << volID << std::endl;
 
         // prepare the vector containing the pieces of information to be stored in the DB table
         std::vector<std::string> values;
@@ -1592,7 +1598,7 @@ template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT st
         values.push_back(std::to_string(volID));
 
         unsigned int recordID = addRecord(cachePublishedNodes, values);
-        std::cout << "Pushed record: " << recordID << std::endl;
+        //std::cout << "Pushed record: " << recordID << std::endl; // debug msg
     }
 }
 

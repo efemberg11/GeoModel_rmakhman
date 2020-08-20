@@ -122,6 +122,16 @@ public:
 	void printAllChildrenPositions() const;
 
 	/**
+	 * @brief Print the db table storing all the 'published' GeoVFullPhysVol nodes
+	 */
+	void printAllPublishedFullPhysVols(std::string suffix = "") const;
+	
+	/**
+	 * @brief Print the db table storing all the 'published' GeoAlignableTransform nodes
+	 */
+	void printAllPublishedAlignableTransforms(std::string suffix = "") const;
+	
+    /**
 	 * @brief Print the db table storing all the children positions per parent
 	 */
 	void printAllNodeTypes() const;

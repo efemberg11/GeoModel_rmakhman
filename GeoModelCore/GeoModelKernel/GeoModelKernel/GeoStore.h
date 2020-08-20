@@ -50,22 +50,20 @@ class GeoStore : public GeoVStore
   std::map<GeoVFullPhysVol*, std::any> getStoreFPV() override final;;
   std::map<GeoAlignableTransform*, std::any> getStoreAXF() override final;
 
-  //GeoVFullPhysVol* getPointerFPV(std::any key) override final;
-  //GeoAlignableTransform* getPointerAXF(std::any key) override final;
-
+  void setTableSuffixAXF(std::string suffix) override final { suffixTableAXF = suffix; }
+  void setTableSuffixFPV(std::string suffix) override final { suffixTableFPV = suffix; }
   
+  std::string getTableSuffixAXF() override final { return suffixTableAXF; }
+  std::string getTableSuffixFPV() override final { return suffixTableFPV; }
+
+
  private:
 
-  /*
-   * std::any cannot be used as key, because (by default) it has no '<' to be used to index.
-   * Also, I want to use std::string as keys in my implementation class.
-   * If you want to use other types as keys---for example, integers---, please change the type
-   * of the keys in your own implementation of the 'store' map.
-   */
-  //std::vector<std::string, GeoVFullPhysVol*> m_storeFPV;
-  //std::vector<std::string, GeoAlignableTransform*> m_storeAXF;
   std::map<GeoVFullPhysVol*, std::any> m_storeFPV;
   std::map<GeoAlignableTransform*, std::any> m_storeAXF;
+
+  std::string suffixTableFPV;
+  std::string suffixTableAXF;
 
   template<typename Iter> void printInsertionStatus(Iter it, bool success);
 

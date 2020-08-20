@@ -152,11 +152,16 @@ int main(int argc, char *argv[])
     toyPhys->add(xform);
     toyPhys->add(ringPhys);
     
-    // publish the list of FPV and AXF nodes
-    std::string key = "HelloToyExample-FPV-" + std::to_string(i+1);
-    store->storeFPV( ringPhys, key );
-    key = "HelloToyExample-AXF-" + std::to_string(i+1);
-    store->storeAXF( xform, key );
+    // *** publish the list of FPV and AXF nodes ***
+    // we use integer-based keys for FullPhysVols...
+    std::string keyStr = "HelloToyExample-FPV-" + std::to_string(i+1);
+    store->storeFPV( ringPhys, keyStr );
+    // ...and string-based keys for AlignableTransforms
+    unsigned int keyInt = i+1;
+    store->storeAXF( xform, keyInt );
+    // we set a suffix for the name of the DB table that hosts our published AXF and FPV nodes
+    store->setTableSuffixFPV("ToyPlugin-StringKey");
+    store->setTableSuffixAXF("ToyPlugin-IntegerKey");
   }
 
 
@@ -265,6 +270,11 @@ int main(int argc, char *argv[])
   std::cout << "\nTest - list of all the GeoAlignableTransform nodes in the persistified geometry:" << std::endl;
   db.printAllAlignableTransforms();
   */
+  
+  std::cout << "\nTest - list of all the 'published' GeoFullPhysVol nodes in the persistified geometry:" << std::endl;
+  db.printAllPublishedFullPhysVols();
+  std::cout << "\nTest - list of all the 'published' GeoAlignableTransform nodes in the persistified geometry:" << std::endl;
+  db.printAllPublishedAlignableTransforms();
 
   // cleaning
   delete store;

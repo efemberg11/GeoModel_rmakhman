@@ -6,7 +6,7 @@
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
-#include "GeoModelKernel/GeoFullPhysVol.h"
+//#include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoLogVol.h"
@@ -54,7 +54,7 @@ class AccordionPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  AccordionPlugin();
+  AccordionPlugin( std::string pluginName ) : GeoVGeometryPlugin( pluginName ) {};
 
   // Destructor:
   ~AccordionPlugin();
@@ -77,13 +77,6 @@ class AccordionPlugin : public GeoVGeometryPlugin  {
   
 };
 
-
-
-
-
-AccordionPlugin::AccordionPlugin()
-{
-}
 
 
 AccordionPlugin::~AccordionPlugin()
@@ -1238,5 +1231,5 @@ GeoGenfun::FunctionNoop AccordionPlugin::ATan2(GeoGenfun::GENFUNCTION y, GeoGenf
 
 
 extern "C" AccordionPlugin *createAccordionPlugin() {
-  return new AccordionPlugin;
+  return new AccordionPlugin("AccordionPlugin");
 }

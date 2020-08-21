@@ -617,6 +617,6 @@ void LArGeoPlugin::create(GeoPhysVol* world, GeoVStore* /*store*/)
 }
 
 extern "C" LArGeoPlugin *createLArGeoPlugin() {
-    GeoModelKernel::GeoStore* store = new GeoModelKernel::GeoStore();
+    GeoStore* store = new GeoStore();
     return new LArGeoPlugin( "LArGeoPlugin", store );
 }

@@ -169,7 +169,7 @@ void HGTDPlugin::create(GeoPhysVol *world, GeoVStore*)
 }
 
 extern "C" HGTDPlugin *createHGTDPlugin() {
-    GeoModelKernel::GeoStore* store = new GeoModelKernel::GeoStore();
+    GeoStore* store = new GeoStore();
     return new HGTDPlugin("HGTDPlugin", store);
 }
 

@@ -37,7 +37,7 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:  (no default constructor)
-  ToyGeometryPlugin( std::string pluginName, GeoVStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
+  ToyGeometryPlugin( std::string pluginName, GeoStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
 
   // Destructor:
   ~ToyGeometryPlugin();
@@ -123,12 +123,12 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* storePtr)
 
     // publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoStore is provided
     if (storePtr) {
-	if( !(dynamic_cast<GeoModelKernel::GeoStore*>(storePtr)) ) {
-	    std::cout << "ERROR! The store should be or inherit from `GeoModelKernel::GeoStore`."
+	if( !(dynamic_cast<GeoStore*>(storePtr)) ) {
+	    std::cout << "ERROR! The store should be or inherit from `GeoModelKernel/GeoStore`."
 		      << std::endl;
             exit(EXIT_FAILURE);
 	}
-        GeoModelKernel::GeoStore* store = dynamic_cast<GeoModelKernel::GeoStore*>(storePtr);
+        GeoStore* store = dynamic_cast<GeoStore*>(storePtr);
  	// *** publish the list of FPV and AXF nodes ***
 	// we use string-based keys for FullPhysVols...
 	std::string keyStr = this->getName() + std::to_string(i+1);
@@ -204,9 +204,8 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* storePtr)
 }
 
 extern "C" ToyGeometryPlugin *createToyGeometryPlugin() {
-  GeoVStore* store = new GeoModelKernel::GeoStore();
+  GeoStore* store = new GeoStore();
   ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPlugin", store);
   std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
-  //return new ToyGeometryPlugin("ToyGeometryPlugin");
 }

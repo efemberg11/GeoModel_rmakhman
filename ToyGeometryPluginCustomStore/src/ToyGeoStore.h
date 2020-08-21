@@ -6,7 +6,7 @@
 #define TOYGEOMETRYPLUGIN_GEOSTORE_H
 
 /**
- * @class GeoStore
+ * @class ToyGeoStore
  *
  * @brief Class for a generic GeoModel store, implements the abstract class GeoModelKernel/GeoVStore.
  * The interface allows to store pointers to two types of objects
@@ -38,12 +38,12 @@ class GeoVFullPhysVol;
 
 namespace ToyGeometryPlugin {
 
-class GeoStore : public GeoModelKernel::GeoStore 
+class ToyGeoStore : public GeoStore 
 {
  public:
   
-  GeoStore() {}
-  virtual ~GeoStore() {}
+  ToyGeoStore() {}
+  virtual ~ToyGeoStore() {}
 
   /*
   void storeAXF(GeoAlignableTransform* axf, std::any key) override final;

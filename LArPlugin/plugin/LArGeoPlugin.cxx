@@ -8,6 +8,7 @@
 #include "LArGeoUtils/LArGeoMaterialManager.h"
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
+#include "GeoModelKernel/GeoStore.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoLogVol.h"
@@ -28,7 +29,8 @@
 class LArGeoPlugin : public GeoVGeometryPlugin
 {
 public:
-  LArGeoPlugin();
+  
+  LArGeoPlugin( std::string pluginName, GeoVStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
   ~LArGeoPlugin();
 
   const LArGeoPlugin & operator=(const LArGeoPlugin &right)=delete;
@@ -52,9 +54,6 @@ private:
   bool         m_activateFT{false};
 };
 
-LArGeoPlugin::LArGeoPlugin()
-{
-}
 
 LArGeoPlugin::~LArGeoPlugin()
 {
@@ -618,5 +617,6 @@ void LArGeoPlugin::create(GeoPhysVol* world, GeoVStore* /*store*/)
 }
 
 extern "C" LArGeoPlugin *createLArGeoPlugin() {
-  return new LArGeoPlugin;
+    GeoModelKernel::GeoStore* store = new GeoModelKernel::GeoStore();
+    return new LArGeoPlugin( "LArGeoPlugin", store );
 }

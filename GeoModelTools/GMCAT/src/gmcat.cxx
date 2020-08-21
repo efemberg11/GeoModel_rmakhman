@@ -48,6 +48,7 @@ int main(int argc, char ** argv) {
   std::vector<std::string> inputFiles;
   std::vector<std::string> inputPlugins;
   std::string outputFile;
+  bool outputFileSet = false;
   for (int argi=1;argi<argc;argi++) {
     std::string argument=argv[argi];
     if (argument.find("-o")!=std::string::npos) {
@@ -57,6 +58,7 @@ int main(int argc, char ** argv) {
 	return 1;
       }
       outputFile=argv[argi];
+      outputFileSet = true;
     }
     else if (argument.find(shared_obj_extension)!=std::string::npos) {
       inputPlugins.push_back(argument);
@@ -69,6 +71,11 @@ int main(int argc, char ** argv) {
       std::cerr << usage << std::endl;
       return 2;
     }
+  }
+  if( !outputFileSet ) {
+      std::cerr << "\nERROR! You should set an output file.\n" << std::endl;
+      std::cerr << usage << std::endl;
+      return 3;
   }
 
   //

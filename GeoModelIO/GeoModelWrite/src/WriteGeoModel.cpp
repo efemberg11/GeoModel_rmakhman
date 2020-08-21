@@ -1495,7 +1495,14 @@ unsigned int WriteGeoModel::addLogVol(const std::string &name, const unsigned in
 /*
  * The store parameter is optional, by default it is set to 'nullptr' in the header.
  */
-void WriteGeoModel::saveToDB( GeoVStore* store )
+void WriteGeoModel::saveToDB( GeoVStore* store ) 
+{
+    std::vector<GeoVStore*> vec;
+    if( store )
+        vec.push_back(store);
+    saveToDB(vec);
+}
+void WriteGeoModel::saveToDB( std::vector<GeoVStore*>& stores )
 {
     std::cout << "Saving the GeoModel tree to file: '" << m_dbpath << "'" << std::endl;
 
@@ -1515,9 +1522,11 @@ void WriteGeoModel::saveToDB( GeoVStore* store )
 	m_dbManager->addListOfChildrenPositions(m_childrenPositions);
 	m_dbManager->addRootVolume(m_rootVolume);
 
-    if(store) {
-	    std::cout << "\nA pointer to a GeoVStore instance has been provided, so we dump the published list of FullPhysVol and AlignableTransforms\n" << std::endl;
-        storePublishedNodes(store);
+    if(stores.size()) {
+        for(GeoVStore* store : stores) {
+            std::cout << "\nA pointer to a GeoVStore instance has been provided, so we dump the published list of FullPhysVol and AlignableTransforms\n" << std::endl;
+            storePublishedNodes(store);
+        }
 	}
 
 	if ( !m_objectsNotPersistified.empty() ) {
@@ -1603,7 +1612,7 @@ template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT st
         }
 
         // debug msg
-        std::cout << vol << "::" << keyStr << " [" << keyTypeStr << "] --> " << volID << std::endl;
+        //std::cout << vol << "::" << keyStr << " [" << keyTypeStr << "] --> " << volID << std::endl;
 
         // prepare the vector containing the pieces of information to be stored in the DB table
         std::vector<std::string> values;

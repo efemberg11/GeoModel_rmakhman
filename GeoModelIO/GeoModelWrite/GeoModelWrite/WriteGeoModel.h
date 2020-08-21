@@ -69,7 +69,7 @@ public:
 	virtual void handleNameTag (const GeoNameTag *);
 
 	void saveToDB(GeoVStore* store = nullptr);
-
+    void saveToDB( std::vector<GeoVStore*>& vecStores);
 
 private:
 

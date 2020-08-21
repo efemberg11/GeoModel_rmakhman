@@ -295,7 +295,7 @@ std::string suffix /* optional parameter */)
         tableName += "_";
         tableName += suffix;
         std::string nodeType = "GeoAlignableTransform";
-        std::cout << "Saving the published '"<< nodeType << "' nodes to the custom table: '"
+        std::cout << "\nSaving the published '"<< nodeType << "' nodes to the custom table: '"
                   << tableName << "'." << std::endl;
         const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
        createTableCustomPublishedNodes( tableName, nodeType, &keyType );
@@ -317,7 +317,7 @@ suffix /* optional parameter */)
         tableName += "_";
         tableName += suffix;
         std::string nodeType = "GeoFullPhysVol";
-        std::cout << "Saving the published '"<< nodeType << "' nodes to the custom table: '"
+        std::cout << "\nSaving the published '"<< nodeType << "' nodes to the custom table: '"
                   << tableName << "'." << std::endl;
         const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
        createTableCustomPublishedNodes( tableName, nodeType, &keyType );
@@ -928,9 +928,10 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
   storeTableColumnNames(tab);
 
   queryStr = fmt::format("create table {0} ({1} integer primary key, {2} {3} not null, {4} integer not null REFERENCES {5}(id))", tab[0], tab[1], tab[2], keyTypeDB, tab[3], referencedTable);
-  std::cout << "Creating table with query: '" << queryStr << "'..." << std::endl; // debug msg
+  //std::cout << "Creating table with query: '" << queryStr << "'..." << std::endl; // debug msg
   rc = execQuery(queryStr);
   tab.clear();
+  std::cout << "Crated custom table: '" << tableName << "'." << std::endl;
   return rc;
 }
 

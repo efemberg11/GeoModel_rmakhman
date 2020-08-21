@@ -50,7 +50,7 @@ void GeoStore::printInsertionStatus(Iter it, bool success)
 
 void GeoStore::storeAXF(GeoAlignableTransform* axf, std::any key)
 {
-  //std::cout << "AXF key: " << std::any_cast<std::string>(key) << std::endl;
+  //std::cout << "AXF key: " << std::any_cast<std::string>(key) << std::endl; // debug msg
   const auto [it_hinata, success] = m_storeAXF.insert( {axf, key} );
   if(!success) printInsertionStatus(it_hinata, success);
 }
@@ -58,7 +58,7 @@ void GeoStore::storeAXF(GeoAlignableTransform* axf, std::any key)
 
 void GeoStore::storeFPV(GeoVFullPhysVol* fpv, std::any key)
 {
-  //std::cout << "FPV key: " << std::any_cast<std::string>(key) << std::endl;
+  //std::cout << "FPV key: " << std::any_cast<std::string>(key) << std::endl; // debug msg
   const auto [it_hinata, success] = m_storeFPV.insert( {fpv, key} );
   if(!success) printInsertionStatus(it_hinata, success);
 }

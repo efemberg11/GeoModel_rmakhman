@@ -128,6 +128,7 @@ int main(int argc, char ** argv) {
   //
   // Loop over plugins, create the geometry and put it under the world:
   //
+  std::vector<GeoVStore*> vecPluginsStores; // caches the stores from all plugins
   for (const std::string & plugin : inputPlugins) {
     GeoGeometryPluginLoader loader;
     GeoVGeometryPlugin *factory=loader.load(plugin);
@@ -141,6 +142,7 @@ int main(int argc, char ** argv) {
         exit(EXIT_FAILURE);
     }
     GeoModelKernel::GeoStore* store = dynamic_cast<GeoModelKernel::GeoStore*>(factory->getStore());
+    vecPluginsStores.push_back(store); // cache the store for later
     factory->create(world, store);
   }
   //factory->create(world);
@@ -188,7 +190,7 @@ int main(int argc, char ** argv) {
 
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
-  dumpGeoModelGraph.saveToDB();
+  dumpGeoModelGraph.saveToDB(vecPluginsStores);
 
   world->unref();
 

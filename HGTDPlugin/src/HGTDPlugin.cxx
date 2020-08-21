@@ -18,6 +18,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
+#include "GeoModelKernel/GeoStore.h"
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -37,7 +38,7 @@ class HGTDPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  HGTDPlugin();
+  HGTDPlugin( std::string pluginName, GeoVStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
 
   // Destructor:
   ~HGTDPlugin();
@@ -136,10 +137,6 @@ class HGTDPlugin : public GeoVGeometryPlugin  {
 };
 
 
-HGTDPlugin::HGTDPlugin()
-{
-}
-
 
 HGTDPlugin::~HGTDPlugin()
 {
@@ -172,7 +169,8 @@ void HGTDPlugin::create(GeoPhysVol *world, GeoVStore*)
 }
 
 extern "C" HGTDPlugin *createHGTDPlugin() {
-  return new HGTDPlugin;
+    GeoModelKernel::GeoStore* store = new GeoModelKernel::GeoStore();
+    return new HGTDPlugin("HGTDPlugin", store);
 }
 
 GeoFullPhysVol* HGTDPlugin::createEnvelope(bool bPos) {

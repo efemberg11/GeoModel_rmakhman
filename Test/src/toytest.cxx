@@ -24,7 +24,7 @@ int main(int argc, char ** argv) {
     return 1;
   }
 
-  // Load Toy Plugin
+  // Load the Plugin
   GeoGeometryPluginLoader loader;
   GeoVGeometryPlugin *factory=loader.load(argv[1]);
   if(!factory) {
@@ -44,7 +44,7 @@ int main(int argc, char ** argv) {
   GeoPhysVol *world=new GeoPhysVol(worldLog);
   world->ref();
 
-  std::cout << "Building Toy Geometry ... ";
+  std::cout << "Building the plugin's Geometry ... ";
   factory->create(world);
 
   // Clean up and declare success

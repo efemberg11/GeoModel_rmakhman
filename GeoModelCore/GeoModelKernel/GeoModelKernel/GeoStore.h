@@ -36,7 +36,7 @@
 class GeoAlignableTransform;
 class GeoVFullPhysVol;
 
-namespace GeoModelKernel {
+//namespace GeoModelKernel {
 
 class GeoStore : public GeoVStore 
 {
@@ -44,8 +44,8 @@ class GeoStore : public GeoVStore
   GeoStore() {}
   virtual ~GeoStore() {}
 
-  void storeAXF(GeoAlignableTransform* axf, std::any key) override final;
-  void storeFPV(GeoVFullPhysVol* fpv, std::any key) override final;
+  void storeAXF(GeoAlignableTransform* axf, std::any key) override;
+  void storeFPV(GeoVFullPhysVol* fpv, std::any key) override;
 
   //std::map<GeoVFullPhysVol*, std::any> getStoreFPV() override final;
   //std::map<GeoAlignableTransform*, std::any> getStoreAXF() override final;
@@ -66,6 +66,9 @@ class GeoStore : public GeoVStore
   bool isValidTableSuffix(std::string suffix);
   void printSuffixErrMsg(std::string suffix);
 
+  void setName(std::string name) { m_name = name; }
+  std::string getName() { return m_name; }
+
  private:
 
   std::map<GeoVFullPhysVol*, std::any> m_storeFPV;
@@ -76,8 +79,10 @@ class GeoStore : public GeoVStore
 
   template<typename Iter> void printInsertionStatus(Iter it, bool success);
 
+  std::string m_name;
+
 }; 
 
-} // end of the GeoModelKernel namespace
+//} // end of the GeoModelKernel namespace
 
 #endif

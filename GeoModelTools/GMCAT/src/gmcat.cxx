@@ -128,7 +128,7 @@ int main(int argc, char ** argv) {
   //
   // Loop over plugins, create the geometry and put it under the world:
   //
-  std::vector<GeoVStore*> vecPluginsStores; // caches the stores from all plugins
+  std::vector<GeoStore*> vecPluginsStores; // caches the stores from all plugins
   for (const std::string & plugin : inputPlugins) {
     GeoGeometryPluginLoader loader;
     GeoVGeometryPlugin *factory=loader.load(plugin);
@@ -136,17 +136,15 @@ int main(int argc, char ** argv) {
       std::cerr << "Could not load plugin " << plugin << std::endl;
       return 5;
     }
-    if(!(dynamic_cast<GeoModelKernel::GeoStore*>(factory->getStore()))) {
-        std::cout << "ERROR!!  To be used with GeoModelIO/GeoModelVisualzation, the store should be or inherit from GeoModelKernel::GeoStore.\n"
+    if(!(dynamic_cast<GeoStore*>(factory->getStore()))) {
+        std::cout << "ERROR!!  To be used with GeoModelIO/GeoModelVisualzation, the store should be or inherit from GeoStore.\n"
             << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting...\n";
         exit(EXIT_FAILURE);
     }
-    GeoModelKernel::GeoStore* store = dynamic_cast<GeoModelKernel::GeoStore*>(factory->getStore());
+    GeoStore* store = dynamic_cast<GeoStore*>(factory->getStore());
     vecPluginsStores.push_back(store); // cache the store for later
     factory->create(world, store);
   }
-  //factory->create(world);
-  //}
 
   //
   // Loop over files, create the geometry and put it under the world:

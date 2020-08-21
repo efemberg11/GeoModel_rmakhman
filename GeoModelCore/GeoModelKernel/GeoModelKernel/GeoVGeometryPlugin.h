@@ -13,15 +13,17 @@
  */
 
 #include "GeoModelKernel/GeoVPhysVol.h"
+#include "GeoModelKernel/GeoStore.h"
 
 class GeoPhysVol;
-class GeoVStore;
+//class GeoVStore;
 
 class GeoVGeometryPlugin 
 {
  public:
   // no default constructor. We prohibit it in the 'private' session 
-  GeoVGeometryPlugin(std::string name, GeoVStore* store = nullptr) : m_pluginName( name ), m_store(store) {} // must enforce derived to call this.
+  GeoVGeometryPlugin(std::string name, GeoStore* store) : m_pluginName( name ), m_store(store) { m_store->setName(m_pluginName); } 
+  GeoVGeometryPlugin(std::string name) : m_pluginName( name ) {}
   virtual ~GeoVGeometryPlugin();
 
   // Create the system.
@@ -48,7 +50,7 @@ class GeoVGeometryPlugin
   std::string m_pluginName;
 
   // a pointer to an instance of a class inheriting from GeoVStore
-  GeoVStore* m_store;
+  GeoStore* m_store;
 
 };
 

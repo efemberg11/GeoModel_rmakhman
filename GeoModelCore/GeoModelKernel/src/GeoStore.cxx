@@ -15,7 +15,7 @@
 #include <iostream>
 
 
-namespace GeoModelKernel {
+//namespace GeoModelKernel {
 
 void GeoStore::printSuffixErrMsg(std::string suffix)
 {
@@ -79,4 +79,4 @@ bool GeoStore::isValidTableSuffix(std::string suffix)
                     [](char c) { return !(isalnum(c) || (c == '_')); }) == suffix.end();
 }
 
-}; // end of GeoModelKernel namespace
+//}; // end of GeoModelKernel namespace

@@ -35,7 +35,7 @@
 #include <unordered_map>
 
 // FWD declarations
-class GeoVStore;
+class GeoStore;
 
 namespace GeoModelIO {
 
@@ -68,8 +68,8 @@ public:
 	virtual void handleTransform (const GeoTransform *);
 	virtual void handleNameTag (const GeoNameTag *);
 
-	void saveToDB(GeoVStore* store = nullptr);
-    void saveToDB( std::vector<GeoVStore*>& vecStores);
+	void saveToDB(GeoStore* store = nullptr);
+    void saveToDB( std::vector<GeoStore*>& vecStores);
 
 private:
 
@@ -153,7 +153,7 @@ private:
 
   unsigned int getIdFromNodeType(const std::string &nodeType);
 
-  void storePublishedNodes(GeoVStore* store);
+  void storePublishedNodes(GeoStore* store);
   template <typename TT> void storeRecordPublishedNodes(const TT storeMap, std::vector<std::vector<std::string>>* cachePublishedNodes);
 
   std::string m_dbpath;

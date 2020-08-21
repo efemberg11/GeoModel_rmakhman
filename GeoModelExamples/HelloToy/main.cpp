@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
   toyPhys->add(ringName);
  
   // Instanciate a GeoStore, to publish the list of FullPhysVol and AlignableTransforms nodes
-  GeoModelKernel::GeoStore* store = new GeoModelKernel::GeoStore;
+  GeoStore* store = new GeoStore;
 
   for (int i=0;i<100;i++) {
     GeoFullPhysVol         *ringPhys = new GeoFullPhysVol(ringLog);

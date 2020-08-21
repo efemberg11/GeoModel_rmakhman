@@ -1495,14 +1495,14 @@ unsigned int WriteGeoModel::addLogVol(const std::string &name, const unsigned in
 /*
  * The store parameter is optional, by default it is set to 'nullptr' in the header.
  */
-void WriteGeoModel::saveToDB( GeoVStore* store ) 
+void WriteGeoModel::saveToDB( GeoStore* store ) 
 {
-    std::vector<GeoVStore*> vec;
+    std::vector<GeoStore*> vec;
     if( store )
         vec.push_back(store);
     saveToDB(vec);
 }
-void WriteGeoModel::saveToDB( std::vector<GeoVStore*>& stores )
+void WriteGeoModel::saveToDB( std::vector<GeoStore*>& stores )
 {
     std::cout << "Saving the GeoModel tree to file: '" << m_dbpath << "'" << std::endl;
 
@@ -1523,8 +1523,8 @@ void WriteGeoModel::saveToDB( std::vector<GeoVStore*>& stores )
 	m_dbManager->addRootVolume(m_rootVolume);
 
     if(stores.size()) {
-        for(GeoVStore* store : stores) {
-            std::cout << "\nA pointer to a GeoVStore instance has been provided, so we dump the published list of FullPhysVol and AlignableTransforms\n" << std::endl;
+        for(GeoStore* store : stores) {
+            std::cout << "\nA pointer to a GeoStore instance has been provided, so we dump the published list of FullPhysVol and AlignableTransforms\n" << std::endl;
             storePublishedNodes(store);
         }
 	}
@@ -1539,18 +1539,18 @@ void WriteGeoModel::saveToDB( std::vector<GeoVStore*>& stores )
 }
 
 
-void WriteGeoModel::storePublishedNodes(GeoVStore* storePtr)
+void WriteGeoModel::storePublishedNodes(GeoStore* storePtr)
 {
-    if( !(dynamic_cast<GeoModelKernel::GeoStore*>(storePtr)) )
+    if( !(dynamic_cast<GeoStore*>(storePtr)) )
     {
         std::cout << "ERROR!!! " 
-            << "The implemntation class of GeoVStore you are using is not targeted to publish nodes wth GeoModelIO. "
+            << "The implemntation class of GeoStore you are using is not targeted to publish nodes wth GeoModelIO. "
             << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting..."
             << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    GeoModelKernel::GeoStore* store = dynamic_cast<GeoModelKernel::GeoStore*>(storePtr);
+    GeoStore* store = dynamic_cast<GeoStore*>(storePtr);
 
     std::cout << "Storing published FPV and AXF nodes...\n";
     
@@ -1565,6 +1565,11 @@ void WriteGeoModel::storePublishedNodes(GeoVStore* storePtr)
     // save the list of matching published nodes to the DB
     std::string suffixAXF = store->getTableSuffixAXF();
     std::string suffixFPV = store->getTableSuffixFPV();
+    std::string nameStore = store->getName();
+    if(nameStore.size()) { //if not empty, we add name (often set to plugin's name) to the suffix
+        suffixAXF = nameStore + "_" + suffixAXF;
+        suffixFPV = nameStore + "_" + suffixFPV;
+    }
     m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String, suffixAXF);
     m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String, suffixFPV);
 

@@ -632,7 +632,7 @@ unsigned int WriteGeoModel::storeMaterial(const GeoMaterial* mat)
 		unsigned int elementId = storeElement(element);
 
 		//Gets the fraction by weight of the i-th element
-    const std::string elementFraction = to_string_with_precision( mat->getFraction(i) ); //double
+    const std::string elementFraction = to_string_with_precision( mat->getFraction(i) );
 
     matElementsList.push_back( std::to_string(elementId) + ":" + elementFraction ); //INT+string
 	}
@@ -948,7 +948,7 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		const GeoTessellatedSolid* shapeIn = dynamic_cast<const GeoTessellatedSolid*>(shape);
 		// get number of facets
 		const size_t nFacets = shapeIn->getNumberOfFacets();
-		pars.push_back("nFacets=" + std::to_string(nFacets));//size_t INT
+		pars.push_back("nFacets=" + std::to_string(nFacets)); //size_t
 		// loop over the facets
 		for (size_t i=0; i<nFacets; ++i) {
 			GeoFacet* facet = shapeIn->getFacet(i);
@@ -961,7 +961,7 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape)
 			if (facetVertexType == GeoFacet::RELATIVE) pars.push_back("vT=RELATIVE");
 			// get number of vertices and loop over them
 			const size_t nVertices = facet->getNumberOfVertices();
-			pars.push_back("nV=" + std::to_string(nVertices));//size_t INT
+			pars.push_back("nV=" + std::to_string(nVertices)); //size_t
 			for (size_t i=0; i<nVertices; ++i) {
 				GeoFacetVertex facetVertex = facet->getVertex(i);
 				pars.push_back("xV=" + to_string_with_precision( facetVertex[0] ));
@@ -1453,7 +1453,7 @@ unsigned int WriteGeoModel::addTransform(const std::vector<double> &params)
 unsigned int WriteGeoModel::addPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume)
 {
 	std::vector<std::vector<std::string>>* container = &m_physVols;
-  std::vector<std::string> values;
+    std::vector<std::string> values;
     values.push_back( std::to_string(logVolId) ); //INT
 	unsigned int idx = addRecord(container, values);
 	if (isRootVolume) {

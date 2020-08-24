@@ -125,8 +125,8 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
     /* FEC position sould be corrected in the DB, but we have no time */
     if(m_activateFT && ztrEC == -249.05){
        ztrEC += 6.;
-       log << MSG::DEBUG << "FEC position corrected to " << ztrEC
-           << " to fit mother volume" << endmsg;
+       std::cout << "EndcapDMConstruction: FEC position corrected to " << ztrEC
+		 << " to fit mother volume" << std::endl;
     }
     crate1ztr = ztrEC;
     pedestztr = ztrEC;
@@ -210,7 +210,7 @@ void LArGeo::EndcapDMConstruction::create(GeoFullPhysVol* envelope)
 
   if(m_activateFT){
     std::string name = "LAr::Endcap::SignalFT::";
-    log << MSG::INFO << "creating " << name << " volumes" << endmsg;
+    std::cout << "EndcapDMConstruction: creating " << name << " volumes" << std::endl;
 
     const GeoMaterial* iron = materialManager->getMaterial("std::Iron");
 

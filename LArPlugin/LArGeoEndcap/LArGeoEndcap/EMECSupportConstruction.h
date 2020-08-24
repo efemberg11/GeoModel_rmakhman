@@ -17,8 +17,7 @@
 #ifndef LARGEOENDCAP_EMECSUPPORTCONSTRUCTION_H
 #define LARGEOENDCAP_EMECSUPPORTCONSTRUCTION_H
 
-#include "LArInpManTest/GeoXmlInpManager.h"
-#include "LArInpManTest/GeoInpRecordset.h"
+#include "GeoXmlInpManager/GeoXmlInpManager.h"
 
 class GeoPhysVol;
 class GeoMaterial;

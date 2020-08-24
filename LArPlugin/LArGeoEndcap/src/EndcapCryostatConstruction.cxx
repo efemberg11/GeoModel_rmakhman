@@ -33,10 +33,6 @@
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-#include "GeoModelInterfaces/AbsMaterialManager.h"
-#include "GeoModelInterfaces/StoredMaterialManager.h"
-#include "GeoModelUtilities/StoredPhysVol.h"
-#include "GeoModelUtilities/StoredAlignX.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/Units.h"
@@ -46,9 +42,10 @@
 #include "GeoGenericFunctions/Variable.h"
 
 // For the database:
-#include "GeoXmlMatManager/GeoXmlInpManager.h"
-#include "GeoXmlMatManager/GeoInpRecordset.h"
-#include "GeoXmlMatManager/GeoInpUtils.h"
+#include "GeoXmlMatManager/GeoXmlMatManager.h"
+#include "GeoXmlInpManager/GeoXmlInpManager.h"
+#include "GeoXmlInpManager/GeoInpRecordset.h"
+#include "LArGeoUtils/LArGeoInpUtils.h"
 #include "LArGeoUtils/LArGeoMaterialManager.h"
 
 /*
@@ -560,8 +557,8 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
       (1920./LArEndcapCratePhiPos->size()) *
       M_PI * 1.1*1.1/4. * SYSTEM_OF_UNITS::mm2
       / (icable_dz*2);
-    log << MSG::DEBUG << "adding " << icable_dr/SYSTEM_OF_UNITS::mm << " mm"
-        << " of cables inside EC cryostat in front of FT" << endmsg;
+    std::cout << "EndcapScryostatConstruction: adding " << icable_dr/SYSTEM_OF_UNITS::mm << " mm"
+	      << " of cables inside EC cryostat in front of FT" << std::endl;
     const double z_pos = -249.*SYSTEM_OF_UNITS::mm - icable_dz;
     const GeoMaterial* icable_mat = materialManager->getMaterial("LAr::FT::Cable");
     GeoShape* icable = new GeoTube(rcoldwall - icable_dr, rcoldwall, icable_dz);
@@ -580,14 +577,14 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     GeoFullPhysVol *envelope = m_emec.GetEnvelope(bPos);
 
     //=>
-    const GeoInpRecord *posRec = GeoInpUtils::getTransformRecord(larPosition, bPos ? "EMEC_POS":"EMEC_NEG");
+    const GeoInpRecord *posRec = LArGeoInpUtils::getTransformRecord(larPosition, bPos ? "EMEC_POS":"EMEC_NEG");
     if (!posRec) throw std::runtime_error("Error, no lar position record in the database") ;
-    GeoTrf::Transform3D xfPos = GeoInpUtils::getTransform(posRec);
+    GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
     GeoAlignableTransform *xfEmec = new GeoAlignableTransform(xfPos);
 
     std::string tag = bPos? std::string("EMEC_POS") : std::string("EMEC_NEG");
-    StatusCode status;
 
+/*
     StoredPhysVol *sPhysVol = new StoredPhysVol(envelope);
     status=detStore->record(sPhysVol,tag);
     if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
@@ -595,7 +592,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     StoredAlignX *sAlignX = new StoredAlignX(xfEmec);
     status=detStore->record(sAlignX,tag);
     if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-
+*/
 
     //=>
     totalEMHLArPhysical->add(xfEmec);
@@ -615,8 +612,8 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
     //--- Make the Front Wheel alignable:
 
-    const GeoInpRecord *posHec1 = GeoInpUtils::getTransformRecord(larPosition, bPos ? "HEC1_POS":"HEC1_NEG");
-    GeoTrf::Transform3D xfPosHec1 = posHec1 ? GeoInpUtils::getTransform(posHec1) : GeoTrf::Translate3D(0.,0.,-2423.0);
+    const GeoInpRecord *posHec1 = LArGeoInpUtils::getTransformRecord(larPosition, bPos ? "HEC1_POS":"HEC1_NEG");
+    GeoTrf::Transform3D xfPosHec1 = posHec1 ? LArGeoInpUtils::getTransform(posHec1) : GeoTrf::Translate3D(0.,0.,-2423.0);
     GeoAlignableTransform *xfHec1 = new GeoAlignableTransform(xfPosHec1);
 
     std::string tag1 = bPos? std::string("HEC1_POS") : std::string("HEC1_NEG");
@@ -640,8 +637,8 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     HECWheelConstruction rearHEC(m_fullGeo,wheelType,threeBoards,bPos) ;
     GeoFullPhysVol* EnvelopeR = rearHEC.GetEnvelope();
 
-    const GeoInpRecord *posHec2 = GeoInpUtils::getTransformRecord(larPosition, bPos ? "HEC2_POS":"HEC2_NEG");
-    GeoTrf::Transform3D xfPosHec2 = posHec2 ? GeoInpUtils::getTransform(posHec2) : GeoTrf::Translate3D(0.,0.,-1566.0);
+    const GeoInpRecord *posHec2 = LArGeoInpUtils::getTransformRecord(larPosition, bPos ? "HEC2_POS":"HEC2_NEG");
+    GeoTrf::Transform3D xfPosHec2 = posHec2 ? LArGeoInpUtils::getTransform(posHec2) : GeoTrf::Translate3D(0.,0.,-1566.0);
     GeoAlignableTransform *xfHec2 = new GeoAlignableTransform(xfPosHec2);
 
     std::string tag2 = bPos? std::string("HEC2_POS") : std::string("HEC2_NEG");
@@ -683,9 +680,9 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
     std::string tag = bPos ? "FCAL_POS" : "FCAL_NEG";
     // Get default values for alignable transform deltas from SubdetPosHelper
-    const GeoInpRecord *posRec = GeoInpUtils::getTransformRecord(larPosition, tag);
+    const GeoInpRecord *posRec = LArGeoInpUtils::getTransformRecord(larPosition, tag);
     if (!posRec) throw std::runtime_error("Error, no lar position record in the database") ;
-    GeoTrf::Transform3D xfPos = GeoInpUtils::getTransform(posRec);
+    GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
     GeoAlignableTransform *fcalXF = new GeoAlignableTransform(xfPos);
 
     StatusCode status;
@@ -1023,9 +1020,9 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
       else {
 	// This recordset is need for calculating global Z positions of scintillators
 	GeoInpRecordset_ptr larPosition = inpman->getRecordsetPtr("LArPosition");
-	const GeoInpRecord *posRec = GeoInpUtils::getTransformRecord(larPosition, "LARCRYO_EC_POS");
+	const GeoInpRecord *posRec = LArGeoInpUtils::getTransformRecord(larPosition, "LARCRYO_EC_POS");
 	if(!posRec) throw std::runtime_error("Error, no lar position record in the database") ;
-	GeoTrf::Transform3D xfPos = GeoInpUtils::getTransform(posRec);
+	GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
 	double globalZMM = xfPos.translation().z() + zposMM;
 
 	// Create MBTS manager

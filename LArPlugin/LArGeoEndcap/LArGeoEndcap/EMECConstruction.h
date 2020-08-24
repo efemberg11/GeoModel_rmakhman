@@ -63,9 +63,10 @@ namespace LArGeo {
 			     , const GeoMaterial *Absorber
 			     , const GeoMaterial *Electrode
 			     , const GeoMaterial *Glue
-			     , const GeoMaterial *Lead);
+			     , const GeoMaterial *Lead
+			     , const LArWheelCalculatorParameters& params);
 
-    void getWheelCalculatorParameters(const GeoXmlInpManager* inpman
+    void getWheelCalculatorParameters(GeoXmlInpManager* inpman
 				      , LArWheelCalculatorParameters& params);
   };
 

@@ -4,7 +4,7 @@
 
 #include "LArGeoBarrel/BarrelCryostatConstruction.h"
 //#include "LArGeoTBBarrel/TBBarrelCryostatConstruction.h"
-//#include "LArGeoEndcap/EndcapCryostatConstruction.h"
+#include "LArGeoEndcap/EndcapCryostatConstruction.h"
 #include "LArGeoUtils/LArGeoMaterialManager.h"
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
@@ -116,16 +116,16 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
   barrelCryostatConstruction.setBarrelSagging(m_barrelSagging);
   barrelCryostatConstruction.setBarrelCellVisLimit(m_barrelVisLimit);
       
-//  EndcapCryostatConstruction endcapCryostatConstruction(m_matman,m_fullGeo, m_EMECVariantInner, m_EMECVariantOuter, m_activateFT);
-//  endcapCryostatConstruction.setFCALVisLimit(m_fcalVisLimit);
+  LArGeo::EndcapCryostatConstruction endcapCryostatConstruction(m_matman,m_fullGeo, m_EMECVariantInner, m_EMECVariantOuter, m_activateFT);
+  endcapCryostatConstruction.setFCALVisLimit(m_fcalVisLimit);
   
   if(m_buildBarrel) {
     barrelEnvelope = barrelCryostatConstruction.GetEnvelope();
   }
       
   if(m_buildEndcap) {
-//    endcapEnvelopePos = endcapCryostatConstruction.createEnvelope(true);
-//    endcapEnvelopeNeg = endcapCryostatConstruction.createEnvelope(false);
+    endcapEnvelopePos = endcapCryostatConstruction.createEnvelope(true);
+    endcapEnvelopeNeg = endcapCryostatConstruction.createEnvelope(false);
   }
       
   world->add(new GeoNameTag("LAr"));
@@ -191,13 +191,13 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
 	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_NEG");
 	}
 	*/
-//    world->add( new GeoNameTag("LArEndcapPos"));
-//    world->add(xfEndcapPos);
-//    world->add(endcapEnvelopePos);
-//    world->add( new GeoNameTag("LArEndcapNeg"));
-//    world->add(xfEndcapNeg);
-//    world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*Gaudi::Units::deg)));
-//    world->add(endcapEnvelopeNeg);
+    world->add( new GeoNameTag("LArEndcapPos"));
+    world->add(xfEndcapPos);
+    world->add(endcapEnvelopePos);
+    world->add( new GeoNameTag("LArEndcapNeg"));
+    world->add(xfEndcapNeg);
+    world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*SYSTEM_OF_UNITS::deg)));
+    world->add(endcapEnvelopeNeg);
   }
   else if(!m_buildEndcap) {
     // -- Build the Barrel only
@@ -257,13 +257,13 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
 	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_NEG");
 	}
 	*/
-//    world->add( new GeoNameTag("LArEndcapPos"));
-//    world->add(xfEndcapPos);
-//    world->add(endcapEnvelopePos);
-//    world->add( new GeoNameTag("LArEndcapNeg"));
-//    world->add(xfEndcapNeg);
-//    world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*Gaudi::Units::deg)));
-//    world->add(endcapEnvelopeNeg);
+    world->add( new GeoNameTag("LArEndcapPos"));
+    world->add(xfEndcapPos);
+    world->add(endcapEnvelopePos);
+    world->add( new GeoNameTag("LArEndcapNeg"));
+    world->add(xfEndcapNeg);
+    world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*SYSTEM_OF_UNITS::deg)));
+    world->add(endcapEnvelopeNeg);
     
   }
   /*      

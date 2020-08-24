@@ -12,7 +12,7 @@
 #include "LArGeoEndcap/EndcapPresamplerConstruction.h"
 #include "EndcapDMConstruction.h"
 
-//#include "LArGeoHec/HECWheelConstruction.h"
+#include "LArGeoHec/HECWheelConstruction.h"
 
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
@@ -603,12 +603,9 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
     std::string wheelType="front";
     bool threeBoards= false;
-/*    
+    
     HECWheelConstruction frontHEC(m_fullGeo,wheelType,threeBoards,bPos) ;
     GeoFullPhysVol* EnvelopeF = frontHEC.GetEnvelope();
-
-    StatusCode status;
-
 
     //--- Make the Front Wheel alignable:
 
@@ -618,6 +615,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
     std::string tag1 = bPos? std::string("HEC1_POS") : std::string("HEC1_NEG");
 
+    /*
     StoredPhysVol *sPhysVol1 = new StoredPhysVol(EnvelopeF);
     status=detStore->record(sPhysVol1,tag1);
     if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag1).c_str());
@@ -625,7 +623,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     StoredAlignX *sAlignX1 = new StoredAlignX(xfHec1);
     status=detStore->record(sAlignX1,tag1);
     if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag1).c_str());
-
+    */
     totalEMHLArPhysical->add( xfHec1);
     totalEMHLArPhysical->add(new GeoIdentifierTag(0));
     totalEMHLArPhysical->add( EnvelopeF );
@@ -642,7 +640,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     GeoAlignableTransform *xfHec2 = new GeoAlignableTransform(xfPosHec2);
 
     std::string tag2 = bPos? std::string("HEC2_POS") : std::string("HEC2_NEG");
-
+    /*
     StoredPhysVol *sPhysVol2 = new StoredPhysVol(EnvelopeR);
     status=detStore->record(sPhysVol2,tag2);
     if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag2).c_str());
@@ -650,11 +648,11 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     StoredAlignX *sAlignX2 = new StoredAlignX(xfHec2);
     status=detStore->record(sAlignX2,tag2);
     if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag2).c_str());
-
+    */
     totalEMHLArPhysical->add( xfHec2);
     totalEMHLArPhysical->add(new GeoIdentifierTag(1));
     totalEMHLArPhysical->add( EnvelopeR );
-*/
+
 
   }
 

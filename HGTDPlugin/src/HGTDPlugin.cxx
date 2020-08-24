@@ -18,7 +18,8 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-#include "GeoModelKernel/GeoStore.h"
+#include "GeoModelKernel/GeoVStore.h" // for create()
+#include "GeoModelKernel/GeoStore.h"  // for I/O methods in general
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -31,14 +32,13 @@
 using namespace GeoGenfun;
 using namespace GeoXF;
 
-class GeoVStore;
 
 class HGTDPlugin : public GeoVGeometryPlugin  {
 
  public:
 
   // Constructor:
-  HGTDPlugin( std::string pluginName, GeoVStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
+  HGTDPlugin( std::string pluginName, GeoStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
 
   // Destructor:
   ~HGTDPlugin();

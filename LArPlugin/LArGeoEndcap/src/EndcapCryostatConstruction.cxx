@@ -657,7 +657,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
   }
 
 
-/*
+
   // 13-Mar-2002 WGS: Place the FCAL detector inside the cryostat.
   m_fcal.setFCALVisLimit(m_fcalVisLimit);
   m_fcal.setFullGeo(m_fullGeo);
@@ -682,12 +682,12 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     if (!posRec) throw std::runtime_error("Error, no lar position record in the database") ;
     GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
     GeoAlignableTransform *fcalXF = new GeoAlignableTransform(xfPos);
-
+/*
     StatusCode status;
     StoredAlignX *sAlignX = new StoredAlignX(fcalXF);
     status=detStore->record(sAlignX,tag);
     if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-
+*/
 
     const GeoLogVol *envVol = fcalEnvelope->getLogVol();
     const GeoShape  *envShape = envVol->getShape();
@@ -704,7 +704,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
 
   }
-*/
+
 
   //_________________________ MBTS ___________________________________________________
     // DB related stuff first

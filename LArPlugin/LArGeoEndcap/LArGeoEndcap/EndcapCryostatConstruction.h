@@ -14,7 +14,7 @@
 
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
-//#include "LArGeoFcal/FCALConstruction.h"
+#include "LArGeoFcal/FCALConstruction.h"
 #include "LArGeoEndcap/EMECConstruction.h"
 
 class GeoInpRecord;
@@ -50,7 +50,7 @@ namespace LArGeo {
     int                     m_fcalVisLimit;
 
     EMECConstruction        m_emec;
-//    FCALConstruction        m_fcal;
+    FCALConstruction        m_fcal;
 
     bool                    m_fullGeo;  // true->FULL, false->RECO
     std::string m_EMECVariantInner;

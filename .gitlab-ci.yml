@@ -83,6 +83,7 @@ variables:
     # - mv rmbianchi-soqt-25692a805a2c soqt
     #- hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
     - wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/soqt.zip
+    - unzip soqt.zip
     - mkdir build_soqt
     - cd build_soqt
     - echo "CMAKE_ARGS - ${CMAKE_ARGS}"

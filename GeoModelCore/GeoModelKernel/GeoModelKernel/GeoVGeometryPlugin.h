@@ -13,10 +13,10 @@
  */
 
 #include "GeoModelKernel/GeoVPhysVol.h"
-#include "GeoModelKernel/GeoStore.h"
+#include "GeoModelKernel/GeoVStore.h" // for create()
+#include "GeoModelKernel/GeoStore.h"  // for publishing and I/O methods in general
 
 class GeoPhysVol;
-//class GeoVStore;
 
 class GeoVGeometryPlugin 
 {

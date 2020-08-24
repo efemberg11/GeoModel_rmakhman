@@ -57,7 +57,8 @@ variables:
     CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
   script:
     - pwd; ls
-    - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
+    #- wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
+    - wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/coin-4.0.0-src.zip
     - unzip coin-4.0.0-src.zip -d coin-sources
     - mv coin-sources/* coin
     - mkdir build_coin
@@ -80,7 +81,8 @@ variables:
     # - wget https://bitbucket.org/rmbianchi/soqt/get/CI-fix-25692a8.zip
     # - unzip CI-fix-25692a8.zip
     # - mv rmbianchi-soqt-25692a805a2c soqt
-    - hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
+    #- hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
+    - wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/soqt.zip
     - mkdir build_soqt
     - cd build_soqt
     - echo "CMAKE_ARGS - ${CMAKE_ARGS}"

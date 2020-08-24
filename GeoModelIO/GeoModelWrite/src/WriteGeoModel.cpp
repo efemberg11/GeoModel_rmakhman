@@ -1523,16 +1523,18 @@ void WriteGeoModel::saveToDB( std::vector<GeoStore*>& stores )
 	m_dbManager->addRootVolume(m_rootVolume);
 
     if(stores.size()) {
+            std::cout << "\nA pointer to a GeoStore instance has been provided, "
+                << "so we dump the published list of FullPhysVol and AlignableTransforms\n" 
+                << std::endl;
         for(GeoStore* store : stores) {
-            std::cout << "\nA pointer to a GeoStore instance has been provided, so we dump the published list of FullPhysVol and AlignableTransforms\n" << std::endl;
             storePublishedNodes(store);
         }
 	}
 
 	if ( !m_objectsNotPersistified.empty() ) {
-    std::cout << "\n\tWARNING!! There are shapes/nodes which need to be persistified! --> ";
-    printStdVectorStrings(m_objectsNotPersistified);
-    std::cout << "\n\n";
+        std::cout << "\n\tWARNING!! There are shapes/nodes which need to be persistified! --> ";
+        printStdVectorStrings(m_objectsNotPersistified);
+        std::cout << "\n\n";
 	}
 
 	return;
@@ -1544,7 +1546,7 @@ void WriteGeoModel::storePublishedNodes(GeoStore* storePtr)
     if( !(dynamic_cast<GeoStore*>(storePtr)) )
     {
         std::cout << "ERROR!!! " 
-            << "The implemntation class of GeoStore you are using is not targeted to publish nodes wth GeoModelIO. "
+            << "The implementation class of GeoStore you are using is not targeted to publish nodes wth GeoModelIO. "
             << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting..."
             << std::endl;
         exit(EXIT_FAILURE);
@@ -1552,8 +1554,6 @@ void WriteGeoModel::storePublishedNodes(GeoStore* storePtr)
 
     GeoStore* store = dynamic_cast<GeoStore*>(storePtr);
 
-    std::cout << "Storing published FPV and AXF nodes...\n";
-    
     // loop over the published AlignableTransform nodes
     std::map<GeoAlignableTransform*, std::any> storeAXF = store->getStoreAXF();
     storeRecordPublishedNodes<std::map<GeoAlignableTransform*, std::any>>(storeAXF, &m_publishedAlignableTransforms_String);   
@@ -1573,6 +1573,9 @@ void WriteGeoModel::storePublishedNodes(GeoStore* storePtr)
     m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String, suffixAXF);
     m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String, suffixFPV);
 
+    // clear the caches
+    m_publishedAlignableTransforms_String.clear();
+    m_publishedFullPhysVols_String.clear();
 }
 
 template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT storeMap, std::vector<std::vector<std::string>>* cachePublishedNodes   )

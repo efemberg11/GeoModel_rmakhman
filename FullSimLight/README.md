@@ -14,43 +14,33 @@ The supported geometry formats are SQLite (.db), GDML (.gdml) and dual-use plugi
 
 ## Dependencies:
 
-FullSimLight project depends on [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), [GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModelIO),
+FullSimLight repository has been recently merged in a big monorepository under the main [GeoModel repository](https://gitlab.cern.ch/GeoModelDev/GeoModel). 
+FullSimLight project depends on [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModel/GeoModelCore), [GeoModelIO](https://gitlab.cern.ch/GeoModelDev/GeoModel/GeoModelIO),
 [Geant4](https://geant4.web.cern.ch), 
-[GeoModelG4](https://gitlab.cern.ch/GeoModelDev/GeoModelG4) and 
+[GeoModelG4](https://gitlab.cern.ch/GeoModelDev/GeoModel/GeoModelG4) and 
 [nlohmann_json](https://github.com/nlohmann/json.git)
-Following are the instructions to install them. 
 
-## GeoModelCore:
-First, install GeoModelCore dependencies: [Eigen](http://eigen.tuxfamily.org/) and  [Doxygen](http://www.doxygen.nl/index.html) (optional).
-Then, clone the repository at [GeoModelCore repo](https://gitlab.cern.ch/GeoModelDev/GeoModelCore), then:
+GeoModelCore, GeoModelIO and GeoModelG4 will be built as part of the monorepository, and also nhlomann_json can be built within the monorepository.  Before installing them you need to have Geant4 installed on you machine. 
+Following are the installation instructions. 
 
-```bash
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
-cd GeoModelCore
-mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
-make
-make install
-```
-## GeoModelIO:
-
-Clone the repository at [GeoModelIO repo](https://gitlab.cern.ch/GeoModelDev/GeoModelIO).
-
-```bash
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-cd GeoModelIO
-mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
-make
-make install
-```
 
 ## Geant4:
 
 Before installing Geant4, check at the Geant4 website the pre-requisites needed:
 http://geant4-userdoc.web.cern.ch/geant4-userdoc/UsersGuides/InstallationGuide/html/gettingstarted.html
 An installation of Geant4 including the GDML extension (which requires the XercesC version >=3 package installed in the system) is required, i.e. the Geant4 toolkit must be built with the -DGEANT4_USE_GDML=ON CMake option.
-Clone the repository at [Geant4 repo](https://gitlab.cern.ch/geant4/geant4.git), then:
+
+### Xerces-c installation
+```bash
+- wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
+- tar -xf xerces-c-3.2.2.tar.gz
+- cd xerces-c-3.2.2 ; mkdir build  ; cd build
+- cmake -DCMAKE_INSTALL_PREFIX=../../install ../
+- make -j8 ; make install
+```
+
+
+Now that you have installed xerces-c, clone the repository at [Geant4 repo](https://gitlab.cern.ch/geant4/geant4.git), then:
 
 ```bash
 git clone https://gitlab.cern.ch/geant4/geant4.git
@@ -63,8 +53,7 @@ Choose the release you want to use, i.e. Geant4-10.6.0, and checkout the corresp
 git checkout tags/v10.6.0
 mkdir build ; cd build
 cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../  -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON
-make
-make install
+make -j8 ; make install
 ```
 Before running ./fullSimLight and ./gmgeantino make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
 ```bash
@@ -86,57 +75,32 @@ export G4ABLADATA=$G4INSTALL/data/G4ABLA3.1
 export G4INCLDATA=$G4INSTALL/data/G4INCL1.0
 export G4ENSDFSTATEDATA=$G4INSTALL/data/G4ENSDFSTATE2.2
 ```
-## GeoModelG4:
-First, install GeoModelG4 dependency: [CLHEP](https://gitlab.cern.ch/CLHEP/CLHEP.git)
 
-```bash
-git clone https://gitlab.cern.ch/CLHEP/CLHEP.git
-cd CLHEP
-git checkout CLHEP_2_4_1_0
-mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
-make
-make install
-```
-
-Then, clone the repository at [GeoModelG4 repo](https://gitlab.cern.ch/GeoModelDev/GeoModelG4):
-
-```bash
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelG4.git
-cd GeoModelG4
-mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
-make
-make install
-```
 ## nlohmann_json:
-Clone the repository at [nlohmann_json repo](https://github.com/nlohmann/json.git), then:
+You can build nlohmann_json internally to the GeoModel build. Alternatively, clone the repository at [nlohmann_json repo](https://github.com/nlohmann/json.git), then:
 ```bash
 git clone https://github.com/nlohmann/json.git
 cd json
 mkdir build ; cd build
 cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release -DJSON_BuildTests=False ../
-make
-make install
+make -j8 ; make install
 ```
 
 ## FullSimLight:
 
-Clone the repository at [FullSimLight repo](https://gitlab.cern.ch/GeoModelDev/FullSimLight), then:
+Clone the new GeoModel monorepository at [GeoModel repo](https://gitlab.cern.ch/GeoModelDev/GeoModel), then:
 
 ```bash
-git clone https://gitlab.cern.ch/GeoModelDev/FullSimLight.git
-cd FullSimLight
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModel.git
+cd GeoModel
 mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
-make
-make install
+cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../ -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE -DGEOMODEL_BUILD_GEOMODELG4=TRUE ../ 
+make -j8 ; make install
 ```
 
-If you experience issues with CMake not finding GeoModelPackages properly, try to pass their lib/cmake installation dir to CMake, to let it correctly find the xxxConfig.cmake file:
-
+If you want to build nlohman_json as part of GeoModel build, add the following cmake option:
 ```bash
-cmake -DGeoModelCore_DIR=<path_to_geomodelcore>/lib/cmake/GeoModelCore/ -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
+-DGEOMODEL_USE_BUILTIN_JSON=TRUE
 ```
 
 **NOTE:** If you experience issues with CMake not finding Geant4 properly, try to pass the Geant4 lib installation dir to CMake, to let it correctly find the Geant4Config.cmake file:
@@ -181,7 +145,7 @@ wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geom
 
 The application can be built and used both with sequential and multithreaded
 Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will
-run in proper multithreaded mode.
+run in proper multithreaded mode. You can find the executables under the build/bin directory and/or under the install/bin dir. 
 
 NB: Before running fullSimLight make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
 ```bash
@@ -232,26 +196,26 @@ in this case.
 
 ## Examples
 
-During the installation a default macro file <macro.g4> will be installed in your bin directory.
+During the installation a default macro file <macro.g4> will be installed in your share/FullSimLight directory.
 To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
 Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db file :
 
 ``` bash
-./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -p -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
+./fullSimLight -m ../share/FullSimLight/macro.g4 -f FTFP_BERT_ATL -p -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
 ``` 
 To execute the application using the <macro.g4> macro file, with the FTFP_BERT_ATL
 Physics List, not in performance mode and building the detector from my geometry gdml file:
 ``` bash
-./fullSimLight -m macro.g4 -f FTFP_BERT_ATL -g mygeometry.gdml
+./fullSimLight -m ../share/FullSimLight/macro.g4 -f FTFP_BERT_ATL -g mygeometry.gdml
 ``` 
 To execute the application using the <macro.g4> macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin* :
 ``` bash
-./fullSimLight -m macro.g4  -g libHGTDPlugin.1.0.0.dylib
+./fullSimLight -m ../share/FullSimLight/macro.g4  -g libHGTDPlugin.1.0.0.dylib
 ``` 
 
 ## Parameters settings via geant4 macro
 
-fullsimlight and in general Geant4 based simulations, need a geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the <install-path>/bin directory and under the <path-to-fullsimlight-repo-source>/build/bin. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
+Fullsimlight and in general Geant4 based simulations, need a Geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the <install-path>/share/FullSimLight directory. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
 
 ## Magnetic field
  
@@ -399,7 +363,7 @@ To execute a clash detection on a geometry described with one of the [GeoModelPl
 GeoModelGeantino (gmgeantino) is a Geant4 based application that allows you to produce geantino maps for the geometry specified as input. It supports .db/.gdml/.dylib/.so geomtry formats and it writes out the geantino maps in a ROOT file. However, it does not depend on ROOT, cause it uses the G4AnalysisManager to create/fill/write 1D and 2D Profiles.
 The 1D and 2D profiles are filled during the simulation, per Event or per Step. The creation of different profiles can be tunes with command line flags. In general XY,ZR,etaPhi RadiationLength/InteractionLength profiles can be created per DetectorVolume/Material/Element.
 
-gmgeantino uses a default geant4 macro to take some input parameters. You should find this macro under your <install-path>/bin directory and under your <path-to-fullsimlight-repo-source>/build/bin. You can edit this macro to change some parameters, like the verbosity, the n. of threads, the n. of primaries per event, the primary particle energy.. etc. By default the primary particles shot by 'gmgeantino' are geantinos (this parameter should not be changed). By default the number of simulated geantinos is set to 1000. To increase the resolution of the maps, the n. of simulated events can be increased, editing the geantino.g4 macro and changing value at the following line:
+gmgeantino uses a default geant4 macro to take some input parameters. You should find this macro under your <install-path>/share/FullSimLight directory. You can edit this macro to change some parameters, like the verbosity, the n. of threads, the n. of primaries per event, the primary particle energy.. etc. By default the primary particles shot by 'gmgeantino' are geantinos (this parameter should not be changed). By default the number of simulated geantinos is set to 1000. To increase the resolution of the maps, the n. of simulated events can be increased, editing the geantino.g4 macro and changing value at the following line:
 ```bash
 /run/beamOn <n. of events>
 ```
@@ -448,7 +412,7 @@ Run the executable with the --help option to see the available options:
 
 To run GeoModelGeantino one has to specify with the -g flag the geometry file (this is mandatory). By default a 'geantinoMaps.root' is created and it containts RZ RadiationLenght and Interaction Lenght 2D profiles. To run gmgeantino on *LArBarrel.db* geometry, with the default *geantino.g4* macro file, and producing eta-phi maps and detector maps:
 ``` bash
-./gmgeantino -g LArBarrel.db -e -d
+./gmgeantino -m ../share/FullSimLight/geantino.g4 -g LArBarrel.db -e -d 
 ``` 
 
 To produce geantino maps of a geometry described by one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin*, using a custom macro file *mymacro.g4*, activate detectors/materials and elements maps, and write out the geantino maps in the *geantinoMaps_HGTD.root* file :

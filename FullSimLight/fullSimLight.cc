@@ -54,6 +54,9 @@ int main(int argc, char** argv) {
     << "   Run Overlap Check  =  " << parRunOverlapCheck              << G4endl
     << " ===================================================== "      << G4endl;
     
+    G4Timer myTotalCPUTimer;
+    myTotalCPUTimer.Start();
+    
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
     G4Random::setTheEngine(new CLHEP::MixMaxRng);
     // set seed and print info
@@ -114,6 +117,12 @@ int main(int argc, char** argv) {
     //
     // Delete the RunManager
     delete runManager;
+    myTotalCPUTimer.Stop();
+    G4cout << "FullSimLight done! Total execution time info: " << G4endl;
+    G4cout << "*** User time elapsed   : " <<myTotalCPUTimer.GetUserElapsed()   << G4endl;
+    G4cout << "*** Real time elapsed   : " <<myTotalCPUTimer.GetRealElapsed()   << G4endl;
+    G4cout << "*** System time elapsed : " <<myTotalCPUTimer.GetSystemElapsed() << G4endl
+    << " ================================================================= "    << G4endl;
     return 0;
 }
 

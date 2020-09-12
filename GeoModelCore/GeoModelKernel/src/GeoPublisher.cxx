@@ -7,7 +7,7 @@
 
 
 // local includes
-#include <GeoModelKernel/GeoStore.h>
+#include <GeoModelKernel/GeoPublisher.h>
 #include <GeoModelKernel/GeoVFullPhysVol.h>
 #include <GeoModelKernel/GeoAlignableTransform.h>
 
@@ -17,7 +17,8 @@
 
 //namespace GeoModelKernel {
 
-void GeoStore::printSuffixErrMsg(std::string suffix)
+/*
+void GeoPublisher::printSuffixErrMsg(std::string suffix)
 {
     std::cout << "ERROR!! The provided table name's suffix ('" << suffix << "') is not valid. \n"
         << "Please, use only alphanumeric characters and the underscore ('_') symbol.\n"
@@ -25,8 +26,10 @@ void GeoStore::printSuffixErrMsg(std::string suffix)
         << std::endl;
     exit(EXIT_FAILURE);
 }
+*/
 
-void GeoStore::setTableSuffixAXF(std::string suffix) 
+/*
+void GeoPublisher::setTableSuffixAXF(std::string suffix) 
 {
     if(isValidTableSuffix(suffix))
         m_suffixTableAXF = suffix;
@@ -34,49 +37,61 @@ void GeoStore::setTableSuffixAXF(std::string suffix)
         printSuffixErrMsg(suffix);
 }
 
-void GeoStore::setTableSuffixFPV(std::string suffix) 
+void GeoPublisher::setTableSuffixFPV(std::string suffix) 
 {
     if(isValidTableSuffix(suffix))
         m_suffixTableFPV = suffix;
     else 
         printSuffixErrMsg(suffix);
 }
+*/
+
 
 template<typename Iter>
-void GeoStore::printInsertionStatus(Iter it, bool success)
+void GeoPublisher::printInsertionStatus(Iter it, bool success)
 {   
-    std::cout << "GeoModelKernel::GeoStore : Insertion of " << it->first << (success ? " succeeded\n" : " failed\n");
+    std::cout << "GeoModelKernel::GeoPublisher : Insertion of " << it->first << (success ? " succeeded\n" : " failed\n");
 }
 
-void GeoStore::storeAXF(GeoAlignableTransform* axf, std::any key)
+void GeoPublisher::publishAXF(GeoAlignableTransform* axf, std::any key)
 {
   //std::cout << "AXF key: " << std::any_cast<std::string>(key) << std::endl; // debug msg
-  const auto [it_hinata, success] = m_storeAXF.insert( {axf, key} );
-  if(!success) printInsertionStatus(it_hinata, success);
+  const auto [iter, success] = m_publishedAXF.insert( {axf, key} );
+  if(!success) printInsertionStatus(iter, success);
 }
 
 
-void GeoStore::storeFPV(GeoVFullPhysVol* fpv, std::any key)
+void GeoPublisher::publishFPV(GeoVFullPhysVol* fpv, std::any key)
 {
   //std::cout << "FPV key: " << std::any_cast<std::string>(key) << std::endl; // debug msg
-  const auto [it_hinata, success] = m_storeFPV.insert( {fpv, key} );
-  if(!success) printInsertionStatus(it_hinata, success);
+  const auto [iter, success] = m_publishedFPV.insert( {fpv, key} );
+  if(!success) printInsertionStatus(iter, success);
 }
 
-std::map<GeoVFullPhysVol*, std::any> GeoStore::getStoreFPV()
+std::map<GeoVFullPhysVol*, std::any> GeoPublisher::getPublishedFPV()
 {
-    return m_storeFPV;
+    return m_publishedFPV;
 }
 
-std::map<GeoAlignableTransform*, std::any> GeoStore::getStoreAXF()
+std::map<GeoAlignableTransform*, std::any> GeoPublisher::getPublishedAXF()
 {
-    return m_storeAXF;
+    return m_publishedAXF;
 }
 
-bool GeoStore::isValidTableSuffix(std::string suffix)
+
+void GeoPublisher::setName(std::string name)
+{
+    m_name = name;
+    //m_tableNameFPV = m_name + "_FPV";
+    //m_tableNameAXF = m_name + "_AXF";
+}
+
+/*
+bool GeoPublisher::isValidTableSuffix(std::string suffix)
 {
     return find_if(suffix.begin(), suffix.end(), 
                     [](char c) { return !(isalnum(c) || (c == '_')); }) == suffix.end();
 }
+*/
 
 //}; // end of GeoModelKernel namespace

@@ -8,7 +8,7 @@
 * major updates:
 *  - Aug 2018, R.M.Bianchi
 *  - Jun 2020, R.M.Bianchi
-*  - Aug 2020, R.M.Bianchi
+*  - Aug 2020, R.M.Bianchi - Added support to publish lists of FullPhysVol and AlignableTransform nodes
 */
 
 #include <GeoModelDBManager/GMDBManager.h>
@@ -22,7 +22,7 @@
 #include <sstream>
 
 
-static std::string dbversion = "0.5.0"; // Added two new tables to store the list of published FullPhysVols and AlignableTransforms
+static std::string dbversion = "0.5.0"; // Added new tables to store lists of published FullPhysVols and AlignableTransforms
 
 
 //// FIXME: move this to utility class/file
@@ -285,46 +285,38 @@ bool GMDBManager::addListOfChildrenPositions(const std::vector<std::vector<std::
 bool GMDBManager::addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records,
 std::string suffix /* optional parameter */)
 {
-    if( "" == suffix ) {
-        // NOTE: Choose the right function for your version of SQLite!!
-	    return addListOfRecordsToTable("PublishedAlignableTransforms", records); // needs SQLite >= 3.7.11
-	    //return addListOfRecordsToTableOld("PublishedAlignableTransforms", records); // old SQLite versions
-    } else {
-       // create custom table first then add to it
-        std::string tableName = "PublishedAlignableTransforms";
+    std::string tableName = "PublishedAlignableTransforms"; // default table name
+    std::string nodeType = "GeoAlignableTransform";
+    const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
+    if( "" != suffix ) {
         tableName += "_";
         tableName += suffix;
-        std::string nodeType = "GeoAlignableTransform";
         // debug msg
         //std::cout << "\nSaving the published '"<< nodeType << "' nodes to the custom table: '"
         //          << tableName << "'." << std::endl;
-        const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
-       createTableCustomPublishedNodes( tableName, nodeType, &keyType );
-	    return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
     }
-    return false;
+    // create custom table first then add to it
+    createTableCustomPublishedNodes( tableName, nodeType, &keyType );
+    return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+    //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
 }
 
 bool GMDBManager::addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records, std::string
 suffix /* optional parameter */)
 {
-    if( "" == suffix ) {
-        // NOTE: Choose the right function for your version of SQLite!!
-        return addListOfRecordsToTable("PublishedFullPhysVols", records); // needs SQLite >= 3.7.11
-        //return addListOfRecordsToTableOld("PublishedFullPhysVols", records); // old SQLite versions
-    } else {
-       // create custom table first then add to it
-        std::string tableName = "PublishedFullPhysVols";
+    std::string tableName = "PublishedFullPhysVols"; // default table name
+    std::string nodeType = "GeoFullPhysVol";
+    const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
+    if( "" != suffix ) {
         tableName += "_";
         tableName += suffix;
-        std::string nodeType = "GeoFullPhysVol";
         //std::cout << "\nSaving the published '"<< nodeType << "' nodes to the custom table: '"
         //          << tableName << "'." << std::endl;
-        const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
-       createTableCustomPublishedNodes( tableName, nodeType, &keyType );
-	    return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
     }
-    return false;
+    // create custom table first then add to it
+    createTableCustomPublishedNodes( tableName, nodeType, &keyType );
+    return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+    //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
 }
 
 
@@ -855,6 +847,7 @@ void GMDBManager::printAllDBTables()
 }
 
 
+
 void GMDBManager::getAllDBTables()
 {
   std::string tableName;
@@ -884,6 +877,29 @@ void GMDBManager::getAllDBTables()
   m_cache_tables = tables;
 }
 
+
+std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable( std::string suffix )
+{
+    std::string tableName = "PublishedFullPhysVols"; // default table name
+    if( "" != suffix ) {
+        tableName += "_";
+        tableName += suffix;
+    }
+
+    return getTableRecords( tableName );
+}
+std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable( std::string suffix )
+{
+    std::string tableName = "PublishedAlignableTransforms"; // default table name
+    if( "" != suffix ) {
+        tableName += "_";
+        tableName += suffix;
+    }
+
+    return getTableRecords( tableName );
+}
+
+
 // create a user-defined custom table to store the published nodes 
 // (usually GeoFullPhysVol and AlignableTransform nodes) and their keys.
 bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, const std::string nodeType, const std::type_info* keyType)
@@ -891,8 +907,8 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
   
   // get the right node type and referenced table
   if( nodeType != "GeoFullPhysVol" && nodeType != "GeoVFullPhysVol" && nodeType != "GeoAlignableTransform" ) {
-    std::cout << "ERROR!! Type " << nodeType 
-              << " is not currently supported in GMDBManager::createTableCustomPublishedNodes()"
+    std::cout << "ERROR!! GeoModel node type '" << nodeType 
+              << "' is not currently supported in GMDBManager::createTableCustomPublishedNodes()"
               << " Please, ask to geomodel-developers@cern.ch. Exiting..."
               << std::endl;
     exit(EXIT_FAILURE);
@@ -910,25 +926,23 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
   else if( typeid(int) == *keyType || typeid(unsigned) == *keyType) 
     keyTypeDB = "integer";
   else {
-    std::cout << "ERROR!!! The keyType '" << typeid(keyType).name() 
+    std::cout << "ERROR!!! The key type '" << typeid(keyType).name() 
       << "' is not currently supported in GMDBManager::createTableCustomPublishedNodes()."
       << " Please, ask to 'geomodel-developers@cern.ch'. Exiting..."
       << std::endl;
     exit(EXIT_FAILURE);
   }
  
-  int rc = -1; // sqlite return code
+  int rc = -1; // sqlite's return code
   std::string queryStr;
 
-  //std::string geoNode;
-  //std::string tableName;
   std::vector<std::string> tab;
 
   //tableName = "dbversion";
-  tab.insert(tab.begin(), {tableName, "id", "key", "nodeID"});
+  tab.insert(tab.begin(), {tableName, "id", "key", "nodeID", "keyType"});
   storeTableColumnNames(tab);
 
-  queryStr = fmt::format("create table {0} ({1} integer primary key, {2} {3} not null, {4} integer not null REFERENCES {5}(id))", tab[0], tab[1], tab[2], keyTypeDB, tab[3], referencedTable);
+  queryStr = fmt::format("create table {0} ({1} integer primary key, {2} {3} not null, {4} integer not null REFERENCES {5}(id), {6} varchar not null)", tab[0], tab[1], tab[2], keyTypeDB, tab[3], referencedTable, tab[4]);
   //std::cout << "Creating table with query: '" << queryStr << "'..." << std::endl; // debug msg
   rc = execQuery(queryStr);
   tab.clear();
@@ -990,29 +1004,7 @@ bool GMDBManager::createTables()
   queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer not null, {3} integer not null REFERENCES GeoNodesTypes(id))", tab[0], tab[1], tab[2], tab[3]);
   rc = execQuery(queryStr);
   tab.clear();
-  
-  // create a table to store the list of published GeoFullPhysVol node
-  tableName = "PublishedFullPhysVols";
-  tab.push_back(tableName);
-  tab.push_back("id");
-  tab.push_back("key");
-  tab.push_back("nodeID");
-  storeTableColumnNames(tab);
-  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar not null, {3} integer not null REFERENCES FullPhysVols(id))", tab[0], tab[1], tab[2], tab[3]);
-  rc = execQuery(queryStr);
-  tab.clear();
-  
-  // create a table to store the list of published GeoAlignableTransform node
-  tableName = "PublishedAlignableTransforms";
-  tab.push_back(tableName);
-  tab.push_back("id");
-  tab.push_back("key");
-  tab.push_back("nodeID");
-  storeTableColumnNames(tab);
-  queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar not null, {3} integer not null REFERENCES AlignableTransforms(id))", tab[0], tab[1], tab[2], tab[3]);
-  rc = execQuery(queryStr);
-  tab.clear();
-  
+ 
   // PhysVols table
   geoNode = "GeoPhysVol";
   tableName = "PhysVols";

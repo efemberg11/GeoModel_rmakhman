@@ -14,7 +14,7 @@
 
 #include "GeoModelKernel/GeoVPhysVol.h"
 //#include "GeoModelKernel/GeoVStore.h" // for create()
-#include "GeoModelKernel/GeoPublisher.h"  // for publishing and I/O methods in general
+#include "GeoModelKernel/GeoPublisher.h" // to publish lists of FullPhysVol and AlignableTransform nodes
 
 class GeoPhysVol;
 
@@ -23,7 +23,6 @@ class GeoVGeometryPlugin
  public:
   GeoVGeometryPlugin() {};
   GeoVGeometryPlugin(std::string name, GeoPublisher* publisher) : m_pluginName( name ), m_publisher(publisher) { m_publisher->setName(m_pluginName); } 
-  GeoVGeometryPlugin(std::string name) : m_pluginName( name ) {}
   virtual ~GeoVGeometryPlugin();
 
   // Create the system.
@@ -39,10 +38,8 @@ class GeoVGeometryPlugin
 
  private:
 
-  // we prohibit default constructor, copy constructor, and assignment operator
-  //GeoVGeometryPlugin()=delete;
-  //GeoVGeometryPlugin(const GeoVGeometryPlugin &right)=delete;
-  //GeoVGeometryPlugin & operator=(const GeoVGeometryPlugin &right)=delete;
+  GeoVGeometryPlugin(const GeoVGeometryPlugin &right)=delete;
+  GeoVGeometryPlugin & operator=(const GeoVGeometryPlugin &right)=delete;
 
   // the name of the plugin. 
   // It will be used to keep track of the FullPhysVol 

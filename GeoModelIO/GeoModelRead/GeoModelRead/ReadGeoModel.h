@@ -1,12 +1,13 @@
 /*
- * GeoModelReadIn.h
+ * ReadGeoModel.h
  *
- *  Created on: May 20, 2016
- *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ * Created on: May 20, 2016
+ * Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
  *
  * major updates:
  * - 2019 Feb, R.M.Bianchi
- * - 2020 May, R.M.Bianchi
+ * - 2020 May, R.M.Bianchi - Added parallel read
+ * - 2020 Aug, R.M.Bianchi - Added support for reading back published nodes
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
@@ -44,6 +45,7 @@ typedef GeoModelIO::ReadGeoModel Persistifier;
 #include <tuple>
 #include <vector>
 #include <deque>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -86,6 +88,71 @@ public:
 	virtual ~ReadGeoModel();
 
 	GeoPhysVol* buildGeoModel();
+
+    template <typename T, class N> std::map<T,N> getPublishedNodes( std::string publisherName = "" /*optional variable*/);
+/*    {
+        std::map<T, N> mapNodes;
+        std::string keyType = "";
+
+        std::vector<std::vector<std::string>> vecFPVs;
+        if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
+            vecFPVs = m_dbManager->getPublishedFPVTable( publisherName );
+        } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
+            vecFPVs = m_dbManager->getPublishedAXFTable( publisherName );
+        } else {
+            std::cout << "ERROR! The node type '" << typeid(N).name() 
+                << "' is not currently supported.\n"
+                << "If in doubt, please ask to 'geomodel-developers@cern.ch'.\n"
+                << "Exiting...\n";
+            exit(EXIT_FAILURE);
+        }
+        unsigned ii = 0;
+        for( auto const record : vecFPVs ) {
+            // record[0] is the record's ID in the DB table, we skip that.
+            std::string keyStr  = record[1];
+            std::string volID   = record[2];
+            if(0==ii) keyType   = record[3];
+            ++ii;
+            
+            //std::cout << "keyStr: " << keyStr << ", volID: " << volID 
+            //          << ", keyType: " << keyType << std::endl; // debug msg
+
+            N volPtr = nullptr;
+            if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
+                volPtr = getBuiltFullPhysVol(std::stoul(volID));
+            } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
+                volPtr = getBuiltAlignableTransform(std::stoul(volID));
+            } else {
+                std::cout << "ERROR! The node type '" << typeid(N).name() 
+                    << "' is not currently supported.\n"
+                    << "If in doubt, please ask to 'geomodel-developers@cern.ch'.\n"
+                    << "Exiting...\n";
+                exit(EXIT_FAILURE);
+            }
+
+            if constexpr ( std::is_same_v<unsigned, T> ) {
+                unsigned int key = std::stoul( keyStr );
+                mapNodes.insert( {key, volPtr} );
+            } 
+            else if constexpr ( std::is_same_v<int, T> ) {
+                int key = std::stoi( keyStr );
+                mapNodes.insert( {key, volPtr} );
+            } 
+            else if constexpr ( std::is_same_v<std::string, T> ) {
+                // OK! key is string already, so we use keyStr.
+                mapNodes.insert( {keyStr, volPtr} );
+            } 
+            else {
+                std::cout << "ERROR! Key type '" << keyType << "' is not currently supported.\n"
+                          << "If in doubt, please ask to 'geomodel-developers@cern.ch'.\n"
+                          << "Exiting...\n";
+                exit(EXIT_FAILURE);
+            }
+        }
+        return mapNodes;
+    }
+*/
+   
 
 private:
 
@@ -264,4 +331,9 @@ private:
 };
 
 } /* namespace GeoModelIO */
+
+// include the implementation of the class' template functions
+#include "ReadGeoModel.tpp"
+
+
 #endif /* GeoModelRead_ReadGeoModel_H_ */

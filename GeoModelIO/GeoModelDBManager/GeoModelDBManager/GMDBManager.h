@@ -4,9 +4,6 @@
 #ifndef GMDBManager_H
 #define GMDBManager_H
 
-//#include "GeoModelKernel/GeoNodeAction.h"
-//#include "GeoModelKernel/GeoGraphNode.h"
-
 // include SQLite 
 #include <sqlite3.h>
 
@@ -198,6 +195,9 @@ public:
 
 	/// methods to dump the DB
   std::vector<std::vector<std::string>> getChildrenTable();
+  
+  std::vector<std::vector<std::string>> getPublishedFPVTable( std::string suffix = "" );
+  std::vector<std::vector<std::string>> getPublishedAXFTable( std::string suffix = "" );
 
   std::vector<std::vector<std::string>> getTableFromNodeType(std::string nodeType);
 

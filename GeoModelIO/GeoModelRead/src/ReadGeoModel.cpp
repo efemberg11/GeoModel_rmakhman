@@ -1,5 +1,5 @@
 /*
- * GeoModelReadIn.cpp
+ * ReadGeoModel.cpp
  *
  *  Created on: May 20, 2016
  *      Author: riccardo.maria.bianchi@cern.ch
@@ -9,6 +9,7 @@
  *  - Mar 2020, R.M.Bianchi
  *  - Mar 2020, boudreau
  *  - May 2020, R.M.Bianchi
+ *  - Aug 2020, R.M.Bianchi - Added support to read published FullPhysVols and AlignableTransforms back in
  */
 
 

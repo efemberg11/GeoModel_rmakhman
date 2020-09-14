@@ -9,7 +9,7 @@
  * - Aug 2018 - R.M.Bianchi
  * - Feb 2019 - R.M.Bianchi
  * - May 2020 - R.M.Bianchi
- * - Aug 2020 - R.M.Bianchi // added support for GeoStore
+ * - Aug 2020 - R.M.Bianchi // added support for GeoPublisher
  */
 
 #ifndef GeoModelWrite_WriteGeoModel_H
@@ -35,7 +35,7 @@
 #include <unordered_map>
 
 // FWD declarations
-class GeoStore;
+class GeoPublisher;
 
 namespace GeoModelIO {
 
@@ -68,8 +68,8 @@ public:
 	virtual void handleTransform (const GeoTransform *);
 	virtual void handleNameTag (const GeoNameTag *);
 
-	void saveToDB(GeoStore* store = nullptr);
-    void saveToDB( std::vector<GeoStore*>& vecStores);
+	void saveToDB(GeoPublisher* store = nullptr);
+    void saveToDB( std::vector<GeoPublisher*>& vecStores);
 
 private:
 
@@ -153,7 +153,7 @@ private:
 
   unsigned int getIdFromNodeType(const std::string &nodeType);
 
-  void storePublishedNodes(GeoStore* store);
+  void storePublishedNodes(GeoPublisher* store);
   template <typename TT> void storeRecordPublishedNodes(const TT storeMap, std::vector<std::vector<std::string>>* cachePublishedNodes);
 
   std::string m_dbpath;

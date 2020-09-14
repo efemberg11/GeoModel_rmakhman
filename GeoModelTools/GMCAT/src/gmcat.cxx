@@ -137,8 +137,12 @@ int main(int argc, char ** argv) {
       return 5;
     }
     GeoPublisher* publisher = factory->getPublisher();
-    vecPluginsStores.push_back(publisher); // cache the publisher for later
-    factory->create(world, publisher);
+    if (publisher) {
+        vecPluginsStores.push_back(publisher); // cache the publisher, if any, for later
+        factory->create(world, publisher);
+    } else {
+        factory->create(world);
+    }
   }
 
   //

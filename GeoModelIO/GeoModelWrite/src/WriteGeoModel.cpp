@@ -1523,7 +1523,7 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
 	m_dbManager->addRootVolume(m_rootVolume);
 
     if(publishers.size()) {
-            std::cout << "\nA pointer to a GeoPublisher instance has been provided, "
+            std::cout << "\nINFO: A pointer to a GeoPublisher instance has been provided, "
                 << "so we dump the published list of FullPhysVol and AlignableTransforms\n" 
                 << std::endl;
         for(GeoPublisher* publisher : publishers) {
@@ -1541,19 +1541,8 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
 }
 
 
-void WriteGeoModel::storePublishedNodes(GeoPublisher* storePtr)
+void WriteGeoModel::storePublishedNodes(GeoPublisher* store)
 {
-    if( !(dynamic_cast<GeoPublisher*>(storePtr)) )
-    {
-        std::cout << "ERROR!!! " 
-            << "The implementation class of GeoPublisher you are using is not targeted to publish nodes wth GeoModelIO. "
-            << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting..."
-            << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    GeoPublisher* store = dynamic_cast<GeoPublisher*>(storePtr);
-
     // loop over the published AlignableTransform nodes
     std::map<GeoAlignableTransform*, std::any> mapAXF = store->getPublishedAXF();
     storeRecordPublishedNodes<std::map<GeoAlignableTransform*, std::any>>(mapAXF, &m_publishedAlignableTransforms_String);   

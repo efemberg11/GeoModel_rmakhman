@@ -1553,8 +1553,16 @@ void WriteGeoModel::storePublishedNodes(GeoPublisher* store)
 
     // save the list of matching published nodes to the DB
     std::string storeName = store->getName();
-    m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String, storeName);
-    m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String, storeName);
+    if (mapAXF.size() > 0) {
+        m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String, storeName); 
+    } else {
+        std::cout << "\nWARNING! A pointer to a GeoPublisher was provided, but no GeoAlignableTransform nodes have been published. Please, check if that was intended. (If in doubt, please ask to 'geomodel-developers@cern.ch')\n" << std::endl;
+    }
+    if (mapFPV.size() > 0) {
+        m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String, storeName);
+    } else {
+        std::cout << "\nWARNING! A pointer to a GeoPublisher was provided, but no GeoFullPhysVol nodes have been published. Please, check if that was intended. (If in doubt, please ask to 'geomodel-developers@cern.ch')\n" << std::endl;
+    }
 
     // clear the caches
     m_publishedAlignableTransforms_String.clear();

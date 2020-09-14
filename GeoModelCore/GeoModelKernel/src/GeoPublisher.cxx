@@ -15,38 +15,6 @@
 #include <iostream>
 
 
-//namespace GeoModelKernel {
-
-/*
-void GeoPublisher::printSuffixErrMsg(std::string suffix)
-{
-    std::cout << "ERROR!! The provided table name's suffix ('" << suffix << "') is not valid. \n"
-        << "Please, use only alphanumeric characters and the underscore ('_') symbol.\n"
-        << "Exiting..."
-        << std::endl;
-    exit(EXIT_FAILURE);
-}
-*/
-
-/*
-void GeoPublisher::setTableSuffixAXF(std::string suffix) 
-{
-    if(isValidTableSuffix(suffix))
-        m_suffixTableAXF = suffix;
-    else 
-        printSuffixErrMsg(suffix);
-}
-
-void GeoPublisher::setTableSuffixFPV(std::string suffix) 
-{
-    if(isValidTableSuffix(suffix))
-        m_suffixTableFPV = suffix;
-    else 
-        printSuffixErrMsg(suffix);
-}
-*/
-
-
 template<typename Iter>
 void GeoPublisher::printInsertionStatus(Iter it, bool success)
 {   
@@ -59,7 +27,6 @@ void GeoPublisher::publishAXF(GeoAlignableTransform* axf, std::any key)
   const auto [iter, success] = m_publishedAXF.insert( {axf, key} );
   if(!success) printInsertionStatus(iter, success);
 }
-
 
 void GeoPublisher::publishFPV(GeoVFullPhysVol* fpv, std::any key)
 {
@@ -82,16 +49,6 @@ std::map<GeoAlignableTransform*, std::any> GeoPublisher::getPublishedAXF()
 void GeoPublisher::setName(std::string name)
 {
     m_name = name;
-    //m_tableNameFPV = m_name + "_FPV";
-    //m_tableNameAXF = m_name + "_AXF";
 }
 
-/*
-bool GeoPublisher::isValidTableSuffix(std::string suffix)
-{
-    return find_if(suffix.begin(), suffix.end(), 
-                    [](char c) { return !(isalnum(c) || (c == '_')); }) == suffix.end();
-}
-*/
 
-//}; // end of GeoModelKernel namespace

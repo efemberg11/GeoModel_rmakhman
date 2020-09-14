@@ -26,7 +26,7 @@
 
 
 // GeoModelCore includes
-//#include <GeoModelKernel/GeoVStore.h>
+//#include <GeoModelKernel/GeoVFullPhysVol.h>
 
 // C++ includes
 #include <any> // needs C++17
@@ -37,8 +37,6 @@
 class GeoAlignableTransform;
 class GeoVFullPhysVol;
 
-//namespace GeoModelKernel {
-
 class GeoPublisher
 {
  public:
@@ -48,22 +46,11 @@ class GeoPublisher
   void publishAXF(GeoAlignableTransform* axf, std::any key);
   void publishFPV(GeoVFullPhysVol* fpv, std::any key);
 
-  //std::map<GeoVFullPhysVol*, std::any> getStoreFPV() override final;
-  //std::map<GeoAlignableTransform*, std::any> getStoreAXF() override final;
   std::map<GeoVFullPhysVol*, std::any> getPublishedFPV();
   std::map<GeoAlignableTransform*, std::any> getPublishedAXF();
 
-  //void setTableSuffixAXF(std::string suffix); 
-  //void setTableSuffixFPV(std::string suffix);
-  
-  //bool isValidTableSuffix(std::string suffix) override final;
-  //bool isValidTableSuffix(std::string suffix);
-  //void printSuffixErrMsg(std::string suffix);
-
   void setName(std::string name);
   std::string getName() { return m_name; }
-  //std::string getTableNameAXF() { return m_tableNameAXF; }
-  //std::string getTableNameFPV() { return m_tableNameFPV; }
 
  private:
 
@@ -73,12 +60,7 @@ class GeoPublisher
   template<typename Iter> void printInsertionStatus(Iter it, bool success);
 
   std::string m_name;
-  //std::string m_tableNameFPV;
-  //std::string m_tableNameAXF;
-
 
 }; 
-
-//} // end of the GeoModelKernel namespace
 
 #endif

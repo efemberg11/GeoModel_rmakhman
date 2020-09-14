@@ -16,7 +16,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-#include "GeoModelKernel/GeoStore.h"
+#include "GeoModelKernel/GeoPublisher.h"
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -32,27 +32,29 @@
 using namespace GeoGenfun;
 using namespace GeoXF;
 
-class ToyGeometryPlugin : public GeoVGeometryPlugin  {
+class ToyGeometryPluginCustomPublisher : public GeoVGeometryPlugin  {
 
  public:
 
-  // Constructor:  (no default constructor)
-  ToyGeometryPlugin( std::string pluginName, GeoStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
+  // Constructor
+  // Note: we use the parametrized constructor because we need to publish
+  //       lists of FullPhysVol and AlignableTransforms nodes
+  ToyGeometryPluginCustomPublisher( std::string pluginName, GeoPublisher* publisher, GeoVStore* store=nullptr /*not used here*/ ) : GeoVGeometryPlugin( pluginName, publisher ) {};
 
   // Destructor:
-  ~ToyGeometryPlugin();
+  ~ToyGeometryPluginCustomPublisher();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoVStore* store);
+  virtual void create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* store);
 
  
  private:
 
   // Illegal operations:
   // we prohibit default constructor, copy constructor, and assignment operator
-  ToyGeometryPlugin()=delete;
-  const ToyGeometryPlugin & operator=(const ToyGeometryPlugin &right)=delete;
-  ToyGeometryPlugin(const ToyGeometryPlugin &right) = delete;
+  ToyGeometryPluginCustomPublisher()=delete; // prohibited, because we need to use the parametrized constructor to set the name used by the publisher to store the published FullPhysVol and AlignableTransform nodes.
+  const ToyGeometryPluginCustomPublisher & operator=(const ToyGeometryPluginCustomPublisher &right)=delete;
+  ToyGeometryPluginCustomPublisher(const ToyGeometryPluginCustomPublisher &right) = delete;
 
   // Plugin's name.
   // It is also used to publish the list of FullPhysVol and AlignableTransform nodes
@@ -62,18 +64,18 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
 
 
 /* default constructor is prohibited
-ToyGeometryPlugin::ToyGeometryPlugin()
+ToyGeometryPluginCustomPublisher::ToyGeometryPluginCustomPublisher()
 {
 }
 */
 
-ToyGeometryPlugin::~ToyGeometryPlugin()
+ToyGeometryPluginCustomPublisher::~ToyGeometryPluginCustomPublisher()
 {
 }
 
 
 //## Other Operations (implementation)
-void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* storePtr)
+void ToyGeometryPluginCustomPublisher::create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* /*not used here*/)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
@@ -121,28 +123,15 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* storePtr)
     toyPhys->add(xform);
     toyPhys->add(ringPhys);
 
-    // publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoStore is provided
-    if (storePtr) {
-	if( !(dynamic_cast<GeoStore*>(storePtr)) ) {
-	    std::cout << "ERROR! The store should be or inherit from `GeoModelKernel/GeoStore`."
-		      << std::endl;
-            exit(EXIT_FAILURE);
-	}
-        GeoStore* store = dynamic_cast<GeoStore*>(storePtr);
+    // publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoPublisher is provided
+    if (publisher) {
  	// *** publish the list of FPV and AXF nodes ***
 	// we use string-based keys for FullPhysVols...
-	std::string keyStr = this->getName() + std::to_string(i+1);
-	store->storeFPV( ringPhys, keyStr );
-	// ...and integer-based keys for AlignableTransforms
 	unsigned int keyInt = i+1;
-	store->storeAXF( xform, keyInt );
-	// then, we want to store our published FPV and AXF nodes in a custom DB table
-	// For that, we set a suffix for the name of the custom DB table
-	// The tables will be named:
-	// - PublishedFullPhysVols-suffix
-	// - PublishedAlignableTransforms-suffix
-	store->setTableSuffixFPV("ToyPlugin_StringKey");
-	store->setTableSuffixAXF("ToyPlugin_IntegerKey");
+	publisher->publishFPV( ringPhys, keyInt );
+	// ...and integer-based keys for AlignableTransforms
+	std::string keyStr = "Toy-AXF-" + std::to_string(i+1);
+	publisher->publishAXF( xform, keyStr );
     }
   }
 
@@ -203,10 +192,9 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* storePtr)
   //--------------------------------------//
 }
 
-extern "C" ToyGeometryPlugin *createToyGeometryPluginCustomStore() {
-  GeoStore* store = new GeoStore();
-  ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPluginCustomStore", store);
+extern "C" ToyGeometryPluginCustomPublisher *createToyGeometryPluginCustomPublisher() {
+  GeoPublisher* publisher = new GeoPublisher();
+  ToyGeometryPluginCustomPublisher* toy = new ToyGeometryPluginCustomPublisher( "ToyGeometryPluginCustomPublisher", publisher );
   std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
-  //return new ToyGeometryPlugin("ToyGeometryPlugin");
 }

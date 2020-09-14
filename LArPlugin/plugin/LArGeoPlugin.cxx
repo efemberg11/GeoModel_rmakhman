@@ -9,7 +9,6 @@
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoVStore.h"
-#include "GeoModelKernel/GeoStore.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoLogVol.h"
@@ -31,13 +30,13 @@ class LArGeoPlugin : public GeoVGeometryPlugin
 {
 public:
   
-  LArGeoPlugin( std::string pluginName, GeoStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
+  LArGeoPlugin() {};
   ~LArGeoPlugin();
 
   const LArGeoPlugin & operator=(const LArGeoPlugin &right)=delete;
   LArGeoPlugin(const LArGeoPlugin &right) = delete;
   
-  virtual void create(GeoPhysVol* world, GeoVStore* store) override;
+  virtual void create(GeoPhysVol* world, GeoPublisher* /*not used here*/, GeoVStore* /*not used here*/) override;
 
 private:
   LArGeoMaterialManager* m_matman{new LArGeoMaterialManager()};
@@ -61,7 +60,7 @@ LArGeoPlugin::~LArGeoPlugin()
   delete m_matman;
 }
 
-void LArGeoPlugin::create(GeoPhysVol* world, GeoVStore* /*store*/)
+void LArGeoPlugin::create(GeoPhysVol* world, GeoPublisher* /*not used here*/, GeoVStore* /*not used here*/)
 {
   // ________ Time measure ____________
   typedef std::chrono::high_resolution_clock Time;
@@ -618,6 +617,5 @@ void LArGeoPlugin::create(GeoPhysVol* world, GeoVStore* /*store*/)
 }
 
 extern "C" LArGeoPlugin *createLArGeoPlugin() {
-    GeoStore* store = new GeoStore();
-    return new LArGeoPlugin( "LArGeoPlugin", store );
+    return new LArGeoPlugin();
 }

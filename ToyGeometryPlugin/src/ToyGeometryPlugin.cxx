@@ -40,13 +40,13 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
   // Constructor 
   // Note: we use the parametrized constructor because we need to publish 
   //       lists of FullPhysVol and AlignableTransforms nodes
-  ToyGeometryPlugin( std::string pluginName, GeoPublisher* publisher, GeoVStore* store=nullptr /*not used here*/ ) : GeoVGeometryPlugin( pluginName, publisher ) {};
+  ToyGeometryPlugin( std::string pluginName, GeoPublisher* publisher ) : GeoVGeometryPlugin( pluginName, publisher ) {};
 
   // Destructor:
   ~ToyGeometryPlugin() {};
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* store ) override;
+  virtual void create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* store /*not used here*/) override;
 
  
  private:

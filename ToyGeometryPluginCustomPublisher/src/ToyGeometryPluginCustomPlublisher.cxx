@@ -39,7 +39,7 @@ class ToyGeometryPluginCustomPublisher : public GeoVGeometryPlugin  {
   // Constructor
   // Note: we use the parametrized constructor because we need to publish
   //       lists of FullPhysVol and AlignableTransforms nodes
-  ToyGeometryPluginCustomPublisher( std::string pluginName, GeoPublisher* publisher, GeoVStore* store=nullptr /*not used here*/ ) : GeoVGeometryPlugin( pluginName, publisher ) {};
+  ToyGeometryPluginCustomPublisher( std::string pluginName, GeoPublisher* publisher ) : GeoVGeometryPlugin( pluginName, publisher ) {};
 
   // Destructor:
   ~ToyGeometryPluginCustomPublisher();

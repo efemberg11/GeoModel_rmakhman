@@ -24,7 +24,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-#include "GeoModelKernel/GeoStore.h"
+#include "GeoModelKernel/GeoPublisher.h"
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -94,15 +94,6 @@ int main(int argc, char *argv[])
         carbon->add(const_cast<GeoElement*> (Carbon), 1.0);
         carbon->lock();
 
-
-
-  //const GeoMaterial *air        = matman->getMaterial("std::Air");
-  //const GeoMaterial *poly       = matman->getMaterial("std::Polystyrene");
-  //const GeoMaterial *silicon    = matman->getMaterial("std::Silicon");
-  //const GeoMaterial *copper     = matman->getMaterial("std::Copper");
-
-
-
    //-----------------------------------------------------------------------------------//
   // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
@@ -143,8 +134,12 @@ int main(int argc, char *argv[])
   GeoSerialDenominator *ringName = new GeoSerialDenominator("RING");
   toyPhys->add(ringName);
  
-  // Instanciate a GeoStore, to publish the list of FullPhysVol and AlignableTransforms nodes
-  GeoStore* store = new GeoStore;
+  // Instanciate a GeoPublisher, to publish the list of FullPhysVol and AlignableTransforms nodes
+  GeoPublisher* publisher = new GeoPublisher;
+  // Optional - We set a name for the publisher: it will be appended to the name of the DB tables that host our published AXF and FPV nodes. 
+  // Note : This is not compulsory: if not set, the default table name will be used; 
+  //        however, it helps to keep the output data well organized.
+  publisher->setName("HelloToyExample");
 
   for (int i=0;i<100;i++) {
     GeoFullPhysVol         *ringPhys = new GeoFullPhysVol(ringLog);
@@ -153,15 +148,12 @@ int main(int argc, char *argv[])
     toyPhys->add(ringPhys);
     
     // *** publish the list of FPV and AXF nodes ***
-    // we use integer-based keys for FullPhysVols...
-    std::string keyStr = "HelloToyExample-FPV-" + std::to_string(i+1);
-    store->storeFPV( ringPhys, keyStr );
-    // ...and string-based keys for AlignableTransforms
+    // in this example, we use integer-based keys for FullPhysVols...
     unsigned int keyInt = i+1;
-    store->storeAXF( xform, keyInt );
-    // we set a suffix for the name of the DB table that hosts our published AXF and FPV nodes
-    store->setTableSuffixFPV("ToyPlugin_StringKey");
-    store->setTableSuffixAXF("ToyPlugin_IntegerKey");
+    publisher->publishFPV( ringPhys, keyInt );
+    // ...and string-based keys for AlignableTransforms
+    std::string keyStr = "HelloToyExample-FPV-" + std::to_string(i+1);
+    publisher->publishAXF( xform, keyStr );
   }
 
 
@@ -254,31 +246,30 @@ int main(int argc, char *argv[])
   world->exec(&dumpGeoModelGraph); // visit all GeoModel nodes
 
   // Save the GeoModel tree to the SQlite DB file.
-  // We pass a pointer to the GeoStore as well, so the list of published 
+  // We pass a pointer to the GeoPublisher as well, so the list of published 
   // FullPhysVol and AlignableTransform nodes will be stored into the DB too.
-  dumpGeoModelGraph.saveToDB( store );
+  dumpGeoModelGraph.saveToDB( publisher );
 
-  std::cout << "DONE. Geometry saved." <<std::endl;
+  std::cout << "\n-----\nDONE. Geometry saved.\n-----\n" <<std::endl;
 
-  /* UNCOMMENT to see test messages
-  std::cout << "\nTest - list of all the GeoMaterial nodes in the persistified geometry:" << std::endl;
-  db.printAllMaterials();
-  std::cout << "\nTest - list of all the GeoElement nodes in the persistified geometry:" << std::endl;
-  db.printAllElements();
+
+  //------------------------------------------------------------------------------------//
+  // Testing the persitified geometry
+  //------------------------------------------------------------------------------------//
+
   std::cout << "\nTest - list of all the GeoFullPhysVol nodes in the persistified geometry:" << std::endl;
   db.printAllFullPhysVols();
   std::cout << "\nTest - list of all the GeoAlignableTransform nodes in the persistified geometry:" << std::endl;
   db.printAllAlignableTransforms();
-  */
   
   std::cout << "\nTest - list of all the 'published' GeoFullPhysVol nodes in the persistified geometry:" << std::endl;
-  db.printAllPublishedFullPhysVols( store->getTableSuffixFPV() );
+  db.printAllPublishedFullPhysVols( publisher->getName() );
   std::cout << "\nTest - list of all the 'published' GeoAlignableTransform nodes in the persistified geometry:" << std::endl;
-  db.printAllPublishedAlignableTransforms( store->getTableSuffixAXF() );
+  db.printAllPublishedAlignableTransforms( publisher->getName() );
 
   // cleaning
-  delete store;
-  store = nullptr;
+  delete publisher;
+  publisher = nullptr;
 
 
   return 0;

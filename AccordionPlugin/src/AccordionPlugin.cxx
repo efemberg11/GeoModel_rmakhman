@@ -4,6 +4,8 @@
 
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
+#include "GeoModelKernel/GeoVStore.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -53,13 +55,13 @@ class AccordionPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  AccordionPlugin( std::string pluginName ) : GeoVGeometryPlugin( pluginName ) {};
+  AccordionPlugin() {};
 
   // Destructor:
   ~AccordionPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoVStore* store);
+  virtual void create(GeoPhysVol *world, GeoPublisher* publisher /*not used here*/, GeoVStore* store /*not used here*/);
 
  private:
 
@@ -84,7 +86,7 @@ AccordionPlugin::~AccordionPlugin()
 
 
 //## Other Operations (implementation)
-void AccordionPlugin::create(GeoPhysVol *world, GeoVStore*)
+void AccordionPlugin::create(GeoPhysVol *world, GeoPublisher* /*not used here*/, GeoVStore* /*not used here*/)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
@@ -1230,5 +1232,5 @@ GeoGenfun::FunctionNoop AccordionPlugin::ATan2(GeoGenfun::GENFUNCTION y, GeoGenf
 
 
 extern "C" AccordionPlugin *createAccordionPlugin() {
-  return new AccordionPlugin("AccordionPlugin");
+  return new AccordionPlugin();
 }

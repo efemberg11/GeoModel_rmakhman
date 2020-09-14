@@ -150,10 +150,11 @@ int main(int argc, char *argv[])
     // *** publish the list of FPV and AXF nodes ***
     // in this example, we use integer-based keys for FullPhysVols...
     unsigned int keyInt = i+1;
-    publisher->publishFPV( ringPhys, keyInt );
+    publisher->publishNode<GeoVFullPhysVol*,unsigned>(ringPhys, keyInt);
     // ...and string-based keys for AlignableTransforms
-    std::string keyStr = "HelloToyExample-FPV-" + std::to_string(i+1);
-    publisher->publishAXF( xform, keyStr );
+    std::string keyStr = "HelloToy-AXF-" + std::to_string(i+1);
+    publisher->publishNode<GeoAlignableTransform*,std::string>(xform, keyStr);
+
   }
 
 

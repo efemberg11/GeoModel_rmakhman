@@ -32,6 +32,7 @@
 #include <any> // needs C++17
 #include <map>
 #include <string>
+#include <iostream>
 
 
 class GeoAlignableTransform;
@@ -43,8 +44,21 @@ class GeoPublisher
   GeoPublisher() {}
   virtual ~GeoPublisher() {}
 
-  void publishAXF(GeoAlignableTransform* axf, std::any key);
-  void publishFPV(GeoVFullPhysVol* fpv, std::any key);
+  template<class N, typename T> void publishNode(N node,T keyT) {
+    std::any key = keyT;
+    if constexpr (std::is_same_v<GeoVFullPhysVol*, N>) {
+        const auto [iter, success] = m_publishedFPV.insert( {node, key} );
+        if(!success) printInsertionStatus(iter, success);
+    } else if constexpr (std::is_same_v<GeoAlignableTransform*, N>) {
+        const auto [iter, success] = m_publishedAXF.insert( {node, key} );
+        if(!success) printInsertionStatus(iter, success);
+    } else {
+        std::cout << "ERROR!!! The node type '" << typeid(N).name() 
+                  << " is not currently supported by 'GeoPublisher'.\n"
+                  << "If in doubt, please ask to `geomodel-developers@cern.ch'.\n"
+                  << std::endl;
+    }
+  }
 
   std::map<GeoVFullPhysVol*, std::any> getPublishedFPV();
   std::map<GeoAlignableTransform*, std::any> getPublishedAXF();
@@ -57,7 +71,11 @@ class GeoPublisher
   std::map<GeoVFullPhysVol*, std::any> m_publishedFPV;
   std::map<GeoAlignableTransform*, std::any> m_publishedAXF;
 
-  template<typename Iter> void printInsertionStatus(Iter it, bool success);
+  template<typename Iter> void printInsertionStatus(Iter it, bool success)
+  {   
+      std::cout << "GeoModelKernel::GeoPublisher : Insertion of " << it->first << (success ? " succeeded\n" : " failed\n");
+  }
+
 
   std::string m_name;
 

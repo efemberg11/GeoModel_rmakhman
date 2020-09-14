@@ -16,7 +16,8 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-#include "GeoModelKernel/GeoStore.h"
+#include "GeoModelKernel/GeoPublisher.h"
+#include "GeoModelKernel/GeoVStore.h"
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -36,21 +37,23 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
 
  public:
 
-  // Constructor:  (no default constructor)
-  ToyGeometryPlugin( std::string pluginName, GeoStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
+  // Constructor 
+  // Note: we use the parametrized constructor because we need to publish 
+  //       lists of FullPhysVol and AlignableTransforms nodes
+  ToyGeometryPlugin( std::string pluginName, GeoPublisher* publisher, GeoVStore* store=nullptr /*not used here*/ ) : GeoVGeometryPlugin( pluginName, publisher ) {};
 
   // Destructor:
-  ~ToyGeometryPlugin();
+  ~ToyGeometryPlugin() {};
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoVStore* store);
+  virtual void create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* store ) override;
 
  
  private:
 
   // Illegal operations:
   // we prohibit default constructor, copy constructor, and assignment operator
-  ToyGeometryPlugin()=delete;
+  ToyGeometryPlugin()=delete;//prohibited, because we need to set a plugin's name, to store the published FullPhysVol and AlignableTransform nodes.
   const ToyGeometryPlugin & operator=(const ToyGeometryPlugin &right)=delete;
   ToyGeometryPlugin(const ToyGeometryPlugin &right) = delete;
 
@@ -61,19 +64,9 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
 };
 
 
-/* default constructor is prohibited
-ToyGeometryPlugin::ToyGeometryPlugin()
-{
-}
-*/
-
-ToyGeometryPlugin::~ToyGeometryPlugin()
-{
-}
-
 
 //## Other Operations (implementation)
-void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* storePtr)
+void ToyGeometryPlugin::create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* /*not used here*/)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
@@ -121,28 +114,15 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* storePtr)
     toyPhys->add(xform);
     toyPhys->add(ringPhys);
 
-    // publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoStore is provided
-    if (storePtr) {
-	if( !(dynamic_cast<GeoStore*>(storePtr)) ) {
-	    std::cout << "ERROR! The store should be or inherit from `GeoModelKernel/GeoStore`."
-		      << std::endl;
-            exit(EXIT_FAILURE);
-	}
-        GeoStore* store = dynamic_cast<GeoStore*>(storePtr);
- 	// *** publish the list of FPV and AXF nodes ***
-	// we use string-based keys for FullPhysVols...
-	std::string keyStr = this->getName() + std::to_string(i+1);
-	store->storeFPV( ringPhys, keyStr );
-	// ...and integer-based keys for AlignableTransforms
-	unsigned int keyInt = i+1;
-	store->storeAXF( xform, keyInt );
-	// then, we want to store our published FPV and AXF nodes in a custom DB table
-	// For that, we set a suffix for the name of the custom DB table
-	// The tables will be named:
-	// - PublishedFullPhysVols-suffix
-	// - PublishedAlignableTransforms-suffix
-	store->setTableSuffixFPV("ToyPlugin_StringKey");
-	store->setTableSuffixAXF("ToyPlugin_IntegerKey");
+    // Publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoPublisher is provided
+    if (publisher) {
+        // *** publish the list of FPV and AXF nodes ***
+        // we use integer-based keys for FullPhysVol (FPV) nodes...
+        unsigned int keyInt = i+1;
+        publisher->publishFPV( ringPhys, keyInt );
+        // ...and string-based keys for AlignableTransform (AXF) nodes
+        std::string keyStr = this->getName() + "-AXF-" + std::to_string(i+1);
+        publisher->publishAXF( xform, keyStr );
     }
   }
 
@@ -204,8 +184,8 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoVStore* storePtr)
 }
 
 extern "C" ToyGeometryPlugin *createToyGeometryPlugin() {
-  GeoStore* store = new GeoStore();
-  ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPlugin", store);
+  GeoPublisher* publisher = new GeoPublisher();
+  ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPlugin", publisher);
   std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
 }

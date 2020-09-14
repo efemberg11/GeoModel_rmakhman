@@ -71,7 +71,7 @@
 #include "GeoModelKernel/Units.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
-#include "GeoModelKernel/GeoStore.h"
+#include "GeoModelKernel/GeoPublisher.h"
 
 // GeoModelIO includes
 #include "GeoModelDBManager/GMDBManager.h"
@@ -593,15 +593,23 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       }
 
       if (!world) world=createTheWorld(nullptr);
-      
-      if(!(dynamic_cast<GeoStore*>(factory->getStore()))) {
+     
+      /*
+      if(!(dynamic_cast<GeoPublisher*>(factory->getStore()))) {
         std::cout << "ERROR!! The implementation of the GeoVStore provided with the plugin is not tailored to be used with GeoModelIO/GeoModelVisualzation. \n"
             << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting..."
             << std::endl;
         exit(EXIT_FAILURE);
       }
-      GeoStore* store = dynamic_cast<GeoStore*>(factory->getStore()); 
-      factory->create(world, store);
+      */
+      GeoPublisher* publisher = nullptr;
+      publisher = factory->getPublisher(); 
+      if( publisher == nullptr ) {
+        std::cout << "ERROR!! Plugin's pointer to the 'publisher' is empty! Check that the plugin correctly implements the 'getPublisher()' method. "
+            << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting..." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      factory->create(world, publisher);
     }
 
     g++;

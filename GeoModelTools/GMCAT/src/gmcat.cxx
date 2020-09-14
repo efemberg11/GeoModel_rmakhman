@@ -136,13 +136,6 @@ int main(int argc, char ** argv) {
       std::cerr << "Could not load plugin " << plugin << std::endl;
       return 5;
     }
-    /*
-    if(!(dynamic_cast<GeoPublisher*>(factory->getPublisher()))) {
-        std::cout << "ERROR!!  To be used with GeoModelIO/GeoModelVisualzation, the store should be or inherit from GeoPublisher.\n"
-            << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting...\n";
-        exit(EXIT_FAILURE);
-    }
-    */
     GeoPublisher* publisher = factory->getPublisher();
     vecPluginsStores.push_back(publisher); // cache the publisher for later
     factory->create(world, publisher);

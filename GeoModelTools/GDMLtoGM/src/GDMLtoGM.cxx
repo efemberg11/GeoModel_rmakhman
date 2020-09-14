@@ -31,13 +31,13 @@ class GDMLtoGM : public GeoVGeometryPlugin  {
   ~GDMLtoGM();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher* publisher);
+  void create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* store);
 
  private:
 
   // Illegal operations:
-  //const GDMLtoGM & operator=(const GDMLtoGM &right)=delete;
-  //GDMLtoGM(const GDMLtoGM &right) = delete;
+  const GDMLtoGM & operator=(const GDMLtoGM &right)=delete;
+  GDMLtoGM(const GDMLtoGM &right) = delete;
 
 };
 
@@ -56,7 +56,7 @@ GDMLtoGM::~GDMLtoGM()
 
 
 //## Other Operations (implementation)
-void GDMLtoGM::create(GeoPhysVol *world, GeoPublisher*)
+void GDMLtoGM::create(GeoPhysVol *world, GeoPublisher*, GeoVStore*)
 {
 	char* fPath=getenv("GDML_FILE_NAME");
 	std::string fileName;

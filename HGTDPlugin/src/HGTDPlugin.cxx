@@ -19,7 +19,7 @@
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoVStore.h" // for create()
-#include "GeoModelKernel/GeoStore.h"  // for I/O methods in general
+#include "GeoModelKernel/GeoPublisher.h"  // for I/O methods in general
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -38,13 +38,13 @@ class HGTDPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  HGTDPlugin( std::string pluginName, GeoStore* store ) : GeoVGeometryPlugin( pluginName, store ) {};
+  HGTDPlugin( std::string pluginName, GeoPublisher* publisher ) : GeoVGeometryPlugin( pluginName, publisher ) {};
 
   // Destructor:
   ~HGTDPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoVStore*);
+  virtual void create(GeoPhysVol *world, GeoPublisher*, GeoVStore*) override;
 
  private:
 
@@ -144,7 +144,7 @@ HGTDPlugin::~HGTDPlugin()
 
 
 //## Other Operations (implementation)
-void HGTDPlugin::create(GeoPhysVol *world, GeoVStore*)
+void HGTDPlugin::create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* /*not used here*/)
 {
 
 
@@ -169,8 +169,8 @@ void HGTDPlugin::create(GeoPhysVol *world, GeoVStore*)
 }
 
 extern "C" HGTDPlugin *createHGTDPlugin() {
-    GeoStore* store = new GeoStore();
-    return new HGTDPlugin("HGTDPlugin", store);
+    GeoPublisher* publisher = new GeoPublisher();
+    return new HGTDPlugin("HGTDPlugin", publisher);
 }
 
 GeoFullPhysVol* HGTDPlugin::createEnvelope(bool bPos) {

@@ -4,7 +4,6 @@
 
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
-#include "GeoModelKernel/GeoVStore.h"
 #include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
@@ -61,7 +60,7 @@ class AccordionPlugin : public GeoVGeometryPlugin  {
   ~AccordionPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher* publisher /*not used here*/, GeoVStore* store /*not used here*/);
+  virtual void create(GeoPhysVol *world, GeoPublisher* publisher /*not used here*/) override;
 
  private:
 
@@ -86,7 +85,7 @@ AccordionPlugin::~AccordionPlugin()
 
 
 //## Other Operations (implementation)
-void AccordionPlugin::create(GeoPhysVol *world, GeoPublisher* /*not used here*/, GeoVStore* /*not used here*/)
+void AccordionPlugin::create(GeoPhysVol *world, GeoPublisher* /*not used here*/)
 {
   // Get the materials that we shall use.
   // -------------------------------------//

@@ -16,8 +16,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-#include "GeoModelKernel/GeoPublisher.h"
-#include "GeoModelKernel/GeoVStore.h"
+#include "GeoModelKernel/GeoPublisher.h" // to publish lists of FullPhysVol and AlignableTransform nodes
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -46,7 +45,7 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
   ~ToyGeometryPlugin() {};
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* store /*not used here*/) override;
+  virtual void create(GeoPhysVol *world, GeoPublisher* publisher) override;
 
  
  private:
@@ -66,7 +65,7 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
 
 
 //## Other Operations (implementation)
-void ToyGeometryPlugin::create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* /*not used here*/)
+void ToyGeometryPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
 {
   // Get the materials that we shall use.
   // -------------------------------------//

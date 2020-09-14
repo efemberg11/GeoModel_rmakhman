@@ -18,8 +18,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-#include "GeoModelKernel/GeoVStore.h" // for create()
-#include "GeoModelKernel/GeoPublisher.h"  // for I/O methods in general
+#include "GeoModelKernel/GeoPublisher.h"  // to publish lists of nodes
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -44,7 +43,7 @@ class HGTDPlugin : public GeoVGeometryPlugin  {
   ~HGTDPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher*, GeoVStore*) override;
+  virtual void create(GeoPhysVol *world, GeoPublisher*) override;
 
  private:
 
@@ -144,7 +143,7 @@ HGTDPlugin::~HGTDPlugin()
 
 
 //## Other Operations (implementation)
-void HGTDPlugin::create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* /*not used here*/)
+void HGTDPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
 {
 
 

@@ -13,7 +13,6 @@
  */
 
 #include "GeoModelKernel/GeoVPhysVol.h"
-#include "GeoModelKernel/GeoVStore.h" // for create()
 #include "GeoModelKernel/GeoPublisher.h" // to publish lists of FullPhysVol and AlignableTransform nodes in create()
 
 class GeoPhysVol;
@@ -32,7 +31,7 @@ class GeoVGeometryPlugin
 
   //! Create the system geometry.
   // Note: this is a pure virtual method, so you need to implement it in your derived plugin class
-  virtual void create (GeoPhysVol* world, GeoPublisher* publisher = nullptr, GeoVStore* store = nullptr) = 0;
+  virtual void create (GeoPhysVol* world, GeoPublisher* publisher = nullptr) = 0;
 
   // Get the plugin's name
   std::string getName() { return m_pluginName; };

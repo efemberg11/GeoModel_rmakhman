@@ -4,16 +4,16 @@
 #include <fstream>
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
-
 #include "GeoModelXMLParser/XercesParser.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/Units.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GDMLInterface/GDMLController.h"
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 #include <iostream>
+
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 inline bool exists (const std::string& name) {
     std::ifstream f(name.c_str());
@@ -31,7 +31,7 @@ class GDMLtoGM : public GeoVGeometryPlugin  {
   ~GDMLtoGM();
 
   // Creation of geometry:
-  void create(GeoPhysVol *world, GeoPublisher* publisher, GeoVStore* store);
+  void create(GeoPhysVol *world, GeoPublisher* publisher);
 
  private:
 
@@ -56,7 +56,7 @@ GDMLtoGM::~GDMLtoGM()
 
 
 //## Other Operations (implementation)
-void GDMLtoGM::create(GeoPhysVol *world, GeoPublisher*, GeoVStore*)
+void GDMLtoGM::create(GeoPhysVol *world, GeoPublisher*)
 {
 	char* fPath=getenv("GDML_FILE_NAME");
 	std::string fileName;

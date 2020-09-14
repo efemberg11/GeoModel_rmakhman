@@ -593,7 +593,8 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       }
 
       if (!world) world=createTheWorld(nullptr);
-     
+    
+      // TODO: check this with siple and more complex plugins! Also, get lists of FPV and AXF and show them or highlight them in the viewer somehow...
       GeoPublisher* publisher = nullptr;
       publisher = factory->getPublisher(); 
       if( publisher == nullptr ) {

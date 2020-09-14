@@ -2,11 +2,11 @@
   Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef TOYGEOMETRYPLUGIN_GEOSTORE_H
-#define TOYGEOMETRYPLUGIN_GEOSTORE_H
+#ifndef TOYGEOMETRYPLUGIN_GEOPUBLISHER_H
+#define TOYGEOMETRYPLUGIN_GEOPUBLISHER_H
 
 /**
- * @class ToyGeoStore
+ * @class ToyGeoPublisher
  *
  * @brief Class for a generic GeoModel store, implements the abstract class GeoModelKernel/GeoVStore.
  * The interface allows to store pointers to two types of objects
@@ -25,7 +25,7 @@
 
 
 // GeoModelCore includes
-#include <GeoModelKernel/GeoStore.h>
+#include <GeoModelKernel/GeoPublisher.h>
 
 // C++ includes
 #include <any> // needs C++17
@@ -36,34 +36,20 @@
 class GeoAlignableTransform;
 class GeoVFullPhysVol;
 
-namespace ToyGeometryPlugin {
+namespace ToyGeometryPluginCustomPublisher {
 
-class ToyGeoStore : public GeoStore 
+class ToyGeoPublisher : public GeoPublisher 
 {
  public:
   
-  ToyGeoStore() {}
-  virtual ~ToyGeoStore() {}
+  ToyGeoPublisher() { /* something here */ }
+  virtual ~ToyGeoPublisher() {}
 
-  /*
-  void storeAXF(GeoAlignableTransform* axf, std::any key) override final;
-  void storeFPV(GeoVFullPhysVol* fpv, std::any key) override final;
-
-  std::map<GeoVFullPhysVol*, std::any> getStoreFPV() override final;;
-  std::map<GeoAlignableTransform*, std::any> getStoreAXF() override final;
-  */
 
  private:
 
-  /*
-  std::map<GeoVFullPhysVol*, std::any> m_storeFPV;
-  std::map<GeoAlignableTransform*, std::any> m_storeAXF;
-
-  template<typename Iter> void printInsertionStatus(Iter it, bool success);
-  */
-
 }; 
 
-} // end of the GeoModelKernel namespace
+} // end of the namespace
 
 #endif

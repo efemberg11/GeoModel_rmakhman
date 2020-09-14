@@ -6,7 +6,7 @@
 // August 2020
 
 // local includes
-#include "ToyGeoStore.h"
+#include "ToyGeoPublisher.h"
 
 // GeoModel includes
 #include <GeoModelKernel/GeoVFullPhysVol.h>
@@ -20,12 +20,12 @@ namespace ToyGeometryPlugin {
 
 /*
 template<typename Iter>
-void GeoStore::printInsertionStatus(Iter it, bool success)
+void GeoPublisher::printInsertionStatus(Iter it, bool success)
 {   
-    std::cout << "GeoModelKernel::GeoStore : Insertion of " << it->first << (success ? " succeeded\n" : " failed\n");
+    std::cout << "GeoModelKernel::GeoPublisher : Insertion of " << it->first << (success ? " succeeded\n" : " failed\n");
 }
 
-void GeoStore::storeAXF(GeoAlignableTransform* axf, std::any key)
+void GeoPublisher::storeAXF(GeoAlignableTransform* axf, std::any key)
 {
   //std::cout << "AXF key: " << std::any_cast<std::string>(key) << std::endl;
   const auto [it_hinata, success] = m_storeAXF.insert( {axf, key} );
@@ -33,19 +33,19 @@ void GeoStore::storeAXF(GeoAlignableTransform* axf, std::any key)
 }
 
 
-void GeoStore::storeFPV(GeoVFullPhysVol* fpv, std::any key)
+void GeoPublisher::storeFPV(GeoVFullPhysVol* fpv, std::any key)
 {
   //std::cout << "FPV key: " << std::any_cast<std::string>(key) << std::endl;
   const auto [it_hinata, success] = m_storeFPV.insert( {fpv, key} );
   if(!success) printInsertionStatus(it_hinata, success);
 }
 
-std::map<GeoVFullPhysVol*, std::any> GeoStore::getStoreFPV()
+std::map<GeoVFullPhysVol*, std::any> GeoPublisher::getStoreFPV()
 {
     return m_storeFPV;
 }
 
-std::map<GeoAlignableTransform*, std::any> GeoStore::getStoreAXF()
+std::map<GeoAlignableTransform*, std::any> GeoPublisher::getStoreAXF()
 {
     return m_storeAXF;
 }
@@ -53,20 +53,4 @@ std::map<GeoAlignableTransform*, std::any> GeoStore::getStoreAXF()
 
 
 
-
-
-
-
-/*
-GeoVFullPhysVol* GeoStore::getPointerFPV(std::any key) 
-{
-	return m_storeFPV[std::any_cast<std::string>(key)];
-}
-
-GeoAlignableTransform* GeoStore::getPointerAXF(std::any key) 
-{
-	//return m_storeAXF[std::any_cast<std::string>(key)];
-}
-*/
-
-}; // end of ToyGeomoetryPlugin namespace
+}; // end of the namespace

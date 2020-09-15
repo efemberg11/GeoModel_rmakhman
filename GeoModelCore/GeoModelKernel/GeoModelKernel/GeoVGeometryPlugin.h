@@ -15,8 +15,9 @@
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoPublisher.h" // to publish lists of FullPhysVol and AlignableTransform nodes in create()
 
-class GeoPhysVol;
+#include <memory> // smart pointers
 
+class GeoPhysVol;
 class GeoVGeometryPlugin 
 {
  public:
@@ -25,7 +26,10 @@ class GeoVGeometryPlugin
   GeoVGeometryPlugin() {};
   
   //! Constructor used when publishing FullPhysVol/AlignableTransform nodes is needed.
-  GeoVGeometryPlugin(std::string name, GeoPublisher* publisher) : m_pluginName( name ), m_publisher(publisher) { m_publisher->setName(m_pluginName); } 
+  /// The constructor is a 'sink': it takes ownership of the pointer to the GeoPublisher instance. You should use the constructor by passing the ownership of a unique pointer to it:
+  /// @code
+  /// @endcode
+  GeoVGeometryPlugin(std::string name, std::unique_ptr<GeoPublisher> publisher) : m_pluginName( name ) { m_publisher = std::move(publisher);  m_publisher->setName(m_pluginName); } 
   
   virtual ~GeoVGeometryPlugin() {};
 
@@ -37,7 +41,7 @@ class GeoVGeometryPlugin
   std::string getName() { return m_pluginName; };
 
   // Get the Publisher that publishes the lists of the GeoFullPhysVol and AlignableTransform nodes
-  GeoPublisher* getPublisher() {return m_publisher; };
+  GeoPublisher* getPublisher() { return m_publisher.get(); };
 
  private:
 
@@ -48,7 +52,8 @@ class GeoVGeometryPlugin
   std::string m_pluginName;
 
   //! A GeoPublisher instance is used to publish lists of nodes.
-  GeoPublisher* m_publisher;
+  //GeoPublisher* m_publisher;
+  std::unique_ptr<GeoPublisher> m_publisher;
 
 };
 

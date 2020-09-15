@@ -128,7 +128,7 @@ int main(int argc, char ** argv) {
   //
   // Loop over plugins, create the geometry and put it under the world:
   //
-  std::vector<GeoPublisher*> vecPluginsStores; // caches the stores from all plugins
+  std::vector<GeoPublisher*> vecPluginsPublishers; // caches the stores from all plugins
   for (const std::string & plugin : inputPlugins) {
     GeoGeometryPluginLoader loader;
     GeoVGeometryPlugin *factory=loader.load(plugin);
@@ -138,7 +138,7 @@ int main(int argc, char ** argv) {
     }
     GeoPublisher* publisher = factory->getPublisher();
     if (publisher) {
-        vecPluginsStores.push_back(publisher); // cache the publisher, if any, for later
+        vecPluginsPublishers.push_back(publisher); // cache the publisher, if any, for later
         factory->create(world, publisher);
     } else {
         factory->create(world);
@@ -187,7 +187,7 @@ int main(int argc, char ** argv) {
 
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
-  dumpGeoModelGraph.saveToDB(vecPluginsStores);
+  dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
 
   world->unref();
 

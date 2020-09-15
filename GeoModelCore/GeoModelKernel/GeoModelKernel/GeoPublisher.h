@@ -44,7 +44,9 @@ class GeoPublisher
   GeoPublisher() {}
   virtual ~GeoPublisher() {}
 
-  template<class N, typename T> void publishNode(N node,T keyT) {
+  template<class N, typename T> void publishNode(N node,T keyT);
+  /*
+  {
     std::any key = keyT;
     if constexpr (std::is_same_v<GeoVFullPhysVol*, N>) {
         const auto [iter, success] = m_publishedFPV.insert( {node, key} );
@@ -59,6 +61,7 @@ class GeoPublisher
                   << std::endl;
     }
   }
+  */
 
   std::map<GeoVFullPhysVol*, std::any> getPublishedFPV();
   std::map<GeoAlignableTransform*, std::any> getPublishedAXF();
@@ -71,14 +74,18 @@ class GeoPublisher
   std::map<GeoVFullPhysVol*, std::any> m_publishedFPV;
   std::map<GeoAlignableTransform*, std::any> m_publishedAXF;
 
-  template<typename Iter> void printInsertionStatus(Iter it, bool success)
+  template<typename Iter> void printInsertionStatus(Iter it, bool success);
+  /*
   {   
       std::cout << "GeoModelKernel::GeoPublisher : Insertion of " << it->first << (success ? " succeeded\n" : " failed\n");
   }
-
+*/
 
   std::string m_name;
 
 }; 
+
+// include the implementation of the class' templated member functions
+#include "GeoPublisher.tpp"
 
 #endif

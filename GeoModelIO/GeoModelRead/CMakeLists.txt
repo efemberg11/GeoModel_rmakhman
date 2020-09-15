@@ -7,7 +7,7 @@
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cpp )
-file( GLOB HEADERS GeoModelRead/*.h )
+file( GLOB HEADERS GeoModelRead/*.h GeoModelRead/*.tpp )
 
 # Set up the library.
 add_library( GeoModelRead SHARED ${HEADERS} ${SOURCES} )

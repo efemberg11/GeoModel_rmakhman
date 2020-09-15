@@ -28,6 +28,17 @@ class GeoVGeometryPlugin
   //! Constructor used when publishing FullPhysVol/AlignableTransform nodes is needed.
   /// The constructor is a 'sink': it takes ownership of the pointer to the GeoPublisher instance. You should use the constructor by passing the ownership of a unique pointer to it:
   /// @code
+  /// class ToyGeometryPlugin : public GeoVGeometryPlugin  {
+  ///   public:
+  ///     ToyGeometryPlugin( std::string pluginName, std::unique_ptr<GeoPublisher> publisher ) : GeoVGeometryPlugin( pluginName, std::move(publisher) ) {};
+  ///      ...
+  ///  };
+  ///
+  ///  int main() {
+  ///    auto publisher = std::make_unique<GeoPublisher>();
+  ///    ToyGeometryPlugin* toy = new ToyGeometryPlugin( "ToyGeometryPlugin", std::move(publisher) );
+  ///    ...
+  ///  }
   /// @endcode
   GeoVGeometryPlugin(std::string name, std::unique_ptr<GeoPublisher> publisher) : m_pluginName( name ) { m_publisher = std::move(publisher);  m_publisher->setName(m_pluginName); } 
   

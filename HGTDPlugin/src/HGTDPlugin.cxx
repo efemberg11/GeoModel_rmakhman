@@ -37,7 +37,7 @@ class HGTDPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  HGTDPlugin( std::string pluginName, GeoPublisher* publisher ) : GeoVGeometryPlugin( pluginName, publisher ) {};
+  HGTDPlugin( std::string pluginName, std::unique_ptr<GeoPublisher> publisher ) : GeoVGeometryPlugin( pluginName, std::move(publisher) ) {};
 
   // Destructor:
   ~HGTDPlugin();
@@ -168,8 +168,8 @@ void HGTDPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
 }
 
 extern "C" HGTDPlugin *createHGTDPlugin() {
-    GeoPublisher* publisher = new GeoPublisher();
-    return new HGTDPlugin("HGTDPlugin", publisher);
+    auto publisher = std::make_unique<GeoPublisher>(); 
+    return new HGTDPlugin( "HGTDPlugin", std::move(publisher) );
 }
 
 GeoFullPhysVol* HGTDPlugin::createEnvelope(bool bPos) {

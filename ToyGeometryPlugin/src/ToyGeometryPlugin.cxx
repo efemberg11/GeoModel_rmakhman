@@ -23,11 +23,13 @@
 #include "GeoGenericFunctions/Sin.h"
 #include "GeoGenericFunctions/Cos.h"
 
-#include "GeoModelKernel/Units.h"
-
 #include "GeoXmlMatManager/GeoXmlMatManager.h"
 
+#include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'SYSTEM_OF_UNITS::cm'
+
+#include <memory>
+
 
 using namespace GeoGenfun;
 using namespace GeoXF;
@@ -39,7 +41,7 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
   // Constructor 
   // Note: we use the parametrized constructor because we need to publish 
   //       lists of FullPhysVol and AlignableTransforms nodes
-  ToyGeometryPlugin( std::string pluginName, GeoPublisher* publisher ) : GeoVGeometryPlugin( pluginName, publisher ) {};
+  ToyGeometryPlugin( std::string pluginName, std::unique_ptr<GeoPublisher> publisher ) : GeoVGeometryPlugin( pluginName, std::move(publisher) ) {};
 
   // Destructor:
   ~ToyGeometryPlugin() {};
@@ -183,8 +185,8 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
 }
 
 extern "C" ToyGeometryPlugin *createToyGeometryPlugin() {
-  GeoPublisher* publisher = new GeoPublisher();
-  ToyGeometryPlugin* toy = new ToyGeometryPlugin("ToyGeometryPlugin", publisher);
+  auto publisher = std::make_unique<GeoPublisher>(); 
+  ToyGeometryPlugin* toy = new ToyGeometryPlugin( "ToyGeometryPlugin", std::move(publisher) );
   std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
 }

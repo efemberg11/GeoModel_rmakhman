@@ -39,7 +39,7 @@ class ToyGeometryPluginCustomPublisher : public GeoVGeometryPlugin  {
   // Constructor
   // Note: we use the parametrized constructor because we need to publish
   //       lists of FullPhysVol and AlignableTransforms nodes
-  ToyGeometryPluginCustomPublisher( std::string pluginName, GeoPublisher* publisher ) : GeoVGeometryPlugin( pluginName, publisher ) {};
+  ToyGeometryPluginCustomPublisher( std::string pluginName, std::unique_ptr<GeoPublisher> publisher ) : GeoVGeometryPlugin( pluginName, std::move(publisher) ) {};
 
   // Destructor:
   ~ToyGeometryPluginCustomPublisher();
@@ -187,8 +187,8 @@ void ToyGeometryPluginCustomPublisher::create(GeoPhysVol *world, GeoPublisher* p
 }
 
 extern "C" ToyGeometryPluginCustomPublisher *createToyGeometryPluginCustomPublisher() {
-  GeoPublisher* publisher = new GeoPublisher();
-  ToyGeometryPluginCustomPublisher* toy = new ToyGeometryPluginCustomPublisher( "ToyGeometryPluginCustomPublisher", publisher );
+  auto publisher = std::make_unique<GeoPublisher>(); 
+  ToyGeometryPluginCustomPublisher* toy = new ToyGeometryPluginCustomPublisher( "ToyGeometryPluginCustomPublisher", std::move(publisher) );
   std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
 }

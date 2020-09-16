@@ -14,7 +14,7 @@
  *   2. Alignable Transforms
  * and to publish the lists.
  *
- * A pointer to the publisher object can be passed to GeoVGeometryPlugin::create().
+ * A pointer to a GeoPublisher object can be passed to GeoVGeometryPlugin::create().
  * This allows for storing pointers to full physical volumes and alignable transforms
  * while the plugin is building raw detector geometries. The stored pointers can
  * be used later for constructing the readout geometry layer, and for applying
@@ -45,23 +45,6 @@ class GeoPublisher
   virtual ~GeoPublisher() {}
 
   template<class N, typename T> void publishNode(N node,T keyT);
-  /*
-  {
-    std::any key = keyT;
-    if constexpr (std::is_same_v<GeoVFullPhysVol*, N>) {
-        const auto [iter, success] = m_publishedFPV.insert( {node, key} );
-        if(!success) printInsertionStatus(iter, success);
-    } else if constexpr (std::is_same_v<GeoAlignableTransform*, N>) {
-        const auto [iter, success] = m_publishedAXF.insert( {node, key} );
-        if(!success) printInsertionStatus(iter, success);
-    } else {
-        std::cout << "ERROR!!! The node type '" << typeid(N).name() 
-                  << " is not currently supported by 'GeoPublisher'.\n"
-                  << "If in doubt, please ask to `geomodel-developers@cern.ch'.\n"
-                  << std::endl;
-    }
-  }
-  */
 
   std::map<GeoVFullPhysVol*, std::any> getPublishedFPV();
   std::map<GeoAlignableTransform*, std::any> getPublishedAXF();
@@ -75,11 +58,6 @@ class GeoPublisher
   std::map<GeoAlignableTransform*, std::any> m_publishedAXF;
 
   template<typename Iter> void printInsertionStatus(Iter it, bool success);
-  /*
-  {   
-      std::cout << "GeoModelKernel::GeoPublisher : Insertion of " << it->first << (success ? " succeeded\n" : " failed\n");
-  }
-*/
 
   std::string m_name;
 

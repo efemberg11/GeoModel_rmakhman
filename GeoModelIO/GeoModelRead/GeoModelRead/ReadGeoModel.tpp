@@ -1,5 +1,14 @@
-// VIM modeline options
-/* vim: set ft=cpp: */
+/* vim: set ft=cpp: */ // VIM modeline options
+/*
+ * ReadGeoModel.tpp
+ *
+ * Created on: Sep 8, 2020
+ * Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ *
+ * The file contains the definitions of the templated functions of the ReadGeoModel class.
+ *
+ */
+
 
 
 namespace GeoModelIO {

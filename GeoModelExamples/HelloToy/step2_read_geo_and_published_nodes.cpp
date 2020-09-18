@@ -128,13 +128,13 @@ int main(int argc, char *argv[])
 		  if ( dynamic_cast<const GeoPhysVol*>(childVolV) ) {
 			  const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
 			  std::cout << "is a GeoPhysVol, whose GeoLogVol's name is: " << childVol->getLogVol()->getName();
-			  std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
+			  std::cout << " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
 		  }
 		  else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
 			  const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
 			  std::cout << "is a GeoFullPhysVol, whose GeoLogVol's name is: " << childVol->getLogVol()->getName();
-			  std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
-              GeoUtilFunctions::printTrf(childVol->getAbsoluteTransform());
+			  std::cout << " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
+              std::cout << "\txf:"; GeoUtilFunctions::printTrf(childVol->getAbsoluteTransform());
 		  }
 	  }
   }
@@ -151,30 +151,30 @@ int main(int argc, char *argv[])
   std::map<std::string, GeoAlignableTransform*> mapAXF = readInGeo.getPublishedNodes<std::string, GeoAlignableTransform*>("HelloToyExample");
 
   unsigned int ii=0;
-  std::cout << "Published AlignableTransforms from the DB...\n";
+  std::cout << "\n\nPublished AlignableTransforms from the DB...\n";
+  std::cout << "['xf' is the output of 'getTransform()']\n";
   for ( auto const& [key, xf] : mapAXF ) 
   {
-      if(0==ii) std::cout << " [key type (compiler's code): '" << typeid(key).name() << "']\n";
-      std::cout << "\n--> key: " << key 
+      if(0==ii) std::cout << "[key type (compiler's code): '" << typeid(key).name() << "']\n";
+      std::cout << "\n\t--> key: " << key 
                 << " - AlignableTransform*: " << xf 
                 << std::endl;
-      GeoUtilFunctions::printTrf( xf->getTransform() );
+      std::cout << "\txf:: "; GeoUtilFunctions::printTrf( xf->getTransform() );
       ++ii;
    }
   
   ii=0; // reset the counter
-  std::cout << "Published FullPhysVols from the DB...\n";
+  std::cout << "\n\nPublished FullPhysVols from the DB...\n";
+  std::cout << "['xf' is the output of 'getAbsoluteTransform()']\n";
   for ( auto const& [key, vol] : mapFPV ) 
   {
       GeoTrf::Transform3D xf = vol->getAbsoluteTransform();
 
-      if(0==ii) std::cout << " [key type (compiler's code): '" << typeid(key).name() << "']\n";
-      std::cout << "\n--> key: " << key 
+      if(0==ii) std::cout << "[key type (compiler's code): '" << typeid(key).name() << "']\n";
+      std::cout << "\n\t--> key: " << key 
                 << " - GeoFullPhysVol*: " << vol 
-                    //<< " - AbsTransf: " << xf
-                    //<< " , " << vol->getAbsoluteTransform() 
                 << std::endl;
-      GeoUtilFunctions::printTrf(vol->getAbsoluteTransform());
+      std::cout << "\txf:"; GeoUtilFunctions::printTrf(vol->getAbsoluteTransform());
       ++ii;
   }
   

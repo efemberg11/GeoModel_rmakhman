@@ -13,7 +13,6 @@ class GeoUtilFunctions {
     public: 
 
         static void printTrf(GeoTrf::Transform3D t) {
-            std::cout << "transformation: " << std::endl;
             std::cout << "[[" << t(0, 0) << " , ";
             std::cout <<         t(0, 1) << " , ";
             std::cout <<         t(0, 2) << " , ";
@@ -29,7 +28,8 @@ class GeoUtilFunctions {
             std::cout << "["  << t(3, 0) << " , ";
             std::cout <<         t(3, 1) << " , ";
             std::cout <<         t(3, 2) << " , ";
-            std::cout <<         t(3, 3) << " ]]" << std::endl;
+            std::cout <<         t(3, 3) << " ]]" 
+                      << std::endl;
         }
 
 };

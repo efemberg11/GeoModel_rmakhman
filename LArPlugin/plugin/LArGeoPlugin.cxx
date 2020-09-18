@@ -34,12 +34,13 @@ public:
   LArGeoPlugin() {};
   ~LArGeoPlugin();
 
+  virtual void create(GeoPhysVol* world, bool publish) override;
+
+private:
+  
   const LArGeoPlugin & operator=(const LArGeoPlugin &right)=delete;
   LArGeoPlugin(const LArGeoPlugin &right) = delete;
   
-  virtual void create(GeoPhysVol* world, GeoPublisher* /*not used here*/) override;
-
-private:
   LArGeoMaterialManager* m_matman{new LArGeoMaterialManager()};
   
   // Configuration parameters
@@ -61,7 +62,7 @@ LArGeoPlugin::~LArGeoPlugin()
   delete m_matman;
 }
 
-void LArGeoPlugin::create(GeoPhysVol* world, GeoPublisher* /*not used here*/)
+void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
 {
   // ________ Time measure ____________
   typedef std::chrono::high_resolution_clock Time;

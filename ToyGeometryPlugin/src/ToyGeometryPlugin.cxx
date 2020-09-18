@@ -39,35 +39,27 @@ class ToyGeometryPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor 
-  // Note: we use the parametrized constructor because we need to publish 
-  //       lists of FullPhysVol and AlignableTransforms nodes
-  ToyGeometryPlugin( std::string pluginName, std::unique_ptr<GeoPublisher> publisher ) : GeoVGeometryPlugin( pluginName, std::move(publisher) ) {};
+  ToyGeometryPlugin( std::string pluginName) : GeoVGeometryPlugin( pluginName ) {};
 
   // Destructor:
   ~ToyGeometryPlugin() {};
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher* publisher) override;
+  virtual void create(GeoPhysVol *world, bool publish) override;
 
  
  private:
 
   // Illegal operations:
-  // we prohibit default constructor, copy constructor, and assignment operator
-  ToyGeometryPlugin()=delete;//prohibited, because we need to set a plugin's name, to store the published FullPhysVol and AlignableTransform nodes.
   const ToyGeometryPlugin & operator=(const ToyGeometryPlugin &right)=delete;
   ToyGeometryPlugin(const ToyGeometryPlugin &right) = delete;
-
-  // Plugin's name.
-  // It is also used to publish the list of FullPhysVol and AlignableTransform nodes
-  std::string m_pluginName;
  
 };
 
 
 
 //## Other Operations (implementation)
-void ToyGeometryPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
+void ToyGeometryPlugin::create(GeoPhysVol *world, bool publish)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
@@ -116,15 +108,17 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
     toyPhys->add(ringPhys);
 
     // Publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoPublisher is provided
-    if (publisher) {
+    if (publish) {
+        GeoPublisher* publisher = this->getPublisher();
         // *** publish the list of FPV and AXF nodes ***
-        // we use integer-based keys for FullPhysVol (FPV) nodes...
+        // as an example, we use integer-based keys for FullPhysVol (FPV) nodes...
         unsigned int keyInt = i+1;
         publisher->publishNode<GeoVFullPhysVol*,unsigned >( ringPhys, keyInt );
         // ...and string-based keys for AlignableTransform (AXF) nodes
         std::string keyStr = this->getName() + "-AXF-" + std::to_string(i+1);
         publisher->publishNode<GeoAlignableTransform*,std::string>( xform, keyStr );
     }
+    
   }
 
 
@@ -182,11 +176,12 @@ void ToyGeometryPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
   world->add(tag);
   world->add(toyPhys);
   //--------------------------------------//
+  
+  return;
 }
 
 extern "C" ToyGeometryPlugin *createToyGeometryPlugin() {
-  auto publisher = std::make_unique<GeoPublisher>(); 
-  ToyGeometryPlugin* toy = new ToyGeometryPlugin( "ToyGeometryPlugin", std::move(publisher) );
+  ToyGeometryPlugin* toy = new ToyGeometryPlugin( "ToyGeometryPlugin" );
   std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
 }

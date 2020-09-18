@@ -37,13 +37,13 @@ class HGTDPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  HGTDPlugin( std::string pluginName, std::unique_ptr<GeoPublisher> publisher ) : GeoVGeometryPlugin( pluginName, std::move(publisher) ) {};
+  HGTDPlugin( std::string pluginName) : GeoVGeometryPlugin( pluginName ) {};
 
   // Destructor:
   ~HGTDPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher*) override;
+  virtual void create(GeoPhysVol *world, bool publish) override;
 
  private:
 
@@ -143,9 +143,8 @@ HGTDPlugin::~HGTDPlugin()
 
 
 //## Other Operations (implementation)
-void HGTDPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
+void HGTDPlugin::create(GeoPhysVol *world, bool publish)
 {
-
 
   GeoFullPhysVol* HGTD_EnvelopePos = createEnvelope(true);
   GeoFullPhysVol* HGTD_EnvelopeNeg = createEnvelope(false);
@@ -163,13 +162,11 @@ void HGTDPlugin::create(GeoPhysVol *world, GeoPublisher* publisher)
   world->add( new GeoTransform(GeoTrf::TranslateZ3D(3500)));
   world->add(HGTD_EnvelopeNeg);
   
-
-  
+  return;
 }
 
 extern "C" HGTDPlugin *createHGTDPlugin() {
-    auto publisher = std::make_unique<GeoPublisher>(); 
-    return new HGTDPlugin( "HGTDPlugin", std::move(publisher) );
+    return new HGTDPlugin( "HGTDPlugin" );
 }
 
 GeoFullPhysVol* HGTDPlugin::createEnvelope(bool bPos) {

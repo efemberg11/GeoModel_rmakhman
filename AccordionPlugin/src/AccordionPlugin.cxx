@@ -54,13 +54,13 @@ class AccordionPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  AccordionPlugin() {};
+  AccordionPlugin() {}
 
   // Destructor:
   ~AccordionPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher* publisher /*not used here*/) override;
+  virtual void create(GeoPhysVol *world, bool publish /*not used here*/) override;
 
  private:
 
@@ -85,7 +85,7 @@ AccordionPlugin::~AccordionPlugin()
 
 
 //## Other Operations (implementation)
-void AccordionPlugin::create(GeoPhysVol *world, GeoPublisher* /*not used here*/)
+void AccordionPlugin::create(GeoPhysVol *world, bool /*not used here*/)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
@@ -1163,7 +1163,8 @@ void AccordionPlugin::create(GeoPhysVol *world, GeoPublisher* /*not used here*/)
   }
 
 #endif  //  BUILD_ACCORDION_PLATES
-  
+
+  return;
 }
 
 

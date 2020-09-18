@@ -37,29 +37,22 @@ class ToyGeometryPluginCustomPublisher : public GeoVGeometryPlugin  {
  public:
 
   // Constructor
-  // Note: we use the parametrized constructor because we need to publish
-  //       lists of FullPhysVol and AlignableTransforms nodes
-  ToyGeometryPluginCustomPublisher( std::string pluginName, std::unique_ptr<GeoPublisher> publisher ) : GeoVGeometryPlugin( pluginName, std::move(publisher) ) {};
+  ToyGeometryPluginCustomPublisher( std::string pluginName) : GeoVGeometryPlugin( pluginName ) {};
 
   // Destructor:
   ~ToyGeometryPluginCustomPublisher();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoPublisher* publisher);
+  virtual void create(GeoPhysVol *world, bool publish) override;
 
  
  private:
 
   // Illegal operations:
   // we prohibit default constructor, copy constructor, and assignment operator
-  ToyGeometryPluginCustomPublisher()=delete; // prohibited, because we need to use the parametrized constructor to set the name used by the publisher to store the published FullPhysVol and AlignableTransform nodes.
   const ToyGeometryPluginCustomPublisher & operator=(const ToyGeometryPluginCustomPublisher &right)=delete;
   ToyGeometryPluginCustomPublisher(const ToyGeometryPluginCustomPublisher &right) = delete;
 
-  // Plugin's name.
-  // It is also used to publish the list of FullPhysVol and AlignableTransform nodes
-  std::string m_pluginName;
- 
 };
 
 
@@ -69,7 +62,7 @@ ToyGeometryPluginCustomPublisher::~ToyGeometryPluginCustomPublisher()
 
 
 //## Other Operations (implementation)
-void ToyGeometryPluginCustomPublisher::create(GeoPhysVol *world, GeoPublisher* publisher)
+void ToyGeometryPluginCustomPublisher::create(GeoPhysVol *world, bool publish)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
@@ -118,14 +111,15 @@ void ToyGeometryPluginCustomPublisher::create(GeoPhysVol *world, GeoPublisher* p
     toyPhys->add(ringPhys);
 
     // publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoPublisher is provided
-    if (publisher) {
- 	// *** publish the list of FPV and AXF nodes ***
-	// we use string-based keys for FullPhysVols...
-	unsigned int keyInt = i+1;
-	publisher->publishNode<GeoVFullPhysVol*,unsigned>( ringPhys, keyInt );
-	// ...and integer-based keys for AlignableTransforms
-	std::string keyStr = "Toy-AXF-" + std::to_string(i+1);
-	publisher->publishNode<GeoAlignableTransform*,std::string>( xform, keyStr );
+    if ( publish ) {
+        GeoPublisher* publisher = this->getPublisher();
+        // *** publish the list of FPV and AXF nodes ***
+        // as an example, we use string-based keys for FullPhysVols...
+        unsigned int keyInt = i+1;
+        publisher->publishNode<GeoVFullPhysVol*,unsigned>( ringPhys, keyInt );
+        // ...and integer-based keys for AlignableTransforms
+        std::string keyStr = "Toy-AXF-" + std::to_string(i+1);
+        publisher->publishNode<GeoAlignableTransform*,std::string>( xform, keyStr );
     }
   }
 
@@ -184,11 +178,12 @@ void ToyGeometryPluginCustomPublisher::create(GeoPhysVol *world, GeoPublisher* p
   world->add(tag);
   world->add(toyPhys);
   //--------------------------------------//
+  
+  return;
 }
 
 extern "C" ToyGeometryPluginCustomPublisher *createToyGeometryPluginCustomPublisher() {
-  auto publisher = std::make_unique<GeoPublisher>(); 
-  ToyGeometryPluginCustomPublisher* toy = new ToyGeometryPluginCustomPublisher( "ToyGeometryPluginCustomPublisher", std::move(publisher) );
+  ToyGeometryPluginCustomPublisher* toy = new ToyGeometryPluginCustomPublisher( "ToyGeometryPluginCustomPublisher" );
   std::cout << "The plugin, whose name is '" << toy->getName() << "', has been created." << std::endl;
   return toy;
 }

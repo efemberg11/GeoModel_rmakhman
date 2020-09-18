@@ -25,13 +25,13 @@ class GDMLtoGM : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:  
-  GDMLtoGM();
+  GDMLtoGM() {}
 
   // Destructor:
   ~GDMLtoGM();
 
   // Creation of geometry:
-  void create(GeoPhysVol *world, GeoPublisher* publisher);
+  virtual void create(GeoPhysVol *world, bool publish = false ) override;
 
  private:
 
@@ -42,21 +42,13 @@ class GDMLtoGM : public GeoVGeometryPlugin  {
 };
 
 
-
-
-
-GDMLtoGM::GDMLtoGM()
-{
-}
-
-
 GDMLtoGM::~GDMLtoGM()
 {
 }
 
 
 //## Other Operations (implementation)
-void GDMLtoGM::create(GeoPhysVol *world, GeoPublisher*)
+void GDMLtoGM::create(GeoPhysVol *world, bool /* 'publish' is not used here */)
 {
 	char* fPath=getenv("GDML_FILE_NAME");
 	std::string fileName;

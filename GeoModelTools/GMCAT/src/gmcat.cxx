@@ -136,12 +136,16 @@ int main(int argc, char ** argv) {
       std::cerr << "Could not load plugin " << plugin << std::endl;
       return 5;
     }
-    GeoPublisher* publisher = factory->getPublisher();
-    if (publisher) {
-        vecPluginsPublishers.push_back(publisher); // cache the publisher, if any, for later
-        factory->create(world, publisher);
-    } else {
-        factory->create(world);
+    
+    // NOTE: we want the plugin to publish lits FPV and AXF nodes, 
+    // if it is intended to do that, and store them in the DB. 
+    // For that, we pass a true to the plugin's `create()` method, 
+    // which will use it to publish nodes, 
+    // and then we get from the plugin the pointer to the GeoPublisher instance 
+    // and we cache it for later, to dump the published nodes into the DB.
+    factory->create(world, true);
+    if( nullptr != factory->getPublisher() ) {
+        vecPluginsPublishers.push_back( factory->getPublisher() ); // cache the publisher, if any, for later
     }
   }
 

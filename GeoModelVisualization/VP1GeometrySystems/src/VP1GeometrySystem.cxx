@@ -594,15 +594,11 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 
       if (!world) world=createTheWorld(nullptr);
     
-      // TODO: check this with siple and more complex plugins! Also, get lists of FPV and AXF and show them or highlight them in the viewer somehow...
-      GeoPublisher* publisher = nullptr;
-      publisher = factory->getPublisher(); 
-      if( publisher == nullptr ) {
-        std::cout << "ERROR!! Plugin's pointer to the 'publisher' is empty! Check that the plugin correctly implements the 'getPublisher()' method. "
-            << "If in doubt, please ask to 'geomodel-developers@cern.ch'. \nExiting..." << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      factory->create(world, publisher);
+      // TODO: check this with simple and more complex plugins! Also, get lists of FPV and AXF and show them or highlight them in the viewer somehow...
+     
+      factory->create(world);
+      //factory->create(world, true); // if we want to get lists of nodes published by plugins, if any
+
     }
 
     g++;

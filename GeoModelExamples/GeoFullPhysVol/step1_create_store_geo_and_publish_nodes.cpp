@@ -35,6 +35,7 @@
 #include "GeoModelDBManager/GMDBManager.h"
 
 #include "GeoModelWrite/WriteGeoModel.h"
+#include "GeoModelRead/ReadGeoModel.h"
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -66,7 +67,6 @@ int main(int argc, char *argv[])
         GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
         GeoElement*  Iron     = new GeoElement ("Iron"     ,"Fe" , 26.0 ,  55.847  *gr/mole);
         GeoElement*  Carbon   = new GeoElement ("Carbon"   ,"C"  ,  6.0 ,  12.0107 *gr/mole);
-        GeoElement*  Sillicon = new GeoElement ("Silicon"  ,"Si" , 14.0 ,  28.085  *gr/mole);
 
         // Define the materials
 
@@ -85,16 +85,15 @@ int main(int argc, char *argv[])
         steel->add(Carbon, 0.02);
         steel->lock();
 
-        // Silicon 100% (Detector)
-        GeoMaterial* silicon = new GeoMaterial("Silicon", 2.329 *gr/cm3);
-        silicon->add(const_cast<GeoElement*> (Sillicon), 1.0);
-        silicon->lock();
-
-        // Carbon
-        GeoMaterial* carbon = new GeoMaterial("Carbon", 2.329 *gr/cm3);
-        carbon->add(const_cast<GeoElement*> (Carbon), 1.0);
-        carbon->lock();
-
+        /*
+   //-----------------------------------------------------------------------------------//
+  // create the world volume container and
+  // get the 'world' volume, i.e. the root volume of the GeoModel tree
+  std::cout << "Creating the 'world' volume, i.e. the root volume of the GeoModel tree..." << std::endl;
+  const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+  const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
+  GeoPhysVol* world = new GeoPhysVol(worldLog);
+*/
  
   //--------------------------------------//
   // Next make the box that describes
@@ -120,26 +119,25 @@ int main(int argc, char *argv[])
   
   // Bundle this with a material //
   // into a logical volume:      //
-  const GeoLogVol   *ringLog  = new  GeoLogVol("RingLog", ringTube, carbon);
+  const GeoLogVol   *ringLog  = new  GeoLogVol("RingLog", ringTube, steel);
   
   // Make 100 of these              //
   // within the volume of the toy:  //
   GeoSerialDenominator *ringName = new GeoSerialDenominator("RING");
   toyPhys->add(ringName);
- 
-  // Instanciate a GeoPublisher, to publish the list of FullPhysVol and AlignableTransforms nodes
+  
+  // Before doing that, instanciate a GeoPublisher, to publish the list of FullPhysVol and AlignableTransforms nodes
   GeoPublisher* publisher = new GeoPublisher;
   // Optional - We set a name for the publisher: it will be appended to the name of the DB tables that host our published AXF and FPV nodes. 
   // Note : This is not compulsory: if not set, the default table name will be used; 
   //        however, it helps to keep the output data well organized.
   publisher->setName("HelloToyExample");
 
-  for (int i=0;i<100;i++) {
+  for (int i=0;i<10;i++) {
     GeoFullPhysVol         *ringPhys = new GeoFullPhysVol(ringLog);
     GeoAlignableTransform  *xform    = new GeoAlignableTransform(GeoTrf::TranslateZ3D((i-50)*20*SYSTEM_OF_UNITS::cm));
     toyPhys->add(xform);
     toyPhys->add(ringPhys);
-    
 
     // *** publish the list of FPV and AXF nodes ***
     // in this example, we use integer-based keys for FullPhysVols...
@@ -157,50 +155,13 @@ int main(int argc, char *argv[])
 
 
   //--------------------------------------//
-  //  Now, in addition to active daughters,
-  // add some passive material.
-  // This is done here using
-  // the "SerialTransformer",
-  // our way of parameterizing volumes.
-  // It does not need to be done this way,
-  // but we want to provide an example of
-  // parametrizations in the Toy
+  // Now insert all of this into the world...
+  //--------------------------------------//
+  //GeoNameTag *tag = new GeoNameTag("Toy");
+  //world->add(tag);
+  //world->add(toyPhys);
   //--------------------------------------//
 
-  GeoBox       *sPass = new GeoBox(5.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm);
-  GeoLogVol    *lPass = new GeoLogVol("Passive", sPass, steel);
-  GeoPhysVol   *pPass = new GeoPhysVol(lPass);
-
-  GeoBox       *sIPass = new GeoBox(4*SYSTEM_OF_UNITS::cm, 25*SYSTEM_OF_UNITS::cm, 25*SYSTEM_OF_UNITS::cm);
-  GeoLogVol    *lIPass = new GeoLogVol("InnerPassive", sIPass, silicon);
-  GeoPhysVol   *pIPass = new GeoPhysVol(lIPass);
-
-  pPass->add(pIPass);
-
-  const unsigned int NPLATES=100;
-  Variable       i;
-  Sin            sin;
-  GENFUNCTION    f = 360*SYSTEM_OF_UNITS::deg/NPLATES*i;
-  GENFUNCTION    g = sin(4*f);
-  GENFUNCTION    h = -g;
-  TRANSFUNCTION t1 = Pow(GeoTrf::RotateZ3D(1.0),f)*GeoTrf::TranslateX3D(1100*SYSTEM_OF_UNITS::cm)*Pow(GeoTrf::TranslateZ3D(800*SYSTEM_OF_UNITS::cm),g);
-  TRANSFUNCTION t2 = Pow(GeoTrf::RotateZ3D(1.0),f)*GeoTrf::TranslateX3D(1100*SYSTEM_OF_UNITS::cm)*Pow(GeoTrf::TranslateZ3D(800*SYSTEM_OF_UNITS::cm),h);
-
-  //--------------------------------------//
-  // Inside, by the way, the serial transformer
-  // will evaluate the functions:
-  // HepTransform3D xf = t1(i), for i=1,NPLATES....
-  //--------------------------------------//
-
-  GeoSerialDenominator  *pass1Name = new GeoSerialDenominator("PASSIVE-1-");
-  GeoSerialTransformer *s1 = new GeoSerialTransformer(pPass,&t1, NPLATES);
-  toyPhys->add(pass1Name);
-  toyPhys->add(s1);
-
-  GeoSerialDenominator *pass2Name = new GeoSerialDenominator("PASSIVE-2-");
-  GeoSerialTransformer *s2 = new GeoSerialTransformer(pPass,&t2, NPLATES);
-  toyPhys->add(pass2Name);
-  toyPhys->add(s2);
 
 
 
@@ -209,15 +170,14 @@ int main(int argc, char *argv[])
    //------------------------------------------------------------------------------------//
   std::string path = "geometry.db";
 
-  // check if DB file exists. If yes, delete it.
+        // check if DB file exists. If yes, delete it.
+  // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
   std::ifstream infile(path.c_str());
   if ( infile.good() ) {
       if( remove( path.c_str() ) != 0 )
-          perror( "Error deleting file" );
-      else {
-          std::string msg = "Previously existing " + path + " successfully deleted"; 
-          puts( msg.c_str() );
-      }
+              perror( "Error deleting file" );
+        else
+                puts( "File successfully deleted" );
   }
   infile.close();
 
@@ -245,6 +205,34 @@ int main(int argc, char *argv[])
   std::cout << "\n-----\nDONE. Geometry saved.\n-----\n" <<std::endl;
 
 
+  //db.close(); // TODO: do we need a clse() method??
+
+  // GET GEOMETRY FROM LOCAL DB
+
+
+  // open the DB
+  GMDBManager* db2 = new GMDBManager(path);
+  /* Open database */
+  if (db2->checkIsDBOpen()) {
+    std::cout << "OK! Database is open!\n";
+  }
+  else {
+    std::cout << "Database is not open!\n";
+    // return;
+    throw;
+  }
+
+  
+  /* setup the GeoModel reader */
+  GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db2);
+  std::cout << "OK! ReadGeoModel is set." << std::endl;
+
+
+  /* build the GeoModel tree */
+  GeoPhysVol* world2 = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+  std::cout << "ReadGeoModel::buildGeoModel() done." << std::endl;
+
+
   //------------------------------------------------------------------------------------//
   // Testing the persitified geometry
   //------------------------------------------------------------------------------------//
@@ -259,6 +247,39 @@ int main(int argc, char *argv[])
   std::cout << "\nTest - list of all the 'published' GeoAlignableTransform nodes in the persistified geometry:" << std::endl;
   db.printAllPublishedAlignableTransforms( publisher->getName() );
 */
+ 
+  // --- testing the imported Geometry
+
+  // get number of children volumes
+  unsigned int nChil = world2->getNChildVols();
+  std:: cout << "world's number of children: " << nChil << std::endl;
+
+  // loop over all children nodes
+  std::cout << "Looping over all 'volume' children (i.e., GeoPhysVol and GeoFullPhysVol)..." << std::endl;
+  for (unsigned int idx=0; idx<nChil; ++idx) {
+	  PVConstLink nodeLink = world2->getChildVol(idx);
+
+	  if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) ) {
+
+		  std::cout << "\n\t" << "the child n. " << idx << " ";
+		  const GeoVPhysVol *childVolV = &(*( nodeLink ));
+
+		  if ( dynamic_cast<const GeoPhysVol*>(childVolV) ) {
+			  const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
+			  std::cout << "is a GeoPhysVol, whose GeoLogVol's name is: " << childVol->getLogVol()->getName();
+			  std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
+		  }
+		  else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
+			  const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
+			  std::cout << childVol << " is a GeoFullPhysVol, whose GeoLogVol's name is: " << childVol->getLogVol()->getName();
+			  std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
+              GeoUtilFunctions::printTrf(childVol->getAbsoluteTransform());
+		  }
+	  }
+  }
+
+
+
   // cleaning
   delete publisher;
   publisher = nullptr;

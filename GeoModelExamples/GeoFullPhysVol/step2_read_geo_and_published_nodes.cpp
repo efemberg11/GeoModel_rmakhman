@@ -14,7 +14,6 @@
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
-#include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoUtilFunctions.h"
 
@@ -28,42 +27,6 @@
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
-
-
-GeoPhysVol* createTheWorld(GeoPhysVol* world)
-{
-  if (world == nullptr)
-  {
-  	//-----------------------------------------------------------------------------------//
-    // Define the materials that we shall use.                                              //
-    // ----------------------------------------------------------------------------------//
-
-    // Define the units
-    #define gr   SYSTEM_OF_UNITS::gram
-    #define mole SYSTEM_OF_UNITS::mole
-    #define cm3  SYSTEM_OF_UNITS::cm3
-
-    // Define the chemical elements
-    GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
-    GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
-    GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
-    GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
-
-    // Define the materials
-    double densityOfAir=0.001214 *gr/cm3;
-    GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
-    air->add(Nitrogen  , 0.7494);
-    air->add(Oxygen, 0.2369);
-    air->add(Argon, 0.0129);
-    air->add(Hydrogen, 0.0008);
-    air->lock();
-
-  	const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-  	const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
-  	world = new GeoPhysVol(worldLog);
-  }
-  return world;
-}
 
 
 
@@ -80,7 +43,7 @@ int main(int argc, char *argv[])
   // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
   std::ifstream infile(path.c_str());
     if ( ! infile.good() ) {
-      std::cout << "\n\tERROR!! The '" << path << "' file does not exists already!! Please, check.\n";
+      std::cout << "\n\tERROR!! The '" << path << "' input file does not exist! Please, check.\n";
       exit(EXIT_FAILURE);
   }
   infile.close();
@@ -132,7 +95,7 @@ int main(int argc, char *argv[])
 		  }
 		  else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
 			  const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
-			  std::cout << "is a GeoFullPhysVol, whose GeoLogVol's name is: " << childVol->getLogVol()->getName();
+			  std::cout << childVol << " is a GeoFullPhysVol, whose GeoLogVol's name is: " << childVol->getLogVol()->getName();
 			  std::cout<< " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
               GeoUtilFunctions::printTrf(childVol->getAbsoluteTransform());
 		  }
@@ -150,26 +113,14 @@ int main(int argc, char *argv[])
   std::map<unsigned int, GeoFullPhysVol*> mapFPV = readInGeo.getPublishedNodes<unsigned int, GeoFullPhysVol*>("HelloToyExample");
   std::map<std::string, GeoAlignableTransform*> mapAXF = readInGeo.getPublishedNodes<std::string, GeoAlignableTransform*>("HelloToyExample");
 
-  unsigned int ii=0;
-  std::cout << "Published AlignableTransforms from the DB...\n";
-  for ( auto const& [key, xf] : mapAXF ) 
-  {
-      if(0==ii) std::cout << " [key type (compiler's code): '" << typeid(key).name() << "']\n";
-      std::cout << "\n--> key: " << key 
-                << " - AlignableTransform*: " << xf 
-                << std::endl;
-      GeoUtilFunctions::printTrf( xf->getTransform() );
-      ++ii;
-   }
-  
-  ii=0; // reset the counter
   std::cout << "Published FullPhysVols from the DB...\n";
+  unsigned int ii=0;
   for ( auto const& [key, vol] : mapFPV ) 
   {
       GeoTrf::Transform3D xf = vol->getAbsoluteTransform();
 
       if(0==ii) std::cout << " [key type (compiler's code): '" << typeid(key).name() << "']\n";
-      std::cout << "\n--> key: " << key 
+      std::cout << "--> key: " << key 
                 << " - GeoFullPhysVol*: " << vol 
                     //<< " - AbsTransf: " << xf
                     //<< " , " << vol->getAbsoluteTransform() 
@@ -177,7 +128,19 @@ int main(int argc, char *argv[])
       GeoUtilFunctions::printTrf(vol->getAbsoluteTransform());
       ++ii;
   }
-  
+ 
+  /*
+  ii=0;
+  std::cout << "Published AlignableTransforms from the DB...\n";
+  for ( auto const& [key, xf] : mapAXF ) 
+  {
+      if(0==ii) std::cout << " [key type (compiler's code): '" << typeid(key).name() << "']\n";
+      std::cout << "--> key: " << key 
+                << " - AlignableTransform*: " << xf 
+                << std::endl;
+      ++ii;
+   }
+*/
   std::cout << "Everything done." << std::endl;
 
   return 0;

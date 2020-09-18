@@ -22,6 +22,7 @@ add_subdirectory( GeoActions )
 add_subdirectory( GeoShapeExamples )
 add_subdirectory( GeoShiftUnion )
 add_subdirectory( GeoTessellatedSolidExamples )
+add_subdirectory( GeoFullPhysVol )
 
 # GeoModel <--> Geant4 examples are built on explicit request only
 if(GEOMODEL_BUILD_EXAMPLES_W_GEANT4)

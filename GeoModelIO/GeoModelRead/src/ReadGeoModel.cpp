@@ -2453,30 +2453,6 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
 	return logPtr;
 }
 
-/*
-// TODO: this should be moved to an Utilities class!
-void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
-  muxCout.lock();
-	std::cout << "transformation: " << std::endl;
-	std::cout << "[[" << t(0, 0) << " , ";
-	std::cout <<         t(0, 1) << " , ";
-	std::cout <<         t(0, 2) << " , ";
-	std::cout <<         t(0, 3) << " ]";
-	std::cout << "["  << t(1, 0) << " , ";
-	std::cout <<         t(1, 1) << " , ";
-	std::cout <<         t(1, 2) << " , ";
-	std::cout <<         t(1, 3) << " ]";
-	std::cout << "["  << t(2, 0) << " , ";
-	std::cout <<         t(2, 1) << " , ";
-	std::cout <<         t(2, 2) << " , ";
-	std::cout <<         t(2, 3) << " ]";
-	std::cout << "["  << t(3, 0) << " , ";
-	std::cout <<         t(3, 1) << " , ";
-	std::cout <<         t(3, 2) << " , ";
-	std::cout <<         t(3, 3) << " ]]" << std::endl;
-  muxCout.unlock();
-}
-*/
 
 //// TODO: should go in a QtUtils header-only class, to be used in other packages
 //QList<double> ReadGeoModel::convertQstringListToDouble(QStringList listin) {

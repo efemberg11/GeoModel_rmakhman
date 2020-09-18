@@ -204,7 +204,6 @@ private:
   // Utility functions
   std::string getEnvVar( std::string const & key ) const;
   std::vector<std::string> splitString(const std::string& s, char delimiter);
-	void printTrf(GeoTrf::Transform3D t);
   void printStdVectorStrings(std::vector<std::string> vec); //TODO: move it to utility class
   
   // void printTransformationValues(QStringList t); // TODO: move to a Qt utility class

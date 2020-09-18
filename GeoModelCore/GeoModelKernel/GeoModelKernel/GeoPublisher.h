@@ -25,9 +25,6 @@
 // August 2020
 
 
-// GeoModelCore includes
-//#include <GeoModelKernel/GeoVFullPhysVol.h>
-
 // C++ includes
 #include <any> // needs C++17
 #include <map>

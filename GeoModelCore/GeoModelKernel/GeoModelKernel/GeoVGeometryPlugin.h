@@ -22,49 +22,37 @@ class GeoVGeometryPlugin
 {
  public:
 
-  //! Default constructor.
-  GeoVGeometryPlugin() {};
-  
-  //! Constructor used when publishing FullPhysVol/AlignableTransform nodes is needed.
-  /// The constructor is a 'sink': it takes ownership of the pointer to the GeoPublisher instance. You should use the constructor by passing the ownership of a unique pointer to it:
-  /// @code
-  /// class ToyGeometryPlugin : public GeoVGeometryPlugin  {
-  ///   public:
-  ///     ToyGeometryPlugin( std::string pluginName, std::unique_ptr<GeoPublisher> publisher ) : GeoVGeometryPlugin( pluginName, std::move(publisher) ) {};
-  ///      ...
-  ///  };
-  ///
-  ///  int main() {
-  ///    auto publisher = std::make_unique<GeoPublisher>();
-  ///    ToyGeometryPlugin* toy = new ToyGeometryPlugin( "ToyGeometryPlugin", std::move(publisher) );
-  ///    ...
-  ///  }
-  /// @endcode
-  GeoVGeometryPlugin(std::string name, std::unique_ptr<GeoPublisher> publisher) : m_pluginName( name ) { m_publisher = std::move(publisher);  m_publisher->setName(m_pluginName); } 
-  
-  virtual ~GeoVGeometryPlugin() {};
+   //! Default constructor.
+   GeoVGeometryPlugin() : m_publisher(nullptr) {}
+     
+  //! Parametrized constructor for plugins that publish lists of nodes 
+  GeoVGeometryPlugin(std::string name) : m_pluginName( name ), m_publisher(std::make_unique<GeoPublisher>()) {  m_publisher->setName(m_pluginName); } 
+    
+
+  virtual ~GeoVGeometryPlugin() {}
 
   //! Create the system geometry.
-  // Note: this is a pure virtual method, so you need to implement it in your derived plugin class
-  virtual void create (GeoPhysVol* world, GeoPublisher* publisher = nullptr) = 0;
+  /// Note: this is a pure virtual method, so you need to implement it in your derived plugin class
+  virtual void create ( GeoPhysVol* world, bool publish = false ) = 0;
 
-  // Get the plugin's name
-  std::string getName() { return m_pluginName; };
+  //! Returns the plugin's name
+  std::string getName() { return m_pluginName; }
 
-  // Get the Publisher that publishes the lists of the GeoFullPhysVol and AlignableTransform nodes
-  GeoPublisher* getPublisher() { return m_publisher.get(); };
+  //! Returns the Publisher that publishes the lists of the GeoFullPhysVol and AlignableTransform nodes
+  GeoPublisher* getPublisher() { return m_publisher.get(); }
 
- private:
+ 
+  private:
 
+  /// We prohibit copy constructor, and assignment operator
   GeoVGeometryPlugin(const GeoVGeometryPlugin &right)=delete;
   GeoVGeometryPlugin & operator=(const GeoVGeometryPlugin &right)=delete;
 
+  //! A GeoPublisher instance is used to publish lists of nodes.
+  std::unique_ptr<GeoPublisher> m_publisher;
+
   //! The name of the plugin, used to store plugin's published nodes. 
   std::string m_pluginName;
-
-  //! A GeoPublisher instance is used to publish lists of nodes.
-  //GeoPublisher* m_publisher;
-  std::unique_ptr<GeoPublisher> m_publisher;
 
 };
 

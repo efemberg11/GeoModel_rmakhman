@@ -19,8 +19,8 @@
 // TFPersistification includes
 #include "TFPersistification/TransFunctionInterpreter.h"
 
-
-// GeoModelKernel
+// GeoModelKernel includes
+#include "GeoModelKernel/GeoUtilFunctions.h"
 #include "GeoModelKernel/GeoTransform.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
@@ -2453,7 +2453,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
 	return logPtr;
 }
 
-
+/*
 // TODO: this should be moved to an Utilities class!
 void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
   muxCout.lock();
@@ -2476,6 +2476,7 @@ void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
 	std::cout <<         t(3, 3) << " ]]" << std::endl;
   muxCout.unlock();
 }
+*/
 
 //// TODO: should go in a QtUtils header-only class, to be used in other packages
 //QList<double> ReadGeoModel::convertQstringListToDouble(QStringList listin) {
@@ -2544,7 +2545,7 @@ GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(const unsigned int 
 	txf(1,3)=dy;
 	txf(2,3)=dz;
 
-	// printTrf(txf); // DEBUG
+	// GeoUtilFunctions::printTrf(txf); // DEBUG
   GeoAlignableTransform* tr = new GeoAlignableTransform(txf);
   storeBuiltAlignableTransform(id, tr);
   return tr;
@@ -2596,7 +2597,7 @@ GeoTransform* ReadGeoModel::buildTransform(const unsigned int id)
 	txf(1,3) = dy;
 	txf(2,3) = dz;
 
-	// printTrf(txf); // DEBUG
+	// GeoUtilsFunctions::printTrf(txf); // DEBUG
 	GeoTransform* tr = new GeoTransform(txf);
   storeBuiltTransform(id, tr);
   return tr;

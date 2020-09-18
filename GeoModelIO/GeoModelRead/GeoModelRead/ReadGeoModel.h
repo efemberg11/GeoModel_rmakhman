@@ -244,8 +244,6 @@ private:
   std::unordered_map<unsigned int, std::string> m_tableID_toTableName; // to look for node's type name starting from a table ID
   std::unordered_map<std::string, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
 
-  
-//  QStringList m_root_vol_data;
   std::vector<std::string> m_root_vol_data;
 
   //! memory chaches

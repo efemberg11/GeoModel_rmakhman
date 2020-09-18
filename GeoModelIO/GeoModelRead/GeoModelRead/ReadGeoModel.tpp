@@ -9,6 +9,7 @@
  *
  */
 
+#include "GeoModelKernel/GeoFullPhysVol.h"
 
 
 namespace GeoModelIO {
@@ -35,7 +36,7 @@ namespace GeoModelIO {
             // record[0] is the record's ID in the DB table, we skip that.
             std::string keyStr  = record[1];
             std::string volID   = record[2];
-            if(0==ii) keyType   = record[3];
+            if(0==ii) keyType   = record[3];//this is the same for all records. TODO: it should be stored in a metadata table
             ++ii;
             
             //std::cout << "keyStr: " << keyStr << ", volID: " << volID 
@@ -43,7 +44,8 @@ namespace GeoModelIO {
 
             N volPtr = nullptr;
             if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
-                volPtr = getBuiltFullPhysVol(std::stoul(volID));
+                volPtr = dynamic_cast<GeoFullPhysVol*>( getVPhysVol(std::stoul(volID), 2, 1) ); //always table=2, copyN=1 (because FullPhysVols are not sharable 
+                std::cout << "volPtr: " << volPtr << "\n";
             } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
                 volPtr = getBuiltAlignableTransform(std::stoul(volID));
             } else {

@@ -1,8 +1,14 @@
+/*
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+*/
+
 // author: Riccardo.Maria.Bianchi@cern.ch, 2017
 // major updates:
 // - Aug 2018 - Riccardo Maria Bianchi
 // - Feb 2019 - Riccardo Maria Bianchi
 // - May 2020 - Riccardo Maria Bianchi
+// - Aug 2020 - Riccardo Maria Bianchi - Added support to publish lists of FPV and AXF nodes
+//
 
 // local includes
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -34,6 +40,7 @@
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
+#include "GeoModelKernel/GeoPublisher.h"
 
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
@@ -1315,6 +1322,8 @@ unsigned int WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, const
 	return id;
 }
 
+
+
   void WriteGeoModel::storeChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &childId, const unsigned int &parentCopyN, const unsigned int &childPos, const std::string &childType, const unsigned int &childCopyN)
 {
 	addChildPosition(parentId, parentType, childId, parentCopyN, childPos, childType, childCopyN); // FIXME: change the positions of the parameters to a more logical order, like: parentID, parentType, parentCopyN, childPos, ChildType, childId, childCopyN
@@ -1329,6 +1338,7 @@ unsigned int WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, const
 	return idx;
 }
 
+
   unsigned int WriteGeoModel::addMaterial(const std::string &name, const double &density, const std::string &elements)
 {
   std::vector<std::vector<std::string>>* container = &m_materials;
@@ -1338,6 +1348,8 @@ unsigned int WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, const
   values.push_back( elements );
 	return addRecord(container, values);
 }
+
+
 
 
 unsigned int WriteGeoModel::addElement(const std::string &name, const std::string &symbol, const double &elZ, const double &elA)
@@ -1480,7 +1492,17 @@ unsigned int WriteGeoModel::addLogVol(const std::string &name, const unsigned in
 }
 
 
-void WriteGeoModel::saveToDB()
+/*
+ * The 'publisher' parameter is optional, by default it is set to 'nullptr' in the header.
+ */
+void WriteGeoModel::saveToDB( GeoPublisher* publisher ) 
+{
+    std::vector<GeoPublisher*> vec;
+    if( publisher )
+        vec.push_back(publisher);
+    saveToDB(vec);
+}
+void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
 {
     std::cout << "Saving the GeoModel tree to file: '" << m_dbpath << "'" << std::endl;
 
@@ -1500,15 +1522,109 @@ void WriteGeoModel::saveToDB()
 	m_dbManager->addListOfChildrenPositions(m_childrenPositions);
 	m_dbManager->addRootVolume(m_rootVolume);
 
+    if(publishers.size()) {
+            std::cout << "\nINFO: A pointer to a GeoPublisher instance has been provided, "
+                << "so we dump the published list of FullPhysVol and AlignableTransforms\n" 
+                << std::endl;
+        for(GeoPublisher* publisher : publishers) {
+            storePublishedNodes(publisher);
+        }
+	}
+
 	if ( !m_objectsNotPersistified.empty() ) {
-    std::cout << "\n\tWARNING!! There are shapes/nodes which need to be persistified! --> ";
-    printStdVectorStrings(m_objectsNotPersistified);
-    std::cout << "\n\n";
+        std::cout << "\n\tWARNING!! There are shapes/nodes which need to be persistified! --> ";
+        printStdVectorStrings(m_objectsNotPersistified);
+        std::cout << "\n\n";
 	}
 
 	return;
 }
- 
+
+
+void WriteGeoModel::storePublishedNodes(GeoPublisher* store)
+{
+    // loop over the published AlignableTransform nodes
+    std::map<GeoAlignableTransform*, std::any> mapAXF = store->getPublishedAXF();
+    storeRecordPublishedNodes<std::map<GeoAlignableTransform*, std::any>>(mapAXF, &m_publishedAlignableTransforms_String);   
+
+    // loop over the published GeoVFullPhysVol nodes
+    std::map<GeoVFullPhysVol*, std::any> mapFPV = store->getPublishedFPV();
+    storeRecordPublishedNodes<std::map<GeoVFullPhysVol*, std::any>>(mapFPV, &m_publishedFullPhysVols_String);   
+
+    // save the list of matching published nodes to the DB
+    std::string storeName = store->getName();
+    if (mapAXF.size() > 0) {
+        m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String, storeName); 
+    } else {
+        std::cout << "\nWARNING! A pointer to a GeoPublisher was provided, but no GeoAlignableTransform nodes have been published. Please, check if that was intended. (If in doubt, please ask to 'geomodel-developers@cern.ch')\n" << std::endl;
+    }
+    if (mapFPV.size() > 0) {
+        m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String, storeName);
+    } else {
+        std::cout << "\nWARNING! A pointer to a GeoPublisher was provided, but no GeoFullPhysVol nodes have been published. Please, check if that was intended. (If in doubt, please ask to 'geomodel-developers@cern.ch')\n" << std::endl;
+    }
+
+    // clear the caches
+    m_publishedAlignableTransforms_String.clear();
+    m_publishedFullPhysVols_String.clear();
+}
+
+template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT storeMap, std::vector<std::vector<std::string>>* cachePublishedNodes   )
+{
+    // NOTE: We store all keys as strings, independently of their original format. 
+    //       However, we store the original format as well, 
+    //       so we will be able to convert the keys to their original format when clients will read them back.
+    //
+    for( const auto& [vol, key ] : storeMap ) 
+    {
+        auto& keyType = key.type();
+
+        // get key type and convert to std::string to store into the cache
+        std::string keyStr;
+        std::string keyTypeStr;
+        if ( typeid(std::string) == keyType ) {
+            keyTypeStr = "string";
+            keyStr = std::any_cast<std::string>(key);
+        }
+        else if ( typeid(int) == keyType ) {
+            keyTypeStr = "int";
+            keyStr = std::to_string( std::any_cast<int>(key) );
+        }
+        else if ( typeid(unsigned) == keyType ) {
+            keyTypeStr = "uint";
+            keyStr = std::to_string( std::any_cast<unsigned>(key) );
+        }
+        else {
+            std::cout << "ERROR! The type of the key used to publish FPV and AXF nodes is not 'std::string', nor 'int', nor 'unsigned int'. Format not supported, at the moment..\n"
+                      << "If in doubt, please ask to 'geomodel-developers@cern.ch'. Exiting...\n\n";
+            exit(EXIT_FAILURE);
+        }
+
+        // check if address is stored already; and get the ID associated with it. 
+        // NOTE: All of the addresses should be stored already, at this stage. 
+        //       If not, there's a serious bug!
+        unsigned int volID = 0;
+        std::string volStr = getAddressStringFromPointer( vol );
+        if( isAddressStored(volStr) ) {
+            volID = getStoredIdFromAddress(volStr);
+        } else {
+            std::cout << "ERROR!!! Address of node is not stored, but it should! Ask 'geomodel-developers@cern.ch'. Exiting...\n\n";
+            exit(EXIT_FAILURE);
+        }
+
+        // debug msg
+        //std::cout << vol << "::" << keyStr << " [" << keyTypeStr << "] --> " << volID << std::endl;
+
+        // prepare the vector containing the pieces of information to be stored in the DB table
+        std::vector<std::string> values;
+        values.push_back(keyStr);
+        values.push_back(std::to_string(volID));
+        values.push_back(keyTypeStr); // TODO: store the key type in a metadata table, not in the records' table; so it can be stored once only.
+
+        unsigned int recordID = addRecord(cachePublishedNodes, values);
+        //std::cout << "Pushed record: " << recordID << std::endl; // debug msg
+    }
+}
 
   void WriteGeoModel::storeAddress(const std::string &address, const unsigned int &id)
 {

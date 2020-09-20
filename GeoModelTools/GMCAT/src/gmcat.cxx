@@ -8,12 +8,11 @@
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoPVLink.h"
-
-
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelKernel/GeoNameTag.h"
+#include "GeoModelKernel/GeoPublisher.h"
 
 #include <iostream>
 #include <string>
@@ -129,6 +128,7 @@ int main(int argc, char ** argv) {
   //
   // Loop over plugins, create the geometry and put it under the world:
   //
+  std::vector<GeoPublisher*> vecPluginsPublishers; // caches the stores from all plugins
   for (const std::string & plugin : inputPlugins) {
     GeoGeometryPluginLoader loader;
     GeoVGeometryPlugin *factory=loader.load(plugin);
@@ -136,7 +136,17 @@ int main(int argc, char ** argv) {
       std::cerr << "Could not load plugin " << plugin << std::endl;
       return 5;
     }
-    factory->create(world);
+    
+    // NOTE: we want the plugin to publish lits FPV and AXF nodes, 
+    // if it is intended to do that, and store them in the DB. 
+    // For that, we pass a true to the plugin's `create()` method, 
+    // which will use it to publish nodes, 
+    // and then we get from the plugin the pointer to the GeoPublisher instance 
+    // and we cache it for later, to dump the published nodes into the DB.
+    factory->create(world, true);
+    if( nullptr != factory->getPublisher() ) {
+        vecPluginsPublishers.push_back( factory->getPublisher() ); // cache the publisher, if any, for later
+    }
   }
 
   //
@@ -181,7 +191,7 @@ int main(int argc, char ** argv) {
 
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
-  dumpGeoModelGraph.saveToDB();
+  dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
 
   world->unref();
 

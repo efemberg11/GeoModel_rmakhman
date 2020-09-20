@@ -1,12 +1,13 @@
 /*
- * GeoModelReadIn.h
+ * ReadGeoModel.h
  *
- *  Created on: May 20, 2016
- *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ * Created on: May 20, 2016
+ * Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
  *
  * major updates:
  * - 2019 Feb, R.M.Bianchi
- * - 2020 May, R.M.Bianchi
+ * - 2020 May, R.M.Bianchi - Added parallel read
+ * - 2020 Aug, R.M.Bianchi - Added support for reading back published nodes
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
@@ -44,6 +45,7 @@ typedef GeoModelIO::ReadGeoModel Persistifier;
 #include <tuple>
 #include <vector>
 #include <deque>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -86,6 +88,9 @@ public:
 	virtual ~ReadGeoModel();
 
 	GeoPhysVol* buildGeoModel();
+
+    template <typename T, class N> std::map<T,N> getPublishedNodes( std::string publisherName = "" /*optional variable*/);
+  
 
 private:
 
@@ -199,7 +204,6 @@ private:
   // Utility functions
   std::string getEnvVar( std::string const & key ) const;
   std::vector<std::string> splitString(const std::string& s, char delimiter);
-	void printTrf(GeoTrf::Transform3D t);
   void printStdVectorStrings(std::vector<std::string> vec); //TODO: move it to utility class
   
   // void printTransformationValues(QStringList t); // TODO: move to a Qt utility class
@@ -239,8 +243,6 @@ private:
   std::unordered_map<unsigned int, std::string> m_tableID_toTableName; // to look for node's type name starting from a table ID
   std::unordered_map<std::string, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
 
-  
-//  QStringList m_root_vol_data;
   std::vector<std::string> m_root_vol_data;
 
   //! memory chaches
@@ -264,4 +266,9 @@ private:
 };
 
 } /* namespace GeoModelIO */
+
+// include the implementation of the class' template functions
+#include "ReadGeoModel.tpp"
+
+
 #endif /* GeoModelRead_ReadGeoModel_H_ */

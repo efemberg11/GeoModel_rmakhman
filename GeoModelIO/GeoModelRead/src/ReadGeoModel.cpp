@@ -1,5 +1,5 @@
 /*
- * GeoModelReadIn.cpp
+ * ReadGeoModel.cpp
  *
  *  Created on: May 20, 2016
  *      Author: riccardo.maria.bianchi@cern.ch
@@ -9,6 +9,7 @@
  *  - Mar 2020, R.M.Bianchi
  *  - Mar 2020, boudreau
  *  - May 2020, R.M.Bianchi
+ *  - Aug 2020, R.M.Bianchi - Added support to read published FullPhysVols and AlignableTransforms back in
  */
 
 
@@ -18,8 +19,8 @@
 // TFPersistification includes
 #include "TFPersistification/TransFunctionInterpreter.h"
 
-
-// GeoModelKernel
+// GeoModelKernel includes
+#include "GeoModelKernel/GeoUtilFunctions.h"
 #include "GeoModelKernel/GeoTransform.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
@@ -2453,29 +2454,6 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
 }
 
 
-// TODO: this should be moved to an Utilities class!
-void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
-  muxCout.lock();
-	std::cout << "transformation: " << std::endl;
-	std::cout << "[[" << t(0, 0) << " , ";
-	std::cout <<         t(0, 1) << " , ";
-	std::cout <<         t(0, 2) << " , ";
-	std::cout <<         t(0, 3) << " ]";
-	std::cout << "["  << t(1, 0) << " , ";
-	std::cout <<         t(1, 1) << " , ";
-	std::cout <<         t(1, 2) << " , ";
-	std::cout <<         t(1, 3) << " ]";
-	std::cout << "["  << t(2, 0) << " , ";
-	std::cout <<         t(2, 1) << " , ";
-	std::cout <<         t(2, 2) << " , ";
-	std::cout <<         t(2, 3) << " ]";
-	std::cout << "["  << t(3, 0) << " , ";
-	std::cout <<         t(3, 1) << " , ";
-	std::cout <<         t(3, 2) << " , ";
-	std::cout <<         t(3, 3) << " ]]" << std::endl;
-  muxCout.unlock();
-}
-
 //// TODO: should go in a QtUtils header-only class, to be used in other packages
 //QList<double> ReadGeoModel::convertQstringListToDouble(QStringList listin) {
 //  QList<double> listout;
@@ -2543,7 +2521,7 @@ GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(const unsigned int 
 	txf(1,3)=dy;
 	txf(2,3)=dz;
 
-	// printTrf(txf); // DEBUG
+	// GeoUtilFunctions::printTrf(txf); // DEBUG
   GeoAlignableTransform* tr = new GeoAlignableTransform(txf);
   storeBuiltAlignableTransform(id, tr);
   return tr;
@@ -2595,7 +2573,7 @@ GeoTransform* ReadGeoModel::buildTransform(const unsigned int id)
 	txf(1,3) = dy;
 	txf(2,3) = dz;
 
-	// printTrf(txf); // DEBUG
+	// GeoUtilsFunctions::printTrf(txf); // DEBUG
 	GeoTransform* tr = new GeoTransform(txf);
   storeBuiltTransform(id, tr);
   return tr;

@@ -33,6 +33,7 @@
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
@@ -62,12 +63,16 @@ using namespace GeoGenfun;
 // The objects for mapping plane indexes in Pcon to the record index in GeoInpRecordset
 typedef std::map<int, unsigned int, std::less<int> > planeIndMap;
 
-LArGeo::BarrelCryostatConstruction::BarrelCryostatConstruction(bool fullGeo, LArGeoMaterialManager* matman, bool ft)
+LArGeo::BarrelCryostatConstruction::BarrelCryostatConstruction(bool fullGeo
+							       , LArGeoMaterialManager* matman
+							       , GeoPublisher* publisher
+							       , bool ft)
   : m_barrelSagging(0)
   , m_barrelVisLimit(-1)
   , m_cryoMotherPhysical(NULL)
   , m_fullGeo(fullGeo)
   , m_matman(matman)
+  , m_publisher(publisher)
   , m_activateFT(ft)
 {}
 
@@ -126,11 +131,8 @@ GeoFullPhysVol* LArGeo::BarrelCryostatConstruction::GetEnvelope()
     if (!posRec) throw std::runtime_error("Error, no lar position record in the XML input!") ;
     GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
     xf[n] = new GeoAlignableTransform(xfPos);
-    /*
-    StoredAlignX *sAlignX = new StoredAlignX(xf[n]);
-    StatusCode status=detStore->record(sAlignX,names[n]);
-    if(!status.isSuccess()) throw std::runtime_error (("Cannot store " + names[n]).c_str() );
-    */
+
+    if(m_publisher) m_publisher->publishNode<GeoAlignableTransform*,std::string>(xf[n],names[n]);
   }
 
   GeoAlignableTransform *xfHalfLArPos=xf[0],  *xfHalfLArNeg=xf[1], *xfSolenoid=xf[2];
@@ -424,13 +426,9 @@ GeoFullPhysVol* LArGeo::BarrelCryostatConstruction::GetEnvelope()
 	  // I'm storing the first one #10. (FIXME)
 	  // NOTE:  Pretty soon there will
 	  // be no need at all to store physical volumes in the manager or in storegate!
-	  /*
-	  if(cylID==10) {
-	    StoredPhysVol *sPhysVol = new StoredPhysVol(physBarrelCylinder);
-	    StatusCode status=detStore->record(sPhysVol,"SOLENOID");
-	    if(!status.isSuccess()) throw std::runtime_error ("Cannot store SOLENOID");
+	  if(cylID==10 && m_publisher) {
+	    m_publisher->publishNode<GeoVFullPhysVol*,std::string>(physBarrelCylinder,"SOLENOID");
 	  }
-	  */
 
 	}else{
 	  GeoPhysVol* physBarrelCylinder = new GeoPhysVol(logicBarrelCylinder);
@@ -819,7 +817,7 @@ GeoFullPhysVol* LArGeo::BarrelCryostatConstruction::GetEnvelope()
     // There are two placements: one for the z>0 section, one for the z<0 section.
 
 
-    BarrelConstruction barrelConstruction(m_fullGeo,m_matman);
+    BarrelConstruction barrelConstruction(m_fullGeo,m_matman,m_publisher);
     barrelConstruction.setBarrelSagging(m_barrelSagging);
     barrelConstruction.setBarrelCellVisLimit(m_barrelVisLimit);
 
@@ -924,11 +922,14 @@ GeoFullPhysVol* LArGeo::BarrelCryostatConstruction::GetEnvelope()
       halfLArPhysicalPos->add(xfPos);
       //halfLArPhysicalPos->add(new GeoNameTag("PositivePSBarrel"));
       halfLArPhysicalPos->add(barrelPSPosEnvelope);
-      /*
-      StoredPhysVol *sPhysVol = new StoredPhysVol(barrelPSPosEnvelope);
-      StatusCode status=detStore->record(sPhysVol,"PRESAMPLER_B_POS");
-      if(!status.isSuccess()) throw std::runtime_error ("Cannot store PRESAMPLER_B_POS");
-      */
+      if(m_publisher) m_publisher->publishNode<GeoVFullPhysVol*,std::string>(barrelPSPosEnvelope,"PRESAMPLER_B_POS");
+      {
+	GeoTrf::Transform3D xf = barrelPSPosEnvelope->getAbsoluteTransform();
+	std::cout << "VT. PRESAMPLER_B_POS" << std::endl;
+	std::cout << xf(0,0) << "\t" << xf(0,1) << "\t" << xf(0,2) << "\t" << xf(0,3) << std::endl;
+	std::cout << xf(1,0) << "\t" << xf(1,1) << "\t" << xf(1,2) << "\t" << xf(1,3) << std::endl;
+	std::cout << xf(2,0) << "\t" << xf(2,1) << "\t" << xf(2,2) << "\t" << xf(2,3) << std::endl;	
+      }
     }
     // The "envelope" determined by the EMB should be a GeoFullPhysVol.
     GeoFullPhysVol* barrelPSNegEnvelope = barrelPSConstruction.GetNegativeEnvelope();
@@ -937,11 +938,15 @@ GeoFullPhysVol* LArGeo::BarrelCryostatConstruction::GetEnvelope()
       halfLArPhysicalNeg->add(xfNeg);
       //halfLArPhysicalPos->add(new GeoNameTag("NegativePSBarrel"));
       halfLArPhysicalNeg->add(barrelPSNegEnvelope);
-      /*
-      StoredPhysVol *sPhysVol = new StoredPhysVol(barrelPSNegEnvelope);
-      StatusCode status=detStore->record(sPhysVol,"PRESAMPLER_B_NEG");
-      if(!status.isSuccess()) throw std::runtime_error ("Cannot store PRESAMPLER_B_NEG");
-      */
+
+      if(m_publisher) m_publisher->publishNode<GeoVFullPhysVol*,std::string>(barrelPSNegEnvelope,"PRESAMPLER_B_NEG");      
+      {
+	GeoTrf::Transform3D xf = barrelPSNegEnvelope->getAbsoluteTransform();
+	std::cout << "VT. PRESAMPLER_B_NEG" << std::endl;
+	std::cout << xf(0,0) << "\t" << xf(0,1) << "\t" << xf(0,2) << "\t" << xf(0,3) << std::endl;
+	std::cout << xf(1,0) << "\t" << xf(1,1) << "\t" << xf(1,2) << "\t" << xf(1,3) << std::endl;
+	std::cout << xf(2,0) << "\t" << xf(2,1) << "\t" << xf(2,2) << "\t" << xf(2,3) << std::endl;	
+      }
     }
 
   }

@@ -26,18 +26,20 @@
 
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
-
 class LArGeoPlugin : public GeoVGeometryPlugin
 {
 public:
-  
-  LArGeoPlugin() {};
+  LArGeoPlugin()
+    : GeoVGeometryPlugin()
+  {}
+  LArGeoPlugin(std::string name)
+    :GeoVGeometryPlugin(name)
+  {}
   ~LArGeoPlugin();
 
   virtual void create(GeoPhysVol* world, bool publish) override;
 
-private:
-  
+private:  
   const LArGeoPlugin & operator=(const LArGeoPlugin &right)=delete;
   LArGeoPlugin(const LArGeoPlugin &right) = delete;
   
@@ -56,13 +58,12 @@ private:
   bool         m_activateFT{false};
 };
 
-
 LArGeoPlugin::~LArGeoPlugin()
 {
   delete m_matman;
 }
 
-void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
+void LArGeoPlugin::create(GeoPhysVol* world, bool publish)
 {
   // ________ Time measure ____________
   typedef std::chrono::high_resolution_clock Time;
@@ -112,7 +113,10 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
 
 //    if (m_testbeam==0) {
 
-  LArGeo::BarrelCryostatConstruction barrelCryostatConstruction(m_fullGeo, m_matman, m_activateFT);
+  LArGeo::BarrelCryostatConstruction barrelCryostatConstruction(m_fullGeo
+								, m_matman
+								, publish ? getPublisher() : nullptr
+								, m_activateFT);
   barrelCryostatConstruction.setBarrelSagging(m_barrelSagging);
   barrelCryostatConstruction.setBarrelCellVisLimit(m_barrelVisLimit);
       
@@ -619,5 +623,5 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
 }
 
 extern "C" LArGeoPlugin *createLArGeoPlugin() {
-    return new LArGeoPlugin();
+  return new LArGeoPlugin("LAr");
 }

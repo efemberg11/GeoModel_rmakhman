@@ -25,6 +25,7 @@
 #include "GeoModelKernel/GeoSerialIdentifier.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoXF.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
@@ -88,13 +89,16 @@
 
 //===================constructor
 
-LArGeo::BarrelConstruction::BarrelConstruction(bool fullGeo,LArGeoMaterialManager* matman)
+LArGeo::BarrelConstruction::BarrelConstruction(bool fullGeo
+					       , LArGeoMaterialManager* matman
+					       , GeoPublisher* publisher)
   : m_A_SAGGING(false)
   , m_NVISLIM(-1)
   , m_ecamPhysicalPos(nullptr)
   , m_ecamPhysicalNeg(nullptr)
   , m_fullGeo(fullGeo)
   , m_matman(matman)
+  , m_publisher(publisher)
 {
 }
 
@@ -433,18 +437,11 @@ void LArGeo::BarrelConstruction::MakeEnvelope()
     // store FullPhysicalVolumes in the manager                                   //
     //_manager->set_volLink(CaloSubdetNames::EMB_POS,m_ecamPhysicalPos);          //
     //_manager->set_volLink(CaloSubdetNames::EMB_NEG,m_ecamPhysicalNeg);          //
-    /*
-    {
-      StoredPhysVol *sPhysVol = new StoredPhysVol(m_ecamPhysicalPos);
-      StatusCode status=detStore->record(sPhysVol,"EMB_POS");
-      if(!status.isSuccess()) throw std::runtime_error ("Cannot store EMB_POS");
+
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(m_ecamPhysicalPos,"EMB_POS");
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(m_ecamPhysicalNeg,"EMB_NEG");
     }
-    {
-      StoredPhysVol *sPhysVol = new StoredPhysVol(m_ecamPhysicalNeg);
-      StatusCode status=detStore->record(sPhysVol,"EMB_NEG");
-      if(!status.isSuccess()) throw std::runtime_error ("Cannot store EMB_NEG");
-    }
-    */
   }                                                                               //
   //------------------------------------------------------------------------------//
 

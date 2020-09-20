@@ -14,6 +14,7 @@
 
 #include "GeoModelKernel/GeoFullPhysVol.h"
 class LArGeoMaterialManager;
+class GeoPublisher;
 
 namespace LArGeo {
   
@@ -25,7 +26,10 @@ namespace LArGeo {
   class BarrelCryostatConstruction
   {
   public:
-    BarrelCryostatConstruction(bool fullGeo, LArGeoMaterialManager* matman,bool activateFT = false);
+    BarrelCryostatConstruction(bool fullGeo
+			       , LArGeoMaterialManager* matman
+			       , GeoPublisher* publisher
+			       , bool activateFT = false);
     virtual ~BarrelCryostatConstruction();
 
     // Get the envelope containing this detector.
@@ -41,6 +45,7 @@ namespace LArGeo {
 
     bool                    m_fullGeo;  // true->FULL, false->RECO
     LArGeoMaterialManager*  m_matman;
+    GeoPublisher*           m_publisher;
     bool                    m_activateFT;
   };
 } // namespace LArGeo

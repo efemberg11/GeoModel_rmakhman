@@ -18,6 +18,7 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
+#include "GeoModelKernel/GeoPublisher.h"  // to publish lists of nodes
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
@@ -30,20 +31,19 @@
 using namespace GeoGenfun;
 using namespace GeoXF;
 
-class GeoVStore;
 
 class HGTDPlugin : public GeoVGeometryPlugin  {
 
  public:
 
   // Constructor:
-  HGTDPlugin();
+  HGTDPlugin( std::string pluginName) : GeoVGeometryPlugin( pluginName ) {};
 
   // Destructor:
   ~HGTDPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoVStore*);
+  virtual void create(GeoPhysVol *world, bool publish) override;
 
  private:
 
@@ -136,10 +136,6 @@ class HGTDPlugin : public GeoVGeometryPlugin  {
 };
 
 
-HGTDPlugin::HGTDPlugin()
-{
-}
-
 
 HGTDPlugin::~HGTDPlugin()
 {
@@ -147,9 +143,8 @@ HGTDPlugin::~HGTDPlugin()
 
 
 //## Other Operations (implementation)
-void HGTDPlugin::create(GeoPhysVol *world, GeoVStore*)
+void HGTDPlugin::create(GeoPhysVol *world, bool publish)
 {
-
 
   GeoFullPhysVol* HGTD_EnvelopePos = createEnvelope(true);
   GeoFullPhysVol* HGTD_EnvelopeNeg = createEnvelope(false);
@@ -167,12 +162,11 @@ void HGTDPlugin::create(GeoPhysVol *world, GeoVStore*)
   world->add( new GeoTransform(GeoTrf::TranslateZ3D(3500)));
   world->add(HGTD_EnvelopeNeg);
   
-
-  
+  return;
 }
 
 extern "C" HGTDPlugin *createHGTDPlugin() {
-  return new HGTDPlugin;
+    return new HGTDPlugin( "HGTDPlugin" );
 }
 
 GeoFullPhysVol* HGTDPlugin::createEnvelope(bool bPos) {

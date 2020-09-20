@@ -4,9 +4,9 @@
 
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
-#include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoLogVol.h"
@@ -54,13 +54,13 @@ class AccordionPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  AccordionPlugin();
+  AccordionPlugin() {}
 
   // Destructor:
   ~AccordionPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoVStore* store);
+  virtual void create(GeoPhysVol *world, bool publish /*not used here*/) override;
 
  private:
 
@@ -79,20 +79,13 @@ class AccordionPlugin : public GeoVGeometryPlugin  {
 
 
 
-
-
-AccordionPlugin::AccordionPlugin()
-{
-}
-
-
 AccordionPlugin::~AccordionPlugin()
 {
 }
 
 
 //## Other Operations (implementation)
-void AccordionPlugin::create(GeoPhysVol *world, GeoVStore*)
+void AccordionPlugin::create(GeoPhysVol *world, bool /*not used here*/)
 {
   // Get the materials that we shall use.
   // -------------------------------------//
@@ -1170,7 +1163,8 @@ void AccordionPlugin::create(GeoPhysVol *world, GeoVStore*)
   }
 
 #endif  //  BUILD_ACCORDION_PLATES
-  
+
+  return;
 }
 
 
@@ -1238,5 +1232,5 @@ GeoGenfun::FunctionNoop AccordionPlugin::ATan2(GeoGenfun::GENFUNCTION y, GeoGenf
 
 
 extern "C" AccordionPlugin *createAccordionPlugin() {
-  return new AccordionPlugin;
+  return new AccordionPlugin();
 }

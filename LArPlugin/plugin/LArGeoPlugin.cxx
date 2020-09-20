@@ -15,7 +15,6 @@
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/Units.h"
-#define SYSTEM_OF_UNITS GeoModelKernelUnits
 
 #include "GeoXmlMatManager/GeoXmlMatManager.h"
 #include "GeoXmlInpManager/GeoXmlInpManager.h"
@@ -25,18 +24,23 @@
 #include <iostream>
 #include <chrono>
 
+#define SYSTEM_OF_UNITS GeoModelKernelUnits
+
+
 class LArGeoPlugin : public GeoVGeometryPlugin
 {
 public:
-  LArGeoPlugin();
+  
+  LArGeoPlugin() {};
   ~LArGeoPlugin();
 
+  virtual void create(GeoPhysVol* world, bool publish) override;
+
+private:
+  
   const LArGeoPlugin & operator=(const LArGeoPlugin &right)=delete;
   LArGeoPlugin(const LArGeoPlugin &right) = delete;
   
-  virtual void create(GeoPhysVol* world, GeoVStore* store) override;
-
-private:
   LArGeoMaterialManager* m_matman{new LArGeoMaterialManager()};
   
   // Configuration parameters
@@ -52,16 +56,13 @@ private:
   bool         m_activateFT{false};
 };
 
-LArGeoPlugin::LArGeoPlugin()
-{
-}
 
 LArGeoPlugin::~LArGeoPlugin()
 {
   delete m_matman;
 }
 
-void LArGeoPlugin::create(GeoPhysVol* world, GeoVStore* /*store*/)
+void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
 {
   // ________ Time measure ____________
   typedef std::chrono::high_resolution_clock Time;
@@ -618,5 +619,5 @@ void LArGeoPlugin::create(GeoPhysVol* world, GeoVStore* /*store*/)
 }
 
 extern "C" LArGeoPlugin *createLArGeoPlugin() {
-  return new LArGeoPlugin;
+    return new LArGeoPlugin();
 }

@@ -4,7 +4,6 @@
 
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
-#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoPhysVol.h"

@@ -18,7 +18,6 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
-#include "GeoModelKernel/GeoPublisher.h"  // to publish lists of nodes
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"

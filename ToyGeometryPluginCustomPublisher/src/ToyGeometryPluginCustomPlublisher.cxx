@@ -112,14 +112,15 @@ void ToyGeometryPluginCustomPublisher::create(GeoPhysVol *world, bool publish)
 
     // publish GeoAlignableTransform and GeoFullPhysVol nodes, if a pointer to a GeoPublisher is provided
     if ( publish ) {
-        GeoPublisher* publisher = this->getPublisher();
+        
         // *** publish the list of FPV and AXF nodes ***
         // as an example, we use string-based keys for FullPhysVols...
         unsigned int keyInt = i+1;
-        publisher->publishNode<GeoVFullPhysVol*,unsigned>( ringPhys, keyInt );
+        m_publisher->publishNode<GeoVFullPhysVol*,unsigned>( ringPhys, keyInt );
+        
         // ...and integer-based keys for AlignableTransforms
         std::string keyStr = "Toy-AXF-" + std::to_string(i+1);
-        publisher->publishNode<GeoAlignableTransform*,std::string>( xform, keyStr );
+        m_publisher->publishNode<GeoAlignableTransform*,std::string>( xform, keyStr );
     }
   }
 

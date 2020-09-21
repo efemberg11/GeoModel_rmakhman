@@ -26,7 +26,7 @@ class GeoVGeometryPlugin
    GeoVGeometryPlugin() : m_publisher(nullptr) {}
      
   //! Parametrized constructor for plugins that publish lists of nodes 
-  GeoVGeometryPlugin(std::string name) : m_pluginName( name ), m_publisher(std::make_unique<GeoPublisher>()) {  m_publisher->setName(m_pluginName); } 
+  GeoVGeometryPlugin(std::string name) : m_pluginName( name ), m_publisher(std::make_shared<GeoPublisher>()) {  m_publisher->setName(m_pluginName); } 
     
 
   virtual ~GeoVGeometryPlugin() {}
@@ -41,15 +41,18 @@ class GeoVGeometryPlugin
   //! Returns the Publisher that publishes the lists of the GeoFullPhysVol and AlignableTransform nodes
   GeoPublisher* getPublisher() { return m_publisher.get(); }
 
- 
-  private:
+
+ protected:
+
+  //! A GeoPublisher instance is used to publish lists of nodes.
+  std::shared_ptr<GeoPublisher> m_publisher;
+  
+ private:
 
   /// We prohibit copy constructor, and assignment operator
   GeoVGeometryPlugin(const GeoVGeometryPlugin &right)=delete;
   GeoVGeometryPlugin & operator=(const GeoVGeometryPlugin &right)=delete;
 
-  //! A GeoPublisher instance is used to publish lists of nodes.
-  std::unique_ptr<GeoPublisher> m_publisher;
 
   //! The name of the plugin, used to store plugin's published nodes. 
   std::string m_pluginName;

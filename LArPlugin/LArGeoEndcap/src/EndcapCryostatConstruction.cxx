@@ -35,6 +35,7 @@
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoShapeShift.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
@@ -70,12 +71,15 @@ typedef std::map<int, unsigned int, std::less<int> > planeIndMap;
 
 LArGeo::EndcapCryostatConstruction::EndcapCryostatConstruction(LArGeoMaterialManager* matman
 							       , bool fullGeo
+							       , GeoPublisher* publisher
 							       , std::string emecVariantInner
 							       , std::string emecVariantOuter
 							       , bool activateFT) 
   : m_matman(matman)
+  , m_publisher(publisher)
   , m_fcalVisLimit(-1)
-  , m_emec(matman)
+  , m_emec(matman,publisher)
+  , m_fcal(publisher)
   , m_fullGeo(fullGeo)
   , m_EMECVariantInner(emecVariantInner)
   , m_EMECVariantOuter(emecVariantOuter)
@@ -447,11 +451,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 	    
             std::string tag = bPos? std::string("PRESAMPLER_EC_POS") : std::string("PRESAMPLER_EC_NEG");
 
-/*
-            StoredPhysVol *sPhysVol = new StoredPhysVol(emecPSEnvelope);
-            status=detStore->record(sPhysVol,tag);
-            if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-*/
+	    if(m_publisher) m_publisher->publishNode<GeoVFullPhysVol*,std::string>(emecPSEnvelope,tag);
           }
         }
 
@@ -584,15 +584,10 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
     std::string tag = bPos? std::string("EMEC_POS") : std::string("EMEC_NEG");
 
-/*
-    StoredPhysVol *sPhysVol = new StoredPhysVol(envelope);
-    status=detStore->record(sPhysVol,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-
-    StoredAlignX *sAlignX = new StoredAlignX(xfEmec);
-    status=detStore->record(sAlignX,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-*/
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(envelope,tag);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfEmec,tag);
+    }
 
     //=>
     totalEMHLArPhysical->add(xfEmec);
@@ -615,15 +610,11 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
     std::string tag1 = bPos? std::string("HEC1_POS") : std::string("HEC1_NEG");
 
-    /*
-    StoredPhysVol *sPhysVol1 = new StoredPhysVol(EnvelopeF);
-    status=detStore->record(sPhysVol1,tag1);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag1).c_str());
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(EnvelopeF,tag1);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfHec1,tag1);
+    }
 
-    StoredAlignX *sAlignX1 = new StoredAlignX(xfHec1);
-    status=detStore->record(sAlignX1,tag1);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag1).c_str());
-    */
     totalEMHLArPhysical->add( xfHec1);
     totalEMHLArPhysical->add(new GeoIdentifierTag(0));
     totalEMHLArPhysical->add( EnvelopeF );
@@ -640,15 +631,12 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     GeoAlignableTransform *xfHec2 = new GeoAlignableTransform(xfPosHec2);
 
     std::string tag2 = bPos? std::string("HEC2_POS") : std::string("HEC2_NEG");
-    /*
-    StoredPhysVol *sPhysVol2 = new StoredPhysVol(EnvelopeR);
-    status=detStore->record(sPhysVol2,tag2);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag2).c_str());
 
-    StoredAlignX *sAlignX2 = new StoredAlignX(xfHec2);
-    status=detStore->record(sAlignX2,tag2);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag2).c_str());
-    */
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(EnvelopeR,tag2);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfHec2,tag2);
+    }
+    
     totalEMHLArPhysical->add( xfHec2);
     totalEMHLArPhysical->add(new GeoIdentifierTag(1));
     totalEMHLArPhysical->add( EnvelopeR );
@@ -682,13 +670,9 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     if (!posRec) throw std::runtime_error("Error, no lar position record in the database") ;
     GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
     GeoAlignableTransform *fcalXF = new GeoAlignableTransform(xfPos);
-/*
-    StatusCode status;
-    StoredAlignX *sAlignX = new StoredAlignX(fcalXF);
-    status=detStore->record(sAlignX,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-*/
 
+    if(m_publisher) m_publisher->publishNode<GeoAlignableTransform*,std::string>(fcalXF,tag);
+    
     const GeoLogVol *envVol = fcalEnvelope->getLogVol();
     const GeoShape  *envShape = envVol->getShape();
     if (envShape->typeID()!=GeoTubs::getClassTypeID()) {

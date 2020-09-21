@@ -62,6 +62,7 @@
 #include "GeoModelKernel/GeoIdentifierTag.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
@@ -78,10 +79,12 @@
 #include "LArGeoUtils/LArGeoMaterialManager.h"
 
 LArGeo::EMECConstruction::EMECConstruction(LArGeoMaterialManager* matman
+					   , GeoPublisher* publisher
 					   , bool is_tb
 					   , bool has_inner
 					   , bool has_outer)
   : m_matman(matman)
+  , m_publisher(publisher)
   , m_fullGeo(true)
   , m_isTB(is_tb)
   , m_hasInnerWheel(has_inner)
@@ -314,13 +317,9 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
         emecMotherPhysical->add(refSystemTransform);
         emecMotherPhysical->add(new GeoTransform(GeoTrf::TranslateZ3D(zWheelFrontFace)));
         emecMotherPhysical->add(fullPV);
-/*
-        StoredPhysVol *sPhysVol = new StoredPhysVol(fullPV);
-        StatusCode status=detStore->record(sPhysVol, bPos? "EMEC_INNER_WHEEL_POS": "EMEC_INNER_WHEEL_NEG");
-        if(!status.isSuccess()){
-            throw std::runtime_error(bPos? "Cannot store EMEC_INNER_WHEEL_POS": "Cannot store EMEC_INNER_WHEEL_NEG");
-        }
-*/
+
+	if(m_publisher) m_publisher->publishNode<GeoVFullPhysVol*,std::string>(fullPV,bPos? "EMEC_INNER_WHEEL_POS": "EMEC_INNER_WHEEL_NEG");
+
         place_custom_solids(
             fullPV, absorbers, electrodes, multilayered_absorbers,
             innerAbsorberMaterial, electrodeMaterial, Glue, Lead,
@@ -393,13 +392,9 @@ GeoFullPhysVol* LArGeo::EMECConstruction::GetEnvelope(bool bPos)
         emecMotherPhysical->add(refSystemTransform);
         emecMotherPhysical->add(new GeoTransform(GeoTrf::TranslateZ3D(zWheelFrontFace)));
         emecMotherPhysical->add(fullPV);
-/*
-        StoredPhysVol *sPhysVol = new StoredPhysVol(fullPV);
-        StatusCode status = detStore->record(sPhysVol, bPos? "EMEC_OUTER_WHEEL_POS": "EMEC_OUTER_WHEEL_NEG");
-        if(!status.isSuccess()){
-            throw std::runtime_error(bPos? "Cannot store EMEC_OUTER_WHEEL_POS": "Cannot store EMEC_OUTER_WHEEL_NEG");
-        }
-*/
+
+	if(m_publisher) m_publisher->publishNode<GeoVFullPhysVol*,std::string>(fullPV,bPos? "EMEC_OUTER_WHEEL_POS": "EMEC_OUTER_WHEEL_NEG");
+
         place_custom_solids(
             fullPV, absorbers, electrodes, multilayered_absorbers,
             outerAbsorberMaterial, electrodeMaterial, Glue, Lead,

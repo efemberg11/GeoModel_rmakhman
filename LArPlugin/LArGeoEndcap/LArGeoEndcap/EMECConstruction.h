@@ -20,6 +20,7 @@ class GeoMaterial;
 class LArGeoMaterialManager;
 class LArWheelCalculatorParameters;
 class GeoXmlInpManager;
+class GeoPublisher;
 
 namespace LArGeo {
 
@@ -31,6 +32,7 @@ namespace LArGeo {
   public:
 
     EMECConstruction(LArGeoMaterialManager* matman
+		     , GeoPublisher* publisher
 		     , bool is_tb = false
 		     , bool has_inner = true
 		     , bool has_outer = true);
@@ -47,6 +49,7 @@ namespace LArGeo {
 
   private:
     LArGeoMaterialManager*  m_matman;
+    GeoPublisher*           m_publisher;
     bool        m_fullGeo;  // true->FULL, false->RECO
 
     bool	m_isTB;

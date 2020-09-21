@@ -14,6 +14,7 @@
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoNameTag.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/Units.h"
 
 #include "GeoXmlMatManager/GeoXmlMatManager.h"
@@ -120,7 +121,12 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool publish)
   barrelCryostatConstruction.setBarrelSagging(m_barrelSagging);
   barrelCryostatConstruction.setBarrelCellVisLimit(m_barrelVisLimit);
       
-  LArGeo::EndcapCryostatConstruction endcapCryostatConstruction(m_matman,m_fullGeo, m_EMECVariantInner, m_EMECVariantOuter, m_activateFT);
+  LArGeo::EndcapCryostatConstruction endcapCryostatConstruction(m_matman
+								, m_fullGeo
+								, publish ? getPublisher() : nullptr
+								, m_EMECVariantInner
+								, m_EMECVariantOuter
+								, m_activateFT);
   endcapCryostatConstruction.setFCALVisLimit(m_fcalVisLimit);
   
   if(m_buildBarrel) {
@@ -146,17 +152,11 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool publish)
     GeoTrf::Transform3D xfBarrel = LArGeoInpUtils::getTransform(barrelRec);
 	
     GeoAlignableTransform* barrelAlXf = new GeoAlignableTransform(xfBarrel);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(barrelEnvelope);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_B");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_B PhysVol");
-	  
-	  StoredAlignX *sAlignX = new StoredAlignX(barrelAlXf);
-	  status=detStore->record(sAlignX,"LARCRYO_B");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_B Alignable XF");
-	}
-	*/
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(barrelEnvelope,"LARCRYO_B");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(barrelAlXf,"LARCRYO_B");
+    }
+    
     world->add(new GeoNameTag("LArBarrel"));
     world->add(barrelAlXf);
     world->add(barrelEnvelope);
@@ -167,34 +167,22 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool publish)
     GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
 
     GeoAlignableTransform *xfEndcapPos = new GeoAlignableTransform(xfPos);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(endcapEnvelopePos);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_EC_POS");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_EC_POS PhysVol");
-	  
-	  StoredAlignX *sAlignX = new StoredAlignX(xfEndcapPos);
-	  status=detStore->record(sAlignX,"LARCRYO_EC_POS");
-	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_POS");
-	}
-	*/
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(endcapEnvelopePos,"LARCRYO_EC_POS");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(xfEndcapPos,"LARCRYO_EC_POS");
+    }
+
     // --- Endcap Neg
     const GeoInpRecord *negRec = LArGeoInpUtils::getTransformRecord(larPosition,"LARCRYO_EC_NEG");
     if(!negRec) throw std::runtime_error("Error, no lar position record in the XML database");
     GeoTrf::Transform3D xfNeg = LArGeoInpUtils::getTransform(negRec);
     
     GeoAlignableTransform *xfEndcapNeg = new GeoAlignableTransform(xfNeg);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(endcapEnvelopeNeg);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_EC_NEG");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_EC_NEG PhysVol");
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(endcapEnvelopeNeg,"LARCRYO_EC_NEG");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(xfEndcapNeg,"LARCRYO_EC_NEG");
+    }
 
-	  StoredAlignX *sAlignX = new StoredAlignX(xfEndcapNeg);
-	  status=detStore->record(sAlignX,"LARCRYO_EC_NEG");
-	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_NEG");
-	}
-	*/
     world->add( new GeoNameTag("LArEndcapPos"));
     world->add(xfEndcapPos);
     world->add(endcapEnvelopePos);
@@ -210,17 +198,11 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool publish)
     GeoTrf::Transform3D xfBarrel = LArGeoInpUtils::getTransform(barrelRec);
     
     GeoAlignableTransform* barrelAlXf = new GeoAlignableTransform(xfBarrel);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(barrelEnvelope);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_B");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_B PhysVol");
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(barrelEnvelope,"LARCRYO_B");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(barrelAlXf,"LARCRYO_B");
+    }
 
-	  StoredAlignX *sAlignX = new StoredAlignX(barrelAlXf);
-	  status=detStore->record(sAlignX,"LARCRYO_B");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_B Alignable XF");
-	}
-	*/
     world->add(new GeoNameTag("LArBarrel"));
     world->add(barrelAlXf);
     world->add(barrelEnvelope);
@@ -233,34 +215,22 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool publish)
     GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
 	
     GeoAlignableTransform *xfEndcapPos = new GeoAlignableTransform(xfPos);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(endcapEnvelopePos);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_EC_POS");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_EC_POS PhysVol");
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(endcapEnvelopePos,"LARCRYO_EC_POS");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(xfEndcapPos,"LARCRYO_EC_POS");
+    }
 
-	  StoredAlignX *sAlignX = new StoredAlignX(xfEndcapPos);
-	  status=detStore->record(sAlignX,"LARCRYO_EC_POS");
-	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_POS");
-	}
-	*/
     // --- Endcap Neg
     const GeoInpRecord *negRec = LArGeoInpUtils::getTransformRecord(larPosition,"LARCRYO_EC_NEG");
     if(!negRec) throw std::runtime_error("Error, no lar position record in the XML database");
     GeoTrf::Transform3D xfNeg = LArGeoInpUtils::getTransform(negRec);
     
     GeoAlignableTransform *xfEndcapNeg = new GeoAlignableTransform(xfNeg);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(endcapEnvelopeNeg);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_EC_NEG");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_EC_NEG PhysVol");
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(endcapEnvelopeNeg,"LARCRYO_EC_NEG");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(xfEndcapNeg,"LARCRYO_EC_NEG");
+    }
 
-	  StoredAlignX *sAlignX = new StoredAlignX(xfEndcapNeg);
-	  status=detStore->record(sAlignX,"LARCRYO_EC_NEG");
-	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_NEG");
-	}
-	*/
     world->add( new GeoNameTag("LArEndcapPos"));
     world->add(xfEndcapPos);
     world->add(endcapEnvelopePos);

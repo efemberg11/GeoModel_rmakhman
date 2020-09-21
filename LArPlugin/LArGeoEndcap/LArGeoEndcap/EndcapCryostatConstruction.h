@@ -20,6 +20,7 @@
 class GeoInpRecord;
 class GeoXmlMatManager;
 class LArGeoMaterialManager;
+class GeoPublisher;
 
 namespace LArGeo {
 
@@ -32,6 +33,7 @@ namespace LArGeo {
 
     EndcapCryostatConstruction(LArGeoMaterialManager* matman
 			       , bool fullGeo
+			       , GeoPublisher* publisher
 			       , std::string emecVariantInner = "Wheel"
 			       , std::string emecVariantOuter = "Wheel"
 			       , bool activateFT = false);
@@ -47,6 +49,7 @@ namespace LArGeo {
 
   private:
     LArGeoMaterialManager*  m_matman;
+    GeoPublisher*           m_publisher;
     int                     m_fcalVisLimit;
 
     EMECConstruction        m_emec;

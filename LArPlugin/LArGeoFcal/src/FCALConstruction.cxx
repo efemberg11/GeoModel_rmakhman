@@ -14,6 +14,7 @@
 #include "GeoModelKernel/GeoSerialIdentifier.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoXF.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
@@ -40,13 +41,14 @@
 #include <fstream>
 #include <stdexcept>
 
-LArGeo::FCALConstruction::FCALConstruction()
+LArGeo::FCALConstruction::FCALConstruction(GeoPublisher* publisher)
   : m_fcalPhysical(0)
   , m_absPhysical1(0)
   , m_absPhysical2(0)
   , m_absPhysical3(0)
   , m_VisLimit(0)
   , m_fullGeo(true)
+  , m_publisher(publisher)
 {
 }  
 
@@ -181,17 +183,11 @@ GeoVFullPhysVol* LArGeo::FCALConstruction::GetEnvelope(bool bPos)
     modPhysical = physVol;
 	
     std::string tag = bPos? std::string("FCAL1_POS") : std::string("FCAL1_NEG");
-/*
-    StatusCode status;
-	
-    StoredPhysVol *sPhysVol = new StoredPhysVol(physVol);
-    status=detStore->record(sPhysVol,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-    
-    StoredAlignX *sAlignX = new StoredAlignX(xfAbs1);
-    status=detStore->record(sAlignX,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-*/    
+
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(physVol,tag);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfAbs1,tag);
+    }
   }   
   // 16 Troughs representing  Cable Harnesses:
   if(m_fullGeo) {
@@ -271,18 +267,11 @@ GeoVFullPhysVol* LArGeo::FCALConstruction::GetEnvelope(bool bPos)
     modPhysical = physVol;
     
     std::string tag = bPos? std::string("FCAL2_POS") : std::string("FCAL2_NEG");
-/*
-    StatusCode status;
-	
-    StoredPhysVol *sPhysVol = new StoredPhysVol(physVol);
-    status=detStore->record(sPhysVol,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-    
-    StoredAlignX *sAlignX = new StoredAlignX(xfAbs2);
-    status=detStore->record(sAlignX,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-*/
-    
+
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(physVol,tag);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfAbs2,tag);
+    }
   }   
   // 16 Troughs representing  Cable Harnesses:
   if(m_fullGeo) {
@@ -368,17 +357,11 @@ GeoVFullPhysVol* LArGeo::FCALConstruction::GetEnvelope(bool bPos)
     modPhysical = physVol;
     
     std::string tag = bPos? std::string("FCAL3_POS") : std::string("FCAL3_NEG");
-/*
-    StatusCode status;
-    
-    StoredPhysVol *sPhysVol = new StoredPhysVol(physVol);
-    status=detStore->record(sPhysVol,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-    
-    StoredAlignX *sAlignX = new StoredAlignX(xfAbs3);
-    status=detStore->record(sAlignX,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-*/   
+
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(physVol,tag);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfAbs3,tag);
+    }
   }   
   // 16 Troughs representing  Cable Harnesses:
   if(m_fullGeo) {

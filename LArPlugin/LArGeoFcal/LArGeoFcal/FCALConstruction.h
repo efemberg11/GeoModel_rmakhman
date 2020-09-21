@@ -12,6 +12,7 @@
 #include "GeoXmlInpManager/GeoXmlInpManager.h"
 class GeoVFullPhysVol;
 class GeoFullPhysVol;
+class GeoPublisher;
 
 namespace LArGeo {
 
@@ -20,7 +21,7 @@ namespace LArGeo {
   public:
 
     // Constructor;
-    FCALConstruction();
+    FCALConstruction(GeoPublisher* publisher);
 
     // Destructor:
     virtual ~FCALConstruction();
@@ -55,6 +56,8 @@ namespace LArGeo {
     GeoInpRecordset_ptr  m_LArPosition;
 
     bool             m_fullGeo;  // true->FULL, false->RECO
+
+    GeoPublisher* m_publisher;
   };
 
  

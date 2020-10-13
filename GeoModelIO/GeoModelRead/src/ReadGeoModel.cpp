@@ -1566,19 +1566,22 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 				it++; // advance to the next parameter
 
-				unsigned int nVertexes = 0;
+                /*
+				unsigned int nVertexes = 0; // TODO: check how this is used
 				par = shapePars[it];
 				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				if (varName == "nV") nVertexes = std::stoi(varValue);
+				if (varName == "nV") {
+                    nVertexes = std::stoi(varValue);
+                }
 				else {
           muxCout.lock();
 					std::cout << "ERROR! - GeoTessellatedSolid - nVertices not defined!" << std::endl;
           muxCout.unlock();
 					error=true;
 				}
-
+                */
 
 				// if we get a QUAD ==> GeoQuadrangularFacet
 				if (facetType=="QUAD") {

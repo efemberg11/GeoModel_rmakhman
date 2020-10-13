@@ -19,7 +19,7 @@ void xtruHandler::ElementHandle()
 {
 
   std::string name=getAttributeAsString("name");
-  double lunit=getAttributeAsDouble("lunit");
+  //double lunit=getAttributeAsDouble("lunit"); // RMB: removed to stop the 'unused variable' warning
   
   // This interface is only for GeoSimplePolygonBrep.Checks are performed to
   // ensure a GSPB can be built out of the parameters being collected, in any

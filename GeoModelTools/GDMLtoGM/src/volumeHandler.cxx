@@ -56,7 +56,7 @@ void volumeHandler::ElementHandle()
 	theVolume=std::make_pair(tempLV,tempPV);
 	if (tempPhys.size()!=0)
 	{
-		for (int i=0;i<tempPhys.size();i++)
+		for (unsigned long i=0; i< tempPhys.size(); i++)
 		{
 			GeoPhysVol* pV=tempPhys[i];
 			if (tempTransform[i]) 

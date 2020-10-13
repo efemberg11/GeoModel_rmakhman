@@ -1020,7 +1020,7 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape)
 	  const GeoGenericTrap * shapeIn = dynamic_cast<const GeoGenericTrap*>(shape);
 	  pars.push_back("ZHalfLength=" + to_string_with_precision(shapeIn->getZHalfLength()));
 	  pars.push_back("NVertices="   + to_string_with_precision(shapeIn->getVertices().size()));
-	  for (int i=0; i<shapeIn->getVertices().size(); ++i) {
+	  for (unsigned long i=0; i<shapeIn->getVertices().size(); ++i) {
 	    pars.push_back("X=" + to_string_with_precision(shapeIn->getVertices()[i](0)));
 	    pars.push_back("Y=" + to_string_with_precision(shapeIn->getVertices()[i](1)));
 	  }
@@ -1450,7 +1450,7 @@ unsigned int WriteGeoModel::addTransform(const std::vector<double> &params)
 }
 
 
-unsigned int WriteGeoModel::addPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume)
+unsigned int WriteGeoModel::addPhysVol(const unsigned int &logVolId, const unsigned int & /*parentPhysVolId*/, const bool &isRootVolume)
 {
 	std::vector<std::vector<std::string>>* container = &m_physVols;
     std::vector<std::string> values;
@@ -1465,7 +1465,7 @@ unsigned int WriteGeoModel::addPhysVol(const unsigned int &logVolId, const unsig
 }
 
 
-unsigned int WriteGeoModel::addFullPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume)
+unsigned int WriteGeoModel::addFullPhysVol(const unsigned int &logVolId, const unsigned int & /*parentPhysVolId*/, const bool &isRootVolume)
 {
 	std::vector<std::vector<std::string>>* container = &m_fullPhysVols;
 	std::vector<std::string> values;
@@ -1632,7 +1632,8 @@ template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT st
         values.push_back(std::to_string(volID));
         values.push_back(keyTypeStr); // TODO: store the key type in a metadata table, not in the records' table; so it can be stored once only.
 
-        unsigned int recordID = addRecord(cachePublishedNodes, values);
+        // save the published nodes to the cache, to be later stored into the DB
+        /*unsigned int recordID = */addRecord(cachePublishedNodes, values);
         //std::cout << "Pushed record: " << recordID << std::endl; // debug msg
     }
 }

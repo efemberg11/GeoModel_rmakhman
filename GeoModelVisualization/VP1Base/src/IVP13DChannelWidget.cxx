@@ -131,11 +131,9 @@ void IVP13DChannelWidget::goingToNextEvent()
 }
 
 //_______________________________________________________
-QPixmap IVP13DChannelWidget::getSnapshot(bool transp, int width, bool /*batch*/)
+// TODO: see how to use the 'transp', 'width', and 'batch' parameters
+QPixmap IVP13DChannelWidget::getSnapshot(bool /*transp*/, int /*width*/, bool /*batch*/)
 {
-
-
-	
 	QScreen *screen=qApp->primaryScreen();
 	
         m_d->it = m_d->renderareas.begin();

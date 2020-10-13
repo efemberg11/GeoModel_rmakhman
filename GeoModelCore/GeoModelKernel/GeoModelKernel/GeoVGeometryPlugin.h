@@ -26,7 +26,7 @@ class GeoVGeometryPlugin
    GeoVGeometryPlugin() : m_publisher(nullptr) {}
      
   //! Parametrized constructor for plugins that publish lists of nodes 
-  GeoVGeometryPlugin(std::string name) : m_pluginName( name ), m_publisher(std::make_unique<GeoPublisher>()) {  m_publisher->setName(m_pluginName); } 
+  GeoVGeometryPlugin(std::string name) : m_publisher(std::make_unique<GeoPublisher>()), m_pluginName( name ) {  m_publisher->setName(m_pluginName); } 
     
 
   virtual ~GeoVGeometryPlugin() {}

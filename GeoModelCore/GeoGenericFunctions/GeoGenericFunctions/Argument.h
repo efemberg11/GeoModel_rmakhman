@@ -10,8 +10,8 @@
 // agglomerate the variables. It is similar to a vector.               // 
 //                                                                     //
 //---------------------------------------------------------------------//
-#ifndef __ARGUMENT_H_
-#define __ARGUMENT_H_
+#ifndef ARGUMENT_H
+#define ARGUMENT_H
 #include <iostream>
 #include <vector>
 #include <iterator>
@@ -61,14 +61,14 @@ namespace GeoGenfun {
   inline const Argument & Argument::operator=( const Argument & right) {
     if (this != &right) {
       delete _data;
-      _data=NULL;
+      _data = nullptr;
       _data = new std::vector<double>(*(right._data));
     }
     return *this;
   }
 
   inline unsigned int Argument::dimension() const {
-    return _data->size();
+    return static_cast<unsigned int>(_data->size());
   }
 
   inline double & Argument::operator[] (int i) {

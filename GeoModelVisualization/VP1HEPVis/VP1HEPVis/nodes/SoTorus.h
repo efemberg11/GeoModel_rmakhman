@@ -227,11 +227,11 @@ private:
 
   // vertex property node containing the geometry of the torus
   // SoRef<SoVertexProperty> m_vertexProperty; // TODO: this seems to be specific to  OpenInventor
-  SoVertexProperty* m_vertexProperty;
+  //SoVertexProperty* m_vertexProperty; // RMB: removed to stop the 'unused variable' warning
 
   // Internal shape representing the torus
   // SoRef<SoTriangleStripSet> m_internalShape; // TODO: this seems to be specific to  OpenInventor
-  SoTriangleStripSet* m_internalShape;
+  //SoTriangleStripSet* m_internalShape; // RMB: removed to stop the 'unused variable' warning
 
   // This cache handler is used as a flag to check whether or not the internal shape needs to be rebuilt.
   // It is also needed to add a dependency on one or more inventor elements, so that the cache

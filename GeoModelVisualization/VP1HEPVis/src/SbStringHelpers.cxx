@@ -5,9 +5,16 @@
 // this :
 
 #include <Inventor/C/errors/debugerror.h>
-#define private public
-#include <Inventor/SbPList.h>//hack to work around numitems not initialised in coin
-#undef private
+
+// starting ignoring the warnings for a few lines
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wkeyword-macro"
+  #define private public
+  #include <Inventor/SbPList.h>//hack to work around numitems not initialised in coin
+  #undef private
+#pragma clang diagnostic pop
+// ending ignoring the warnings
+
 #include "SbStringHelpers.h"
 
 #include <Inventor/SbString.h>

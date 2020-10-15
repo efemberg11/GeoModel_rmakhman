@@ -19,7 +19,7 @@ void xtruHandler::ElementHandle()
 {
 
   std::string name=getAttributeAsString("name");
-  double lunit=getAttributeAsDouble("lunit");
+  double lunit=getAttributeAsDouble("lunit"); 
   
   // This interface is only for GeoSimplePolygonBrep.Checks are performed to
   // ensure a GSPB can be built out of the parameters being collected, in any
@@ -59,10 +59,10 @@ void xtruHandler::ElementHandle()
   if ((theSections[0].xOffset!=0 || theSections[0].yOffset!=0) || (theSections[1].xOffset!=0 || theSections[1].yOffset!=0)) throw; // no offset
   if ((theSections[0].zPosition+theSections[1].zPosition) != 0) throw;  // centered at z=0
   
-  pgsb=new GeoSimplePolygonBrep(std::fabs(theSections[1].zPosition));
+  pgsb=new GeoSimplePolygonBrep(std::fabs(lunit*theSections[1].zPosition));
   for (auto vt: theVertices) 
   {
-  	pgsb->addVertex(vt.xv,vt.yv);
+  	pgsb->addVertex(lunit*vt.xv,lunit*vt.yv);
   }
   
   

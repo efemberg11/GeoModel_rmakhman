@@ -27,7 +27,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Setting CMAKE_CXX_FLAGS to avoid "deprecated" warnings
-set(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations" )
+set(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations" ) # very basic
+#set(CMAKE_CXX_FLAGS "-Wall -Werror -pedantic-errors -Wno-deprecated-declarations" ) # good enough for a quick, better check
+#set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic-errors -Wno-deprecated-declarations" ) # better for a thorough check
+#set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic-errors" ) # better for an even more severe check
+#set(CMAKE_CXX_FLAGS "-Weverything -Werror -pedantic-errors" ) # not recommended, it warns for really EVERYTHING!
 
 
 # TODO: for Debug and with GCC, do we want to set the flags below by default?

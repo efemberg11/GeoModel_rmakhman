@@ -393,7 +393,8 @@ void VP1Controller::restoreSettings(QByteArray ba)
   if (m_d->collWidget)
     s.ignoreWidget(m_d->collWidget);
   s.warnUnrestored((QWidget*)(this));
-  QPair<QPushButton*,QWidget*> b2d;
+
+  //QPair<QPushButton*,QWidget*> b2d;// RMB: removed to stop the 'unused variable' warning
   foreach (Imp::DialogInfo* di,m_d->dialogs)
     s.warnUnrestored(di->dialogWidget);
 
@@ -413,9 +414,9 @@ QByteArray VP1Controller::saveSettings() const
   //Warn unsaved:
   if (m_d->collWidget)
     s.ignoreWidget(m_d->collWidget);
-
   s.warnUnsaved((QWidget*)(this));
-  QPair<QPushButton*,QWidget*> b2d;
+
+  //QPair<QPushButton*,QWidget*> b2d;// RMB: removed to stop the 'unused variable' warning
   foreach (Imp::DialogInfo* di,m_d->dialogs)
     s.warnUnsaved(di->dialogWidget);
 

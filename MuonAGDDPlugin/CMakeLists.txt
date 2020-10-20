@@ -4,7 +4,7 @@ project( "MuonAGDDPlugin" VERSION 1.0.0 LANGUAGES CXX )
 
 # Set default build options.
 set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
-set( CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard used for the build" )
+set( CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard used for the build" )
 set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 
 find_package( AGDD REQUIRED )

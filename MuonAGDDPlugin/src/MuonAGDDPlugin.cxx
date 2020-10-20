@@ -35,7 +35,7 @@ class MuonAGDDPlugin : public GeoVGeometryPlugin  {
   ~MuonAGDDPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoVStore* store);
+  virtual void create(GeoPhysVol *world, bool publish);
 
  private:
 
@@ -60,7 +60,7 @@ MuonAGDDPlugin::~MuonAGDDPlugin()
 
 
 //## Other Operations (implementation)
-void MuonAGDDPlugin::create(GeoPhysVol *world, GeoVStore*)
+void MuonAGDDPlugin::create(GeoPhysVol *world, bool publish)
 {
 
   	std::cout<< "MuonAGDDPlugin: creating an AGDDController "<<std::endl;

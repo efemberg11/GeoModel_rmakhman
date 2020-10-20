@@ -26,7 +26,7 @@ class AGDDPlugin : public GeoVGeometryPlugin  {
   ~AGDDPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, GeoVStore* store);
+  virtual void create(GeoPhysVol *world, bool publish);
 
  private:
 
@@ -51,7 +51,7 @@ AGDDPlugin::~AGDDPlugin()
 
 
 //## Other Operations (implementation)
-void AGDDPlugin::create(GeoPhysVol *world, GeoVStore*)
+void AGDDPlugin::create(GeoPhysVol *world, bool publish)
 {
 
   	std::cout<< "creating an AGDDController "<<std::endl;

@@ -23,6 +23,7 @@
 #include "MyGVPhysicsList.hh"
 
 #include "MyActionInitialization.hh"
+#include "PythiaPrimaryGeneratorAction.hh"
 
 #include <getopt.h>
 #include <err.h>
@@ -121,6 +122,7 @@ static struct option options[] = {
     {"physics list name     "  , required_argument, 0, 'f'},
     {"performance flag      "  , no_argument      , 0, 'p'},
     {"geometry file name    "  , required_argument, 0, 'g'},
+    {"pythia"                  , required_argument, 0, 'P'},
     {"overlap geometry check"  , no_argument      , 0, 'o'},
     {"help"                    , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
@@ -136,6 +138,7 @@ void Help() {
             <<"      -g :   REQUIRED : the Geometry file name \n"
             <<"      -o :   flag  ==> run the geometry overlap check (default: FALSE)\n"
             <<"      -f :   physics list name (default: FTFP_BERT) \n"
+            <<"      -P :   generate events with Pythia [config. available: ttbar/higgs/minbias or use .txt input file]\n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"<< std::endl;
     
@@ -147,7 +150,6 @@ void Help() {
   std::cout<<"\n "<<std::setw(100)<<std::setfill('=')<<""<<std::setfill(' ')<<std::endl;
 }
 
-
 void GetInputArguments(int argc, char** argv) {
   // process arguments
   if (argc == 1) {
@@ -156,13 +158,23 @@ void GetInputArguments(int argc, char** argv) {
   }
   while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "pm:f:g:oh", options, &optidx);
+   c = getopt_long(argc, argv, "P:pm:f:g:oh", options, &optidx);
    if (c == -1)
      break;
    //
    switch (c) {
    case 0:
      c = options[optidx].val;
+     break;
+   case 'P':
+#if USE_PYTHIA
+     set_pythia_config(optarg);
+     // Need to enable performance mode, as user actions require particle gun setup
+     parIsPerformance = true;
+#else
+     std::cerr << "Support for Pythia is not available." << std::endl;
+     exit(1);
+#endif
      break;
    case 'p':
      parIsPerformance = true;

@@ -34,6 +34,8 @@ add_subdirectory(MagneticField)
 find_package(Geant4 REQUIRED)
 #----------------------------------------------------------------------------
 
+find_package(Pythia)
+
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
@@ -62,6 +64,10 @@ add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 add_executable(testMagneticField testMagneticField.cc)
 add_executable(gmtogdml geoModeltoGDML.cc ${sources} ${headers})
 
+if(Pythia_FOUND)
+  target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
+  target_link_libraries(fullSimLight Pythia::Pythia)
+endif()
 
 #----------------------------------------------------------------------------
 # Add extra 'include' directories

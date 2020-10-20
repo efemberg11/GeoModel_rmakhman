@@ -8,6 +8,7 @@
 #include "MyTrackingAction.hh"
 #include "MyLengthIntegratorEventAction.hh"
 #include "MyLengthIntegratorSteppingAction.hh"
+#include "PythiaPrimaryGeneratorAction.hh"
 
 #include "G4MultiRunAction.hh"
 #include "G4MultiEventAction.hh"
@@ -32,7 +33,16 @@ void MyActionInitialization::BuildForMaster() const {
 
 
 void MyActionInitialization::Build() const {
+
+#if !USE_PYTHIA
   SetUserAction(new MyPrimaryGeneratorAction());
+#else
+  if (use_pythia())
+    SetUserAction(new PythiaPrimaryGeneratorAction());
+  else
+    SetUserAction(new MyPrimaryGeneratorAction());
+#endif
+
 #ifndef G4MULTITHREADED
 // in sequential mode the BuildForMaster method is not called:
 // - create the only one run action with perfomance flag true i.e. only time is measured

@@ -6,9 +6,9 @@
 #include "GeoSpecialShapes/sincos.h"
 //#include "CLHEP/Units/SystemOfUnits.h"
 
-/// TO DO        : Dependencies from fROOT - gone
-/// TO BE TESTED : RowVectorXd equivalent of TVectorD
-///                MatrixXd    equivalent of TMatrixD
+/// Dependencies from fROOT - gone
+/// TESTED : VectorXd Eigin equivalent of TVectorD
+///          MatrixXd Eigen equivalent of TMatrixD
 
 //#include "TMath.h"
 //#include "TMatrixD.h"
@@ -82,14 +82,10 @@ findLinearApproximation(
   //TMatrixDSym Ainv(A);
   MatrixXd Ainv(A);
   //Ainv.Invert();
-  Ainv.inverse();
+  //the inverse() function of Eigen doesn't modify the matrix
+  MatrixXd inverse=A.inverse().eval();
 
-  // std::cout << "Ainv: " << std::endl;
-  // std::cout << Ainv << std::endl;
-  // std::cout << "vY: " << std::endl;
-  // std::cout << vY << std::endl;
-
-  return Ainv*vY;
+  return inverse*vY;
 }
 
 void LArWheelCalculator::fill_sincos_parameterization()

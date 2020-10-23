@@ -227,7 +227,7 @@ LArWheelCalculator::LArWheelCalculator(LArG4::LArWheelCalculator_t a_wheelType, 
    //m_zWheelFrontFace = 999;//      : " << m_zWheelFrontFace / cm << " [cm]" << std::endl
    //m_zWheelBackFace = 999;//       : " << m_zWheelBackFace / cm << " [cm]" << std::endl
    //m_zShift = 999;//               : " << m_zShift / cm << " [cm]" << std::endl
-   m_phiRotation = true;//? "true": "false") << std::endl
+   //m_phiRotation = true;//? "true": "false") << std::endl
    //m_eta_low = 999;//
    //m_eta_mid = 999;//
    //m_eta_hi = 999;//
@@ -370,23 +370,25 @@ LArWheelCalculator::LArWheelCalculator(LArG4::LArWheelCalculator_t a_wheelType, 
   //msg << MSG::VERBOSE << "Loading SlantAngle parameters ...";
   std::string slant_params;
 
-    //TO DO : needed?
-//  if (m_isInner) {
-//    EMECParams_recs.param(slant_params,  "INNERSLANTPARAM");
-//  } else {
-//    EMECParams_recs.param(slant_params,  "OUTERSLANTPARAM");
-//  }
+    //TO DO : needed? not really, they are both "default"
+  if (m_isInner) {
+      slant_params = "default";
+    //EMECParams_recs.param(slant_params,  "INNERSLANTPARAM");
+  } else {
+      slant_params = "default";
+    //EMECParams_recs.param(slant_params,  "OUTERSLANTPARAM");
+  }
 
   //msg << (m_isInner?" InnerWheel ":" OuterWheel ") << slant_params << endmsg;
 
   if(slant_params != "" && slant_params != "default"){
     double a, b, c, d, e;
     if(sscanf(slant_params.c_str(), "%80le %80le %80le %80le %80le", &a, &b, &c, &d, &e) != 5){
-      //msg << MSG::ERROR
-      //    << "LArWheelCalculator: ERROR: wrong value(s) "
-      //    << "for EMEC slant angle parameters: "
-      //    << slant_params << ", "
-      //    << "defaults are used" << endmsg;
+        std::cout << MSG::ERROR
+          << "LArWheelCalculator: ERROR: wrong value(s) "
+          << "for EMEC slant angle parameters: "
+          << slant_params << ", "
+        << "defaults are used" << std::endl;
     } else {
       m_slant_parametrization[0] = a;
       m_slant_parametrization[1] = b;

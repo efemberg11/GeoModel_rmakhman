@@ -384,7 +384,7 @@ LArWheelCalculator::LArWheelCalculator(LArG4::LArWheelCalculator_t a_wheelType, 
   if(slant_params != "" && slant_params != "default"){
     double a, b, c, d, e;
     if(sscanf(slant_params.c_str(), "%80le %80le %80le %80le %80le", &a, &b, &c, &d, &e) != 5){
-        std::cout << MSG::ERROR
+        std::cout
           << "LArWheelCalculator: ERROR: wrong value(s) "
           << "for EMEC slant angle parameters: "
           << slant_params << ", "

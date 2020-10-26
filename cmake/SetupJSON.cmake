@@ -23,6 +23,8 @@ if( GEOMODEL_USE_BUILTIN_JSON )
    set( nlohmann_json_INCLUDE_DIR
       "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/JSONInstall/${CMAKE_INSTALL_INCLUDEDIR}" )
    set( nlohmann_json_INCLUDE_DIRS "${nlohmann_json_INCLUDE_DIR}" )
+   set( nlohmann_json_VERSION "3.6.1" )
+   set( nlohmann_json_FOUND TRUE )
    message(STATUS "Installing the built-in 'nlohmann_json' in: ${nlohmann_json_INCLUDE_DIR}")
 
    # Create the include directory already, otherwise CMake refuses to
@@ -34,7 +36,7 @@ if( GEOMODEL_USE_BUILTIN_JSON )
    ExternalProject_Add( JSONExt
       PREFIX ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/JSONBuild
       INSTALL_DIR ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/JSONInstall
-      URL "https://cern.ch/lcgpackages/tarFiles/sources/json-3.6.1.tar.gz"
+      URL "https://cern.ch/lcgpackages/tarFiles/sources/json-${nlohmann_json_VERSION}.tar.gz"
       URL_MD5 "c53592d55e7fec787cf0a406d36098a3"
       CMAKE_CACHE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}

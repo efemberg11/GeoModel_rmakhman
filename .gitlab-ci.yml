@@ -17,6 +17,9 @@ variables:
 .macos-template-job: &macos-job
   tags:
     - macos
+  rules:
+    - if: '$CI_REPOSITORY_URL == "https://gitlab.cern.ch/GeoModelDev/GeoModel.git"'
+      when: on_success
   allow_failure: true
   timeout: 30 minutes
   before_script:
@@ -24,7 +27,7 @@ variables:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
   after_script:
     - brew remove nlohmann-json xerces-c
-    
+
 
 .ubuntu-template-job-base: &ubuntu-job-base
   image: ubuntu:18.04
@@ -38,7 +41,10 @@ variables:
 .ubuntu-template-job-default: &ubuntu-job
   <<: *ubuntu-job-base
   before_script:
-    - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
+    - apt-get update -qq && apt-get install -y -qq git wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
+    - wget https://cmake.org/files/v3.14/cmake-3.14.7-Linux-x86_64.tar.gz
+    - tar -C /usr/local --strip-components=1 --no-same-owner -xvf cmake-*-Linux-x86_64.tar.gz
+    - rm cmake-*-Linux-x86_64.tar.gz
 
 
 # .ubuntu-template-job-registry: &ubuntu-job-registry

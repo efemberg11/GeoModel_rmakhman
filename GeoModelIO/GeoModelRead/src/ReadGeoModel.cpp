@@ -86,27 +86,37 @@ std::mutex muxCout;
 using namespace GeoGenfun;
 using namespace GeoXF;
 
+// Set default (false) values for the debugging variables.
+#ifndef GEOMODEL_IO_READ_DEBUG
+#define GEOMODEL_IO_READ_DEBUG false
+#endif // not GEOMODEL_IO_READ_DEBUG
+#ifndef GEOMODEL_IO_DEBUG_VERBOSE
+#define GEOMODEL_IO_DEBUG_VERBOSE false
+#endif // not GEOMODEL_IO_DEBUG_VERBOSE
+#ifndef GEOMODEL_IO_READ_TIMING
+#define GEOMODEL_IO_READ_TIMING false
+#endif // not GEOMODEL_IO_READ_TIMING
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDebug(false),
-  m_debug(false), m_timing(false), m_runMultithreaded(false),
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDebug(GEOMODEL_IO_DEBUG_VERBOSE),
+  m_debug(GEOMODEL_IO_READ_DEBUG), m_timing(GEOMODEL_IO_READ_TIMING), m_runMultithreaded(false),
   m_runMultithreaded_nThreads(0), m_progress(nullptr)
 {
   // Check if the user asked for debug messages
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_READ_DEBUG")) {
     m_debug = true;
-    std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will see a verbose output." << std::endl;
+    std::cout << "You defined the GEOMODEL_ENV_IO_DEBUG variable, so you will see a verbose output." << std::endl;
   }
   // Check if the user asked for verbose debug messages
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_DEBUG_VERBOSE")) {
     m_deepDebug = true;
-    std::cout << "You defined the GEOMODEL_IO_READ_DEBUG_VERBOSE variable, so you will see a verbose output." << std::endl;
+    std::cout << "You defined the GEOMODEL_ENV_IO_READ_DEBUG_VERBOSE variable, so you will see a verbose output." << std::endl;
   }
   // Check if the user asked for timing output
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_READ_TIMING")) {
     m_timing = true;
-    std::cout << "You defined the GEOMODEL_IO_READ_TIMING variable, so you will see a timing measurement in the output." << std::endl;
+    std::cout << "You defined the GEOMODEL_ENV_IO_READ_TIMING variable, so you will see a timing measurement in the output." << std::endl;
   }
 
 	if ( progress != nullptr) {
@@ -2731,7 +2741,7 @@ bool ReadGeoModel::isBuiltElement(const unsigned int id)
 }
 void ReadGeoModel::storeBuiltElement(GeoElement* nodePtr)
 {
-  m_memMapElements.push_back(nodePtr); // vector, we store them in the order of IDs 
+  m_memMapElements.push_back(nodePtr); // vector, we store them in the order of IDs
 }
 GeoElement* ReadGeoModel::getBuiltElement(const unsigned int id)
 {

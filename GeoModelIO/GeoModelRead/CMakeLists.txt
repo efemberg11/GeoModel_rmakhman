@@ -1,9 +1,17 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 ################################################################################
 # Package: GeoModelRead
 # author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - 2017
 # major updates: rbianchi@cern.ch, 2018
 ################################################################################
+
+# Set up configuration variables for turning certain build flags on or off.
+option( GEOMODEL_IO_READ_DEBUG
+   "Turn on debug level output from the GeoModel I/O code by default" FALSE )
+option( GEOMODEL_IO_DEBUG_VERBOSE
+   "Turn on verbose level output from the GeoModel I/O code by default" FALSE )
+option( GEOMODEL_IO_READ_TIMING
+   "Turn on timing measurements in the GeoModel I/O code by default" FALSE )
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cpp )
@@ -21,6 +29,14 @@ source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoModelRead PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
+
+# Set up custom build flags for the library.
+foreach( _flag GEOMODEL_IO_READ_DEBUG GEOMODEL_IO_DEBUG_VERBOSE
+   GEOMODEL_IO_READ_TIMING )
+   if( ${${_flag}} )
+      target_compile_definitions( GeoModelRead PRIVATE ${_flag}=true )
+   endif()
+endforeach()
 
 # Install the library.
 install( TARGETS GeoModelRead

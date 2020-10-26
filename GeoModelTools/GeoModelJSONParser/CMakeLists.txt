@@ -11,10 +11,6 @@ add_library( GeoModelJSONParser SHARED ${HEADERS} ${SOURCES} )
 # If the in-house build of the nlohmann_json library is used, add explicit dependency
 if( GEOMODEL_USE_BUILTIN_JSON )
   add_dependencies( GeoModelJSONParser JSONExt )
-  # Acquire Installation Directory of JSONExt
-  ExternalProject_Get_Property (JSONExt install_dir)
-  # Include the installed 'include' PATH
-  include_directories (${install_dir}/include)
 endif()
 
 # We link to `nlohmann_json` only  if we use a version of nlohmann_json

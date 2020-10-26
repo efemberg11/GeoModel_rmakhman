@@ -3,16 +3,13 @@
 # === Preamble ===
 cmake_minimum_required(VERSION 3.10)
 project( "GeoModel" VERSION 1.0.0 LANGUAGES CXX )
-# enable_testing()
-
 
 # === Project wide setup ===
 # Make the 'cmake' module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+
 # Define color codes for CMake messages
 include( cmake_colors_defs )
-# Set build and C++ default options
-include( configure_cpp_options )
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 # Set a default build type
@@ -20,10 +17,30 @@ include( BuildType )
 # Print Build Info on screen
 include( PrintBuildInfo )
 
+# Set default build options.
+set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
+set( CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard used for the build" )
+set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
+set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
+   "Require the specified C++ standard for the build" )
+
 # === Externally provided content ===
-# Make the 'dependencies' module directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/dependencies )
-include(Dependencies)
+
+# By default prefer not to use frameworks on macOS.
+# But use it at a "LAST" resource, if no other options worked.
+# For details on the behaviour of this cache variable, see:
+# - https://cmake.org/cmake/help/v3.0/command/find_file.html
+set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
+   "Framework finding behaviour on macOS" )
+
+# Set up how the project handle some of its dependenices. Either by picking them
+# up from the environment, or building them itself.
+include( SetupEigen3 )
+include( SetupXercesC )
+include( SetupJSON )
+
+# Find the dependencies that the project always picks up from its environment.
+find_package( SQLite3 )
 
 # === Main targets built by this project ===
 
@@ -90,9 +107,3 @@ getCSVStringFromList( "${BUILT_PACKAGES}" BUILT_PACKAGES_STR )
 message(STATUS "${BoldWhite}-----${ColourReset}")
 message( STATUS "${BoldGreen}Building the following ${BUILT_PACKAGES_LENGTH} packages: ${BUILT_PACKAGES_STR}${ColourReset}")
 message(STATUS "${BoldWhite}-----${ColourReset}")
-
-# === Things typically only needed if we are the top level project ===
-# if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-#     add_subdirectory(tests)
-#     add_subdirectory(packaging)
-# endif()

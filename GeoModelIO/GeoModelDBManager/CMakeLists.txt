@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 ################################################################################
 # Package: GeoModelDBManager
 # author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - 2017
@@ -6,14 +6,12 @@
 ################################################################################
 
 # Find the header and source files.
-file( GLOB SOURCES src/*.cpp  )
-file( GLOB HEADERS GeoModelDBManager/*.h fmt/*.h )
+file( GLOB SOURCES src/*.cpp fmt/*.h )
+file( GLOB HEADERS GeoModelDBManager/*.h )
 
 # Set up the library.
 add_library( GeoModelDBManager SHARED ${HEADERS} ${SOURCES} )
-
-target_link_libraries( GeoModelDBManager PUBLIC sqlite3 )
-
+target_link_libraries( GeoModelDBManager PUBLIC SQLite::SQLite3 )
 target_include_directories( GeoModelDBManager PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -6,8 +6,8 @@ file( GLOB HEADERS GeoModelKernel/*.h GeoModelKernel/*.tpp )
 
 # Create the library.
 add_library( GeoModelKernel SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoModelKernel PUBLIC GeoGenericFunctions ${CMAKE_DL_LIBS} )
-target_include_directories( GeoModelKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} )
+target_link_libraries( GeoModelKernel PUBLIC Eigen3::Eigen GeoGenericFunctions
+   ${CMAKE_DL_LIBS} )
 target_include_directories( GeoModelKernel PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

@@ -8,15 +8,9 @@ set(MYLIB_VERSION_PATCH 0)
 
 project ( "GXGeometryPlugin" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-if ( APPLE )
-	find_package(OpenGL REQUIRED)
-endif()
-#find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-
 find_package( Coin REQUIRED )
 find_package( SoQt REQUIRED )
-find_package( Qt5 COMPONENTS Core Gui Widgets Sql )
-# find_package( Eigen3 REQUIRED )
+find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport )
 if( APPLE )
   find_package(OpenGL REQUIRED)
 endif()
@@ -35,7 +29,8 @@ set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
 QT5_WRAP_UI(UI_HDRS ${UIS})
 
 
-include_directories ("${EIGEN3_INCLUDE_DIR}")
+# TODO: these include directories should not be explicitly declared, 
+#       they should be taken by CMake automatically...
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
@@ -43,20 +38,26 @@ include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1GeometrySystems")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1GuideLineSystems")
 include_directories ("${PROJECT_SOURCE_DIR}/../GXClashPointSystems")
+
+
 add_library ( GXGeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 
-# External dependencies:
-include_directories(${Qt5Core_INCLUDE_DIRS} )
-include_directories(${Qt5Gui_INCLUDE_DIRS} )
-include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Network_INCLUDE_DIRS} )
-include_directories(${Qt5Sql_INCLUDE_DIRS} )
-include_directories(${Coin_INCLUDE_DIRS} )
-include_directories(${SoQt_INCLUDE_DIRS} )
-include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-target_link_libraries (GXGeometryPlugin ${Qt5Core_LIBRARIES} GXGeometrySystems GXGuideLineSystems  GXClashPointSystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GeoModelKernel GeoGenericFunctions GeoModelRead TFPersistification GeoModelDBManager )
+# Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
+# i.e., after having already compiled the base packages (GeoModelCore). 
+# This is used when building distribution packages. 
+find_package( GeoModelCore 4.0.0 )  # TODO: we should use ${GeoModelCore_VERSION} set upstream even when individually built 
+if( GeoModelCore_FOUND ) # if built individually
+    target_link_libraries( GXGeometryPlugin PUBLIC GeoModelCore::GeoModelKernel )
+else() # if built as part of the build of GeoModelCore and the other base libraries
+    target_link_libraries( GXGeometryPlugin PUBLIC GeoModelKernel )
+endif()
+find_package( GeoModelIO 4.0.0 )  # TODO: we should use ${GeoModelIO_VERSION} set upstream even when individually built 
+if( GeoModelIO_FOUND ) # if built individually
+    target_link_libraries( GXGeometryPlugin PUBLIC GeoModelIO::GeoModelRead GeoModelIO::GeoModelDBManager GeoModelIO::TFPersistification GeoModelCore::GeoGenericFunctions GeoModelCore::GeoModelKernel )
+else() # if built as part of the build of GeoModelCore and the other base libraries
+    target_link_libraries( GXGeometryPlugin PUBLIC GeoModelRead GeoModelDBManager TFPersistification GeoGenericFunctions GeoModelKernel )
+endif()
+target_link_libraries (GXGeometryPlugin PUBLIC GXGeometrySystems GXGuideLineSystems  GXClashPointSystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::PrintSupport )
 add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGeometryPlugin

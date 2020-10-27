@@ -32,9 +32,7 @@ set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
 QT5_WRAP_UI(UI_HDRS ${UIS})
 
 
-include_directories ("${EIGEN3_INCLUDE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 
@@ -50,32 +48,34 @@ if( GEOMODEL_USE_BUILTIN_JSON )
 endif()
 
 
-# External dependencies:
-include_directories(${Qt5Core_INCLUDE_DIRS} )
-include_directories(${Qt5Gui_INCLUDE_DIRS} )
-include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Sql_INCLUDE_DIRS} )
-include_directories(${Coin_INCLUDE_DIR} )
-include_directories(${SoQt_INCLUDE_DIRS} )
-include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-
-
 # We link to `nlohmann_json` only  if we use a version of nlohmann_json
 # that provides a CMake config file (i.e., either built from source, or also
 # installed with Homebrew on macOS).
 # This is not needed if the single-header library is installed in a regular
 # system include folder (e.g., '/usr/local/include', '/usr/include', ...)
 if ( nlohmann_json_FOUND )
-  target_link_libraries( GXGeometrySystems nlohmann_json::nlohmann_json )
+    target_link_libraries( GXGeometrySystems PUBLIC nlohmann_json::nlohmann_json )
+endif()
+# Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
+# i.e., after having already compiled the base packages (GeoModelCore). 
+# This is used when building distribution packages. 
+find_package( GeoModelCore 4.0.0 )
+if( GeoModelCore_FOUND ) # if built individually
+    target_link_libraries( GXGeometrySystems PUBLIC GeoModelCore::GeoModelKernel )
+else() # if built as part of the build of GeoModelCore and the other base libraries
+    target_link_libraries( GXGeometrySystems PUBLIC GeoModelKernel )
+endif()
+find_package( GeoModelIO 4.0.0 )
+if( GeoModelIO_FOUND ) # if built individually
+    target_link_libraries( GXGeometrySystems PUBLIC GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
+else() # if built as part of the build of GeoModelCore and the other base libraries
+    target_link_libraries( GXGeometrySystems PUBLIC GeoModelRead GeoModelWrite )
 endif()
 
+target_link_libraries (GXGeometrySystems PUBLIC SoQt::SoQt Coin::Coin Qt5::Core 
+    GXGui GXBase GXHEPVis Qt5::Gui Qt5::Widgets Qt5::PrintSupport )
 if ( APPLE )
   target_link_directories (GXGeometrySystems PUBLIC ${Coin_LIB_DIR} )
-  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelRead GeoModelWrite  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-  else()
-  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelRead GeoModelWrite  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 endif()
 
 

@@ -7,9 +7,22 @@ project( "GeoModelVisualization" VERSION 3.2.0 LANGUAGES CXX )
 # Set the OpenGL flag requested by CMake
 set( OpenGL_GL_PREFERENCE GLVND )
 
-
-# Make the module directory visible to CMake.
-# list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    # I am top-level project.
+    message(STATUS "Building ${PROJECT_NAME} individually, as a top-level project.")
+    # Make the root module directory visible to CMake.
+    list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
+    # Set default build and C++ options
+    include( configure_cpp_options )
+    set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
+         "Framework finding behaviour on macOS" )
+    # Set up how the project handle some of its dependenices. Either by picking them
+    # up from the environment, or building them itself.
+    include( SetupJSON )
+else()
+    # I am called from other project with add_subdirectory().
+    message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
+endif()
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )

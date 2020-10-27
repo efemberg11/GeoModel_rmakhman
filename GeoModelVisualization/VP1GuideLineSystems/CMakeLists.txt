@@ -36,21 +36,29 @@ include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 add_library ( GXGuideLineSystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 
 # External dependencies:
-include_directories(${Qt5Core_INCLUDE_DIRS} )
-include_directories(${Qt5Gui_INCLUDE_DIRS} )
-include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Sql_INCLUDE_DIRS} )
-include_directories(${Coin_INCLUDE_DIR} )
-include_directories(${SoQt_INCLUDE_DIRS} )
-include_directories(${VP1HEPVis_INCLUDE_DIRS} )
+#include_directories(${Qt5Core_INCLUDE_DIRS} )
+#include_directories(${Qt5Gui_INCLUDE_DIRS} )
+#include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
+#include_directories(${Qt5Widgets_INCLUDE_DIRS} )
+#include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
+#include_directories(${Qt5Sql_INCLUDE_DIRS} )
+#include_directories(${Coin_INCLUDE_DIR} )
+#include_directories(${SoQt_INCLUDE_DIRS} )
+#include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 
+
+# Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
+# i.e., after having already compiled the base packages (GeoModelCore). 
+# This is used when building distribution packages. 
+find_package( GeoModelCore ${GeoModelCore_VERSION} )
+if( GeoModelCore_FOUND ) # if built individually
+    target_link_libraries( GXGuideLineSystems PUBLIC GeoModelCore::GeoModelKernel )
+else() # if built as part of the build of GeoModelCore and the other base libraries
+    target_link_libraries( GXGuideLineSystems PUBLIC GeoModelKernel )
+endif()
+target_link_libraries (GXGuideLineSystems PUBLIC SoQt::SoQt Coin::Coin Qt5::Core GXGui GXBase GXHEPVis Qt5::Gui Qt5::Widgets Qt5::PrintSupport )
 if ( APPLE )
   target_link_directories (GXGuideLineSystems PUBLIC ${Coin_LIB_DIR} )
-  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-  else()
-  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 endif()
 
 

@@ -16,13 +16,8 @@ include( GNUInstallDirs )
 include( BuildType )
 # Print Build Info on screen
 include( PrintBuildInfo )
-
-# Set default build options.
-set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
-set( CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard used for the build" )
-set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
-set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
-   "Require the specified C++ standard for the build" )
+# Set default build and C++ options
+include( configure_cpp_options )
 
 # === Externally provided content ===
 
@@ -40,7 +35,7 @@ include( SetupXercesC )
 include( SetupJSON )
 
 # Find the dependencies that the project always picks up from its environment.
-find_package( SQLite3 )
+find_package( SQLite3 3.7.11 )
 
 # === Main targets built by this project ===
 

@@ -7,7 +7,7 @@
 //#include "CLHEP/Units/SystemOfUnits.h"
 
 /// Dependencies from fROOT - gone
-/// TESTED : VectorXd Eigin equivalent of TVectorD
+/// TESTED : VectorXd Eigen equivalent of TVectorD
 ///          MatrixXd Eigen equivalent of TMatrixD
 
 //#include "TMath.h"
@@ -80,12 +80,13 @@ findLinearApproximation(
   }
 
   //TMatrixDSym Ainv(A);
-  MatrixXd Ainv(A);
   //Ainv.Invert();
-  //the inverse() function of Eigen doesn't modify the matrix
-  MatrixXd inverse=A.inverse().eval();
+    
+  // N.B.: The inverse() function of Eigen doesn't modify the matrix
+  // instead it returns the inverse matrix
+  MatrixXd Ainv=A.inverse().eval();
 
-  return inverse*vY;
+  return Ainv*vY;
 }
 
 void LArWheelCalculator::fill_sincos_parameterization()

@@ -370,14 +370,15 @@ LArWheelCalculator::LArWheelCalculator(LArG4::LArWheelCalculator_t a_wheelType, 
   //msg << MSG::VERBOSE << "Loading SlantAngle parameters ...";
   std::string slant_params;
 
-    //TO DO : needed? not really, they are both "default"
-  if (m_isInner) {
-      slant_params = "default";
-    //EMECParams_recs.param(slant_params,  "INNERSLANTPARAM");
-  } else {
-      slant_params = "default";
-    //EMECParams_recs.param(slant_params,  "OUTERSLANTPARAM");
-  }
+  //TO DO : needed? not really, they are both "default"
+//  if (m_isInner) {
+//      slant_params = "default";
+//    //EMECParams_recs.param(slant_params,  "INNERSLANTPARAM");
+//  } else {
+//      slant_params = "default";
+//    //EMECParams_recs.param(slant_params,  "OUTERSLANTPARAM");
+//  }
+  slant_params = "default";
 
   //msg << (m_isInner?" InnerWheel ":" OuterWheel ") << slant_params << endmsg;
 

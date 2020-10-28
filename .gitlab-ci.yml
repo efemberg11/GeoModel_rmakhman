@@ -171,6 +171,7 @@ variables:
 
 # ACTUAL BUILD JOBS
 
+
 ### MACOS BUILD JOBS
 mac-coin:
   <<: *macos-job
@@ -275,3 +276,41 @@ ubu-gm-fullsimlight-builtinjson:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
+
+
+### Documentation
+
+docs-build:
+    stage: step-A
+    image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
+    before_script:
+        - pip install markdown-include
+        - pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
+    script:
+        #- git --version #TODO: update the docker image to have git
+        - ls
+        - cd documentation
+        - ls
+        - mkdocs build --clean --site-dir public
+        - ls
+        - cp .htaccess public/papers/internal/
+        - ls
+    artifacts:
+        paths:
+            - documentation/public
+        expire_in: 1 hour
+
+docs-deploy:
+    stage: step-B
+    needs: ["docs-build"]
+    variables:
+      "EOS_PATH": "/eos/project/g/geomodel/www/home"
+    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+    #only:
+    #    - master
+    script:
+        - ls
+        - cd documentation
+        - ls
+        - deploy-eos
+

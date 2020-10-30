@@ -45,13 +45,13 @@ add_library ( GXGeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 # Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
 # i.e., after having already compiled the base packages (GeoModelCore). 
 # This is used when building distribution packages. 
-find_package( GeoModelCore 4.0.0 )  # TODO: we should use ${GeoModelCore_VERSION} set upstream even when individually built 
+find_package( GeoModelCore 4.0.0 QUIET )  # TODO: we should use ${GeoModelCore_VERSION} set upstream even when individually built 
 if( GeoModelCore_FOUND ) # if built individually
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelCore::GeoModelKernel )
 else() # if built as part of the build of GeoModelCore and the other base libraries
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelKernel )
 endif()
-find_package( GeoModelIO 4.0.0 )  # TODO: we should use ${GeoModelIO_VERSION} set upstream even when individually built 
+find_package( GeoModelIO 4.0.0 QUIET )  # TODO: we should use ${GeoModelIO_VERSION} set upstream even when individually built 
 if( GeoModelIO_FOUND ) # if built individually
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelIO::GeoModelRead GeoModelIO::GeoModelDBManager GeoModelIO::TFPersistification GeoModelCore::GeoGenericFunctions GeoModelCore::GeoModelKernel )
 else() # if built as part of the build of GeoModelCore and the other base libraries

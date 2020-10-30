@@ -26,7 +26,7 @@ add_library ( GXHEPVis SHARED ${SOURCES} ${HEADERS}  )
 # Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
 # i.e., after having already compiled the base packages (GeoModelCore). 
 # This is used when building distribution packages. 
-find_package( GeoModelCore ${GeoModelCore_VERSION} )
+find_package( GeoModelCore ${GeoModelCore_VERSION} QUIET )
 if( GeoModelCore_FOUND ) # if built individually
     target_link_libraries( GXHEPVis PUBLIC GeoModelCore::GeoModelKernel )
 else() # if built as part of the build of GeoModelCore and the other base libraries

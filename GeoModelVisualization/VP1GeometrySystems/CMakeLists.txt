@@ -59,13 +59,13 @@ endif()
 # Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
 # i.e., after having already compiled the base packages (GeoModelCore). 
 # This is used when building distribution packages. 
-find_package( GeoModelCore 4.0.0 )
+find_package( GeoModelCore 4.0.0 QUIET )
 if( GeoModelCore_FOUND ) # if built individually
     target_link_libraries( GXGeometrySystems PUBLIC GeoModelCore::GeoModelKernel )
 else() # if built as part of the build of GeoModelCore and the other base libraries
     target_link_libraries( GXGeometrySystems PUBLIC GeoModelKernel )
 endif()
-find_package( GeoModelIO 4.0.0 )
+find_package( GeoModelIO 4.0.0 QUIET )
 if( GeoModelIO_FOUND ) # if built individually
     target_link_libraries( GXGeometrySystems PUBLIC GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
 else() # if built as part of the build of GeoModelCore and the other base libraries

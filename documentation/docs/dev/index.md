@@ -61,6 +61,9 @@ sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip buil
 dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial xerces-c-devel unzip freeglut-devel wget eigen3-devel
 ```
 
+### Centos/RedHat
+
+
 
 ## Quick instructions - Build everything
 
@@ -86,6 +89,15 @@ make -j
 make install
 cd ..
 ```
+
+A note: on some platforms, the default Eigen, Xerces-C, and nlohmann_json libraries installed through the platform's package manager are quite old. If you desire, you can build GeoModel with a builtin version of those libraries by enabling the corresponding options at configuration time:
+
+```
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_USE_BUILTIN_EIGEN3=1 -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_JSON=1 ../GeoModel
+```
+
+If you compile on Centos7, that above could be a convenient option.
+
 
 #### Build the optional packages 
 
@@ -139,46 +151,31 @@ unzip coin-4.0.0-src.zip -d coin-sources
 mv coin-sources/* coin
 mkdir build_coin
 cd build_coin
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../coin
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DCOIN_BUILD_TESTS=0 ../coin
 make -j
 make install
 cd ..
 
 # Build SoQt
-hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
+wget -O soqt.zip http://cern.ch/atlas-software-dist-eos/externals/SoQt/soqt_ea5cd76.zip
+unzip soqt.zip
 mkdir build_soqt
 cd build_soqt
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../soqt
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DSOQT_BUILD_DOCUMENTATION=0 ../soqt
 make -j
 make install
 cd ..
 ```
 
-# Build GeoModelCore
+##### Build GeoModelVisualization (a.k.a, `gmex`)
 
+Now, you can build the GeoModel visualization tools by enabling the corresponding option in the CMake configuration of GeoModel.
 
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
-mkdir build_core
-cd build_core
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
-make -j
-make install
-cd ..
+To do that, come back to the `build_geomodel` folder we created earlier, or create it right now, then run:
 
-# Build GeoModelIO
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
-mkdir build_io
-cd build_io
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
-make -j
-make install
-cd ..
-
-# Build GeoModelVisualization
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization.git
-mkdir build_viz
-cd build_viz
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelVisualization
+```
+cd build_geomodel
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel
 make -j
 make install
 cd ..

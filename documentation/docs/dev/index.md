@@ -23,9 +23,9 @@ In the GeoModel packages, we use modern C++ constructs (C++ 14 and sometimes C++
 
 ```bash
 # install external dependencies
-brew install cmake eigen doxygen wget boost hg xerces-c nlohmann-json sqlite
+brew install cmake eigen doxygen wget boost xerces-c nlohmann-json sqlite
 
-# install and configure Qt
+# if you want to build the visualization tools as well, please install and configure Qt5
 brew install qt5
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 ```
@@ -52,10 +52,7 @@ See also the [Troubleshooting](troubleshooting.md) page for additional help.
 ### Linux/Ubuntu
 
 ```bash
-sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libxerces-c-dev
-
-sudo apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
-
+sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default libeigen3-dev libxerces-c-dev
 ```
 
 ### Linux/Fedora
@@ -72,14 +69,72 @@ With these instructions you will build the whole the software stack for GeoModel
 
 ### Build and Install locally
 
-#### Build the dependencies for graphics (only needed for GeoModelVisualization)
+These instructions will install the libraries and the tools in a local `install` folder. That is useful for developmemnt, because yuo can handle multiple versions installed on the same system.
 
-If you are working
+However, if you prefer to install the tools and the libraries in the `/usrl/local` system directory, just remove from the commands the option `-DCMAKE_INSTALL_PREFIX=../install`.
 
+#### Build the base libraries and tools (GeoModelCore, GeoModelIO, GeoModelTools)
+
+This will install the base libraries and tools, the ones conatined in the packages GeoModelCore (GeoModelKernel), GeoModelIO (I/O libraries and the interface to the SQLite engine), and GeoModelTools (XML and JSON parsers, GeoModelXML, the `gmcat` concatenation command line tool):
+
+```
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModel.git
+mkdir build_geomodel
+cd build_geomodel
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModel
+make -j
+make install
+cd ..
+```
+
+#### Build the optional packages 
+
+There are several options offered to the user to selectively build the optional packages. 
+
+!!! note
+    You can see all the available options, and you can enable/disable them inetractively, by using the command for the interactive CMake configuration `ccmake`, instead of the classical `cmake`; *i.e.*: `cmake ../GeoModel`.
+
+
+#### Build the visualization tools (GeoModelVisualization)
+
+##### Build the dependencies for 3D graphics
+
+###### Simage 
+
+On all platforms except for Centos7, you can build Simage by follwoing these instructions:
+
+```bash
+# Build Simage
+wget http://cern.ch/atlas-software-dist-eos/externals/Simage/Coin3D-simage-2c958a61ea8b.zip
+unzip Coin3D-simage-2c958a61ea8b.zip
+cd Coin3D-simage-2c958a61ea8b
+./configure --prefix=$PWD/../install
+make -j
+make install 
+```
+
+On Centos7, you have to apply a patch to build the package. Therefore, on Centos7 please build Simage by following the instructions below:
+
+```bash
+# Build Simage
+wget http://cern.ch/atlas-software-dist-eos/externals/Simage/Coin3D-simage-2c958a61ea8b.zip
+unzip Coin3D-simage-2c958a61ea8b.zip
+cd Coin3D-simage-2c958a61ea8b
+./configure --prefix=$PWD/../install
+wget -O cc7.patch https://gitlab.cern.ch/atlas/atlasexternals/-/raw/master/External/Simage/patches/libpng_centos7.patch?inline=false 
+patch -p1 < cc7.patch
+make -j
+make install 
+cd ..
+```
+
+###### Coin3D & SoQt
+
+Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):
 
 ```bash
 # Build Coin3D
-wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
+wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/coin-4.0.0-src.zip
 unzip coin-4.0.0-src.zip -d coin-sources
 mv coin-sources/* coin
 mkdir build_coin
@@ -100,6 +155,8 @@ cd ..
 ```
 
 # Build GeoModelCore
+
+
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
 mkdir build_core
 cd build_core
@@ -206,14 +263,4 @@ Then, you can run your local copy of `gmex` with:
 
 For a collection of suggestions on how to fix potential errors and glitches, please refer to the dedicated [Troubleshooting](troubleshooting.md) page.
 
-----
 
-## Build the single libraries
-
-### GeoModelCore
-
-### GeoModelIO
-
-### GeoModelG4
-
-### GeoModelExamples

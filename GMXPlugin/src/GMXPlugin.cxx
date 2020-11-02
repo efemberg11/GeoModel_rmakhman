@@ -36,6 +36,25 @@ class GMXPlugin : public GeoVGeometryPlugin  {
   const GMXPlugin & operator=(const GMXPlugin &right)=delete;
   GMXPlugin(const GMXPlugin &right) = delete;
 
+  bool exists (const std::string& name)
+  {
+    std::ifstream f(name.c_str());
+    return f.good();
+  }
+
+  std::vector<std::string> parseFiles(const std::string files, const char separator=';')
+  {
+  	 std::string parsed;
+	 std::istringstream iFiles(files);
+	 std::vector<std::string> fileList;
+	 while (iFiles>>parsed)
+	 {
+		std::cout<<" parsed string "<<parsed<<std::endl;
+		fileList.push_back(parsed);
+	 }
+	 return fileList;
+  }
+
 };
 
 
@@ -56,16 +75,30 @@ GMXPlugin::~GMXPlugin()
 void GMXPlugin::create(GeoPhysVol *world, bool publish)
 {
 
-  	std::cout<< "creating a GeoModelXml detector "<<std::endl;
-	
-	std::ifstream xmlFile("gmx.xml");
-	std::stringstream gmxInput;
-	gmxInput<<xmlFile.rdbuf();
-	
-//	std::cout<< " string being parsed "<<std::endl<<std::endl<<gmxInput.str()<<std::endl;
-	
-	GmxInterface gmxInterface;
-	Gmx2Geo gmx2Geo("gmx.xml", world, gmxInterface, 0);
+  std::cout<< "This is GMXPlugin: creating a GeoModelXml detector "<<std::endl;
+  std::vector<std::string> filesToParse;
+  char* fPath=getenv("GMX_FILES");
+  std::string fileName;
+  if (fPath!=NULL) {
+    std::cout<<" Environment variable GMX_FILES set to "<<fPath<<std::endl;
+    fileName=std::string(fPath);
+    filesToParse=parseFiles(fileName,':');
+  }
+  else {
+  	fileName="gmx.xml";
+	filesToParse.push_back(fileName);
+  }
+
+  for (auto f: filesToParse)
+  {
+    if (!exists(f)) {
+    	std::cout <<"GDMLtoGeo: input file "<<f<<
+      	" does not exist. quitting and returning nicely! "<<std::endl;
+   	return;
+    }
+    GmxInterface gmxInterface;
+    Gmx2Geo gmx2Geo(f, world, gmxInterface, 0);
+  }
 
 }
 

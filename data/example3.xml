@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE geomodel SYSTEM "geomodel.dtd" [
+
+<!-- include the file where the materials are defined -->
+<!ENTITY materials SYSTEM "materials.gmx" >
+
+]>
+
+<geomodel name="ITk_Example" version="1.0"
+  xmlns="http://www.nikhef.nl/%7Er29/gmx">
+
+  <!-- Definition of materials -->
+  <!-- Load materials -->
+  &materials;
+
+  <!-- Definition of variables -->
+  <defines>
+    <var name="TubeInnerRadius" value="0" />
+    <var name="TubeOuterRadius" value="600." />
+    <var name="TubeHalfLength"  value="1200." />
+  </defines>
+  
+  <!-- Definition of shapes -->  
+  <shapes>
+    <tube name="Tube"  rmin="TubeInnerRadius"
+                       rmax="TubeOuterRadius"
+                       zhalflength="TubeHalfLength"/>
+    
+    <box name="Box" xhalflength="100" yhalflength="100" zhalflength="100" />   
+  </shapes>
+  
+  <!-- Defining logical volumes -->
+  <logvol name="MyBox" shape="Box" material="N2"/>
+  <logvol name="MyTube" shape="Tube" material="Air" >
+    <transform>
+      <transformation name="MyBoxShift" >
+        <translation z="250" />
+      </transformation>
+      <logvolref ref="MyBox" />
+    </transform>
+  </logvol>
+  
+
+  <!-- Adding volume branches -->
+  <addbranch>
+      <logvolref ref="MyTube" />    
+  </addbranch>
+  
+</geomodel>
+

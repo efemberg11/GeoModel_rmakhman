@@ -11,7 +11,7 @@ file( GLOB HEADERS GeoModelDBManager/*.h )
 
 # Set up the library.
 add_library( GeoModelDBManager SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoModelDBManager PUBLIC SQLite::SQLite3 )
+target_link_libraries( GeoModelDBManager PRIVATE SQLite::SQLite3 )
 target_include_directories( GeoModelDBManager PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

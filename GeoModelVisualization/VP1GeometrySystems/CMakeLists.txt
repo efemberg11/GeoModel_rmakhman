@@ -20,11 +20,13 @@ endif()
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1GeometrySystems/*.h )
-file( GLOB UIS src/*.ui VP1GeometrySystems/*.ui )
+file( GLOB UIS src/*.ui VP1GeometrySystems/*.ui ) # Qt5 UI files
 file( GLOB DATA share/*.jpg share/*.json )
 
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# Qt5 settings
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTOUIC ON)
 unset (AUTOUIC_SEARCH_PATHS)

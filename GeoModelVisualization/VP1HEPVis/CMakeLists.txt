@@ -18,11 +18,6 @@ include_directories ("${PROJECT_SOURCE_DIR}")
 
 add_library ( GXHEPVis SHARED ${SOURCES} ${HEADERS}  )
 
-# External dependencies:
-# find_package( Qt5 COMPONENTS Core )
-# include_directories(${Qt5Core__INCLUDE_DIRS} )
-#include_directories(${Coin_INCLUDE_DIR} )
-
 # Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
 # i.e., after having already compiled the base packages (GeoModelCore). 
 # This is used when building distribution packages. 
@@ -35,9 +30,7 @@ endif()
 target_link_libraries( GXHEPVis PUBLIC Coin::Coin )
 if ( APPLE )
   target_link_libraries (GXHEPVis PUBLIC ${OPENGL_LIBRARIES} )
-  target_link_directories (GXHEPVis PUBLIC ${Coin_LIB_DIR} )
 endif()
-# add_definitions (${Qt5Core_DEFINITIONS})
 
 
 install(TARGETS GXHEPVis

@@ -22,11 +22,6 @@ variables:
     - when: on_success
   allow_failure: true
   timeout: 30 minutes
-  before_script:
-    - brew install nlohmann-json xerces-c
-    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
-  after_script:
-    - brew remove --ignore-dependencies nlohmann-json xerces-c
 
 
 .ubuntu-template-job-base: &ubuntu-job-base
@@ -181,11 +176,18 @@ mac-soqt:
   <<: *macos-job
   <<: *soqt-job
   needs: ["mac-coin"]
+  before_script:
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
 
 mac-geomodel-base:
   <<: *macos-job
   <<: *geomodel-job
   stage: step-A
+  before_script:
+    - brew install nlohmann-json xerces-c
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+  after_script:
+    - brew remove --ignore-dependencies nlohmann-json xerces-c
 
 # mac-geomodel-visualization:
 #   <<: *macos-job

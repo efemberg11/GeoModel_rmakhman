@@ -26,7 +26,7 @@ variables:
     - brew install nlohmann-json xerces-c
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
   after_script:
-    - brew remove nlohmann-json xerces-c
+    - brew remove --ignore-dependencies nlohmann-json xerces-c
 
 
 .ubuntu-template-job-base: &ubuntu-job-base

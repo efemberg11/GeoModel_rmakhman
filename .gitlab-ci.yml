@@ -170,6 +170,12 @@ mac-coin:
   <<: *coin-job
   before_script:
     - echo "CI_REPOSITORY_URL -- $CI_REPOSITORY_URL"
+    - echo "GITLAB_USER_NAME -- $GITLAB_USER_NAME"
+    - echo "GITLAB_USER_LOGIN -- $GITLAB_USER_LOGIN"
+    - echo "CI_PROJECT_URL -- $CI_PROJECT_URL"
+    - echo "CI_PROJECT_NAMESPACE -- $CI_PROJECT_NAMESPACE"
+    - echo "CI_PROJECT_ROOT_NAMESPACE -- $CI_PROJECT_ROOT_NAMESPACE"
+    - echo "CI_PROJECT_PATH -- $CI_PROJECT_PATH"
 
 mac-soqt:
   <<: *macos-job

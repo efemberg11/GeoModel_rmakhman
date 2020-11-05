@@ -183,18 +183,22 @@ mac-geomodel-base:
   stage: step-A
   before_script:
     - brew install nlohmann-json xerces-c
-    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
   after_script:
     - brew remove --ignore-dependencies nlohmann-json xerces-c
 
-# mac-geomodel-visualization:
-#   <<: *macos-job
-#   <<: *geomodel-job
-#   stage: step-C
-#   needs: ["mac-coin", "mac-soqt"]
-#   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
+mac-geomodel-visualization:
+  <<: *macos-job
+  <<: *geomodel-job
+  # stage: step-C
+  needs: ["mac-coin", "mac-soqt"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
+  before_script:
+    - brew install nlohmann-json xerces-c
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+  after_script:
+    - brew remove --ignore-dependencies nlohmann-json xerces-c
 
 
 

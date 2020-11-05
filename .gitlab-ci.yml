@@ -16,8 +16,10 @@ variables:
 .macos-template-job: &macos-job
   tags:
     - macos
-  rules:
-    - if: '$CI_REPOSITORY_URL == "https://gitlab.cern.ch/GeoModelDev/GeoModel.git"'
+  #rules:
+  #  - if: '$CI_REPOSITORY_URL == "https://gitlab.cern.ch/GeoModelDev/GeoModel.git"'
+  before_script:
+    - echo 'CI_REPOSITORY_URL: $CI_REPOSITORY_URL'
   allow_failure: true
   timeout: 30 minutes
 

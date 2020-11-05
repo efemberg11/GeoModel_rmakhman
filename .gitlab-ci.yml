@@ -284,6 +284,9 @@ ubu-gm-fullsimlight-builtinjson:
 
 docs-build:
     stage: step-A
+    rules:
+      changes:
+        - documentation/**/*
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
     before_script:
         - pip install markdown-include

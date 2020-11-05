@@ -6,10 +6,9 @@ stages:
 
 # List global variables
 variables:
-  # CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install
   CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
-  # CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install
   CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  # also, 'CMAKE_EXTRA_FLAGS' will be specified by specific jobs when needed, and used by job templates like 'geomodel-job'
   GIT_SUBMODULE_STRATEGY: recursive
 
 
@@ -151,7 +150,7 @@ variables:
     - mkdir build
     - cd build
     - echo "CMAKE_ARGS - ${CMAKE_ARGS}"
-    - cmake ${CMAKE_ARGS} ..
+    - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
     - cmake --build . -- -j2
     - cmake --build . -- install
     - pwd; ls # CI debug only

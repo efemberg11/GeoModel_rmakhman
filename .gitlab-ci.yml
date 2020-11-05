@@ -307,6 +307,9 @@ docs-build:
 docs-deploy:
     stage: step-B
     needs: ["docs-build"]
+    rules:
+      - changes:
+        - documentation/**/*
     variables:
       "EOS_PATH": "/eos/project/g/geomodel/www/home"
     image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest

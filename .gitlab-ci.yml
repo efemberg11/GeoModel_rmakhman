@@ -163,11 +163,8 @@ variables:
 
 # ACTUAL BUILD JOBS
 
-
-### MACOS BUILD JOBS
-mac-coin:
-  <<: *macos-job
-  <<: *coin-job
+## a debug job
+debug-job:
   before_script:
     - echo "CI_REPOSITORY_URL -- $CI_REPOSITORY_URL"
     - echo "GITLAB_USER_NAME -- $GITLAB_USER_NAME"
@@ -176,6 +173,13 @@ mac-coin:
     - echo "CI_PROJECT_NAMESPACE -- $CI_PROJECT_NAMESPACE"
     - echo "CI_PROJECT_ROOT_NAMESPACE -- $CI_PROJECT_ROOT_NAMESPACE"
     - echo "CI_PROJECT_PATH -- $CI_PROJECT_PATH"
+  when: manual
+
+
+### MACOS BUILD JOBS
+mac-coin:
+  <<: *macos-job
+  <<: *coin-job
 
 mac-soqt:
   <<: *macos-job

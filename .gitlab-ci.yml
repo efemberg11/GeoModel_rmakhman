@@ -169,7 +169,7 @@ mac-coin:
   <<: *macos-job
   <<: *coin-job
   before_script:
-    - echo "CI_REPOSITORY_URL: $CI_REPOSITORY_URL"
+    - echo "CI_REPOSITORY_URL -- $CI_REPOSITORY_URL"
 
 mac-soqt:
   <<: *macos-job

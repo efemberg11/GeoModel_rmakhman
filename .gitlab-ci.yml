@@ -16,8 +16,8 @@ variables:
 .macos-template-job: &macos-job
   tags:
     - macos
-  #rules:
-  #  - if: '$CI_REPOSITORY_URL == "https://gitlab.cern.ch/GeoModelDev/GeoModel.git"'
+  rules:
+    - if: '$CI_PROJECT_ROOT_NAMESPACE == "GeoModelDev"'
   allow_failure: true
   timeout: 30 minutes
 

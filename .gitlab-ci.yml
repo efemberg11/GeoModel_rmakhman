@@ -285,7 +285,7 @@ ubu-gm-fullsimlight-builtinjson:
 docs-build:
     stage: step-A
     rules:
-      changes:
+      - changes:
         - documentation/**/*
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
     before_script:

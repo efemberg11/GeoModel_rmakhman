@@ -165,6 +165,7 @@ variables:
 
 ## a debug job
 debug-job:
+  stage: step-A
   before_script:
     - echo "CI_REPOSITORY_URL -- $CI_REPOSITORY_URL"
     - echo "GITLAB_USER_NAME -- $GITLAB_USER_NAME"

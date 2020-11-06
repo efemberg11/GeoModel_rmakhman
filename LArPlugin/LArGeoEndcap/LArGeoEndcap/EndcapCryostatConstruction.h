@@ -14,12 +14,13 @@
 
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
-//#include "LArGeoFcal/FCALConstruction.h"
+#include "LArGeoFcal/FCALConstruction.h"
 #include "LArGeoEndcap/EMECConstruction.h"
 
 class GeoInpRecord;
-class LArGeoMaterialManager;
 class GeoXmlMatManager;
+class LArGeoMaterialManager;
+class GeoPublisher;
 
 namespace LArGeo {
 
@@ -32,6 +33,7 @@ namespace LArGeo {
 
     EndcapCryostatConstruction(LArGeoMaterialManager* matman
 			       , bool fullGeo
+			       , GeoPublisher* publisher
 			       , std::string emecVariantInner = "Wheel"
 			       , std::string emecVariantOuter = "Wheel"
 			       , bool activateFT = false);
@@ -46,12 +48,14 @@ namespace LArGeo {
     void setFCALVisLimit(int limit) {m_fcalVisLimit=limit;}
 
   private:
-    int                 m_fcalVisLimit;
+    LArGeoMaterialManager*  m_matman;
+    GeoPublisher*           m_publisher;
+    int                     m_fcalVisLimit;
 
-    EMECConstruction          m_emec;
-//    FCALConstruction          m_fcal;
+    EMECConstruction        m_emec;
+    FCALConstruction        m_fcal;
 
-    bool                      m_fullGeo;  // true->FULL, false->RECO
+    bool                    m_fullGeo;  // true->FULL, false->RECO
     std::string m_EMECVariantInner;
     std::string m_EMECVariantOuter;
 

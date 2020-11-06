@@ -13,13 +13,16 @@
 #include "GeoGenericFunctions/FunctionNoop.h"
 
 class LArGeoMaterialManager;
+class GeoPublisher;
 
 namespace LArGeo {
 
   class BarrelConstruction
   {
   public:
-    BarrelConstruction(bool fullGeo,LArGeoMaterialManager* matman);
+    BarrelConstruction(bool fullGeo
+		       , LArGeoMaterialManager* matman
+		       , GeoPublisher* publisher);
     virtual ~BarrelConstruction();
 
     // Get the envelope containing this detector.
@@ -70,6 +73,7 @@ namespace LArGeo {
 
     bool             m_fullGeo;  // true->FULL, false->RECO
     LArGeoMaterialManager* m_matman;
+    GeoPublisher*          m_publisher;
   };
 }  // namespace LArGeo
 

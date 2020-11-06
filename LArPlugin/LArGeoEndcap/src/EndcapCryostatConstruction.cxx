@@ -33,34 +33,29 @@
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-#include "StoreGate/StoreGateSvc.h"
-#include "GeoModelInterfaces/AbsMaterialManager.h"
-#include "GeoModelInterfaces/StoredMaterialManager.h"
-#include "GeoModelUtilities/StoredPhysVol.h"
-#include "GeoModelUtilities/StoredAlignX.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoShapeShift.h"
+#include "GeoModelKernel/GeoPublisher.h"
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits
 
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Variable.h"
 
 // For the database:
-#include "LArInpManTest/GeoXmlInpManager.h"
-#include "LArInpManTest/GeoInpRecordset.h"
-#include "LArInpManTest/GeoInpUtils.h"
-#include "LArGeoMaterialManager/LArGeoMaterialManager.h"
+#include "GeoXmlMatManager/GeoXmlMatManager.h"
+#include "GeoXmlInpManager/GeoXmlInpManager.h"
+#include "GeoXmlInpManager/GeoInpRecordset.h"
+#include "LArGeoUtils/LArGeoInpUtils.h"
+#include "LArGeoUtils/LArGeoMaterialManager.h"
 
+/*
 // For MBTS DDE
 #include "CaloDetDescr/MbtsDetDescrManager.h"
 #include "CaloDetDescr/CaloDetectorElements.h"
 #include "CaloIdentifier/TileTBID.h"
+*/
 
-
-#include "GeoModelInterfaces/IGeoModelSvc.h"
-
-#include "GaudiKernel/MsgStream.h"
-#include "GaudiKernel/Bootstrap.h"
-#include "GaudiKernel/SystemOfUnits.h"
 
 #include <string>
 #include <cmath>
@@ -70,19 +65,21 @@
 using namespace GeoGenfun;
 using namespace GeoXF;
 
-
-
 // The objects for mapping plane indexes in Pcon to the record index in the recordset
 typedef std::map<int, unsigned int, std::less<int> > planeIndMap;
 
 
 LArGeo::EndcapCryostatConstruction::EndcapCryostatConstruction(LArGeoMaterialManager* matman
 							       , bool fullGeo
+							       , GeoPublisher* publisher
 							       , std::string emecVariantInner
 							       , std::string emecVariantOuter
 							       , bool activateFT) 
-  : m_fcalVisLimit(-1)
-  , m_emec(matman)
+  : m_matman(matman)
+  , m_publisher(publisher)
+  , m_fcalVisLimit(-1)
+  , m_emec(matman,publisher)
+  , m_fcal(publisher)
   , m_fullGeo(fullGeo)
   , m_EMECVariantInner(emecVariantInner)
   , m_EMECVariantOuter(emecVariantOuter)
@@ -97,49 +94,20 @@ LArGeo::EndcapCryostatConstruction::~EndcapCryostatConstruction()
 
 GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 {
-  GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
-
-  // Get access to the material manager:
-
-  ISvcLocator *svcLocator = Gaudi::svcLocator();
-  IMessageSvc * msgSvc;
-  if (svcLocator->service("MessageSvc", msgSvc, true )==StatusCode::FAILURE) {
-    throw std::runtime_error("Error in EndcapCryostatConstruction, cannot access MessageSvc");
-  }
-
-  MsgStream log(msgSvc, "LArGeo::EndcapCryostatConstruction");
-  log << MSG::DEBUG << "started" << endmsg;
-
-
-  StoreGateSvc *detStore;
-  if (svcLocator->service("DetectorStore", detStore, false )==StatusCode::FAILURE) {
-    throw std::runtime_error("Error in EndcapCryostatConstruction, cannot access DetectorStore");
-  }
-
-  // Get the materials from the material manager:-----------------------------------------------------//
-  //                                                                                                  //
-  const StoredMaterialManager* materialManager = nullptr;
-  if (StatusCode::SUCCESS != detStore->retrieve(materialManager, std::string("MATERIALS"))) return NULL;
+  GeoXmlInpManager*       inpman          = GeoXmlInpManager::getManager();
+  const GeoXmlMatManager* materialManager = GeoXmlMatManager::getManager();
 
   const GeoMaterial *Lead = materialManager->getMaterial("std::Lead");
-  if (!Lead) {
-    throw std::runtime_error("Error in EndcapCryostatConstruction, std::Lead is not found.");
-  }
+  if (!Lead) throw std::runtime_error("Error in EndcapCryostatConstruction, std::Lead is not found.");
 
   const GeoMaterial *Air  = materialManager->getMaterial("std::Air");
-  if (!Air) {
-    throw std::runtime_error("Error in EndcapCryostatConstruction, std::Air is not found.");
-  }
+  if (!Air) throw std::runtime_error("Error in EndcapCryostatConstruction, std::Air is not found.");
 
   const GeoMaterial *Al  = materialManager->getMaterial("std::Aluminium");
-  if (!Al) {
-    throw std::runtime_error("Error in EndcapCryostatConstruction, std::Aluminium is not found.");
-  }
+  if (!Al) throw std::runtime_error("Error in EndcapCryostatConstruction, std::Aluminium is not found.");
 
   const GeoMaterial *LAr  = materialManager->getMaterial("std::LiquidArgon");
-  if (!LAr) {
-    throw std::runtime_error("Error in EndcapCryostatConstruction, std::LiquidArgon is not found.");
-  }
+  if (!LAr) throw std::runtime_error("Error in EndcapCryostatConstruction, std::LiquidArgon is not found.");
 
   const GeoMaterial *G10  = materialManager->getMaterial("LAr::G10");
   if (!G10) throw std::runtime_error("Error in EndcapCryostatConstruction, LAr::G10 is not found.");
@@ -153,8 +121,6 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
   const GeoMaterial *Polystyrene  = materialManager->getMaterial("std::Polystyrene");
   if (!Polystyrene) throw std::runtime_error("Error in EndcapCryostatConstruction, std::Polystyrene is not found.");
 
-  //                                                                                                 //
-  //-------------------------------------------------------------------------------------------------//
 
   GeoInpRecordset_ptr larPosition = inpman->getRecordsetPtr("LArPosition");
   GeoInpRecordset_ptr cryoCylinders = inpman->getRecordsetPtr("CryoCylinders");
@@ -211,32 +177,33 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
   double zStartCryoMother = 0.; // This variable is needed to calculate local transform of the MBTS mother
 
-  for(unsigned int ind = 0; ind < cryoMotherPlanes.size(); ++ ind){
+  for(unsigned int ind = 0; ind < cryoMotherPlanes.size(); ++ ind) {
     iter = cryoMotherPlanes.find(ind);
-    if(iter == cryoMotherPlanes.end()){
-      throw std::runtime_error(
-        "Error in EndcapCryostatConstruction, missing plane in Endcap Cryo Mother"
-      );
-    } else {
+    if(iter == cryoMotherPlanes.end()) {
+      throw std::runtime_error("Error in EndcapCryostatConstruction, missing plane in Endcap Cryo Mother");
+    }
+    else {
       const GeoInpRecord& currentRecord = (*cryoPcons)[(*iter).second];
       double zplane = currentRecord.getDouble("ZPLANE");
       double rmin = currentRecord.getDouble("RMIN");
       double rmax =  currentRecord.getDouble("RMAX");
       /* This sould be corrected in the DB, but we have no time */
-      if(m_activateFT){
-        if(zplane == 0.){
+      if(m_activateFT) {
+        if(zplane == 0.) {
           zplane = 12.;
-          log << MSG::DEBUG << "Put cryoMother zplane " << ind
-		          << " at " << zplane << " to accomodate FEC" << endmsg;
+//          log << MSG::DEBUG << "Put cryoMother zplane " << ind
+//		          << " at " << zplane << " to accomodate FEC" << endmsg;
         }
-        if(rmax == 2476.){
+        if(rmax == 2476.) {
           rmax = 2506.;
-          log << MSG::DEBUG << "Put cryoMother rmax " << ind
-		          << " at " << rmax << " to accomodate FT Chimney" << endmsg;
+//          log << MSG::DEBUG << "Put cryoMother rmax " << ind
+//		          << " at " << rmax << " to accomodate FT Chimney" << endmsg;
         }
       }
       cryoMotherShape->addPlane(zplane, rmin, rmax);
-      if(ind == 0) zStartCryoMother = zplane;
+      if(ind == 0) {
+	zStartCryoMother = zplane;
+      }
     }
   }
 
@@ -254,127 +221,126 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
   GeoInpRecordset_ptr cryoExtraCyl = inpman->getRecordsetPtr("LArCones");
 
-  if(m_fullGeo && cryoCylinders->size()>0){
+  if(m_fullGeo && cryoCylinders->size()>0) {
     unsigned int nextra=cryoExtraCyl->size();
-    if(nextra>0){
-      log << MSG::DEBUG << "activate extra material in front of PS" << endmsg;
+    if(nextra>0) {
+//      log << MSG::DEBUG << "activate extra material in front of PS" << endmsg;
       bool finloop=false;
-      for(unsigned int i=0;i<nextra;i++){
+      for(unsigned int i=0;i<nextra;i++) {
         std::string name=(*cryoExtraCyl)[i].getString("CONE");
-          if(name.find("EmecCylBeforePS") != std::string::npos){
-            double rmin=(*cryoExtraCyl)[i].getDouble("RMIN1"); //PS rmin
-            double rmax=(*cryoExtraCyl)[i].getDouble("RMAX1"); //PS rmax
-            double dz = (*cryoExtraCyl)[i].getDouble("DZ");    //leadthickness
-            if(dz>0.){
+	if(name.find("EmecCylBeforePS") != std::string::npos) {
+	  double rmin=(*cryoExtraCyl)[i].getDouble("RMIN1"); //PS rmin
+	  double rmax=(*cryoExtraCyl)[i].getDouble("RMAX1"); //PS rmax
+	  double dz = (*cryoExtraCyl)[i].getDouble("DZ");    //leadthickness
+	  if(dz>0.) {
+	    double rmin_warm=0.,rmax_warm=0.,dz_warm=0.,zInCryostat_warm=0.;
+	    double rmin_cold=0.,rmax_cold=0.,dz_cold=0.,zInCryostat_cold=0.;
+	    int wallfind=0;
 
-              double rmin_warm=0.,rmax_warm=0.,dz_warm=0.,zInCryostat_warm=0.;
-              double rmin_cold=0.,rmax_cold=0.,dz_cold=0.,zInCryostat_cold=0.;
-              int wallfind=0;
+	    for (unsigned int layer = 0; layer < cryoCylinders->size(); layer++) {
+	      const GeoInpRecord& currentRecord = (*cryoCylinders)[layer];
+	      int cylNumber = currentRecord.getInt("CYL_NUMBER");
+	      if(currentRecord.getString("CYL_LOCATION")=="Endcap") {
+		if (cylNumber==3) {
+		  rmin_warm=currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm;
+		  rmax_warm=currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm + currentRecord.getDouble("DR")*SYSTEM_OF_UNITS::cm;
+		  dz_warm=currentRecord.getDouble("DZ")*SYSTEM_OF_UNITS::cm / 2.;
+		  zInCryostat_warm = currentRecord.getDouble("ZMIN")*SYSTEM_OF_UNITS::cm + currentRecord.getDouble("DZ")*SYSTEM_OF_UNITS::cm / 2.;
+		  wallfind=wallfind+1;
+		}
+		if (cylNumber==14) {
+		  rmin_cold=currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm;
+		  rmax_cold=currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm + currentRecord.getDouble("DR")*SYSTEM_OF_UNITS::cm;
+		  dz_cold=currentRecord.getDouble("DZ")*SYSTEM_OF_UNITS::cm / 2.;
+		  zInCryostat_cold = currentRecord.getDouble("ZMIN")*SYSTEM_OF_UNITS::cm + currentRecord.getDouble("DZ")*SYSTEM_OF_UNITS::cm / 2.;
+		  wallfind=wallfind+1;
+		}
+	      }
+	    }
+	    if(wallfind==2) {
+	      double maxdz=(zInCryostat_cold-dz_cold)-(zInCryostat_warm+dz_warm);
+	      if(dz>maxdz) dz=maxdz;
+	      double zpos=((zInCryostat_cold-dz_cold)+(zInCryostat_warm+dz_warm))/2.;
 
-              for (unsigned int layer = 0; layer < cryoCylinders->size(); layer++) {
-                const GeoInpRecord& currentRecord = (*cryoCylinders)[layer];
-                int cylNumber = currentRecord.getInt("CYL_NUMBER");
-                if(currentRecord.getString("CYL_LOCATION")=="Endcap"){
-                  if(cylNumber  == 3 )
-                    {
-                      rmin_warm=currentRecord.getDouble("RMIN")*Gaudi::Units::cm;
-                      rmax_warm=currentRecord.getDouble("RMIN")*Gaudi::Units::cm + currentRecord.getDouble("DR")*Gaudi::Units::cm;
-                      dz_warm=currentRecord.getDouble("DZ")*Gaudi::Units::cm / 2.;
-                      zInCryostat_warm = currentRecord.getDouble("ZMIN")*Gaudi::Units::cm + currentRecord.getDouble("DZ")*Gaudi::Units::cm / 2.;
-                      wallfind=wallfind+1;
-                    }
-                  if(cylNumber  == 14 )
-                    {
-                      rmin_cold=currentRecord.getDouble("RMIN")*Gaudi::Units::cm;
-                      rmax_cold=currentRecord.getDouble("RMIN")*Gaudi::Units::cm + currentRecord.getDouble("DR")*Gaudi::Units::cm;
-                      dz_cold=currentRecord.getDouble("DZ")*Gaudi::Units::cm / 2.;
-                      zInCryostat_cold = currentRecord.getDouble("ZMIN")*Gaudi::Units::cm + currentRecord.getDouble("DZ")*Gaudi::Units::cm / 2.;
-                      wallfind=wallfind+1;
-                    }
-                }
-              }
-              if(wallfind==2){
-                double maxdz=(zInCryostat_cold-dz_cold)-(zInCryostat_warm+dz_warm);
-                if(dz>maxdz) dz=maxdz;
-                double zpos=((zInCryostat_cold-dz_cold)+(zInCryostat_warm+dz_warm))/2.;
+	      std::ostringstream cylStream;
+	      cylStream << baseName << "::ExtraCyl";
+	      std::string cylName = cylStream.str();
+	      cylName = cylName + "_beforePS";
 
-                std::ostringstream cylStream;
-                cylStream << baseName << "::ExtraCyl";
-                std::string cylName = cylStream.str();
-                cylName = cylName + "_beforePS";
+	      double phi0=(*cryoExtraCyl)[i].getDouble("PHI0");
+	      double dphi=(*cryoExtraCyl)[i].getDouble("DPHI");
+	      if(dphi>6.28) dphi=2.*M_PI;
+	      std::string material=(*cryoExtraCyl)[i].getString("MATERIAL"); //lead
+	      const GeoMaterial *mat = materialManager->getMaterial(material);
+	      if (!mat) {
+		throw std::runtime_error("Error in EndcapCryostatConstruction,material for CylBeforePS is not found.");
+	      }
 
-                double phi0=(*cryoExtraCyl)[i].getDouble("PHI0");
-                double dphi=(*cryoExtraCyl)[i].getDouble("DPHI");
-                if(dphi>6.28) dphi=2.*M_PI;
-                std::string material=(*cryoExtraCyl)[i].getString("MATERIAL"); //lead
-                const GeoMaterial *mat = materialManager->getMaterial(material);
-                if (!mat) {
-                  throw std::runtime_error("Error in EndcapCryostatConstruction,material for CylBeforePS is not found.");
-                }
+	      GeoTubs         *solidCyl = new GeoTubs(rmin,rmax,dz/2.,phi0,dphi);
+	      const GeoLogVol *logicCyl = new GeoLogVol(cylName,solidCyl,mat);
+	      GeoPhysVol      *physCyl  = new GeoPhysVol(logicCyl);
+	      
+	      cryoMotherPhysical->add(new GeoTransform(GeoTrf::TranslateZ3D(zpos)));
+	      cryoMotherPhysical->add(physCyl);
+	      
+	      std::cout<<"**************************************************"<<std::endl;
+	      std::cout<<"EndcapCryostatConstruction insert extra material between warm and cold wall of cryo at front of PS::"<<std::endl;
+	      std::cout<<"  ExtraCyl params: name,mat= "<<cylName<<" "<<mat->getName()
+		       <<" rmin,rmax,dzthick,zpos="<<rmin<<" "<<rmax<<" "<<dz<<" "<<zpos
+		       <<" PhiStart,PhiSize="<<phi0<<" "<<dphi
+		       <<std::endl;
 
-                GeoTubs         *solidCyl = new GeoTubs(rmin,rmax,dz/2.,phi0,dphi);
-                const GeoLogVol *logicCyl = new GeoLogVol(cylName,solidCyl,mat);
-                GeoPhysVol      *physCyl  = new GeoPhysVol(logicCyl);
+	      std::cout<<"  warm cyl params: rmin,rmax,dzthick,zpos="<<rmin_warm<<" "<<rmax_warm<<" "<<2.*dz_warm<<" "
+		       <<zInCryostat_warm<<std::endl;
+	      std::cout<<"  cold cyl params: rmin,rmax,dzthick,zpos="<<rmin_cold<<" "<<rmax_cold<<" "<<2.*dz_cold<<" "
+		       <<zInCryostat_cold<<std::endl;
+	      std::cout<<"**************************************************"<<std::endl;
 
-                cryoMotherPhysical->add(new GeoTransform(GeoTrf::TranslateZ3D(zpos)));
-                cryoMotherPhysical->add(physCyl);
-
-                std::cout<<"**************************************************"<<std::endl;
-                std::cout<<"EndcapCryostatConstruction insert extra material between warm and cold wall of cryo at front of PS::"<<std::endl;
-                std::cout<<"  ExtraCyl params: name,mat= "<<cylName<<" "<<mat->getName()
-                         <<" rmin,rmax,dzthick,zpos="<<rmin<<" "<<rmax<<" "<<dz<<" "<<zpos
-                         <<" PhiStart,PhiSize="<<phi0<<" "<<dphi
-                         <<std::endl;
-
-                std::cout<<"  warm cyl params: rmin,rmax,dzthick,zpos="<<rmin_warm<<" "<<rmax_warm<<" "<<2.*dz_warm<<" "
-                         <<zInCryostat_warm<<std::endl;
-                std::cout<<"  cold cyl params: rmin,rmax,dzthick,zpos="<<rmin_cold<<" "<<rmax_cold<<" "<<2.*dz_cold<<" "
-                         <<zInCryostat_cold<<std::endl;
-                std::cout<<"**************************************************"<<std::endl;
-
-                finloop=true;
-              } // warm cold walls found
-            }  // dz>0. , extra cyl. thickness is positive
-          }   //CylBeforePS ; extracyl is defined in the db record
-          if(finloop) break;
+	      finloop=true;
+	    } // warm cold walls found
+	  }  // dz>0. , extra cyl. thickness is positive
+	}   //CylBeforePS ; extracyl is defined in the db record
+	if(finloop) break;
       }   // loop for extra cyls in the db record
     }  // number of items in the db record >0
     else {
-      log << MSG::DEBUG << "no extra material in front of PS" << endmsg;
+      std::cout << "LAr Endcap Cryostat: No extra material in front of PS" << std::endl;
+//      log << MSG::DEBUG << "no extra material in front of PS" << endmsg;
     }
   }  // fullgeo is required and cryocyl reciord is not empty
-
-    // end of inserting extra lead plate before PS
+  
+  // end of inserting extra lead plate before PS
 
 
   GeoInpRecordset_ptr LArEndcapCratePhiPos = inpman->getRecordsetPtr("LArEndcapCratePhiPos");
 
-  for(unsigned int layer = 0; layer < cryoCylinders->size(); layer++){
+  for(unsigned int layer = 0; layer < cryoCylinders->size(); layer++) {
     const GeoInpRecord& currentRecord = (*cryoCylinders)[layer];
     int cylNumber = currentRecord.getInt("CYL_NUMBER");
-      if(m_fullGeo || cylNumber == 14 || cylNumber == 100) {
+    if(m_fullGeo || cylNumber == 14 || cylNumber == 100) {
       // 100 - is the piece of Shielding. We need to build it for minimal geo too
-
+      
       if(currentRecord.getString("CYL_LOCATION")=="Endcap") {
         std::ostringstream cylStream;
         cylStream << baseName << "::Cylinder";
         std::string cylName = (cylNumber == 100?"JDSH_AddShield_Inner":cylStream.str());
-
+	
         if(!currentRecord.isFieldNull("QUALIFIER")){
           std::string qualifier = currentRecord.getString("QUALIFIER");
-          if (qualifier.size()) cylName = cylName + "::" + qualifier;
+          if (qualifier.size()) {
+	    cylName = cylName + "::" + qualifier;
+	  }
         }
 
-        const GeoShape* solidCyl = new GeoTubs(
-          currentRecord.getDouble("RMIN")*Gaudi::Units::cm,
-          currentRecord.getDouble("RMIN")*Gaudi::Units::cm + currentRecord.getDouble("DR")*Gaudi::Units::cm,
-          currentRecord.getDouble("DZ")*Gaudi::Units::cm / 2.,
-          (double) 0.,
-          (double) 2.*M_PI*Gaudi::Units::rad
-        );
+        const GeoShape* solidCyl = new GeoTubs(currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm
+					       , currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm + currentRecord.getDouble("DR")*SYSTEM_OF_UNITS::cm
+					       , currentRecord.getDouble("DZ")*SYSTEM_OF_UNITS::cm / 2.
+					       , (double) 0.
+					       , (double) 2.*M_PI*SYSTEM_OF_UNITS::rad
+					       );
         const GeoMaterial *material = materialManager->getMaterial(currentRecord.getString("MATERIAL"));
 
-        if(!material){
+        if(!material) {
           std::ostringstream errorMessage;
           errorMessage << "Error in EndcapCrysostat Construction" << std::endl;
           errorMessage << "Material " << currentRecord.getString("MATERIAL") << " is not found" << std::endl;
@@ -383,63 +349,63 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
         if(m_activateFT){ // need to cut holes in cryostat walls for FT
           if(cylNumber == 13){ // warm wall
-            log << MSG::DEBUG << "Cut holes for feedthroughs in warm wall "
-                << cylName
-                << endmsg;
-            const double rmin = currentRecord.getDouble("RMIN")*Gaudi::Units::cm;
-            const double rmax = currentRecord.getDouble("RMIN")*Gaudi::Units::cm + currentRecord.getDouble("DR")*Gaudi::Units::cm;
-            const double dz = currentRecord.getDouble("DZ")*Gaudi::Units::cm / 2.;
-            const double warmhole_radius = 0.5*340.*Gaudi::Units::mm;
-            const double warmhole_pos = dz - 247.*Gaudi::Units::mm;
+	    std::cout << "LAr Endcap Cryostat: Cut holes for feedthroughs in warm wall "
+		      << cylName << std::endl;
+            const double rmin = currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm;
+            const double rmax = currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm + currentRecord.getDouble("DR")*SYSTEM_OF_UNITS::cm;
+            const double dz = currentRecord.getDouble("DZ")*SYSTEM_OF_UNITS::cm / 2.;
+            const double warmhole_radius = 0.5*340.*SYSTEM_OF_UNITS::mm;
+            const double warmhole_pos = dz - 247.*SYSTEM_OF_UNITS::mm;
             GeoTube *warmhole = new GeoTube(0., warmhole_radius, (rmax - rmin) * 4);
-            const GeoShapeShift &h1 = (*warmhole) << GeoTrf::RotateX3D(90*Gaudi::Units::deg);
+            const GeoShapeShift &h1 = (*warmhole) << GeoTrf::RotateX3D(90*SYSTEM_OF_UNITS::deg);
             const double r = (rmin + rmax) * 0.5;
             const GeoShape* warmwall = solidCyl;
-            const double dphi = 5.*Gaudi::Units::deg;
+            const double dphi = 5.*SYSTEM_OF_UNITS::deg;
             auto put = [&warmwall, &warmhole_pos, &r, &h1](double pos){
               const double x = r*cos(pos), y = r*sin(pos);
               warmwall = &(warmwall->subtract(
                 h1 << GeoTrf::Translate3D(x, y, warmhole_pos)
-                     *GeoTrf::RotateZ3D(pos + 90*Gaudi::Units::deg)
-              ));
+                     *GeoTrf::RotateZ3D(pos + 90*SYSTEM_OF_UNITS::deg)
+					      ));
             };
-            for(unsigned int i{0}; i < LArEndcapCratePhiPos->size(); ++ i){
+            for(unsigned int i{0}; i < LArEndcapCratePhiPos->size(); ++ i) {
               const int num = (*LArEndcapCratePhiPos)[i].getInt("CRATENUM");
-              const double phi = (*LArEndcapCratePhiPos)[i].getDouble("PHIPOS")*Gaudi::Units::deg;
-              if(num == 10){ // topmost crate has one FT
+              const double phi = (*LArEndcapCratePhiPos)[i].getDouble("PHIPOS")*SYSTEM_OF_UNITS::deg;
+              if(num == 10) { // topmost crate has one FT
                 put(phi + dphi); // asymmetric, see DMConstruction
-              } else {
+              }
+	      else {
                 put(phi - dphi);
                 put(phi + dphi);
               }
             }
             solidCyl = warmwall;
-          } else if(cylNumber == 20){ // cold wall
-            log << MSG::DEBUG << "Cut holes for feedthroughs in cold wall "
-                << cylName
-                << endmsg;
-            const double rmin = currentRecord.getDouble("RMIN")*Gaudi::Units::cm;
-            const double rmax = currentRecord.getDouble("RMIN")*Gaudi::Units::cm + currentRecord.getDouble("DR")*Gaudi::Units::cm;
-            const double coldhole_radius = 0.5*150.*Gaudi::Units::mm;
-            const double coldhole_pos = 21.5*Gaudi::Units::mm;
+          }
+	  else if(cylNumber == 20) { // cold wall
+	    std::cout << "LAr Endcap Cryostat: Cut holes for feedthroughs in cold wall "
+		      << cylName << std::endl;
+            const double rmin = currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm;
+            const double rmax = currentRecord.getDouble("RMIN")*SYSTEM_OF_UNITS::cm + currentRecord.getDouble("DR")*SYSTEM_OF_UNITS::cm;
+            const double coldhole_radius = 0.5*150.*SYSTEM_OF_UNITS::mm;
+            const double coldhole_pos = 21.5*SYSTEM_OF_UNITS::mm;
             GeoTube *coldhole = new GeoTube(0., coldhole_radius, (rmax - rmin) * 4);
-            const GeoShapeShift &h1 = (*coldhole) << GeoTrf::RotateX3D(90*Gaudi::Units::deg);
+            const GeoShapeShift &h1 = (*coldhole) << GeoTrf::RotateX3D(90*SYSTEM_OF_UNITS::deg);
             const double r = (rmin + rmax) * 0.5;
             const GeoShape *coldwall = solidCyl;
-            const double dphi = 5.*Gaudi::Units::deg;
-            auto put = [&coldwall, &coldhole_pos, &r, &h1](double pos){
+            const double dphi = 5.*SYSTEM_OF_UNITS::deg;
+            auto put = [&coldwall, &coldhole_pos, &r, &h1](double pos) {
               const double x = r*cos(pos), y = r*sin(pos);
-              coldwall = &(coldwall->subtract(
-                h1 << GeoTrf::Translate3D(x, y, coldhole_pos)
-                     *GeoTrf::RotateZ3D(pos + 90*Gaudi::Units::deg)
-              ));
+              coldwall = &(coldwall->subtract(h1 << GeoTrf::Translate3D(x, y, coldhole_pos)
+					      *GeoTrf::RotateZ3D(pos + 90*SYSTEM_OF_UNITS::deg)
+					      ));
             };
-            for(unsigned int i{0}; i < LArEndcapCratePhiPos->size(); ++ i){
+            for(unsigned int i{0}; i < LArEndcapCratePhiPos->size(); ++ i) {
               const int num = (*LArEndcapCratePhiPos)[i].getInt("CRATENUM");
-              const double phi = (*LArEndcapCratePhiPos)[i].getDouble("PHIPOS")*Gaudi::Units::deg;
-              if(num == 10){ // topmost crate has one FT
+              const double phi = (*LArEndcapCratePhiPos)[i].getDouble("PHIPOS")*SYSTEM_OF_UNITS::deg;
+              if(num == 10) { // topmost crate has one FT
                 put(phi + dphi); // asymmetric, see DMConstruction
-              } else {
+              }
+	      else {
                 put(phi - dphi);
                 put(phi + dphi);
               }
@@ -447,12 +413,12 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
             solidCyl = coldwall;
           }
         }
-
+	
         const GeoLogVol* logicCyl = new GeoLogVol(cylName,solidCyl,material);
         GeoPhysVol* physCyl = new GeoPhysVol(logicCyl);
-
-        double zInCryostat = currentRecord.getDouble("ZMIN")*Gaudi::Units::cm
-                           + currentRecord.getDouble("DZ")*Gaudi::Units::cm / 2.;
+	
+        double zInCryostat = currentRecord.getDouble("ZMIN")*SYSTEM_OF_UNITS::cm
+	  + currentRecord.getDouble("DZ")*SYSTEM_OF_UNITS::cm / 2.;
         // Don't move the pump even if the rest of the cryostat moves.
 
         //if ( cylNumber == 33 ) zInCryostat -= zEmec;
@@ -461,18 +427,18 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
         cryoMotherPhysical->add(new GeoIdentifierTag(cylNumber));
         cryoMotherPhysical->add(new GeoTransform(GeoTrf::TranslateZ3D(zInCryostat)));
-
+	
         // Front cold wall of Cryostat is a mother for Endcap Presampler
-        if ( cylNumber == 14 ) {
+        if (cylNumber==14) {
           // its PhysicalVolume has a special name
           cryoMotherPhysical->add( new GeoNameTag(cylName + "::PresamplerMother") );
 
           EndcapPresamplerConstruction endcapPresamplerConstruction;
-
+	  
           GeoFullPhysVol* emecPSEnvelope = endcapPresamplerConstruction.Envelope();
-          if ( emecPSEnvelope != 0 ) {
+          if (emecPSEnvelope!=0) {
             // Get the position of the presampler from the geometry helper.
-            double Zpos = 30.5*Gaudi::Units::mm;
+            double Zpos = 30.5*SYSTEM_OF_UNITS::mm;
 
             // It is highly debateable whether the endcap presampler is
             // alignable, but in any case we shall not align it here because
@@ -482,13 +448,10 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
             physCyl->add(xfPs);
             physCyl->add( emecPSEnvelope );
-
+	    
             std::string tag = bPos? std::string("PRESAMPLER_EC_POS") : std::string("PRESAMPLER_EC_NEG");
-            StatusCode status;
 
-            StoredPhysVol *sPhysVol = new StoredPhysVol(emecPSEnvelope);
-            status=detStore->record(sPhysVol,tag);
-            if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
+	    if(m_publisher) m_publisher->publishNode<GeoVFullPhysVol*,std::string>(emecPSEnvelope,tag);
           }
         }
 
@@ -587,16 +550,16 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
   if(m_activateFT){
   // this ring emulates signal cables concentration area
   // nearby the theedtrougs inside the cryostat
-    const double rcoldwall = 2155.*Gaudi::Units::mm;
-    const double coldhole_radius = 0.5*150.*Gaudi::Units::mm; // copied from above
+    const double rcoldwall = 2155.*SYSTEM_OF_UNITS::mm;
+    const double coldhole_radius = 0.5*150.*SYSTEM_OF_UNITS::mm; // copied from above
     const double icable_dz = coldhole_radius;
     const double icable_dr =
       (1920./LArEndcapCratePhiPos->size()) *
-      M_PI * 1.1*1.1/4. * Gaudi::Units::mm2
+      M_PI * 1.1*1.1/4. * SYSTEM_OF_UNITS::mm2
       / (icable_dz*2);
-    log << MSG::DEBUG << "adding " << icable_dr/Gaudi::Units::mm << " mm"
-        << " of cables inside EC cryostat in front of FT" << endmsg;
-    const double z_pos = -249.*Gaudi::Units::mm - icable_dz;
+    std::cout << "EndcapScryostatConstruction: adding " << icable_dr/SYSTEM_OF_UNITS::mm << " mm"
+	      << " of cables inside EC cryostat in front of FT" << std::endl;
+    const double z_pos = -249.*SYSTEM_OF_UNITS::mm - icable_dz;
     const GeoMaterial* icable_mat = materialManager->getMaterial("LAr::FT::Cable");
     GeoShape* icable = new GeoTube(rcoldwall - icable_dr, rcoldwall, icable_dz);
     GeoLogVol* icableLV = new GeoLogVol("LAr::Endcap::InnerFTCables", icable, icable_mat);
@@ -614,22 +577,17 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     GeoFullPhysVol *envelope = m_emec.GetEnvelope(bPos);
 
     //=>
-    const GeoInpRecord *posRec = GeoInpUtils::getTransformRecord(larPosition, bPos ? "EMEC_POS":"EMEC_NEG");
+    const GeoInpRecord *posRec = LArGeoInpUtils::getTransformRecord(larPosition, bPos ? "EMEC_POS":"EMEC_NEG");
     if (!posRec) throw std::runtime_error("Error, no lar position record in the database") ;
-    GeoTrf::Transform3D xfPos = GeoInpUtils::getTransform(posRec);
+    GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
     GeoAlignableTransform *xfEmec = new GeoAlignableTransform(xfPos);
 
     std::string tag = bPos? std::string("EMEC_POS") : std::string("EMEC_NEG");
-    StatusCode status;
 
-    StoredPhysVol *sPhysVol = new StoredPhysVol(envelope);
-    status=detStore->record(sPhysVol,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-
-    StoredAlignX *sAlignX = new StoredAlignX(xfEmec);
-    status=detStore->record(sAlignX,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(envelope,tag);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfEmec,tag);
+    }
 
     //=>
     totalEMHLArPhysical->add(xfEmec);
@@ -640,27 +598,22 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
     std::string wheelType="front";
     bool threeBoards= false;
+    
     HECWheelConstruction frontHEC(m_fullGeo,wheelType,threeBoards,bPos) ;
     GeoFullPhysVol* EnvelopeF = frontHEC.GetEnvelope();
 
-    StatusCode status;
-
-
     //--- Make the Front Wheel alignable:
 
-    const GeoInpRecord *posHec1 = GeoInpUtils::getTransformRecord(larPosition, bPos ? "HEC1_POS":"HEC1_NEG");
-    GeoTrf::Transform3D xfPosHec1 = posHec1 ? GeoInpUtils::getTransform(posHec1) : GeoTrf::Translate3D(0.,0.,-2423.0);
+    const GeoInpRecord *posHec1 = LArGeoInpUtils::getTransformRecord(larPosition, bPos ? "HEC1_POS":"HEC1_NEG");
+    GeoTrf::Transform3D xfPosHec1 = posHec1 ? LArGeoInpUtils::getTransform(posHec1) : GeoTrf::Translate3D(0.,0.,-2423.0);
     GeoAlignableTransform *xfHec1 = new GeoAlignableTransform(xfPosHec1);
 
     std::string tag1 = bPos? std::string("HEC1_POS") : std::string("HEC1_NEG");
 
-    StoredPhysVol *sPhysVol1 = new StoredPhysVol(EnvelopeF);
-    status=detStore->record(sPhysVol1,tag1);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag1).c_str());
-
-    StoredAlignX *sAlignX1 = new StoredAlignX(xfHec1);
-    status=detStore->record(sAlignX1,tag1);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag1).c_str());
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(EnvelopeF,tag1);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfHec1,tag1);
+    }
 
     totalEMHLArPhysical->add( xfHec1);
     totalEMHLArPhysical->add(new GeoIdentifierTag(0));
@@ -673,20 +626,17 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     HECWheelConstruction rearHEC(m_fullGeo,wheelType,threeBoards,bPos) ;
     GeoFullPhysVol* EnvelopeR = rearHEC.GetEnvelope();
 
-    const GeoInpRecord *posHec2 = GeoInpUtils::getTransformRecord(larPosition, bPos ? "HEC2_POS":"HEC2_NEG");
-    GeoTrf::Transform3D xfPosHec2 = posHec2 ? GeoInpUtils::getTransform(posHec2) : GeoTrf::Translate3D(0.,0.,-1566.0);
+    const GeoInpRecord *posHec2 = LArGeoInpUtils::getTransformRecord(larPosition, bPos ? "HEC2_POS":"HEC2_NEG");
+    GeoTrf::Transform3D xfPosHec2 = posHec2 ? LArGeoInpUtils::getTransform(posHec2) : GeoTrf::Translate3D(0.,0.,-1566.0);
     GeoAlignableTransform *xfHec2 = new GeoAlignableTransform(xfPosHec2);
 
     std::string tag2 = bPos? std::string("HEC2_POS") : std::string("HEC2_NEG");
 
-    StoredPhysVol *sPhysVol2 = new StoredPhysVol(EnvelopeR);
-    status=detStore->record(sPhysVol2,tag2);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag2).c_str());
-
-    StoredAlignX *sAlignX2 = new StoredAlignX(xfHec2);
-    status=detStore->record(sAlignX2,tag2);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag2).c_str());
-
+    if(m_publisher) {
+      m_publisher->publishNode<GeoVFullPhysVol*,std::string>(EnvelopeR,tag2);
+      m_publisher->publishNode<GeoAlignableTransform*,std::string>(xfHec2,tag2);
+    }
+    
     totalEMHLArPhysical->add( xfHec2);
     totalEMHLArPhysical->add(new GeoIdentifierTag(1));
     totalEMHLArPhysical->add( EnvelopeR );
@@ -704,29 +654,25 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
     // The "envelope" determined by the EMB should be a GeoFullPhysVol.
     GeoVFullPhysVol* fcalEnvelope = m_fcal.GetEnvelope(bPos);
 
-    /* For now, comment out the FCAL placement, for two reasons:
-       1) The FCAL geometry helper class has been written yet;
-       2) Reconstruction needs each FCAL module to have a
-       separate alignable envelope.  We'll work out t hese
-       issues later. */
+    // For now, comment out the FCAL placement, for two reasons:
+    //   1) The FCAL geometry helper class has been written yet;
+    //   2) Reconstruction needs each FCAL module to have a
+    //   separate alignable envelope.  We'll work out t hese
+    //   issues later.
 
 
-    // From FCALConstruction.cxx: */
+    // From FCALConstruction.cxx: 
    //
 
     std::string tag = bPos ? "FCAL_POS" : "FCAL_NEG";
     // Get default values for alignable transform deltas from SubdetPosHelper
-    const GeoInpRecord *posRec = GeoInpUtils::getTransformRecord(larPosition, tag);
+    const GeoInpRecord *posRec = LArGeoInpUtils::getTransformRecord(larPosition, tag);
     if (!posRec) throw std::runtime_error("Error, no lar position record in the database") ;
-    GeoTrf::Transform3D xfPos = GeoInpUtils::getTransform(posRec);
+    GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
     GeoAlignableTransform *fcalXF = new GeoAlignableTransform(xfPos);
 
-    StatusCode status;
-    StoredAlignX *sAlignX = new StoredAlignX(fcalXF);
-    status=detStore->record(sAlignX,tag);
-    if(!status.isSuccess()) throw std::runtime_error ((std::string("Cannot store")+tag).c_str());
-
-
+    if(m_publisher) m_publisher->publishNode<GeoAlignableTransform*,std::string>(fcalXF,tag);
+    
     const GeoLogVol *envVol = fcalEnvelope->getLogVol();
     const GeoShape  *envShape = envVol->getShape();
     if (envShape->typeID()!=GeoTubs::getClassTypeID()) {
@@ -742,6 +688,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
 
   }
+
 
   //_________________________ MBTS ___________________________________________________
     // DB related stuff first
@@ -785,10 +732,10 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 	}
 
 	// Build mother volume
-	double rminMM = itMother->getDouble("RMIN")*Gaudi::Units::mm;
-	double rmaxMM = itMother->getDouble("RMAX")*Gaudi::Units::mm;
-	double dzMM = itMother->getDouble("DZ")*Gaudi::Units::mm;
-	zposMM = itMother->getDouble("ZPOS")*Gaudi::Units::mm;
+	double rminMM = itMother->getDouble("RMIN")*SYSTEM_OF_UNITS::mm;
+	double rmaxMM = itMother->getDouble("RMAX")*SYSTEM_OF_UNITS::mm;
+	double dzMM = itMother->getDouble("DZ")*SYSTEM_OF_UNITS::mm;
+	zposMM = itMother->getDouble("ZPOS")*SYSTEM_OF_UNITS::mm;
 
 	const GeoMaterial *matMM  = materialManager->getMaterial(itMother->getString("MATERIAL"));
 
@@ -797,8 +744,8 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 	GeoTube *tubeJM=NULL;
 	const GeoShape *solidMM=NULL;
 	if (itTube!=mbtsTubs->end()) {
-	  double dzMod   = (*itTube).getDouble("DZ")*Gaudi::Units::mm;
-	  double rMaxMod = (*itTube).getDouble("RMAX")*Gaudi::Units::mm;
+	  double dzMod   = (*itTube).getDouble("DZ")*SYSTEM_OF_UNITS::mm;
+	  double rMaxMod = (*itTube).getDouble("RMAX")*SYSTEM_OF_UNITS::mm;
 
 	  GeoPcon *pcon = new GeoPcon(0,2*M_PI);
 	  pcon->addPlane(-dzMM,rminMM,rmaxMM);
@@ -818,10 +765,10 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 	cryoMotherPhysical->add(pvMM);
 
 	// Moderator cylinder
-	//double rminMod  = (*itModerator)->getDouble("RMIN")*Gaudi::Units::mm;
-	//double rmaxMod = (*itModerator)->getDouble("RMAX")*Gaudi::Units::mm;
-	double dzMod = itModerator->getDouble("DZ")*Gaudi::Units::mm;
-	double zposMod = itModerator->getDouble("ZPOS")*Gaudi::Units::mm;
+	//double rminMod  = (*itModerator)->getDouble("RMIN")*SYSTEM_OF_UNITS::mm;
+	//double rmaxMod = (*itModerator)->getDouble("RMAX")*SYSTEM_OF_UNITS::mm;
+	double dzMod = itModerator->getDouble("DZ")*SYSTEM_OF_UNITS::mm;
+	double zposMod = itModerator->getDouble("ZPOS")*SYSTEM_OF_UNITS::mm;
 
 	const GeoMaterial *matMod  = materialManager->getMaterial(itModerator->getString("MATERIAL"));
 
@@ -928,13 +875,13 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 	  const GeoInpRecord& curScin = (*mbtsScin)[scinId];
 
 	  int nScin = curScin.getInt("SCINNUM");
-	  double dx1Scin = curScin.getDouble("DX1")*Gaudi::Units::mm;
-	  double dx2Scin = curScin.getDouble("DX2")*Gaudi::Units::mm;
-	  double dy1Scin = curScin.getDouble("DY1")*Gaudi::Units::mm;
-	  double dy2Scin = curScin.getDouble("DY2")*Gaudi::Units::mm;
-	  double dzScin  = curScin.getDouble("DZ")*Gaudi::Units::mm;
-	  double zposScin = curScin.getDouble("ZPOS")*Gaudi::Units::mm;
-	  double rposScin = curScin.getDouble("RPOS")*Gaudi::Units::mm;
+	  double dx1Scin = curScin.getDouble("DX1")*SYSTEM_OF_UNITS::mm;
+	  double dx2Scin = curScin.getDouble("DX2")*SYSTEM_OF_UNITS::mm;
+	  double dy1Scin = curScin.getDouble("DY1")*SYSTEM_OF_UNITS::mm;
+	  double dy2Scin = curScin.getDouble("DY2")*SYSTEM_OF_UNITS::mm;
+	  double dzScin  = curScin.getDouble("DZ")*SYSTEM_OF_UNITS::mm;
+	  double zposScin = curScin.getDouble("ZPOS")*SYSTEM_OF_UNITS::mm;
+	  double rposScin = curScin.getDouble("RPOS")*SYSTEM_OF_UNITS::mm;
 
 	  double startPhi = 0.;
 	  try {
@@ -959,12 +906,12 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 	  GeoSerialTransformer* stScin = 0;
 
 	  if(bPos) {
-	    GENFUNCTION phiInd = deltaPhi*(varInd + startPhi)*Gaudi::Units::deg;
-	    TRANSFUNCTION xfScin = Pow(GeoTrf::RotateZ3D(1.0),phiInd)*GeoTrf::TranslateZ3D(zposScin)*GeoTrf::TranslateX3D(rposScin)*GeoTrf::RotateY3D(90*Gaudi::Units::deg);
+	    GENFUNCTION phiInd = deltaPhi*(varInd + startPhi)*SYSTEM_OF_UNITS::deg;
+	    TRANSFUNCTION xfScin = Pow(GeoTrf::RotateZ3D(1.0),phiInd)*GeoTrf::TranslateZ3D(zposScin)*GeoTrf::TranslateX3D(rposScin)*GeoTrf::RotateY3D(90*SYSTEM_OF_UNITS::deg);
 	    stScin = new GeoSerialTransformer(pvScin,&xfScin,nScin);
 	  } else {
-	    GENFUNCTION phiInd = (180 - deltaPhi*(varInd + startPhi))*Gaudi::Units::deg;
-	    TRANSFUNCTION xfScin = Pow(GeoTrf::RotateZ3D(1.0),phiInd)*GeoTrf::TranslateZ3D(zposScin)*GeoTrf::TranslateX3D(rposScin)*GeoTrf::RotateY3D(90*Gaudi::Units::deg);
+	    GENFUNCTION phiInd = (180 - deltaPhi*(varInd + startPhi))*SYSTEM_OF_UNITS::deg;
+	    TRANSFUNCTION xfScin = Pow(GeoTrf::RotateZ3D(1.0),phiInd)*GeoTrf::TranslateZ3D(zposScin)*GeoTrf::TranslateX3D(rposScin)*GeoTrf::RotateY3D(90*SYSTEM_OF_UNITS::deg);
 	    stScin = new GeoSerialTransformer(pvScin,&xfScin,nScin);
 	  }
 
@@ -1027,12 +974,12 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 	Variable varInd;
 	GeoSerialTransformer* stAirEnv = 0;
 	if(bPos) {
-	  GENFUNCTION phiInd = deltaPhi*(varInd + startPhi)*Gaudi::Units::deg;
-	  TRANSFUNCTION xfAirEnv = Pow(GeoTrf::RotateZ3D(1.0),phiInd)*GeoTrf::TranslateZ3D(zposAirEnv)*GeoTrf::TranslateX3D(rposAirEnv)*GeoTrf::RotateY3D(90*Gaudi::Units::deg);
+	  GENFUNCTION phiInd = deltaPhi*(varInd + startPhi)*SYSTEM_OF_UNITS::deg;
+	  TRANSFUNCTION xfAirEnv = Pow(GeoTrf::RotateZ3D(1.0),phiInd)*GeoTrf::TranslateZ3D(zposAirEnv)*GeoTrf::TranslateX3D(rposAirEnv)*GeoTrf::RotateY3D(90*SYSTEM_OF_UNITS::deg);
 	  stAirEnv = new GeoSerialTransformer(pvAirEnv,&xfAirEnv,nAirEnv);
 	} else {
-	  GENFUNCTION phiInd = (180 - deltaPhi*(varInd + startPhi))*Gaudi::Units::deg;
-	  TRANSFUNCTION xfAirEnv = Pow(GeoTrf::RotateZ3D(1.0),phiInd)*GeoTrf::TranslateZ3D(zposAirEnv)*GeoTrf::TranslateX3D(rposAirEnv)*GeoTrf::RotateY3D(90*Gaudi::Units::deg);
+	  GENFUNCTION phiInd = (180 - deltaPhi*(varInd + startPhi))*SYSTEM_OF_UNITS::deg;
+	  TRANSFUNCTION xfAirEnv = Pow(GeoTrf::RotateZ3D(1.0),phiInd)*GeoTrf::TranslateZ3D(zposAirEnv)*GeoTrf::TranslateX3D(rposAirEnv)*GeoTrf::RotateY3D(90*SYSTEM_OF_UNITS::deg);
 	  stAirEnv = new GeoSerialTransformer(pvAirEnv,&xfAirEnv,nAirEnv);
 	}
 
@@ -1042,6 +989,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
       }
     } // if(m_fullGeo)
 
+/*    
     // Build readout for MBTS
     // Do it only once for both A and C sides
     if(bPos) {
@@ -1054,9 +1002,9 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
       else {
 	// This recordset is need for calculating global Z positions of scintillators
 	GeoInpRecordset_ptr larPosition = inpman->getRecordsetPtr("LArPosition");
-	const GeoInpRecord *posRec = GeoInpUtils::getTransformRecord(larPosition, "LARCRYO_EC_POS");
+	const GeoInpRecord *posRec = LArGeoInpUtils::getTransformRecord(larPosition, "LARCRYO_EC_POS");
 	if(!posRec) throw std::runtime_error("Error, no lar position record in the database") ;
-	GeoTrf::Transform3D xfPos = GeoInpUtils::getTransform(posRec);
+	GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
 	double globalZMM = xfPos.translation().z() + zposMM;
 
 	// Create MBTS manager
@@ -1076,15 +1024,15 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 
 		nScin = curScin.getInt("SCINNUM");
 		eta = curScin.getInt("SCIN_ID")-1;
-		dx1Scin = curScin.getDouble("DX1")*Gaudi::Units::mm;
-		dzScin  = curScin.getDouble("DZ")*Gaudi::Units::mm;
-		zposScin = curScin.getDouble("ZPOS")*Gaudi::Units::mm;
-		rposScin = curScin.getDouble("RPOS")*Gaudi::Units::mm;
+		dx1Scin = curScin.getDouble("DX1")*SYSTEM_OF_UNITS::mm;
+		dzScin  = curScin.getDouble("DZ")*SYSTEM_OF_UNITS::mm;
+		zposScin = curScin.getDouble("ZPOS")*SYSTEM_OF_UNITS::mm;
+		rposScin = curScin.getDouble("RPOS")*SYSTEM_OF_UNITS::mm;
 		if(!curScin.isFieldNull("ETA"))
 		  scineta = curScin.getDouble("ETA");
 		if(!curScin.isFieldNull("DETA"))
 		  scindeta = curScin.getDouble("DETA");
-		deltaPhi = 360.*Gaudi::Units::deg/nScin;
+		deltaPhi = 360.*SYSTEM_OF_UNITS::deg/nScin;
 		try {
 		  if(!curScin.isFieldNull("STARTPHI"))
 		    startPhi = curScin.getDouble("STARTPHI");
@@ -1097,14 +1045,14 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 		const GeoInpRecord& curScin = (*mbtsTrds)[trdMap[scinName]];
 		nScin = (*mbtsGen)[0].getInt("NSCIN");
 		eta = curScin.getInt("SCIN_ID")-1;
-		dx1Scin = curScin.getDouble("DX1")*Gaudi::Units::mm;
-		dzScin  = curScin.getDouble("DZ")*Gaudi::Units::mm;
-		zposScin = (*mbtsGen)[0].getDouble("ZPOSENV")*Gaudi::Units::mm;
-		rposScin = ((*mbtsGen)[0].getDouble("RPOSENV")+curScin.getDouble("ZPOS"))*Gaudi::Units::mm;
+		dx1Scin = curScin.getDouble("DX1")*SYSTEM_OF_UNITS::mm;
+		dzScin  = curScin.getDouble("DZ")*SYSTEM_OF_UNITS::mm;
+		zposScin = (*mbtsGen)[0].getDouble("ZPOSENV")*SYSTEM_OF_UNITS::mm;
+		rposScin = ((*mbtsGen)[0].getDouble("RPOSENV")+curScin.getDouble("ZPOS"))*SYSTEM_OF_UNITS::mm;
 		scineta = curScin.getDouble("ETA");
 		scindeta = curScin.getDouble("DETA");
 		startPhi = (*mbtsGen)[0].getDouble("STARTPHI");
-		deltaPhi = 360.*Gaudi::Units::deg/nScin;
+		deltaPhi = 360.*SYSTEM_OF_UNITS::deg/nScin;
 	      }
 
 	    for(int phi=0; phi<nScin; phi++) {
@@ -1132,7 +1080,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 	  log << MSG::ERROR << "Unable to record MBTS Detector Manager into DS" << endmsg;
       } // TileTB Initialize
     } // if(bPos)
-
+*/
   // Build endcap dead matter around the cryostat
   EndcapDMConstruction crateBuilder(m_activateFT);
   crateBuilder.create(cryoMotherPhysical);
@@ -1141,7 +1089,7 @@ GeoFullPhysVol* LArGeo::EndcapCryostatConstruction::createEnvelope(bool bPos)
 }
 
 GeoPhysVol* LArGeo::EndcapCryostatConstruction::buildMbtsTrd(const GeoInpRecord* rec
-							     , const StoredMaterialManager* matmanager
+							     , const GeoXmlMatManager* matmanager
 							     , GeoPhysVol* parent)
 {
   // Construct the Trd

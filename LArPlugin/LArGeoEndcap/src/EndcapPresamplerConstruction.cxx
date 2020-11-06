@@ -10,17 +10,12 @@
 #include "GeoModelKernel/GeoLogVol.h"  
 #include "GeoModelKernel/GeoTubs.h"  
 #include "GeoModelKernel/GeoDefinitions.h"
-#include "StoreGate/StoreGateSvc.h"
-#include "GeoModelInterfaces/AbsMaterialManager.h"
-#include "GeoModelInterfaces/StoredMaterialManager.h"
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits
 
-#include "StoreGate/StoreGateSvc.h"
-#include "GaudiKernel/MsgStream.h"
-#include "GaudiKernel/Bootstrap.h"
-#include "GaudiKernel/SystemOfUnits.h"
-
-#include "LArInpManTest/GeoXmlInpManager.h"
-#include "LArInpManTest/GeoInpRecordset.h"
+#include "GeoXmlMatManager/GeoXmlMatManager.h"
+#include "GeoXmlInpManager/GeoXmlInpManager.h"
+#include "GeoXmlInpManager/GeoInpRecordset.h"
 
 #include <string>
 #include <cmath>
@@ -46,35 +41,26 @@ GeoFullPhysVol* EndcapPresamplerConstruction::Envelope()
 {
   if (m_psPhysical) return m_psPhysical->clone();
 
-
-  ISvcLocator *svcLocator = Gaudi::svcLocator();
-  StoreGateSvc *detStore;
-  if (svcLocator->service("DetectorStore", detStore, false )==StatusCode::FAILURE) {
-    throw std::runtime_error("Error in EndcapCryostatConstruction, cannot access DetectorStore");
-  }
-
-  const StoredMaterialManager* materialManager = nullptr;
-  if (StatusCode::SUCCESS != detStore->retrieve(materialManager, std::string("MATERIALS"))) return 0;
+  GeoXmlInpManager*       inpman          = GeoXmlInpManager::getManager();
+  const GeoXmlMatManager* materialManager = GeoXmlMatManager::getManager();
 
   const GeoMaterial *LAr  = materialManager->getMaterial("std::LiquidArgon");
   if (!LAr) {
     throw std::runtime_error("Error in EndcapCryostatConstruction, std::LiquidArgon is not found.");
   }
 
-  GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
   GeoInpRecordset_ptr presamplerPosition = inpman->getRecordsetPtr("PresamplerPosition");
 
   ///////////////////////////////////////////////////////////////////
   // LAr Endcap Presampler GEOMETRY
   ///////////////////////////////////////////////////////////////////
-  double Rmin = (*presamplerPosition)[0].getDouble("RMAX")*Gaudi::Units::cm;
-  double Rmax = (*presamplerPosition)[0].getDouble("RMAX")*Gaudi::Units::cm;
-  double HalfZ = ((*presamplerPosition)[0].getDouble("TCK")/2.)*Gaudi::Units::cm;  
-
+  double Rmin = (*presamplerPosition)[0].getDouble("RMAX")*SYSTEM_OF_UNITS::cm;
+  double Rmax = (*presamplerPosition)[0].getDouble("RMAX")*SYSTEM_OF_UNITS::cm;
+  double HalfZ = ((*presamplerPosition)[0].getDouble("TCK")/2.)*SYSTEM_OF_UNITS::cm;  
 
   std::string name = "LAr::Endcap::Presampler::LiquidArgon";
 
-  double phi_size = 360.*Gaudi::Units::deg;
+  double phi_size = 360.*SYSTEM_OF_UNITS::deg;
   double start_phi = 0.;
   
   if( m_isModule ){

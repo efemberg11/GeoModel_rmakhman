@@ -14,10 +14,10 @@ set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
 include( GNUInstallDirs )
 
 # Find the header and source files.
-file( GLOB SOURCES plugin/*.cxx LArGeoUtils/src/*.cxx LArGeoBarrel/src/*.cxx)
+file( GLOB SOURCES plugin/*.cxx LArGeoUtils/src/*.cxx LArGeoBarrel/src/*.cxx LArGeoEndcap/src/*.cxx GeoSpecialShapes/src/*.cxx GeoSpecialShapes/src/LArWheelCalculator_Impl/*.cxx LArGeoHec/src/*.cxx LArGeoFcal/src/*.cxx)
 
 # Define include directories
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/LArGeoUtils ${CMAKE_CURRENT_SOURCE_DIR}/LArGeoBarrel )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/LArGeoUtils ${CMAKE_CURRENT_SOURCE_DIR}/LArGeoBarrel ${CMAKE_CURRENT_SOURCE_DIR}/LArGeoEndcap ${CMAKE_CURRENT_SOURCE_DIR}/GeoSpecialShapes ${CMAKE_CURRENT_SOURCE_DIR}/GeoSpecialShapes/src/LArWheelCalculator_Impl ${CMAKE_CURRENT_SOURCE_DIR}/LArGeoHec ${CMAKE_CURRENT_SOURCE_DIR}/LArGeoFcal )
 
 
 add_library( LArGeoPlugin SHARED ${SOURCES} )

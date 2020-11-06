@@ -4,7 +4,7 @@
 
 #include "LArGeoBarrel/BarrelCryostatConstruction.h"
 //#include "LArGeoTBBarrel/TBBarrelCryostatConstruction.h"
-//#include "LArGeoEndcap/EndcapCryostatConstruction.h"
+#include "LArGeoEndcap/EndcapCryostatConstruction.h"
 #include "LArGeoUtils/LArGeoMaterialManager.h"
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
@@ -14,6 +14,7 @@
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoNameTag.h"
+#include "GeoModelKernel/GeoPublisher.h"
 #include "GeoModelKernel/Units.h"
 
 #include "GeoXmlMatManager/GeoXmlMatManager.h"
@@ -26,18 +27,20 @@
 
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
-
 class LArGeoPlugin : public GeoVGeometryPlugin
 {
 public:
-  
-  LArGeoPlugin() {};
+  LArGeoPlugin()
+    : GeoVGeometryPlugin()
+  {}
+  LArGeoPlugin(std::string name)
+    :GeoVGeometryPlugin(name)
+  {}
   ~LArGeoPlugin();
 
   virtual void create(GeoPhysVol* world, bool publish) override;
 
-private:
-  
+private:  
   const LArGeoPlugin & operator=(const LArGeoPlugin &right)=delete;
   LArGeoPlugin(const LArGeoPlugin &right) = delete;
   
@@ -56,13 +59,12 @@ private:
   bool         m_activateFT{false};
 };
 
-
 LArGeoPlugin::~LArGeoPlugin()
 {
   delete m_matman;
 }
 
-void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
+void LArGeoPlugin::create(GeoPhysVol* world, bool publish)
 {
   // ________ Time measure ____________
   typedef std::chrono::high_resolution_clock Time;
@@ -112,20 +114,28 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
 
 //    if (m_testbeam==0) {
 
-  LArGeo::BarrelCryostatConstruction barrelCryostatConstruction(m_fullGeo, m_matman, m_activateFT);
+  LArGeo::BarrelCryostatConstruction barrelCryostatConstruction(m_fullGeo
+								, m_matman
+								, publish ? getPublisher() : nullptr
+								, m_activateFT);
   barrelCryostatConstruction.setBarrelSagging(m_barrelSagging);
   barrelCryostatConstruction.setBarrelCellVisLimit(m_barrelVisLimit);
       
-//  EndcapCryostatConstruction endcapCryostatConstruction(m_matman,m_fullGeo, m_EMECVariantInner, m_EMECVariantOuter, m_activateFT);
-//  endcapCryostatConstruction.setFCALVisLimit(m_fcalVisLimit);
+  LArGeo::EndcapCryostatConstruction endcapCryostatConstruction(m_matman
+								, m_fullGeo
+								, publish ? getPublisher() : nullptr
+								, m_EMECVariantInner
+								, m_EMECVariantOuter
+								, m_activateFT);
+  endcapCryostatConstruction.setFCALVisLimit(m_fcalVisLimit);
   
   if(m_buildBarrel) {
     barrelEnvelope = barrelCryostatConstruction.GetEnvelope();
   }
       
   if(m_buildEndcap) {
-//    endcapEnvelopePos = endcapCryostatConstruction.createEnvelope(true);
-//    endcapEnvelopeNeg = endcapCryostatConstruction.createEnvelope(false);
+    endcapEnvelopePos = endcapCryostatConstruction.createEnvelope(true);
+    endcapEnvelopeNeg = endcapCryostatConstruction.createEnvelope(false);
   }
       
   world->add(new GeoNameTag("LAr"));
@@ -142,17 +152,11 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
     GeoTrf::Transform3D xfBarrel = LArGeoInpUtils::getTransform(barrelRec);
 	
     GeoAlignableTransform* barrelAlXf = new GeoAlignableTransform(xfBarrel);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(barrelEnvelope);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_B");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_B PhysVol");
-	  
-	  StoredAlignX *sAlignX = new StoredAlignX(barrelAlXf);
-	  status=detStore->record(sAlignX,"LARCRYO_B");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_B Alignable XF");
-	}
-	*/
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(barrelEnvelope,"LARCRYO_B");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(barrelAlXf,"LARCRYO_B");
+    }
+    
     world->add(new GeoNameTag("LArBarrel"));
     world->add(barrelAlXf);
     world->add(barrelEnvelope);
@@ -163,41 +167,29 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
     GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
 
     GeoAlignableTransform *xfEndcapPos = new GeoAlignableTransform(xfPos);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(endcapEnvelopePos);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_EC_POS");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_EC_POS PhysVol");
-	  
-	  StoredAlignX *sAlignX = new StoredAlignX(xfEndcapPos);
-	  status=detStore->record(sAlignX,"LARCRYO_EC_POS");
-	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_POS");
-	}
-	*/
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(endcapEnvelopePos,"LARCRYO_EC_POS");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(xfEndcapPos,"LARCRYO_EC_POS");
+    }
+
     // --- Endcap Neg
     const GeoInpRecord *negRec = LArGeoInpUtils::getTransformRecord(larPosition,"LARCRYO_EC_NEG");
     if(!negRec) throw std::runtime_error("Error, no lar position record in the XML database");
     GeoTrf::Transform3D xfNeg = LArGeoInpUtils::getTransform(negRec);
     
     GeoAlignableTransform *xfEndcapNeg = new GeoAlignableTransform(xfNeg);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(endcapEnvelopeNeg);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_EC_NEG");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_EC_NEG PhysVol");
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(endcapEnvelopeNeg,"LARCRYO_EC_NEG");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(xfEndcapNeg,"LARCRYO_EC_NEG");
+    }
 
-	  StoredAlignX *sAlignX = new StoredAlignX(xfEndcapNeg);
-	  status=detStore->record(sAlignX,"LARCRYO_EC_NEG");
-	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_NEG");
-	}
-	*/
-//    world->add( new GeoNameTag("LArEndcapPos"));
-//    world->add(xfEndcapPos);
-//    world->add(endcapEnvelopePos);
-//    world->add( new GeoNameTag("LArEndcapNeg"));
-//    world->add(xfEndcapNeg);
-//    world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*Gaudi::Units::deg)));
-//    world->add(endcapEnvelopeNeg);
+    world->add( new GeoNameTag("LArEndcapPos"));
+    world->add(xfEndcapPos);
+    world->add(endcapEnvelopePos);
+    world->add( new GeoNameTag("LArEndcapNeg"));
+    world->add(xfEndcapNeg);
+    world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*SYSTEM_OF_UNITS::deg)));
+    world->add(endcapEnvelopeNeg);
   }
   else if(!m_buildEndcap) {
     // -- Build the Barrel only
@@ -206,17 +198,11 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
     GeoTrf::Transform3D xfBarrel = LArGeoInpUtils::getTransform(barrelRec);
     
     GeoAlignableTransform* barrelAlXf = new GeoAlignableTransform(xfBarrel);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(barrelEnvelope);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_B");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_B PhysVol");
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(barrelEnvelope,"LARCRYO_B");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(barrelAlXf,"LARCRYO_B");
+    }
 
-	  StoredAlignX *sAlignX = new StoredAlignX(barrelAlXf);
-	  status=detStore->record(sAlignX,"LARCRYO_B");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_B Alignable XF");
-	}
-	*/
     world->add(new GeoNameTag("LArBarrel"));
     world->add(barrelAlXf);
     world->add(barrelEnvelope);
@@ -229,41 +215,29 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
     GeoTrf::Transform3D xfPos = LArGeoInpUtils::getTransform(posRec);
 	
     GeoAlignableTransform *xfEndcapPos = new GeoAlignableTransform(xfPos);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(endcapEnvelopePos);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_EC_POS");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_EC_POS PhysVol");
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(endcapEnvelopePos,"LARCRYO_EC_POS");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(xfEndcapPos,"LARCRYO_EC_POS");
+    }
 
-	  StoredAlignX *sAlignX = new StoredAlignX(xfEndcapPos);
-	  status=detStore->record(sAlignX,"LARCRYO_EC_POS");
-	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_POS");
-	}
-	*/
     // --- Endcap Neg
     const GeoInpRecord *negRec = LArGeoInpUtils::getTransformRecord(larPosition,"LARCRYO_EC_NEG");
     if(!negRec) throw std::runtime_error("Error, no lar position record in the XML database");
     GeoTrf::Transform3D xfNeg = LArGeoInpUtils::getTransform(negRec);
     
     GeoAlignableTransform *xfEndcapNeg = new GeoAlignableTransform(xfNeg);
-	/*
-	{
-	  StoredPhysVol *sPhysVol = new StoredPhysVol(endcapEnvelopeNeg);
-	  StatusCode status=detStore->record(sPhysVol,"LARCRYO_EC_NEG");
-	  if(!status.isSuccess()) throw std::runtime_error("Cannot store LARCRYO_EC_NEG PhysVol");
+    if(publish) {
+      getPublisher()->publishNode<GeoVFullPhysVol*,std::string>(endcapEnvelopeNeg,"LARCRYO_EC_NEG");
+      getPublisher()->publishNode<GeoAlignableTransform*,std::string>(xfEndcapNeg,"LARCRYO_EC_NEG");
+    }
 
-	  StoredAlignX *sAlignX = new StoredAlignX(xfEndcapNeg);
-	  status=detStore->record(sAlignX,"LARCRYO_EC_NEG");
-	  if(!status.isSuccess()) throw std::runtime_error ("Cannot store LARCRYO_EC_NEG");
-	}
-	*/
-//    world->add( new GeoNameTag("LArEndcapPos"));
-//    world->add(xfEndcapPos);
-//    world->add(endcapEnvelopePos);
-//    world->add( new GeoNameTag("LArEndcapNeg"));
-//    world->add(xfEndcapNeg);
-//    world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*Gaudi::Units::deg)));
-//    world->add(endcapEnvelopeNeg);
+    world->add( new GeoNameTag("LArEndcapPos"));
+    world->add(xfEndcapPos);
+    world->add(endcapEnvelopePos);
+    world->add( new GeoNameTag("LArEndcapNeg"));
+    world->add(xfEndcapNeg);
+    world->add( new GeoTransform(GeoTrf::RotateY3D(180.0*SYSTEM_OF_UNITS::deg)));
+    world->add(endcapEnvelopeNeg);
     
   }
   /*      
@@ -619,5 +593,5 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool /*not used here*/)
 }
 
 extern "C" LArGeoPlugin *createLArGeoPlugin() {
-    return new LArGeoPlugin();
+  return new LArGeoPlugin("LAr");
 }

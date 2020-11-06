@@ -18,6 +18,9 @@ class GeoFullPhysVol;
 class LArCustomShape;
 class GeoMaterial;
 class LArGeoMaterialManager;
+class LArWheelCalculatorParameters;
+class GeoXmlInpManager;
+class GeoPublisher;
 
 namespace LArGeo {
 
@@ -28,7 +31,11 @@ namespace LArGeo {
   {
   public:
 
-    EMECConstruction(LArGeoMaterialManager* matman, bool is_tb = false, bool has_inner = true, bool has_outer = true);
+    EMECConstruction(LArGeoMaterialManager* matman
+		     , GeoPublisher* publisher
+		     , bool is_tb = false
+		     , bool has_inner = true
+		     , bool has_outer = true);
     virtual ~EMECConstruction();
 
     // Get the envelope containing this detector.
@@ -41,25 +48,29 @@ namespace LArGeo {
     void setOuterVariant(const std::string &v){ m_outerWheelVariant = v; }
 
   private:
-    LArGeoMaterialManager* m_matman;
+    LArGeoMaterialManager*  m_matman;
+    GeoPublisher*           m_publisher;
     bool        m_fullGeo;  // true->FULL, false->RECO
 
-    bool	    m_isTB;
-    bool	    m_hasInnerWheel;
-    bool	    m_hasOuterWheel;
+    bool	m_isTB;
+    bool	m_hasInnerWheel;
+    bool	m_hasOuterWheel;
 
     std::string m_innerWheelVariant;
     std::string m_outerWheelVariant;
 
-    void place_custom_solids(
-        GeoFullPhysVol *fullPV,
-        std::vector<LArCustomShape *> &absorbers,
-        std::vector<LArCustomShape *> &electrodes,
-        int multilayered_absorbers,
-        const GeoMaterial *Absorber, const GeoMaterial *Electrode,
-        const GeoMaterial *Glue, const GeoMaterial *Lead
-    );
+    void place_custom_solids(GeoFullPhysVol *fullPV
+			     , std::vector<LArCustomShape *> &absorbers
+			     , std::vector<LArCustomShape *> &electrodes
+			     , int multilayered_absorbers
+			     , const GeoMaterial *Absorber
+			     , const GeoMaterial *Electrode
+			     , const GeoMaterial *Glue
+			     , const GeoMaterial *Lead
+			     , const LArWheelCalculatorParameters& params);
 
+    void getWheelCalculatorParameters(GeoXmlInpManager* inpman
+				      , LArWheelCalculatorParameters& params);
   };
 
 } // namespace LArGeo

@@ -1,4 +1,3 @@
-
 # GeoModel --- A user-friendly C++ Toolkit for HEP Detector Description
 
 GeoModel is a user-friendly C++ Toolkit and Suite for HEP Detector Description with minimal dependencies.
@@ -69,15 +68,7 @@ will enable the build of the geometry visualization tool, `GeoModelExplorer` (`g
 cmake -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel
 ```
 
-will enable the build of all the examples, except those requiring Geant4, and of all the base classes.
-
-While this:
-
-```
-cmake  -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=1 ../GeoModel
-```
-
-will enable the build of all the examples, also those requiring Geant4. This option will also build `GeoModelG4`, the interface between GeoModel and GEant4, and brings in the dependency on a Geant4 installation.
+will enable the build of all the examples (except those requiring Geant4, see below) and of all the base classes and packages.
 
 
 #### Build the GeoModel --> Geant4 interface
@@ -88,8 +79,18 @@ This CMake command
 cmake  -DGEOMODEL_BUILD_GEOMODELG4=1 ../GeoModel
 ```
 
-will build the interface classes which translate GeoModel nodes into Geant4 entities, as well as all the base GeoModel classes.
+will build the base packages as well the interface classes which translate GeoModel nodes into Geant4 entities, as well as all the base GeoModel classes.
 This also brings in an additional dependency on a Geant4 installation.
+
+#### Build the examples for the GeoModel --> Geant4 interface
+
+To build the examples for the GeoModel --> Geant4 interface, you should use the `GEOMODEL_BUILD_EXAMPLES_W_GEANT4` build option:
+
+```
+cmake  -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=1 ../GeoModel
+```
+
+This will enable the build of all the examples, also those requiring Geant4. This option will also build `GeoModelG4` (see above), which is the interface between GeoModel and Geant4, and brings in the dependency on a local Geant4 installation.
 
 
 #### Build the standalone Geant4-based detector simulation application
@@ -102,7 +103,7 @@ cmake  -DGEOMODEL_BUILD_FULLSIMLIGHT=1 ../GeoModel
 
 will build `FullSimLight`, the Geant4-based application which let users run standalone simulations on a complete detector geometry or on a piece of that, as well as `GeoModelG4` and all the base classes. This also brings in an additional dependency on a Geant4 installation.
 
-
+### Notes
 
 **Note:**
 When used during the CMake configuration step, all the variables must be prefixed by `-D`, like in the first example of this section. You can also combine them.

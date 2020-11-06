@@ -17,9 +17,9 @@ endif()
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1Base/*.h )
-file( GLOB UIS src/*.ui )
+file( GLOB UIS src/*.ui ) # Qt5 UI files
 
-
+# Qt5 settings
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTOUIC ON)
@@ -32,26 +32,13 @@ QT5_ADD_RESOURCES(UI_RESOURCES_RCC ${UI_RESOURCES})
 
 include_directories ("${PROJECT_SOURCE_DIR}")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
+
 add_library ( GXBase SHARED ${SOURCES} ${HEADERS} ${UI_HDRS} ${UI_RESOURCES_RCC} )
 
-# External dependencies:
-include_directories(${Qt5Core_INCLUDE_DIRS} )
-include_directories(${Qt5Gui_INCLUDE_DIRS} )
-include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Coin_INCLUDE_DIR} )
-include_directories(${SoQt_INCLUDE_DIRS} )
-include_directories(${VP1HEPVis_INCLUDE_DIRS} )
 if ( APPLE )
-  target_link_libraries (GXBase ${Qt5Core_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5OpenGL_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} GXHEPVis ${SoQt_LIBRARIES} ${Coin_LIBRARIES} ${OPENGL_LIBRARIES} )
-  target_link_directories (GXBase PUBLIC ${Coin_LIB_DIR} )
-else()
-  target_link_libraries (GXBase ${Qt5Core_LIBRARIES} )
+    target_link_libraries (GXBase ${OPENGL_LIBRARIES} )
 endif()
-
-target_link_libraries (GXBase ${Qt5Core_LIBRARIES} )
-add_definitions (${Qt5Core_DEFINITIONS})
+target_link_libraries (GXBase Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Widgets Qt5::PrintSupport GXHEPVis SoQt::SoQt Coin::Coin )
 
 install(TARGETS GXBase
   LIBRARY

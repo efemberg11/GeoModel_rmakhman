@@ -18,10 +18,12 @@ endif()
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1GuideLineSystems/*.h )
-file( GLOB UIS src/*.ui VP1GuideLineSystems/*.ui )
+file( GLOB UIS src/*.ui VP1GuideLineSystems/*.ui ) # Qt5 UI files
 
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# Qt5 settings
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTOUIC ON)
 unset (AUTOUIC_SEARCH_PATHS)
@@ -34,18 +36,6 @@ include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 add_library ( GXGuideLineSystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
-
-# External dependencies:
-#include_directories(${Qt5Core_INCLUDE_DIRS} )
-#include_directories(${Qt5Gui_INCLUDE_DIRS} )
-#include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-#include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-#include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-#include_directories(${Qt5Sql_INCLUDE_DIRS} )
-#include_directories(${Coin_INCLUDE_DIR} )
-#include_directories(${SoQt_INCLUDE_DIRS} )
-#include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-
 
 # Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
 # i.e., after having already compiled the base packages (GeoModelCore). 

@@ -18,10 +18,11 @@ endif()
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1GeometryPlugin/*.h )
-file( GLOB UIS src/*.ui VP1GeometryPlugin/*.ui )
-
+file( GLOB UIS src/*.ui VP1GeometryPlugin/*.ui ) # Qt5 UI files
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# Qt5 settings
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTOUIC ON)
 unset (AUTOUIC_SEARCH_PATHS)
@@ -58,7 +59,6 @@ else() # if built as part of the build of GeoModelCore and the other base librar
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelRead GeoModelDBManager TFPersistification GeoGenericFunctions GeoModelKernel )
 endif()
 target_link_libraries (GXGeometryPlugin PUBLIC GXGeometrySystems GXGuideLineSystems  GXClashPointSystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::PrintSupport )
-add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGeometryPlugin
   LIBRARY

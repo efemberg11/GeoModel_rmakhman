@@ -37,13 +37,15 @@ include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 add_library ( GXGuideLineSystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 
-# Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
-# i.e., after having already compiled the base packages (GeoModelCore). 
-# This is used when building distribution packages. 
-find_package( GeoModelCore ${GeoModelCore_VERSION} QUIET )
-if( GeoModelCore_FOUND ) # if built individually
+
+# Check if we are building GeoModelVisualization individually,
+# or as a part of the main GeoModel.
+# In the first case, we link against the imported targets, which are taken
+# from the base packages already installed on the system.
+# This is used when building distribution packages.
+if (${VISUALIZATION_INDIVIDUAL_BUILD}) # if built individually
     target_link_libraries( GXGuideLineSystems PUBLIC GeoModelCore::GeoModelKernel )
-else() # if built as part of the build of GeoModelCore and the other base libraries
+else() # if built as a part of GeoModel
     target_link_libraries( GXGuideLineSystems PUBLIC GeoModelKernel )
 endif()
 target_link_libraries (GXGuideLineSystems PUBLIC SoQt::SoQt Coin::Coin Qt5::Core GXGui GXBase GXHEPVis Qt5::Gui Qt5::Widgets Qt5::PrintSupport )
@@ -51,9 +53,6 @@ if ( APPLE )
   target_link_directories (GXGuideLineSystems PUBLIC ${Coin_LIB_DIR} )
 endif()
 
-
-
-add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGuideLineSystems
   LIBRARY

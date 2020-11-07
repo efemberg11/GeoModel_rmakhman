@@ -58,38 +58,29 @@ endif()
 if ( nlohmann_json_FOUND )
     target_link_libraries( GXGeometrySystems PUBLIC nlohmann_json::nlohmann_json )
 endif()
-# Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
-# i.e., after having already compiled the base packages (GeoModelCore). 
+# Check if we are building GeoModelVisualization individually,
+# or as a part of the main GeoModel.
+# In the first case, we link against the imported targets, which are taken
+# from the base packages already installed on the system. 
 # This is used when building distribution packages. 
-find_package( GeoModelCore 4.0.0 QUIET )
-if( GeoModelCore_FOUND ) # if built individually
+if (${VISUALIZATION_INDIVIDUAL_BUILD}) # if built individually
     target_link_libraries( GXGeometrySystems PUBLIC GeoModelCore::GeoModelKernel )
-else() # if built as part of the build of GeoModelCore and the other base libraries
-    target_link_libraries( GXGeometrySystems PUBLIC GeoModelKernel )
-endif()
-find_package( GeoModelIO 4.0.0 QUIET )
-if( GeoModelIO_FOUND ) # if built individually
     target_link_libraries( GXGeometrySystems PUBLIC GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-else() # if built as part of the build of GeoModelCore and the other base libraries
+else() # if built as a part of GeoModel
+    target_link_libraries( GXGeometrySystems PUBLIC GeoModelKernel )
     target_link_libraries( GXGeometrySystems PUBLIC GeoModelRead GeoModelWrite )
 endif()
-
 target_link_libraries (GXGeometrySystems PUBLIC SoQt::SoQt Coin::Coin Qt5::Core 
     GXGui GXBase GXHEPVis Qt5::Gui Qt5::Widgets Qt5::PrintSupport )
 if ( APPLE )
   target_link_directories (GXGeometrySystems PUBLIC ${Coin_LIB_DIR} )
 endif()
 
-
 # Set a variable storing the CMake install prefix.
 # -- It is passed to the C++ preprocessor to load, from the C++ code,
 #    the JSON files storing the default materials and volume attributes
 #    for Coin3D.
 add_definitions ( -DGEOMODEL_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX})
-
-
-
-add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGeometrySystems
   LIBRARY

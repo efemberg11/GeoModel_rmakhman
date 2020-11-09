@@ -30,4 +30,5 @@ add_subdirectory( AccordionPlugin )
 add_subdirectory( HGTDPlugin )
 add_subdirectory( Test )
 add_subdirectory( LArPlugin )
+add_subdirectory( TRTPlugin )
 

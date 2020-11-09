@@ -123,6 +123,7 @@ cd Coin3D-simage-2c958a61ea8b
 ./configure --prefix=$PWD/../install
 make -j
 make install 
+cd ..
 ```
 
 On Centos7, you have to apply a patch to build the package. Therefore, on Centos7 please build Simage by following the instructions below:
@@ -171,10 +172,10 @@ cd ..
 
 Now, you can build the GeoModel visualization tools by enabling the corresponding option in the CMake configuration of GeoModel.
 
-To do that, come back to the `build_geomodel` folder we created earlier, or create it right now, then run:
+To do that, come back to the `build_geomodel` folder we created earlier, or create a new directory for this build right now, then run:
 
 ```
-cd build_geomodel
+cd build_geomodel # or 'cd' to the new directory you have just created for this specific build
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel
 make -j
 make install

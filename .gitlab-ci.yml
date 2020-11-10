@@ -144,8 +144,10 @@ variables:
     - cmake --version # CI debug only
     - mkdir build
     - cd build
-    - echo "CMAKE_ARGS - ${CMAKE_ARGS}"
-    - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - echo "CMAKE_ARGS -- ${CMAKE_ARGS}"
+    - echo "CMAKE_CONFIG_FLAGS -- ${CMAKE_CONFIG_FLAGS}"
+    - echo "CMAKE_EXTRA_FLAGS -- ${CMAKE_EXTRA_FLAGS}"
+    - cmake ${CMAKE_ARGS} ${CMAKE_CONFIG_FLAGS} ${CMAKE_EXTRA_FLAGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
     - cmake --build . -- -j2
     - cmake --build . -- install
     - pwd; ls # CI debug only
@@ -305,7 +307,7 @@ ubu-gm-fullsimlight-customxercesc-builtinjson:
     XERCESC_VERSION: 3.2.3
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-3.2.3/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
 
 
 ### Documentation

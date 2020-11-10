@@ -300,8 +300,9 @@ ubu-gm-fullsimlight-customxercesc-builtinjson:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC"]
+  needs: ["ubu-geant4", "ubu-XercesC-323"]
   variables:
+    XERCESC_VERSION: 3.2.3
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 

@@ -94,7 +94,7 @@ Clone the new GeoModel monorepository at [GeoModel repo](https://gitlab.cern.ch/
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModel.git
 cd GeoModel
 mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../ -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE -DGEOMODEL_BUILD_GEOMODELG4=TRUE ../ 
+cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../ -DGEOMODEL_BUILD_FULLSIMLIGHT=1 ../ 
 make -j8 ; make install
 ```
 
@@ -114,6 +114,14 @@ Alternatively, you can source the Geant4 setup, before running cmake:
 ```bash
 source <path_to_geant4_install_dir>/bin/geant4.sh
 cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
+```
+
+### How to use a custom version of Xerces-C
+
+The Geant4 GDML format depends on the Xerces-C library. Therefore, different Geant4 releases can use different versions of the Xerces-C library. If you want to build FullSimLight with a custom, locally installed Xerces-C library, you can pass the XercesC_INCLUDE_DIR and XercesC_LIBRARY variable to CMake while configuring the build of FullSimLight:
+
+```bash
+cmake -DGEOMODEL_BUILD_FULLSIMLIGHT=1 -DXercesC_INCLUDE_DIR=<path-to-local-XercesC-installation>/include -DXercesC_LIBRARY=<path-to-local-XercesC-installation>/lib/libxerces-c.dylib ../../install
 ```
 # Detector Construction
 

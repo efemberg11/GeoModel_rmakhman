@@ -94,7 +94,7 @@ variables:
 .xercesc-build-template-job: &xercesc-job
   stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install/xerces-c-${XERCESC_VERSION} # was: ${CMAKE_BASE_ARGS}
     XERCESC_VERSION: ${XERCESC_VERSION_BASE}
   script:
     - pwd; ls

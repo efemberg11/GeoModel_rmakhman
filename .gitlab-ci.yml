@@ -288,6 +288,17 @@ ubu-gm-gmg4-builtinjson:
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
 
+ubu-gm-gmg4-builtinxercesc-builtinjson:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-C
+  needs: ["ubu-geant4"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
+
+
 ubu-gm-fullsimlight-builtinjson:
   <<: *ubuntu-job
   <<: *geomodel-job
@@ -297,6 +308,17 @@ ubu-gm-fullsimlight-builtinjson:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
+
+ubu-gm-fullsimlight-builtinxercesc-builtinjson:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-C
+  needs: ["ubu-geant4"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE 
+
 
 ubu-gm-fullsimlight-customxercesc-builtinjson:
   <<: *ubuntu-job

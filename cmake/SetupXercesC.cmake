@@ -37,8 +37,7 @@ if( GEOMODEL_USE_BUILTIN_XERCESC )
       PREFIX "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/XercesCBuild"
       INSTALL_DIR "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/XercesCInstall"
       URL "https://cern.ch/lcgpackages/tarFiles/sources/xerces-c-${XercesC_VERSION}.tar.gz"
-      #URL_MD5 "70320ab0e3269e47d978a6ca0c0e1e2d"
-      URL_MD5 "87b994ba2cf95b43143335e390282a80"
+      URL_MD5 "a5fa4d920fce31c9ca3bfef241644494"
       CONFIGURE_COMMAND
       ${CMAKE_COMMAND} -E env CXXFLAGS=-std=c++${CMAKE_CXX_STANDARD}
       <SOURCE_DIR>/configure --disable-static --prefix=<INSTALL_DIR>

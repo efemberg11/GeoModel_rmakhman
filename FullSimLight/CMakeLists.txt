@@ -70,6 +70,7 @@ find_package(Pythia QUIET) # optional
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
 #
+#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
 include(${Geant4_USE_FILE})
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
@@ -108,7 +109,6 @@ if( GEOMODEL_USE_BUILTIN_JSON )
   add_dependencies( gmclash JSONExt )
   add_dependencies( fillHistogramExample JSONExt )
   add_dependencies( gmgeantino JSONExt )
-  # add_dependencies( plotGeantinoMaps JSONExt )
   add_dependencies( testMagneticField JSONExt )
   add_dependencies( gmtogdml JSONExt )
   # Acquire Installation Directory of JSONExt
@@ -116,7 +116,15 @@ if( GEOMODEL_USE_BUILTIN_JSON )
   # Include the installed 'include' PATH
   include_directories (${install_dir}/include)
 endif()
-
+# If the in-house build of the Xerces-C library is used, add explicit dependency: for Geant4
+if( GEOMODEL_USE_BUILTIN_XERCESC )
+    add_dependencies( fullSimLight XercesCBuiltIn )
+    add_dependencies( gmclash XercesCBuiltIn )
+    add_dependencies( fillHistogramExample XercesCBuiltIn )
+    add_dependencies( gmgeantino XercesCBuiltIn )
+    add_dependencies( testMagneticField XercesCBuiltIn )
+    add_dependencies( gmtogdml XercesCBuiltIn )
+endif()
 #----------------------------------------------------------------------------
 # Link all needed libraries
 #

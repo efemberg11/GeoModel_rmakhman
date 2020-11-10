@@ -17,6 +17,10 @@ file( GLOB HEADERS GeoSpecialShapes/*.h src/LArWheelCalculator_Impl/*.h)
 
 # Set the library.
 add_library( GeoSpecialShapes SHARED ${HEADERS} ${SOURCES} )
+# If the in-house build of the nlohmann_json library is used, add explicit dependency
+if( GEOMODEL_USE_BUILTIN_XERCESC )
+    add_dependencies( GeoSpecialShapes XercesCBuiltIn )
+endif()
 target_link_libraries( GeoSpecialShapes PRIVATE ${Geant4_LIBRARIES})
 # Check if we are building FullSimLight individually,
 # or as a part of the main GeoModel.

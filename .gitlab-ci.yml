@@ -126,7 +126,6 @@ variables:
     - ls;
     - ls ../
     - ls ../install
-    - ls ../install/xerces-c-${XERCESC_VERSION}/
     - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install ../geant4 -DGEANT4_USE_SYSTEM_EXPAT=OFF
     - make -j4
     - make install
@@ -263,8 +262,8 @@ ubu-XercesC-323:
   <<: *ubuntu-job
   <<: *xercesc-job
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     XERCESC_VERSION: 3.2.3
+    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install/xerces-c-${XERCESC_VERSION} # was: ${CMAKE_BASE_ARGS}
 
 ubu-geant4:
   <<: *ubuntu-job

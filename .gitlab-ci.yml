@@ -8,6 +8,7 @@ stages:
 variables:
   CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  XERCESC_VERSION_BASE: 3.2.2
   # also, 'CMAKE_EXTRA_FLAGS' will be specified by specific jobs when needed, and used by job templates like 'geomodel-job'
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -101,13 +102,14 @@ variables:
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    XERCESC_VERSION: ${XERCESC_VERSION_BASE}
   script:
     - pwd; ls
-    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
-    - tar -xf xerces-c-3.2.2.tar.gz
-    - mkdir xerces-c-build
-    - cd xerces-c-build
-    - cmake ${CMAKE_ARGS} ../xerces-c-3.2.2
+    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCES_VERSION}.tar.gz
+    - tar -xf xerces-c-${XERCES_VERSION}.tar.gz
+    - mkdir xerces-c-build-${XERCES_VERSION}
+    - cd xerces-c-build-${XERCES_VERSION}
+    - cmake ${CMAKE_ARGS} ../xerces-c-${XERCEX_VERSION}
     - make -j4
     - make install
   artifacts:
@@ -256,6 +258,13 @@ ubu-gm-examples-builtin:
 ubu-XercesC:
   <<: *ubuntu-job
   <<: *xercesc-job
+
+ubu-XercesC-323:
+  <<: *ubuntu-job
+  <<: *xercesc-job
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    XERCESC_VERSION: 3.2.3
 
 ubu-geant4:
   <<: *ubuntu-job

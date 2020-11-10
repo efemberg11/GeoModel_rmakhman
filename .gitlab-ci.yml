@@ -105,11 +105,11 @@ variables:
     XERCESC_VERSION: ${XERCESC_VERSION_BASE}
   script:
     - pwd; ls
-    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCES_VERSION}.tar.gz
-    - tar -xf xerces-c-${XERCES_VERSION}.tar.gz
-    - mkdir xerces-c-build-${XERCES_VERSION}
-    - cd xerces-c-build-${XERCES_VERSION}
-    - cmake ${CMAKE_ARGS} ../xerces-c-${XERCEX_VERSION}
+    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC_VERSION}.tar.gz
+    - tar -xf xerces-c-${XERCESC_VERSION}.tar.gz
+    - mkdir xerces-c-build-${XERCESC_VERSION}
+    - cd xerces-c-build-${XERCESC_VERSION}
+    - cmake ${CMAKE_ARGS} ../xerces-c-${XERCESC_VERSION}
     - make -j4
     - make install
   artifacts:

@@ -57,7 +57,6 @@ variables:
     CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
   script:
     - pwd; ls
-    #- wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
     - wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/coin-4.0.0-src.zip
     - unzip coin-4.0.0-src.zip -d coin-sources
     - mv coin-sources/* coin
@@ -76,12 +75,6 @@ variables:
     CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
   script:
     - pwd; ls
-    # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
-    # - unzip soqt-1b4fe9d-macos-mojave-fix.zip
-    # - wget https://bitbucket.org/rmbianchi/soqt/get/CI-fix-25692a8.zip
-    # - unzip CI-fix-25692a8.zip
-    # - mv rmbianchi-soqt-25692a805a2c soqt
-    #- hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
     - wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/soqt.zip
     - unzip soqt.zip
     - mkdir build_soqt
@@ -121,6 +114,7 @@ variables:
   stage: step-B
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    XERCESC_VERSION: ${XERCESC_VERSION_BASE}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/geant4/geant4.git
@@ -129,7 +123,7 @@ variables:
     - cd ../
     - mkdir Geant4-build
     - cd Geant4-build
-    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install/xerces-c/ ../geant4 -DGEANT4_USE_SYSTEM_EXPAT=OFF
+    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install/xerces-c-${XERCESC_VERSION}/ ../geant4 -DGEANT4_USE_SYSTEM_EXPAT=OFF
     - make -j4
     - make install
   artifacts:
@@ -301,6 +295,16 @@ ubu-gm-fullsimlight-builtinjson:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
+
+ubu-gm-fullsimlight-customxercesc-builtinjson:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-C
+  needs: ["ubu-geant4", "ubu-XercesC"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
 
 
 ### Documentation

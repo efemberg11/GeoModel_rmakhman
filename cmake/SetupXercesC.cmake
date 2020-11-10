@@ -12,9 +12,6 @@ option( GEOMODEL_USE_BUILTIN_XERCESC
 if( GEOMODEL_USE_BUILTIN_XERCESC )
 
    # Tell the user what's happening.
-   message( STATUS "Building XercesC as part of the project" )
-
-   # Tell the user what's happening.
    if( COLOR_DEFS )
      message( STATUS "${BoldMagenta}'GEOMODEL_USE_BUILTIN_XERCESC' was set to 'true' ==> Building XercesC as part of the project${ColourReset}" )
    else()
@@ -24,11 +21,11 @@ if( GEOMODEL_USE_BUILTIN_XERCESC )
    # The include directory and library that will be produced.
    set( XercesC_INCLUDE_DIR
       "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/XercesCInstall/${CMAKE_INSTALL_INCLUDEDIR}" )
-   set( XercesC_INCLUDE_DIRS "${XercesC_INCLUDE_DIR}" )
+  set( XercesC_INCLUDE_DIRS "${XercesC_INCLUDE_DIR}" FORCE )
    set( XercesC_LIBRARY
       "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/XercesCInstall/lib/${CMAKE_SHARED_LIBRARY_PREFIX}xerces-c${CMAKE_SHARED_LIBRARY_SUFFIX}" )
    set( XercesC_LIBRARIES "${XercesC_LIBRARY}" )
-   set( XercesC_VERSION "3.1.3" )
+   set( XercesC_VERSION "3.2.3" )
 
    # Create the include directory already, otherwise CMake refuses to
    # create the imported target.
@@ -40,7 +37,8 @@ if( GEOMODEL_USE_BUILTIN_XERCESC )
       PREFIX "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/XercesCBuild"
       INSTALL_DIR "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/XercesCInstall"
       URL "https://cern.ch/lcgpackages/tarFiles/sources/xerces-c-${XercesC_VERSION}.tar.gz"
-      URL_MD5 "70320ab0e3269e47d978a6ca0c0e1e2d"
+      #URL_MD5 "70320ab0e3269e47d978a6ca0c0e1e2d"
+      URL_MD5 "87b994ba2cf95b43143335e390282a80"
       CONFIGURE_COMMAND
       ${CMAKE_COMMAND} -E env CXXFLAGS=-std=c++${CMAKE_CXX_STANDARD}
       <SOURCE_DIR>/configure --disable-static --prefix=<INSTALL_DIR>

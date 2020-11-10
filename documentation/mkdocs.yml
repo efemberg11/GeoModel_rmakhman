@@ -19,6 +19,7 @@ nav:
         - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
         - 'Load a geometry from a file': 'how/how_load_geo.md'
         - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
+        - 'Build FullSimLight': 'how/how_build_fullsimlight.md'
     - Papers & Presentations:
         - 'Public': 'papers/public.md'
         - 'Internal': 'papers/internal.md'

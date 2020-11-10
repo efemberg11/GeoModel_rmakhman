@@ -20,11 +20,12 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Set up how the project handle some of its dependenices. Either by picking them
     # up from the environment, or building them itself.
     include( SetupJSON )
+    include( SetupXercesC )
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
     find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
-    # FullSimLight needs GeoModelG4, so we set the cache variable to be used to set its standalone build
-    set(GEOMODEL_BUILD_GEOMODELG4 TRUE) 
+    # FullSimLight needs GeoModelG4, so we trigger its build
+    set( GEOMODEL_BUILD_GEOMODELG4_FROM_FULLSIMLIGHT ON CACHE BOOL "GeoModelG4 build triggered by FullSimLigh when built individually" FORCE ) 
     add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/../GeoModelG4 build_GeoModelG4 )
     # Set a flag to steer the  of the subpackages
     set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )

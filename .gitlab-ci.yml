@@ -94,8 +94,8 @@ variables:
 .xercesc-build-template-job: &xercesc-job
   stage: step-A
   variables:
-    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install/xerces-c-${XERCESC_VERSION} # was: ${CMAKE_BASE_ARGS}
     XERCESC_VERSION: ${XERCESC_VERSION_BASE}
+    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install/xerces-c-${XERCESC_VERSION} # was: ${CMAKE_BASE_ARGS}
   script:
     - pwd; ls
     - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC_VERSION}.tar.gz
@@ -123,6 +123,8 @@ variables:
     - cd ../
     - mkdir Geant4-build
     - cd Geant4-build
+    - ls;
+    - ls ../
     - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=install/xerces-c-${XERCESC_VERSION}/ ../geant4 -DGEANT4_USE_SYSTEM_EXPAT=OFF
     - make -j4
     - make install

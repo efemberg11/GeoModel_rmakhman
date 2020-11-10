@@ -1,18 +1,10 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 ################################################################################
 # Package: GeoMaterial2G4
 ################################################################################
 cmake_minimum_required(VERSION 3.10)
 project( "GeoMaterial2G4" VERSION 1.1.0 LANGUAGES CXX )
-
-
-# # External dependencies:
-# find_package( Geant4 REQUIRED )
-# find_package( GeoModelCore 3.2.0 REQUIRED )
-
-# Project's Settings
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )  # it defines CMAKE_INSTALL_LIBDIR
@@ -24,10 +16,21 @@ file( GLOB HEADERS GeoMaterial2G4/*.h )
 # include Geant4 headers
 include(${Geant4_USE_FILE})
 
-
 # Set target and properties
 add_library( GeoMaterial2G4 SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoMaterial2G4 PUBLIC ${Geant4_LIBRARIES} GeoModelKernel )
+
+# Check if we are building FullSimLight individually,
+# or as a part of the main GeoModel.
+# In the first case, we link against the imported targets, which are taken
+# from the base GeoModel packages already installed on the system.
+# This is used when building distribution packages.
+if ( GeoModelG4_INDIVIDUAL_BUILD ) # if built individually
+    target_link_libraries( GeoMaterial2G4 PUBLIC GeoModelCore::GeoModelKernel )
+else()
+    target_link_libraries( GeoMaterial2G4 PUBLIC GeoModelKernel )
+endif()
+target_link_libraries( GeoMaterial2G4 PUBLIC ${Geant4_LIBRARIES} )
+
 target_include_directories( GeoMaterial2G4 PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

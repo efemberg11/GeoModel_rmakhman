@@ -7,7 +7,6 @@ project( "MagneticField" VERSION 1.0.1 LANGUAGES CXX )
 add_subdirectory(MagFieldInterfaces)
 add_subdirectory(MagFieldServices)
 
-
 install(EXPORT MagFieldInterfaces-export FILE MagneticField-MagFieldInterfaces.cmake DESTINATION lib/cmake/MagneticField)
 install(EXPORT MagFieldServices-export FILE MagneticField-MagFieldServices.cmake DESTINATION lib/cmake/MagneticField)
 install(FILES cmake/MagneticFieldConfig.cmake DESTINATION lib/cmake/MagneticField)

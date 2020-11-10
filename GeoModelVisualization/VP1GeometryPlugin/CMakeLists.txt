@@ -18,10 +18,11 @@ endif()
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1GeometryPlugin/*.h )
-file( GLOB UIS src/*.ui VP1GeometryPlugin/*.ui )
-
+file( GLOB UIS src/*.ui VP1GeometryPlugin/*.ui ) # Qt5 UI files
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# Qt5 settings
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTOUIC ON)
 unset (AUTOUIC_SEARCH_PATHS)
@@ -42,23 +43,19 @@ include_directories ("${PROJECT_SOURCE_DIR}/../GXClashPointSystems")
 
 add_library ( GXGeometryPlugin SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
 
-# Using find_package(GeoModelCore) is only needed when building GeoModelVisualization individually,
-# i.e., after having already compiled the base packages (GeoModelCore). 
-# This is used when building distribution packages. 
-find_package( GeoModelCore 4.0.0 QUIET )  # TODO: we should use ${GeoModelCore_VERSION} set upstream even when individually built 
-if( GeoModelCore_FOUND ) # if built individually
+# Check if we are building GeoModelVisualization individually,
+# or as a part of the main GeoModel.
+# In the first case, we link against the imported targets, which are taken
+# from the base packages already installed on the system.
+# This is used when building distribution packages.
+if (${VISUALIZATION_INDIVIDUAL_BUILD}) # if built individually
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelCore::GeoModelKernel )
-else() # if built as part of the build of GeoModelCore and the other base libraries
-    target_link_libraries( GXGeometryPlugin PUBLIC GeoModelKernel )
-endif()
-find_package( GeoModelIO 4.0.0 QUIET )  # TODO: we should use ${GeoModelIO_VERSION} set upstream even when individually built 
-if( GeoModelIO_FOUND ) # if built individually
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelIO::GeoModelRead GeoModelIO::GeoModelDBManager GeoModelIO::TFPersistification GeoModelCore::GeoGenericFunctions GeoModelCore::GeoModelKernel )
-else() # if built as part of the build of GeoModelCore and the other base libraries
+else() # if built as a part of GeoModel
+    target_link_libraries( GXGeometryPlugin PUBLIC GeoModelKernel )
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelRead GeoModelDBManager TFPersistification GeoGenericFunctions GeoModelKernel )
 endif()
 target_link_libraries (GXGeometryPlugin PUBLIC GXGeometrySystems GXGuideLineSystems  GXClashPointSystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::PrintSupport )
-add_definitions (${Qt5Core_DEFINITIONS})
 
 install(TARGETS GXGeometryPlugin
   LIBRARY

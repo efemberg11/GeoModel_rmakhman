@@ -9,9 +9,12 @@ set( OpenGL_GL_PREFERENCE GLVND )
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am top-level project.
-    message(STATUS "Building ${PROJECT_NAME} individually, as a top-level project.")
     # Make the root module directory visible to CMake.
     list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
+    # Define color codes for CMake messages
+    include( cmake_colors_defs )
+    # Warn the users about what they are doing
+    message(STATUS "${BoldGreen}Building ${PROJECT_NAME} individually, as a top-level project.${ColourReset}")
     # Set default build and C++ options
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
@@ -19,6 +22,11 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Set up how the project handle some of its dependenices. Either by picking them
     # up from the environment, or building them itself.
     include( SetupJSON )
+    # Find the base GeoModel packages, which must be installed on the target system already
+    find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
+    find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
+    # Set a flag to steer the  of the subpackages
+    set( VISUALIZATION_INDIVIDUAL_BUILD ON )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")

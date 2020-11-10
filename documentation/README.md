@@ -3,4 +3,6 @@
 
 # GeoModel - A Detector Description Toolkit for HEP experiments
 
-This repository contains the source for the generated website: https://www.cern.ch/geomodel
+This repository contains the source for the website hosted at: https://www.cern.ch/geomodel
+
+

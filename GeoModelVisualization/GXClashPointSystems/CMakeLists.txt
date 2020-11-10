@@ -21,9 +21,9 @@ find_package(nlohmann_json QUIET)
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS GXClashPointSystems/*.h )
-file( GLOB UIS src/*.ui GXClashPointSystems/*.ui )
+file( GLOB UIS src/*.ui GXClashPointSystems/*.ui ) # Qt5 UI files
 
-
+# Qt5 settings
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_AUTOMOC ON)
 set (CMAKE_AUTOUIC ON)
@@ -46,22 +46,6 @@ if( GEOMODEL_USE_BUILTIN_JSON )
   ExternalProject_Get_Property (JSONExt install_dir)
   # Include the installed 'include' PATH
   include_directories (${install_dir}/include)
-endif()
-
-
-# External dependencies:
-include_directories(${Qt5Core_INCLUDE_DIRS} )
-include_directories(${Qt5Gui_INCLUDE_DIRS} )
-include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Sql_INCLUDE_DIRS} )
-include_directories(${Coin_INCLUDE_DIR} )
-include_directories(${SoQt_INCLUDE_DIRS} )
-include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-
-if ( APPLE )
-  target_link_directories (GXClashPointSystems PUBLIC ${Coin_LIB_DIR} )
 endif()
 
 target_link_libraries (GXClashPointSystems PRIVATE SoQt::SoQt Coin::Coin  ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )

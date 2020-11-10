@@ -1,6 +1,7 @@
 #include "GDMLInterface/xtruHandler.h"
 #include "GDMLInterface/GDMLHandler.h"
 #include <iostream>
+#include <algorithm>
 
 #include "GeoModelXMLParser/XercesParser.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
@@ -58,6 +59,22 @@ void xtruHandler::ElementHandle()
   if (theSections[0].scalingFactor != 1. || theSections[1].scalingFactor != 1.) throw; // no scaling
   if ((theSections[0].xOffset!=0 || theSections[0].yOffset!=0) || (theSections[1].xOffset!=0 || theSections[1].yOffset!=0)) throw; // no offset
   if ((theSections[0].zPosition+theSections[1].zPosition) != 0) throw;  // centered at z=0
+  
+  // it looks like the xtru is well defined. Let's calculate the area of the 
+  // surfaces (to check that vertices are provided anti-clockwise)
+  
+  double area=0;
+  int nPoints=theVertices.size();
+  int iMinus=nPoints-1;
+  for (int i=0;i<nPoints;i++)
+  {
+	area += (theVertices[iMinus].xv+theVertices[i].xv)*(theVertices[iMinus].yv-theVertices[i].yv);
+	iMinus=i;
+  }
+  
+  bool clockwise=area<0?false:true;
+  if (clockwise)  // theVertices has to be reversed
+    std::reverse(theVertices.begin(),theVertices.end());
   
   pgsb=new GeoSimplePolygonBrep(std::fabs(lunit*theSections[1].zPosition));
   for (auto vt: theVertices) 

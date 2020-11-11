@@ -333,6 +333,7 @@ ubu-gm-fullsimlight-customxercesc-builtinjson:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=./install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=./install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
+  allow_failure: true
 
 
 ### Documentation

@@ -94,7 +94,7 @@ Clone the new GeoModel monorepository at [GeoModel repo](https://gitlab.cern.ch/
 git clone https://gitlab.cern.ch/GeoModelDev/GeoModel.git
 cd GeoModel
 mkdir build ; cd build
-cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../ -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE -DGEOMODEL_BUILD_GEOMODELG4=TRUE ../ 
+cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../ -DGEOMODEL_BUILD_FULLSIMLIGHT=1 ../ 
 make -j8 ; make install
 ```
 
@@ -114,6 +114,14 @@ Alternatively, you can source the Geant4 setup, before running cmake:
 ```bash
 source <path_to_geant4_install_dir>/bin/geant4.sh
 cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../
+```
+
+### How to use a custom version of Xerces-C
+
+The Geant4 GDML format depends on the Xerces-C library. Therefore, different Geant4 releases can use different versions of the Xerces-C library. If you want to build FullSimLight with a custom, locally installed Xerces-C library, you can pass the XercesC_INCLUDE_DIR and XercesC_LIBRARY variable to CMake while configuring the build of FullSimLight:
+
+```bash
+cmake -DGEOMODEL_BUILD_FULLSIMLIGHT=1 -DXercesC_INCLUDE_DIR=<path-to-local-XercesC-installation>/include -DXercesC_LIBRARY=<path-to-local-XercesC-installation>/lib/libxerces-c.dylib ../../install
 ```
 # Detector Construction
 
@@ -171,12 +179,16 @@ export G4ENSDFSTATEDATA=$G4INSTALL/data/G4ENSDFSTATE2.2
 Run the executable with the --help option to see the available options:
 
 ``` bash
--m   <Geant4-Macro-File>  [MANDATORY; a standard Geant4 macro file name]
--g   <Geometry-File-Name> [MANDATORY; the Geometry file name]
--f   <Physics-List-Name>  [OPTIONAL;  physics list name (default: FTFP_BERT)]
--p   <NO-ARGUMENT>        [OPTIONAL;  run in performance mode (default: false)]
--o : <NO-ARGUMENT>        [OPTIONAL;  run the geometry overlap check (default: false)]
+-m :   REQUIRED : the standard Geant4 macro file name 
+-g :   REQUIRED : the Geometry file name 
+-o :   flag  ==> run the geometry overlap check (default: FALSE)
+-f :   physics list name (default: FTFP_BERT) 
+-P :   generate events with Pythia [config. available: ttbar/higgs/minbias or use ascii input file]
+-p :   flag  ==> run the application in performance mode i.e. no user actions 
+   :   -     ==> run the application in NON performance mode i.e. with user actions (default) 
 ``` 
+FullSimLight uses by default the Geant4 particle gun as primary generator, but it supports also
+input events from the Pythia generator (see the Primary generator section for more details)
 A minimal set of "observable" is collected during the simulation per-primary
 particle type: mean energy deposit, mean charged and neutral step lengths,
 mean number of steps made by charged and neutral particles, mean number of
@@ -262,7 +274,10 @@ Use the -t to set the Toroids off, and test the solenoid_bfieldmap_7730_0_14m_ve
 
 ## Primary Generator
 
- The primary generator is a particle gun that will generate primary particles
+The primary generator used by default is the Geant4 particle gun, but FullSimLight also supports the  [Pythia generator](http://home.thep.lu.se/Pythia/)
+ 
+ ## Particle gun
+ The particle gun used by default  will generate primary particles
  at the (0,0,0) position with the following options:
 
 ### Number of primaries per event:
@@ -299,6 +314,19 @@ The primary particle type can be set through the macro command:
 ``` 
 By default, i.e. if it is not specified by the above command, the type will be randomly selected from a pre-defined list for each individual primary particle uniformly. The current list of particles includes e-, e+ and gamma particles. It can be extended by adding more particles to the list in the MyPrimaryGeneratorAction class.
 
+ ## Pythia generator
+ 
+ FullSimLight supports Pythia as primary particles generator. In order to use Pythia, the user should have it installed in their system and if Pythia is found FullSImLight will be compiled with the support on. There are three different default options available when using the -P or --pythia flag (i.e. ttbar, higgs and minbias):
+  ``` bash
+ -P :   generate events with Pythia [config. available: ttbar/higgs/minbias or use ascii input file]
+ ``` 
+ Alternatively the user can plug their own Pythia configuration file to simulate the desired events. 
+ For example, in order to simulate the default *ttbar* events, the command to be run is the following:
+ 
+ ``` bash
+./fullSimLight -m ../share/FullSimLight/pythia.g4 -P ttbar -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db 
+ ``` 
+ The number of events that the user wants to simulate must be specified in the g4 macro file. A specific *pythia.g4* macro file can be found in the *share* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 
 
 ## Physics List
 

@@ -274,7 +274,7 @@ Use the -t to set the Toroids off, and test the solenoid_bfieldmap_7730_0_14m_ve
 
 ## Primary Generator
 
-The primary generator used by default is the Geant4 particle gun, but FullSimLight also supports the Pythia generator.
+The primary generator used by default is the Geant4 particle gun, but FullSimLight also supports the  [Pythia generator](http://home.thep.lu.se/Pythia/)
  
  ## Particle gun
  The particle gun used by default  will generate primary particles
@@ -316,17 +316,17 @@ By default, i.e. if it is not specified by the above command, the type will be r
 
  ## Pythia generator
  
- FullSimLight supports Pythia as primary generator. In order to use Pythia, the user should have it installed in their system and  if Pythia is found FullSImLight will be compiled with the support on. There are three different default options available when using the -P or --pythia flag (i.e. ttbar, higgs and minbias):
+ FullSimLight supports Pythia as primary particles generator. In order to use Pythia, the user should have it installed in their system and if Pythia is found FullSImLight will be compiled with the support on. There are three different default options available when using the -P or --pythia flag (i.e. ttbar, higgs and minbias):
   ``` bash
  -P :   generate events with Pythia [config. available: ttbar/higgs/minbias or use ascii input file]
  ``` 
  Alternatively the user can plug their own Pythia configuration file to simulate the desired events. 
- For example, in order to simulate the default ttbar events the command to be run is the following:
+ For example, in order to simulate the default *ttbar* events, the command to be run is the following:
  
  ``` bash
 ./fullSimLight -m ../share/FullSimLight/pythia.g4 -P ttbar -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db 
  ``` 
- A specific {pythia.g4} macro file can be found in the *share* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 
+ The number of events that the user wants to simulate must be specified in the g4 macro file. A specific *pythia.g4* macro file can be found in the *share* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 
 
 ## Physics List
 

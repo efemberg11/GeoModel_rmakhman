@@ -19,8 +19,12 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
          "Framework finding behaviour on macOS" )
     # Set up how the project handle some of its dependenices. Either by picking them
     # up from the environment, or building them itself.
-    include( SetupJSON )
-    include( SetupXercesC )
+    if( NOT TARGET JSONExt )
+        include( SetupJSON )
+    endif()
+    if( NOT TARGET XercesCBuiltIn )
+        include( SetupXercesC )
+    endif()
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
     find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
@@ -180,6 +184,7 @@ endif()
 set(FULLSIMLIGHT_SCRIPTS
   geantino.g4
   macro.g4
+  pythia.g4
   drawMagField.C
   )
 

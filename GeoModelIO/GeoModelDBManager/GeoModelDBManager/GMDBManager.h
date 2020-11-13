@@ -1,11 +1,10 @@
 // author: Riccardo.Maria.Bianchi@cern.ch - 2017
-// major updates: Aug 2018
+// major updates: 
+// - Aug 2018, R.M.Bianchi
+// - Nov 2020, R.M.Bianchi
 
 #ifndef GMDBManager_H
 #define GMDBManager_H
-
-// include SQLite 
-#include <sqlite3.h>
 
 // include C++
 #include <iostream>
@@ -13,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <typeindex> // std::type_index, needs C++11
+
 
 /**
  * \class GMDBManager
@@ -169,6 +169,7 @@ public:
      * @note The 'suffix' parameter is optional. If not provided, the records will be saved in the default table.
    */
   bool addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records, std::string suffix = "");
+  
   /**
    * @brief Save the list of 'published' GeoVFullPhysVol nodes to the DB.
    * @details The method gets a list of records and stores them in the default table 'PublishedFullPhysVols".
@@ -237,10 +238,6 @@ private:
 
   std::string getTableNameFromNodeType(const std::string &nodeType);
 
-  sqlite3_stmt* selectAllFromTable(std::string tableName) const;
-  sqlite3_stmt* selectAllFromTableSortBy(std::string tableName, std::string sortColumn="") const;
-  sqlite3_stmt* selectAllFromTableChildrenPositions() const;
-
   void storeTableColumnNames(std::vector<std::string> input);
 
   std::vector<std::string> getTableColumnNames(const std::string &tableName);
@@ -251,20 +248,11 @@ private:
 
   bool storeRootVolume(const unsigned int &id, const std::string &nodeType);
 
-//  void showError(const QSqlError &err) const;
-
   std::string m_dbpath;
 
-//  QSqlDatabase m_db;
-  /// Pointer to SQLite connection
-  sqlite3* m_dbSqlite;
-  /// Variable to store error messages from SQLite
-  char *m_SQLiteErrMsg;
+  bool m_dbIsOK;
 
-
-	bool m_dbIsOK;
-
-	bool m_debug;
+  bool m_debug;
 
   std::unordered_map<std::string, std::vector<std::string>> m_tableNames; /// stores the column names for each table
   std::unordered_map<std::string, std::string> m_childType_tableName;
@@ -274,6 +262,12 @@ private:
   std::unordered_map<unsigned int, std::string> m_cache_tableId_nodeType; /// cache for tableID-->nodeType
   std::unordered_map<std::string, std::string> m_cache_nodeType_tableName; /// cache for nodeType-->tableName
   std::unordered_map<std::string, unsigned int> m_cache_nodeType_tableID; /// cache for nodeType-->tableID
+
+protected:
+  class Imp;
+  Imp * m_d;
+
 };
+
 
 #endif // GMDBManager_H

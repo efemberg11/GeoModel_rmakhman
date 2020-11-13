@@ -24,6 +24,14 @@
 
 #include "GeoModel2G4/CLHEPtoEigenConverter.h"
 
+bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
 ExtParameterisedVolumeBuilder::ExtParameterisedVolumeBuilder(std::string n):
   VolumeBuilder(n),
   m_getMatEther(true),
@@ -125,8 +133,7 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
 
           Query<int> Qint =  av.getId();
           if(Qint.isValid()) id = Qint;
-
-          if(m_matEther->getName()  == theGeoPhysChild->getLogVol()->getMaterial()->getName() )
+          if(m_matEther->getName()  == theGeoPhysChild->getLogVol()->getMaterial()->getName() || hasEnding(theGeoPhysChild->getLogVol()->getMaterial()->getName(), "Ether"))
             {
               Geo2G4AssemblyVolume* assembly = BuildAssembly(theGeoPhysChild);
 
@@ -174,6 +181,8 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
   return theG4LogVolume;
 }
 
+
+
 Geo2G4AssemblyVolume* ExtParameterisedVolumeBuilder::BuildAssembly(PVConstLink pv) const
 {
   PVConstLink theGeoPhysChild;
@@ -201,7 +210,9 @@ Geo2G4AssemblyVolume* ExtParameterisedVolumeBuilder::BuildAssembly(PVConstLink p
 
       // Check if it is an assembly
       if(m_matEther->getName() == theGeoPhysChild->getLogVol()->getMaterial()->getName() ||
-         m_matHypUr->getName() == theGeoPhysChild->getLogVol()->getMaterial()->getName() )
+         m_matHypUr->getName() == theGeoPhysChild->getLogVol()->getMaterial()->getName() ||
+         hasEnding(theGeoPhysChild->getLogVol()->getMaterial()->getName(), "Ether")||
+         hasEnding(theGeoPhysChild->getLogVol()->getMaterial()->getName(), "HyperUranium"))
         {
           // Build the child assembly
           if(!(theG4AssemblyChild = BuildAssembly(theGeoPhysChild))) return 0;
@@ -254,10 +265,10 @@ void ExtParameterisedVolumeBuilder::getMatEther() const
 {
     GeoElement* ethElement = new GeoElement("EtherEl","ET",500.0,0.0);
     ethElement->ref();
-    GeoMaterial* ether = new GeoMaterial("Ether",0.0);
+    GeoMaterial* ether = new GeoMaterial("special::Ether",0.0);
     ether->add(ethElement,1.);
     // "Alternative" assembly material
-    GeoMaterial* hyperUranium = new GeoMaterial("HyperUranium",0.0);
+    GeoMaterial* hyperUranium = new GeoMaterial("special::HyperUranium",0.0);
     hyperUranium->add(ethElement,1.);
     m_matEther = ether;
     m_matHypUr = hyperUranium;

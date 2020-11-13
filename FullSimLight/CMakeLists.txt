@@ -17,9 +17,11 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
          "Framework finding behaviour on macOS" )
-    # Set up how the project handle some of its dependenices. Either by picking them
-    # up from the environment, or building them itself.
-    include( SetupJSON )
+    if( NOT TARGET JSONExt )
+        # Set up how the project handle some of its dependenices. Either by picking them
+        # up from the environment, or building them itself.
+        include( SetupJSON )
+    endif()
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
     find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder

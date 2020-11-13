@@ -2,8 +2,8 @@
 cmake_minimum_required( VERSION 3.1 )
 project( "GeoModelG4" VERSION 1.1.0 LANGUAGES CXX )
 
-message("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
-message("PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
+#message("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}") # debug msg
+#message("PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}") # debug msg
 if( (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR GEOMODEL_BUILD_GEOMODELG4 )
     # I am top-level project.
     # Make the root module directory visible to CMake.
@@ -16,9 +16,11 @@ if( (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR GEOMODEL_BUILD_GEOMODELG4 
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
          "Framework finding behaviour on macOS" )
-    # Set up how the project handle some of its dependenices. Either by picking them
-    # up from the environment, or building them itself.^[[?12;4$y
-    include( SetupJSON )
+    if( NOT TARGET JSONExt )
+        # Set up how the project handle some of its dependenices. Either by picking them
+        # up from the environment, or building them itself.
+        include( SetupJSON )
+    endif()
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
     # Set a flag to steer the  of the subpackages

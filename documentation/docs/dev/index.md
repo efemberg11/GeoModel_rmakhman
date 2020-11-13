@@ -111,7 +111,19 @@ There are several options offered to the user to selectively build the optional 
 
 ##### Build the dependencies for 3D graphics
 
-###### Simage 
+###### macOS
+
+On macOS, you can install the needed graphics dependencies with `brew`:
+
+```
+brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
+brew install simage coin-bb soqt-bb
+```
+
+
+####### Other platforms
+
+######## Simage 
 
 On all platforms except for Centos7, you can build Simage by follwoing these instructions:
 
@@ -141,7 +153,7 @@ make install
 cd ..
 ```
 
-###### Coin3D & SoQt
+######## Coin3D & SoQt
 
 Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):
 

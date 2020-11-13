@@ -118,13 +118,13 @@ int main(int argc, char** argv) {
 }
 
 static struct option options[] = {
-    {"macro file            "  , required_argument, 0, 'm'},
-    {"physics list name     "  , required_argument, 0, 'f'},
-    {"performance flag      "  , no_argument      , 0, 'p'},
-    {"geometry file name    "  , required_argument, 0, 'g'},
-    {"pythia"                  , required_argument, 0, 'P'},
-    {"overlap geometry check"  , no_argument      , 0, 'o'},
-    {"help"                    , no_argument      , 0, 'h'},
+    {"macro file               "  , required_argument, 0, 'm'},
+    {"physics list name        "  , required_argument, 0, 'f'},
+    {"performance flag         "  , no_argument      , 0, 'p'},
+    {"geometry file name       "  , required_argument, 0, 'g'},
+    {"pythia primary generator "  , required_argument, 0, 'P'},
+    {"overlap geometry check   "  , no_argument      , 0, 'o'},
+    {"help"                       , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
 
@@ -138,7 +138,7 @@ void Help() {
             <<"      -g :   REQUIRED : the Geometry file name \n"
             <<"      -o :   flag  ==> run the geometry overlap check (default: FALSE)\n"
             <<"      -f :   physics list name (default: FTFP_BERT) \n"
-            <<"      -P :   generate events with Pythia [config. available: ttbar/higgs/minbias or use .txt input file]\n"
+            <<"      -P :   use Pythia primary generator [config. available: ttbar/higgs/minbias or use a Pythia command input file]\n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"<< std::endl;
     
@@ -172,7 +172,7 @@ void GetInputArguments(int argc, char** argv) {
      // Need to enable performance mode, as user actions require particle gun setup
      parIsPerformance = true;
 #else
-     std::cerr << "Support for Pythia is not available." << std::endl;
+     std::cerr << "Support for Pythia is not available. \nPlease visit the website http://home.thep.lu.se/Pythia/ to install it in your system." << std::endl;
      exit(1);
 #endif
      break;

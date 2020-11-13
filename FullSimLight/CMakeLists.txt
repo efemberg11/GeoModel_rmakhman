@@ -17,16 +17,19 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
          "Framework finding behaviour on macOS" )
+    # Set up how the project handle some of its dependenices. Either by picking them
+    # up from the environment, or building them itself.
     if( NOT TARGET JSONExt )
-        # Set up how the project handle some of its dependenices. Either by picking them
-        # up from the environment, or building them itself.
         include( SetupJSON )
+    endif()
+    if( NOT TARGET XercesCBuiltIn )
+        include( SetupXercesC )
     endif()
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
     find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
-    # FullSimLight needs GeoModelG4, so we set the cache variable to be used to set its standalone build
-    set(GEOMODEL_BUILD_GEOMODELG4 TRUE) 
+    # FullSimLight needs GeoModelG4, so we trigger its build
+    set( GEOMODEL_BUILD_GEOMODELG4_FROM_FULLSIMLIGHT ON CACHE BOOL "GeoModelG4 build triggered by FullSimLigh when built individually" FORCE ) 
     add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/../GeoModelG4 build_GeoModelG4 )
     # Set a flag to steer the  of the subpackages
     set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
@@ -71,6 +74,7 @@ find_package(Pythia QUIET) # optional
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
 #
+#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
 include(${Geant4_USE_FILE})
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
@@ -109,7 +113,6 @@ if( GEOMODEL_USE_BUILTIN_JSON )
   add_dependencies( gmclash JSONExt )
   add_dependencies( fillHistogramExample JSONExt )
   add_dependencies( gmgeantino JSONExt )
-  # add_dependencies( plotGeantinoMaps JSONExt )
   add_dependencies( testMagneticField JSONExt )
   add_dependencies( gmtogdml JSONExt )
   # Acquire Installation Directory of JSONExt
@@ -117,7 +120,15 @@ if( GEOMODEL_USE_BUILTIN_JSON )
   # Include the installed 'include' PATH
   include_directories (${install_dir}/include)
 endif()
-
+# If the in-house build of the Xerces-C library is used, add explicit dependency: for Geant4
+if( GEOMODEL_USE_BUILTIN_XERCESC )
+    add_dependencies( fullSimLight XercesCBuiltIn )
+    add_dependencies( gmclash XercesCBuiltIn )
+    add_dependencies( fillHistogramExample XercesCBuiltIn )
+    add_dependencies( gmgeantino XercesCBuiltIn )
+    add_dependencies( testMagneticField XercesCBuiltIn )
+    add_dependencies( gmtogdml XercesCBuiltIn )
+endif()
 #----------------------------------------------------------------------------
 # Link all needed libraries
 #
@@ -173,6 +184,7 @@ endif()
 set(FULLSIMLIGHT_SCRIPTS
   geantino.g4
   macro.g4
+  pythia.g4
   drawMagField.C
   )
 

@@ -4,7 +4,7 @@ project( "GeoModelG4" VERSION 1.1.0 LANGUAGES CXX )
 
 #message("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}") # debug msg
 #message("PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}") # debug msg
-if( (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR GEOMODEL_BUILD_GEOMODELG4 )
+if( (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR GEOMODEL_BUILD_GEOMODELG4_FROM_FULLSIMLIGHT )
     # I am top-level project.
     # Make the root module directory visible to CMake.
     list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
@@ -16,21 +16,21 @@ if( (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR GEOMODEL_BUILD_GEOMODELG4 
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
          "Framework finding behaviour on macOS" )
-    if( NOT TARGET JSONExt )
-        # Set up how the project handle some of its dependenices. Either by picking them
-        # up from the environment, or building them itself.
-        include( SetupJSON )
-    endif()
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
+    # Find Geant4, if not triggered by FullSimLight, where Geant4 is already found/set.
+    if( NOT GEOMODEL_BUILD_GEOMODELG4_FROM_FULLSIMLIGHT )
+        find_package( Geant4 REQUIRED )
+        include( SetupXercesC )
+    endif()
     # Set a flag to steer the  of the subpackages
     set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
+    # External dependencies:
+    find_package( Geant4 REQUIRED )
 endif()
-# External dependencies:
-find_package( Geant4 REQUIRED )
 
 # Set up the build of the three libraries of the project.
 add_subdirectory(GeoSpecialShapes)

@@ -10,7 +10,7 @@ target_include_directories( GXHEPVis PUBLIC ${COIN3D_INCLUDE_DIRS}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
 target_link_libraries( GXHEPVis
-   PUBLIC ${COIN3D_LIBRARIES} OpenGL::OpenGL )
+   PUBLIC ${COIN3D_LIBRARIES} OpenGL::GL )
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.

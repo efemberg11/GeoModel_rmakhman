@@ -57,6 +57,19 @@ PythiaPrimaryGeneratorAction::PythiaPrimaryGeneratorAction() {
         if (access(config, R_OK) == 0) {
                 pythia.readFile(config);
         } else {
+                /*
+                flag name="Pythia:setSeed" default="off"
+                Indicates whether a user-set seed should be used every time the Pythia::init routine is called. If off, the random number generator is initialized with its default seed at the beginning of the run, and never again. If on, each new Pythia::init call (should several be made in the same run) results in the random number being re-initialized, thereby possibly starting over with the same sequence, if you do not watch out.
+
+                mode name="Pythia:seed" default="-1" max="900000000"
+                The seed to be used, if setSeed is on.
+                A negative value gives the default seed,
+                a value 0 gives a random seed based on the time, and
+                a value between 1 and 900,000,000 a unique different random number sequence.
+                */
+                pythia.readString("Random:setSeed = on");
+                // use a reproducible seed: always the same results for benchmarks.
+                pythia.readString("Random:seed = 1234");
                 for (const auto str : pythia_defaults)
                         pythia.readString(str);
 

@@ -1,8 +1,8 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 # Set up the project.
 cmake_minimum_required( VERSION 3.10 )
-
 project( "GeoModelVisualization" VERSION 3.2.0 LANGUAGES CXX )
-# set( CMAKE_BUILD_TYPE RELEASE )
 
 # Set the OpenGL flag requested by CMake
 set( OpenGL_GL_PREFERENCE GLVND )
@@ -19,11 +19,6 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
          "Framework finding behaviour on macOS" )
-    if( NOT TARGET JSONExt )
-        # Set up how the project handle some of its dependenices. Either by picking them
-        # up from the environment, or building them itself.
-        include( SetupJSON )
-    endif()
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
     find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
@@ -34,11 +29,23 @@ else()
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
 endif()
 
+# Find the dependencies of the project.
+find_package( Coin3D REQUIRED )
+find_package( SoQt REQUIRED )
+find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport REQUIRED )
+find_package( OpenGL REQUIRED )
+
+# Set up how the project handle some of its dependenices. Either by picking them
+# up from the environment, or building them itself.
+include( SetupJSON )
+
+# Qt5 settings.
+set( CMAKE_AUTOMOC ON )
+set( CMAKE_AUTOUIC ON )
+set( CMAKE_AUTORCC ON )
+
 # Use the GNU install directory names.
 include( GNUInstallDirs )
-
-# External dependencies.
-# find_package( nlohmann_json REQUIRED )
 
 # Set sub-packages to build.
 add_subdirectory(VP1GeometryPlugin)

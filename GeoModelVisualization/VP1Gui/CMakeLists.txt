@@ -1,52 +1,40 @@
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 0)
-set(MYLIB_VERSION_PATCH 0)
-
-project ( "GXGui" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
-
-
-find_package( Coin REQUIRED )
-find_package( SoQt REQUIRED )
-find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-if ( APPLE )
-	find_package(OpenGL REQUIRED)
-endif()
-
-
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1Gui/*.h )
-file( GLOB UIS src/*.ui VP1Gui/*.ui ) # Qt5 UI files
+file( GLOB UIS src/*.ui VP1Gui/*.ui )
+file( GLOB RCS src/*.qrc )
 
+# Add the library.
+add_library( GXGui SHARED ${SOURCES} ${HEADERS} ${UIS} ${RCS} )
+target_link_libraries( GXGui
+   PUBLIC ${COIN3D_LIBRARIES} Qt5::Core Qt5::Gui Qt5::Widgets SoQt::SoQt GXBase
+   PRIVATE Qt5::PrintSupport )
+target_include_directories( GXGui PUBLIC ${COIN3D_INCLUDE_DIRS}
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+   $<INSTALL_INTERFACE:include> )
+source_group( "VP1Gui" FILES ${HEADERS} )
+source_group( "src" FILES ${SOURCES} ${UIS} ${RCS} )
+set_target_properties( GXGui PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
 
-set (CMAKE_INCLUDE_CURRENT_DIR ON)
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelVisualization::GXGui ALIAS GXGui )
 
-# Qt5 settings
-set (CMAKE_AUTOMOC ON)
-set (CMAKE_AUTOUIC ON)
-set (CMAKE_AUTORCC ON)
-set (UI_RESOURCES src/vp1.qrc)
-unset (AUTOUIC_SEARCH_PATHS)
-set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
-QT5_WRAP_UI(UI_HDRS ${UIS})
-QT5_ADD_RESOURCES(UI_RESOURCES_RCC ${UI_RESOURCES})
-
-
-include_directories ("${PROJECT_SOURCE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}/src")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
-add_library ( GXGui SHARED ${SOURCES} ${HEADERS} ${UI_HDRS} ${UI_RESOURCES_RCC}  )
-
-target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt::SoQt Coin::Coin ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-
-install(TARGETS GXGui
-  LIBRARY
-  DESTINATION lib
-  COMPONENT Libraries
-  )
-
-set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
-
-set_target_properties(GXGui PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
+# Install the library.
+install( TARGETS GXGui
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   COMPONENT Runtime
+   NAMELINK_SKIP )
+install( TARGETS GXGui
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   COMPONENT Development
+   NAMELINK_ONLY )
+install( FILES ${HEADERS}
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/VP1Gui
+   COMPONENT Development )

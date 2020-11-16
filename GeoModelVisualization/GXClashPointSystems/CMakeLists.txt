@@ -1,72 +1,40 @@
-# $Id: CMakeLists.txt 732131 2016-03-24 11:03:29Z krasznaa $
-################################################################################
-# Package: GXClashPointPlugin
-################################################################################
-
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 0)
-set(MYLIB_VERSION_PATCH 0)
-project ( "GXClashPointSystems" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
-
-if ( APPLE )
-	find_package(OpenGL REQUIRED)
-endif()
-find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-
-find_package( Coin REQUIRED )
-find_package( SoQt REQUIRED )
-find_package(nlohmann_json QUIET)
-
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS GXClashPointSystems/*.h )
-file( GLOB UIS src/*.ui GXClashPointSystems/*.ui ) # Qt5 UI files
+file( GLOB UIS src/*.ui )
 
-# Qt5 settings
-set (CMAKE_INCLUDE_CURRENT_DIR ON)
-set (CMAKE_AUTOMOC ON)
-set (CMAKE_AUTOUIC ON)
-unset (AUTOUIC_SEARCH_PATHS)
-set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
-QT5_WRAP_UI(UI_HDRS ${UIS})
+# Add the library.
+add_library( GXClashPointSystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
+target_link_libraries( GXClashPointSystems
+   PUBLIC ${COIN3D_LIBRARIES} GXBase
+   PRIVATE Qt5::Core Qt5::Widgets nlohmann_json::nlohmann_json )
+target_include_directories( GXClashPointSystems PUBLIC ${COIN3D_INCLUDE_DIRS}
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+   $<INSTALL_INTERFACE:include> )
+source_group( "GXClashPointSystems" FILES ${HEADERS} )
+source_group( "src" FILES ${SOURCES} ${UIS} ${RCS} )
+set_target_properties( GXClashPointSystems PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
 
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelVisualization::GXClashPointSystems ALIAS
+   GXClashPointSystems )
 
-include_directories ("${PROJECT_SOURCE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}/src")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
-
-add_library ( GXClashPointSystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
-
-# If we use standalone-build of the nlohmann_json library, add explicit dependency
-if( GEOMODEL_USE_BUILTIN_JSON )
-  add_dependencies( GXClashPointSystems JSONExt )
-  # Acquire Installation Directory of JSONExt
-  ExternalProject_Get_Property (JSONExt install_dir)
-  # Include the installed 'include' PATH
-  include_directories (${install_dir}/include)
-endif()
-
-target_link_libraries (GXClashPointSystems PRIVATE SoQt::SoQt Coin::Coin  ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-
-# We link to `nlohmann_json` only  if we use a version of nlohmann_json
-# that provides a CMake config file (i.e., either built from source, or also
-# installed with Homebrew on macOS).
-# This is not needed if the single-header library is installed in a regular
-# system include folder (e.g., '/usr/local/include', '/usr/include', ...)
-if ( nlohmann_json_FOUND )
-  target_link_libraries( GXClashPointSystems PUBLIC nlohmann_json::nlohmann_json )
-endif()
-
-add_definitions (${Qt5Core_DEFINITIONS})
-
-install(TARGETS GXClashPointSystems
-  LIBRARY
-  DESTINATION lib
-  COMPONENT Libraries
-  )
-
-set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
-
-set_target_properties(GXClashPointSystems PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
+# Install the library.
+install( TARGETS GXClashPointSystems
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   COMPONENT Runtime
+   NAMELINK_SKIP )
+install( TARGETS GXClashPointSystems
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   COMPONENT Development
+   NAMELINK_ONLY )
+install( FILES ${HEADERS}
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GXClashPointSystems
+   COMPONENT Development )

@@ -4,6 +4,14 @@
 # it on the build machine, or by downloading it during the build itself.
 #
 
+# Make sure that this file is only included once.
+get_property( _eigenSetUp GLOBAL PROPERTY GEOMODEL_EIGEN_SET_UP SET )
+if( _eigenSetUp )
+   unset( _eigenSetUp )
+   return()
+endif()
+set_property( GLOBAL PROPERTY GEOMODEL_EIGEN_SET_UP TRUE )
+
 # Configuration option for how Eigen should be used.
 option( GEOMODEL_USE_BUILTIN_EIGEN3
    "Download a version of Eigen3 during the build" FALSE )

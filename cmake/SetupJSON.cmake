@@ -5,6 +5,14 @@
 # itself.
 #
 
+# Make sure that this file is only included once.
+get_property( _jsonSetUp GLOBAL PROPERTY GEOMODEL_JSON_SET_UP SET )
+if( _jsonSetUp )
+   unset( _jsonSetUp )
+   return()
+endif()
+set_property( GLOBAL PROPERTY GEOMODEL_JSON_SET_UP TRUE )
+
 # Configuration option for how "nlohmann_json" should be used.
 option( GEOMODEL_USE_BUILTIN_JSON
 "Download and compile a version of nlohmann_json during the build" FALSE )

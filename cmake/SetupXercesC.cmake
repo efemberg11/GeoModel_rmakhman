@@ -4,6 +4,14 @@
 # it on the build machine, or by downloading it during the build itself.
 #
 
+# Make sure that this file is only included once.
+get_property( _xercescSetUp GLOBAL PROPERTY GEOMODEL_XERCESC_SET_UP SET )
+if( _xercescSetUp )
+   unset( _xercescSetUp )
+   return()
+endif()
+set_property( GLOBAL PROPERTY GEOMODEL_XERCESC_SET_UP TRUE )
+
 # Configuration option for how XercesC should be used.
 option( GEOMODEL_USE_BUILTIN_XERCESC
    "Download/build a version of XercesC during the build" FALSE )

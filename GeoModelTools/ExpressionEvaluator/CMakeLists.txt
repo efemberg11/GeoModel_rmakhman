@@ -17,6 +17,10 @@ set_target_properties( ExpressionEvaluator PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelTools::ExpressionEvaluator ALIAS ExpressionEvaluator )
+
 # Install the library.
 install( TARGETS ExpressionEvaluator
    EXPORT ${PROJECT_NAME}-export

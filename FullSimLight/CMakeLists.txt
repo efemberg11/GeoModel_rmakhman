@@ -101,7 +101,7 @@ add_executable(gmtogdml geoModeltoGDML.cc ${sources} ${headers})
 
 if(Pythia_FOUND)
   target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
-  target_link_libraries(fullSimLight Pythia::Pythia)
+  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
 endif()
 
 #----------------------------------------------------------------------------

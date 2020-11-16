@@ -14,9 +14,6 @@ target_include_directories( GXGeometryPlugin PUBLIC
    $<INSTALL_INTERFACE:include> )
 source_group( "VP1GeometryPlugin" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} ${UIS} )
-set_target_properties( GXGeometryPlugin PROPERTIES
-   VERSION ${PROJECT_VERSION}
-   SOVERSION ${PROJECT_VERSION_MAJOR} )
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.

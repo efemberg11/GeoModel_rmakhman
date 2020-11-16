@@ -6,11 +6,14 @@ file( GLOB HEADERS VP1HEPVis/*.h )
 
 # Add the library.
 add_library( GXHEPVis SHARED ${SOURCES} ${HEADERS} )
-target_include_directories( GXHEPVis PUBLIC ${COIN3D_INCLUDE_DIRS}
+target_include_directories( GXHEPVis PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
 target_link_libraries( GXHEPVis
-   PUBLIC ${COIN3D_LIBRARIES} OpenGL::GL )
+   PUBLIC Coin::Coin OpenGL::GL )
+if( GEOMODEL_USE_BUILTIN_COIN3D )
+   add_dependencies( GXHEPVis Coin3DBuiltIn )
+endif()
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.

@@ -30,13 +30,12 @@ else()
 endif()
 
 # Find the dependencies of the project.
-find_package( Coin3D REQUIRED )
-find_package( SoQt REQUIRED )
-find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport REQUIRED )
+find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )
 find_package( OpenGL REQUIRED )
 
-# Set up how the project handle some of its dependenices. Either by picking them
-# up from the environment, or building them itself.
+# Set up how the project should handle some of its dependenices. Either by
+# picking them up from the environment, or building them itself.
+include( SetupCoin3D )
 include( SetupJSON )
 
 # Qt5 settings.

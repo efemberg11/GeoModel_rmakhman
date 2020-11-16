@@ -9,9 +9,9 @@ file( GLOB RCS src/*.qrc )
 # Add the library.
 add_library( GXGui SHARED ${SOURCES} ${HEADERS} ${UIS} ${RCS} )
 target_link_libraries( GXGui
-   PUBLIC ${COIN3D_LIBRARIES} Qt5::Core Qt5::Gui Qt5::Widgets SoQt::SoQt GXBase
-   PRIVATE Qt5::PrintSupport )
-target_include_directories( GXGui PUBLIC ${COIN3D_INCLUDE_DIRS}
+   PUBLIC Coin::Coin Qt5::Core Qt5::Gui Qt5::Widgets SoQt::SoQt GXBase
+   PRIVATE Qt5::PrintSupport Qt5::OpenGL )
+target_include_directories( GXGui PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
 source_group( "VP1Gui" FILES ${HEADERS} )
@@ -19,6 +19,9 @@ source_group( "src" FILES ${SOURCES} ${UIS} ${RCS} )
 set_target_properties( GXGui PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
+if( GEOMODEL_USE_BUILTIN_COIN3D )
+   add_dependencies( GXGui Coin3DBuiltIn SoQtBuiltIn )
+endif()
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.

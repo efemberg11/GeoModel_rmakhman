@@ -8,9 +8,9 @@ file( GLOB UIS src/*.ui )
 # Add the library.
 add_library( GXGuideLineSystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXGuideLineSystems
-   PUBLIC ${COIN3D_LIBRARIES} Qt5::Core Qt5::Gui Qt5::Widgets GXBase
+   PUBLIC Coin::Coin Qt5::Core Qt5::Gui Qt5::Widgets GXBase
    PRIVATE GeoModelCore::GeoModelKernel GXHEPVis )
-target_include_directories( GXGuideLineSystems PUBLIC ${COIN3D_INCLUDE_DIRS}
+target_include_directories( GXGuideLineSystems PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
 source_group( "VP1GuideLineSystems" FILES ${HEADERS} )
@@ -18,6 +18,9 @@ source_group( "src" FILES ${SOURCES} ${UIS} )
 set_target_properties( GXGuideLineSystems PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
+if( GEOMODEL_USE_BUILTIN_COIN3D )
+   add_dependencies( GXGuideLineSystems Coin3DBuiltIn )
+endif()
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.

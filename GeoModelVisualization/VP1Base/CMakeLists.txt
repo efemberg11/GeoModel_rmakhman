@@ -5,7 +5,7 @@ set(MYLIB_VERSION_PATCH 0)
 
 project ( "GXBase" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-find_package( Coin REQUIRED )
+find_package( Coin3D REQUIRED )
 find_package( SoQt REQUIRED )
 find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport )
 if ( APPLE )
@@ -38,7 +38,7 @@ add_library ( GXBase SHARED ${SOURCES} ${HEADERS} ${UI_HDRS} ${UI_RESOURCES_RCC}
 if ( APPLE )
     target_link_libraries (GXBase ${OPENGL_LIBRARIES} )
 endif()
-target_link_libraries (GXBase Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Widgets Qt5::PrintSupport GXHEPVis SoQt::SoQt Coin::Coin )
+target_link_libraries (GXBase Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Widgets Qt5::PrintSupport GXHEPVis SoQt::SoQt ${COIN3D_LIBRARIES} )
 
 install(TARGETS GXBase
   LIBRARY

@@ -5,7 +5,7 @@ set(MYLIB_VERSION_PATCH 0)
 project ( "GXGui" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
 
-find_package( Coin REQUIRED )
+find_package( Coin3D REQUIRED )
 find_package( SoQt REQUIRED )
 find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
 if ( APPLE )
@@ -39,7 +39,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
 include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
 add_library ( GXGui SHARED ${SOURCES} ${HEADERS} ${UI_HDRS} ${UI_RESOURCES_RCC}  )
 
-target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt::SoQt Coin::Coin ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+target_link_libraries (GXGui ${Qt5Core_LIBRARIES} GXBase GXHEPVis  SoQt::SoQt ${COIN3D_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 
 install(TARGETS GXGui
   LIBRARY

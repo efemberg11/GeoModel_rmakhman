@@ -13,7 +13,7 @@ if ( APPLE )
 endif()
 find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
 
-find_package( Coin REQUIRED )
+find_package( Coin3D REQUIRED )
 find_package( SoQt REQUIRED )
 find_package(nlohmann_json QUIET)
 
@@ -48,7 +48,7 @@ if( GEOMODEL_USE_BUILTIN_JSON )
   include_directories (${install_dir}/include)
 endif()
 
-target_link_libraries (GXClashPointSystems PRIVATE SoQt::SoQt Coin::Coin  ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+target_link_libraries (GXClashPointSystems PRIVATE SoQt::SoQt ${COIN3D_LIBRARIES}  ${Qt5::Core_LIBRARIES} GXGui GXBase GXHEPVis  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
 
 # We link to `nlohmann_json` only  if we use a version of nlohmann_json
 # that provides a CMake config file (i.e., either built from source, or also

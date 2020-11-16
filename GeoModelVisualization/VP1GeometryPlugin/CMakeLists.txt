@@ -8,7 +8,7 @@ set(MYLIB_VERSION_PATCH 0)
 
 project ( "GXGeometryPlugin" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-find_package( Coin REQUIRED )
+find_package( Coin3D REQUIRED )
 find_package( SoQt REQUIRED )
 find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport )
 if( APPLE )
@@ -55,7 +55,7 @@ else() # if built as a part of GeoModel
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelKernel )
     target_link_libraries( GXGeometryPlugin PUBLIC GeoModelRead GeoModelDBManager TFPersistification GeoGenericFunctions GeoModelKernel )
 endif()
-target_link_libraries (GXGeometryPlugin PUBLIC GXGeometrySystems GXGuideLineSystems  GXClashPointSystems GXGui GXBase GXHEPVis SoQt::SoQt Coin::Coin Qt5::Gui Qt5::Core Qt5::Widgets Qt5::PrintSupport )
+target_link_libraries (GXGeometryPlugin PUBLIC GXGeometrySystems GXGuideLineSystems  GXClashPointSystems GXGui GXBase GXHEPVis SoQt::SoQt ${COIN3D_LIBRARIES} Qt5::Gui Qt5::Core Qt5::Widgets Qt5::PrintSupport )
 
 install(TARGETS GXGeometryPlugin
   LIBRARY

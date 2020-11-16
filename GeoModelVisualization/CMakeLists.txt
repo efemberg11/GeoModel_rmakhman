@@ -37,9 +37,6 @@ endif()
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
-# External dependencies.
-# find_package( nlohmann_json REQUIRED )
-
 # Set sub-packages to build.
 add_subdirectory(VP1GeometryPlugin)
 add_subdirectory(VP1GeometrySystems)

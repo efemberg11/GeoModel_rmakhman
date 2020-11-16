@@ -9,7 +9,7 @@ set(MYLIB_VERSION_PATCH 0)
 project ( "GXGeometrySystems" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
 find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-find_package( Coin REQUIRED )
+find_package( Coin3D REQUIRED )
 find_package( SoQt REQUIRED )
 # find_package( Eigen3 REQUIRED )
 find_package(nlohmann_json QUIET)
@@ -70,7 +70,7 @@ else() # if built as a part of GeoModel
     target_link_libraries( GXGeometrySystems PUBLIC GeoModelKernel )
     target_link_libraries( GXGeometrySystems PUBLIC GeoModelRead GeoModelWrite )
 endif()
-target_link_libraries (GXGeometrySystems PUBLIC SoQt::SoQt Coin::Coin Qt5::Core 
+target_link_libraries (GXGeometrySystems PUBLIC SoQt::SoQt ${COIN3D_LIBRARIES} Qt5::Core 
     GXGui GXBase GXHEPVis Qt5::Gui Qt5::Widgets Qt5::PrintSupport )
 if ( APPLE )
   target_link_directories (GXGeometrySystems PUBLIC ${Coin_LIB_DIR} )

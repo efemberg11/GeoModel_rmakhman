@@ -121,6 +121,7 @@ GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbIsOK(fal
 GMDBManager::~GMDBManager()
 {
   sqlite3_close(m_d->m_dbSqlite);
+  delete m_d->m_dbSqlite;
   m_d->m_dbSqlite = nullptr;
 }
 

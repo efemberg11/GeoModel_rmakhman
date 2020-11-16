@@ -70,6 +70,8 @@
 #include "MagFieldServices/AtlasFieldSvc.h"
 #include "StandardFieldSvc.h"
 
+#include "GeoModelKernel/GeoVolumeCursor.h"
+
 
 namespace clashdet {
     enum typeOfClash{ withMother=0, withSister, fullyEncapsSister, invalidSolid};
@@ -105,7 +107,38 @@ namespace clashdet {
      }
 } // namespace clashdet
 
+//_____________________________________________________________________________________
+double volume(const PVConstLink& pv) {
+  const GeoLogVol        * lv       = pv->getLogVol();
+  const GeoShape         *shape    = lv->getShape();
+  return shape->volume();
+}
 
+
+double exclusiveMass(const PVConstLink& pv) {
+  const GeoLogVol* lv       = pv->getLogVol();
+  const GeoMaterial      *material = lv->getMaterial();
+  double density = material->getDensity();
+  return density*volume(pv);
+}
+
+double inclusiveMass(const PVConstLink& pv) {
+
+  const GeoLogVol*        lv       = pv->getLogVol();
+  const GeoMaterial      *material = lv->getMaterial();
+  double density = material->getDensity();
+
+  double mass = exclusiveMass(pv);
+
+  GeoVolumeCursor av(pv);
+  while (!av.atEnd()) {
+    mass += inclusiveMass(av.getVolume());
+    mass -= volume(av.getVolume())*density;
+    av.next();
+  }
+
+  return mass;
+}
 
 
 
@@ -701,9 +734,6 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
         G4cout << "Detector Construction from the plugin file " << fGeometryFileName.data() <<", done!"<<G4endl;
 
-        
-
-        
     }
     else if (fGeometryFileName.contains(".db")){
         G4cout << "Building the detector from the SQLite file: "<<fGeometryFileName<<G4endl;
@@ -807,6 +837,26 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
         exit(0);
     }
+    
+    if(fRunMassCalculator)
+    {
+        std::cout<<"Calculating the mass of the total detector... "<<fGeometryFileName<<std::endl;
+        fTimer.Start();
+        double mass = fWorld->GetLogicalVolume()->GetMass(false, true);
+        std::cout<<"Geant4: Total mass of the detector is ... "<<mass / (CLHEP::kg) <<" [kg]."<<std::endl;
+        
+        if (!fGeometryFileName.contains(".gdml")){
+            const PVConstLink mypv=world;
+            double mass2 = inclusiveMass(mypv);
+            std::cout<<"VP1: Total mass of the detector is ... "<<mass2 / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
+        }
+    
+        fTimer.Stop();
+        G4cout << "\n**** Real time elapsed for mass calculation  : "<<fTimer.GetRealElapsed()/60   << " min. "<< G4endl;
+        G4cout << "**** User time elapsed for mass calculation   : " <<fTimer.GetUserElapsed()/60   << " min. "<<G4endl;
+        G4cout << "**** System time elapsed for mass calculation : " <<fTimer.GetSystemElapsed()/60 << " min. "<<G4endl;
+    }
+
     if (fDumpGDML){
         
         G4cout << "\n ===================  Dump geometry in GDML format  =================== \n" << G4endl;

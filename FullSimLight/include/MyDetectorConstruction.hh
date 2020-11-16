@@ -34,6 +34,7 @@ public:
 
   void SetGDMLFileName  (const G4String &gdmlfile)   { fGeometryFileName = gdmlfile;}
   void SetRunOverlapCheck(const bool runOvCheck)     { fRunOverlapCheck = runOvCheck; }
+  void SetRunMassCalculator(const bool runMassCalc)     { fRunMassCalculator = runMassCalc; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
   void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
@@ -83,6 +84,7 @@ private:
   // this static member is for the print out
   static G4double gFieldValue;
   G4bool   fRunOverlapCheck;
+  G4bool   fRunMassCalculator;
   G4bool   fDumpGDML;
   G4double fMinStep;
   G4String fGeometryFileName;

@@ -19,6 +19,9 @@ option( GEOMODEL_USE_BUILTIN_COIN3D
 # Now do what was requested.
 if( GEOMODEL_USE_BUILTIN_COIN3D )
 
+   # External(s) required for the build.
+   find_package( Boost REQUIRED )
+
    # The include directory and library that will be produced.
    set( COIN3D_INCLUDE_DIR
        "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/Coin3DInstall/${CMAKE_INSTALL_INCLUDEDIR}" )

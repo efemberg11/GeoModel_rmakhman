@@ -50,5 +50,7 @@ set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_V
 
 set_target_properties(GXBase PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
 
+# Disable Qt5's qDebug message from GeoModelVisualization
+# TODO: add an option to disable the two lines below, to get qDebug() messages from GeoModelVisualization
 target_compile_definitions( GXBase PUBLIC -DQT_NO_DEBUG_OUTPUT )
 target_compile_definitions( GXBase PUBLIC -DQT_NO_INFO_OUTPUT )

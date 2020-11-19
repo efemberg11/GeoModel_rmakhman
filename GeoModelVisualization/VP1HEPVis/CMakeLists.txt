@@ -5,7 +5,7 @@ set(MYLIB_VERSION_PATCH 0)
 
 project ( "GXHEPVis" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
 
-find_package( Coin3D REQUIRED )
+find_package( Coin REQUIRED )
 find_package( OpenGL REQUIRED )
 
 
@@ -28,7 +28,7 @@ if (${VISUALIZATION_INDIVIDUAL_BUILD}) # if built individually
 else() # if built as a part of GeoModel
     target_link_libraries( GXHEPVis PUBLIC GeoModelKernel )
 endif()
-target_link_libraries( GXHEPVis PUBLIC ${COIN3D_LIBRARIES} )
+target_link_libraries( GXHEPVis PUBLIC Coin::Coin )
 if ( APPLE )
   target_link_libraries (GXHEPVis PUBLIC ${OPENGL_LIBRARIES} )
 endif()

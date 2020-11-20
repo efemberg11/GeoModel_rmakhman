@@ -11,6 +11,11 @@ target_include_directories( GXHEPVis PUBLIC
    $<INSTALL_INTERFACE:include> )
 target_link_libraries( GXHEPVis
    PUBLIC Coin::Coin OpenGL::GL )
+source_group( "VP1HEPVis" FILES ${HEADERS} )
+source_group( "src" FILES ${SOURCES} )
+set_target_properties( GXHEPVis PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
 if( GEOMODEL_USE_BUILTIN_COIN3D )
    add_dependencies( GXHEPVis Coin3DBuiltIn )
 endif()
@@ -24,12 +29,7 @@ install( TARGETS GXHEPVis
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    COMPONENT Runtime
-   NAMELINK_SKIP )
-install( TARGETS GXHEPVis
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Development
-   NAMELINK_ONLY )
+   NAMELINK_COMPONENT Development )
 install( DIRECTORY VP1HEPVis
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
    COMPONENT Development )

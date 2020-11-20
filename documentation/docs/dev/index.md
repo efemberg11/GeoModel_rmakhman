@@ -30,7 +30,8 @@ brew install qt5
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 ```
 
-Also, before building the GeoModel libraries from source, as explained here below, please check if you have old versions of them installed on your system and remove them.
+Before building the GeoModel libraries from source, as explained here below, please check if you have old versions of them installed on your system and remove them.
+Also, you should remove all GeoModel packages previously installed through `brew`, because they could be picked up by the build system while building the sources, affecting the compilation.
 
 You can check if you have GeoModel libraries which had installed with Homebrew by typing:
 

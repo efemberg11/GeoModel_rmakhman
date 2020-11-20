@@ -17,14 +17,30 @@ set_target_properties( ExpressionEvaluator PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 
+
 # Install the library.
-install( TARGETS ExpressionEvaluator
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     COMPONENT Runtime
-     NAMELINK_COMPONENT Development
-   NAMELINK_ONLY
-     COMPONENT Development )
+install(TARGETS ExpressionEvaluator
+    EXPORT ${PROJECT_NAME}-export
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT          Runtime
+            NAMELINK_COMPONENT Development   # Requires CMake 3.12
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT Development
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ExpressionEvaluator
+            COMPONENT Development
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Install the library.
+#install( TARGETS ExpressionEvaluator
+#   EXPORT ${PROJECT_NAME}-export
+#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     COMPONENT Runtime
+#     NAMELINK_COMPONENT Development
+#   NAMELINK_ONLY
+#     COMPONENT Development )
 #install( TARGETS ExpressionEvaluator
 #   EXPORT ${PROJECT_NAME}-export
 #   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -1,8 +1,10 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 ################################################################################
 # Package: GeoModelDBManager
-# author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - 2017
-# major updates: rbianchi@cern.ch, 2018
+# author: Riccardo Maria BIANCHI @ CERN - 2017
+# major updates: 
+# - R.M.Bianchi, 2018
+# - R.M.Bianvhi, Nov 2020
 ################################################################################
 
 # Find the header and source files.
@@ -26,14 +28,30 @@ set_target_properties( GeoModelDBManager PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 
+
 # Install the library.
-install( TARGETS GeoModelDBManager
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-     COMPONENT Runtime
-     NAMELINK_COMPONENT Development
-   NAMELINK_ONLY
-     COMPONENT Development )
+install(TARGETS GeoModelDBManager
+    EXPORT ${PROJECT_NAME}-export
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT          Runtime
+            NAMELINK_COMPONENT Development   # Requires CMake 3.12
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT Development
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelDBManager
+            COMPONENT Development
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Install the library.
+#install( TARGETS GeoModelDBManager
+#   EXPORT ${PROJECT_NAME}-export
+#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     COMPONENT Runtime
+#     NAMELINK_COMPONENT Development
+#   NAMELINK_ONLY
+#     COMPONENT Development )
 #install( TARGETS GeoModelDBManager
 #   EXPORT ${PROJECT_NAME}-export
 #   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

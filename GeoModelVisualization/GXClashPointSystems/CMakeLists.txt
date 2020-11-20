@@ -21,6 +21,9 @@ set_target_properties( GXClashPointSystems PROPERTIES
 if( GEOMODEL_USE_BUILTIN_COIN3D )
    add_dependencies( GXClashPointSystems Coin3DBuiltIn )
 endif()
+if( GEOMODEL_USE_BUILTIN_JSON )
+   add_dependencies( GXClashPointSystems JSONExt )
+endif()
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.

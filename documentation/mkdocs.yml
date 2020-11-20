@@ -10,7 +10,7 @@ nav:
     - Home: 'index.md'
     - Getting Started:
         - 'Intro': 'start/index.md'
-        - 'Install the Libraries':nd Tools 'start/install.md'
+        - 'Install the Libraries and Tools': 'start/install.md'
         - 'The Basic Concepts': 'start/basic_concepts.md'
         - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
     - How To:

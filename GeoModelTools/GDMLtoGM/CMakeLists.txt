@@ -28,21 +28,25 @@ set_target_properties( GDMLtoGM PROPERTIES
 add_library( GeoModelTools::GDMLtoGM ALIAS GDMLtoGM )
 
 # Install the library.
-install( TARGETS GDMLtoGM
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Runtime
-   NAMELINK_SKIP )
-install( TARGETS GDMLtoGM
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Development
-   NAMELINK_ONLY )
+install(TARGETS GDMLtoGM
+    EXPORT ${PROJECT_NAME}-export
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT          Runtime
+            NAMELINK_COMPONENT Development   # Requires CMake 3.12
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT Development
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GDMLtoGM
+            COMPONENT Development
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GDMLInterface
    COMPONENT Development )
 
-# Create an install the gdml2gm executable.
+# Create and install the gdml2gm executable.
 add_executable( gdml2gm gdml2gm/gdml2gm.cxx )
 target_link_libraries( gdml2gm PRIVATE
    GeoModelXMLParser GeoModelKernel GeoModelWrite GeoModelDBManager GDMLtoGM )

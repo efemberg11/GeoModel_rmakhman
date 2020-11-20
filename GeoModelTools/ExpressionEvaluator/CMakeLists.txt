@@ -22,16 +22,20 @@ set_target_properties( ExpressionEvaluator PROPERTIES
 add_library( GeoModelTools::ExpressionEvaluator ALIAS ExpressionEvaluator )
 
 # Install the library.
-install( TARGETS ExpressionEvaluator
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Runtime
-   NAMELINK_SKIP )
-install( TARGETS ExpressionEvaluator
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Development
-   NAMELINK_ONLY )
+install(TARGETS ExpressionEvaluator
+    EXPORT ${PROJECT_NAME}-export
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT          Runtime
+            NAMELINK_COMPONENT Development   # Requires CMake 3.12
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT Development
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ExpressionEvaluator
+            COMPONENT Development
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ExpressionEvaluator
    COMPONENT Development )

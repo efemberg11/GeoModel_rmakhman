@@ -25,16 +25,19 @@ set_target_properties( GeoModelKernel PROPERTIES
 add_library( GeoModelCore::GeoModelKernel ALIAS GeoModelKernel )
 
 # Install the library.
-install( TARGETS GeoModelKernel
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Runtime
-   NAMELINK_SKIP )
-install( TARGETS GeoModelKernel
-   EXPORT ${PROJECT_NAME}-export
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-   COMPONENT Development
-   NAMELINK_ONLY )
+install(TARGETS GeoModelKernel
+    EXPORT ${PROJECT_NAME}-export
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT          Runtime
+            NAMELINK_COMPONENT Development   # Requires CMake 3.12
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT Development
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelKernel
+            COMPONENT Development
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelKernel
    COMPONENT Development )

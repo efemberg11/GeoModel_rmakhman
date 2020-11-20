@@ -35,7 +35,7 @@ include( SetupXercesC )
 include( SetupJSON )
 
 # Find the dependencies that the project always picks up from its environment.
-find_package( SQLite3 3.7.18 )
+find_package( SQLite3 3.7.17 )
 
 # === Main targets built by this project ===
 

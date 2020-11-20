@@ -33,19 +33,6 @@ install(TARGETS GeoModelWrite
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-# Install the library.
-#install( TARGETS GeoModelWrite
-#   EXPORT ${PROJECT_NAME}-export
-#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#     COMPONENT Runtime
-#     NAMELINK_COMPONENT Development
-#   NAMELINK_ONLY
-#     COMPONENT Development )
- #install( TARGETS GeoModelWrite
- #   EXPORT ${PROJECT_NAME}-export
- #  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
- #  COMPONENT Development
- #  NAMELINK_ONLY )
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelWrite
    COMPONENT Development )

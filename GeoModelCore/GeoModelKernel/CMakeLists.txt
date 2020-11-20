@@ -35,20 +35,6 @@ install(TARGETS GeoModelKernel
             COMPONENT Development
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
-
-# Install the library.
-#install( TARGETS GeoModelKernel
-#   EXPORT ${PROJECT_NAME}-export
-#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#     COMPONENT Runtime
-#     NAMELINK_COMPONENT Development
-#   NAMELINK_ONLY 
-#     COMPONENT Development )
- #install( TARGETS GeoModelKernel
- #  EXPORT ${PROJECT_NAME}-export
- #  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
- #  COMPONENT Development
- #  NAMELINK_ONLY )
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelKernel
    COMPONENT Development )

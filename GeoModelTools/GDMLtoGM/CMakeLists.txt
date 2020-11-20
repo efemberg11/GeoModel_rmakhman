@@ -38,24 +38,11 @@ install(TARGETS GDMLtoGM
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-# Install the library.
-#install( TARGETS GDMLtoGM
-#   EXPORT ${PROJECT_NAME}-export
-#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#     COMPONENT Runtime
-#     NAMELINK_COMPONENT Development
-#   NAMELINK_ONLY
-#     COMPONENT Development )
-#install( TARGETS GDMLtoGM
-#   EXPORT ${PROJECT_NAME}-export
-#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#   COMPONENT Development
-#   NAMELINK_ONLY )
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GDMLInterface
    COMPONENT Development )
 
-# Create an install the gdml2gm executable.
+# Create and install the gdml2gm executable.
 add_executable( gdml2gm gdml2gm/gdml2gm.cxx )
 target_link_libraries( gdml2gm PRIVATE
    GeoModelXMLParser GeoModelKernel GeoModelWrite GeoModelDBManager GDMLtoGM )

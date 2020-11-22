@@ -54,7 +54,7 @@ GeoFullPhysVol* EndcapPresamplerConstruction::Envelope()
   ///////////////////////////////////////////////////////////////////
   // LAr Endcap Presampler GEOMETRY
   ///////////////////////////////////////////////////////////////////
-  double Rmin = (*presamplerPosition)[0].getDouble("RMAX")*SYSTEM_OF_UNITS::cm;
+  double Rmin = (*presamplerPosition)[0].getDouble("RMIN")*SYSTEM_OF_UNITS::cm;
   double Rmax = (*presamplerPosition)[0].getDouble("RMAX")*SYSTEM_OF_UNITS::cm;
   double HalfZ = ((*presamplerPosition)[0].getDouble("TCK")/2.)*SYSTEM_OF_UNITS::cm;  
 

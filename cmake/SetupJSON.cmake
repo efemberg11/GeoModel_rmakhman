@@ -5,6 +5,14 @@
 # itself.
 #
 
+# Make sure that this file is only included once.
+get_property( _jsonSetUp GLOBAL PROPERTY GEOMODEL_JSON_SET_UP SET )
+if( _jsonSetUp )
+   unset( _jsonSetUp )
+   return()
+endif()
+set_property( GLOBAL PROPERTY GEOMODEL_JSON_SET_UP TRUE )
+
 # Configuration option for how "nlohmann_json" should be used.
 option( GEOMODEL_USE_BUILTIN_JSON
 "Download and compile a version of nlohmann_json during the build" FALSE )
@@ -55,12 +63,22 @@ if( GEOMODEL_USE_BUILTIN_JSON )
       INTERFACE_INCLUDE_DIRECTORIES "${nlohmann_json_INCLUDE_DIR}" )
 
 else()
-   # Just find an existing installation of nlohmann_json.
-   find_package( nlohmann_json QUIET)
-   if( NOT nlohmann_json_FOUND )
-     message(STATUS "SetupJSON - WARNING! 'nlohmann_json' was not found by CMake!! However, if you installed this single-header library in a standard system include dir (e.g., '/usr/local/include'), I will be able to use it.")
+   # Find an existing installation of nlohmann_json.
+   find_package( nlohmann_json QUIET )
+   if( nlohmann_json_FOUND )
+      # If it was found, tell the user about it.
+      get_target_property( _incPaths nlohmann_json::nlohmann_json
+         INTERFACE_INCLUDE_DIRECTORIES )
+      list( GET _incPaths 0 _incPath )
+      message( STATUS "Found nlohmann_json: ${_incPath}" )
+      unset( _incPaths )
+      unset( _incPath )
    else()
-     message(STATUS "SetupJSON - Found 'nlohmann_json' at: ${nlohmann_json_DIR}")
+      # If it was not found, it may still be that the necessary header is
+      # available on the build system. So just set up a dummy library that would
+      # allow the configuration to succeed.
+      message( WARNING "Creating a dummy nlohmann_json::nlohmann_json target "
+         "in case the headers are avalable in some public place..." )
+      add_library( nlohmann_json::nlohmann_json INTERFACE IMPORTED )
    endif()
-
 endif()

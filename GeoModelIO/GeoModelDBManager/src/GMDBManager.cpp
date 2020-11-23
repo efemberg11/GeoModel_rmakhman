@@ -17,7 +17,7 @@
 #define FMT_HEADER_ONLY 1 // to use 'fmt' header-only
 #include "fmt/format.h"
 
-// include SQLite 
+// include SQLite
 #include <sqlite3.h>
 
 // C++ includes
@@ -67,15 +67,15 @@ public:
     // constructor
   Imp (GMDBManager* dbm)
     : theManager(dbm), m_dbSqlite(nullptr), m_SQLiteErrMsg(0) {}
-  
+
   // The class
   GMDBManager* theManager;
-  
+
   // Pointer to SQLite connection
   sqlite3* m_dbSqlite;
 
   /// Variable to store error messages from SQLite
-  char *m_SQLiteErrMsg; 
+  char *m_SQLiteErrMsg;
 
   sqlite3_stmt* selectAllFromTable(std::string tableName) const;
   sqlite3_stmt* selectAllFromTableSortBy(std::string tableName, std::string sortColumn="") const;
@@ -121,7 +121,6 @@ GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbIsOK(fal
 GMDBManager::~GMDBManager()
 {
   sqlite3_close(m_d->m_dbSqlite);
-  delete m_d->m_dbSqlite;
   m_d->m_dbSqlite = nullptr;
   delete m_d;
   m_d = nullptr;
@@ -179,22 +178,22 @@ void GMDBManager::printAllNameTags() const
 {
 	printAllRecords("NameTags");
 }
-void GMDBManager::printAllPublishedFullPhysVols(const std::string suffix) const 
+void GMDBManager::printAllPublishedFullPhysVols(const std::string suffix) const
 {
     if( "" == suffix ) printAllRecords("PublishedFullPhysVols");
     else {
         std::string tableName = "PublishedFullPhysVols";
         tableName += "_"; // separator
-        printAllRecords( tableName+suffix ); 
+        printAllRecords( tableName+suffix );
     }
 }
-void GMDBManager::printAllPublishedAlignableTransforms(const std::string suffix) const 
+void GMDBManager::printAllPublishedAlignableTransforms(const std::string suffix) const
 {
     if( "" == suffix ) printAllRecords("PublishedAlignableTransforms");
     else {
         std::string tableName = "PublishedAlignableTransforms";
         tableName += "_"; // separator
-        printAllRecords( tableName+suffix ); 
+        printAllRecords( tableName+suffix );
     }
 }
 void GMDBManager::printAllChildrenPositions() const
@@ -271,7 +270,7 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(std::string t
         }
         records.push_back(nodeParams);
       }
-      
+
       if ( res == SQLITE_DONE || res==SQLITE_ERROR)
       {
         if (res == SQLITE_ERROR) {
@@ -405,10 +404,10 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     } else {
       sql += ";";
     }
-    
+
   }
   if(m_debug) std::cout << "Query string:" << sql << std::endl; // debug
-  
+
   // executing the SQL query
   if ( ! (execQuery(sql)) ) {
     return false;
@@ -714,12 +713,12 @@ std::vector<std::string> GMDBManager::getItemFromTableName(std::string tableName
 //  }
   // finalize
   sqlite3_finalize(stmt);
-    
+
   if (item.size()==0) {
     std::cout << "ERROR!!" << "Item with ID:'" << id << "' does not exist in table" << tableName << "! Exiting...";
     exit(EXIT_FAILURE);
   }
-    
+
   return item;
 }
 
@@ -901,7 +900,7 @@ void GMDBManager::getAllDBTables()
   }
   // finalize
   sqlite3_finalize(stmt);
-  
+
   m_cache_tables = tables;
 }
 
@@ -928,39 +927,39 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable( std::st
 }
 
 
-// create a user-defined custom table to store the published nodes 
+// create a user-defined custom table to store the published nodes
 // (usually GeoFullPhysVol and AlignableTransform nodes) and their keys.
 bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, const std::string nodeType, const std::type_info* keyType)
 {
-  
+
   // get the right node type and referenced table
   if( nodeType != "GeoFullPhysVol" && nodeType != "GeoVFullPhysVol" && nodeType != "GeoAlignableTransform" ) {
-    std::cout << "ERROR!! GeoModel node type '" << nodeType 
+    std::cout << "ERROR!! GeoModel node type '" << nodeType
               << "' is not currently supported in GMDBManager::createTableCustomPublishedNodes()"
               << " Please, ask to geomodel-developers@cern.ch. Exiting..."
               << std::endl;
     exit(EXIT_FAILURE);
   }
   std::string referencedTable = "";
-  if( "GeoFullPhysVol" == nodeType || "GeoVFullPhysVol" == nodeType ) 
+  if( "GeoFullPhysVol" == nodeType || "GeoVFullPhysVol" == nodeType )
       referencedTable = "FullPhysVols";
-  if( "GeoAlignableTransform" == nodeType) 
+  if( "GeoAlignableTransform" == nodeType)
       referencedTable = "AlignableTransforms";
- 
+
   // set the right type to use in the DB, based on the type used for the published key
   std::string keyTypeDB = "";
-  if( typeid(std::string) == *keyType) 
+  if( typeid(std::string) == *keyType)
     keyTypeDB = "varchar";
-  else if( typeid(int) == *keyType || typeid(unsigned) == *keyType) 
+  else if( typeid(int) == *keyType || typeid(unsigned) == *keyType)
     keyTypeDB = "integer";
   else {
-    std::cout << "ERROR!!! The key type '" << typeid(keyType).name() 
+    std::cout << "ERROR!!! The key type '" << typeid(keyType).name()
       << "' is not currently supported in GMDBManager::createTableCustomPublishedNodes()."
       << " Please, ask to 'geomodel-developers@cern.ch'. Exiting..."
       << std::endl;
     exit(EXIT_FAILURE);
   }
- 
+
   int rc = -1; // sqlite's return code
   std::string queryStr;
 
@@ -982,7 +981,7 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
 bool GMDBManager::createTables()
 {
   checkIsDBOpen();
-  
+
   int rc = -1; // sqlite return code
   std::string queryStr;
 
@@ -997,7 +996,7 @@ bool GMDBManager::createTables()
   queryStr = fmt::format("create table {0} ({1} integer primary key, {2} integer)", tab[0], tab[1], tab[2]);
   rc = execQuery(queryStr);
   tab.clear();
-  
+
   // create a table to store the relation between the types of GeoNodes and the name of the table
   tableName = "GeoNodesTypes";
   tab.insert(tab.begin(), {tableName, "id", "nodeType", "tableName"});
@@ -1005,7 +1004,7 @@ bool GMDBManager::createTables()
   queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar, {3} varchar)", tab[0], tab[1], tab[2], tab[3]);
   rc = execQuery(queryStr);
   tab.clear();
-  
+
   // create a table to store the mother-daughter relationships between nodes (notably, between the [Full]PhysVols as the parents and their children)
   tableName = "ChildrenPositions";
   tab.push_back(tableName);
@@ -1032,7 +1031,7 @@ bool GMDBManager::createTables()
   queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer not null, {3} integer not null REFERENCES GeoNodesTypes(id))", tab[0], tab[1], tab[2], tab[3]);
   rc = execQuery(queryStr);
   tab.clear();
- 
+
   // PhysVols table
   geoNode = "GeoPhysVol";
   tableName = "PhysVols";
@@ -1045,7 +1044,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr)) ) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // FullPhysVols table
   geoNode = "GeoFullPhysVol";
   tableName = "FullPhysVols";
@@ -1058,7 +1057,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // LogVols table
   geoNode = "GeoLogVol";
   tableName = "LogVols";
@@ -1073,7 +1072,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Materials table
   geoNode = "GeoMaterial";
   tableName = "Materials";
@@ -1088,7 +1087,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Elements table
   geoNode = "GeoElement";
   tableName = "Elements";
@@ -1104,7 +1103,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Shapes table
   geoNode = "GeoShape";
   tableName = "Shapes";
@@ -1118,7 +1117,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // SerialDenominators table
   geoNode = "GeoSerialDenominator";
   tableName = "SerialDenominators";
@@ -1144,7 +1143,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // SerialDenominators table
   geoNode = "GeoSerialTransformer";
   tableName = "SerialTransformers";
@@ -1160,7 +1159,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Transforms table
   geoNode = "GeoTransform";
   tableName = "Transforms";
@@ -1184,7 +1183,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Transforms table
   geoNode = "GeoAlignableTransform";
   tableName = "AlignableTransforms";
@@ -1208,7 +1207,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // NameTags table
   geoNode = "GeoNameTag";
   tableName = "NameTags";
@@ -1221,7 +1220,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   if(m_debug) {
     std::cout << "All these tables have been successfully created:" << std::endl; // debug
     printAllDBTables();
@@ -1331,7 +1330,7 @@ void GMDBManager::storeNodeType(std::string nodeType, std::string tableName)
 bool GMDBManager::storeRootVolume(const unsigned int &id, const std::string &nodeType)
 {
   checkIsDBOpen();
-  
+
   std::string tableName = "RootVolume";
 	const unsigned int typeId = getTableIdFromNodeType(nodeType);
   std::vector<std::string> cols = getTableColumnNames(tableName);
@@ -1390,7 +1389,7 @@ std::vector<std::string> GMDBManager::getRootPhysVol()
   }
   // finalize
   sqlite3_finalize(stmt);
-  
+
   return getItemAndType(typeId, id);
 }
 
@@ -1417,4 +1416,3 @@ int GMDBManager::getTableColIndex(const std::string &tableName, const std::strin
   std::vector<std::string> colFields = m_tableNames.at(tableName);
 	return lastIndexOf(colFields, colName);
 }
-

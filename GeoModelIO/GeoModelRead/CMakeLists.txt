@@ -38,6 +38,9 @@ foreach( _flag GEOMODEL_IO_READ_DEBUG GEOMODEL_IO_DEBUG_VERBOSE
    endif()
 endforeach()
 
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelIO::GeoModelRead ALIAS GeoModelRead )
 
 # Install the library.
 install(TARGETS GeoModelRead

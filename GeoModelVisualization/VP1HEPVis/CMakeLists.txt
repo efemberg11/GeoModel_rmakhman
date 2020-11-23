@@ -1,45 +1,35 @@
-
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 0)
-set(MYLIB_VERSION_PATCH 0)
-
-project ( "GXHEPVis" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
-
-find_package( Coin REQUIRED )
-find_package( OpenGL REQUIRED )
-
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1HEPVis/*.h )
 
-
-include_directories ("${PROJECT_SOURCE_DIR}")
-
-add_library ( GXHEPVis SHARED ${SOURCES} ${HEADERS}  )
-
-# Check if we are building GeoModelVisualization individually,
-# or as a part of the main GeoModel.
-# In the first case, we link against the imported targets, which are taken
-# from the base packages already installed on the system.
-# This is used when building distribution packages.
-if (${VISUALIZATION_INDIVIDUAL_BUILD}) # if built individually
-    target_link_libraries( GXHEPVis PUBLIC GeoModelCore::GeoModelKernel )
-else() # if built as a part of GeoModel
-    target_link_libraries( GXHEPVis PUBLIC GeoModelKernel )
-endif()
-target_link_libraries( GXHEPVis PUBLIC Coin::Coin )
-if ( APPLE )
-  target_link_libraries (GXHEPVis PUBLIC ${OPENGL_LIBRARIES} )
+# Add the library.
+add_library( GXHEPVis SHARED ${SOURCES} ${HEADERS} )
+target_include_directories( GXHEPVis PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+   $<INSTALL_INTERFACE:include> )
+target_link_libraries( GXHEPVis
+   PUBLIC Coin::Coin OpenGL::GL )
+source_group( "VP1HEPVis" FILES ${HEADERS} )
+source_group( "src" FILES ${SOURCES} )
+set_target_properties( GXHEPVis PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
+if( GEOMODEL_USE_BUILTIN_COIN3D )
+   add_dependencies( GXHEPVis Coin3DBuiltIn )
 endif()
 
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelVisualization::GXHEPVis ALIAS GXHEPVis )
 
-install(TARGETS GXHEPVis
-  LIBRARY
-  DESTINATION lib
-  COMPONENT Libraries
-  )
-
-set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
-
-set_target_properties(GXHEPVis PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
+# Install the library.
+install( TARGETS GXHEPVis
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   COMPONENT Runtime
+   NAMELINK_COMPONENT Development )
+install( DIRECTORY VP1HEPVis
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+   COMPONENT Development )

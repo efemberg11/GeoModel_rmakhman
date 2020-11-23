@@ -122,11 +122,14 @@ brew install simage coin-bb soqt-bb
 ```
 
 
-####### Other platforms
+###### Other platforms
 
-######## Simage 
+On Linux, you can build the needed graphics libraries by following the instructions below.
 
-On all platforms except for Centos7, you can build Simage by follwoing these instructions:
+
+**Step A - Simage** 
+
+On all platforms *except Centos7*, you can build Simage by followoing these instructions:
 
 ```bash
 # Build Simage
@@ -139,7 +142,7 @@ make install
 cd ..
 ```
 
-On Centos7, you have to apply a patch to build the package. Therefore, on Centos7 please build Simage by following the instructions below:
+*On Centos7*, you have to apply a patch to build the package. Therefore, on Centos7 please build Simage by following the instructions below:
 
 ```bash
 # Build Simage
@@ -154,7 +157,7 @@ make install
 cd ..
 ```
 
-######## Coin3D & SoQt
+**Step B - Coin3D & SoQt**
 
 Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):
 

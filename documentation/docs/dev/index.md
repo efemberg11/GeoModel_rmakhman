@@ -120,7 +120,7 @@ brew install simage coin-bb soqt-bb
 ```
 
 
-##### 3D graphics dependencies - macOS
+##### 3D graphics dependencies - Linux
 
 On Linux, you can build the needed graphics libraries by following the instructions below.
 

@@ -1,4 +1,4 @@
-# Install the GeoModel Libraries
+# Install the GeoModel Libraries and Tools
 
 In this section, instructions on how to **install** the GeoModel libraries on different platforms are given. The instructions are aimed at **end users**. A relevant package manager will be used for each of the **supported platforms**, and the commands will install **stable**, **pre-compiled** versions of the libraries.
 
@@ -27,6 +27,7 @@ You can install the visualization tool and all the libraries by running the foll
 
 ```
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
+brew update
 brew install geomodelvisualization
 ```
 

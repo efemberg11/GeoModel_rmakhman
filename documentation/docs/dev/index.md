@@ -110,9 +110,7 @@ There are several options offered to the user to selectively build the optional 
 
 #### Build the visualization tools (GeoModelVisualization)
 
-##### Build the dependencies for 3D graphics
-
-###### macOS
+##### 3D graphics dependencies - macOS
 
 On macOS, you can install the needed graphics dependencies with `brew`:
 
@@ -122,12 +120,12 @@ brew install simage coin-bb soqt-bb
 ```
 
 
-###### Other platforms
+##### 3D graphics dependencies - macOS
 
 On Linux, you can build the needed graphics libraries by following the instructions below.
 
 
-**Step A - Simage** 
+###### a) Simage
 
 On all platforms *except Centos7*, you can build Simage by followoing these instructions:
 
@@ -157,7 +155,8 @@ make install
 cd ..
 ```
 
-**Step B - Coin3D & SoQt**
+
+###### b) Coin3D & SoQt
 
 Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):
 

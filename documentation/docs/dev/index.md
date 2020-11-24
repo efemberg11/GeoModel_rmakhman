@@ -187,7 +187,7 @@ wget -O soqt.zip http://cern.ch/atlas-software-dist-eos/externals/SoQt/soqt_ea5c
 unzip soqt.zip
 mkdir build_soqt
 cd build_soqt
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DSOQT_BUILD_DOCUMENTATION=0 ../soqt
+path-to-cmake-3.18/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DSOQT_BUILD_DOCUMENTATION=0 ../soqt
 make -j
 make install
 cd ..

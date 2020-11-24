@@ -677,11 +677,18 @@ GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
         GeoMaterial* Air=new GeoMaterial("Air", 1.290*SYSTEM_OF_UNITS::mg/SYSTEM_OF_UNITS::cm3);
         GeoElement* Oxigen = new GeoElement("Oxygen",  "O", 8.0, 16.0*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
         GeoElement* Nitrogen = new GeoElement("Nitrogen", "N", 7., 14.0067*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
+        
+//        GeoMaterial* Ether=new GeoMaterial("Ether", 1e-25*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3);
+//        GeoElement* vacuum = new GeoElement("vacuum", "Mt", 1, 1);
+//        Ether->add(vacuum, 1.0);
+//        Ether->lock();
+        
         Air->add(Nitrogen, .8);
         Air->add(Oxigen, .2);
         Air->lock();
         const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 4000*SYSTEM_OF_UNITS::cm);
         const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Air);
+        //const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Ether);
         world = new GeoPhysVol(worldLog);
     }
     return world;
@@ -840,21 +847,68 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     
     if(fRunMassCalculator)
     {
+        G4cout<<"\n=================== Starting mass calculation...   =================== "<<G4endl;
+        
         std::cout<<"Calculating the mass of the total detector... "<<fGeometryFileName<<std::endl;
         fTimer.Start();
-        double mass = fWorld->GetLogicalVolume()->GetMass(false, true);
-        std::cout<<"Geant4: Total mass of the detector is ... "<<mass / (CLHEP::kg) <<" [kg]."<<std::endl;
+        int localNoDaughters = fWorld->GetLogicalVolume()->GetNoDaughters();
+        std::cout<<"Total n. of Daughters of "<<fWorld->GetLogicalVolume()->GetName()<<" is : "<<localNoDaughters<<std::endl;
+        G4VPhysicalVolume *daughter;
+        G4LogicalVolume *daughterLV;
+        G4double cubicVolumeWorld, globalDensityWorld;
+        
+        std::cout<<"Checking World volume "<<std::endl;
+        std::cout<<"-----> World Name is: "<<fWorld->GetName()<<std::endl;
+        std::cout<<"-----> WorldLV Name is: "<<fWorld->GetLogicalVolume()->GetName()<< " it has  "<<localNoDaughters<<" daughters."<<std::endl;
+        std::cout<<"-----> World Material is: "<<fWorld->GetLogicalVolume()->GetMaterial()<<std::endl;
+        std::cout<<"-----> World Solid name is: "<<fWorld->GetLogicalVolume()->GetSolid()->GetName()<<std::endl;
+        cubicVolumeWorld = fWorld->GetLogicalVolume()->GetSolid()->GetCubicVolume();
+        std::cout<<"-----> World Solid cubic volume is: "<<cubicVolumeWorld/CLHEP::m3<<" m3"<<std::endl;
+        std::cout<<"-----> World Solid entity type: "<<fWorld->GetLogicalVolume()->GetSolid()->GetEntityType()<<std::endl;
+        globalDensityWorld = fWorld->GetLogicalVolume()->GetMaterial()->GetDensity();
+        std::cout<<"-----> World Solid density is: "<<globalDensityWorld/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
+        std::cout<<"-----> World mass is: "<<globalDensityWorld * cubicVolumeWorld / (CLHEP::kg) <<" [Kg]"<<std::endl;
+        std::cout<<"\n *** --------------- ***\n"<<std::endl;
+        
+        double massG4 = 0., massGeoModel = 0., tmp;
+        
+        for (int n=0; n<localNoDaughters; n++)
+        {
+            daughter=fWorld->GetLogicalVolume()->GetDaughter(n);
+            daughterLV = daughter->GetLogicalVolume();
+            std::cout<<"\n****** Checking daughter "<< n+1 <<" out of "<<localNoDaughters<<std::endl;
+            std::cout<<"---> Daughter Name is: "<<daughter->GetName()<<std::endl;
+            std::cout<<"---> DaughterLV Name is: "<<daughterLV->GetName()<< " it has  "<<daughterLV->GetNoDaughters()<< " daughters" <<std::endl;
+            std::cout<<"---> DaughterLV Material is: "<<daughterLV->GetMaterial()<<std::endl;
+            std::cout<<"---> DaughterLV Solid name is: "<<daughterLV->GetSolid()->GetName()<<std::endl;
+            std::cout<<"---> DaughterLV Solid cubic volume is: "<<daughterLV->GetSolid()->GetCubicVolume()/CLHEP::m3<<" m3"<<std::endl;
+             std::cout<<"---> DaughterLV Solid entity type: "<<daughterLV->GetSolid()->GetEntityType()<<std::endl;
+            G4double globalDensity = daughterLV->GetMaterial()->GetDensity();
+            std::cout<<"---> DaughterLV Solid density is: "<<globalDensity/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
+            
+            tmp = daughter->GetLogicalVolume()->GetMass(false, true);
+            massG4+= tmp;
+            if (!fGeometryFileName.contains(".gdml")){
+                const PVConstLink mypv = world->getChildVol(n); //fWorld->GetLogicalVolume()->GetDaughter(n);
+                massGeoModel+= inclusiveMass(mypv);
+                
+            }
+            
+            std::cout<<"-----> DaughterLV mass is: "<<tmp/ (CLHEP::kg)<<" [kg]"<<std::endl;
+        }
+        
+        std::cout<<"\nGeant4: Total mass of the detector is ... "<<massG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
         
         if (!fGeometryFileName.contains(".gdml")){
-            const PVConstLink mypv=world;
-            double mass2 = inclusiveMass(mypv);
-            std::cout<<"VP1: Total mass of the detector is ... "<<mass2 / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
+            std::cout<<"GeoModel: Total mass of the detector is ... "<<massGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
         }
     
         fTimer.Stop();
         G4cout << "\n**** Real time elapsed for mass calculation  : "<<fTimer.GetRealElapsed()/60   << " min. "<< G4endl;
         G4cout << "**** User time elapsed for mass calculation   : " <<fTimer.GetUserElapsed()/60   << " min. "<<G4endl;
         G4cout << "**** System time elapsed for mass calculation : " <<fTimer.GetSystemElapsed()/60 << " min. "<<G4endl;
+        
+        G4cout<<"\n=================== Mass calculation...DONE!   =================== "<<G4endl;
     }
 
     if (fDumpGDML){

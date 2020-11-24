@@ -107,6 +107,31 @@ namespace clashdet {
      }
 } // namespace clashdet
 
+namespace masscalc {
+
+    // a simple struct to model a mass calculation report
+    struct massReport {
+        std::string volumeName;
+        G4int       volumeCopyNo;
+        std::string volumeEntityType;
+        //double x,y,z;
+        G4double mass;
+    };
+    
+    void to_json(json& j, const massReport& p) {
+        j = json{{"volumeName", p.volumeName}, {"volumeCopyNo", p.volumeCopyNo}, {"volumeEntityType", p.volumeEntityType}, {"mass[kg]", p.mass} };
+    }
+    
+    void from_json(const json& j, massReport& p) {
+      p.volumeName=j.at("volumeName").get<std::string>();
+      p.volumeCopyNo=j.at("volumeCopyNo").get<int>();
+      p.volumeEntityType=j.at("volumeEntityType").get<std::string>();
+      p.mass=j.at("mass[kg]").get<double>();
+     }
+} // namespace masscalc
+
+
+
 //_____________________________________________________________________________________
 double volume(const PVConstLink& pv) {
   const GeoLogVol        * lv       = pv->getLogVol();
@@ -289,6 +314,75 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool s
 
     }
     return globalPoint;
+}
+
+void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoPhysVol* worldgeoModel, std::vector<json>& jlist){
+    
+    masscalc::massReport singleMassReport;
+    json jSingleMassReport;
+    int localNoDaughters = worldg4->GetLogicalVolume()->GetNoDaughters();
+    std::cout<<"Total n. of Daughters of "<<worldg4->GetLogicalVolume()->GetName()<<" is : "<<localNoDaughters<<std::endl;
+    G4VPhysicalVolume *daughter;
+    G4LogicalVolume *daughterLV;
+    G4double cubicVolumeWorld, globalDensityWorld;
+    
+    std::cout<<"Checking World volume "<<std::endl;
+    std::cout<<"-----> World Name is: "<<worldg4->GetName()<<std::endl;
+    std::cout<<"-----> WorldLV Name is: "<<worldg4->GetLogicalVolume()->GetName()<< " it has  "<<localNoDaughters<<" daughters."<<std::endl;
+    std::cout<<"-----> World Material is: "<<worldg4->GetLogicalVolume()->GetMaterial()<<std::endl;
+    std::cout<<"-----> World Solid name is: "<<worldg4->GetLogicalVolume()->GetSolid()->GetName()<<std::endl;
+    cubicVolumeWorld = worldg4->GetLogicalVolume()->GetSolid()->GetCubicVolume();
+    std::cout<<"-----> World Solid cubic volume is: "<<cubicVolumeWorld/CLHEP::m3<<" m3"<<std::endl;
+    std::cout<<"-----> World Solid entity type: "<<worldg4->GetLogicalVolume()->GetSolid()->GetEntityType()<<std::endl;
+    globalDensityWorld = worldg4->GetLogicalVolume()->GetMaterial()->GetDensity();
+    std::cout<<"-----> World Solid density is: "<<globalDensityWorld/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
+    std::cout<<"-----> World mass is: "<<globalDensityWorld * cubicVolumeWorld / (CLHEP::kg) <<" [Kg]"<<std::endl;
+    std::cout<<"\n *** --------------- ***\n"<<std::endl;
+    
+    double massG4 = 0., massGeoModel = 0., tmp;
+    
+    for (int n=0; n<localNoDaughters; n++)
+    {
+        daughter=worldg4->GetLogicalVolume()->GetDaughter(n);
+        daughterLV = daughter->GetLogicalVolume();
+        std::cout<<"\n****** Checking daughter "<< n+1 <<" out of "<<localNoDaughters<<std::endl;
+        std::cout<<"---> Daughter Name is: "<<daughter->GetName()<<std::endl;
+        std::cout<<"---> DaughterLV Name is: "<<daughterLV->GetName()<< " it has  "<<daughterLV->GetNoDaughters()<< " daughters" <<std::endl;
+        std::cout<<"---> DaughterLV Material is: "<<daughterLV->GetMaterial()<<std::endl;
+        std::cout<<"---> DaughterLV Solid name is: "<<daughterLV->GetSolid()->GetName()<<std::endl;
+        std::cout<<"---> DaughterLV Solid cubic volume is: "<<daughterLV->GetSolid()->GetCubicVolume()/CLHEP::m3<<" m3"<<std::endl;
+         std::cout<<"---> DaughterLV Solid entity type: "<<daughterLV->GetSolid()->GetEntityType()<<std::endl;
+        G4double globalDensity = daughterLV->GetMaterial()->GetDensity();
+        std::cout<<"---> DaughterLV Solid density is: "<<globalDensity/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
+        
+        tmp = daughterLV->GetMass(false, true);
+        massG4+= tmp;
+        if (!fGeometryFileName.contains(".gdml")){
+            const PVConstLink mypv = worldgeoModel->getChildVol(n);
+            massGeoModel+= inclusiveMass(mypv);
+
+        }
+        //fill the singleMassReport struct
+        singleMassReport.volumeName=daughter->GetName();
+        singleMassReport.volumeCopyNo =daughter->GetCopyNo();
+        singleMassReport.volumeEntityType=daughterLV->GetSolid()->GetEntityType();
+        singleMassReport.mass = tmp/(CLHEP::kg);
+        std::cout<<"-----> DaughterLV mass is: "<<singleMassReport.mass<<" [kg]"<<std::endl;
+        
+        //write the singleMassReport in the json file
+        to_json(jSingleMassReport, singleMassReport);
+        // write prettified JSON to another file
+        jlist.push_back(jSingleMassReport);
+    }
+    
+    
+    std::cout<<"\nGeant4: Total mass of the detector is ... "<<massG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
+    
+    if (!fGeometryFileName.contains(".gdml")){
+        std::cout<<"GeoModel: Total mass of the detector is ... "<<massGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
+    }
+    
+    
 }
 
 
@@ -872,63 +966,20 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         
         std::cout<<"Calculating the mass of the total detector... "<<fGeometryFileName<<std::endl;
         fTimer.Start();
-        int localNoDaughters = fWorld->GetLogicalVolume()->GetNoDaughters();
-        std::cout<<"Total n. of Daughters of "<<fWorld->GetLogicalVolume()->GetName()<<" is : "<<localNoDaughters<<std::endl;
-        G4VPhysicalVolume *daughter;
-        G4LogicalVolume *daughterLV;
-        G4double cubicVolumeWorld, globalDensityWorld;
+        std::vector<json> jlist;
+        RecursiveMassCalculation(fWorld,world, jlist);
         
-        std::cout<<"Checking World volume "<<std::endl;
-        std::cout<<"-----> World Name is: "<<fWorld->GetName()<<std::endl;
-        std::cout<<"-----> WorldLV Name is: "<<fWorld->GetLogicalVolume()->GetName()<< " it has  "<<localNoDaughters<<" daughters."<<std::endl;
-        std::cout<<"-----> World Material is: "<<fWorld->GetLogicalVolume()->GetMaterial()<<std::endl;
-        std::cout<<"-----> World Solid name is: "<<fWorld->GetLogicalVolume()->GetSolid()->GetName()<<std::endl;
-        cubicVolumeWorld = fWorld->GetLogicalVolume()->GetSolid()->GetCubicVolume();
-        std::cout<<"-----> World Solid cubic volume is: "<<cubicVolumeWorld/CLHEP::m3<<" m3"<<std::endl;
-        std::cout<<"-----> World Solid entity type: "<<fWorld->GetLogicalVolume()->GetSolid()->GetEntityType()<<std::endl;
-        globalDensityWorld = fWorld->GetLogicalVolume()->GetMaterial()->GetDensity();
-        std::cout<<"-----> World Solid density is: "<<globalDensityWorld/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
-        std::cout<<"-----> World mass is: "<<globalDensityWorld * cubicVolumeWorld / (CLHEP::kg) <<" [Kg]"<<std::endl;
-        std::cout<<"\n *** --------------- ***\n"<<std::endl;
-        
-        double massG4 = 0., massGeoModel = 0., tmp;
-        
-        for (int n=0; n<localNoDaughters; n++)
-        {
-            daughter=fWorld->GetLogicalVolume()->GetDaughter(n);
-            daughterLV = daughter->GetLogicalVolume();
-            std::cout<<"\n****** Checking daughter "<< n+1 <<" out of "<<localNoDaughters<<std::endl;
-            std::cout<<"---> Daughter Name is: "<<daughter->GetName()<<std::endl;
-            std::cout<<"---> DaughterLV Name is: "<<daughterLV->GetName()<< " it has  "<<daughterLV->GetNoDaughters()<< " daughters" <<std::endl;
-            std::cout<<"---> DaughterLV Material is: "<<daughterLV->GetMaterial()<<std::endl;
-            std::cout<<"---> DaughterLV Solid name is: "<<daughterLV->GetSolid()->GetName()<<std::endl;
-            std::cout<<"---> DaughterLV Solid cubic volume is: "<<daughterLV->GetSolid()->GetCubicVolume()/CLHEP::m3<<" m3"<<std::endl;
-             std::cout<<"---> DaughterLV Solid entity type: "<<daughterLV->GetSolid()->GetEntityType()<<std::endl;
-            G4double globalDensity = daughterLV->GetMaterial()->GetDensity();
-            std::cout<<"---> DaughterLV Solid density is: "<<globalDensity/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
-            
-            tmp = daughterLV->GetMass(false, true);
-            massG4+= tmp;
-            if (!fGeometryFileName.contains(".gdml")){
-                const PVConstLink mypv = world->getChildVol(n);
-                massGeoModel+= inclusiveMass(mypv);
-
-            }
-            
-            std::cout<<"-----> DaughterLV mass is: "<<tmp/ (CLHEP::kg)<<" [kg]"<<std::endl;
-        }
-        
-        std::cout<<"\nGeant4: Total mass of the detector is ... "<<massG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
-        
-        if (!fGeometryFileName.contains(".gdml")){
-            std::cout<<"GeoModel: Total mass of the detector is ... "<<massGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
-        }
     
         fTimer.Stop();
         G4cout << "\n**** Real time elapsed for mass calculation  : "<<fTimer.GetRealElapsed()/60   << " min. "<< G4endl;
         G4cout << "**** User time elapsed for mass calculation   : " <<fTimer.GetUserElapsed()/60   << " min. "<<G4endl;
         G4cout << "**** System time elapsed for mass calculation : " <<fTimer.GetSystemElapsed()/60 << " min. "<<G4endl;
         
+        json jReport={{"MassReport",jlist}};
+        std::cout<<"\n**** Writing out the mass report file: "<<fReportFileName<<std::endl;
+        std::ofstream outJsonFile(fReportFileName);
+        outJsonFile << std::setw(4) << jReport << std::endl;
+        outJsonFile.close();
         G4cout<<"\n=================== Mass calculation...DONE!   =================== "<<G4endl;
     }
 

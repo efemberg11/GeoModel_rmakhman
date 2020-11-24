@@ -53,6 +53,8 @@ public:
 
   static G4double GetFieldValue() { return gFieldValue; }
     
+  void RecursiveMassCalculation (G4VPhysicalVolume* worldg4,GeoPhysVol* worldgeoModel, std::vector<json>& jlist);
+    
   void RecursivelyCheckOverlap(G4LogicalVolume* envelope, std::vector<json>& jlist);
   
   // Verifies if the placed volume is overlapping with existing

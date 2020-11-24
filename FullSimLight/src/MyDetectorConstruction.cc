@@ -123,21 +123,41 @@ double exclusiveMass(const PVConstLink& pv) {
 }
 
 double inclusiveMass(const PVConstLink& pv) {
-
-  const GeoLogVol*        lv       = pv->getLogVol();
-  const GeoMaterial      *material = lv->getMaterial();
-  double density = material->getDensity();
-
-  double mass = exclusiveMass(pv);
-
-  GeoVolumeCursor av(pv);
-  while (!av.atEnd()) {
-    mass += inclusiveMass(av.getVolume());
-    mass -= volume(av.getVolume())*density;
-    av.next();
-  }
-
-  return mass;
+    
+    const GeoLogVol*        lv       = pv->getLogVol();
+    const GeoMaterial      *material = lv->getMaterial();
+    // Exclude from the calculation the EMEC special shape
+    // cause the corresponding methods are not implemented in GeoModel
+    if (lv->getName() == "LAr::EMEC::Pos::InnerWheel" ||
+        lv->getName() == "LAr::EMEC::Neg::InnerWheel" ||
+        lv->getName() == "LAr::EMEC::Pos::OuterWheel" ||
+        lv->getName() == "LAr::EMEC::Neg::OuterWheel" ||
+        lv->getName() == "LAr::EMEC::Pos::InnerCone"  ||
+        lv->getName() == "LAr::EMEC::Neg::InnerCone"  ||
+        lv->getName() == "LAr::EMEC::Pos::OuterFrontCone" ||
+        lv->getName() == "LAr::EMEC::Neg::OuterFrontCone" ||
+        lv->getName() == "LAr::EMEC::Pos::OuterBackCone"  ||
+        lv->getName() == "LAr::EMEC::Neg::OuterBackCone"  ||
+        lv->getName() == "LAr::EMEC::Pos::InnerSlice00"   ||
+        lv->getName() == "LAr::EMEC::Neg::InnerSlice00"   ||
+        lv->getName() == "LAr::EMEC::Pos::OuterSlice00"   ||
+        lv->getName() == "LAr::EMEC::Neg::OuterSlice00"   ||
+        lv->getName() == "UnidentifiedShape"){
+        // This is one to remove
+        std::cout<<" !REMOVING Unidentified shapes: "<< lv->getName()<<", shape is not implemented in GeoModel, it will account zero in the mass calculation!"<<std::endl;
+        return 0;
+    }
+    double density = material->getDensity();
+    double mass = exclusiveMass(pv);
+    
+    GeoVolumeCursor av(pv);
+    while (!av.atEnd()) {
+        mass += inclusiveMass(av.getVolume());
+        mass -= volume(av.getVolume())*density;
+        av.next();
+    }
+    
+    return mass;
 }
 
 
@@ -150,6 +170,7 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
   fFieldConstant       = false;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
+  fRunMassCalculator   = false;
   fDumpGDML            = false;
   fReportFileName      = "gmclash_report.json";
   fMinStep             = 1.0e-2;
@@ -886,12 +907,12 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
             G4double globalDensity = daughterLV->GetMaterial()->GetDensity();
             std::cout<<"---> DaughterLV Solid density is: "<<globalDensity/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
             
-            tmp = daughter->GetLogicalVolume()->GetMass(false, true);
+            tmp = daughterLV->GetMass(false, true);
             massG4+= tmp;
             if (!fGeometryFileName.contains(".gdml")){
-                const PVConstLink mypv = world->getChildVol(n); //fWorld->GetLogicalVolume()->GetDaughter(n);
+                const PVConstLink mypv = world->getChildVol(n);
                 massGeoModel+= inclusiveMass(mypv);
-                
+
             }
             
             std::cout<<"-----> DaughterLV mass is: "<<tmp/ (CLHEP::kg)<<" [kg]"<<std::endl;

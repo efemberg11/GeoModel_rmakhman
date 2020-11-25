@@ -34,6 +34,7 @@ public:
 
 private:
   static const G4int       gNumberCandidateParticles;
+  static const G4int       gTotalNumberParticles;
   static const G4String    gNameParticlesVector[];
   static const std::map<G4String,G4int> gPrimaryNameToIndexMap;
 

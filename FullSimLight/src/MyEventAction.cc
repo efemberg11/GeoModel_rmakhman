@@ -10,8 +10,8 @@
 #include "G4Gamma.hh"
 #include "G4Electron.hh"
 #include "G4Positron.hh"
-#include "G4Geantino.hh"
-#include "G4ChargedGeantino.hh"
+//#include "G4Geantino.hh"
+//#include "G4ChargedGeantino.hh"
 
 #include "G4ThreeVector.hh"
 #include "G4PrimaryVertex.hh"
@@ -84,14 +84,16 @@ void MyEventAction::AddData(G4double edep, G4double length, G4bool ischarged, G4
 
 
 void MyEventAction::AddSecondaryTrack(const G4Track* track, G4int primid) {
-  const G4ParticleDefinition* pdf = track->GetDefinition();
-  if (pdf==G4Gamma::Gamma()) {
-    fEventDataPerPrimary[primid].fNGamma += 1.;
-  } else if (pdf==G4Electron::Electron()) {
-    fEventDataPerPrimary[primid].fNElec += 1.;
-  } else if (pdf==G4Positron::Positron()) {
-    fEventDataPerPrimary[primid].fNPosit += 1.;
-  } else if (pdf==G4Geantino::Geantino()) {
-      fEventDataPerPrimary[primid].fNGeantino += 1.;
-  }
+    const G4ParticleDefinition* pdf = track->GetDefinition();
+    if (pdf==G4Gamma::Gamma()) {
+        fEventDataPerPrimary[primid].fNGamma += 1.;
+        
+    } else if (pdf==G4Electron::Electron()) {
+        fEventDataPerPrimary[primid].fNElec += 1.;
+        
+    } else if (pdf==G4Positron::Positron()) {
+        fEventDataPerPrimary[primid].fNPosit += 1.;
+        
+    }
+    
 }

@@ -293,7 +293,7 @@ void GDMLController::registerHandlers()
 	new subtractionHandler("subtraction",this);
 	new intersectionHandler("intersection",this);
 	new trapHandler("trap",this);
-    new twistedTrapHandler("twistedtrap",this);
+        new twistedTrapHandler("twistedtrap",this);
 	new tessellatedHandler("tessellated",this);
 	new triangularHandler("triangular",this);
 	new quadrangularHandler("quadrangular",this);

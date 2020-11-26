@@ -51,6 +51,8 @@
 //                                        - create polyhedron for G3 Trd2;
 //   SbPolyhedronTrap (dz,theta,phi, h1,bl1,tl1,alp1, h2,bl2,tl2,alp2)
 //                                        - create polyhedron for G3 Trap;
+//   SbPolyhedronTwistedTrap (phitwist, dz,theta,phi, h1,bl1,tl1, h2,bl2,tl2,alp)
+//                                        - create polyhedron for TwistedTrap;
 //   SbPolyhedronPara (dx,dy,dz,alpha,theta,phi)
 //                                        - create polyhedron for G3 Para;
 //   SbPolyhedronTube (rmin,rmax,dz)
@@ -430,6 +432,19 @@ public:
                     double Dy2,
                     double Dx3, double Dx4, double Alp2);
   virtual ~SbPolyhedronTrap();
+  virtual SbPolyhedron& operator = (const SbPolyhedron& from) {
+    return SbPolyhedron::operator = (from);
+  }
+};
+
+class SbPolyhedronTwistedTrap : public SbPolyhedron {
+public:
+  SbPolyhedronTwistedTrap(double phiTwist, double Dz, double Theta, double Phi,
+                    double Dy1,
+                    double Dx1, double Dx2,
+                    double Dy2,
+                    double Dx3, double Dx4, double Alp);
+  virtual ~SbPolyhedronTwistedTrap();
   virtual SbPolyhedron& operator = (const SbPolyhedron& from) {
     return SbPolyhedron::operator = (from);
   }

@@ -7,6 +7,7 @@
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
@@ -141,6 +142,18 @@ void SoVisualizeAction::handleTrap(const GeoTrap *trap)
 				trap->getDydzn(), trap->getDxdyndzn(), trap->getDxdypdzn(),
 				trap->getDydzp(), trap->getDxdyndzp(), trap->getDxdypdzp(),
 				trap->getAngleydzn(), trap->getAngleydzp());
+  m_shape=gb;
+}
+
+void SoVisualizeAction::handleTwistedTrap(const GeoTwistedTrap *twistedtrap)
+{
+  //qDebug() << "SoVisualizeAction::handleTwistedTrap";
+  SoGenericBox * gb = new SoGenericBox;
+  //TO DO : kept the same method as the trapezoid one, but this has to be customized for the twisted trap
+  gb->setParametersForTrapezoid(twistedtrap->getZHalfLength(), twistedtrap->getTheta(), twistedtrap->getPhi(),
+                twistedtrap->getY1HalfLength(), twistedtrap->getX1HalfLength(), twistedtrap->getX2HalfLength(),
+                twistedtrap->getY2HalfLength(), twistedtrap->getX3HalfLength(), twistedtrap->getX4HalfLength(),
+                twistedtrap->getTiltAngleAlpha(), twistedtrap->getTiltAngleAlpha());
   m_shape=gb;
 }
 

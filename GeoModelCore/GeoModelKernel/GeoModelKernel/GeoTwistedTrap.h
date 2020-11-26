@@ -90,37 +90,6 @@ class GeoTwistedTrap : public GeoShape
   inline double getPhi()          const { return m_phi ; }
   inline double getTiltAngleAlpha() const { return m_tAlph ; }
   
-//  //	Z half length.
-//  const double& getZHalfLength () const;
-//
-//  //	Polar (theta) angle.
-//  const double& getTheta () const;
-//
-//  //	Azimuthal (phi) angle.
-//  const double& getPhi () const;
-//
-//  //	Y half length at -z.
-//  const double& getDydzn () const;
-//
-//  //	X half length at -z, -y.
-//  const double& getDxdyndzn () const;
-//
-//  //	X half length at -z, +y
-//  const double& getDxdypdzn () const;
-//
-//  const double& getAngleydzn () const;
-//
-//  //	Y half length at +z.
-//  const double& getDydzp () const;
-//
-//  //	X half length at +z, -y
-//  const double& getDxdyndzp () const;
-//
-//  //	X half length at +z, +y
-//  const double& getDxdypdzp () const;
-//
-//  const double& getAngleydzp () const;
-  
  protected:
   virtual ~GeoTwistedTrap();
 
@@ -131,33 +100,22 @@ class GeoTwistedTrap : public GeoShape
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-//  double m_zHalfLength;
-//  double m_theta;
-//  double m_phi;
-//  double m_dydzn;
-//  double m_dxdyndzn;
-//  double m_dxdypdzn;
-//  double m_angleydzn;
-//  double m_dydzp;
-//  double m_dxdyndzp;
-//  double m_dxdypdzp;
-//  double m_angleydzp;
-    double m_theta;
-    double m_phi ;
-    double m_dy1;
-    double m_dx1;
-    double m_dx2;
-    double m_dy2;
-    double m_dx3;
-    double m_dx4;
-    double m_dz;        // Half-length along the z axis
-    double m_dx ;       // maximum side in x
-    double m_dy ;       // maximum side in y
-    double m_alph ;
-    double m_tAlph ;    // std::tan(fAlph)
-    double m_deltaX ;
-    double m_deltaY ;
-    double m_phiTwist;  // twist angle ( dphi in surface equation)
+  double m_theta;
+  double m_phi ;
+  double m_dy1;
+  double m_dx1;
+  double m_dx2;
+  double m_dy2;
+  double m_dx3;
+  double m_dx4;
+  double m_dz;        // Half-length along the z axis
+  double m_dx ;       // maximum side in x
+  double m_dy ;       // maximum side in y
+  double m_alph ;
+  double m_tAlph ;    // std::tan(fAlph)
+  double m_deltaX ;
+  double m_deltaY ;
+  double m_phiTwist;  // twist angle ( dphi in surface equation)
 
 };
 

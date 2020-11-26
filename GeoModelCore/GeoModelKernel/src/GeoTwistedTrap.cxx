@@ -78,5 +78,5 @@ ShapeType GeoTwistedTrap::typeID () const
 
 void GeoTwistedTrap::exec (GeoShapeAction *action) const
 {
-  //action->handleTrap(this); //TO DO : this has to be implemented for Twisted Trap
+  action->handleTwistedTrap(this); 
 }

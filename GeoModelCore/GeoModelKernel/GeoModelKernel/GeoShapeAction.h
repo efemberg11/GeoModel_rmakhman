@@ -27,6 +27,7 @@ class GeoCons;
 class GeoPcon;
 class GeoPgon;
 class GeoTrap;
+class GeoTwistedTrap;
 class GeoTrd;
 class GeoPara;
 class GeoTubs;
@@ -91,6 +92,9 @@ class GeoShapeAction
 
   //	Handles a trap shape.
   virtual void handleTrap (const GeoTrap *trap);
+    
+  //    Handles a twistedtrap shape.
+  virtual void handleTwistedTrap (const GeoTwistedTrap *trap);
 
   //	Handles a  trd shape.
   virtual void handleTrd (const GeoTrd *trd);

@@ -47,6 +47,8 @@
 //                                        - create polyhedron for G3 Trd2;
 //   GeoPolyhedronTrap (dz,theta,phi, h1,bl1,tl1,alp1, h2,bl2,tl2,alp2)
 //                                        - create polyhedron for G3 Trap;
+//   GeoPolyhedronTwistedTrap (TwistPhi, dz,theta,phi, y1,x1,x2,y2, x3,x4,alp)
+//                                        - create polyhedron for TwistedTrap;
 //   GeoPolyhedronPara (dx,dy,dz,alpha,theta,phi)
 //                                        - create polyhedron for G3 Para;
 //   GeoPolyhedronTube (rmin,rmax,dz)
@@ -390,6 +392,19 @@ public:
 		     double Dx1, double Dx2, double Alp1,
 		     double Dy2, double Dx3, double Dx4, double Alp2);
   virtual ~ GeoPolyhedronTrap ();
+  virtual GeoPolyhedron & operator = (const GeoPolyhedron & from)
+  {
+    return GeoPolyhedron::operator = (from);
+  }
+};
+
+class GeoPolyhedronTwistedTrap:public GeoPolyhedron
+{
+public:
+  GeoPolyhedronTwistedTrap (double TwistedPhi, double Dz, double Theta, double Phi,
+             double Dy1, double Dx1, double Dx2,
+             double Dy2, double Dx3, double Dx4, double Alp);
+  virtual ~ GeoPolyhedronTwistedTrap ();
   virtual GeoPolyhedron & operator = (const GeoPolyhedron & from)
   {
     return GeoPolyhedron::operator = (from);

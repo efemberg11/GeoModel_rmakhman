@@ -16,9 +16,9 @@
  * A G4TwistedTrap is a general twisted trapezoid: The faces perpendicular to the
  * z planes are trapezia, and their centres are not necessarily on
  * a line parallel to the z axis.
- *
+ *      pTwist  Phi twist angle
  *      pDz      Half-length along the z-axis
- *      pTheta  Polar angle of the line joining the centres of the faces at -/+pDz
+ *      pTheta Polar angle of the line joining the centres of the faces at -/+pDz
  *      pPhi     Azimuthal angle of the line joing the centre of the face at -pDz to the centre of the face at +pDz
  *      pDy1    Half-length along y of the face at -pDz
  *      pDx1    Half-length along x of the side at y=-pDy1 of the face at -pDz

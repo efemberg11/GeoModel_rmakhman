@@ -1686,6 +1686,78 @@ GeoPolyhedronTrap::~GeoPolyhedronTrap ()
 {
 }
 
+GeoPolyhedronTwistedTrap::GeoPolyhedronTwistedTrap (double TwistedPhi, double Dz,
+              double Theta,
+              double Phi,
+              double Dy1,
+              double Dx1,
+              double Dx2,
+              double Dy2,
+              double Dx3,
+              double Dx4,
+              double Alp)
+/***********************************************************************
+ *
+ * Name: GeoPolyhedronTwistedTrap         Date:    26.11.2020
+ * Author: Marilena Bandieramonte             Revised:
+ *
+ * Function: Create TWISTEDTRAP-trapezoid for visualization
+ *
+ * A G4TwistedTrap is a general twisted trapezoid: The faces perpendicular to the
+ * z planes are trapezia, and their centres are not necessarily on
+ * a line parallel to the z axis.
+ *
+ *      pTwist  Phi twist angle
+ *      pDz      Half-length along the z-axis
+ *      pTheta  Polar angle of the line joining the centres of the faces at -/+pDz
+ *      pPhi     Azimuthal angle of the line joing the centre of the face at -pDz to the centre of the face at +pDz
+ *      pDy1    Half-length along y of the face at -pDz
+ *      pDx1    Half-length along x of the side at y=-pDy1 of the face at -pDz
+ *      pDx2    Half-length along x of the side at y=+pDy1 of the face at -pDz
+ *
+ *      pDy2    Half-length along y of the face at +pDz
+ *      pDx3    Half-length along x of the side at y=-pDy2 of the face at +pDz
+ *      pDx4    Half-length along x of the side at y=+pDy2 of the face at +pDz
+ *      pAlph   Angle with respect to the y axis from the centre of the side
+ *
+ ***********************************************************************/
+{
+    //TO DO NB: in this way it's creating a normal trap, not a twisted one.
+    //it has to be seen how this is handled in Geant4 with the
+    /*
+     
+      G4Polyhedron* G4VTwistedFaceted::GetPolyhedron() const method
+     
+     */
+  double DzTthetaCphi = Dz * tan (Theta) * cos (Phi);
+  double DzTthetaSphi = Dz * tan (Theta) * sin (Phi);
+  //double Dy1Talp1 = Dy1 * tan (Alp1);
+  //double Dy2Talp2 = Dy2 * tan (Alp2);
+  double Dy1Talp1 = Dy1 * tan (Alp);
+  double Dy2Talp2 = Dy2 * tan (Alp);
+
+  AllocateMemory (8, 6);
+
+  m_pV[1] =
+    GeoTrf::Vector3D (-DzTthetaCphi - Dy1Talp1 - Dx1, -DzTthetaSphi - Dy1, -Dz);
+  m_pV[2] =
+    GeoTrf::Vector3D (-DzTthetaCphi - Dy1Talp1 + Dx1, -DzTthetaSphi - Dy1, -Dz);
+  m_pV[3] =
+    GeoTrf::Vector3D (-DzTthetaCphi + Dy1Talp1 + Dx2, -DzTthetaSphi + Dy1, -Dz);
+  m_pV[4] =
+    GeoTrf::Vector3D (-DzTthetaCphi + Dy1Talp1 - Dx2, -DzTthetaSphi + Dy1, -Dz);
+  m_pV[5] = GeoTrf::Vector3D (DzTthetaCphi - Dy2Talp2 - Dx3, DzTthetaSphi - Dy2, Dz);
+  m_pV[6] = GeoTrf::Vector3D (DzTthetaCphi - Dy2Talp2 + Dx3, DzTthetaSphi - Dy2, Dz);
+  m_pV[7] = GeoTrf::Vector3D (DzTthetaCphi + Dy2Talp2 + Dx4, DzTthetaSphi + Dy2, Dz);
+  m_pV[8] = GeoTrf::Vector3D (DzTthetaCphi + Dy2Talp2 - Dx4, DzTthetaSphi + Dy2, Dz);
+
+  CreatePrism ();
+}
+
+GeoPolyhedronTwistedTrap::~GeoPolyhedronTwistedTrap ()
+{
+}
+
 GeoPolyhedronPara::GeoPolyhedronPara (double Dx, double Dy, double Dz,
               double Alpha, double Theta, double Phi):
 GeoPolyhedronTrap (Dz, Theta, Phi, Dy, Dx, Dx, Alpha, Dy, Dx, Dx, Alpha)

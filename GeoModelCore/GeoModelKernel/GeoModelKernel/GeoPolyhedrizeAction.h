@@ -53,6 +53,9 @@ class GeoPolyhedrizeAction : public GeoShapeAction
   
   //	Handles a trap shape.
   virtual void handleTrap (const GeoTrap *trap);
+    
+  //    Handles a twistedtrap shape.
+  virtual void handleTwistedTrap (const GeoTwistedTrap *twistedtrap);
   
   //	Handles a  trd shape.
   virtual void handleTrd (const GeoTrd *trd);

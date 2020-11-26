@@ -1796,6 +1796,39 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 			}
 		shape = new GeoTrap (ZHalfLength, Theta, Phi, Dydzn, Dxdyndzn, Dxdypdzn, Angleydzn, Dydzp, Dxdyndzp, Dxdypdzp, Angleydzp);
 	}
+    else if (type == "TwistedTrap") {
+        // shape constructor parameters
+        const GeoTwistedTrap* shapeIn = dynamic_cast<const GeoTwistedTrap*>(shape);
+        double PhiTwist = 0;
+        double ZHalfLength = 0.;
+        double Theta = 0.;
+        double Phi = 0.;
+        double DY1HalfLength = 0.;
+        double DX1HalfLength = 0.;
+        double DX2HalfLength = 0.;
+        double DY2HalfLength = 0.;
+        double DX3HalfLength = 0.;
+        double DX4HalfLength = 0.;
+        double DTiltAngleAlpha = 0.;
+        // get parameters
+        for( auto& par : shapePars) {
+            std::vector<std::string> vars = splitString(par, '=');
+            std::string varName = vars[0];
+            std::string varValue = vars[1];
+            if (varName == "PhiTwist")    PhiTwist = std::stod(varValue);// angle
+            if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+            if (varName == "Theta")       Theta = std::stod(varValue); // angle
+            if (varName == "Phi")         Phi = std::stod(varValue);   // angle
+            if (varName == "DY1HalfLength")  DY1HalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+            if (varName == "DX1HalfLength")  DX1HalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+            if (varName == "DX2HalfLength")  DX2HalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+            if (varName == "DY2HalfLength")  DY2HalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+            if (varName == "DX3HalfLength")  DX3HalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+            if (varName == "DX4HalfLength")  DX4HalfLength = std::stod(varValue);// * SYSTEM_OF_UNITS::mm;
+            if (varName == "DTiltAngleAlpha")DTiltAngleAlpha = std::stod(varValue);//angle
+        }
+        shape = new GeoTwistedTrap (PhiTwist, ZHalfLength, Theta, Phi, DY1HalfLength, DX1HalfLength, DX2HalfLength, DY2HalfLength, DX3HalfLength, DX4HalfLength, DTiltAngleAlpha);
+    }
 	else if (type == "Trd") {
 			// shape constructor parameters
 			double XHalfLength1 = 0.;

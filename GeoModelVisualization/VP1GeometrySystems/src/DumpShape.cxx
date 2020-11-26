@@ -10,6 +10,7 @@
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
@@ -140,6 +141,24 @@ QStringList DumpShape::shapeToStringList(const GeoShape* shape)
       out << "  Dxdyndzp = "+QString::number(theTrap->getDxdyndzp()/mm)+" mm";
       out << "  Dxdypdzp = "+QString::number(theTrap->getDxdypdzp()/mm)+" mm";
       out << "  Angleydzp = "+QString::number(theTrap->getAngleydzp());
+    }
+  }
+  else if(shape->typeID() == GeoTwistedTrap::getClassTypeID()) {
+    const GeoTwistedTrap* theTwistedTrap = dynamic_cast<const GeoTwistedTrap*>(shape);
+    assert(theTwistedTrap);
+    if (theTwistedTrap){
+      out << " =========> TwistedTrap:";
+      out << "  PhiTwist = "+QString::number(theTwistedTrap->getPhiTwist());
+      out << "  ZHalfLength = "+QString::number(theTwistedTrap->getZHalfLength()/mm)+" mm";
+      out << "  Theta = "+QString::number(theTwistedTrap->getTheta());
+      out << "  Phi = "+QString::number(theTwistedTrap->getPhi());
+      out << "  DY1HalfLength = "+QString::number(theTwistedTrap->getY1HalfLength()/mm)+" mm";
+      out << "  DX1HalfLength = "+QString::number(theTwistedTrap->getX1HalfLength()/mm)+" mm";
+      out << "  DX2HalfLength = "+QString::number(theTwistedTrap->getX2HalfLength()/mm)+" mm";
+      out << "  DY2HalfLength = "+QString::number(theTwistedTrap->getY2HalfLength());
+      out << "  DX3HalfLength = "+QString::number(theTwistedTrap->getX3HalfLength()/mm)+" mm";
+      out << "  DX4HalfLength = "+QString::number(theTwistedTrap->getX4HalfLength()/mm)+" mm";
+      out << "  DTiltAngleAlpha = "+QString::number(theTwistedTrap->getTiltAngleAlpha());
     }
   }
   // Boolean volumes:

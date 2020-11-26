@@ -45,6 +45,7 @@
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"

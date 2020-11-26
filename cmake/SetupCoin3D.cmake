@@ -19,6 +19,13 @@ option( GEOMODEL_USE_BUILTIN_COIN3D
 # Now do what was requested.
 if( GEOMODEL_USE_BUILTIN_COIN3D )
 
+   # Tell the user what's happening.
+   if( COLOR_DEFS )
+	   message( STATUS "${BoldMagenta}'GEOMODEL_USE_BUILTIN_COIN3D' was set to 'true' ==> Building Coin and SoQt  as part of the project${ColourReset}" )
+   else()
+	   message( STATUS "'GEOMODEL_USE_BUILTIN_COIN3D' was set to 'true' ==> Building Coin and SoQt as part of the project" )
+   endif()
+
    # External(s) required for the build.
    find_package( Boost REQUIRED )
 
@@ -49,6 +56,7 @@ if( GEOMODEL_USE_BUILTIN_COIN3D )
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCOIN_BUILD_TESTS:BOOL=FALSE
       -DCOIN_BUILD_DOCUMENTATION:BOOL=FALSE
+      -DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated-declarations
       BUILD_BYPRODUCTS "${COIN3D_INCLUDE_DIR}" "${COIN3D_LIBRARY}" )
    install( DIRECTORY
       "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/Coin3DInstall/"
@@ -88,6 +96,7 @@ if( GEOMODEL_USE_BUILTIN_COIN3D )
       -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DSOQT_BUILD_DOCUMENTATION:BOOL=FALSE
+      -DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated-declarations
       BUILD_BYPRODUCTS "${SoQt_INCLUDE_DIR}" "${SoQt_LIBRARY}"
       DEPENDS Coin3DBuiltIn )
    install( DIRECTORY
@@ -107,5 +116,24 @@ else()
    # Just find an existing installation of Coin3D.
    find_package( Coin REQUIRED )
    find_package( SoQt REQUIRED )
+
+   if( Coin_FOUND )
+      # If it was found, tell the user about it.
+      get_target_property( _incPaths Coin::Coin
+         INTERFACE_INCLUDE_DIRECTORIES )
+      list( GET _incPaths 0 _incPath )
+      message( STATUS "Found Coin: ${_incPath}" )
+      unset( _incPaths )
+      unset( _incPath )
+   endif() 
+   if( SoQt_FOUND )
+      # If it was found, tell the user about it.
+      get_target_property( _incPaths SoQt::SoQt
+         INTERFACE_INCLUDE_DIRECTORIES )
+      list( GET _incPaths 0 _incPath )
+      message( STATUS "Found SoQt: ${_incPath}" )
+      unset( _incPaths )
+      unset( _incPath )
+   endif()
 
 endif()

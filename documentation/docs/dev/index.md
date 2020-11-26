@@ -158,6 +158,15 @@ cd ..
 
 ###### b) Coin3D & SoQt
 
+!!! warning
+
+    The Coin sources are not compatible with CMake 3.19 (see https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/7). Therefore, for the moment, until the Coin sources will be ported to CMake 3.19, you should use CMake <= 3.18.X to compile Coin. 
+
+    Please note that, at the time of writing, Homebrew, the package manager for macOS, updated its version of CMake from 3.18.4 to 3.19. Thus, you cannot build Coin on macOS with the CMake vertsion installed by the §brew§ command.
+
+    You can install CMake on your system by downloading the installer from the [CMake website](https://cmake.org/download/). 
+
+
 Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):
 
 ```bash
@@ -167,7 +176,8 @@ unzip coin-4.0.0-src.zip -d coin-sources
 mv coin-sources/* coin
 mkdir build_coin
 cd build_coin
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DCOIN_BUILD_TESTS=0 ../coin
+# NOTE: replace the path below with the patch of your CMake <= 3.18.X installation
+path-to-cmake-3.18/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DCOIN_BUILD_TESTS=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../coin
 make -j
 make install
 cd ..
@@ -177,7 +187,7 @@ wget -O soqt.zip http://cern.ch/atlas-software-dist-eos/externals/SoQt/soqt_ea5c
 unzip soqt.zip
 mkdir build_soqt
 cd build_soqt
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DSOQT_BUILD_DOCUMENTATION=0 ../soqt
+path-to-cmake-3.18/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DSOQT_BUILD_DOCUMENTATION=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../soqt
 make -j
 make install
 cd ..

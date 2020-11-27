@@ -3,15 +3,14 @@
 */
 
 #include "GeoModelXml/GmxUtil.h"
+
+#include "GeoModelXml/OutputDirector.h"
+
 #ifndef STANDALONE_GMX
 #include "StoreGate/StoreGateSvc.h"
-#include "GaudiKernel/ISvcLocator.h"
-#include "GaudiKernel/MsgStream.h"
-#include "GaudiKernel/IMessageSvc.h"
 #include "GeoModelInterfaces/StoredMaterialManager.h"
-#else
-#include <iostream>
 #endif
+
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
@@ -28,12 +27,12 @@ using namespace std;
 GmxUtil::GmxUtil(GmxInterface &gmxInterface) {
     m_gmxInterface = &gmxInterface;
 //
-//    Initialise the Evaluator
+//    Initialise the CLHEP::Evaluator
 //
     eval.setStdMath();
 //
-//    Fetch the material special::Ether and make any shape with it to make a special logvol.
-//    When Geo2G4 finds any physvol using a logvol with material special::Ether, it creates a G4Assembly
+//    Fetch the material special::HyperUranium and make any shape with it to make a special logvol.
+//    When Geo2G4 finds any physvol using a logvol with material special::HyperUranium, it creates a G4Assembly
 //    instead of a G4Volume.
 //
     m_assemblyLV = makeAssemblyLV();
@@ -52,6 +51,7 @@ GmxUtil::GmxUtil(GmxInterface &gmxInterface) {
 //   Register tag handlers that produce GeoNodes. Only useful for those tags which
 //   can appear in a long list in any order. So certainly all shapes; maybe others.
 //
+    geoItemRegistry.enregister("simplepolygonbrep", (Element2GeoItem *) &tagHandler.simplepolygonbrep);
     geoItemRegistry.enregister("box", (Element2GeoItem *) &tagHandler.box);
     geoItemRegistry.enregister("cons", (Element2GeoItem *) &tagHandler.cons);
     geoItemRegistry.enregister("generictrap", (Element2GeoItem *) &tagHandler.generictrap);
@@ -90,14 +90,12 @@ double GmxUtil::evaluate(char const *expression) {
     }
     if (isWhiteSpace) { // Catch a common error early and give best message possible
 #ifndef STANDALONE_GMX
-        ServiceHandle<IMessageSvc> msgh("MessageSvc", "GeoModelXml");
-        MsgStream log(&(*msgh), "GeoModelXml");
-        log << MSG::FATAL << "GeoModelXml Error processing Evaluator expression: empty expression. Exiting program.\n" << 
+	OUTPUT_STREAM;
+        msglog << MSG::FATAL << "GeoModelXml Error processing Evaluator expression: empty expression. Exiting program.\n" << 
                endmsg;
-#else
-	std::cout <<"GeoModelXml Error processing CLHEP Evaluator expression: empty expression. Exiting program.\n";
-        throw runtime_error(string("evaluate: empty or white space expression. Last good expression was " + lastGoodExpression));
 #endif
+        throw runtime_error(string("evaluate: empty or white space expression. Last good expression was " + lastGoodExpression));
+
     }
 //
 //    Process any []s. Contents are evaluated to in integer, then the [...] are replaced by 
@@ -109,25 +107,20 @@ double GmxUtil::evaluate(char const *expression) {
 //   And evaluate the result
 //
     double result = eval.evaluate(noBrackets.c_str());
-    if (eval.status() != Evaluator::OK) {
 #ifndef STANDALONE_GMX
-        ServiceHandle<IMessageSvc> msgh("MessageSvc", "GeoModelXml");
-        MsgStream log(&(*msgh), "GeoModelXml");
-        log << MSG::FATAL << "GeoModelXml Error processing Evaluator expression. Error name <" <<
+    if (eval.status() != HepTool::Evaluator::OK) {
+#else
+    if (eval.status() != Evaluator::OK) {
+#endif
+#ifndef STANDALONE_GMX
+	OUTPUT_STREAM;
+        msglog << MSG::FATAL << "GeoModelXml Error processing Evaluator expression. Error name <" <<
          eval.error_name() << ">" << endl << "Message: <";
         eval.print_error();
-        log << ">. Original expression <" << expression << ">; Expression after de-bracketing:\n";
-        log << noBrackets << endl;
-        log << string(eval.error_position(), '-') << '^' << '\n';
-        log << "Exiting program.\n" << endmsg;
-#else
-	std::cout << "GeoModelXml Error processing Evaluator expression. Error name <" <<
-         eval.error_name() << ">" << std::endl << "Message: <";
-        eval.print_error();
-        std::cout << ">. Original expression <" << expression << ">; Expression after de-bracketing:\n";
-        std::cout << noBrackets << std::endl;
-        std::cout << string(eval.error_position(), '-') << '^' << '\n';
-        std::cout << "Exiting program.\n" << std::endl;
+        msglog << ">. Original expression <" << expression << ">; Expression after de-bracketing:\n";
+        msglog << noBrackets << endl;
+        msglog << string(eval.error_position(), '-') << '^' << '\n';
+        msglog << "Exiting program.\n" << endmsg;
 #endif
         throw runtime_error(string("evaluate: invalid expression. Last good expression was <" + lastGoodExpression + ">"));
     }
@@ -146,14 +139,9 @@ std::string GmxUtil::debracket(std::string expression) {
     size_t nextClose = expression.find_first_of(']', lastOpen);
     if (nextClose == string::npos) {
 #ifndef STANDALONE_GMX
-        ServiceHandle<IMessageSvc> msgh("MessageSvc", "GeoModelXml");
-        MsgStream log(&(*msgh), "GeoModelXml");
-        log << MSG::ERROR << "debracket: unpaired opening [; expression was:\n    " << expression << endmsg; 
-#else
-	std::cout<<"debracket: unpaired opening [; expression was:\n    " <<
-	expression << std::endl;
+	OUTPUT_STREAM;
+        msglog << MSG::ERROR << "debracket: unpaired opening [; expression was:\n    " << expression << endmsg; 
 #endif
-
         return expression;
     }
     string toEvaluate = expression.substr(lastOpen + 1, nextClose - lastOpen - 1);
@@ -176,21 +164,20 @@ GeoLogVol * GmxUtil::makeAssemblyLV() {
     StoreGateSvc *pDetStore = 0;
     ISvcLocator *svcLocator = Gaudi::svcLocator();
 
-    ServiceHandle<IMessageSvc> msgh("MessageSvc", "GeoModelXml");
-    MsgStream log(&(*msgh), "GeoModelXml");
+    OUTPUT_STREAM;
 
     StatusCode sc = svcLocator->service("DetectorStore", pDetStore);
     if (sc.isFailure()) {
-            log << MSG::ERROR << "GmxUtil::makeAssemblyLV: Unable to access Detector Store" << endmsg;
+            msglog << MSG::ERROR << "GmxUtil::makeAssemblyLV: Unable to access Detector Store" << endmsg;
     }
     else {
         DataHandle<StoredMaterialManager> theMaterialManager;
         sc = pDetStore->retrieve(theMaterialManager, "MATERIALS");
         if(sc.isFailure()) {
-                log << MSG::ERROR << "GmxUtil::makeAssemblyLV: Unable to access Material Manager" << endmsg;
+                msglog << MSG::ERROR << "GmxUtil::makeAssemblyLV: Unable to access Material Manager" << endmsg;
         }
         else {
-            GeoMaterial *assembly_material = theMaterialManager->getMaterial("special::Ether");
+            GeoMaterial *assembly_material = theMaterialManager->getMaterial("special::HyperUranium");
             GeoBox *box = new GeoBox(1., 1., 1.); // Simplest shape; it is irrelevant
             GeoLogVol *lv = new GeoLogVol(string("AssemblyLV"), box, assembly_material);
             return lv;
@@ -198,7 +185,7 @@ GeoLogVol * GmxUtil::makeAssemblyLV() {
     }
     return 0;
 #else
-    GeoMaterial *assembly_material = new GeoMaterial("special::Ether", 1.e-20);
+    GeoMaterial *assembly_material = new GeoMaterial("special::HyperUranium", 1.e-20);
     GeoElement *vacuum = new GeoElement("vacuum", "Mt", 1, 1);
     assembly_material->add(vacuum, 1.0);
     assembly_material->lock();

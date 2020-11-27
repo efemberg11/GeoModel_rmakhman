@@ -9,7 +9,11 @@
 //    to element handlers instead of a (changing??) list.
 //
 #include <string>
+#ifndef STANDALONE_GMX
+#include "CLHEP/Evaluator/Evaluator.h"
+#else
 #include "ExpressionEvaluator/Evaluator.h"
+#endif
 #include "GeoModelXml/ProcessorRegistry.h"
 #include "GeoModelXml/Element2GeoItemRegistry.h"
 
@@ -28,7 +32,11 @@
 #include "GeoModelXml/MakeTransformationref.h"
 #include "GeoModelXml/MakeTranslation.h"
 #include "GeoModelXml/MakeRotation.h"
+#ifndef STANDALONE_GMX
+#include "GeoModelXml/MakeScaling.h"
+#endif
 
+#include "GeoModelXml/shape/MakeSimplePolygonBrep.h"
 #include "GeoModelXml/shape/MakeBox.h"
 #include "GeoModelXml/shape/MakeCons.h"
 #include "GeoModelXml/shape/MakeGenericTrap.h"
@@ -56,7 +64,11 @@ public:
     GmxInterface *gmxInterface();
     double evaluate(char const *expression);
     std::string debracket(std::string expression);
+#ifndef STANDALONE_GMX
+    HepTool::Evaluator eval;
+#else
     Evaluator eval;
+#endif
     PositionIndex positionIndex;
     ProcessorRegistry processorRegistry;
     Element2GeoItemRegistry geoItemRegistry;
@@ -78,6 +90,7 @@ public:
 //
         MakeElement element;
         MakeMaterial material;
+        MakeSimplePolygonBrep simplepolygonbrep;
         MakeBox box;
         MakeCons cons;
         MakeGenericTrap generictrap;
@@ -99,6 +112,9 @@ public:
 //
         MakeTranslation translation;
         MakeRotation rotation;
+#ifndef STANDALONE_GMX
+        MakeScaling scaling;
+#endif
 //
 //    Other things
 //

@@ -115,8 +115,9 @@ There are several options offered to the user to selectively build the optional 
 On macOS, you can install the needed graphics dependencies with `brew`:
 
 ```
-brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
-brew install simage coin-bb soqt-bb
+brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git # this, only the first time you install the 'atlas' Homebrew repository (Tap)
+brew update # this will pick up the latest version of the 'atlas' Homebrew formulas
+brew install soqt-geomodel  # this will install the latest `simage-geomodel`, `coin-geomodel`, and `soqt-geomodel`
 ```
 
 
@@ -162,9 +163,12 @@ cd ..
 
     The Coin sources are not compatible with CMake 3.19 (see https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/7). Therefore, for the moment, until the Coin sources will be ported to CMake 3.19, you should use CMake <= 3.18.X to compile Coin. 
 
-    Please note that, at the time of writing, Homebrew, the package manager for macOS, updated its version of CMake from 3.18.4 to 3.19. Thus, you cannot build Coin on macOS with the CMake vertsion installed by the §brew§ command.
+    Please note that, at the time of writing, Homebrew, the package manager for macOS, has updated its version of CMake from 3.18.4 to 3.19. Thus, you cannot build Coin on macOS with the CMake version installed by the `brew` command.
 
-    You can install CMake on your system by downloading the installer from the [CMake website](https://cmake.org/download/). 
+    You can install CMake on your system by downloading the installer from the [CMake website](https://cmake.org/download/).
+
+    Or, you could have still  an older version on your system, which you can use. On macOS, and if those were installed with `brew`, you can check which versions of CMake you have in the path `/usr/local/Cellar/cmake/`. Then, you can use one of the ones you have installed by running its `cmake` binary command directly; for example: `/usr/local/Cellar/cmake/3.18.4/bin/cmake ...` .
+
 
 
 Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):

@@ -26,9 +26,9 @@ On macOS, we use the Homebrew package manager to handle and install the GeoModel
 You can install the visualization tool and all the libraries by running the following commands:
 
 ```
-brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
-brew update
-brew install geomodelvisualization
+brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git # this, only the first time you install the 'atlas' Homebrew repository (Tap)
+brew update  # this will pick the latest versions of the 'atlas' Homebrew formulas
+brew install geomodelvisualization  # this will install 'geomodelvisualization' (`gmex`) and all its dependencies automatically
 ```
 
 The first command will set the Homebrew repository (a "Tap" in Homebrew jargon) storing the "recipes" to install the ATLAS GeoModel libraries on macOS. The second command install all the libraries.

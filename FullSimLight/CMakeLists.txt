@@ -5,6 +5,22 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 project(fullSimLight)
 
 
+## External dependencies.
+#----------------------------------------------------------------------------
+# Find Geant4 package, batch mode only executable (i.e. no need ui and vis).
+#
+find_package(Geant4 REQUIRED)
+#----------------------------------------------------------------------------
+
+find_package(Pythia QUIET) # optional
+
+#----------------------------------------------------------------------------
+# Setup Geant4 include directories and compile definitions
+# Setup include directory for this project
+#
+#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
+include(${Geant4_USE_FILE})
+
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am top-level project.
     # Make the root module directory visible to CMake.
@@ -61,21 +77,7 @@ add_subdirectory(MagneticField)
 #include(${ROOT_USE_FILE})
 
 
-## External dependencies.
-#----------------------------------------------------------------------------
-# Find Geant4 package, batch mode only executable (i.e. no need ui and vis).
-#
-find_package(Geant4 REQUIRED)
-#----------------------------------------------------------------------------
 
-find_package(Pythia QUIET) # optional
-
-#----------------------------------------------------------------------------
-# Setup Geant4 include directories and compile definitions
-# Setup include directory for this project
-#
-#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
-include(${Geant4_USE_FILE})
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 

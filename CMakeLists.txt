@@ -2,7 +2,7 @@
 
 # === Preamble ===
 cmake_minimum_required(VERSION 3.14)
-project( "GeoModel" VERSION 1.0.0 LANGUAGES CXX )
+project( "GeoModel" VERSION 1.1.1 LANGUAGES CXX )
 
 # === Project wide setup ===
 # Make the 'cmake' module directory visible to CMake.

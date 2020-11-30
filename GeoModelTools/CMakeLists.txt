@@ -2,7 +2,7 @@
 
 # Set up the (sub-)project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelTools" VERSION 4.0.1 LANGUAGES CXX )
+project( "GeoModelTools" VERSION 4.1.0 LANGUAGES CXX )
 
 # Set up the version of GeoModelTools as a cache variable, so that other
 # sub-projects could use this value.

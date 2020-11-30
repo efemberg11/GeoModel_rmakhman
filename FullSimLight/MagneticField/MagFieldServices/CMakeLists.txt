@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.1) 
 
 # Declare the package name:
-project( "MagFieldServices" VERSION 1.0.1 LANGUAGES CXX )
+project( "MagFieldServices" VERSION 4.1.0 LANGUAGES CXX )
 
 # External dependencies:
 find_package( Eigen3 REQUIRED )

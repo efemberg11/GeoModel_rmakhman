@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.10 )
-project( "GeoModelVisualization" VERSION 3.2.0 LANGUAGES CXX )
+project( "GeoModelVisualization" VERSION 4.1.0 LANGUAGES CXX )
 
 # Set the OpenGL flag requested by CMake
 set( OpenGL_GL_PREFERENCE GLVND )

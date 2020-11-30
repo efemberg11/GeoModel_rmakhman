@@ -9,6 +9,16 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(HelloToyDetectorFactory)
 
+# Compile with C++17
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
+
+find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder 
+find_package( GeoModelIO REQUIRED 4.1.0 ) #TODO: the version should bese in the root folder
+
+
+
 # Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -19,4 +29,4 @@ FILE(GLOB SRCS src/main.cpp src/*.cxx )
 add_executable( helloToyDetectorFactory ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( helloToyDetectorFactory GeoModelKernel GeoModelDBManager GeoModelWrite )
+target_link_libraries( helloToyDetectorFactory GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite )

@@ -2,7 +2,7 @@
 # Setup the project
 #
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(fullSimLight)
+project("fullSimLight" VERSION 4.1.0 LANGUAGES CXX )
 
 
 ## External dependencies.
@@ -42,8 +42,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
         include( SetupXercesC )
     endif()
     # Find the base GeoModel packages, which must be installed on the target system already
-    find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
-    find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
+    find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
+    find_package( GeoModelIO REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
     # FullSimLight needs GeoModelG4, so we trigger its build
     set( GEOMODEL_BUILD_GEOMODELG4_FROM_FULLSIMLIGHT ON CACHE BOOL "GeoModelG4 build triggered by FullSimLigh when built individually" FORCE ) 
     add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/../GeoModelG4 build_GeoModelG4 )

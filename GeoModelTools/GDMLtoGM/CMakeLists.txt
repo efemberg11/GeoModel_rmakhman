@@ -13,7 +13,7 @@ if( GEOMODEL_USE_BUILTIN_XERCESC )
 endif()
 
 target_link_libraries( GDMLtoGM PUBLIC XercesC::XercesC
-   ExpressionEvaluator GeoModelXMLParser GeoModelKernel )
+    ExpressionEvaluator GeoModelXMLParser GeoModelCore::GeoModelKernel )
 target_include_directories( GDMLtoGM PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
@@ -49,7 +49,8 @@ install( FILES ${HEADERS}
 # Create and install the gdml2gm executable.
 add_executable( gdml2gm gdml2gm/gdml2gm.cxx )
 target_link_libraries( gdml2gm PRIVATE
-   GeoModelXMLParser GeoModelKernel GeoModelWrite GeoModelDBManager GDMLtoGM )
+    GeoModelXMLParser GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite GeoModelIO::GeoModelDBManager GDMLtoGM )
 install( TARGETS gdml2gm
-   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
    COMPONENT Runtime )

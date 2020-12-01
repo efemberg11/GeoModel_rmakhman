@@ -22,7 +22,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
     find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
-    # Set a flag to steer the  of the subpackages
+    # Set a flag to steer the build of the subpackages
     set( VISUALIZATION_INDIVIDUAL_BUILD ON )
 else()
     # I am called from other project with add_subdirectory().

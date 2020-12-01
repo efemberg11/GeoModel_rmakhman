@@ -16,7 +16,7 @@ The GeoModelKernel library has been extracted from the ATLAS software and comple
 The original, ATLAS-only version of the GeoModelKernel library was developed by *Joseph Boudreau* and *Vakhtang Tsulaia*, and presented at CHEP 2004 [^n1].
 
 
-The list of all contributors can be found in the [Contributors](dev/contribs.md) page.
+The list of all contributors can be found in the [Contributors](dev/contributors.md) page.
 
 
 [^n1]: See the references listed in the [Papers](papers/public.md) section. "CHEP" stands for _Computing in High Energy Physics_: that is the major conference where new tools and techniques in Software and Computing techniques for particle physics experiments are presented.

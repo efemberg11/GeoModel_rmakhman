@@ -25,9 +25,10 @@ nav:
         - 'Internal': 'papers/internal.md'
     - Reference:  'reference/reference.md'
     - For Developers:
-        - 'Build the Libraries': 'dev/index.md'
+        - 'Build the Libraries and Tools': 'dev/index.md'
         - 'Troubleshooting': 'dev/troubleshooting.md'
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
+        - 'Contributing to the Documentation': 'dev/docs-contrib.md'
     - Team & History: 'team.md'
     - Contacts: 'contacts.md'
 extra_css:
@@ -40,6 +41,14 @@ markdown_extensions:
         permalink: true
     - markdown_include.include:
         base_path: docs
+    - pymdownx.arithmatex:
+        generic: true
 plugins:
   - search
   #- git-revision-date #TODO: teh mkdocs docker image apparently lacks the git exec, so this cannot be used. Update the image!
+
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+

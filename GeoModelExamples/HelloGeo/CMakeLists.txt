@@ -14,7 +14,10 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 project(HelloGeo)
 
-find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
+# Find the needed dependencies, when building individually
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # when building individually
+  find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
+endif()
 
 # Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

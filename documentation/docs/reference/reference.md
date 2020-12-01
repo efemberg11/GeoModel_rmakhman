@@ -142,5 +142,14 @@ All GeoShapes have the following interface:
 ```
 
 The classes `GeoShapeShift`, `GeoShapeUnion`, `GeoShapeSubtraction`, and `GeoShapeIntersection` are internal and should be considered for experts.  We will not discuss them further.  
+
 We now present the interfaces to specific shapes.  In general these shapes are by default constructed as symmetrically around the origin as possible.  
+
+{!reference/RCBase/GeoShape/GeoBox.md!}
+
+{!reference/RCBase/GeoShape/GeoCons.md!}
+
+{!reference/RCBase/GeoShape/GeoPara.md!}
+
+
 

@@ -21,7 +21,7 @@
 A `GeoCons` represents a cone section positioned with its axis along the $z$ direction, and is specified by a starting value of $\phi$, a total subtended angle in $\phi$, a *half-width* in $z$, and minimum and maximum values of radius at both extremities in $z$.  The constructor specifies the values of these constants, and the accessors return them.
 
 <figure>
-  <img src="/reference/RCBase/GeoShape/GeoCons.png" width="300" />
+  <img src="/reference/RCBase/GeoShape/GeoCons.png" width="400" />
   <figcaption>Figure 3:  A GeoCons Object, representing a cone section.</figcaption>
 </figure>
 

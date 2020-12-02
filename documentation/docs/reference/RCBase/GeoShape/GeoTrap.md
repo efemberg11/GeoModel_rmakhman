@@ -31,6 +31,6 @@ The two edges not parallel to the $x$-axis make an angle of $\alpha_n$ (`Angleyd
 The constructor fills the `GeoTrap` with these values and the accessors return them.
 
 <figure>
-  <img src="/reference/RCBase/GeoShape/GeoTrap.png" width="300" />
+  <img src="/reference/RCBase/GeoShape/GeoTrap.png" width="400" />
   <figcaption>Figure 2: A GeoTrap object, representing a very general kind of trapezoid.</figcaption>
 </figure>

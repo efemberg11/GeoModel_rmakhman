@@ -26,7 +26,7 @@ The constructor takes $\phi$ , $\phi_0$, and the number of sides in the cross-se
 *Note:  Visualization of GeoPgon is on the to-do list.*
 
 <figure>
-  <img src="https://dummyimage.com/600x400/eee/aaa" width="300" />
+  <img src="https://dummyimage.com/600x400/eee/aaa" width="400" />
   <figcaption>Figure 4: GeoPgon object, representing a polycone with a polygonal cross section.</figcaption>
 </figure>
 

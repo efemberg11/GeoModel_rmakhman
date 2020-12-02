@@ -22,7 +22,7 @@ The `GeoPara` class represents a parallelepiped. Faces at $\pm z$ are parallel t
 *Note:  Visualization of GeoPara is on the to-do list.*
 
 <figure>
-  <img src="https://dummyimage.com/600x400/eee/aaa" width="300" />
+  <img src="https://dummyimage.com/600x400/eee/aaa" width="400" />
   <figcaption>Figure 4: GeoPara object, representing a parallelepiped.</figcaption>
 </figure>
 

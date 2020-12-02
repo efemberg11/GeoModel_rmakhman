@@ -16,4 +16,9 @@ Detailed descriptions of the geometry kernel classes follow.
 
 {!reference/Transformations.md!}
 
+{!reference/NameTags.md!}
+
+
+
+
 

@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.10 )
-project( "GeoModelVisualization" VERSION 3.2.0 LANGUAGES CXX )
+project( "GeoModelVisualization" VERSION 4.1.0 LANGUAGES CXX )
 
 # Set the OpenGL flag requested by CMake
 set( OpenGL_GL_PREFERENCE GLVND )
@@ -22,7 +22,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
     find_package( GeoModelIO REQUIRED 4.0.0 ) #TODO: the version should be se in the root folder
-    # Set a flag to steer the  of the subpackages
+    # Set a flag to steer the build of the subpackages
     set( VISUALIZATION_INDIVIDUAL_BUILD ON )
 else()
     # I am called from other project with add_subdirectory().

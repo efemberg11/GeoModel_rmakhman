@@ -12,6 +12,12 @@ project(HelloGeoRead2G4)
 # Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# Find the needed dependencies, when building individually
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) 
+  find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
+  find_package( GeoModelIO REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder 
+endif()
+
 ## External dependencies.
 find_package( Geant4 REQUIRED )
 # include Geant4 headers

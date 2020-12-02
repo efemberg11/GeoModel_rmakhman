@@ -2,7 +2,7 @@
 
 # === Preamble ===
 cmake_minimum_required(VERSION 3.14)
-project( "GeoModel" VERSION 1.1.1 LANGUAGES CXX )
+project( "GeoModel" VERSION 4.1.0 LANGUAGES CXX )
 
 # === Project wide setup ===
 # Make the 'cmake' module directory visible to CMake.
@@ -40,6 +40,7 @@ find_package( SQLite3 3.7.17 )
 # === Main targets built by this project ===
 
 # switches to let users build specific packages on request
+option(GEOMODEL_BUILD_TOOLS "Enable the build of GeoModelTools" OFF)
 option(GEOMODEL_BUILD_EXAMPLES "Enable the build of GeoModelExamples" OFF)
 option(GEOMODEL_BUILD_EXAMPLES_W_GEANT4 "Enable the build of GeoModelExamples, including the ones concerning the interface GeoModel->Geant4" OFF)
 option(GEOMODEL_BUILD_VISUALIZATION "Enable the build of GeoModelVisualization" OFF)
@@ -53,8 +54,12 @@ add_subdirectory(GeoModelCore)
 list( APPEND BUILT_PACKAGES "GeoModelCore")
 add_subdirectory(GeoModelIO)
 list( APPEND BUILT_PACKAGES "GeoModelIO")
-add_subdirectory(GeoModelTools)
-list( APPEND BUILT_PACKAGES "GeoModelTools")
+
+
+if(GEOMODEL_BUILD_TOOLS)
+  add_subdirectory(GeoModelTools)
+  list( APPEND BUILT_PACKAGES "GeoModelTools")
+endif()
 
 if(GEOMODEL_BUILD_VISUALIZATION)
   add_subdirectory(GeoModelVisualization)

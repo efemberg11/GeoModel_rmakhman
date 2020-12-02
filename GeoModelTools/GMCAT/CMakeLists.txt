@@ -2,9 +2,9 @@
 
 # Declare the package's executable.
 add_executable( gmcat src/gmcat.cxx )
-target_link_libraries( gmcat PRIVATE GeoModelKernel
-   GeoModelRead GeoModelWrite
-   GeoModelDBManager )
+target_link_libraries( gmcat PRIVATE GeoModelCore::GeoModelKernel
+    GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite
+    GeoModelIO::GeoModelDBManager )
 
 # Tweak how debug information should be attached to the executable, in Debug
 # builds.

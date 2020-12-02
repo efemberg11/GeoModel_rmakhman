@@ -23,6 +23,9 @@ The documentation uses the documentation engine [MkDocs](https://www.mkdocs.org/
 
 It also uses the [Material](https://squidfunk.github.io/mkdocs-material/) theme for MkDocs, which offers many tools to handle additional documentation metadata.
 
+The actual documentation files are stored under the folder `documentation/docs/`.
+While the `MkDocs` configuration files are stored in the `documentation` root folder.
+
 In order to update the documentation, you don't need to install `MkDocs` locally, because its build is performed within the GitLab CI (Continuos Integration) pipelines and then the HTML outcome is installed on the GeoModel server at CERN. 
 
 Thus, if you only want to update the documentation, you can merely:
@@ -35,12 +38,14 @@ Thus, if you only want to update the documentation, you can merely:
 However, if you want to preview your changes on your machine---and we recommend that---, you need to install `MkDocs` on your machine.
 
 
-## Dependencies - MkDocs
+## Dependencies - MkDocs + Material
 
-On macOS, you can install `MkDocs` with [Homebrew](https://brew.sh):
+You can install `MkDocs`, the `Material` theme, and all the plugins with [pip](https://pip.pypa.io/en/stable/installing/):
+
 
 ```
-brew install mkdocs
+pip3 install mkdocs-material # it will install `mkdocs` as well
+pip3 install markdown-include
 ```
 
 ## Build and serve

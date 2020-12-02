@@ -44,7 +44,7 @@ You can install `MkDocs`, the `Material` theme, and all the plugins with [pip](h
 
 
 ```
-pip3 install mkdocs-material # it will install `mkdocs` as well
+pip3 install mkdocs-material      # it will install `mkdocs` as well
 pip3 install markdown-include
 ```
 

@@ -105,6 +105,5 @@ We now present the interfaces to specific shapes.  In general these shapes are b
 
 {!reference/RCBase/GeoShape/GeoTrd.md!}
 
-{!reference/RCBase/GeoShape/GeoLogVol.md!}
 
 

@@ -24,7 +24,6 @@ void mm_TechHandler::ElementHandle()
 	MuonGM::MM_Technology *tech=new MuonGM::MM_Technology(name);
 	
 	tech->nlayers=getAttributeAsInt("nLayers",ret);
-	std::cout<<" mm_TechHandler nlayers "<<tech->nlayers<<std::endl;
 	tech->thickness=getAttributeAsDouble("Tck",ret);
 	tech->gasThickness=getAttributeAsDouble("gasTck",ret);
 	tech->pcbThickness=getAttributeAsDouble("driftPcbTck",ret);

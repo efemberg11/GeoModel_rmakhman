@@ -72,8 +72,6 @@ GeoFullPhysVol* sTGC::build(int minimalgeo, int , std::vector<Cutout*> )
   double pcbActualTck = pcbTck/2;
   int nLayer=t->nlayers;
   //thickness=nLayer*chamberTck;
-  std::cout<<" sTGC.cxx: old thickness "<<thickness<<" new thickness "<<nLayer*(gasTck+2.*chamberTck)<<std::endl;
-  std::cout<<"\tnLayer "<<nLayer<<" chamberTck "<<chamberTck<<std::endl;
 
   minimalgeo=t->geoLevel;
 

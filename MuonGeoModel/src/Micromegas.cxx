@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -7,7 +7,6 @@
 #include "MuonGeoModel/MM_Technology.h"
 #include "MuonGeoModel/MaterialManager.h"
 #include "AGDDKernel/AGDDDetectorStore.h"
-//#include "MuonGeoModel/MYSQL.h"
 #include "MuonGeoModel/MicromegasComponent.h"
 #include "MuonGeoModel/Cutout.h"
 #include "GeoModelKernel/GeoTrd.h"
@@ -67,9 +66,6 @@ Micromegas::build(int minimalgeo, int , std::vector<Cutout*> )
   double f3=t->f3Thickness;
   int nLayers=t->nlayers;
   thickness=nLayers*(gasTck+2.*pcbTck);
-  std::cout<<" Micromegas.cxx: old thickness "<<thickness<<" new thickness "<<nLayers*(gasTck+2.*pcbTck)<<std::endl;
-  std::cout<<" \tnLayers "<<nLayers<<" pcb "<<pcbTck<<" gasTck "<<gasTck<<std::endl;
-
   
   minimalgeo=t->geoLevel;
 
@@ -99,7 +95,6 @@ Micromegas::build(int minimalgeo, int , std::vector<Cutout*> )
 
   // Loop over Micromegas layers
   for (int i = 0; i < t->nlayers; i++) {
-    std::cout<<"loop over layers "<<i<<std::endl;
     double widthActive;
     double longWidthActive;
     double lengthActive;

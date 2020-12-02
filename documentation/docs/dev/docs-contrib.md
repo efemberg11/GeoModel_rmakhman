@@ -24,7 +24,7 @@ The documentation uses the documentation engine [MkDocs](https://www.mkdocs.org/
 It also uses the [Material](https://squidfunk.github.io/mkdocs-material/) theme for MkDocs, which offers many tools to handle additional documentation metadata.
 
 The actual documentation files are stored under the folder `documentation/docs/`.
-While the `MkDocs` configuration files are stored in the `documentation` root folder.
+The `MkDocs` configuration files are stored in the `documentation` root folder, besides the `docs/` folder.
 
 In order to update the documentation, you don't need to install `MkDocs` locally, because its build is performed within the GitLab CI (Continuos Integration) pipelines and then the HTML outcome is installed on the GeoModel server at CERN. 
 
@@ -72,5 +72,31 @@ http://127.0.0.1:8000
 
 You will be able to preview the documentation web site, and that will be automatically rebuilt and reloaded in the browser as soon as you change a documentation file.
 
+## Adding items to the Navigation Menu
+
+The navigation menu configuration is stored in the `nav` section of the `documentation/mkdocs.yml` configuration file. If you want to add pages that should be directly accessible from the main navigation menu, you have to add them in that file. A detailed example follows here below.
+
+!!! note
+
+    you do not need to edit that configuration file if you only add pages or sections that should be accessible and/or linked only from other pages. You only need to edit that configuration file when adding items to the main navigation menu.
+
+For example, in the following example, we are creating a `Home` menu button and a `Getting Started` menu section with some buttons in it, then we are linking:
+
+* the `Home` button to the `documentation/docs/index.md` page
+* the `Getting Started`-->`Intro` button to the `documentation/docs/start/index.md` page
+* the `Getting Started`-->`Install Libraries & Tools` to the `documentation/docs/start/install.md` page
+
+
+```yaml
+nav:                                                                                                         
+    - Home: 'index.md'                                                                                       
+    - Getting Started:                                                                                       
+        - 'Intro': 'start/index.md'                                                                           │  - dev/contributors.md
+        - 'Install Libraries & Tools': 'start/install.md' 
+```
+
+!!! note
+
+    Please notice that in the `mkdocs.yml` configuration file all paths are relative to the `documentation/docs` folder, which is the main container folder of all the documentation content.
 
 

@@ -10,7 +10,9 @@ Detailed descriptions of the geometry kernel classes follow.
 
 {!reference/Materials_Elements.md!}
 
-{!reference/Shapes_LogicalVolume.md!}
+{!reference/Shapes.md!}
+
+{!reference/LogicalVolumes.md!}
 
 {!reference/Transformations.md!}
 

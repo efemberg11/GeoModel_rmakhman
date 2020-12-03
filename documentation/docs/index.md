@@ -1,4 +1,7 @@
+
+
 # GeoModel - A Detector Description Toolkit for HEP experiments
+
 
 
 The GeoModel Toolkit offers classes that provide geometrical primitives for describing detectors, and a set of tools for accessing, handling, manipulating, dumping, restoring, visualizing, inspecting, and debugging the detector geometry.

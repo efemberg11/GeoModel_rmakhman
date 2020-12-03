@@ -147,14 +147,14 @@ void SoVisualizeAction::handleTrap(const GeoTrap *trap)
 
 void SoVisualizeAction::handleTwistedTrap(const GeoTwistedTrap *twistedtrap)
 {
-  //qDebug() << "SoVisualizeAction::handleTwistedTrap";
-  SoGenericBox * gb = new SoGenericBox;
-  //TO DO : kept the same method as the trapezoid one, but this has to be customized for the twisted trap
-  gb->setParametersForTrapezoid(twistedtrap->getZHalfLength(), twistedtrap->getTheta(), twistedtrap->getPhi(),
-                twistedtrap->getY1HalfLength(), twistedtrap->getX1HalfLength(), twistedtrap->getX2HalfLength(),
-                twistedtrap->getY2HalfLength(), twistedtrap->getX3HalfLength(), twistedtrap->getX4HalfLength(),
-                twistedtrap->getTiltAngleAlpha(), twistedtrap->getTiltAngleAlpha());
-  m_shape=gb;
+    std::cout<<"SoVisualizeAction::handleTwistedTrap ::: "<<std::endl;
+    SbPolyhedrizeAction a;
+    twistedtrap->exec(&a);
+    const SbPolyhedron *poly =a.getPolyhedron();
+    if (poly) {
+      SoPolyhedron *myPoly = new SoPolyhedron(poly);
+      m_shape=myPoly;
+    }
 }
 
 void SoVisualizeAction::handleTrd(const GeoTrd *trd)

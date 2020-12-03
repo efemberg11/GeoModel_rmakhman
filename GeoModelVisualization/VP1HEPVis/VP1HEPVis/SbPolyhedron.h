@@ -291,6 +291,14 @@ class SbPolyhedron {
   // Assignment
   virtual SbPolyhedron & operator=(const SbPolyhedron & from);
 
+  /* @param  Nnodes number of nodes
+   * @param  Nfaces number of faces
+   * @param  xyz    nodes
+   * @param  faces  faces (quadrilaterals or triangles)
+   * @return status of the operation - is non-zero in case of problem
+   */
+  int createPolyhedron(int Nnodes, int Nfaces,
+                         const double xyz[][3], const int faces[][4]);
   // Get number of vertices
   int GetNoVertices() const { return m_nvert; }
 

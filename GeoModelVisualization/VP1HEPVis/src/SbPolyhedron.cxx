@@ -1290,6 +1290,38 @@ bool SbPolyhedron::GetNextUnitNormal(HVNormal3D &normal) const
   return rep;
 }
 
+int
+SbPolyhedron::createPolyhedron(int Nnodes, int Nfaces,
+                                const double xyz[][3],
+                                const int  faces[][4])
+/***********************************************************************
+ *                                                                     *
+ * Name: createPolyhedron                            Date:    05.11.02 *
+ * Author: E.Chernyaev (IHEP/Protvino)               Revised:          *
+ *                                                                     *
+ * Function: Creates user defined polyhedron                           *
+ *                                                                     *
+ * Input: Nnodes  - number of nodes                                    *
+ *        Nfaces  - number of faces                                    *
+ *        nodes[][3] - node coordinates                                *
+ *        faces[][4] - faces                                           *
+ *                                                                     *
+ ***********************************************************************/
+{
+  AllocateMemory(Nnodes, Nfaces);
+  if (m_nvert == 0) return 1;
+
+  for (int i=0; i<Nnodes; i++) {
+    m_pV[i+1] = HVPoint3D(xyz[i][0], xyz[i][1], xyz[i][2]);
+  }
+  for (int k=0; k<Nfaces; k++) {
+    m_pF[k+1] = SbFacet(faces[k][0],0,faces[k][1],0,faces[k][2],0,faces[k][3],0);
+  }
+  SetReferences();
+  return 0;
+}
+
+
 double SbPolyhedron::GetSurfaceArea() const
 /***********************************************************************
  *                                                                     *
@@ -1440,7 +1472,7 @@ SbPolyhedronTrap::SbPolyhedronTrap(double Dz,
 
 SbPolyhedronTrap::~SbPolyhedronTrap() {}
 
-SbPolyhedronTwistedTrap::SbPolyhedronTwistedTrap (double TwistedPhi, double Dz,
+SbPolyhedronTwistedTrap::SbPolyhedronTwistedTrap (double TwistPhi, double Dz,
               double Theta,
               double Phi,
               double Dy1,
@@ -1452,56 +1484,134 @@ SbPolyhedronTwistedTrap::SbPolyhedronTwistedTrap (double TwistedPhi, double Dz,
               double Alp)
 /***********************************************************************
  *
- * Name: GeoPolyhedronTwistedTrap         Date:    26.11.2020
+ * Name: SbPolyhedronTwistedTrap         Date:    26.11.2020
  * Author: Marilena Bandieramonte             Revised:
  *
- * Function: Create TWISTEDTRAP-trapezoid for visualization
+ * Function: Create TwistedTrap -trapezoid for visualization
  *
- * A G4TwistedTrap is a general twisted trapezoid: The faces perpendicular to the
+ * A TwistedTrap is a general twisted trapezoid: The faces perpendicular to the
  * z planes are trapezia, and their centres are not necessarily on
  * a line parallel to the z axis.
  *
- *      pTwist  Phi twist angle
- *      pDz      Half-length along the z-axis
- *      pTheta  Polar angle of the line joining the centres of the faces at -/+pDz
- *      pPhi     Azimuthal angle of the line joing the centre of the face at -pDz to the centre of the face at +pDz
- *      pDy1    Half-length along y of the face at -pDz
- *      pDx1    Half-length along x of the side at y=-pDy1 of the face at -pDz
- *      pDx2    Half-length along x of the side at y=+pDy1 of the face at -pDz
+ *      TwistPhi  Phi twist angle
+ *      Dz      Half-length along the z-axis
+ *      Theta  Polar angle of the line joining the centres of the faces at -/+pDz
+ *      Phi     Azimuthal angle of the line joing the centre of the face at -pDz to the centre of the face at +pDz
+ *      Dy1    Half-length along y of the face at -pDz
+ *      Dx1    Half-length along x of the side at y=-pDy1 of the face at -pDz
+ *      Dx2    Half-length along x of the side at y=+pDy1 of the face at -pDz
  *
- *      pDy2    Half-length along y of the face at +pDz
- *      pDx3    Half-length along x of the side at y=-pDy2 of the face at +pDz
- *      pDx4    Half-length along x of the side at y=+pDy2 of the face at +pDz
- *      pAlph   Angle with respect to the y axis from the centre of the side
+ *      Dy2    Half-length along y of the face at +pDz
+ *      Dx3    Half-length along x of the side at y=-pDy2 of the face at +pDz
+ *      Dx4    Half-length along x of the side at y=+pDy2 of the face at +pDz
+ *      Alp   Angle with respect to the y axis from the centre of the side
  *
  ***********************************************************************/
 {
-    //TO DO NB: in this way it's creating a normal trap, not a twisted one.
-    //it has to be seen how this is handled in Geant4 with the
-    /*
-     
-      G4Polyhedron* G4VTwistedFaceted::GetPolyhedron() const method
-     
-     */
-  double DzTthetaCphi = Dz * tan (Theta) * cos (Phi);
-  double DzTthetaSphi = Dz * tan (Theta) * sin (Phi);
-  //double Dy1Talp1 = Dy1 * tan (Alp1);
-  //double Dy2Talp2 = Dy2 * tan (Alp2);
-  double Dy1Talp1 = Dy1 * tan (Alp);
-  double Dy2Talp2 = Dy2 * tan (Alp);
 
-  AllocateMemory (8, 6);
+    AllocateMemory(12,18);
+    std::cout<<"SbPolyhedronTwistedTrap visualization :::"<<std::endl;
+    float xy1[4][2]; //quadrilateral at the bottom -DZ
+                     //     2 ------ 3
+                     //        1 ------ 4
+    float xy2[4][2]; //quadrilateral at the top    +DZ
+                     //     6 ------ 7
+                     //        5 ------ 8
+    
+    
+    const float tanTheta(tan(Theta));
+    const float TthetaCphi = tanTheta*cos(Phi);
+    const float TthetaSphi = tanTheta*sin(Phi);
+    const float Talp = tan(Alp);
+    
+    //BOTTOM - clockwise
+    xy1[0][0]= -Dx2+Dy1*Talp; //5
+    xy1[0][1]=  Dy1;
+    xy1[1][0]= -Dx1-Dy1*Talp; //6
+    xy1[1][1]= -Dy1;
+    xy1[2][0]=  Dx1-Dy1*Talp; //7
+    xy1[2][1]= -Dy1;
+    xy1[3][0]=  Dx2+Dy1*Talp; //8
+    xy1[3][1]=  Dy1;
 
-  m_pV[1] = HVPoint3D (-DzTthetaCphi - Dy1Talp1 - Dx1, -DzTthetaSphi - Dy1, -Dz);
-  m_pV[2] = HVPoint3D (-DzTthetaCphi - Dy1Talp1 + Dx1, -DzTthetaSphi - Dy1, -Dz);
-  m_pV[3] = HVPoint3D (-DzTthetaCphi + Dy1Talp1 + Dx2, -DzTthetaSphi + Dy1, -Dz);
-  m_pV[4] = HVPoint3D (-DzTthetaCphi + Dy1Talp1 - Dx2, -DzTthetaSphi + Dy1, -Dz);
-  m_pV[5] = HVPoint3D (DzTthetaCphi - Dy2Talp2 - Dx3, DzTthetaSphi - Dy2, Dz);
-  m_pV[6] = HVPoint3D (DzTthetaCphi - Dy2Talp2 + Dx3, DzTthetaSphi - Dy2, Dz);
-  m_pV[7] = HVPoint3D (DzTthetaCphi + Dy2Talp2 + Dx4, DzTthetaSphi + Dy2, Dz);
-  m_pV[8] = HVPoint3D (DzTthetaCphi + Dy2Talp2 - Dx4, DzTthetaSphi + Dy2, Dz);
+    //TOP - clockwise
+    xy2[0][0]= -Dx4+Dy2*Talp; //1
+    xy2[0][1]=  Dy2;
+    xy2[1][0]= -Dx3-Dy2*Talp; //2
+    xy2[1][1]= -Dy2;
+    xy2[2][0]=  Dx3-Dy2*Talp; //3
+    xy2[2][1]= -Dy2;
+    xy2[3][0]=  Dx4+Dy2*Talp; //4
+    xy2[3][1]=  Dy2;
 
-  CreatePrism ();
+    const float dzTthetaCphi(Dz*TthetaCphi);
+    const float dzTthetaSphi(Dz*TthetaSphi);
+    
+    for (int i=0;i<4;i++) {
+      xy1[i][0]-=dzTthetaCphi;
+      xy1[i][1]-=dzTthetaSphi;
+      xy2[i][0]+=dzTthetaCphi;
+      xy2[i][1]+=dzTthetaSphi;
+    }
+
+    float xtmp, ytmp;
+    const float cPhiTwist=cos(TwistPhi);
+    const float sPhiTwist=sin(TwistPhi);
+    
+    //Apply twist (rotate aroud Z of an angle TwistPhi) to the top surface only
+    for (int i=0;i<4;i++) {
+      xtmp =xy2[i][0];
+      ytmp =xy2[i][1];
+      xy2[i][0]= xtmp * cPhiTwist - ytmp * sPhiTwist;
+      xy2[i][1]= xtmp * sPhiTwist + ytmp * cPhiTwist;
+    }
+    
+    m_pV[ 1] = HVPoint3D(xy1[0][0],xy1[0][1],-Dz);
+    m_pV[ 2] = HVPoint3D(xy1[1][0],xy1[1][1],-Dz);
+    m_pV[ 3] = HVPoint3D(xy1[2][0],xy1[2][1],-Dz);
+    m_pV[ 4] = HVPoint3D(xy1[3][0],xy1[3][1],-Dz);
+
+    m_pV[ 5] = HVPoint3D(xy2[0][0],xy2[0][1], Dz);
+    m_pV[ 6] = HVPoint3D(xy2[1][0],xy2[1][1], Dz);
+    m_pV[ 7] = HVPoint3D(xy2[2][0],xy2[2][1], Dz);
+    m_pV[ 8] = HVPoint3D(xy2[3][0],xy2[3][1], Dz);
+    
+     m_pV[ 9] = (m_pV[1]+m_pV[2]+m_pV[5]+m_pV[6])/4.;
+     m_pV[10] = (m_pV[2]+m_pV[3]+m_pV[6]+m_pV[7])/4.;
+     m_pV[11] = (m_pV[3]+m_pV[4]+m_pV[7]+m_pV[8])/4.;
+     m_pV[12] = (m_pV[4]+m_pV[1]+m_pV[8]+m_pV[5])/4.;
+
+     enum {DUMMY, BOTTOM,
+           LEFT_BOTTOM,  LEFT_FRONT,   LEFT_TOP,  LEFT_BACK,
+           BACK_BOTTOM,  BACK_LEFT,    BACK_TOP,  BACK_RIGHT,
+           RIGHT_BOTTOM, RIGHT_BACK,   RIGHT_TOP, RIGHT_FRONT,
+           FRONT_BOTTOM, FRONT_RIGHT,  FRONT_TOP, FRONT_LEFT,
+           TOP};
+
+     m_pF[ 1]=SbFacet(1,LEFT_BOTTOM, 4,BACK_BOTTOM, 3,RIGHT_BOTTOM, 2,FRONT_BOTTOM);
+
+     m_pF[ 2]=SbFacet(4,BOTTOM,     -1,LEFT_FRONT,  -12,LEFT_BACK,    0,0);
+     m_pF[ 3]=SbFacet(1,FRONT_LEFT, -5,LEFT_TOP,    -12,LEFT_BOTTOM,  0,0);
+     m_pF[ 4]=SbFacet(5,TOP,        -8,LEFT_BACK,   -12,LEFT_FRONT,   0,0);
+     m_pF[ 5]=SbFacet(8,BACK_LEFT,  -4,LEFT_BOTTOM, -12,LEFT_TOP,     0,0);
+
+     m_pF[ 6]=SbFacet(3,BOTTOM,     -4,BACK_LEFT,   -11,BACK_RIGHT,   0,0);
+     m_pF[ 7]=SbFacet(4,LEFT_BACK,  -8,BACK_TOP,    -11,BACK_BOTTOM,  0,0);
+     m_pF[ 8]=SbFacet(8,TOP,        -7,BACK_RIGHT,  -11,BACK_LEFT,    0,0);
+     m_pF[ 9]=SbFacet(7,RIGHT_BACK, -3,BACK_BOTTOM, -11,BACK_TOP,     0,0);
+
+     m_pF[10]=SbFacet(2,BOTTOM,     -3,RIGHT_BACK,  -10,RIGHT_FRONT,  0,0);
+     m_pF[11]=SbFacet(3,BACK_RIGHT, -7,RIGHT_TOP,   -10,RIGHT_BOTTOM, 0,0);
+     m_pF[12]=SbFacet(7,TOP,        -6,RIGHT_FRONT, -10,RIGHT_BACK,   0,0);
+     m_pF[13]=SbFacet(6,FRONT_RIGHT,-2,RIGHT_BOTTOM,-10,RIGHT_TOP,    0,0);
+
+     m_pF[14]=SbFacet(1,BOTTOM,     -2,FRONT_RIGHT,  -9,FRONT_LEFT,   0,0);
+     m_pF[15]=SbFacet(2,RIGHT_FRONT,-6,FRONT_TOP,    -9,FRONT_BOTTOM, 0,0);
+     m_pF[16]=SbFacet(6,TOP,        -5,FRONT_LEFT,   -9,FRONT_RIGHT,  0,0);
+     m_pF[17]=SbFacet(5,LEFT_FRONT, -1,FRONT_BOTTOM, -9,FRONT_TOP,    0,0);
+
+     m_pF[18]=SbFacet(5,FRONT_TOP, 6,RIGHT_TOP, 7,BACK_TOP, 8,LEFT_TOP);
+
 }
 
 SbPolyhedronTwistedTrap::~SbPolyhedronTwistedTrap ()

@@ -20,6 +20,7 @@ pip install mkdocs-minify-plugin # ???
 pip install mkdocs-macros-plugin # this adds teh possibility of defining macros to extend MkDocs
 
 
+
 echo "\n\n\nSuccess!!\nYou can now build and serve the web iste locally by running: 'brew serve'"
 echo "\n[Note: if you have mkdocs installed on your system folders already, to avoid errors about missing packages, you might have to run the one in the virtualenv explicitely, by running: './venvp3/bin/mkdocs serve']"
 

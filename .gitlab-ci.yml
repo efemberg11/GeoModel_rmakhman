@@ -346,7 +346,7 @@ docs-build:
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
     before_script:
         - pip install markdown-include
-        - pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
+        #- pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
     script:
         #- git --version #TODO: update the docker image to have git
         - ls

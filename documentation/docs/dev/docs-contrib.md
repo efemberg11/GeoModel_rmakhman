@@ -40,17 +40,22 @@ However, if you want to preview your changes on your machine---and we recommend 
 
 ## Dependencies - MkDocs + Material
 
-You can install `MkDocs`, the `Material` theme, and all the plugins with [pip](https://pip.pypa.io/en/stable/installing/):
+In order to build the documentation and visualize the ouput on your machine, you have to install MkDocs and the needed packages.
+The easiest way to do that is using the script we provide to create a standalone, encapsulated Python *virtualenv* directly in the documentation folder. 
 
+First of all, you need Python3 installed on your machine (you should have it already if your OS is enough recent). Then, navigate to the `documentation` folder and source the script:
 
+```bash
+cd GeoModel/documentation
+source create_activate_virtualenv_p3.sh
 ```
-pip3 install mkdocs-material      # it will install `mkdocs` as well
-pip3 install markdown-include
-```
+
+The script will create a Python3 virtual environment, it will activate it, it will install MkDocs and all the needed packages, and it will start the virtual env. *[If you want to install everything by hand ---* **not reccommended!** *---, please look into the script which packages you would need to install]*
+
 
 ## Build and serve
 
-From the `documentation` folder, you can run
+From the `documentation` folder, you can now run
 
 ```
 mkdocs serve
@@ -71,6 +76,19 @@ http://127.0.0.1:8000
 ```
 
 You will be able to preview the documentation web site, and that will be automatically rebuilt and reloaded in the browser as soon as you change a documentation file.
+
+To stop the local test server, just push `Ctrl+c` in the shell where the server is running. This will stop the test server.
+
+## Closing the *virtualenv*
+
+When you are done with editing and testing the documentation site, you can close the Python3 *virtualenv* by running in the shell:
+
+```bash
+deactivate
+```
+
+That will close the virtual environment and it will return to the standard Python interpreter and packages, the ones installed on your machine besides your main Python installation.
+
 
 ## Adding items to the Navigation Menu
 
@@ -98,5 +116,9 @@ nav:
 !!! note
 
     Please notice that in the `mkdocs.yml` configuration file all paths are relative to the `documentation/docs` folder, which is the main container folder of all the documentation content.
+
+You can find more information on the configuration file and on the navigation menu in the [official MkDocs documentation](https://www.mkdocs.org/user-guide/writing-your-docs/).
+
+
 
 

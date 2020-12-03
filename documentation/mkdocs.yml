@@ -2,10 +2,12 @@ site_name: GeoModel - A Detector Description Toolkit for HEP
 site_description: GeoModel - An experiment-agnostic Detector Description Toolkit for HEP
 site_author: ATLAS Collaboration & Contributors
 site_url: https://cern.ch/geomodel/home
-repo_name: GitLab
-repo_url: https://gitlab.cern.ch/GeoModelDev/Documentation
+repo_name: GeoModel
+repo_url: https://gitlab.cern.ch/GeoModelDev/GeoModel
+
 theme:
     name: material
+
 nav:
     - Home: 'index.md'
     - Getting Started:
@@ -31,18 +33,21 @@ nav:
         - 'Contributing to the Documentation': 'dev/docs-contrib.md'
     - Team & History: 'team.md'
     - Contacts: 'contacts.md'
+
 extra_css:
     - material_nested_lists_rendering.css
+
 markdown_extensions:
-    - admonition
-    - footnotes
-    - pymdownx.superfences
+    - admonition            # to use notes, warnings, tips, ...
+    - footnotes             # to set footnotes
+    - pymdownx.superfences  # to use code blocks nested under lists items
     - toc:
         permalink: true
     - markdown_include.include:
         base_path: docs
-    - pymdownx.arithmatex:
+    - pymdownx.arithmatex:  # to use LaTeX syntax in Markdown files
         generic: true
+
 plugins:
   - search
   #- git-revision-date #TODO: teh mkdocs docker image apparently lacks the git exec, so this cannot be used. Update the image!

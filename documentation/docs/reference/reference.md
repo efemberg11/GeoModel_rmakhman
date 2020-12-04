@@ -14,6 +14,8 @@ Detailed descriptions of the geometry kernel classes follow.
 
 {!reference/LogicalVolumes.md!}
 
+{!reference/PhysicalVolumes.md!}
+
 {!reference/Transformations.md!}
 
 {!reference/NameTags.md!}

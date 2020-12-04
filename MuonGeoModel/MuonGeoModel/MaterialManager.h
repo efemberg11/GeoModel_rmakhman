@@ -12,7 +12,7 @@ public:
 		static GeoMaterial *dummy=0,*ether=0;
 		if (iEntry)
 		{
-		GeoElement * aluminium=new GeoElement("Aluminum"  , "Al"   ,13,26.9815); 
+		GeoElement * aluminium=new GeoElement("Aluminum"  , "Al"   ,13,26.9815*GeoModelKernelUnits::g/GeoModelKernelUnits::mole); 
 		dummy = new GeoMaterial("Dummy",1.);
 		ether = new GeoMaterial("Ether",1.);
 		dummy->add(aluminium,1.0);

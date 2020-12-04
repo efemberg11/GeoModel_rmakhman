@@ -57,13 +57,6 @@ brew install geomodel
     brew install atlas/geomodel/geomodel
     ```
 
-!!! warning
-
-    At the time of writing this note, Homebrew is not fully supporting macOS 11 Big Sur yet. On that OS you might need to install the `geomodel` package explicitely together with `geomodelvisualization` without relying on the usual ability of Homebrew to install all the needed dependency packages. Thus, you might need to run:
-
-    ```
-    brew install geomodel geomodelvisualization
-    ```
 
 !!! tip
     

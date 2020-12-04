@@ -3,6 +3,10 @@
 This package contains a modernised version of Nigel Hessey's GeoModelXml to be 
 used with `gmex` (GeoModelExplorer) and the corresponding plugin (GMXPlugin)
 
+To install gmex and the geomodel core libraries follow the instructions here:
+http://geomodel.web.cern.ch/geomodel/home/start/install/
+
+
 ## Quick Instructions
 
 ### How to clone it

@@ -28,6 +28,7 @@ nav:
     - Reference:  'reference/reference.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'
+        - 'Install single packages': 'dev/install-single-packages.md'
         - 'Troubleshooting': 'dev/troubleshooting.md'
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
         - 'Contributing to the Documentation': 'dev/docs-contrib.md'

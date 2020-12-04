@@ -5,23 +5,43 @@
 
 ### macOS / Homebrew
 
-#### General error
+#### Cleaning your environment
 
 **PACKAGES**
 
-Sometimes, cleaning the system from old packages helps in resolving "brew"-related issues.
+Sometimes, cleaning the system from old packages helps to solve `brew`-related issues.
 
-Also, please clean your system from old packages before installing new packages, or new versions of the packages.
+Also, please clean your system from old packages before installing new packages, or new versions of the packages. This will fix installation issues, in case `brew` does not succeed to correctly upgrade the installed packages.
 
-You can see the list of all `brew` packages installed on your system with: `brew list`.
+You can see the list of all `brew` packages installed on your system with: 
+
+```
+brew list
+```
 
 Then, you can clean the system by removing the GeoModel packages. 
-To do so, just type, for example:
+To do so, just type `brew remove` and the name of the packages that need to be removed (you might be asked to use `brew uninstall` for specific cases; in that case, you will get a clear error message from `brew` about that and you should merely follow the on-screen instructions).
+
+If you see packages like `geomodelcore` in the output of `brew list`, that means that you have old versions of the GeoModel packages installed. Please remove them and update to the latest packages; for example, by using (please remove from the commands below the packages that are not present on your system, otherwise `brew` will complain):
 
 ```bash
 brew remove geomodelexplorer geomodelio geomodelcore geomodelvisualization
 brew remove soqt-bb coin-bb simage
 ```
+
+Also, if you see packages like `geomodel`, please remove them before trying to compile GeoModel from sources.
+You can clean your system from recent versions of the packages by running:
+
+```
+brew remove geomodel geomodelvisualization
+```
+
+You can also remove the graphical libraries by running:
+
+```
+brew remove coin-geomodel soqt-geomodel simage-geomodel
+```
+
 
 **TAPS**
 

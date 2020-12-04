@@ -1,25 +1,30 @@
 # Build the GeoModel libraries
 
-Here below, you will find instructions on how to compile the GeoModel libraries from scratch. You can want to do that for different reasons:
+Here below, you will find instructions on how to compile all the GeoModel libraries and tools, and their main dependencies, from sources. You may want to do that for different reasons:
 
-- you want to build the libraries for an OS which is not officially supported or for a version of it for which no pre-compiled packages are provided (for info, see the [Start](../start/) section)
+- you want to build the libraries for an OS which is not officially supported or for a version of it for which no pre-compiled packages are provided (for info, see the [Start](../start/install.md) section)
 - you want to test the latest version of the code
-- you want to contribute to the development of the libraries
+- you want to contribute to the development of the GeoModel libraries and tools
 
-In the following, you will find basic strategies to effectively build the GeoModel libraries, based on different use cases. For more details, you can find updated and additional instructions inside the `README` file of the [GeoModelVisualization/README.md](https://gitlab.cern.ch/GeoModelDev/geomodelvisualization/-/blob/master/README.md) specific package.
+In the following, you will find basic strategies to effectively build the GeoModel software stack, based on different use cases.
+
 
 ## System Dependencies
 
 ### Compilers
 
-In the GeoModel packages, we use modern C++ constructs (C++ 14 and sometimes C++17). Thus, before trying to compile the GeoModel libraries, be sure your compiler supports C++17.
+In the GeoModel packages, we use **modern C++** constructs (C++ 14 and sometimes C++17). Thus, before trying to compile the GeoModel libraries, be sure your compiler supports **C++17**.
 
 !!! note
 
-    If you use GCC, we successfully tested the build of GeoModel packages on GCC 6.2 and beyond (GCC 7, GCC 8).
+    If you use GCC, we successfully tested the build of GeoModel packages on GCC 6.2 and beyond (GCC 7, GCC 8, GCC 9). 
+
+    If you use Clang (mainly on macOS), we successfully tested the GeoModel build on Clang/Xcode 10 and Clang/Xcode 11.
 
 
-### macOS
+### Third-party libraries - macOS
+
+On macOS, you can install all the needed third-party dependencies by using the [Homebrew](https://brew.sh) package manager:
 
 ```bash
 # install external dependencies
@@ -30,27 +35,20 @@ brew install qt5
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 ```
 
-Before building the GeoModel libraries from source, as explained here below, please check if you have old versions of them installed on your system and remove them.
-Also, you should remove all GeoModel packages previously installed through `brew`, because they could be picked up by the build system while building the sources, affecting the compilation.
+!!! warning
 
-You can check if you have GeoModel libraries which had installed with Homebrew by typing:
+    Before building the GeoModel libraries from source, please check if you have old versions of them installed on your system and remove them.
+    Also, you should remove all GeoModel packages previously installed through `brew`, because they could be picked up by the build system while building the sources, affecting the compilation.
+    
+    Please remove **all** the `geomodel`-packages before trying to build the packages from source.
 
-```
-brew list
-```
+    See the [Troubleshooting](troubleshooting.md) page for additional details and instructions.
 
-Then, you can remove the old GeoModel packages with, for example:
-
-```
-brew remove geomodelcore
-```
-
-Please remove **all** the `geomodel`-packages before trying to build the packages from source.
-
-See also the [Troubleshooting](troubleshooting.md) page for additional help.
 
 
 ### Linux/Ubuntu
+
+On Ubuntu, you can install all the needed third-party dependencies by using the built-in `apt` package manager:
 
 ```bash
 sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default libeigen3-dev libxerces-c-dev
@@ -58,75 +56,46 @@ sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip buil
 
 ### Linux/Fedora
 
+On Fedora, you can install all the needed third-party dependencies by using the built-in `dnf` package manager:
+
 ```bash
 dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial xerces-c-devel unzip freeglut-devel wget eigen3-devel
 ```
 
 ### Centos/RedHat
 
+*coming soon*
 
 
-## Quick instructions - Build everything
+## Build the visualization dependencies
 
-With these instructions you will build the whole the software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](../contacts.md).
+### 3D graphics dependencies - macOS
 
+On macOS, you can install the needed graphics dependencies with `brew`.
 
-### Build and Install locally
-
-These instructions will install the libraries and the tools in a local `install` folder. That is useful for developmemnt, because yuo can handle multiple versions installed on the same system.
-
-However, if you prefer to install the tools and the libraries in the `/usrl/local` system directory, just remove from the commands the option `-DCMAKE_INSTALL_PREFIX=../install`.
-
-#### Build the base libraries and tools (GeoModelCore, GeoModelIO, GeoModelTools)
-
-This will install the base libraries and tools, the ones conatined in the packages GeoModelCore (GeoModelKernel), GeoModelIO (I/O libraries and the interface to the SQLite engine), and GeoModelTools (XML and JSON parsers, GeoModelXML, the `gmcat` concatenation command line tool):
+If you have not installed the `atlas/geomodel` Tap already, please install it now, by running the command below; otherwise, jspi this and jump to the next point.
 
 ```
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModel.git
-mkdir build_geomodel
-cd build_geomodel
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModel
-make -j
-make install
-cd ..
+brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
 ```
 
-A note: on some platforms, the default Eigen, Xerces-C, and nlohmann_json libraries installed through the platform's package manager are quite old. If you desire, you can build GeoModel with a builtin version of those libraries by enabling the corresponding options at configuration time:
+Now, update your `atlas/geomodel` Tap to the latest version and install the graphics libraries:
+
 
 ```
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_USE_BUILTIN_EIGEN3=1 -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_JSON=1 ../GeoModel
+brew update
+brew install soqt-geomodel  
 ```
 
-If you compile on Centos7, that above could be a convenient option.
+The second command will install all the latest graphics libraries needed by the visualization tools of GeoModel:  `simage-geomodel`, `coin-geomodel`, and `soqt-geomodel`.
 
 
-#### Build the optional packages 
-
-There are several options offered to the user to selectively build the optional packages. 
-
-!!! note
-    You can see all the available options, and you can enable/disable them inetractively, by using the command for the interactive CMake configuration `ccmake`, instead of the classical `cmake`; *i.e.*: `cmake ../GeoModel`.
-
-
-#### Build the visualization tools (GeoModelVisualization)
-
-##### 3D graphics dependencies - macOS
-
-On macOS, you can install the needed graphics dependencies with `brew`:
-
-```
-brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git # this, only the first time you install the 'atlas' Homebrew repository (Tap)
-brew update # this will pick up the latest version of the 'atlas' Homebrew formulas
-brew install soqt-geomodel  # this will install the latest `simage-geomodel`, `coin-geomodel`, and `soqt-geomodel`
-```
-
-
-##### 3D graphics dependencies - Linux
+### 3D graphics dependencies - Linux
 
 On Linux, you can build the needed graphics libraries by following the instructions below.
 
 
-###### a) Simage
+#### a) Simage
 
 On all platforms *except Centos7*, you can build Simage by followoing these instructions:
 
@@ -157,7 +126,7 @@ cd ..
 ```
 
 
-###### b) Coin3D & SoQt
+#### b) Coin3D & SoQt
 
 !!! warning
 
@@ -173,11 +142,11 @@ cd ..
 
 Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):
 
+
 ```bash
 # Build Coin3D
-wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/coin-4.0.0-src.zip
-unzip coin-4.0.0-src.zip -d coin-sources
-mv coin-sources/* coin
+wget -O coin.zip https://atlas-vp1.web.cern.ch/atlas-vp1/sources/coin_c8a8003d4_1Dec2020.zip
+unzip coin.zip
 mkdir build_coin
 cd build_coin
 # NOTE: replace the path below with the patch of your CMake <= 3.18.X installation
@@ -187,7 +156,7 @@ make install
 cd ..
 
 # Build SoQt
-wget -O soqt.zip http://cern.ch/atlas-software-dist-eos/externals/SoQt/soqt_ea5cd76.zip
+wget -O soqt.zip http://cern.ch/atlas-software-dist-eos/externals/SoQt/soqt_5796270_1Dec2020.zip
 unzip soqt.zip
 mkdir build_soqt
 cd build_soqt
@@ -197,22 +166,65 @@ make install
 cd ..
 ```
 
-##### Build GeoModelVisualization (a.k.a, `gmex`)
 
-Now, you can build the GeoModel visualization tools by enabling the corresponding option in the CMake configuration of GeoModel.
+## Quick instructions - Build everything
 
-To do that, come back to the `build_geomodel` folder we created earlier, or create a new directory for this build right now, then run:
+With these instructions you will build the whole the whole software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](../contacts.md). 
+
+With these instructions, you will build: `GeoModelCore`, `GeoModelIO`, `GeoModelTools`, `GeoModelVisualization` (a.k.a., `gmex`).
+
+
+!!! note
+
+    These instructions will install the libraries and the tools in a **local** `install` folder. That is very useful for developmemnt, because yuo can handle multiple versions installed on the same system.
+
+    However, if you prefer to install the tools and the libraries in the `/usrl/local` system directory, just remove from the commands the option `-DCMAKE_INSTALL_PREFIX=../install`.
+
+
+
+This will install everything: the base libraries contained in the packages `GeoModelCore` (the kernel libraries and utilities) and `GeoModelIO` (the I/O libraries and the interface to the underlying data formats and/or databases), the tools contained in `GeoModelTools` (XML and JSON parsers, the `GeoModelXML` interface, the `gmcat` concatenation command line tool), and the viusalization tools contained in `GeoModelVisualization` (`gmex`):
+
 
 ```
-cd build_geomodel # or 'cd' to the new directory you have just created for this specific build
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel
+git clone https://gitlab.cern.ch/GeoModelDev/GeoModel.git
+mkdir build_geomodel
+cd build_geomodel
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_BUILD_TOOLS=1 -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel
 make -j
 make install
 cd ..
 ```
 
+!!! note
 
-### (Optional) Build an example GeoModelPlugin
+    On some platforms (for example, on Centos 7 and some Ubuntu releases), the default `Eigen`, `Xerces-C`, and `nlohmann-json` libraries installed through the platform's package manager are quite old. If you desire, you can build GeoModel with a built-in, tested version of those libraries by enabling the corresponding options at configuration time with these additional build options:
+
+    ```
+    -DGEOMODEL_USE_BUILTIN_EIGEN3=1 -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_JSON=1
+    ```
+
+    If you compile on Centos7, that above could be a very convenient option, which lets you skip the installation of custom versions of those libraries directly on your system. 
+
+    A full example on Centos 7 could be:
+
+    ```
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_BUILD_TOOLS=1 -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_USE_BUILTIN_EIGEN3=1 -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_JSON=1 
+ ../GeoModel
+    ```
+
+!!! note
+
+    In these instructions we are building everything, because that is the most used configuration. But the GeoModel build is highly modular, and you can install different combinations of the GeoModel subpackages. 
+
+    You can see all the available options, and you can enable/disable them inetractively, by using the command for the interactive CMake configuration `ccmake`, instead of the classical `cmake`; *i.e.*: `cmake ../GeoModel`.
+
+    *More details on that coming soon....*
+
+
+
+
+
+## (Optional) Build an example GeoModelPlugin
 
 
 
@@ -246,11 +258,11 @@ cd ..
 ```
 
 
-### Post install settings
+## Post install settings
 
 Assuming you followed the above instructions and you used `../install` as the installation path.
 
-#### macOS
+### macOS
 
 ```bash
 # After compilation, you should apply two temporary fixes:
@@ -258,7 +270,7 @@ install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # This is a tem
 export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 ```
 
-#### Linux/Ubuntu
+### Linux/Ubuntu
 
 ```bash
 # After compilation, you should apply this temporary fix:
@@ -266,7 +278,7 @@ export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 export LD_LIBRARY_PATH=${PWD}/../install/lib/ # this is a temporary fix
 ```
 
-#### Linux/Fedora
+### Linux/Fedora
 
 ```bash
 # After compilation, you should apply this temporary fix:
@@ -276,7 +288,7 @@ export LD_LIBRARY_PATH=../install/lib:../install/lib64:$LD_LIBRARY_PATH # this i
 
 
 
-### Run GeoModelExplorer (gmex)
+## Run GeoModelExplorer (gmex)
 
 Then, you can run your local copy of `gmex` with:
 

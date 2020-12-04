@@ -11,6 +11,10 @@
 
 // this :
 #include <VP1HEPVis/SbPolyhedron.h>
+#include <VP1HEPVis/SbTwistTrapAlphaSide.h>
+#include <VP1HEPVis/SbTwistTrapParallelSide.h>
+#include <VP1HEPVis/SbTwistTrapFlatSide.h>
+
 #include <cassert>
 
 #define perMillion 0.000001
@@ -1508,6 +1512,19 @@ SbPolyhedronTwistedTrap::SbPolyhedronTwistedTrap (double TwistPhi, double Dz,
  *
  ***********************************************************************/
 {
+    fPhiTwist = TwistPhi;
+    fDz = Dz;
+    fTheta = Theta;
+    fPhi = Phi;
+    fDy1 = Dy1;
+    fDx1 = Dx1;
+    fDx2 = Dx2;
+    fDy2 = Dy2;
+    fDx3 = Dx3;
+    fDx4 = Dx4;
+    fAlph = Alp;
+    
+    CreateSurfaces();
 
     AllocateMemory(12,18);
     std::cout<<"SbPolyhedronTwistedTrap visualization :::"<<std::endl;
@@ -1566,20 +1583,33 @@ SbPolyhedronTwistedTrap::SbPolyhedronTwistedTrap (double TwistPhi, double Dz,
       xy2[i][1]= xtmp * sPhiTwist + ytmp * cPhiTwist;
     }
     
-    m_pV[ 1] = HVPoint3D(xy1[0][0],xy1[0][1],-Dz);
-    m_pV[ 2] = HVPoint3D(xy1[1][0],xy1[1][1],-Dz);
-    m_pV[ 3] = HVPoint3D(xy1[2][0],xy1[2][1],-Dz);
-    m_pV[ 4] = HVPoint3D(xy1[3][0],xy1[3][1],-Dz);
+    m_pV[ 1] = HVPoint3D(xy1[0][0],xy1[0][1],-Dz); //5 BOTTOM
+    m_pV[ 2] = HVPoint3D(xy1[1][0],xy1[1][1],-Dz); //6
+    m_pV[ 3] = HVPoint3D(xy1[2][0],xy1[2][1],-Dz); //7
+    m_pV[ 4] = HVPoint3D(xy1[3][0],xy1[3][1],-Dz); //8
 
-    m_pV[ 5] = HVPoint3D(xy2[0][0],xy2[0][1], Dz);
-    m_pV[ 6] = HVPoint3D(xy2[1][0],xy2[1][1], Dz);
-    m_pV[ 7] = HVPoint3D(xy2[2][0],xy2[2][1], Dz);
-    m_pV[ 8] = HVPoint3D(xy2[3][0],xy2[3][1], Dz);
+    m_pV[ 5] = HVPoint3D(xy2[0][0],xy2[0][1], Dz); //1 TOP
+    m_pV[ 6] = HVPoint3D(xy2[1][0],xy2[1][1], Dz); //2
+    m_pV[ 7] = HVPoint3D(xy2[2][0],xy2[2][1], Dz); //3
+    m_pV[ 8] = HVPoint3D(xy2[3][0],xy2[3][1], Dz); //4
     
-     m_pV[ 9] = (m_pV[1]+m_pV[2]+m_pV[5]+m_pV[6])/4.;
-     m_pV[10] = (m_pV[2]+m_pV[3]+m_pV[6]+m_pV[7])/4.;
-     m_pV[11] = (m_pV[3]+m_pV[4]+m_pV[7]+m_pV[8])/4.;
-     m_pV[12] = (m_pV[4]+m_pV[1]+m_pV[8]+m_pV[5])/4.;
+    m_pV[ 9] = (m_pV[1]+m_pV[2]+m_pV[5]+m_pV[6])/4.; //lateral left alpha center
+    m_pV[10] = (m_pV[2]+m_pV[3]+m_pV[6]+m_pV[7])/4.; //parallel bottom center
+    m_pV[11] = (m_pV[3]+m_pV[4]+m_pV[7]+m_pV[8])/4.; //lateral right alpha center
+    m_pV[12] = (m_pV[4]+m_pV[1]+m_pV[8]+m_pV[5])/4.; //parallel front center
+    
+//    HVPoint3D a, b, c, d;
+//    a = (m_pV[1]+m_pV[2])/.2;
+//    b = (m_pV[5]+m_pV[6])/.2;
+//    c = (m_pV[1]+m_pV[5])/.2;
+//    d = (m_pV[2]+m_pV[6])/.2;
+//
+//    //lateral left alpha center 4 centers
+//    m_pV[13] = (m_pV[5]+ b + c + m_pV[ 9])/4.;
+//    m_pV[14] = (m_pV[6]+ b + d + m_pV[ 9])/4.;
+//    m_pV[15] = (m_pV[1]+ c + a + m_pV[ 9])/4.;
+//    m_pV[16] = (m_pV[2]+ d + a + m_pV[ 9])/4.;
+
 
      enum {DUMMY, BOTTOM,
            LEFT_BOTTOM,  LEFT_FRONT,   LEFT_TOP,  LEFT_BACK,
@@ -1616,6 +1646,38 @@ SbPolyhedronTwistedTrap::SbPolyhedronTwistedTrap (double TwistPhi, double Dz,
 
 SbPolyhedronTwistedTrap::~SbPolyhedronTwistedTrap ()
 {
+}
+
+void SbPolyhedronTwistedTrap::CreateSurfaces()
+{
+    
+    fSide0   = new SbTwistTrapAlphaSide("0deg"   ,fPhiTwist, fDz, fTheta,
+                      fPhi, fDy1, fDx1, fDx2, fDy2, fDx3, fDx4, fAlph, 0.*deg);
+    fSide180 = new SbTwistTrapAlphaSide("180deg", fPhiTwist, fDz, fTheta,
+                 fPhi+M_PI, fDy1, fDx2, fDx1, fDy2, fDx4, fDx3, fAlph, 180.*deg);
+
+//    // create parallel sides
+//    //
+    fSide90 = new SbTwistTrapParallelSide("90deg",  fPhiTwist, fDz, fTheta,
+                        fPhi, fDy1, fDx1, fDx2, fDy2, fDx3, fDx4, fAlph, 0.*deg);
+    fSide270 = new SbTwistTrapParallelSide("270deg", fPhiTwist, fDz, fTheta,
+                   fPhi+M_PI, fDy1, fDx2, fDx1, fDy2, fDx4, fDx3, fAlph, 180.*deg);
+
+//     // create endcaps
+//     //
+     fUpperEndcap = new SbTwistTrapFlatSide("UpperCap",fPhiTwist, fDx3, fDx4, fDy2,
+                                       fDz, fAlph, fPhi, fTheta,  1 );
+     fLowerEndcap = new SbTwistTrapFlatSide("LowerCap",fPhiTwist, fDx1, fDx2, fDy1,
+                                       fDz, fAlph, fPhi, fTheta, -1 );
+
+//     // Set neighbour surfaces
+
+     fSide0->SetNeighbours(  fSide270 , fLowerEndcap , fSide90  , fUpperEndcap );
+     fSide90->SetNeighbours( fSide0   , fLowerEndcap , fSide180 , fUpperEndcap );
+     fSide180->SetNeighbours(fSide90  , fLowerEndcap , fSide270 , fUpperEndcap );
+     fSide270->SetNeighbours(fSide180 , fLowerEndcap , fSide0   , fUpperEndcap );
+     fUpperEndcap->SetNeighbours( fSide180, fSide270 , fSide0 , fSide90  );
+     fLowerEndcap->SetNeighbours( fSide180, fSide270 , fSide0 , fSide90  );
 }
 
 SbPolyhedronPara::SbPolyhedronPara(double Dx, double Dy, double Dz,

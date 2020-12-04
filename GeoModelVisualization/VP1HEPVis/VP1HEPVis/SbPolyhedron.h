@@ -173,6 +173,7 @@
 
 // VP1 change
 #include <VP1HEPVis/SbRotation.h> //using doubles instead of floats.
+#include <VP1HEPVis/SbTwistSurface.h>
 //---
 
 
@@ -456,6 +457,26 @@ public:
   virtual SbPolyhedron& operator = (const SbPolyhedron& from) {
     return SbPolyhedron::operator = (from);
   }
+private:
+    void CreateSurfaces();
+    double fPhiTwist;
+    double fDz;
+    double fTheta;
+    double fPhi;
+    double fDy1;
+    double fDx1;
+    double fDx2;
+    double fDy2;
+    double fDx3;
+    double fDx4;
+    double fAlph;
+    
+    SbTwistSurface* fLowerEndcap ;  // surface of -ve z
+    SbTwistSurface* fUpperEndcap ;  // surface of +ve z
+    SbTwistSurface* fSide0 ;    // Twisted Side at phi = 0 deg
+    SbTwistSurface* fSide90 ;   // Twisted Side at phi = 90 deg
+    SbTwistSurface* fSide180 ;  // Twisted Side at phi = 180 deg
+    SbTwistSurface* fSide270 ;  // Twisted Side at phi = 270 deg
 };
 
 class SbPolyhedronPara : public SbPolyhedronTrap {

@@ -61,7 +61,7 @@ if (A->typeId() == GeoBox::GetClassTypeId() ) {
 }
 ```
 
-Both methods return a coded integer.  When the class returns the same integer as the object, a match has occurred.  Alternately one can use the methods i`getClassType()` and `type()`, which return meaningful strings like "Box", "Cons"... These are human-readable but slower to compare than unsigned integers.
+Both methods return a coded integer.  When the class returns the same integer as the object, a match has occurred.  Alternately one can use the methods `getClassType()` and `type()`, which return meaningful strings like "Box", "Cons"... These are human-readable but slower to compare than unsigned integers.
 
 
 All GeoShapes have the following interface:

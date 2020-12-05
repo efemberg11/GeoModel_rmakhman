@@ -67,7 +67,7 @@ dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial
 *coming soon*
 
 
-## Build the visualization dependencies
+## Visualization 3D graphics dependencies
 
 ### 3D graphics dependencies - macOS
 

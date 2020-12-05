@@ -169,7 +169,7 @@ cd ..
 
 ## Quick instructions - Build everything
 
-With these instructions you will build the whole the whole software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](../contacts.md). 
+With these instructions you will build the whole the whole software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](../about/contacts.md). 
 
 With these instructions, you will build: `GeoModelCore`, `GeoModelIO`, `GeoModelTools`, `GeoModelVisualization` (a.k.a., `gmex`).
 
@@ -229,15 +229,6 @@ cd ..
 
 
 ```bash
-# Build the GeoModelTools
-git clone https://gitlab.cern.ch/GeoModelDev/GeoModelTools.git
-mkdir build_tools
-cd build_tools
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelTools
-make -j
-make install
-cd ..
-
 # Build the GeoModelATLAS/GeoModelDataManagers
 git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers.git
 mkdir build_managers
@@ -260,29 +251,35 @@ cd ..
 
 ## Post install settings
 
-Assuming you followed the above instructions and you used `../install` as the installation path.
+Assuming you followed the above instructions and you used `../install` as the installation path, in order to run the applications you need to set a couple of system variables.
+
+!!! note
+
+    You don't need to set the variables below, or run any system tool, if you installed GeoModel binaries by following the instructions on the [Install](../start/install.md) page.
+
+    Also, yuo don't need them if you have omitted the local installation option (*i.e.*, the `-DCMAKE_INSTALL_PREFIX=../install` build option) while building and, therefore, you have installed everything i to system folders (like, for example, into `/usr/local/`).
+
 
 ### macOS
 
 ```bash
-# After compilation, you should apply two temporary fixes:
-install_name_tool -add_rpath ../install/lib ../install/bin/gmex  # This is a temporary fix. NOTE: in case you are developing gmex code, this should be run every time you compile and install a new version of gmex.
-export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
+install_name_tool -add_rpath ../install/lib ../install/bin/gmex  
 ```
+
+**Note:** You need to run the command above each time you install a new `gmex` executable while developing; *i.e.*, every time you run `make install`, if you are developing `GeoModelVisualization`. That is needed because a new `gmex` executable does not have the `rpath` set, and you must set it before running it, otherwise the executable cannot find the libraries it is linked against.
+
+This will be automated in a future version.
+
 
 ### Linux/Ubuntu
 
 ```bash
-# After compilation, you should apply this temporary fix:
-export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 export LD_LIBRARY_PATH=${PWD}/../install/lib/ # this is a temporary fix
 ```
 
 ### Linux/Fedora
 
 ```bash
-# After compilation, you should apply this temporary fix:
-export GXPLUGINPATH=../install/lib/gxplugins # this is a temporary fix
 export LD_LIBRARY_PATH=../install/lib:../install/lib64:$LD_LIBRARY_PATH # this is a temporary fix, we will fix the installation on Fedora
 ```
 
@@ -290,7 +287,12 @@ export LD_LIBRARY_PATH=../install/lib:../install/lib64:$LD_LIBRARY_PATH # this i
 
 ## Run GeoModelExplorer (gmex)
 
-Then, you can run your local copy of `gmex` with:
+
+Then, you can download an example geometry data file:
+
+{!start/get-geometry-example-file.md!}
+
+and run your local copy of the GeoModel visualization tool, `gmex`, with (assuming you are still in the build folder):
 
 ```bash
 ../install/bin/gmex

@@ -32,8 +32,8 @@ nav:
         - 'Troubleshooting': 'dev/troubleshooting.md'
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
         - 'Contributing to the Documentation': 'dev/docs-contrib.md'
-    - Team & History: 'team.md'
-    - Contacts: 'contacts.md'
+    - Team & History: 'about/team.md'
+    - Contacts: 'about/contacts.md'
 
 extra_css:
     - material_nested_lists_rendering.css

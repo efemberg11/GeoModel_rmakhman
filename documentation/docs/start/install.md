@@ -57,9 +57,7 @@ After installinmg the tools, you can test your installation on an example ATLAS 
 
 First, download the geometry data file:
 
-```
-wget https://cern.ch/atlas-vp1/geometryfiles/geometry_atlas.db
-```
+{!start/get-geometry-example-file.md!}
 
 Now, you can interactively visualizing the geometry data by running:
 

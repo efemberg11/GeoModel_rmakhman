@@ -51,7 +51,7 @@ echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 On Ubuntu, you can install all the needed third-party dependencies by using the built-in `apt` package manager:
 
 ```bash
-sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default libeigen3-dev libxerces-c-dev
+sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default libeigen3-dev libxerces-c-dev libsqlite3-dev
 ```
 
 ### Linux/Fedora

@@ -1,8 +1,8 @@
 //
 // SbTwistTrapFlatSide implementation
 //
-// Author: 30-Aug-2002 - O.Link (Oliver.Link@cern.ch)
-// Revision: Marilena Bandieramonte (marilena.bandieramonte@cern.ch):
+// Author:   30-Aug-2002 - O.Link (Oliver.Link@cern.ch)
+// Revision: 08-Dec-2020 - Marilena Bandieramonte (marilena.bandieramonte@cern.ch):
 // Adapted from Geant4 to GMEX
 // --------------------------------------------------------------------
 

@@ -9,11 +9,11 @@
  * @class GeoTwistedTrap
  *
  * @brief This shape represents a general twisted trapezoid
- * G4TwistedTrap
+ * GeoTwistedTrap
  *
  *Class description:
  *
- * A G4TwistedTrap is a general twisted trapezoid: The faces perpendicular to the
+ * A GeoTwistedTrap is a general twisted trapezoid: The faces perpendicular to the
  * z planes are trapezia, and their centres are not necessarily on
  * a line parallel to the z axis.
  *      pTwist  Phi twist angle
@@ -128,59 +128,4 @@ inline ShapeType GeoTwistedTrap::getClassTypeID ()
 {
   return s_classTypeID;
 }
-
-//inline const double& GeoTwistedTrap::getZHalfLength () const
-//{
-//  return m_zHalfLength;
-//}
-//
-//inline const double& GeoTwistedTrap::getTheta () const
-//{
-//  return m_theta;
-//}
-//
-//inline const double& GeoTwistedTrap::getPhi () const
-//{
-//  return m_phi;
-//}
-//
-//inline const double& GeoTwistedTrap::getDydzn () const
-//{
-//  return m_dydzn;
-//}
-//
-//inline const double& GeoTwistedTrap::getDxdyndzn () const
-//{
-//  return m_dxdyndzn;
-//}
-//inline const double& GeoTwistedTrap::getDxdypdzn () const
-//{
-//  return m_dxdypdzn;
-//}
-//
-//inline const double& GeoTwistedTrap::getAngleydzn () const
-//{
-//  return m_angleydzn;
-//}
-//
-//inline const double& GeoTwistedTrap::getDydzp () const
-//{
-//  return m_dydzp;
-//}
-//
-//inline const double& GeoTwistedTrap::getDxdyndzp () const
-//{
-//  return m_dxdyndzp;
-//}
-//
-//inline const double& GeoTwistedTrap::getDxdypdzp () const
-//{
-//  return m_dxdypdzp;
-//}
-//
-//inline const double& GeoTwistedTrap::getAngleydzp () const
-//{
-//  return m_angleydzp;
-//}
-
 #endif

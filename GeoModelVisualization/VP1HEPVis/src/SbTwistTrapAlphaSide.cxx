@@ -1,8 +1,8 @@
 //
 // G4TwistTrapAlphaSide implementation
 //
-// Author: 18/03/2005 - O.Link (Oliver.Link@cern.ch)
-// Revision: Marilena Bandieramonte (marilena.bandieramonte@cern.ch):
+// Author:   18/03/2005 - O.Link (Oliver.Link@cern.ch)
+// Revision: 08/Dec/2020 - Marilena Bandieramonte (marilena.bandieramonte@cern.ch):
 // Adapted from Geant4 to GMEX
 // --------------------------------------------------------------------
 

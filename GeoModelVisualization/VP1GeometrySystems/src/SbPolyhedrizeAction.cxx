@@ -174,7 +174,6 @@ void SbPolyhedrizeAction::handleTrap(const GeoTrap *trap)
 
 void SbPolyhedrizeAction::handleTwistedTrap(const GeoTwistedTrap *twistedtrap)
 {
-  std::cout<<"SbPolyhedrizeAction::handleTwistedTrap ::: "<<std::endl;
   m_polyhedron = new SbPolyhedronTwistedTrap (twistedtrap->getPhiTwist(),
                       twistedtrap->getZHalfLength(),
                       twistedtrap->getTheta(),

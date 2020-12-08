@@ -7,9 +7,7 @@
 
 
 twistedTrapHandler::twistedTrapHandler(std::string s,GDMLController* g):GDMLHandler(s,g)
-{
-  // std::cout<<"constructing twistedTrapHandler!"<<std::endl;
-}
+{}
 
 void twistedTrapHandler::ElementHandle()
 {

@@ -147,7 +147,6 @@ void SoVisualizeAction::handleTrap(const GeoTrap *trap)
 
 void SoVisualizeAction::handleTwistedTrap(const GeoTwistedTrap *twistedtrap)
 {
-    std::cout<<"SoVisualizeAction::handleTwistedTrap ::: "<<std::endl;
     SbPolyhedrizeAction a;
     twistedtrap->exec(&a);
     const SbPolyhedron *poly =a.getPolyhedron();

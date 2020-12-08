@@ -347,6 +347,7 @@ docs-build:
     before_script:
         - pip install markdown-include
         - pip install mkdocs-macros-plugin
+        - pip install mkdocs-mermaid2-plugin # adds support for mermaid diagrams / flowcharts
         #- pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
     script:
         #- git --version #TODO: update the docker image to have git

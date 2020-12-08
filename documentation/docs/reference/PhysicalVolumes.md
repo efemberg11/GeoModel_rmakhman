@@ -11,6 +11,21 @@ These types of daughters are referred to collectively as `GeoGraphNodes`.  Physi
 
 **Unlike other geometry modelers, in GeoModel physical volumes live within other physical volumes and not within logical volumes. This simplifies tree traversal.**
 
+```mermaid
+classDiagram
+    RCBase <|-- GeoGraphNode
+    GeoGraphNode <|-- GeoNameTag
+    GeoGraphNode <|-- GeoSerialDenominator
+    GeoGraphNode <|-- GeoTransform
+    GeoGraphNode <|-- GeoVPhysVol
+    GeoGraphNode <|-- GeoSerialTransformer
+    GeoTransform <|-- GeoAlignableTransform
+    GeoVPhysVol <|-- GeoPhysVol
+    GeoVPhysVol <|-- GeoVFullPhysVol
+    GeoVFullPhysVol <|-- GeoFullPhysVol
+end
+```
+
 In GeoModel there are two main types of physical volumes, `GeoPhysVol` and `GeoFullPhysVol`.  These in turn each have an interface class, `GeoVPhysVol` and `GeoVFullPhysVol`[^PV1]. The user needs to be concerned only with the classes `GeoPhysVol` and `GeoFullPhysVol`.  The former is generally used for nondescript pieces of detector geometry whose absolute position in space is not accessed often; while the latter is used typically for active detector components whose absolution position in space is used frequently within reconstruction, or digitization or hit creation.
 `GeoFullPhysVol` has a method for caching important information like absolute transformation of the piece with respect to the global coordinates, default transformation, and the name.
 

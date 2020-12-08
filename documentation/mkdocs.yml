@@ -41,7 +41,13 @@ extra_css:
 markdown_extensions:
     - admonition            # to use notes, warnings, tips, ...
     - footnotes             # to set footnotes
-    - pymdownx.superfences  # to use code blocks nested under lists items
+    - pymdownx.superfences  
+    - pymdownx.superfences: # to use code blocks nested under lists items
+        # make exceptions to highlighting of code:
+        custom_fences:
+          - name: mermaid
+            class: mermaid
+            format: !!python/name:mermaid2.fence_mermaid
     - toc:
         permalink: true
     - markdown_include.include:
@@ -51,11 +57,13 @@ markdown_extensions:
 
 plugins:
   - search
-  - macros 
+  - macros
+  - mermaid2 # for diagrams
   #- git-revision-date #TODO: teh mkdocs docker image apparently lacks the git exec, so this cannot be used. Update the image!
 
 extra_javascript:
   - javascripts/config.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://unpkg.com/mermaid/dist/mermaid.min.js
 

@@ -14,10 +14,11 @@ source venvp3/bin/activate
 python -m pip install --upgrade pip
 
 # install all the needed MkDocs-related packages
-pip install mkdocs-material      # this installs 'mkdocs' too
-pip install markdown-include     # this adds a LaTeX-style `include` directive to include .md files
-pip install mkdocs-minify-plugin # ???
-pip install mkdocs-macros-plugin # this adds teh possibility of defining macros to extend MkDocs
+pip install mkdocs-material        # this installs 'mkdocs' too
+pip install markdown-include       # adds a LaTeX-style `include` directive to include .md files
+pip install mkdocs-minify-plugin   # ???
+pip install mkdocs-macros-plugin   # adds the possibility of defining macros to extend MkDocs
+pip install mkdocs-mermaid2-plugin # adds support for mermaid diagrams / flowcharts
 
 
 

@@ -1,38 +1,15 @@
 //
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
 // G4TwistTrapAlphaSide implementation
 //
 // Author: 18/03/2005 - O.Link (Oliver.Link@cern.ch)
+// Revision: Marilena Bandieramonte (marilena.bandieramonte@cern.ch):
+// Adapted from Geant4 to GMEX
 // --------------------------------------------------------------------
 
 #include <cmath>
+#include <iostream>
 
 #include "VP1HEPVis/SbTwistTrapAlphaSide.h"
-//#include "G4PhysicalConstants.hh"
-//#include "G4JTPolynomialSolver.hh"
 
 //=====================================================================
 //* constructors ------------------------------------------------------
@@ -54,12 +31,6 @@ SbTwistTrapAlphaSide(const std::string& name,
                                              )
   : SbTwistSurface(name)
 {
-//  fAxis[0]    = kYAxis; // in local coordinate system
-//  fAxis[1]    = kZAxis;
-//  fAxisMin[0] = -kInfinity ;  // Y Axis boundary
-//  fAxisMax[0] = kInfinity ;   //   depends on z !!
-//  fAxisMin[1] = -pDz ;      // Z Axis boundary
-//  fAxisMax[1] = pDz ;
   
   fDx1  = pDx1 ;
   fDx2  = pDx2 ;
@@ -91,32 +62,16 @@ SbTwistTrapAlphaSide(const std::string& name,
   fPhiTwist = PhiTwist ;     // dphi
   fAngleSide = AngleSide ;  // 0,90,180,270 deg
 
-//  fdeltaX = 2 * fDz * std::tan(fTheta) * std::cos(fPhi);
-//    // dx in surface equation
-//  fdeltaY = 2 * fDz * std::tan(fTheta) * std::sin(fPhi);
-//    // dy in surface equation
-//
-//  fRot.rotateZ( AngleSide ) ;
-//
-//  fTrans.set(0, 0, 0);  // No Translation
-//  fIsValidNorm = false;
-  
-  //SetCorners() ;
-  //SetBoundaries() ;
+  fdeltaX = 2 * fDz * std::tan(fTheta) * std::cos(fPhi);
+    // dx in surface equation
+  fdeltaY = 2 * fDz * std::tan(fTheta) * std::sin(fPhi);
+    // dy in surface equation
+    
+  GeoTrf::Transform3D rotation = GeoTrf::RotateZ3D(AngleSide);
+  GeoTrf::Vector3D translation=GeoTrf::Vector3D(0,0,0);
+  fRotTrans = GeoTrf::Translate3D(translation.x(),translation.y(),translation.z())*rotation;
+    
 }
-
-
-//=====================================================================
-//* Fake default constructor ------------------------------------------
-//
-//SbTwistTrapAlphaSide::SbTwistTrapAlphaSide()
-//  : G4VTwistSurface(a), fTheta(0.), fPhi(0.), fDy1(0.), fDx1(0.), fDx2(0.),
-//    fDy2(0.), fDx3(0.), fDx4(0.), fDz(0.), fAlph(0.), fTAlph(0.), fPhiTwist(0.),
-//    fAngleSide(0.), fDx4plus2(0.), fDx4minus2(0.), fDx3plus1(0.), fDx3minus1(0.),
-//    fDy2plus1(0.), fDy2minus1(0.), fa1md1(0.), fa2md2(0.), fdeltaX(0.),
-//    fdeltaY(0.)
-//{
-//}
 
 
 //=====================================================================

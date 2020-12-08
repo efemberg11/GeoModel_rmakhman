@@ -166,6 +166,8 @@
 //   needed for the new BooleanProcessor.h from Geant4 4.9.6
 // - added a new GetVertexFast(), from Guy Barrand.
 //
+// 08.12.2020 M. Bandieramonte <marilena.bandieramonte@cern.ch>
+// - twisted trapezoid polyhedron implementation - SbPolyhedronTwistedTrap
 
 #include <Inventor/C/errors/debugerror.h>
 #include <Inventor/SbLinear.h>
@@ -459,6 +461,7 @@ public:
   }
 private:
     void CreateSurfaces();
+    void CreatePolyhedron();
     double fPhiTwist;
     double fDz;
     double fTheta;

@@ -2,8 +2,8 @@
 
 # First off, import the upstream dependencies of the project.
 include( CMakeFindDependencyMacro )
-find_dependency( GeoModelCore @GeoModelCore_VERSION@ CONFIG EXACT )
-find_dependency( GeoModelIO @GeoModelIO_VERSION@ CONFIG EXACT )
+find_dependency( GeoModelCore @GeoModel_VERSION@ CONFIG EXACT )
+find_dependency( GeoModelIO @GeoModel_VERSION@ CONFIG EXACT )
 find_dependency( nlohmann_json @nlohmann_json_VERSION@ EXACT )
 find_dependency( XercesC @XercesC_VERSION@ EXACT )
 

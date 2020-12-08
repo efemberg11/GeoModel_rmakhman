@@ -1,19 +1,20 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
-# Set up the (sub-)project.
-cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelTools" VERSION 4.1.0 LANGUAGES CXX )
+# CMake settings
+cmake_minimum_required( VERSION 3.14 )
 
-# Set up the version of GeoModelTools as a cache variable, so that other
-# sub-projects could use this value.
-set( GeoModelTools_VERSION "${GeoModelTools_VERSION}" CACHE STRING
-   "Version of the GeoModelTools (sub-)project" )
+# Dummy call to 'project()', needed to set 'PROJECT_SOURCE_DIR'
+project( "GeoModelTools" )
 
-
+#Set up the project. Check if we build it with GeoModel or individually
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am top-level project.
     # Make the root module directory visible to CMake.
     list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
+    # get global GeoModel version
+    include( GeoModel-version ) 
+    # set the project, with the version taken from the GeoModel parent project
+    project( "GeoModelTools" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
     # Define color codes for CMake messages
     include( cmake_colors_defs )
     # Warn the users about what they are doing
@@ -31,13 +32,15 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
         include( SetupXercesC )
     endif()
     # Find the base GeoModel packages, which must be installed on the target system already
-    find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
-    find_package( GeoModelIO REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
+    find_package( GeoModelCore REQUIRED ${GeoModel_VERSION} )
+    find_package( GeoModelIO REQUIRED ${GeoModel_VERSION} ) 
     # Set a flag to steer the build of the subpackages
     #set( VISUALIZATION_INDIVIDUAL_BUILD ON )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
+    # Set the project
+    project( "GeoModelTools" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 endif()
 
 

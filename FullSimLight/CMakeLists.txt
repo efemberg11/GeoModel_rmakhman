@@ -1,30 +1,21 @@
-#----------------------------------------------------------------------------
-# Setup the project
-#
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project("fullSimLight" VERSION 4.1.0 LANGUAGES CXX )
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
+# CMake settings
+cmake_minimum_required( VERSION 3.14 )
 
-## External dependencies.
-#----------------------------------------------------------------------------
-# Find Geant4 package, batch mode only executable (i.e. no need ui and vis).
-#
-find_package(Geant4 REQUIRED)
-#----------------------------------------------------------------------------
+# Dummy call to 'project()', needed to set 'PROJECT_SOURCE_DIR'
+project( "FullSimLight" )
 
-find_package(Pythia QUIET) # optional
-
-#----------------------------------------------------------------------------
-# Setup Geant4 include directories and compile definitions
-# Setup include directory for this project
-#
-#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
-include(${Geant4_USE_FILE})
+#Set up the project. Check if we build it with GeoModel or individually
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am top-level project.
     # Make the root module directory visible to CMake.
     list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
+    # get global GeoModel version
+    include( GeoModel-version ) 
+    # set the project, with the version taken from the GeoModel parent project
+    project( "FullSimLight" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
     # Define color codes for CMake messages
     include( cmake_colors_defs )
     # Warn the users about what they are doing
@@ -42,26 +33,41 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
         include( SetupXercesC )
     endif()
     # Find the base GeoModel packages, which must be installed on the target system already
-    find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
-    find_package( GeoModelIO REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
-    # FullSimLight needs GeoModelG4, so we trigger its build
-    set( GEOMODEL_BUILD_GEOMODELG4_FROM_FULLSIMLIGHT ON CACHE BOOL "GeoModelG4 build triggered by FullSimLigh when built individually" FORCE ) 
-    add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/../GeoModelG4 build_GeoModelG4 )
+    find_package( GeoModelCore REQUIRED ${GeoModel_VERSION} )
+    find_package( GeoModelIO REQUIRED ${GeoModel_VERSION} )
+    find_package( GeoModelG4 REQUIRED ${GeoModel_VERSION} )
     # Set a flag to steer the  of the subpackages
     set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
+    # Set the project
+    project( "FullSimLight" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 endif()
 
-# Compile with C++17
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
+
+## External dependencies.
+#----------------------------------------------------------------------------
+# Find Geant4 package, batch mode only executable (i.e. no need ui and vis).
+#
+find_package(Geant4 REQUIRED)
+message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
+#----------------------------------------------------------------------------
+
+find_package(Pythia QUIET) # optional
+
+#----------------------------------------------------------------------------
+# Setup Geant4 include directories and compile definitions
+# Setup include directory for this project
+#
+#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
+include(${Geant4_USE_FILE})
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+
+# Add sub-projects and targets
 add_subdirectory(MagneticField)
 
 

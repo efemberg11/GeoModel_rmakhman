@@ -1,7 +1,7 @@
 # Set up the project.
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required( VERSION 3.1...3.19 )
 
-project( "MagneticField" VERSION 4.1.0 LANGUAGES CXX )
+project( "MagneticField" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
 # Set up the build of the three libraries of the project.
 add_subdirectory(MagFieldInterfaces)

@@ -2,12 +2,14 @@
 
 # === Preamble ===
 cmake_minimum_required(VERSION 3.14)
-project( "GeoModel" VERSION 4.1.0 LANGUAGES CXX )
 
-# === Project wide setup ===
+# === Project's settings ===
 # Make the 'cmake' module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+include( GeoModel-version )
+project( "GeoModel" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
+# === Project wide setup ===
 # Define color codes for CMake messages
 include( cmake_colors_defs )
 # Use the GNU install directory names.

@@ -2,12 +2,13 @@
 
 # Set up the (sub-)project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelCore" VERSION 4.1.0 LANGUAGES CXX )
+#project( "GeoModelCore" VERSION 4.1.0 LANGUAGES CXX )
+project( "GeoModelCore" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
 # Set up the version of GeoModelCore as a cache variable, so that other
 # sub-projects could use this value.
-set( GeoModelCore_VERSION "${GeoModelCore_VERSION}" CACHE STRING
-   "Version of the GeoModelCore (sub-)project" )
+#set( GeoModelCore_VERSION "${GeoModelCore_VERSION}" CACHE STRING
+#   "Version of the GeoModelCore (sub-)project" )
 
 # Set up the build of the two libraries of the (sub-)project.
 add_subdirectory( GeoGenericFunctions )

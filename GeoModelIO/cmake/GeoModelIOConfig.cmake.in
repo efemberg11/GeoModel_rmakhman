@@ -2,7 +2,7 @@
 
 # First off, import the upstream dependencies of the project.
 include( CMakeFindDependencyMacro )
-find_dependency( GeoModelCore @GeoModelCore_VERSION@ CONFIG EXACT )
+find_dependency( GeoModelCore @GeoModel_VERSION@ CONFIG EXACT )
 #find_dependency( SQLite3 @SQLite3_VERSION@ EXACT )
 
 # Now include the exported configuration of GeoModelIO.

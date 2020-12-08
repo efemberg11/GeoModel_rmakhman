@@ -2,12 +2,12 @@
 
 # Set up the (sub-)project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelIO" VERSION 4.1.0 LANGUAGES CXX )
+project( "GeoModelIO" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
 # Set up the version of GeoModelIO as a cache variable, so that other
 # sub-projects could use this value.
-set( GeoModelIO_VERSION "${GeoModelIO_VERSION}" CACHE STRING
-   "Version of the GeoModelIO (sub-)project" )
+#set( GeoModelIO_VERSION "${GeoModelIO_VERSION}" CACHE STRING
+#   "Version of the GeoModelIO (sub-)project" )
 
 # Set sub-packages to build.
 # add_subdirectory( GeoModelErrorHandler ) // unused at the moment.

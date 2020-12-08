@@ -345,6 +345,8 @@ docs-build:
         - documentation/**/*
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
     before_script:
+        - pip install markdown
+        - pip install mkdocs-material
         - pip install markdown-include
         - pip install mkdocs-macros-plugin
         - pip install mkdocs-mermaid2-plugin # adds support for mermaid diagrams / flowcharts

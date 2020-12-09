@@ -20,7 +20,7 @@ variables:
   allow_failure: true
   timeout: 30 minutes
   before_script:
-    - brew install nlohmann-json xerces-c expat atlas/geomodel/geant4 #TODO: we don't want to install/remove Geant4 when not needed by the packages...
+    - brew install wget nlohmann-json xerces-c expat atlas/geomodel/geant4 #TODO: we don't want to install/remove Geant4 when not needed by the packages...
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
     - export PATH="/usr/local/opt/expat/bin:$PATH" # to make CMake use expat from Homebrew instead of the old one shipped with the system in /usr/lib
     - export LDFLAGS="-L/usr/local/opt/expat/lib"

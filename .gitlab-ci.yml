@@ -317,10 +317,12 @@ mac-gm-fullsimlight:
 ubu-coin:
   <<: *ubuntu-job
   <<: *coin-job
+  stage: step-A
 
 ubu-soqt:
   <<: *ubuntu-job
   <<: *soqt-job
+  stage: step-B
   needs: ["ubu-coin"]
 
 ubu-gm-base-builtin:

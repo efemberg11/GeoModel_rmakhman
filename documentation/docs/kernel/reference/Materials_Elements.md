@@ -30,9 +30,9 @@ Both materials and elements are reference-counted; the reference count of an ele
 [^ME1]: http://pdg.lbl.gov/
 
 
-{!reference/RCBase/GeoElement.md!}
+{!kernel/reference/RCBase/GeoElement.md!}
 
-{!reference/RCBase/GeoMaterial.md!}
+{!kernel/reference/RCBase/GeoMaterial.md!}
 
 
 

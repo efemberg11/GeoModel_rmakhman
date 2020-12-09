@@ -17,7 +17,7 @@ The constructor fills the box with the $x$, $y$, and $z$ *half-lengths*, and the
 
 
 <figure>
-  <img src="/reference/RCBase/GeoShape/GeoBox.png" width="400" />
+  <img src="/kernel/reference/RCBase/GeoShape/GeoBox.png" width="400" />
   <figcaption>Figure 2: A GeoBox object, representing a rectangular prism or “box”.</figcaption>
 </figure>
 

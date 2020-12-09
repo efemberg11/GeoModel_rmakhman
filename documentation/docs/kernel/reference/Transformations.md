@@ -15,15 +15,6 @@ The two classes both provide access to a default transformation and to an actual
 
 The full interface for these classes is shown below.
 
-{!reference/RCBase/GeoGraphNode/GeoTransform/GeoTransform.md!}
+{!kernel/reference/RCBase/GeoGraphNode/GeoTransform/GeoTransform.md!}
 
-{!reference/RCBase/GeoGraphNode/GeoTransform/GeoAlignableTransform.md!}
-
-
-
-
-
-
-
-
-
+{!kernel/reference/RCBase/GeoGraphNode/GeoTransform/GeoAlignableTransform.md!}

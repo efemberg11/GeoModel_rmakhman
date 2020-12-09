@@ -23,7 +23,7 @@ The constructor fills the object with these values and the accessors return them
 
 
 <figure>
-  <img src="/reference/RCBase/GeoShape/GeoTrd.png" width="400" />
+  <img src="/kernel/reference/RCBase/GeoShape/GeoTrd.png" width="400" />
   <figcaption>Figure 8: A GeoTrd object, representing a simple trapezoid.</figcaption>
 </figure>
 

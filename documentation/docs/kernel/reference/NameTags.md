@@ -8,14 +8,14 @@ Each physical volume is associated with a name, and with an absolution name.  Th
 The default name can be modified by placing a name tag into the geometry graph immediately prior to a physical volume.  A name tag is applied only to the physical volume that is inserted after the name tag into the geometry graph; it does not affect subsequent physical volumes.  The class representing a name tag is `GeoNameTag`:
 
 
-{!reference/RCBase/GeoGraphNode/GeoNameTag.md!}
+{!kernel/reference/RCBase/GeoGraphNode/GeoNameTag.md!}
 
 
 Another way of modifying the default name is through an object that automatically generates name strings for all subsequent volumes added to a specific physical volume.  
 This object is called a `GeoSerialDenominator`:
 
 
-{!reference/RCBase/GeoGraphNode/GeoSerialDenominator.md!}
+{!kernel/reference/RCBase/GeoGraphNode/GeoSerialDenominator.md!}
 
 The generation of names using `GeoNameTag` and `GeoSerialDenominator` applies also to the virtual volumes when parameterization is used.  If a name tag is used with parameterization, then all of the virtual physical volumes of the parameterization are given the name tag.  In case a serial denominator is used, each parameterized volume is given a name consisting of the base name plus an additional serial number.
 
@@ -25,5 +25,5 @@ In many cases it is useful to assign an identifier, or "serial number", to physi
 [^NT1]: https://geant4.web.cern.ch/
 
 
-{!reference/RCBase/GeoGraphNode/GeoSerialIdentifier.md!}
+{!kernel/reference/RCBase/GeoGraphNode/GeoSerialIdentifier.md!}
 

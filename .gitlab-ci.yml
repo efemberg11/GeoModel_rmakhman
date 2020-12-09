@@ -202,7 +202,8 @@ mac-config:
   script:
     - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
     - brew update
-    - brew install qt5 wget cmake expat boost nlohmann-json xerces-c eigen atlas/geomodel/geant4
+    - brew install qt5 wget expat boost nlohmann-json xerces-c eigen
+    - brew install atlas/geomodel/cmake-geomodel # TODO: remove this as soon as we update Coin/SoQt sources to latest version for CMake 3.19
     - export PATH="/usr/local/opt/expat/bin:$PATH" # to make CMake use expat from Homebrew instead of the old one shipped with the system in /usr/lib
     - export LDFLAGS="-L/usr/local/opt/expat/lib"
     - export CPPFLAGS="-I/usr/local/opt/expat/include"
@@ -224,7 +225,8 @@ mac-clean:
   stage: step-E
   needs: ["mac-gm-visualization"]
   script:
-    - brew remove qt5 wget cmake expat boost nlohmann-json xerces-c eigen atlas/geomodel/geant4
+    - brew remove qt5 wget cmake expat boost nlohmann-json xerces-c eigen 
+    - brew remove atlas/geomodel/cmake-geomodel #TODO: remove this as soon as we update Coin/SoQt
 
 # macOS cleaning job to remove our custom-build of Geant4
 mac-clean-j4:

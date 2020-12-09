@@ -59,7 +59,6 @@ variables:
 # TEMPLATES FOR BUILDING PACKAGES
 
 .coin-build-template: &coin-job
-  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
   script:
@@ -77,7 +76,6 @@ variables:
       - install
 
 .soqt-build-template: &soqt-job
-  stage: step-B
   variables:
     CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
   script:
@@ -244,6 +242,7 @@ mac-coin:
 mac-soqt:
   <<: *macos-job
   <<: *soqt-job
+  stage: step-C
   needs: ["mac-coin"]
   #stage: step-B
 

@@ -226,7 +226,7 @@ mac-gm-base:
 mac-gm-tools:
   <<: *macos-job
   <<: *geomodel-job
-  #stage: step-C
+  stage: step-C
   needs: ["mac-coin", "mac-soqt"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}

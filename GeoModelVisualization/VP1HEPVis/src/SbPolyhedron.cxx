@@ -1529,6 +1529,14 @@ SbPolyhedronTwistedTrap::SbPolyhedronTwistedTrap (double TwistPhi, double Dz,
     CreateSurfaces();
     CreatePolyhedron();
 
+/*
+ 
+   The following lines implement a less precise visualization for the twisted trap,
+   that is base on the 8 vertices + 4 additional vertices generated as middle points of each facet.
+   The shape is then rendered with 16 triangular facets (4 per each lateral face) + 2 trapezoidal
+   facets (the upper and bottom faces).
+ 
+ */
 
 //    AllocateMemory(12,18);
 //    std::cout<<"SbPolyhedronTwistedTrap visualization :::"<<std::endl;

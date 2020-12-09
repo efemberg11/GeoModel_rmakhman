@@ -202,6 +202,10 @@ mac-coin:
   <<: *macos-job
   <<: *coin-job
   stage: step-A
+  before_script:
+    - brew install boost
+  after_script:
+    - brew remove boost
 
 mac-soqt:
   <<: *macos-job

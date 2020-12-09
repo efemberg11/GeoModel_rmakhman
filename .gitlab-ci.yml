@@ -24,7 +24,7 @@ variables:
   before_script:
     - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
     - brew update
-    - brew install wget nlohmann-json xerces-c expat atlas/geomodel/geant4 #TODO: we don't want to install/remove Geant4 when not needed by the packages...
+    - brew install wget cmake nlohmann-json xerces-c expat atlas/geomodel/geant4 #TODO: we don't want to install/remove Geant4 when not needed by the packages...
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
     - export PATH="/usr/local/opt/expat/bin:$PATH" # to make CMake use expat from Homebrew instead of the old one shipped with the system in /usr/lib
     - export LDFLAGS="-L/usr/local/opt/expat/lib"
@@ -222,6 +222,21 @@ mac-gm-base:
   after_script:
     - brew remove --ignore-dependencies nlohmann-json xerces-c
 
+
+mac-gm-tools:
+  <<: *macos-job
+  <<: *geomodel-job
+  #stage: step-C
+  needs: ["mac-coin", "mac-soqt"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
+  before_script:
+    - brew install nlohmann-json xerces-c
+  after_script:
+    - brew remove --ignore-dependencies nlohmann-json xerces-c
+
+
 mac-gm-visualization:
   <<: *macos-job
   <<: *geomodel-job
@@ -231,10 +246,10 @@ mac-gm-visualization:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
   before_script:
-    - brew install nlohmann-json xerces-c
+    - brew install nlohmann-json
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
   after_script:
-    - brew remove --ignore-dependencies nlohmann-json xerces-c
+    - brew remove --ignore-dependencies nlohmann-json
 
 mac-gm-examples:
   <<: *macos-job
@@ -251,6 +266,13 @@ mac-gm-gmg4:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
+  before_script:
+    - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
+    - brew update
+    - brew xerces-c expat atlas/geomodel/geant4
+  after_script:
+    - brew remove --ignore-dependencies xerces-c expat geant4
+  
 
 mac-gm-examples-gmg4:
   <<: *macos-job
@@ -259,6 +281,12 @@ mac-gm-examples-gmg4:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
+  before_script:
+    - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
+    - brew update
+    - brew xerces-c expat atlas/geomodel/geant4
+  after_script:
+    - brew remove --ignore-dependencies xerces-c expat geant4
 
 mac-gm-fullsimlight:
   <<: *macos-job
@@ -267,6 +295,12 @@ mac-gm-fullsimlight:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+  before_script:
+    - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
+    - brew update
+    - brew xerces-c expat atlas/geomodel/geant4
+  after_script:
+    - brew remove --ignore-dependencies xerces-c expat geant4
 
 
 ### UBUNTU BUILD JOBS
@@ -286,6 +320,16 @@ ubu-gm-base-builtin:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
+
+ubu-gm-tools-builtin:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
+
 
 ubu-gm-visualization-builtin:
   <<: *ubuntu-job

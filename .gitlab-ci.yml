@@ -227,16 +227,16 @@ mac-clean:
   stage: step-E
   needs: ["mac-gm-visualization"]
   script:
-    - brew remove qt5 wget cmake expat boost nlohmann-json xerces-c eigen 
-    - brew remove atlas/geomodel/cmake-geomodel #TODO: remove this as soon as we update Coin/SoQt
+    - brew remove -f qt5 wget expat boost nlohmann-json xerces-c eigen 
+    - brew remove -f atlas/geomodel/cmake-geomodel #TODO: remove this as soon as we update Coin/SoQt
 
 # macOS cleaning job to remove our custom-build of Geant4
-mac-clean-j4:
+mac-clean-g4:
   <<: *macos-job
   stage: step-F
-  needs: ["mac-clean", "mac-gm-fullsimlight"]
+  needs: ["mac-clean", "mac-gm-fullsimlight", "mac-gm-gmg4", "mac-gm-examples-gmg4"]
   script:
-    - brew remove atlas/geomodel/geant4 
+    - brew remove -f atlas/geomodel/geant4 
 
 
 mac-coin:

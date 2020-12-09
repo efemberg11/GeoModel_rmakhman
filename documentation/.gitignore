@@ -1,1 +1,5 @@
+# MkDocs output
 _build
+
+# Python3 virtual env for MkDocs packages
+venvp3

@@ -1,12 +1,13 @@
 /*
- * GeoModelReadIn.h
+ * ReadGeoModel.h
  *
- *  Created on: May 20, 2016
- *      Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ * Created on: May 20, 2016
+ * Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
  *
  * major updates:
  * - 2019 Feb, R.M.Bianchi
- * - 2020 May, R.M.Bianchi
+ * - 2020 May, R.M.Bianchi - Added parallel read
+ * - 2020 Aug, R.M.Bianchi - Added support for reading back published nodes
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
@@ -44,6 +45,7 @@ typedef GeoModelIO::ReadGeoModel Persistifier;
 #include <tuple>
 #include <vector>
 #include <deque>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -86,6 +88,9 @@ public:
 	virtual ~ReadGeoModel();
 
 	GeoPhysVol* buildGeoModel();
+
+    template <typename T, class N> std::map<T,N> getPublishedNodes( std::string publisherName = "" /*optional variable*/);
+  
 
 private:
 
@@ -149,57 +154,56 @@ private:
   GeoShape* getBuiltShape(const unsigned int id);
 
   bool isBuiltTransform(const unsigned int id);
-  void storeBuiltTransform(const unsigned int, GeoTransform* node);
+  void storeBuiltTransform(GeoTransform* node);
   GeoTransform* getBuiltTransform(const unsigned int id);
   
   bool isBuiltAlignableTransform(const unsigned int id);
-  void storeBuiltAlignableTransform(const unsigned int, GeoAlignableTransform* node);
+  void storeBuiltAlignableTransform(GeoAlignableTransform* node);
   GeoAlignableTransform* getBuiltAlignableTransform(const unsigned int id);
 
   void storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber, GeoGraphNode* node);
   GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
 
   bool isBuiltLog(const unsigned int id);
-  void storeBuiltLog(const unsigned int id, GeoLogVol* nodePtr);
+  void storeBuiltLog(GeoLogVol* nodePtr);
   GeoLogVol* getBuiltLog(const unsigned int id);
 
   bool isBuiltMaterial(const unsigned int id);
-  void storeBuiltMaterial(const unsigned int id, GeoMaterial* nodePtr);
+  void storeBuiltMaterial(GeoMaterial* nodePtr);
   GeoMaterial* getBuiltMaterial(const unsigned int id);
 
   bool isBuiltElement(const unsigned int id);
-  void storeBuiltElement(const unsigned int id, GeoElement* nodePtr);
+  void storeBuiltElement(GeoElement* nodePtr);
   GeoElement* getBuiltElement(const unsigned int id);
 
   bool isBuiltFunction(const unsigned int id);
-  void storeBuiltFunction(const unsigned int id, GeoXF::Function* nodePtr);
-  GeoXF::Function* getBuiltFunction(const unsigned int id);
+  //void storeBuiltFunction(const unsigned int id, GeoXF::Function* nodePtr); // TODO: implement this
+  //GeoXF::Function* getBuiltFunction(const unsigned int id); // TODO: implement this
 
   bool isBuiltPhysVol(const unsigned int id);
-  void storeBuiltPhysVol(const unsigned int id, GeoPhysVol* nodePtr);
+  void storeBuiltPhysVol(GeoPhysVol* nodePtr);
   GeoPhysVol* getBuiltPhysVol(const unsigned int id);
 
   bool isBuiltFullPhysVol(const unsigned int id);
-  void storeBuiltFullPhysVol(const unsigned int id, GeoFullPhysVol* nodePtr);
+  void storeBuiltFullPhysVol(GeoFullPhysVol* nodePtr);
   GeoFullPhysVol* getBuiltFullPhysVol(const unsigned int id);
 
   bool isBuiltSerialDenominator(const unsigned int id);
-  void storeBuiltSerialDenominator(const unsigned int id, GeoSerialDenominator* nodePtr);
+  void storeBuiltSerialDenominator(GeoSerialDenominator* nodePtr);
   GeoSerialDenominator* getBuiltSerialDenominator(const unsigned int id);
 
   bool isBuiltNameTag(const unsigned int id);
-  void storeBuiltNameTag(const unsigned int id, GeoNameTag* nodePtr);
+  void storeBuiltNameTag(GeoNameTag* nodePtr);
   GeoNameTag* getBuiltNameTag(const unsigned int id);
 
   bool isBuiltSerialTransformer(const unsigned int id);
-  void storeBuiltSerialTransformer(const unsigned int id, GeoSerialTransformer* nodePtr);
+  void storeBuiltSerialTransformer(GeoSerialTransformer* nodePtr);
   GeoSerialTransformer* getBuiltSerialTransformer(const unsigned int id);
 
 
   // Utility functions
   std::string getEnvVar( std::string const & key ) const;
   std::vector<std::string> splitString(const std::string& s, char delimiter);
-	void printTrf(GeoTrf::Transform3D t);
   void printStdVectorStrings(std::vector<std::string> vec); //TODO: move it to utility class
   
   // void printTransformationValues(QStringList t); // TODO: move to a Qt utility class
@@ -239,8 +243,6 @@ private:
   std::unordered_map<unsigned int, std::string> m_tableID_toTableName; // to look for node's type name starting from a table ID
   std::unordered_map<std::string, unsigned int> m_tableName_toTableID; // to look for table ID starting from node's type name
 
-  
-//  QStringList m_root_vol_data;
   std::vector<std::string> m_root_vol_data;
 
   //! memory chaches
@@ -264,4 +266,9 @@ private:
 };
 
 } /* namespace GeoModelIO */
+
+// include the implementation of the class' template functions
+#include "ReadGeoModel.tpp"
+
+
 #endif /* GeoModelRead_ReadGeoModel_H_ */

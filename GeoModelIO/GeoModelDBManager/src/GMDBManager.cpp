@@ -1,9 +1,14 @@
+/*
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+*/
+
 
 /*
-* author: Riccardo.Maria.Bianchi@cern.ch - 2017
+* author: Riccardo Maria Bianchi @ CERN - 2017
 * major updates:
 *  - Aug 2018, R.M.Bianchi
 *  - Jun 2020, R.M.Bianchi
+*  - Aug 2020, R.M.Bianchi - Added support to publish lists of FullPhysVol and AlignableTransform nodes
 */
 
 #include <GeoModelDBManager/GMDBManager.h>
@@ -12,13 +17,15 @@
 #define FMT_HEADER_ONLY 1 // to use 'fmt' header-only
 #include "fmt/format.h"
 
+// include SQLite
+#include <sqlite3.h>
+
 // C++ includes
 #include <stdlib.h> /* exit, EXIT_FAILURE */
 #include <sstream>
 
 
-
-static std::string dbversion = "0.4.0"; // removed "parent" info from [Full]PhysVols tables (May 2020)
+static std::string dbversion = "0.5.0"; // Added new tables to store lists of published FullPhysVols and AlignableTransforms
 
 
 //// FIXME: move this to utility class/file
@@ -54,7 +61,29 @@ std::string joinVectorStrings(std::vector<std::string> vec, std::string sep="") 
 }
 
 
-GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbSqlite(nullptr), m_SQLiteErrMsg(0), m_dbIsOK(false), m_debug(false)
+
+class GMDBManager::Imp {
+public:
+    // constructor
+  Imp (GMDBManager* dbm)
+    : theManager(dbm), m_dbSqlite(nullptr), m_SQLiteErrMsg(0) {}
+
+  // The class
+  GMDBManager* theManager;
+
+  // Pointer to SQLite connection
+  sqlite3* m_dbSqlite;
+
+  /// Variable to store error messages from SQLite
+  char *m_SQLiteErrMsg;
+
+  sqlite3_stmt* selectAllFromTable(std::string tableName) const;
+  sqlite3_stmt* selectAllFromTableSortBy(std::string tableName, std::string sortColumn="") const;
+  sqlite3_stmt* selectAllFromTableChildrenPositions() const;
+
+};
+
+GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbIsOK(false), m_debug(false), m_d(new Imp(this))
 {
   // Check if the user asked for running in serial or multi-threading mode
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_DBMANAGER_DEBUG")) {
@@ -66,14 +95,14 @@ GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbSqlite(n
 
   // FIXME: TODO: we should check the existence of the file, otherwise SQLite will create a new file from scratch
   // Save the connection result
-  int exit = sqlite3_open(path.c_str(), &m_dbSqlite);
+  int exit = sqlite3_open(path.c_str(), &m_d->m_dbSqlite);
 
   // Test if there was an error
   if (exit == SQLITE_OK) {
     std::cout << "The Geometry Database '"<< path << "' has been opened successfully!" << std::endl;
     m_dbIsOK = true;
   } else {
-    std::cout << "DB Open Error: " << sqlite3_errmsg(m_dbSqlite) << std::endl;
+    std::cout << "DB Open Error: " << sqlite3_errmsg(m_d->m_dbSqlite) << std::endl;
     m_dbIsOK = false;
   }
 
@@ -91,8 +120,10 @@ GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbSqlite(n
 
 GMDBManager::~GMDBManager()
 {
-  sqlite3_close(m_dbSqlite);
-  m_dbSqlite = nullptr;
+  sqlite3_close(m_d->m_dbSqlite);
+  m_d->m_dbSqlite = nullptr;
+  delete m_d;
+  m_d = nullptr;
 }
 
 
@@ -147,6 +178,24 @@ void GMDBManager::printAllNameTags() const
 {
 	printAllRecords("NameTags");
 }
+void GMDBManager::printAllPublishedFullPhysVols(const std::string suffix) const
+{
+    if( "" == suffix ) printAllRecords("PublishedFullPhysVols");
+    else {
+        std::string tableName = "PublishedFullPhysVols";
+        tableName += "_"; // separator
+        printAllRecords( tableName+suffix );
+    }
+}
+void GMDBManager::printAllPublishedAlignableTransforms(const std::string suffix) const
+{
+    if( "" == suffix ) printAllRecords("PublishedAlignableTransforms");
+    else {
+        std::string tableName = "PublishedAlignableTransforms";
+        tableName += "_"; // separator
+        printAllRecords( tableName+suffix );
+    }
+}
 void GMDBManager::printAllChildrenPositions() const
 {
 	printAllRecords("ChildrenPositions");
@@ -198,10 +247,10 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(std::string t
   // get the query statetement ready to be executed
   sqlite3_stmt* stmt = nullptr;
   if ("ChildrenPositions" == tableName) {
-    stmt = selectAllFromTableChildrenPositions();
+    stmt = m_d->selectAllFromTableChildrenPositions();
   }
   else {
-    stmt = selectAllFromTable(tableName);
+    stmt = m_d->selectAllFromTable(tableName);
   }
   // execute the query and loop over all rows and all columuns
   if ( stmt )
@@ -221,11 +270,11 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(std::string t
         }
         records.push_back(nodeParams);
       }
-      
+
       if ( res == SQLITE_DONE || res==SQLITE_ERROR)
       {
         if (res == SQLITE_ERROR) {
-          std::string errmsg(sqlite3_errmsg(m_dbSqlite));
+          std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
           sqlite3_finalize(stmt);
           throw errmsg;
         }
@@ -258,6 +307,43 @@ bool GMDBManager::addListOfChildrenPositions(const std::vector<std::vector<std::
     // NOTE: Choose the right function for your version of SQLite!!
 	return addListOfRecordsToTable("ChildrenPositions", records); // needs SQLite >= 3.7.11
 	//return addListOfRecordsToTableOld("ChildrenPositions", records); // old SQLite versions
+}
+
+bool GMDBManager::addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records,
+std::string suffix /* optional parameter */)
+{
+    std::string tableName = "PublishedAlignableTransforms"; // default table name
+    std::string nodeType = "GeoAlignableTransform";
+    const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
+    if( "" != suffix ) {
+        tableName += "_";
+        tableName += suffix;
+        // debug msg
+        //std::cout << "\nSaving the published '"<< nodeType << "' nodes to the custom table: '"
+        //          << tableName << "'." << std::endl;
+    }
+    // create custom table first then add to it
+    createTableCustomPublishedNodes( tableName, nodeType, &keyType );
+    return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+    //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
+}
+
+bool GMDBManager::addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records, std::string
+suffix /* optional parameter */)
+{
+    std::string tableName = "PublishedFullPhysVols"; // default table name
+    std::string nodeType = "GeoFullPhysVol";
+    const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
+    if( "" != suffix ) {
+        tableName += "_";
+        tableName += suffix;
+        //std::cout << "\nSaving the published '"<< nodeType << "' nodes to the custom table: '"
+        //          << tableName << "'." << std::endl;
+    }
+    // create custom table first then add to it
+    createTableCustomPublishedNodes( tableName, nodeType, &keyType );
+    return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+    //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
 }
 
 
@@ -318,10 +404,10 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     } else {
       sql += ";";
     }
-    
+
   }
   if(m_debug) std::cout << "Query string:" << sql << std::endl; // debug
-  
+
   // executing the SQL query
   if ( ! (execQuery(sql)) ) {
     return false;
@@ -533,15 +619,15 @@ void GMDBManager::addDBversion(std::string version)
   sqlite3_stmt * st = nullptr;
   int rc = -1;
   std::string sql = "INSERT INTO dbversion(version) VALUES(?)";
-  rc = sqlite3_prepare_v2( m_dbSqlite, sql.c_str(), -1, &st, NULL);
+  rc = sqlite3_prepare_v2( m_d->m_dbSqlite, sql.c_str(), -1, &st, NULL);
   if (rc != SQLITE_OK) {
-    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) );
+    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) );
     exit(EXIT_FAILURE);
   }
   rc = sqlite3_bind_text(st, 1, version.c_str(), version.length(), SQLITE_TRANSIENT);
   rc = sqlite3_step( st );
   if (rc != SQLITE_DONE) {
-    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) );
+    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) );
     exit(EXIT_FAILURE);
   }
   // finalize
@@ -551,7 +637,7 @@ void GMDBManager::addDBversion(std::string version)
 
 bool GMDBManager::checkIsDBOpen() const
 {
-  if(m_dbSqlite != nullptr) {
+  if(m_d->m_dbSqlite != nullptr) {
     return true;
   } else {
     std::cout << "ERROR! The SQLite DB is not accessible! Exiting..." << std::endl;
@@ -586,9 +672,9 @@ std::vector<std::string> GMDBManager::getItemFromTableName(std::string tableName
   // prepare the query
   sqlite3_stmt * stmt = nullptr;
   int rc = -1;
-  rc = sqlite3_prepare_v2( m_dbSqlite, sql.c_str(), -1, &stmt, NULL);
+  rc = sqlite3_prepare_v2( m_d->m_dbSqlite, sql.c_str(), -1, &stmt, NULL);
   if (rc != SQLITE_OK) {
-    printf( "[SQLite ERR] 'prepare' (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) );
+    printf( "[SQLite ERR] 'prepare' (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) );
     exit(EXIT_FAILURE);
   }
   // bind the parameters
@@ -612,7 +698,7 @@ std::vector<std::string> GMDBManager::getItemFromTableName(std::string tableName
       if ( res == SQLITE_DONE || res==SQLITE_ERROR)
       {
         if (res == SQLITE_ERROR) {
-          std::string errmsg(sqlite3_errmsg(m_dbSqlite));
+          std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
           sqlite3_finalize(stmt);
           throw errmsg;
         }
@@ -622,17 +708,17 @@ std::vector<std::string> GMDBManager::getItemFromTableName(std::string tableName
   }
   // TODO: do we need that error check here??
 //  if (rc != SQLITE_DONE) {
-//    printf( "[SQLite ERR] 'step' (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) );
+//    printf( "[SQLite ERR] 'step' (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) );
 ////    exit(EXIT_FAILURE);
 //  }
   // finalize
   sqlite3_finalize(stmt);
-    
+
   if (item.size()==0) {
     std::cout << "ERROR!!" << "Item with ID:'" << id << "' does not exist in table" << tableName << "! Exiting...";
     exit(EXIT_FAILURE);
   }
-    
+
   return item;
 }
 
@@ -671,9 +757,9 @@ int GMDBManager::loadGeoNodeTypesAndBuildCache()
     std::string nodeType = "";
     std::string tableName = "";
     // prepare the query
-    rc = sqlite3_prepare_v2( m_dbSqlite, sql.c_str(), -1, &st, NULL);
+    rc = sqlite3_prepare_v2( m_d->m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) {
-      printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) );
+      printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) );
       exit(EXIT_FAILURE);
     }
     // execute the statement until all selected records are processed
@@ -690,7 +776,7 @@ int GMDBManager::loadGeoNodeTypesAndBuildCache()
       m_cache_nodeType_tableID.insert( std::pair<std::string, unsigned int>(nodeType, id));
     }
     if (rc != SQLITE_DONE) {
-      std::string errmsg(sqlite3_errmsg(m_dbSqlite));
+      std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
       sqlite3_finalize(st);
       throw errmsg;
     }
@@ -722,15 +808,15 @@ std::unordered_map<std::string, unsigned int> GMDBManager::getAll_NodeTypesTable
 
 
 
-sqlite3_stmt* GMDBManager::selectAllFromTable(std::string tableName) const
+sqlite3_stmt* GMDBManager::Imp::selectAllFromTable(std::string tableName) const
 {
   return selectAllFromTableSortBy(tableName, "id");
 }
 
 
-sqlite3_stmt* GMDBManager::selectAllFromTableSortBy(std::string tableName, std::string sortColumn) const
+sqlite3_stmt* GMDBManager::Imp::selectAllFromTableSortBy(std::string tableName, std::string sortColumn) const
 {
-  checkIsDBOpen();
+  theManager->checkIsDBOpen();
   if ("" == sortColumn || 0 == sortColumn.size()) {
     sortColumn = "id";
   }
@@ -748,9 +834,9 @@ sqlite3_stmt* GMDBManager::selectAllFromTableSortBy(std::string tableName, std::
 }
 
 
-sqlite3_stmt* GMDBManager::selectAllFromTableChildrenPositions() const
+sqlite3_stmt* GMDBManager::Imp::selectAllFromTableChildrenPositions() const
 {
-  checkIsDBOpen();
+  theManager->checkIsDBOpen();
   sqlite3_stmt * st = nullptr;
   int rc = -1;
   //set the SQL query string
@@ -788,6 +874,7 @@ void GMDBManager::printAllDBTables()
 }
 
 
+
 void GMDBManager::getAllDBTables()
 {
   std::string tableName;
@@ -796,9 +883,9 @@ void GMDBManager::getAllDBTables()
   std::string queryStr = "SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';";
   // prepare the query with the query string
   sqlite3_stmt *stmt;
-  int rc = sqlite3_prepare_v2(m_dbSqlite, queryStr.c_str(), -1, &stmt, NULL);
+  int rc = sqlite3_prepare_v2(m_d->m_dbSqlite, queryStr.c_str(), -1, &stmt, NULL);
   if (rc != SQLITE_OK) {
-    throw std::string(sqlite3_errmsg(m_dbSqlite));
+    throw std::string(sqlite3_errmsg(m_d->m_dbSqlite));
   }
   // execute the statement until all selected records are processed
   while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -807,20 +894,94 @@ void GMDBManager::getAllDBTables()
     tables.push_back(tableName);
   }
   if (rc != SQLITE_DONE) {
-    std::string errmsg(sqlite3_errmsg(m_dbSqlite));
+    std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
     sqlite3_finalize(stmt);
     throw errmsg;
   }
   // finalize
   sqlite3_finalize(stmt);
-  
+
   m_cache_tables = tables;
 }
+
+
+std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable( std::string suffix )
+{
+    std::string tableName = "PublishedFullPhysVols"; // default table name
+    if( "" != suffix ) {
+        tableName += "_";
+        tableName += suffix;
+    }
+
+    return getTableRecords( tableName );
+}
+std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable( std::string suffix )
+{
+    std::string tableName = "PublishedAlignableTransforms"; // default table name
+    if( "" != suffix ) {
+        tableName += "_";
+        tableName += suffix;
+    }
+
+    return getTableRecords( tableName );
+}
+
+
+// create a user-defined custom table to store the published nodes
+// (usually GeoFullPhysVol and AlignableTransform nodes) and their keys.
+bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, const std::string nodeType, const std::type_info* keyType)
+{
+
+  // get the right node type and referenced table
+  if( nodeType != "GeoFullPhysVol" && nodeType != "GeoVFullPhysVol" && nodeType != "GeoAlignableTransform" ) {
+    std::cout << "ERROR!! GeoModel node type '" << nodeType
+              << "' is not currently supported in GMDBManager::createTableCustomPublishedNodes()"
+              << " Please, ask to geomodel-developers@cern.ch. Exiting..."
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  std::string referencedTable = "";
+  if( "GeoFullPhysVol" == nodeType || "GeoVFullPhysVol" == nodeType )
+      referencedTable = "FullPhysVols";
+  if( "GeoAlignableTransform" == nodeType)
+      referencedTable = "AlignableTransforms";
+
+  // set the right type to use in the DB, based on the type used for the published key
+  std::string keyTypeDB = "";
+  if( typeid(std::string) == *keyType)
+    keyTypeDB = "varchar";
+  else if( typeid(int) == *keyType || typeid(unsigned) == *keyType)
+    keyTypeDB = "integer";
+  else {
+    std::cout << "ERROR!!! The key type '" << typeid(keyType).name()
+      << "' is not currently supported in GMDBManager::createTableCustomPublishedNodes()."
+      << " Please, ask to 'geomodel-developers@cern.ch'. Exiting..."
+      << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  int rc = -1; // sqlite's return code
+  std::string queryStr;
+
+  std::vector<std::string> tab;
+
+  //tableName = "dbversion";
+  tab.insert(tab.begin(), {tableName, "id", "key", "nodeID", "keyType"});
+  storeTableColumnNames(tab);
+
+  queryStr = fmt::format("create table {0} ({1} integer primary key, {2} {3} not null, {4} integer not null REFERENCES {5}(id), {6} varchar not null)", tab[0], tab[1], tab[2], keyTypeDB, tab[3], referencedTable, tab[4]);
+  //std::cout << "Creating table with query: '" << queryStr << "'..." << std::endl; // debug msg
+  rc = execQuery(queryStr);
+  tab.clear();
+  //std::cout << "Created the custom table: '" << tableName << "'." << std::endl; // debug msg
+  return rc;
+}
+
 
 bool GMDBManager::createTables()
 {
   checkIsDBOpen();
-  
+
   int rc = -1; // sqlite return code
   std::string queryStr;
 
@@ -835,7 +996,7 @@ bool GMDBManager::createTables()
   queryStr = fmt::format("create table {0} ({1} integer primary key, {2} integer)", tab[0], tab[1], tab[2]);
   rc = execQuery(queryStr);
   tab.clear();
-  
+
   // create a table to store the relation between the types of GeoNodes and the name of the table
   tableName = "GeoNodesTypes";
   tab.insert(tab.begin(), {tableName, "id", "nodeType", "tableName"});
@@ -843,7 +1004,7 @@ bool GMDBManager::createTables()
   queryStr = fmt::format("create table {0}({1} integer primary key, {2} varchar, {3} varchar)", tab[0], tab[1], tab[2], tab[3]);
   rc = execQuery(queryStr);
   tab.clear();
-  
+
   // create a table to store the mother-daughter relationships between nodes (notably, between the [Full]PhysVols as the parents and their children)
   tableName = "ChildrenPositions";
   tab.push_back(tableName);
@@ -870,7 +1031,7 @@ bool GMDBManager::createTables()
   queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer not null, {3} integer not null REFERENCES GeoNodesTypes(id))", tab[0], tab[1], tab[2], tab[3]);
   rc = execQuery(queryStr);
   tab.clear();
-  
+
   // PhysVols table
   geoNode = "GeoPhysVol";
   tableName = "PhysVols";
@@ -883,7 +1044,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr)) ) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // FullPhysVols table
   geoNode = "GeoFullPhysVol";
   tableName = "FullPhysVols";
@@ -896,7 +1057,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // LogVols table
   geoNode = "GeoLogVol";
   tableName = "LogVols";
@@ -911,7 +1072,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Materials table
   geoNode = "GeoMaterial";
   tableName = "Materials";
@@ -926,7 +1087,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Elements table
   geoNode = "GeoElement";
   tableName = "Elements";
@@ -942,7 +1103,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Shapes table
   geoNode = "GeoShape";
   tableName = "Shapes";
@@ -956,7 +1117,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // SerialDenominators table
   geoNode = "GeoSerialDenominator";
   tableName = "SerialDenominators";
@@ -982,7 +1143,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // SerialDenominators table
   geoNode = "GeoSerialTransformer";
   tableName = "SerialTransformers";
@@ -998,7 +1159,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Transforms table
   geoNode = "GeoTransform";
   tableName = "Transforms";
@@ -1022,7 +1183,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // Transforms table
   geoNode = "GeoAlignableTransform";
   tableName = "AlignableTransforms";
@@ -1046,7 +1207,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   // NameTags table
   geoNode = "GeoNameTag";
   tableName = "NameTags";
@@ -1059,7 +1220,7 @@ bool GMDBManager::createTables()
   if ( 0==(rc = execQuery(queryStr))) {
     storeNodeType(geoNode, tableName); }
   tab.clear();
-  
+
   if(m_debug) {
     std::cout << "All these tables have been successfully created:" << std::endl; // debug
     printAllDBTables();
@@ -1077,13 +1238,13 @@ int GMDBManager::execQuery(std::string queryStr)
   if(m_debug) std::cout << "queryStr to execute: " << queryStr << std::endl; // debug
   checkIsDBOpen();
   int result = -1;
-  if( (result = sqlite3_exec(m_dbSqlite, queryStr.c_str(), NULL, 0, &m_SQLiteErrMsg)) )
+  if( (result = sqlite3_exec(m_d->m_dbSqlite, queryStr.c_str(), NULL, 0, &m_d->m_SQLiteErrMsg)) )
   {
     printf( "[ERR] : \t> CMD: %s , Error: %d\n" , queryStr.c_str() , result );
-    if ( m_SQLiteErrMsg )
+    if ( m_d->m_SQLiteErrMsg )
     {
-      printf( "[ERR] : Error msg: %s\n", m_SQLiteErrMsg );
-      sqlite3_free(m_SQLiteErrMsg);
+      printf( "[ERR] : Error msg: %s\n", m_d->m_SQLiteErrMsg );
+      sqlite3_free(m_d->m_SQLiteErrMsg);
     }
   }
   return result;
@@ -1115,9 +1276,9 @@ void GMDBManager::storeNodeType(std::string nodeType, std::string tableName)
   int rc = -1;
   // preparing the SQL query
   std::string sql = "INSERT INTO GeoNodesTypes(nodeType, tableName) VALUES(?, ?)";
-  rc = sqlite3_prepare_v2( m_dbSqlite, sql.c_str(), -1, &st, NULL);
+  rc = sqlite3_prepare_v2( m_d->m_dbSqlite, sql.c_str(), -1, &st, NULL);
   if (rc != SQLITE_OK) {
-    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) );
+    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) );
     exit(EXIT_FAILURE);
   }
   if(m_debug) std::cout << "storeNodeType - Query string:" << sql << std::endl; // debug
@@ -1127,7 +1288,7 @@ void GMDBManager::storeNodeType(std::string nodeType, std::string tableName)
   // execute the query
   rc = sqlite3_step( st );
   if (rc != SQLITE_DONE) {
-    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) );
+    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) );
     exit(EXIT_FAILURE);
   }
   // finalize
@@ -1169,7 +1330,7 @@ void GMDBManager::storeNodeType(std::string nodeType, std::string tableName)
 bool GMDBManager::storeRootVolume(const unsigned int &id, const std::string &nodeType)
 {
   checkIsDBOpen();
-  
+
   std::string tableName = "RootVolume";
 	const unsigned int typeId = getTableIdFromNodeType(nodeType);
   std::vector<std::string> cols = getTableColumnNames(tableName);
@@ -1180,9 +1341,9 @@ bool GMDBManager::storeRootVolume(const unsigned int &id, const std::string &nod
   // preparing the SQL query
   sqlite3_stmt * st = nullptr;
   int rc = -1;
-  rc = sqlite3_prepare_v2( m_dbSqlite, sql.c_str(), -1, &st, NULL);
+  rc = sqlite3_prepare_v2( m_d->m_dbSqlite, sql.c_str(), -1, &st, NULL);
   if (rc != SQLITE_OK) {
-    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) ); // TODO: add __func__ to all error messages, as I did here
+    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) ); // TODO: add __func__ to all error messages, as I did here
     exit(EXIT_FAILURE);
   }
   if(m_debug) std::cout << "Query string:" << sql << std::endl; // debug
@@ -1192,7 +1353,7 @@ bool GMDBManager::storeRootVolume(const unsigned int &id, const std::string &nod
   // execute the query
   rc = sqlite3_step( st );
   if (rc != SQLITE_DONE) {
-    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_dbSqlite) );
+    printf( "[SQLite ERR] (%s) : Error msg: %s\n", __func__, sqlite3_errmsg(m_d->m_dbSqlite) );
     exit(EXIT_FAILURE);
   }
   // finalize
@@ -1209,7 +1370,7 @@ bool GMDBManager::storeRootVolume(const unsigned int &id, const std::string &nod
 std::vector<std::string> GMDBManager::getRootPhysVol()
 {
   // get the ID of the ROOT vol from the table "RootVolume"
-  sqlite3_stmt* stmt = selectAllFromTable("RootVolume");
+  sqlite3_stmt* stmt = m_d->selectAllFromTable("RootVolume");
   // declare the data we want to fetch
   unsigned int id;
   unsigned int typeId;
@@ -1222,13 +1383,13 @@ std::vector<std::string> GMDBManager::getRootPhysVol()
     // TODO: fill a cache
   }
   if (rc != SQLITE_DONE) {
-    std::string errmsg(sqlite3_errmsg(m_dbSqlite));
+    std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
     sqlite3_finalize(stmt);
     throw errmsg;
   }
   // finalize
   sqlite3_finalize(stmt);
-  
+
   return getItemAndType(typeId, id);
 }
 

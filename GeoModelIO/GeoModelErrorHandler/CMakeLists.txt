@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Set up how CMake should handle file names given to target_sources().
 if( POLICY CMP0076 )
@@ -20,6 +20,10 @@ if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
    target_compile_definitions( GeoModelErrorHandler INTERFACE
       -DQT_NO_DEBUG_OUTPUT )
 endif()
+
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelIO::GeoModelErrorHandler ALIAS GeoModelErrorHandler )
 
 # Install the library.
 install( TARGETS GeoModelErrorHandler

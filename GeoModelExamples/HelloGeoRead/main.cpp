@@ -73,14 +73,6 @@ int main(int argc, char *argv[])
   const std::string path = "../geometry.db";
   std::cout << "Using this DB file:" << path << std::endl;
 
-  // // check if DB file exists. If not, return
-  // if (! QFileInfo(QString::fromStdString(path)).exists() ) {
-  //       // std::cout << "ERROR!! DB '" << path << "' does not exist!! Exiting..."; // FIXME: path with std::string
-  //       std::cout << "ERROR!! DB does not exist!! Exiting...\n";
-  //       // return;
-  //       throw;
-  // }
-
   // check if DB file exists. If not, return.
   // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
   std::ifstream infile(path.c_str());

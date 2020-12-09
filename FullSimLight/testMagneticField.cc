@@ -15,14 +15,21 @@
 #include "G4SystemOfUnits.hh"
 #include "G4MagneticField.hh"
 #include "Randomize.hh"
+#include "G4Version.hh"
+
+#if G4VERSION_NUMBER > 1059
 #include "g4analysis.hh"
+#else
+#include "g4analysis_defs.hh"
+#include "g4root.hh"
+#endif
+
 #include "fstream"
 #include <sstream>
 
 #include "MagFieldServices/AtlasFieldSvc.h"
 #include "StandardFieldSvc.h"
 
-//#include "g4root.hh"
 
 static bool parSolenoidOff = false;
 static bool parToroidsOff = false;
@@ -153,7 +160,11 @@ int main(int argc, char** argv) {
     }
     
     G4String root_fileName = baseName + ".root";
-    G4AnalysisManager* analysisManager = G4Analysis::ManagerInstance("root");
+#if G4VERSION_NUMBER > 1059
+    G4AnalysisManager *analysisManager = G4Analysis::ManagerInstance("root");
+#else
+    auto *analysisManager = G4AnalysisManager::Instance();
+#endif
     analysisManager->SetVerboseLevel(1);
 //    G4String txt_fileName = baseName + ".txt";
 //    std::ofstream output(txt_fileName, std::ios::out);

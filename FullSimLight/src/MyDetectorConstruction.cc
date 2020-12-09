@@ -46,7 +46,6 @@
 
 
 // **** INCLUDES for GeoModel
-#include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModel2G4/ExtParameterisedVolumeBuilder.h"
 #include "G4LogicalVolume.hh"

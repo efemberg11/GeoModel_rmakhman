@@ -1,5 +1,5 @@
 /*
- * GeoModelReadIn.cpp
+ * ReadGeoModel.cpp
  *
  *  Created on: May 20, 2016
  *      Author: riccardo.maria.bianchi@cern.ch
@@ -9,6 +9,7 @@
  *  - Mar 2020, R.M.Bianchi
  *  - Mar 2020, boudreau
  *  - May 2020, R.M.Bianchi
+ *  - Aug 2020, R.M.Bianchi - Added support to read published FullPhysVols and AlignableTransforms back in
  */
 
 
@@ -18,8 +19,8 @@
 // TFPersistification includes
 #include "TFPersistification/TransFunctionInterpreter.h"
 
-
-// GeoModelKernel
+// GeoModelKernel includes
+#include "GeoModelKernel/GeoUtilFunctions.h"
 #include "GeoModelKernel/GeoTransform.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
@@ -85,27 +86,37 @@ std::mutex muxCout;
 using namespace GeoGenfun;
 using namespace GeoXF;
 
+// Set default (false) values for the debugging variables.
+#ifndef GEOMODEL_IO_READ_DEBUG
+#define GEOMODEL_IO_READ_DEBUG false
+#endif // not GEOMODEL_IO_READ_DEBUG
+#ifndef GEOMODEL_IO_DEBUG_VERBOSE
+#define GEOMODEL_IO_DEBUG_VERBOSE false
+#endif // not GEOMODEL_IO_DEBUG_VERBOSE
+#ifndef GEOMODEL_IO_READ_TIMING
+#define GEOMODEL_IO_READ_TIMING false
+#endif // not GEOMODEL_IO_READ_TIMING
 
 namespace GeoModelIO {
 
-ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDebug(false),
-  m_debug(false), m_timing(false), m_runMultithreaded(false),
+ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDebug(GEOMODEL_IO_DEBUG_VERBOSE),
+  m_debug(GEOMODEL_IO_READ_DEBUG), m_timing(GEOMODEL_IO_READ_TIMING), m_runMultithreaded(false),
   m_runMultithreaded_nThreads(0), m_progress(nullptr)
 {
   // Check if the user asked for debug messages
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_READ_DEBUG")) {
     m_debug = true;
-    std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will see a verbose output." << std::endl;
+    std::cout << "You defined the GEOMODEL_ENV_IO_DEBUG variable, so you will see a verbose output." << std::endl;
   }
   // Check if the user asked for verbose debug messages
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_DEBUG_VERBOSE")) {
     m_deepDebug = true;
-    std::cout << "You defined the GEOMODEL_IO_READ_DEBUG_VERBOSE variable, so you will see a verbose output." << std::endl;
+    std::cout << "You defined the GEOMODEL_ENV_IO_READ_DEBUG_VERBOSE variable, so you will see a verbose output." << std::endl;
   }
   // Check if the user asked for timing output
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_READ_TIMING")) {
     m_timing = true;
-    std::cout << "You defined the GEOMODEL_IO_READ_TIMING variable, so you will see a timing measurement in the output." << std::endl;
+    std::cout << "You defined the GEOMODEL_ENV_IO_READ_TIMING variable, so you will see a timing measurement in the output." << std::endl;
   }
 
 	if ( progress != nullptr) {
@@ -342,10 +353,10 @@ void ReadGeoModel::buildAllSerialDenominators()
   size_t nSize = m_serialDenominators.size();
   m_memMapSerialDenominators.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-    const unsigned int nodeID = std::stoi(m_serialDenominators[ii][0]);
+    //const unsigned int nodeID = std::stoi(m_serialDenominators[ii][0]); // RMB: not used at teh moment, commented to avoid warnings
     const std::string baseName = m_serialDenominators[ii][1];
     GeoSerialDenominator* nodePtr = new GeoSerialDenominator(baseName);
-    storeBuiltSerialDenominator(nodeID, nodePtr);
+    storeBuiltSerialDenominator(nodePtr);
   }
   if (nSize>0) std::cout << "All " << nSize << " SerialDenominators have been built!\n";
 }
@@ -357,10 +368,10 @@ void ReadGeoModel::buildAllNameTags()
   size_t nSize = m_nameTags.size();
   m_memMapNameTags.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-    const unsigned int nodeID = std::stoi(m_nameTags[ii][0]);
+    //const unsigned int nodeID = std::stoi(m_nameTags[ii][0]); // RMB: not used at teh moment, commented to avoid warnings
     const std::string baseName = m_nameTags[ii][1];
     GeoNameTag* nodePtr = new GeoNameTag(baseName);
-    storeBuiltNameTag(nodeID, nodePtr);
+    storeBuiltNameTag(nodePtr);
   }
   if (nSize>0) std::cout << "All " << nSize << " NameTags have been built!\n";
 }
@@ -802,12 +813,12 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(const unsigned int id, const unsigned i
 	// BUILD THE PHYSVOL OR THE FULLPHYSVOL
 	if (nodeType == "GeoPhysVol") {
 		GeoPhysVol* pVol = new GeoPhysVol(logVol);
-    storeBuiltPhysVol(id, pVol);
+    storeBuiltPhysVol(pVol);
     vol = pVol;
   }
 	else if (nodeType == "GeoFullPhysVol") {
 		GeoFullPhysVol* fpVol = new GeoFullPhysVol(logVol);
-    storeBuiltFullPhysVol(id, fpVol);
+    storeBuiltFullPhysVol(fpVol);
     vol = fpVol;
   }
   else
@@ -891,7 +902,7 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id)
 		}
 		mat->lock();
 	}
-  storeBuiltMaterial(id, mat);
+  storeBuiltMaterial(mat);
 	return mat;
 }
 
@@ -931,7 +942,7 @@ GeoElement* ReadGeoModel::buildElement(const unsigned int id)
   }
 
 	GeoElement* elem = new GeoElement(elName, elSymbol, elZ, elA);
-  storeBuiltElement(id, elem);
+  storeBuiltElement(elem);
   return elem;
 }
 
@@ -1325,7 +1336,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 
 			// and now loop over the rest of the list, to get the parameters of all Z planes
-			for (int it=2; it < NVertices; it++)
+			for (unsigned it=2; it < NVertices; it++)
 			{
 				par = shapePars[it];
 				vars = splitString(par, '=');
@@ -1565,19 +1576,22 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 				it++; // advance to the next parameter
 
-				unsigned int nVertexes = 0;
+                /*
+				unsigned int nVertexes = 0; // TODO: check how this is used
 				par = shapePars[it];
 				vars = splitString(par, '=');
 				varName = vars[0];
 				varValue = vars[1];
-				if (varName == "nV") nVertexes = std::stoi(varValue);
+				if (varName == "nV") {
+                    nVertexes = std::stoi(varValue);
+                }
 				else {
           muxCout.lock();
 					std::cout << "ERROR! - GeoTessellatedSolid - nVertices not defined!" << std::endl;
           muxCout.unlock();
 					error=true;
 				}
-
+                */
 
 				// if we get a QUAD ==> GeoQuadrangularFacet
 				if (facetType=="QUAD") {
@@ -2448,33 +2462,10 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
   }
 
 	GeoLogVol* logPtr = new GeoLogVol(logVolName, shape, mat);
-  storeBuiltLog(id, logPtr);
+  storeBuiltLog(logPtr);
 	return logPtr;
 }
 
-
-// TODO: this should be moved to an Utilities class!
-void ReadGeoModel::printTrf(GeoTrf::Transform3D t) {
-  muxCout.lock();
-	std::cout << "transformation: " << std::endl;
-	std::cout << "[[" << t(0, 0) << " , ";
-	std::cout <<         t(0, 1) << " , ";
-	std::cout <<         t(0, 2) << " , ";
-	std::cout <<         t(0, 3) << " ]";
-	std::cout << "["  << t(1, 0) << " , ";
-	std::cout <<         t(1, 1) << " , ";
-	std::cout <<         t(1, 2) << " , ";
-	std::cout <<         t(1, 3) << " ]";
-	std::cout << "["  << t(2, 0) << " , ";
-	std::cout <<         t(2, 1) << " , ";
-	std::cout <<         t(2, 2) << " , ";
-	std::cout <<         t(2, 3) << " ]";
-	std::cout << "["  << t(3, 0) << " , ";
-	std::cout <<         t(3, 1) << " , ";
-	std::cout <<         t(3, 2) << " , ";
-	std::cout <<         t(3, 3) << " ]]" << std::endl;
-  muxCout.unlock();
-}
 
 //// TODO: should go in a QtUtils header-only class, to be used in other packages
 //QList<double> ReadGeoModel::convertQstringListToDouble(QStringList listin) {
@@ -2543,9 +2534,9 @@ GeoAlignableTransform* ReadGeoModel::buildAlignableTransform(const unsigned int 
 	txf(1,3)=dy;
 	txf(2,3)=dz;
 
-	// printTrf(txf); // DEBUG
+	// GeoUtilFunctions::printTrf(txf); // DEBUG
   GeoAlignableTransform* tr = new GeoAlignableTransform(txf);
-  storeBuiltAlignableTransform(id, tr);
+  storeBuiltAlignableTransform(tr);
   return tr;
 }
 
@@ -2595,9 +2586,9 @@ GeoTransform* ReadGeoModel::buildTransform(const unsigned int id)
 	txf(1,3) = dy;
 	txf(2,3) = dz;
 
-	// printTrf(txf); // DEBUG
+	// GeoUtilsFunctions::printTrf(txf); // DEBUG
 	GeoTransform* tr = new GeoTransform(txf);
-  storeBuiltTransform(id, tr);
+  storeBuiltTransform(tr);
   return tr;
 }
 
@@ -2626,12 +2617,12 @@ GeoSerialTransformer* ReadGeoModel::buildSerialTransformer(const unsigned int id
 	if (dynamic_cast<const GeoFullPhysVol*>(vphysVol)) {
 		const GeoFullPhysVol* vol = dynamic_cast<const GeoFullPhysVol*>(vphysVol);
 		GeoSerialTransformer* nodePtr = new GeoSerialTransformer(vol, &func, copies );
-    storeBuiltSerialTransformer(id, nodePtr);
+    storeBuiltSerialTransformer(nodePtr);
     return nodePtr;
 	}
 	const GeoPhysVol* vol = dynamic_cast<const GeoPhysVol*>(vphysVol);
   GeoSerialTransformer* nodePtr = new GeoSerialTransformer(vol, &func, copies );
-  storeBuiltSerialTransformer(id, nodePtr);
+  storeBuiltSerialTransformer(nodePtr);
   return nodePtr;
 }
 
@@ -2690,9 +2681,9 @@ bool ReadGeoModel::isBuiltLog(const unsigned int id)
 {
   return (id <= m_memMapLogVols.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
-void ReadGeoModel::storeBuiltLog(const unsigned int id, GeoLogVol* nodePtr)
+void ReadGeoModel::storeBuiltLog(GeoLogVol* nodePtr)
 {
-  m_memMapLogVols.push_back(nodePtr);
+  m_memMapLogVols.push_back(nodePtr);// vector: we exploit the fact that we built the vols ordered by their IDs
 }
 GeoLogVol* ReadGeoModel::getBuiltLog(const unsigned int id)
 {
@@ -2704,9 +2695,9 @@ bool ReadGeoModel::isBuiltPhysVol(const unsigned int id)
 {
   return (id <= m_memMapPhysVols.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
-void ReadGeoModel::storeBuiltPhysVol(const unsigned int id, GeoPhysVol* nodePtr)
+void ReadGeoModel::storeBuiltPhysVol(GeoPhysVol* nodePtr)
 {
-  m_memMapPhysVols.push_back(nodePtr);
+  m_memMapPhysVols.push_back(nodePtr); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
 GeoPhysVol* ReadGeoModel::getBuiltPhysVol(const unsigned int id)
 {
@@ -2719,7 +2710,7 @@ bool ReadGeoModel::isBuiltFullPhysVol(const unsigned int id)
   return (id <= m_memMapFullPhysVols.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 
 }
-void ReadGeoModel::storeBuiltFullPhysVol(const unsigned int id, GeoFullPhysVol* nodePtr)
+void ReadGeoModel::storeBuiltFullPhysVol(GeoFullPhysVol* nodePtr)
 {
   m_memMapFullPhysVols.push_back(nodePtr); // vector, we store them in the order of IDs
 }
@@ -2734,9 +2725,9 @@ bool ReadGeoModel::isBuiltMaterial(const unsigned int id)
 {
   return (id <= m_memMapMaterials.size());
 }
-void ReadGeoModel::storeBuiltMaterial(const unsigned int id, GeoMaterial* nodePtr)
+void ReadGeoModel::storeBuiltMaterial(GeoMaterial* nodePtr)
 {
-  m_memMapMaterials.push_back(nodePtr);
+  m_memMapMaterials.push_back(nodePtr); // we store them in the order of IDs
 }
 GeoMaterial* ReadGeoModel::getBuiltMaterial(const unsigned int id)
 {
@@ -2748,9 +2739,9 @@ bool ReadGeoModel::isBuiltElement(const unsigned int id)
 {
   return (id <= m_memMapElements.size());
 }
-void ReadGeoModel::storeBuiltElement(const unsigned int id, GeoElement* nodePtr)
+void ReadGeoModel::storeBuiltElement(GeoElement* nodePtr)
 {
-  m_memMapElements.push_back(nodePtr);
+  m_memMapElements.push_back(nodePtr); // vector, we store them in the order of IDs
 }
 GeoElement* ReadGeoModel::getBuiltElement(const unsigned int id)
 {
@@ -2762,7 +2753,7 @@ bool ReadGeoModel::isBuiltTransform(const unsigned int id)
 {
   return (id <= m_memMapTransforms.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
-void ReadGeoModel::storeBuiltTransform(const unsigned int id, GeoTransform* nodePtr)
+void ReadGeoModel::storeBuiltTransform(GeoTransform* nodePtr)
 {
   m_memMapTransforms.push_back(nodePtr); // vector, we store them in the order of IDs
 
@@ -2777,7 +2768,7 @@ bool ReadGeoModel::isBuiltAlignableTransform(const unsigned int id)
 {
   return (id <= m_memMapAlignableTransforms.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
-void ReadGeoModel::storeBuiltAlignableTransform(const unsigned int id, GeoAlignableTransform* nodePtr)
+void ReadGeoModel::storeBuiltAlignableTransform(GeoAlignableTransform* nodePtr)
 {
   m_memMapAlignableTransforms.push_back(nodePtr); // vector, we store them in the order of IDs
 
@@ -2793,10 +2784,9 @@ bool ReadGeoModel::isBuiltSerialDenominator(const unsigned int id)
 {
   return (id <= m_memMapSerialDenominators.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
-void ReadGeoModel::storeBuiltSerialDenominator(const unsigned int id, GeoSerialDenominator* nodePtr)
+void ReadGeoModel::storeBuiltSerialDenominator(GeoSerialDenominator* nodePtr)
 {
   m_memMapSerialDenominators.push_back(nodePtr); // vector, we store them in the order of IDs
-
 }
 GeoSerialDenominator* ReadGeoModel::getBuiltSerialDenominator(const unsigned int id)
 {
@@ -2809,7 +2799,7 @@ bool ReadGeoModel::isBuiltNameTag(const unsigned int id)
 {
   return (id <= m_memMapNameTags.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
-void ReadGeoModel::storeBuiltNameTag(const unsigned int id, GeoNameTag* nodePtr)
+void ReadGeoModel::storeBuiltNameTag(GeoNameTag* nodePtr)
 {
   m_memMapNameTags.push_back(nodePtr); // vector, we store them in the order of IDs
 
@@ -2825,7 +2815,8 @@ bool ReadGeoModel::isBuiltSerialTransformer(const unsigned int id)
 {
   return (id <= m_memMapSerialTransformers.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
-void ReadGeoModel::storeBuiltSerialTransformer(const unsigned int id, GeoSerialTransformer* nodePtr)
+//void ReadGeoModel::storeBuiltSerialTransformer(const unsigned int id, GeoSerialTransformer* nodePtr)
+void ReadGeoModel::storeBuiltSerialTransformer(GeoSerialTransformer* nodePtr)
 {
   m_memMapSerialTransformers.push_back(nodePtr); // vector, we store them in the order of IDs
 

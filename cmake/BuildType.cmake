@@ -26,7 +26,3 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-
-# TODO: for Debug and with GCC, do we want to set the flags below by default?
-# set( CMAKE_BUILD_TYPE DEBUG )
-# set(CMAKE_CXX_FLAGS "-fPIC -O0 -g -gdwarf-2" )

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Set up the basic properties of the package(s).
 set( CPACK_PACKAGE_DESCRIPTION_SUMMARY
@@ -9,9 +9,9 @@ set( CPACK_PACKAGE_VERSION "${PROJECT_VERSION}" )
 set( CPACK_PACKAGE_CONTACT "geomodel-developers@cern.ch" )
 
 # Set up the readme and license for the package.
-set( CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE )
-set( CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/README.md )
-set( CPACK_RESOURCE_FILE_README ${CMAKE_SOURCE_DIR}/README.md )
+set( CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE )
+set( CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.md )
+set( CPACK_RESOURCE_FILE_README ${CMAKE_CURRENT_SOURCE_DIR}/README.md )
 
 # Set up the handling of the Runtime and Development components during
 # the packaging.

@@ -492,11 +492,14 @@ void GXMainWindow::request_loadConfig()
 //_________________________________________________________________________________
 void GXMainWindow::request_loadPlugin()
 {
+/*
 #ifdef __APPLE__
 	QString sharedlibsuffix = "dylib";
 #else
+*/
 	QString sharedlibsuffix = "so";
-#endif
+//#endif
+
   qDebug() << "GXMainWindow::request_loadPlugin()"<<m_currentloadpluginpath;
 
 	QString filename = QFileDialog::getOpenFileName(this, "Select plugin file to load",
@@ -516,15 +519,16 @@ QMap<QString,QString> GXMainWindow::availableFiles(const QString& extension,
 		bool currentdir ) const
 {
 
-  qDebug() << "GXMainWindow::availableFiles()";
+    qDebug() << "GXMainWindow::availableFiles()";
  	qDebug() << "extension:" << extension << "pathvar:" << pathvar << "instareasubdir:" << instareasubdir << "extradirenvvar:" << extradirenvvar << "currentdir:" << currentdir;
 
 
 	//Add directories from extradirenvvar (e.g. $GXPLUGINPATH)
+    qDebug() << "GXPLUGINPATH: " << QString(::getenv(extradirenvvar.toStdString().c_str()));
 	QStringList vp1pluginpath = extradirenvvar.isEmpty() ? QStringList() : QString(::getenv(extradirenvvar.toStdString().c_str())).split(":",QString::SkipEmptyParts);
     if(VP1Msg::debug()){
       qDebug() << "extradirenvvar:" << extradirenvvar;
-      qDebug()  << "vp1pluginpath:" << vp1pluginpath;
+      qDebug()  << "vp1pluginpath A :" << vp1pluginpath;
   	}
 
     #ifdef BUILDVP1LIGHT
@@ -542,7 +546,8 @@ QMap<QString,QString> GXMainWindow::availableFiles(const QString& extension,
 		if (QDir::currentPath()!=VP1Settings::defaultFileSelectDirectory())
 			vp1pluginpath<<VP1Settings::defaultFileSelectDirectory();
 	}
-
+    qDebug()  << "vp1pluginpath B :" << vp1pluginpath;
+    
 	//Add directories from pathvar (looking in subdir instareasubdir):
 	QString varStr = QString(::getenv(pathvar.toStdString().c_str()));
 	//VP1Msg::messageDebug("Add directories from pathvar... " + pathvar + " - " + varStr);
@@ -554,6 +559,7 @@ QMap<QString,QString> GXMainWindow::availableFiles(const QString& extension,
 			vp1pluginpath << ( instareasubdir.isEmpty() ? dir : dir+QDir::separator()+QDir::separator()+instareasubdir );
 		}
 	}
+    qDebug()  << "vp1pluginpath C :" << vp1pluginpath;
 
 	//Remove all nonexisting directories:
 	foreach (QString plugindir, vp1pluginpath) {
@@ -562,12 +568,15 @@ QMap<QString,QString> GXMainWindow::availableFiles(const QString& extension,
 			vp1pluginpath.removeAll(plugindir);
 		}
 	}
+    qDebug()  << "vp1pluginpath D :" << vp1pluginpath;
 
 	//Find all files with required extension in the directories (in case of duplicates - the ones appearing first are used):
 	QMap<QString,QString> plugins2fullpath;
 	foreach (QString plugindir, vp1pluginpath) {
+        qDebug() << "plugindir: " << plugindir;
 		QStringList plugins = QDir(plugindir).entryList((QStringList()<<("*"+extension)),QDir::CaseSensitive | QDir::Files | QDir::Readable,QDir::Name);
 		foreach (QString plugin, plugins) {
+            qDebug() << "plugin: " << plugin;
 			plugin = QFileInfo(plugin).fileName();
 			if (!plugins2fullpath.contains(plugin)) {
 				QString fullpath = plugindir+QDir::separator()+plugin;
@@ -583,12 +592,11 @@ QMap<QString,QString> GXMainWindow::availablePluginFiles() const
 {
 VP1Msg::messageDebug("GXMainWindow::availablePluginFiles()");
 
-#ifdef __APPLE__
-	QString sharedlibsuffix = "dylib";
-#else
+//#ifdef __APPLE__
+//	QString sharedlibsuffix = "dylib";
+//#else
 	QString sharedlibsuffix = "so";
-#endif
-
+//#endif
 	return availableFiles( "."+sharedlibsuffix, "LD_LIBRARY_PATH", "gxplugins", "GXPLUGINPATH" );
 
 }
@@ -1273,11 +1281,12 @@ void GXMainWindow::quickSetupTriggered()
     tabname = "Geometry";
   } 
 
+/*
 #ifdef __APPLE__
   if (plugfile.endsWith(".so"))
     plugfile = plugfile.left(plugfile.count()-3)+".dylib";
 #endif
-
+*/
 
 	//Check that the plugin is available:
 	QMap<QString,QString> plugins2fullpath = availablePluginFiles();
@@ -1287,7 +1296,7 @@ void GXMainWindow::quickSetupTriggered()
 
 	if (!plugins2fullpath.contains(plugfile)) {
 		QMessageBox::critical(0, "Error - could not locate plugin file: "+plugfile,
-				"could not locate plugin file: "
+				"Could not locate the plugin file: "
 				+plugfile,QMessageBox::Ok,QMessageBox::Ok);
 		return;
 	}
@@ -1299,7 +1308,7 @@ void GXMainWindow::quickSetupTriggered()
 		QString err = m_channelmanager->loadPluginFile(plugfile_fullpath);
 		if (!err.isEmpty()||!m_channelmanager->currentPluginFiles().contains(plugfile_fullpath)) {
 			QMessageBox::critical(0, "Error - could not load plugin file: "+plugfile_fullpath,//Fixme: Error message here is hardcoded to be the same as in loadPluginFile method!!
-					"Could not load plugin file: "
+					"Could not load the plugin file: "
 					+plugfile_fullpath+"\n\nReason: "+err,QMessageBox::Ok,QMessageBox::Ok);
 			return;
 		}

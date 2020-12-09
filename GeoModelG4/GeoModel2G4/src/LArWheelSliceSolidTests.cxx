@@ -139,13 +139,13 @@ void LArWheelSliceSolid::get_point_on_accordion_surface(G4ThreeVector &p) const
         d1 *= 2.;
 
         G4ThreeVector B = p + D * d1;
-        G4double dphi = B.phi();
+        G4double Bphi = B.phi();
         int B_fan = 0;
         GetCalculator()->DistanceToTheNearestFan(B, B_fan);
-        dphi -= B.phi();
+        Bphi -= B.phi();
 
         B[0] = GetCalculator()->AmplitudeOfSurface(B, side, B_fan);
-        B.rotateZ(dphi);
+        B.rotateZ(Bphi);
         EInside Bi = m_BoundingShape->Inside(B);
         if(Bi == kSurface){
             p = B;
@@ -532,17 +532,18 @@ void LArWheelSliceSolid::clean_tests(void) {
 //    }
 }
 
-G4double LArWheelSliceSolid::get_area_at_r(G4double r) const
+G4double LArWheelSliceSolid::get_area_at_r(G4double /* r */) const
 {
+//   ADA - variable zmin flagged as unused but the whole method is trivial. commenting out all useless code
   //m_f_area->SetParameter(0, r);
 
-  double zmin = m_BoundingShape->DistanceToIn(
-                                               G4ThreeVector(0., r, m_Zmin), G4ThreeVector(0., 0., 1.)
-                                               );
-  double zmax = m_BoundingShape->DistanceToIn(
-                                               G4ThreeVector(0., r, m_Zmax), G4ThreeVector(0., 0., -1.)
-                                               );
-  zmax = m_Zmax - zmax;
+  //double zmin = m_BoundingShape->DistanceToIn(
+  //                                             G4ThreeVector(0., r, m_Zmin), G4ThreeVector(0., 0., 1.)
+  //                                             );
+  //double zmax = m_BoundingShape->DistanceToIn(
+  //                                             G4ThreeVector(0., r, m_Zmax), G4ThreeVector(0., 0., -1.)
+  //                                             );
+  //  zmax = m_Zmax - zmax;
 
     double result = 1; //m_f_area->Integral(zmin, zmax);
 
@@ -618,10 +619,12 @@ double LArWheelSliceSolid_get_dl(double *x, double *par, G4int side)
   return dl;
 }
 
-static double fcn_length(double *x, double *p)
+
+// ADA - following function flagged as unused, comment it out
+/* static double fcn_length(double *x, double *p)
 {
   return LArWheelSliceSolid_get_dl(x, p, 1) + LArWheelSliceSolid_get_dl(x, p, -1);
-}
+} */
 
 double LArWheelSliceSolid_fcn_side_area(double *x, double *p)
 {

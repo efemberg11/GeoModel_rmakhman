@@ -84,9 +84,12 @@ void VP1CollectionWidget::clear(bool deleteCollections,bool deleteGuiElements)
   m_d->clearGui(deleteGuiElements);
   m_d->widgetsFromCollections.clear();
 
-  if (deleteCollections)
-    foreach(VP1Collection*col, m_d->collections)
+  if (deleteCollections) {
+    //foreach(VP1Collection*col, m_d->collections)
+    //  delete col;
+    for(VP1Collection* col: m_d->collections)
       delete col;
+  }
   m_d->collections.clear();
 
   //Fixme: update report-on-width

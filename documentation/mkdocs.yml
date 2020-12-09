@@ -2,15 +2,17 @@ site_name: GeoModel - A Detector Description Toolkit for HEP
 site_description: GeoModel - An experiment-agnostic Detector Description Toolkit for HEP
 site_author: ATLAS Collaboration & Contributors
 site_url: https://cern.ch/geomodel/home
-repo_name: GitLab
-repo_url: https://gitlab.cern.ch/GeoModelDev/Documentation
+repo_name: GeoModel
+repo_url: https://gitlab.cern.ch/GeoModelDev/GeoModel
+
 theme:
     name: material
+
 nav:
     - Home: 'index.md'
     - Getting Started:
         - 'Intro': 'start/index.md'
-        - 'Install the Libraries': 'start/install.md'
+        - 'Install Libraries & Tools': 'start/install.md'
         - 'The Basic Concepts': 'start/basic_concepts.md'
         - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
     - How To:
@@ -19,23 +21,49 @@ nav:
         - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
         - 'Load a geometry from a file': 'how/how_load_geo.md'
         - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
+        - 'Build FullSimLight': 'how/how_build_fullsimlight.md'
     - Papers & Presentations:
         - 'Public': 'papers/public.md'
         - 'Internal': 'papers/internal.md'
     - Reference:  'reference/reference.md'
     - For Developers:
-        - 'Build the Libraries': 'dev/index.md'
+        - 'Build the Libraries and Tools': 'dev/index.md'
+        - 'Install single packages': 'dev/install-single-packages.md'
         - 'Troubleshooting': 'dev/troubleshooting.md'
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
-    - Team & History: 'team.md'
-    - Contacts: 'contacts.md'
+        - 'Contributing to the Documentation': 'dev/docs-contrib.md'
+    - Team & History: 'about/team.md'
+    - Contacts: 'about/contacts.md'
+
 extra_css:
     - material_nested_lists_rendering.css
+
 markdown_extensions:
-    - admonition
-    - footnotes
-    - pymdownx.superfences
+    - admonition            # to use notes, warnings, tips, ...
+    - footnotes             # to set footnotes
+    - pymdownx.superfences  
+    - pymdownx.superfences: # to use code blocks nested under lists items
+        # make exceptions to highlighting of code:
+        custom_fences:
+          - name: mermaid
+            class: mermaid
+            format: !!python/name:mermaid2.fence_mermaid
     - toc:
         permalink: true
     - markdown_include.include:
         base_path: docs
+    - pymdownx.arithmatex:  # to use LaTeX syntax in Markdown files
+        generic: true
+
+plugins:
+  - search
+  - macros
+  - mermaid2 # for diagrams
+  #- git-revision-date #TODO: teh mkdocs docker image apparently lacks the git exec, so this cannot be used. Update the image!
+
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://unpkg.com/mermaid/dist/mermaid.min.js
+

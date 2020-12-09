@@ -1,20 +1,18 @@
 // author: Riccardo.Maria.Bianchi@cern.ch - 2017
-// major updates: Aug 2018
+// major updates: 
+// - Aug 2018, R.M.Bianchi
+// - Nov 2020, R.M.Bianchi
 
 #ifndef GMDBManager_H
 #define GMDBManager_H
-
-//#include "GeoModelKernel/GeoNodeAction.h"
-//#include "GeoModelKernel/GeoGraphNode.h"
-
-// include SQLite 
-#include <sqlite3.h>
 
 // include C++
 #include <iostream>
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <typeindex> // std::type_index, needs C++11
+
 
 /**
  * \class GMDBManager
@@ -122,6 +120,23 @@ public:
 	void printAllChildrenPositions() const;
 
 	/**
+	 * @brief Print the db table storing all the 'published' GeoVFullPhysVol nodes.
+     * @details By default, the method prints out the table 'PublishedGeoFullPhysVols'.
+     * @param suffix If 'suffix' is provided, then the table 'PublishedGeoFullPhysVols-suffix' will be printed.
+     * @param suffix Optional parameter. If 'suffix' is provided, then the table 'PublishedGeoFullPhysVols-suffix' will be printed. Of course, developers must be first checked the related DB table has been created (e.g., through the tools offered by GeoModelKernel::GeoVStore and its implementation).
+     * @note The 'suffix' parameter is optional. If not provided, the default table will be printed.
+	 */
+	void printAllPublishedFullPhysVols(const std::string suffix = "") const;
+	
+	/**
+	 * @brief Print the db table storing all the 'published' GeoAlignableTransform nodes
+     * @details By default, the method prints out the table 'GeoAlignableTransforms'.
+     * @param suffix Optional parameter. If 'suffix' is provided, then the table 'GeoAlignableTransforms-suffix' will be printed. Of course, developers must be first checked the related DB table has been created (e.g., through the tools offered by GeoModelKernel::GeoVStore and its implementation).
+     * @note The 'suffix' parameter is optional. If not provided, the default table will be printed.
+	 */
+	void printAllPublishedAlignableTransforms(const std::string suffix = "") const;
+	
+    /**
 	 * @brief Print the db table storing all the children positions per parent
 	 */
 	void printAllNodeTypes() const;
@@ -144,10 +159,24 @@ public:
 
   bool addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records);
 
-  bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
 
-//  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
   bool addListOfChildrenPositions(const std::vector<std::vector<std::string>> &records);
+  
+  /**
+   * @brief Save the list of 'published' GeoAlignableTransform nodes to the DB.
+   * @details The method gets a list of records and stores them in the default table 'PublishedAlignableTransforms".
+   * @parameter suffix Optional parameter. If provided, the list of records will be saved in a new table named 'PublishedAlignableTransforms-suffix'.
+     * @note The 'suffix' parameter is optional. If not provided, the records will be saved in the default table.
+   */
+  bool addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records, std::string suffix = "");
+  
+  /**
+   * @brief Save the list of 'published' GeoVFullPhysVol nodes to the DB.
+   * @details The method gets a list of records and stores them in the default table 'PublishedFullPhysVols".
+   * @parameter suffix Optional parameter. If provided, the list of records will be saved in a new table named 'PublishedFullPhysVols-suffix'.
+     * @note The 'suffix' parameter is optional. If not provided, the records will be saved in the default table.
+   */
+  bool addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records, std::string suffix = "");
 
 	bool addRootVolume(const std::vector<std::string> &values);
 
@@ -167,6 +196,9 @@ public:
 
 	/// methods to dump the DB
   std::vector<std::vector<std::string>> getChildrenTable();
+  
+  std::vector<std::vector<std::string>> getPublishedFPVTable( std::string suffix = "" );
+  std::vector<std::vector<std::string>> getPublishedAXFTable( std::string suffix = "" );
 
   std::vector<std::vector<std::string>> getTableFromNodeType(std::string nodeType);
 
@@ -178,8 +210,20 @@ public:
 
 private:
 
+  /**
+   * @brief Create all the default DB tables.
+   */
 	bool createTables();
 
+  /**
+   * @brief Create a custom DB table to store a list of published nodes. 
+   * @param tableName The table's name.
+   * @param keyType The type of the 'key' that identifies the linked node. 
+   */
+  bool createTableCustomPublishedNodes(const std::string tableName, const std::string nodeType, const std::type_info* keyType);
+
+  bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
+//  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
 
   void addDBversion(std::string version);
 
@@ -194,10 +238,6 @@ private:
 
   std::string getTableNameFromNodeType(const std::string &nodeType);
 
-  sqlite3_stmt* selectAllFromTable(std::string tableName) const;
-  sqlite3_stmt* selectAllFromTableSortBy(std::string tableName, std::string sortColumn="") const;
-  sqlite3_stmt* selectAllFromTableChildrenPositions() const;
-
   void storeTableColumnNames(std::vector<std::string> input);
 
   std::vector<std::string> getTableColumnNames(const std::string &tableName);
@@ -208,20 +248,11 @@ private:
 
   bool storeRootVolume(const unsigned int &id, const std::string &nodeType);
 
-//  void showError(const QSqlError &err) const;
-
   std::string m_dbpath;
 
-//  QSqlDatabase m_db;
-  /// Pointer to SQLite connection
-  sqlite3* m_dbSqlite;
-  /// Variable to store error messages from SQLite
-  char *m_SQLiteErrMsg;
+  bool m_dbIsOK;
 
-
-	bool m_dbIsOK;
-
-	bool m_debug;
+  bool m_debug;
 
   std::unordered_map<std::string, std::vector<std::string>> m_tableNames; /// stores the column names for each table
   std::unordered_map<std::string, std::string> m_childType_tableName;
@@ -231,6 +262,12 @@ private:
   std::unordered_map<unsigned int, std::string> m_cache_tableId_nodeType; /// cache for tableID-->nodeType
   std::unordered_map<std::string, std::string> m_cache_nodeType_tableName; /// cache for nodeType-->tableName
   std::unordered_map<std::string, unsigned int> m_cache_nodeType_tableID; /// cache for nodeType-->tableID
+
+protected:
+  class Imp;
+  Imp * m_d;
+
 };
+
 
 #endif // GMDBManager_H

@@ -194,7 +194,6 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 	}
 	else
 	{
-		static GeoLogVol* empty=0;
 		std::cout << " Warning! logical volume "<< name << " not found in store! returning empty"<<std::endl;
 		return std::make_pair(nullptr,nullptr);
 	}
@@ -241,6 +240,10 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 #include "GDMLInterface/tessellatedHandler.h"
 #include "GDMLInterface/triangularHandler.h"
 #include "GDMLInterface/quadrangularHandler.h"
+#include "GDMLInterface/xtruHandler.h"
+#include "GDMLInterface/arb8Handler.h"
+#include "GDMLInterface/sectionHandler.h"
+#include "GDMLInterface/twoDimVertexHandler.h"
 
 void GDMLController::registerHandlers()
 {
@@ -292,4 +295,8 @@ void GDMLController::registerHandlers()
 	new tessellatedHandler("tessellated",this);
 	new triangularHandler("triangular",this);
 	new quadrangularHandler("quadrangular",this);
+	new xtruHandler("xtru",this);
+	new arb8Handler("arb8",this);
+	new twoDimVertexHandler("twoDimVertex",this);
+	new sectionHandler("section",this);
 }

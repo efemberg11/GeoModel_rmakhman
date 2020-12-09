@@ -8,7 +8,7 @@ This package is still under ferocious development; we are not releasing pre-buil
 
 ```bash
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git
-brew install geomodelexplorer
+brew install geomodelvisualization
 gmex # or, `gmex -d inputFile.db`
 ```
 

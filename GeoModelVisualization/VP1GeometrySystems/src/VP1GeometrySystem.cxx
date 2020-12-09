@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 /////////////////////////////////////////////////////////////////////////
@@ -12,14 +12,16 @@
 //  Origins of initial version dates back to ~1996, initial VP1        //
 //  version by TK (May 2007) and almost entirely rewritten Oct 2007.   //
 //  Major refactoring october 2008.                                    //
+//                                                                     //
 //  Updates:                                                           //
-//  - Aug 2019, Riccardo.Maria.Bianchi@cern.ch                         //
+//  - Aug 2019, Riccardo Maria Bianchi @ CERN                          //
+//  - Aug 2020, Riccardo Maria Bianchi @ CERN                          //
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
+// local includes
 #include "VP1GeometrySystems/VP1GeometrySystem.h"
 #include "VP1GeometrySystems/GeoSysController.h"
-
 #include "VP1GeometrySystems/VP1GeoTreeView.h"
 #include "VP1GeometrySystems/VolumeHandle.h"
 #include "VP1GeometrySystems/VolumeHandleSharedData.h"
@@ -28,12 +30,14 @@
 #include "VP1GeometrySystems/VisAttributes.h"
 #include "VP1GeometrySystems/DumpShape.h"
 #include "VP1GeometrySystems/PhiSectorManager.h"
-
 #include "VP1Base/VP1CameraHelper.h"
 #include "VP1Base/VP1QtInventorUtils.h"
 #include "VP1Base/VP1Serialise.h"
 #include "VP1Base/VP1Deserialise.h"
 #include "VP1Base/VP1Msg.h"
+
+
+// Coin/OpenInventor includes
 #include <Inventor/nodes/SoSeparator.h>
 #include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/nodes/SoMaterial.h>
@@ -53,28 +57,35 @@
 #include <Inventor/nodes/SoTransform.h>
 #include <Inventor/nodes/SoScale.h>
 
-
+// GeoModelCore includes
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelKernel/GeoPrintGraphAction.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoPVLink.h"
-
-
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
-#include "GeoModelDBManager/GMDBManager.h"
-#include "GeoModelRead/ReadGeoModel.h"
-#include "GeoModelWrite/WriteGeoModel.h"
+#include "GeoModelKernel/Units.h"
+#include "GeoModelKernel/GeoNameTag.h"
+#include "GeoModelKernel/GeoGeometryPluginLoader.h"
+#include "GeoModelKernel/GeoPublisher.h"
 
+// GeoModelIO includes
+#include "GeoModelDBManager/GMDBManager.h"
+#include "GeoModelWrite/WriteGeoModel.h"
+#include "GeoModelRead/ReadGeoModel.h"
+
+// WARNING: classes making use of 'Persistifier' should be included AFTER 'GeoModelIO/ReadGeoModel'
+#include "GeoModelKernel/GeoShapeUnion.h"
+#include "GeoModelKernel/GeoShapeShift.h"
+
+// Qt includes
 #include <QStack>
 #include <QString>
 #include <QSettings>
-
-
 #include <QDebug>
 #include <QRegExp>
 #include <QByteArray>
@@ -86,16 +97,13 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QPushButton>
+
+// C++ includes
 #include <map>
 #include <unistd.h>
 #include <stdexcept>
-#include "GeoModelKernel/Units.h"
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
-#include "GeoModelKernel/GeoShapeUnion.h"
-#include "GeoModelKernel/GeoShapeShift.h"
-#include "GeoModelKernel/GeoNameTag.h"
-#include "GeoModelKernel/GeoGeometryPluginLoader.h"
 
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 
 static QString m_existingGeoInput;
 
@@ -258,7 +266,7 @@ void VP1GeometrySystem::Imp::addSubSystem(const VP1GeoFlags::SubSystemFlag& f,
     theclass->message(("Error: Problems retrieving checkbox for subsystem "+f).c_str());
     return;
   }
-  int counter(0);
+  //int counter(0); // RMB: removed to stop the 'unused variable' warning
   for (auto i=subsysInfoList.begin();i!=subsysInfoList.end();i++) {
     if (systemName==(*i)->systemName) {
       //std::cout << "Very severe warning. You create duplicate systems! " << std::endl;
@@ -488,7 +496,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoPhysVol* world)
     // Setup the 'World' volume from which everything else will be suspended
     double densityOfAir=0.1;
     const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
-    const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+    const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2500*SYSTEM_OF_UNITS::cm);
     const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
     // GeoPhysVol* worldPhys = new GeoPhysVol(worldLog);
     world = new GeoPhysVol(worldLog);
@@ -580,12 +588,17 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       GeoGeometryPluginLoader loader;
       GeoVGeometryPlugin *factory=loader.load(path.toStdString());
       if (!factory) {
-	QMessageBox::warning(0, "Error!","Cannot load geometry from factory. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
+	QMessageBox::warning(0, "Error!","The factory could not be created (hint: probably the plugin is missing. Check that). Cannot load geometry from factory. Exiting.",QMessageBox::Ok,QMessageBox::Ok);
 	exit(0);
       }
 
       if (!world) world=createTheWorld(nullptr);
+    
+      // TODO: check this with simple and more complex plugins! Also, get lists of FPV and AXF and show them or highlight them in the viewer somehow...
+     
       factory->create(world);
+      //factory->create(world, true); // if we want to get lists of nodes published by plugins, if any
+
     }
 
     g++;
@@ -902,7 +915,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
       SbVec3f    t,s,axis;
       SbRotation r,so;
       float      angle;
-      mtx.getTransform(t,r,s,so);
+      mtx.getTransform(t,r,s,so); // translation, rotation, scaling, scale orientation -- in this order
       translation_x=t[0];
       translation_y=t[1];
       translation_z=t[2];
@@ -910,6 +923,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
       rotaxis_x=axis[0];
       rotaxis_y=axis[1];
       rotaxis_z=axis[2];
+      rotangle_radians=angle;
     }
     message("===> Local Translation:");
     message("        x = "+QString::number(translation_x/SYSTEM_OF_UNITS::mm)+" mm");
@@ -934,6 +948,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
       rotaxis_x=axis[0];
       rotaxis_y=axis[1];
       rotaxis_z=axis[2];
+      rotangle_radians=angle;
     }
     message("===> Global Translation:");
     message("        x = "+QString::number(translation_x/SYSTEM_OF_UNITS::mm)+" mm");
@@ -1503,7 +1518,7 @@ GeoPhysVol *VP1GeometrySystem::newWorld()  const {
   air->add(Hydrogen, 0.0008);
   air->lock();
 
-  const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+  const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2500*SYSTEM_OF_UNITS::cm);
   const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
   GeoPhysVol* world = new GeoPhysVol(worldLog);
   return world;

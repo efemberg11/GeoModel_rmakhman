@@ -13,6 +13,8 @@
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
+#include "GeoModelKernel/GeoTube.h"
+#include "GeoModelKernel/GeoTubs.h"
 
 // Geo core classes
 #include "GeoModelKernel/GeoLogVol.h"
@@ -38,26 +40,58 @@
 int main(int argc, char *argv[])
 {
 	//-----------------------------------------------------------------------------------//
-	// create the world volume container and
-	// get the 'world' volume, i.e. the root volume of the GeoModel tree
-	std::cout << "Creating the 'world' volume, i.e. the root volume of the GeoModel tree..." << std::endl;
-	double densityOfAir = 0.1;
-	const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
-	const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-	const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
-	GeoPhysVol* world = new GeoPhysVol(worldLog);
+        // Define the materials that we shall use.                                              //
+        // ----------------------------------------------------------------------------------//
+
+        // Define the units
+        #define gr   SYSTEM_OF_UNITS::gram
+        #define mole SYSTEM_OF_UNITS::mole
+        #define cm3  SYSTEM_OF_UNITS::cm3
+
+        // Define the chemical elements
+        GeoElement*  el_Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
+        GeoElement*  el_Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
+        GeoElement*  el_Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
+        GeoElement*  el_Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
+        GeoElement*  el_Iron     = new GeoElement ("Iron"     ,"Fe" , 26.0 ,  55.847  *gr/mole);
+        GeoElement*  el_Carbon   = new GeoElement ("Carbon"   ,"C"  ,  6.0 ,  12.0107 *gr/mole);
+        GeoElement*  el_Sillicon = new GeoElement ("Silicon"  ,"Si" , 14.0 ,  28.085  *gr/mole);
+
+        // Define the materials
+
+	// Air: Nitrogen + Oxygen + Argon + Hydrogen
+        double densityOfAir=0.001214 *gr/cm3;
+	GeoMaterial *mat_Air = new GeoMaterial("Air", densityOfAir);
+        mat_Air->add(el_Nitrogen  , 0.7494);
+        mat_Air->add(el_Oxygen, 0.2369);
+        mat_Air->add(el_Argon, 0.0129);
+        mat_Air->add(el_Hydrogen, 0.0008);
+        mat_Air->lock();
+
+        // Steel: Iron + Carbon
+	GeoMaterial* mat_Steel  = new GeoMaterial("Steel", 7.9 *gr/cm3);
+        mat_Steel->add(el_Iron  , 0.98);
+        mat_Steel->add(el_Carbon, 0.02);
+        mat_Steel->lock();
+        
+	// Silicon 100% (Detector)
+        GeoMaterial* mat_Silicon = new GeoMaterial("Silicon", 2.329 *gr/cm3);
+        mat_Silicon->add(el_Sillicon, 1.0);
+        mat_Silicon->lock();
 
 
-	//----------------------------------------------------------------------------------//
-	// Get the materials
-	// const GeoMaterial* matIron = theMaterialManager->getMaterial("std::Iron"); // Athena code
-	// Bogus densities.  Later: read from database.
-	double densityOfIron= 0.7;
-	const GeoMaterial *matIron = new GeoMaterial("Iron Toy",densityOfIron);
+       //-----------------------------------------------------------------------------------//
+        // create the world volume container and
+        // get the 'world' volume, i.e. the root volume of the GeoModel tree
+        std::cout << "Creating the 'world' volume, i.e. the root volume of the GeoModel tree..." << std::endl;
+        const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+        const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, mat_Air);
+        GeoPhysVol* world = new GeoPhysVol(worldLog);
+
 
 
 	//-----------------------------------------------------------------------------------//
-	// Create the shapes:                            //
+	// Create the shapes:
 
 	// A box
 	GeoBox* box = new GeoBox(50.*SYSTEM_OF_UNITS::cm, 50.*SYSTEM_OF_UNITS::cm, 50.*SYSTEM_OF_UNITS::cm);
@@ -97,65 +131,74 @@ int main(int argc, char *argv[])
 	tessPyramid->addFacet(triFacet3Pyr);
 	tessPyramid->addFacet(triFacet4Pyr);
 
+	// this is the Tubs shape used in the AFP's "cornerAddH10" volume 
+	const GeoTubs* tubs = new GeoTubs(18*SYSTEM_OF_UNITS::mm, 18*SYSTEM_OF_UNITS::mm, 420.1*SYSTEM_OF_UNITS::mm, 0*SYSTEM_OF_UNITS::deg, 90*SYSTEM_OF_UNITS::deg);
 
 
 	//------------------------------------//
 	// Define the space transforms to place the boxes:
-	GeoTrf::Translate3D Tr1(-75*SYSTEM_OF_UNITS::cm, 0, 0); // cube
+	GeoTrf::Translate3D Tr1(-75*SYSTEM_OF_UNITS::cm, 0, 0); // box
 	GeoTrf::Translate3D Tr2( 75*SYSTEM_OF_UNITS::cm, 0, 0); // torus
-	GeoTrf::Translate3D Tr3( -75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // tessellated solid quad
-	GeoTrf::Translate3D Tr4( 75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // tessellated solid tri
-//	GeoTrf::Translate3D Tr5( -75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // tessellated solid triquad
-//	GeoTrf::Translate3D Tr6( 75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // tessellated solid pyramid
+	GeoTrf::Translate3D Tr3( -75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // cons
+	GeoTrf::Translate3D Tr4( 75*SYSTEM_OF_UNITS::cm, -150*SYSTEM_OF_UNITS::cm, 0); // tessellated solid
+	GeoTrf::Translate3D Tr5( -75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); // 
+//	GeoTrf::Translate3D Tr6( 75*SYSTEM_OF_UNITS::cm, -225*SYSTEM_OF_UNITS::cm, 0); //
 
-	GeoTransform* tr1 = new GeoTransform(Tr1);
-	GeoTransform* tr2 = new GeoTransform(Tr2);
-	GeoTransform* tr3 = new GeoTransform(Tr3);
-	GeoTransform* tr4 = new GeoTransform(Tr4);
-//	GeoTransform* tr5 = new GeoTransform(Tr5);
+	GeoTransform* boxTr = new GeoTransform(Tr1);
+	GeoTransform* torusTr = new GeoTransform(Tr2);
+	GeoTransform* consTr = new GeoTransform(Tr3);
+	GeoTransform* tessTr = new GeoTransform(Tr4);
+	GeoTransform* tubsTr = new GeoTransform(Tr5);
 //	GeoTransform* tr6 = new GeoTransform(Tr6);
 
 
 	//------------------------------------//
 	// Bundle the resulting compound object with a material into a logical volume, and create a physical volume with that:
-	GeoLogVol* boxLog = new GeoLogVol("Box",box,matIron);
+	GeoLogVol* boxLog = new GeoLogVol("Box", box, mat_Steel);
 	GeoPhysVol* boxPhys = new GeoPhysVol(boxLog);
 
-	GeoLogVol* torusLog = new GeoLogVol("Torus",torus,matIron);
+	GeoLogVol* torusLog = new GeoLogVol("Torus", torus, mat_Silicon);
 	GeoPhysVol* torusPhys = new GeoPhysVol(torusLog);
 
-	GeoLogVol* consLog = new GeoLogVol("Cons",cons,matIron);
+	GeoLogVol* consLog = new GeoLogVol("Cons", cons, mat_Steel);
 	GeoPhysVol* consPhys = new GeoPhysVol(consLog);
 
-	GeoLogVol* tessLog = new GeoLogVol("Tessellated Pyramid",tessPyramid,matIron);
+	GeoLogVol* tessLog = new GeoLogVol("Tessellated Pyramid", tessPyramid, mat_Silicon);
 	GeoPhysVol* tessPhys = new GeoPhysVol(tessLog);
 
-
+	GeoLogVol* tubsLog = new GeoLogVol("Tubs", tubs, mat_Steel);
+	GeoPhysVol* tubsPhys = new GeoPhysVol(tubsLog);
 
 	//------------------------------------//
 	// Now insert all of this into the world...                                           //
-	world->add(tr1);
+	
+	world->add(boxTr);
 	world->add(boxPhys);
-	world->add(tr2);
+	
+	world->add(torusTr);
 	world->add(torusPhys);
-	world->add(tr3);
+	
+	world->add(consTr);
 	world->add(consPhys);
-	world->add(tr4);
+	
+	world->add(tessTr);
 	world->add(tessPhys);
 
+	world->add(tubsTr);
+	world->add(tubsPhys);
 
 	//------------------------------------//
 	// Writing the geometry to file
 	std::string path = "geometry.db";
 
-  // check if DB file exists. If not, return.
-  // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
-  std::ifstream infile(path.c_str());
-    if ( infile.good() ) {
-      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
+  	// check if DB file exists. If not, return.
+  	// FIXME: TODO: this check should go in the 'GMDBManager' constructor.
+  	std::ifstream infile(path.c_str());
+    	if ( infile.good() ) {
+      	std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
         exit(EXIT_FAILURE);
-  }
-  infile.close();
+  	}
+  	infile.close();
 
 	// open the DB connection
 	GMDBManager db(path);

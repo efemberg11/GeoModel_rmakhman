@@ -30,23 +30,28 @@ void elementHandler::ElementHandle() {
 		if (child->getNodeType()==xercesc::DOMNode::ELEMENT_NODE) {
 			XercesParser::elementLoop(child);
 			XMLHandler *h=theController->XMLStore()->GetHandler(child);
-			std::string nH=h->GetName();
-			//std::cout<<" handler name "<<nH<<std::endl;
-			if (nH=="atom") {
-				atomHandler* aH=dynamic_cast<atomHandler*>(h);
-				if (!aH) std::cout<<" something is wrong! can not retrieve atomHandler!!!"<<std::endl;
-				else {
-					isAtom=true;
-					weight=aH->atomicWeight();
-				}
-				break;
-			}
-			else if (nH=="fraction") {
-				fractionHandler* fH=dynamic_cast<fractionHandler*>(h);
-				if (!fH) std::cout<<" something is wrong! can not retrieve fractionHandler!!!"<<std::endl;
-				e.addIsotope(fH->getFraction());
-			}
-			else std::cout << "elementHandler: dont know what this might be!!!"<<nH<<std::endl;
+            if(h){
+                std::string nH=h->GetName();
+                //std::cout<<" handler name "<<nH<<std::endl;
+                if (nH=="atom") {
+                    atomHandler* aH=dynamic_cast<atomHandler*>(h);
+                    if (!aH) std::cout<<" something is wrong! can not retrieve atomHandler!!!"<<std::endl;
+                    else {
+                        isAtom=true;
+                        weight=aH->atomicWeight();
+                    }
+                    break;
+                }
+                else if (nH=="fraction") {
+                    fractionHandler* fH=dynamic_cast<fractionHandler*>(h);
+                    if (!fH) std::cout<<" something is wrong! can not retrieve fractionHandler!!!"<<std::endl;
+                    e.addIsotope(fH->getFraction());
+                }
+                else std::cout << "elementHandler: don't know what this might be!!!"<<nH<<std::endl;
+                
+            }
+            else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
+			
 		}
 	}
 }

@@ -1,10 +1,15 @@
 /*
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+*/
+
+/*
  * author: Riccardo.Maria.Bianchi@cern.ch, 2017
  *
  * major updates:
  * - Aug 2018 - R.M.Bianchi
  * - Feb 2019 - R.M.Bianchi
  * - May 2020 - R.M.Bianchi
+ * - Aug 2020 - R.M.Bianchi // added support for GeoPublisher
  */
 
 #ifndef GeoModelWrite_WriteGeoModel_H
@@ -29,6 +34,8 @@
 #include <string>
 #include <unordered_map>
 
+// FWD declarations
+class GeoPublisher;
 
 namespace GeoModelIO {
 
@@ -61,8 +68,8 @@ public:
 	virtual void handleTransform (const GeoTransform *);
 	virtual void handleNameTag (const GeoNameTag *);
 
-	void saveToDB();
-
+	void saveToDB(GeoPublisher* store = nullptr);
+    void saveToDB( std::vector<GeoPublisher*>& vecStores);
 
 private:
 
@@ -146,21 +153,30 @@ private:
 
   unsigned int getIdFromNodeType(const std::string &nodeType);
 
+  void storePublishedNodes(GeoPublisher* store);
+  template <typename TT> void storeRecordPublishedNodes(const TT storeMap, std::vector<std::vector<std::string>>* cachePublishedNodes);
+
   std::string m_dbpath;
 	GMDBManager* m_dbManager;
 
+    // work caches
   std::unordered_map<std::string, unsigned int> m_parentChildrenMap;
   std::unordered_map<std::string, unsigned int> m_volumeCopiesMap;
   std::unordered_map<std::string, unsigned int> m_memMap;
   std::unordered_map<std::string, unsigned int> m_memMap_Tables;
 
-	// keep track of the number of visited tree nodes
+	// keep track of the number of visited tree node
 	unsigned int m_len;
 	unsigned int m_len_nChild;
 
+    // store True if we have found the Root volume
 	bool m_rootVolumeFound;
+    
+    // store True if we are visiting an unconnected tree 
+    // (for example, one used in a GeoSerialTransformer)
 	bool m_unconnectedTree;
 
+    // caches for GeoModel nodes to be saved into the DB
   std::vector<std::vector<std::string>> m_logVols;
 	std::vector<std::vector<std::string>> m_physVols;
 	std::vector<std::vector<std::string>> m_fullPhysVols;
@@ -172,10 +188,17 @@ private:
 	std::vector<std::vector<std::string>> m_serialTransformers;
 	std::vector<std::vector<std::string>> m_functions;
 	std::vector<std::vector<std::string>> m_nameTags;
-	std::vector<std::vector<std::string>> m_childrenPositions;
   std::vector<std::vector<std::string>> m_shapes;
-  std::vector<std::string> m_rootVolume;
+  
+    // caches for Metadata to be saved into the DB
+    std::vector<std::string> m_rootVolume;
+	std::vector<std::vector<std::string>> m_childrenPositions;
+	std::vector<std::vector<std::string>> m_publishedAlignableTransforms_String;
+	std::vector<std::vector<std::string>> m_publishedFullPhysVols_String;
 
+    // cache to store the node that could not have persistified. 
+    // Usually, that means that persistification code has not been developed
+    // for the particular GeoModel node
   std::vector<std::string> m_objectsNotPersistified;
 
 };

@@ -6,9 +6,9 @@
 #include "GeoSpecialShapes/sincos.h"
 //#include "CLHEP/Units/SystemOfUnits.h"
 
-/// TO DO        : Dependencies from fROOT - gone
-/// TO BE TESTED : RowVectorXd equivalent of TVectorD
-///                MatrixXd    equivalent of TMatrixD
+/// Dependencies from fROOT - gone
+/// TESTED : VectorXd Eigen equivalent of TVectorD
+///          MatrixXd Eigen equivalent of TMatrixD
 
 //#include "TMath.h"
 //#include "TMatrixD.h"
@@ -80,14 +80,11 @@ findLinearApproximation(
   }
 
   //TMatrixDSym Ainv(A);
-  MatrixXd Ainv(A);
   //Ainv.Invert();
-  Ainv.inverse();
-
-  // std::cout << "Ainv: " << std::endl;
-  // std::cout << Ainv << std::endl;
-  // std::cout << "vY: " << std::endl;
-  // std::cout << vY << std::endl;
+    
+  // N.B.: The inverse() function of Eigen doesn't modify the matrix
+  // instead it returns the inverse matrix
+  MatrixXd Ainv=A.inverse().eval();
 
   return Ainv*vY;
 }

@@ -20,9 +20,11 @@
 #include <iostream>
 #include <cstdlib>
 
-
+// utility functions to get preprocessor variables' values
 #define STR_VALUE(arg) #arg
 #define STR_NAME(name) STR_VALUE(name)
+
+
 
 int main(int argc, char** argv)
 {
@@ -45,11 +47,12 @@ int main(int argc, char** argv)
 #ifdef linux
 #define waslinux linux
 #undef linux
-  const char * standardPlaces = STR_NAME( GEOMODEL_INSTALL_PREFIX );
+  const char * standardPlaces = GEOMODEL_INSTALL_PREFIX;
 #define linux waslinux
 #else
-  const char * standardPlaces = STR_NAME( GEOMODEL_INSTALL_PREFIX );
+  const char * standardPlaces = GEOMODEL_INSTALL_PREFIX;
 #endif
+  std::cout << "standardPlaces: " << standardPlaces << std::endl;
   std::string gxpluginpath= std::string(standardPlaces)+"/lib/gxplugins";
   pManip("GXPLUGINPATH",gxpluginpath.c_str());
   QStringList arguments;

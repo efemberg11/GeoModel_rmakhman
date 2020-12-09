@@ -28,19 +28,24 @@ public:
 			if (child->getNodeType()==xercesc::DOMNode::ELEMENT_NODE) {
 				XercesParser::elementLoop(child);
 				XMLHandler *h=theController->XMLStore()->GetHandler(child);
-				std::string nH=h->GetName();
-				//std::cout<<" handler name "<<nH<<std::endl;
-				if (nH=="fraction") {
-					fractionHandler* fH=dynamic_cast<fractionHandler*>(h);
-					if (!fH) std::cout<<" something is wrong! can not retrieve fractionHandler!!!"<<std::endl;
-					addFraction(fH->getFraction());
-				}
-				else if (nH=="D") {
-					densityHandler* dH=dynamic_cast<densityHandler*>(h);
-					if (!dH) std::cout<<" something is wrong! can not retrieve densityHandler!!!"<<std::endl;
-					density=dH->getDensity();
-				}
-			}
+                if(h){
+                    std::string nH=h->GetName();
+                    //std::cout<<" handler name "<<nH<<std::endl;
+                    if (nH=="fraction") {
+                        fractionHandler* fH=dynamic_cast<fractionHandler*>(h);
+                        if (!fH) std::cout<<" something is wrong! can not retrieve fractionHandler!!!"<<std::endl;
+                        addFraction(fH->getFraction());
+                    }
+                    else if (nH=="D") {
+                        densityHandler* dH=dynamic_cast<densityHandler*>(h);
+                        if (!dH) std::cout<<" something is wrong! can not retrieve densityHandler!!!"<<std::endl;
+                        density=dH->getDensity();
+                    }
+                    
+                }
+                else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
+                
+            }
 		}
 	}
 	void postLoopHandling()

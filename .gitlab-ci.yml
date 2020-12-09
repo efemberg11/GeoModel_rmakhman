@@ -227,7 +227,7 @@ mac-clean:
   stage: step-E
   needs: ["mac-gm-visualization", "mac-gm-fullsimlight", "mac-gm-gmg4", "mac-gm-examples-gmg4"]
   script:
-    - brew remove -f qt5 wget expat boost nlohmann-json xerces-c eigen 
+    - brew uninstall --ignore-dependencies qt5 wget expat boost nlohmann-json xerces-c eigen 
     - brew remove -f atlas/geomodel/cmake-geomodel #TODO: remove this as soon as we update Coin/SoQt
 
 # macOS cleaning job to remove our custom-build of Geant4

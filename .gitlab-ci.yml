@@ -209,7 +209,7 @@ mac-config:
     - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
 
 # macOS job to install our custom-build of Geant4
-macos-config-g4:
+mac-config-g4:
   stage: step-B
   script:
     - brew install atlas/geomodel/geant4 

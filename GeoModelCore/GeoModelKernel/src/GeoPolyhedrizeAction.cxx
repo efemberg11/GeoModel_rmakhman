@@ -143,15 +143,15 @@ void GeoPolyhedrizeAction::handleTwistedTrap (const GeoTwistedTrap *twistedtrap)
 {
     m_polyhedron = new GeoPolyhedronTwistedTrap (twistedtrap->getPhiTwist(),
                                                  twistedtrap->getZHalfLength(),
-          twistedtrap->getTheta(),
-          twistedtrap->getPhi(),
-          twistedtrap->getY1HalfLength(),
-          twistedtrap->getX1HalfLength(),
-          twistedtrap->getX2HalfLength(),
-          twistedtrap->getY2HalfLength(),
-          twistedtrap->getX3HalfLength(),
-          twistedtrap->getX4HalfLength(),
-          twistedtrap->getTiltAngleAlpha());
+                                                 twistedtrap->getTheta(),
+                                                 twistedtrap->getPhi(),
+                                                 twistedtrap->getY1HalfLength(),
+                                                 twistedtrap->getX1HalfLength(),
+                                                 twistedtrap->getX2HalfLength(),
+                                                 twistedtrap->getY2HalfLength(),
+                                                 twistedtrap->getX3HalfLength(),
+                                                 twistedtrap->getX4HalfLength(),
+                                                 twistedtrap->getTiltAngleAlpha());
 }
 
 void GeoPolyhedrizeAction::handleTrd (const GeoTrd *trd)

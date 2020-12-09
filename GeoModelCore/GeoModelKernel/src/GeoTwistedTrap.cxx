@@ -10,10 +10,10 @@ const ShapeType GeoTwistedTrap::s_classTypeID = 0x19; //this code should not be 
  
 
 GeoTwistedTrap::GeoTwistedTrap(double  pPhiTwist,
-                             double  pDx1,
-                             double  pDx2,
-                             double  pDy,
-                             double  pDz )
+                               double  pDx1,
+                               double  pDx2,
+                               double  pDy,
+                               double  pDz )
 : m_phiTwist(pPhiTwist),
 m_dz(pDz),
 m_theta(0.),

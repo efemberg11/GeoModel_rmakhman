@@ -1,7 +1,6 @@
 
 
-
-##	Shapes and Logical Volumes
+##	Shapes
 
 ### Introduction
 

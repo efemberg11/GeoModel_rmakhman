@@ -210,7 +210,9 @@ mac-config:
 
 # macOS job to install our custom-build of Geant4
 mac-config-g4:
+  <<: *macos-job
   stage: step-B
+  needs: ["mac-config"]
   script:
     - brew install atlas/geomodel/geant4 
 
@@ -226,6 +228,7 @@ mac-clean:
 
 # macOS cleaning job to remove our custom-build of Geant4
 mac-clean-j4:
+  <<: *macos-job
   stage: step-F
   needs: ["mac-clean", "mac-gm-fullsimlight"]
   script:

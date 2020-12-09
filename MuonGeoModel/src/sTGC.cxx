@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "MuonGeoModel/sTGC.h"
@@ -7,7 +7,8 @@
 #include "MuonGeoModel/MaterialManager.h"
 #include "MuonGeoModel/MaterialManager.h"
 #include "AGDDKernel/AGDDDetectorStore.h"
-// #include "MuonGeoModel/MYSQL.h"
+#include "MuonAGDDDescription/sTGCDetectorDescription.h"
+#include "MuonAGDDDescription/sTGCDetectorHelper.h"
 #include "MuonGeoModel/sTGCComponent.h"
 #include "MuonGeoModel/Cutout.h"
 #include "GeoModelKernel/GeoTrd.h"
@@ -56,41 +57,39 @@ GeoFullPhysVol* sTGC::build(int minimalgeo)
 
 GeoFullPhysVol* sTGC::build(int minimalgeo, int , std::vector<Cutout*> )
 {
-//  std::cout<<"this is sTGC::build "<<std::endl;
-  AGDDDetectorStore* ds = AGDDDetectorStore::GetDetectorStore();	
-//  std::cout<<"fetching technology "<<std::endl;
+  AGDDDetectorStore* ds = AGDDDetectorStore::GetDetectorStore();
+  sTGCDetectorHelper stgcHelper;
+  sTGCDetectorDescription* stgc_descr = stgcHelper.Get_sTGCDetectorSubType(m_component->subType);
+
   sTGC_Technology* t = (sTGC_Technology*) ds->GetTechnology(name);
   thickness = t->Thickness();
   double gasTck=t->gasThickness;
   double pcbTck=t->pcbThickness;
-  double f4=t->f4Thickness;
-  double f5=t->f5Thickness;
-  double f6=t->f6Thickness;
+  double f4=stgc_descr->ylFrame();
+  double f5=stgc_descr->ysFrame();
+  double f6=stgc_descr->xFrame();
+
   //Evaluate honeycomb thickness
   double chamberTck = gasTck+pcbTck; //Note: pcbTck is the xml value and is the combined thickness of 2 pcbs.
   double honeycombTck = (thickness - 4*chamberTck)/5;
   double pcbActualTck = pcbTck/2;
-  int nLayer=t->nlayers;
-  //thickness=nLayer*chamberTck;
 
   minimalgeo=t->geoLevel;
 
-// std::cout<<"===================> FRAME in sTGC.cxx ====> f4= "<<f4<<" f5= "<<f5<<" f6= "<<f6<<std::endl;
-
   //Build sTGC mother volume out of honeycomb material
   GeoSimplePolygonBrep *solid;
-	solid=new GeoSimplePolygonBrep(thickness/2.);
-	solid->addVertex(longWidth/2.,length/2.);
-	solid->addVertex(-longWidth/2.,length/2.);
-	if (yCutout) solid->addVertex(-longWidth/2.,length/2.-yCutout);
-	solid->addVertex(-width/2.,-length/2.);
-	solid->addVertex(width/2.,-length/2.);
-	if (yCutout) solid->addVertex(longWidth/2.,length/2.-yCutout);
+  solid=new GeoSimplePolygonBrep(thickness/2.);
+  solid->addVertex(longWidth/2.,length/2.);
+  solid->addVertex(-longWidth/2.,length/2.);
+  if (yCutout) solid->addVertex(-longWidth/2.,length/2.-yCutout);
+  solid->addVertex(-width/2.,-length/2.);
+  solid->addVertex(width/2.,-length/2.);
+  if (yCutout) solid->addVertex(longWidth/2.,length/2.-yCutout);
 
   //Transform the mother volume to the correct position
   GeoTrf::Transform3D rot = GeoTrf::RotateZ3D(M_PI/2.)*GeoTrf::RotateX3D(M_PI/2.);
   const GeoShape *strd=new GeoShapeShift(solid,rot);
-									
+
   logVolName=name;
   if (!(m_component->subType).empty()) logVolName+=("-"+m_component->subType);
   const GeoMaterial* mtrd = MaterialManager::getMaterial("muo::Honeycomb");
@@ -124,15 +123,14 @@ GeoFullPhysVol* sTGC::build(int minimalgeo, int , std::vector<Cutout*> )
     else newXPos=newpos+ chamberTck + honeycombTck ;
 
     //Build chamber volume (gas + pcb) out of gas
-    GeoSimplePolygonBrep *sGasVolume
-        =new GeoSimplePolygonBrep(chamberTck/2.);
-        sGasVolume->addVertex(longWidthActive/2.,lengthActive/2.);
-		sGasVolume->addVertex(-longWidthActive/2.,lengthActive/2.); 
-		if (yCutout) sGasVolume->addVertex(-longWidthActive/2.,lengthActive/2.-yCutout);
-		sGasVolume->addVertex(-widthActive/2.,-lengthActive/2.);
-		sGasVolume->addVertex(widthActive/2.,-lengthActive/2.);
-		if (yCutout) sGasVolume->addVertex(longWidthActive/2.,lengthActive/2.-yCutout);
-             
+    GeoSimplePolygonBrep *sGasVolume = new GeoSimplePolygonBrep(chamberTck/2.);
+    sGasVolume->addVertex(longWidthActive/2.,lengthActive/2.);
+    sGasVolume->addVertex(-longWidthActive/2.,lengthActive/2.);
+    if (yCutout) sGasVolume->addVertex(-longWidthActive/2.,lengthActive/2.-yCutout);
+    sGasVolume->addVertex(-widthActive/2.,-lengthActive/2.);
+    sGasVolume->addVertex(widthActive/2.,-lengthActive/2.);
+    if (yCutout) sGasVolume->addVertex(longWidthActive/2.,lengthActive/2.-yCutout);
+
     //Transform gas volume
     GeoTrf::Transform3D rot = GeoTrf::RotateZ3D(M_PI/2.)*GeoTrf::RotateX3D(M_PI/2.);
     const GeoShape *sGasVolume1=new GeoShapeShift(sGasVolume,rot);
@@ -143,8 +141,14 @@ GeoFullPhysVol* sTGC::build(int minimalgeo, int , std::vector<Cutout*> )
 
     //Build two pcb volumes and add them to the gas at -chamberTck/2 and at +chamberTck/2
     for(int i = 0; i < 2; i++){
-      if (i==0) pcbpos = -chamberTck/2 + pcbActualTck/2; //This becomes the zero reference point for the pcb at -chamberTck/2
-      else pcbpos = -chamberTck/2 + pcbActualTck + gasTck + pcbActualTck/2; //This becomes the zero reference point for the pcb at +chamberTck/2. Alternatively, we can say pcbpos = +chamberTck/2 - pcbActualTck/2 ???
+      if (i==0) {
+         //This becomes the zero reference point for the pcb at -chamberTck/2
+        pcbpos = -chamberTck/2 + pcbActualTck/2;
+      } else {
+        //This becomes the zero reference point for the pcb at +chamberTck/2. Alternatively,
+        // we can say pcbpos = +chamberTck/2 - pcbActualTck/2 ???
+        pcbpos = -chamberTck/2 + pcbActualTck + gasTck + pcbActualTck/2;
+      }
 
       //Build pcb volume out of G10 material
       GeoSimplePolygonBrep *sPcbVolume = new GeoSimplePolygonBrep(pcbActualTck/2.);
@@ -165,7 +169,7 @@ GeoFullPhysVol* sTGC::build(int minimalgeo, int , std::vector<Cutout*> )
       GeoNameTag* ntrdtmpC = new GeoNameTag(name+"std::G10");
 
       GeoTransform* ttrdtmpC = new GeoTransform(GeoTrf::TranslateX3D(pcbpos));
- 
+
 
       // Place pcb volume inside chamber volume
       ptrdgas->add(ntrdtmpC);//nametag
@@ -179,53 +183,45 @@ GeoFullPhysVol* sTGC::build(int minimalgeo, int , std::vector<Cutout*> )
     ptrd->add(ptrdgas);
 
     //Cutouts
-      if (!yCutout)
-      {
-          double lW=longWidth/2.-((longWidth-width)/2.)*f4/length;
-          double W=width/2.+((longWidth-width)/2.)*f5/length;
-          const GeoShape* trd1 = new GeoTrd(gasTck/2,gasTck/2, width/2,
-                                    longWidth/2, length/2);
-          const GeoShape* trd2 = new GeoTrd(gasTck,gasTck, W-f6,
-                                    lW-f6, length/2-(f4+f5)/2.);
-          GeoTrf::Translate3D c(0,0,(f5-f4)/2.);
-          trd1= &(trd1->subtract( (*trd2) << c ));
-          GeoLogVol* ltrdframe = new GeoLogVol("sTGC_Frame", trd1,
-                                         MaterialManager::getMaterial("std::Aluminium"));
-          GeoPhysVol* ptrdframe = new GeoPhysVol(ltrdframe);
+    if (!yCutout) {
+        double lW=longWidth/2.-((longWidth-width)/2.)*f4/length;
+        double W=width/2.+((longWidth-width)/2.)*f5/length;
+        const GeoShape* trd1 = new GeoTrd(gasTck/2,gasTck/2, width/2,
+                                  longWidth/2, length/2);
+        const GeoShape* trd2 = new GeoTrd(gasTck,gasTck, W-f6,
+                                  lW-f6, length/2-(f4+f5)/2.);
+        GeoTrf::Translate3D c(0,0,(f5-f4)/2.);
+        trd1= &(trd1->subtract( (*trd2) << c ));
+        GeoLogVol* ltrdframe = new GeoLogVol("sTGC_Frame", trd1,
+                                              MaterialManager::getMaterial("std::Aluminium"));
+        GeoPhysVol* ptrdframe = new GeoPhysVol(ltrdframe);
 
-          ptrdgas->add(ptrdframe);
-      }
-      else
-      {
-        double W=width/2.+((longWidth-width)/2.)*f5/(length);
-      	  GeoSimplePolygonBrep *sGasV
-        	=new GeoSimplePolygonBrep(gasTck);
-        sGasV->addVertex(longWidthActive/2.-f6,lengthActive/2.-f4);
-		sGasV->addVertex(-longWidthActive/2.+f6,lengthActive/2.-f4);
-		sGasV->addVertex(-longWidthActive/2.+f6,lengthActive/2.-yCutout);
-		sGasV->addVertex(-W+f6,-lengthActive/2.+f5);
-		sGasV->addVertex(W-f6,-lengthActive/2.+f5);
-		sGasV->addVertex(longWidthActive/2.-f6,lengthActive/2.-yCutout);
-	
-	const GeoShape *sGasV1=new GeoShapeShift(sGasV,rot);
-	
-	const GeoShape* sGasV2=&(sGasVolume1->subtract(*sGasV1));
-	
-	GeoLogVol* ltrdframe = new GeoLogVol("sTGC_Frame", sGasV2,
-                                         MaterialManager::getMaterial("std::Aluminium"));
-          GeoPhysVol* ptrdframe = new GeoPhysVol(ltrdframe);
+        ptrdgas->add(ptrdframe);
+    } else {
+      double W = width/2.+((longWidth-width)/2.)*f5/(length);
+      GeoSimplePolygonBrep *sGasV = new GeoSimplePolygonBrep(gasTck);
+      sGasV->addVertex(longWidthActive/2.-f6,lengthActive/2.-f4);
+      sGasV->addVertex(-longWidthActive/2.+f6,lengthActive/2.-f4);
+      sGasV->addVertex(-longWidthActive/2.+f6,lengthActive/2.-yCutout);
+      sGasV->addVertex(-W+f6,-lengthActive/2.+f5);
+      sGasV->addVertex(W-f6,-lengthActive/2.+f5);
+      sGasV->addVertex(longWidthActive/2.-f6,lengthActive/2.-yCutout);
 
-          ptrdgas->add(ptrdframe);
-	
-      }
+      const GeoShape *sGasV1 = new GeoShapeShift(sGasV,rot);
+      const GeoShape* sGasV2 = &(sGasVolume1->subtract(*sGasV1));
 
+      GeoLogVol* ltrdframe = new GeoLogVol("sTGC_Frame", sGasV2,
+                                           MaterialManager::getMaterial("std::Aluminium"));
+      GeoPhysVol* ptrdframe = new GeoPhysVol(ltrdframe);
 
-      iSenLyr++;
+      ptrdgas->add(ptrdframe);
+    }
 
-      newpos = newXPos;
+    iSenLyr++;
+    newpos = newXPos;
   } // Loop over stgc layers
-        
-  return ptrd;	
+
+  return ptrd;
 }
 
 

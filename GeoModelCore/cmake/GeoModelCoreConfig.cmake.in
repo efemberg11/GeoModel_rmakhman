@@ -2,7 +2,7 @@
 
 # Find the dependencies of the GeoModelCore target(s).
 include( CMakeFindDependencyMacro )
-find_dependency( Eigen3 @Eigen3_VERSION@ CONFIG EXACT )
+find_dependency( Eigen3 @Eigen3_VERSION@ CONFIG )
 
 # Include the exported configuration of GeoModelCore.
 get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )

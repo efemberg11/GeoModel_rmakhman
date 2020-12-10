@@ -26,8 +26,8 @@ nav:
         - 'Public': 'papers/public.md'
         - 'Internal': 'papers/internal.md'
     - GeoModel Kernel:
-        - 'Introduction': 'kernel/index.md'
-        - 'Class Reference': 'kernel/reference/reference.md'
+        - 'Introduction': 'kernel/intro/index.md'
+        - 'Class Reference': 'kernel/reference/index.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'
         - 'Install single packages': 'dev/install-single-packages.md'

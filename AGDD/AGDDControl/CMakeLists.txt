@@ -6,7 +6,8 @@ project( "AGDDControl" VERSION 1.0.0 LANGUAGES CXX )
 find_package( GeoModelCore REQUIRED )
 find_package( Eigen3 REQUIRED )
 find_package( GeoModelTools REQUIRED )
-find_package( GeoModelDataManagers REQUIRED )
+
+#find_package( GeoModelDataManagers REQUIRED )
 
 
 # Set default build options.

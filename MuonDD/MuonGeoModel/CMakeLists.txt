@@ -5,7 +5,8 @@ project( "MuonGeoModel" VERSION 1.0.0 LANGUAGES CXX )
 
 find_package( GeoModelCore REQUIRED )
 find_package( Eigen3 REQUIRED )
-find_package( AGDD REQUIRED )
+
+#find_package( AGDD REQUIRED )
 
 
 # Set default build options.

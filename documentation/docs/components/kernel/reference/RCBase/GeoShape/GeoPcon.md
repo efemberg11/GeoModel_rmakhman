@@ -28,7 +28,7 @@ When the polycone is constructed, only $\phi_0$ and $\phi$ are given; then, the 
 
 
 <figure>
-  <img src="/reference/RCBase/GeoShape/GeoPcon.png" width="400" />
+  <img src="/components/kernel/reference/RCBase/GeoShape/GeoPcon.png" width="400" />
   <figcaption>Figure 2: A GeoPcon object, representing a "polycone", which is a union of cone sections.</figcaption>
 </figure>
 

@@ -11,6 +11,7 @@ The external dependencies are minimal:
 - The Eigen math library for the core packages
 - The `Xerces-C` XML parser and the `nlohmann_json` JSON parser to import external data
 - The Qt framework for the visualization
+- The `fmt` formatting library
 
 ----
 

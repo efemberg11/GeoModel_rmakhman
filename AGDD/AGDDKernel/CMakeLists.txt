@@ -1,18 +1,4 @@
-cmake_minimum_required( VERSION 3.1 )
-
-# Set up the project.
-project( "AGDDKernel" VERSION 1.0.0 LANGUAGES CXX )
-
-find_package( GeoModelCore REQUIRED )
-find_package( Eigen3 REQUIRED )
-
-# Set default build options.
-set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMake build mode to use" )
-set( CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard used for the build" )
-set( CMAKE_CXX_EXTENSIONS FALSE CACHE BOOL "(Dis)allow using GNU extensions" )
-
-# Use the GNU install directory names.
-include( GNUInstallDirs )
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -20,36 +6,36 @@ file( GLOB HEADERS AGDDKernel/*.h )
 
 # Create the library.
 add_library( AGDDKernel SHARED ${HEADERS} ${SOURCES} )
-set_property( TARGET AGDDKernel
-   PROPERTY PUBLIC_HEADER ${HEADERS} )
-target_link_libraries( AGDDKernel PUBLIC GeoModelCore::GeoModelKernel )
-#  target_include_directories( AGDDKernel SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR} ) )
-target_include_directories( AGDDKernel PUBLIC ${EIGEN3_INCLUDE_DIR}
+target_link_libraries( AGDDKernel PUBLIC Eigen3::Eigen GeoModelCore::GeoModelKernel )
+target_include_directories( AGDDKernel PUBLIC 
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
 source_group( "AGDDKernel" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
+set_target_properties( AGDDKernel PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
 
-# # Install the library.
-# install( TARGETS AGDDKernel
-#    EXPORT AGDDKernel
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TestLib )
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelATLAS::AGDDKernel ALIAS AGDDKernel )
 
-# Install a CMake description of the project/library.
-# install( EXPORT AGDDKernel DESTINATION cmake )
+# Install the library.
+install(TARGETS AGDDKernel
+    EXPORT ${PROJECT_NAME}-export
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT          Runtime
+            NAMELINK_COMPONENT Development   # Requires CMake 3.12
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT Development
+            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/AGDDKernel
+            COMPONENT Development
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
-
-# new test GeoModelCore
-install( TARGETS AGDDKernel EXPORT AGDDKernel-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/AGDDKernel )
-#
-# Version the shared library. (Please update when cutting a new release!)
-#
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 1)
-set(MYLIB_VERSION_PATCH 0)
-set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
-
-set_target_properties(AGDDKernel PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
+install( FILES ${HEADERS}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/AGDDKernel
+   COMPONENT Development )
 

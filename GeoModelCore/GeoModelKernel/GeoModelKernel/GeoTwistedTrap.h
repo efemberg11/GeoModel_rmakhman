@@ -88,7 +88,7 @@ class GeoTwistedTrap : public GeoShape
   inline double getPhiTwist()     const { return m_phiTwist ; }
   inline double getTheta()        const { return m_theta ; }
   inline double getPhi()          const { return m_phi ; }
-  inline double getTiltAngleAlpha() const { return m_tAlph ; }
+  inline double getTiltAngleAlpha() const { return m_alph ; }
   
  protected:
   virtual ~GeoTwistedTrap();

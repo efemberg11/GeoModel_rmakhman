@@ -215,9 +215,9 @@ cd ..
 
     In these instructions we are building everything, because that is the most used configuration. But the GeoModel build is highly modular, and you can install different combinations of the GeoModel subpackages. 
 
-    You can see all the available options, and you can enable/disable them inetractively, by using the command for the interactive CMake configuration `ccmake`, instead of the classical `cmake`; *i.e.*: `cmake ../GeoModel`.
+    You can see all the available options, and you can enable/disable them interactively, by using the command for the interactive CMake configuration `ccmake`, instead of the classical `cmake`; *i.e.*: `ccmake ../GeoModel`.
 
-    *More details on that coming soon....*
+    In the section below, a list of all build options will be presented.
 
 
 
@@ -304,3 +304,150 @@ and run your local copy of the GeoModel visualization tool, `gmex`, with (assumi
 For a collection of suggestions on how to fix potential errors and glitches, please refer to the dedicated [Troubleshooting](troubleshooting.md) page.
 
 
+----
+
+## Build Options
+
+
+While configuring the build, you can enable the build of the optional packages, as explained in the following.
+
+
+!!! note
+
+    Please note that you can build some of the dependencies as part of the main build. This is useful for platforms where the versions installed by the system package managers are old. See [here below](#building-dependencies-as-part-of-the-main-build) for instructions.
+
+
+!!! info
+
+    When used during the CMake configuration step, all the variables must be prefixed by `-D`, like in the first example of this section. You can also combine them.
+
+    For example, this CMake command:
+
+    ```
+    cmake -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel
+    ```
+
+    will build the base classes, the visualization tool (`gmex`), and the examples (the ones that not require Geant4).
+
+
+
+#### GEOMODEL_BUILD_TOOLS -- Build the GeoModelTools
+
+
+```
+cmake -DGEOMODEL_BUILD_TOOLS=1 ../GeoModel
+```
+
+will enable the build of the tools in `GeoModelTools`. 
+
+This will also brings in a dependency on the Xerces-C and nlohmann_json third-party libraries.
+
+
+
+#### GEOMODEL_BUILD_VISUALIZATION -- Build the visualization tools
+
+```
+cmake -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel
+```
+
+will enable the build of the geometry visualization tool, `GeoModelExplorer` (`gmex`) and of all the base classes. 
+
+This brings in additional dependencies for the GUI and to handle 3D graphics and on a JSON parser: Qt5, Coin3D, SoQt, and nlohmann_json. 
+
+
+#### GEOMODEL_BUILD_EXAMPLES -- Build the examples
+
+
+```
+cmake -DGEOMODEL_BUILD_EXAMPLES=1 ../GeoModel
+```
+
+will enable the build of all the examples (except those requiring Geant4, see below) and of all the base classes and packages.
+
+
+#### GEOMODEL_BUILD_GEOMODELG4 -- Build the GeoModel --> Geant4 interface
+
+This CMake command
+
+```
+cmake  -DGEOMODEL_BUILD_GEOMODELG4=1 ../GeoModel
+```
+
+will build the base packages as well the interface classes which translate GeoModel nodes into Geant4 entities, as well as all the base GeoModel classes.
+This also brings in an additional dependency on a Geant4 installation.
+
+#### Build the examples for the GeoModel --> Geant4 interface
+
+To build the examples for the GeoModel --> Geant4 interface, you should use the `GEOMODEL_BUILD_EXAMPLES_W_GEANT4` build option:
+
+```
+cmake  -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=1 ../GeoModel
+```
+
+This will enable the build of all the examples, also those requiring Geant4. This option will also build `GeoModelG4` (see above), which is the interface between GeoModel and Geant4, and brings in the dependency on a local Geant4 installation.
+
+
+#### GEOMODEL_BUILD_FULLSIMLIGHT -- Build the standalone Geant4-based detector simulation application
+
+This CMake command
+
+```
+cmake  -DGEOMODEL_BUILD_FULLSIMLIGHT=1 ../GeoModel
+```
+
+will build `FullSimLight`, the Geant4-based application which let users run standalone simulations on a complete detector geometry or on a piece of that, as well as `GeoModelG4` and all the base classes. This also brings in an additional dependency on a Geant4 installation.
+
+
+
+
+
+
+### Building dependencies as part of the main build
+
+You can use CMake compilation flags to configure a built-in build of some of the dependencies. That options will download and build a tested version of those dependencies as part of the build process of GeoModel.
+
+This is especially useful on platforms where the version of those dependencies installed by the system package manager is old, like on Ubuntu.
+
+*Note:* You don't need to use those options on macOS, where the versions installed by the `brew` package manager are often the latest.
+
+#### nlohmann_json
+
+You can enable the built-in build of `nlohmann_json` by using the CMake option:
+
+```
+-DGEOMODEL_USE_BUILTIN_JSON=TRUE
+```
+
+#### Xerces-C
+
+You can enable the built-in build of `Xerces-C` by using the CMake option:
+
+```
+-DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
+```
+
+#### Eigen3
+
+You can enable the built-in build of `Eigen3` by using the CMake option:
+
+```
+-DGEOMODEL_USE_BUILTIN_EIGEN=TRUE
+```
+
+#### Coin3D (Coin + SoQt)
+
+You can enable the built-in build of `Coin3D` (*i.e.*, Coin + SoQt) by using the CMake option:
+
+```
+-DGEOMODEL_USE_BUILTIN_COIN3D=TRUE
+```
+
+
+
+### Examples
+
+For example, you can build the base GeoModel packages, plus the GeoModelVisualization (`gmex`), and a built-in version of nlohmann_json and Xerces-C by configuring the build with:
+
+```
+cmake -DCMAKE_INSTALL_PREFIX=../install/ -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE ../GeoModel/
+```

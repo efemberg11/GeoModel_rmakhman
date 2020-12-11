@@ -1,7 +1,7 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Set up the (sub-)project.
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required( VERSION 3.122 )
 project( "GeoModelIO" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
 # Set up the version of GeoModelIO as a cache variable, so that other

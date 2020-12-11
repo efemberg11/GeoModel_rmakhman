@@ -24,18 +24,10 @@ add_library( GeoModelIO::TFPersistification ALIAS TFPersistification )
 # Install the library.
 install(TARGETS TFPersistification
     EXPORT ${PROJECT_NAME}-export
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT Runtime
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT          Runtime
             NAMELINK_COMPONENT Development   # Requires CMake 3.12
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT Development
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TFPersistification
-            COMPONENT Development
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
-
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/TFPersistification
    COMPONENT Development )

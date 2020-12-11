@@ -30,19 +30,22 @@ include( configure_cpp_options )
 set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
    "Framework finding behaviour on macOS" )
 
+# --- Dependencies --- 
 # Set up how the project handle some of its dependenices. Either by picking them
 # up from the environment, or building them itself.
 include( SetupEigen3 )
 include( SetupXercesC )
 include( SetupJSON )
+# GeoModel dependencies
+find_package( GeoModelCore )
 
 
 # === Main targets built by this project ===
 
 # switches to let users build specific packages on request
 option( GEOMODELATLAS_BUILD_DATAMANAGERS "Enable the build of GeoModelDataManagers" OFF )
-option( GEOMODELATLAS_BUILD_AGDD "Enable the build of AGDD" OFF )
-option( GEOMODELATLAS_BUILD_MUONDD "Enable the build of MuonDD" ON )
+option( GEOMODELATLAS_BUILD_AGDD "Enable the build of AGDD" ON )
+option( GEOMODELATLAS_BUILD_MUONDD "Enable the build of MuonDD" OFF )
 option( GEOMODELATLAS_BUILD_XML "Enable the build of GeoModelXML" OFF )
 
 # a list to keep track of the packages we build
@@ -64,7 +67,6 @@ if( GEOMODELATLAS_BUILD_DATAMANAGERS )
     add_subdirectory(GeoModelDataManagers)
     list( APPEND BUILT_PACKAGES "GeoModelDataManagers" )
 endif()
-
 
 if( GEOMODELATLAS_BUILD_XML )
     add_subdirectory(GeoModelXML)

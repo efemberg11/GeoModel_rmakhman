@@ -36,6 +36,10 @@
 
 #include "GeoModelKernel/GeoShape.h"
 
+// Units
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
+
 class GeoTwistedTrap : public GeoShape
 {
  public:
@@ -116,6 +120,10 @@ class GeoTwistedTrap : public GeoShape
   double m_deltaX ;
   double m_deltaY ;
   double m_phiTwist;  // twist angle ( dphi in surface equation)
+    
+  const double m_CarTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;
+  const double m_RadTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;
+  const double m_AngTolerance = 1E-9 * SYSTEM_OF_UNITS::rad;
 
 };
 

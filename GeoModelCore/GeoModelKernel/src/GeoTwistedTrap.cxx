@@ -4,6 +4,7 @@
 
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include <iostream>
 
 const std::string GeoTwistedTrap::s_classType = "TwistedTrap";
 const ShapeType GeoTwistedTrap::s_classTypeID = 0x19; //this code should not be used by other shapes
@@ -52,6 +53,29 @@ m_dx3(pDx3),
 m_dx4(pDx4),
 m_alph(pAlph)
 {
+     if  ( ! ( ( m_dx1  > 2*m_CarTolerance)
+            && ( m_dx2  > 2*m_CarTolerance)
+            && ( m_dx3  > 2*m_CarTolerance)
+            && ( m_dx4  > 2*m_CarTolerance)
+            && ( m_dy1  > 2*m_CarTolerance)
+            && ( m_dy2  > 2*m_CarTolerance)
+            && ( m_dz   > 2*m_CarTolerance)
+            && ( std::fabs(m_phiTwist) > 2*m_AngTolerance )
+            && ( std::fabs(m_phiTwist) < SYSTEM_OF_UNITS::pi/2 )
+            && ( std::fabs(m_alph) < SYSTEM_OF_UNITS::pi/2 )
+            && ( m_theta < SYSTEM_OF_UNITS::pi/2 && m_theta >= 0 ) )
+         )
+     {
+      std::cout<< "EXCEPTION!!! Invalid dimensions. Too small, or twist angle too big: "<< std::endl
+               << "fDx 1-4 = " << m_dx1/SYSTEM_OF_UNITS::cm << ", " << m_dx2/SYSTEM_OF_UNITS::cm << ", "
+               << m_dx3/SYSTEM_OF_UNITS::cm << ", " << m_dx4/SYSTEM_OF_UNITS::cm << " cm" << std::endl
+               << "fDy 1-2 = " << m_dy1/SYSTEM_OF_UNITS::cm << ", " << m_dy2/SYSTEM_OF_UNITS::cm << ", "
+               << " cm" << std::endl
+               << "fDz = " << m_dz/SYSTEM_OF_UNITS::cm << " cm" << std::endl
+               << " twistangle " << m_phiTwist/SYSTEM_OF_UNITS::deg << " deg"<< std::endl
+               << " phi,theta = " << m_phi/SYSTEM_OF_UNITS::deg << ", "  << m_theta/SYSTEM_OF_UNITS::deg << " deg";
+    
+     }
 }
 
 

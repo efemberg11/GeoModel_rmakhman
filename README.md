@@ -59,9 +59,15 @@ In particular, these are the additional dependencies and the packages that bring
 
 ### Build
 
-For the build instruction, you can refer to the documnentation folder:
+For the build instruction, you can refer to the documentation folder:
 
 `documentation/dev/`
+
+or to the web-based render at the documentation website:
+
+https://geomodel.web.cern.ch/geomodel/
+
+
 
 ## License
 

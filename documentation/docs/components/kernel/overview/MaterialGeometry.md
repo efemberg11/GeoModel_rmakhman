@@ -27,8 +27,14 @@ GeoMaterial *water = new GeoMaterial(“H20”, 1.0*SYSTEM_OF_UNITS::gram/SYSTEM
 To finish constructing this material, water, one needs to follow the constructor with the following lines
 
 ```cpp
-GeoElement *hydrogen = new GeoElement(“Hydrogen”,“H”,1.0, 1.010);
-GeoElement *oxygen = new GeoElement(“Oxygen”,  “O”, 8.0, 16.0);
+GeoElement *hydrogen = new GeoElement("Hydrogen",
+                                      "H",
+                                      1.0,
+                                      1.010);
+GeoElement *oxygen = new GeoElement("Oxygen",
+                                    "O",
+                                    8.0,
+                                    16.0);
 water->add(hydrogen,0.11);
 water->add(oxygen,0.89);
 water->lock();
@@ -100,3 +106,49 @@ if (myShape->typeId()==GeoBox::classTypeId()) {
 ```
 
 The methods `typeId()` and `classTypeId()` return unsigned integers, making the type identification very  fast.  Alternately one can use the methods `type()` and `classType()`, which work in the same way, except that these methods return `std::string`-s:  “Box”, “Tubs”, “Cons”, etc.
+
+### Logical Volumes
+
+Logical volumes represent, conceptually, a specific manufactured piece that can be placed in one or more locations around the detector.  A logical volume is created by specifying a name tag for the volume, a shape, and a material:
+
+```cpp
+const GeoLogVol *myLog = new  GeoLogVol("MyLogVol",
+                                        myShape,
+                                        gNitrogen);
+```
+
+### Physical Volumes and the Geometry Graph
+
+Having created elements, materials, shapes, and logical volumes, you are now ready to create and locate placed volumes called physical volumes. Before you start, you will need to know that there are two kinds of these:
+
+ * Regular Physical Volumes, designed to be small.
+ * Full Physical Volumes, designed to hold in cache complete information about how the volume is located with respect to the world volume, its formatted name string and other important information.
+
+There is a common abstract [base class](/components/kernel/overview/#geomodel-kernel-overview) for all of these:  `GeoVPhysVol`.  In addition both the full physical volumes have another layer of abstraction, `GeoVFullPhysVol`. All physical volumes allow access to their children.
+
+The concrete subclasses that you have at your disposition for detector description are called [GeoPhysVol](/components/kernel/reference/#geophysvol) and [GeoFullPhysVol](/components/kernel/reference/#geofullphysvol).  Both of these have a method to add either volumes or volume properties:
+
+```cpp
+GeoPhysVol* myVol;
+myVol->add(aTransformation);
+myVol->add(anotherVolume);
+```
+
+When you add a transformation, you change the position of the subsequent volume with respect to the parent.  If you add no transformation, you will not shift the daughter relative to the parent and commonly will create a daughter which is centered directly in the parent. If you add more than one transformation to the volume before adding a parent, they will be multiplied.  The last transformation to be added is applied first to the child. Transformations are discussed next. Like logical volumes, they may be shared.
+
+Like physical volumes, transformations come in two types:
+
+* Regular transformations designed to be small.
+* Alignable transformations, which allow one to add a misalignment to the system.  Misaligning a transformation changes the position of all volumes “under” the transformation and clears the absolute location caches of all full physical volumes.
+
+When you create a transformation, you must choose the type.
+
+The model of the raw geometry is a tree of nodes, property nodes and volume nodes. The tree can be thought of as a tree of volumes, each one “having” a set of properties (inherited from property nodes throughout the tree). The subsystem engineer judiciously chooses which of the volumes are to contain full, cached, position information – usually, these first-class volumes are to be associated with a detector. He or she also judiciously decides which of the transformations are to be alignable—usually these are the transformations which position something that ultimately has a detector bolted, glued, riveted or otherwise clamped onto a sensitive piece.  Then, the developer can apply several techniques for keeping track of these pointers so that the important volumes can later be connected to detector elements, and the alignable transformations can be connected to the alignment database for periodic updating.
+
+Finally, we provide three mechanisms for giving names to volumes:
+
+* Do nothing.  The volume will be called "ANON".
+* Add a [GeoNameTag](/components/kernel/reference/#geonametag) object to the graph before adding a volume.  The next volume to be added will be given the `GeoNameTag`’s name.
+* Add a [GeoSerialDenominator](/components/kernel/reference/#geoserialdenominator) object to the graph before adding more volumes. The volumes will be named according to the base name of the `GeoSerialDenominator`, plus given a serial number: 0, 1, 2, 3, ...
+
+In effect this last method can be thought of as a way of parametrizing the name of the volume.

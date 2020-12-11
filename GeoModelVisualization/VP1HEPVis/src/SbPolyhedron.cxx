@@ -16,6 +16,9 @@
 #include <VP1HEPVis/SbTwistTrapParallelSide.h>
 #include <VP1HEPVis/SbTwistTrapFlatSide.h>
 
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'SYSTEM_OF_UNITS::cm'
+
 #include <cassert>
 
 #define perMillion 0.000001
@@ -1514,7 +1517,10 @@ SbPolyhedronTwistedTrap::SbPolyhedronTwistedTrap (double TwistPhi, double Dz,
  *
  ***********************************************************************/
 {
-    fPhiTwist = TwistPhi;
+    if(TwistPhi!=0)
+        fPhiTwist = TwistPhi;
+    else
+        fPhiTwist = 1.E-24*deg;
     fDz = Dz;
     fTheta = Theta;
     fPhi = Phi;

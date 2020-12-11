@@ -1,11 +1,20 @@
-### GeoPhysVol
+### GeoFullPhysVol
 
 ```cpp
-// GeoPhysVol
+// GeoFullPhysVol
   //Constructor:
-    GeoPhysVol (const GeoLogVol * LogVol)
+    GeoFullPhysVol (const GeoLogVol * LogVol)
   //Public Methods:
     void add (GeoGraphNode * graphNode)
+    GeoFullPhysVol* clone(bool attached=true)
+    const GeoFullPhysVol* cloneOrigin() const
+    void clear()
+  //Public Methods from GeoVFullPhysVol
+    const GeoTrf::Transform3D & getAbsoluteTransform () const
+    const GeoTrf::Transform3D & getDefAbsoluteTransform () const
+    void clearPositionInfo () 
+    const std::string &  getAbsoluteName () const
+    Query<unsigned int> getId () const
   //Public Methods from GeoVPhysVol
     bool isShared() const
     Query<unsigned int> indexOf (PVConstLink daughter) const
@@ -29,11 +38,30 @@
     void dockTo (GeoVPhysVol* pv)
 ```
 
-`GeoPhysVol (const GeoLogVol * LogVol)` Constructs the physical volume from the logical volume. The reference count of the logical volume is incremented, and will be decremented again when the physical volume is destroyed.
+`GeoFullPhysVol (const GeoLogVol * LogVol)` Constructs the full physical volume from the logical volume. The reference count of the logical volume is incremented, and will be decremented again when the physical volume is destroyed.
 
-`void add (GeoGraphNode * graphNode)` Adds a graph node to the physical volume.  The reference count of the graph node is incremented.
+`void add (GeoGraphNode * graphNode)` Adds a graph node to the full physical volume.  The reference count of the graph node is incremented.
 
-`bool isShared() const` Accessor to determine whether the physical volume is shared; i.e, used more than once in the geometry description.
+`GeoFullPhysVol* clone(bool attached=true)` Clones full physical volume, and returns a pointer to the cloned instance. 
+
+* If the `attached` argument is `true`, then all cloned volumes are meant to stay identical to their clone origin for the entire lifetime. No further modifications are permitted either in origin, or its clones. I
+* If the `attached` argument is `false`, further modifications in clone origin and its clones are permitted.
+
+`const GeoFullPhysVol* cloneOrigin() const` Returns a pointer to the full physical volume this object has been cloned from, otherwise returns `nullptr`.
+
+`void clear()` Drop the tree under this node. **This method breaks consistency of cloned volumes!**
+
+`const GeoTrf::Transform3D & getAbsoluteTransform () const` Returns the absolute transform with respect to global coordinate system.
+
+`const GeoTrf::Transform3D & getDefAbsoluteTransform () const` Retuns the default absolute transform with respect to the global coordinate system.
+
+`void clearPositionInfo ()` Clears the position information cache.  Users do not normally ever need to do this. The cache is automatically cleared by the geometry system whenever a change in alignment is detected.
+
+`const std::string &  getAbsoluteName () const` Returns the absolute name of the volume.  This is a “/” separated string of names whose substrings represent physical volumes along the path from the world physical volume down to this volume.
+
+`Query<unsigned int> getId () const` Returns an integer identifier for labeling purposes.
+
+`bool isShared() const` Accessor to determine whether the full physical volume is shared; i.e, used more than once in the geometry description. Given full physical volumes cannot be shared, this method is expected to only return `false`.
 
 `Query<unsigned int> indexOf (PVConstLink daughter) const` Accessor to determine the index of a daughter physical volume, in other words, in position within the list of daughters.  The result only counts physical volumes as daughters, not their properties.  
 

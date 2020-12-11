@@ -9,9 +9,9 @@ Before creating hierarchies of volumes representing positioned pieces of detecto
 
 ### Materials
 
-Materials are represented within the geometry kernel class library by the class [GeoMaterial](/kernel/reference/#geomaterial), and are built up by combining different elements, specifying each element and its fraction-by-mass.  Material constants such as the radiation length and the interaction length, as well as constants for ionization energy loss, are available through the interface but do not need to be provided to the constructor.  Instead, they are computed from the material’s element list.
+Materials are represented within the geometry kernel class library by the class [GeoMaterial](/components/kernel/reference/#geomaterial), and are built up by combining different elements, specifying each element and its fraction-by-mass.  Material constants such as the radiation length and the interaction length, as well as constants for ionization energy loss, are available through the interface but do not need to be provided to the constructor.  Instead, they are computed from the material’s element list.
 
-The class [GeoElement](/kernel/reference/#geoelement) is used to represent elements.  Their constructor requires a name, symbol, and effective Z and A. These properties can also be retrieved from the element.
+The class [GeoElement](/components/kernel/reference/#geoelement) is used to represent elements.  Their constructor requires a name, symbol, and effective Z and A. These properties can also be retrieved from the element.
 
 `GeoMaterial` objects are created by specifying a name and a density.  The material is “empty” until elements are added, one by one, using the `GeoMaterial::add()` method, which is overloaded so that one may provide either elements or prebuilt materials.  After all materials are added, the `GeoMaterial::lock()` method must be called, which prevents further elements or materials from being added.
 
@@ -78,7 +78,7 @@ polycone->addPlane(z2, rmin2, rmax2);
 
 This creates a polycone whose projection subtends an angle of 10 degrees between 40 degrees and 50 degrees, with planes at z=0, z=10, and z=15, with minimum and maximum radii there of (5,10), (6, 12), and (5,10).
 
-The shapes can provide their data to a client through their accessors, and in addition support several other operations. Boolean operations on shapes are possible.  They can be accomplished through Boolean operators in class [GeoShape](/kernel/reference/#introduction_1):
+The shapes can provide their data to a client through their accessors, and in addition support several other operations. Boolean operations on shapes are possible.  They can be accomplished through Boolean operators in class [GeoShape](/components/kernel/reference/#introduction_1):
 
 ```cpp
 GeoShape       * donut  = new GeoTube();

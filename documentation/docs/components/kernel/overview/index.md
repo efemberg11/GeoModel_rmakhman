@@ -10,4 +10,4 @@ The set of specialized routines (e.g. GeoModel detector plugins, detector factor
 
 Readout geometry synchronizes itself to raw geometry by holding a pointer to a volume in the raw geometry tree that holds its absolute transformation with respect to world coordinates in cache. The readout geometry should access this information when responding to any queries about, or relying upon, its absolute position.
 
-{!kernel/intro/Overview.md!}
+{!components/kernel/overview/Overview.md!}

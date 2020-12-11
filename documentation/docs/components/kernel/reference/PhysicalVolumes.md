@@ -31,6 +31,6 @@ In GeoModel there are two main types of physical volumes, `GeoPhysVol` and `GeoF
 
 [^PV1]: The reason for the interface classes is to provide a hook for virtual physical volumes which use recipes to generate children that do not actually exist permanently in memory.  So far this has not been necessary to achieve parameterization, but we do not for now rule out the need for an interface class.
 
-{!kernel/reference/RCBase/GeoPhysVol.md!}
+{!components/kernel/reference/RCBase/GeoPhysVol.md!}
 
-{!kernel/reference/RCBase/GeoFullPhysVol.md!}
+{!components/kernel/reference/RCBase/GeoFullPhysVol.md!}

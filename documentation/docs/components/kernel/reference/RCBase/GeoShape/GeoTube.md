@@ -19,7 +19,7 @@ The constructor fills these quantities and the accessors return them.
 
 
 <figure>
-  <img src="/kernel/reference/RCBase/GeoShape/GeoTube.png" width="400" />
+  <img src="/components/kernel/reference/RCBase/GeoShape/GeoTube.png" width="400" />
   <figcaption>Figure 2: A GeoTube object, representing a tube or "pipe".</figcaption>
 </figure>
 

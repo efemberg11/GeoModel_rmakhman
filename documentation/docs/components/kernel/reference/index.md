@@ -6,19 +6,19 @@ Detailed descriptions of the geometry kernel classes follow.
 
 
 
-{!kernel/reference/ReferenceCounting.md!}
+{!components/kernel/reference/ReferenceCounting.md!}
 
-{!kernel/reference/Materials_Elements.md!}
+{!components/kernel/reference/Materials_Elements.md!}
 
-{!kernel/reference/Shapes.md!}
+{!components/kernel/reference/Shapes.md!}
 
-{!kernel/reference/LogicalVolumes.md!}
+{!components/kernel/reference/LogicalVolumes.md!}
 
-{!kernel/reference/PhysicalVolumes.md!}
+{!components/kernel/reference/PhysicalVolumes.md!}
 
-{!kernel/reference/Transformations.md!}
+{!components/kernel/reference/Transformations.md!}
 
-{!kernel/reference/NameTags.md!}
+{!components/kernel/reference/NameTags.md!}
 
 
 

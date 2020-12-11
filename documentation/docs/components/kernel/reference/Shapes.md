@@ -86,23 +86,23 @@ The classes `GeoShapeShift`, `GeoShapeUnion`, `GeoShapeSubtraction`, and `GeoSha
 
 We now present the interfaces to specific shapes.  In general these shapes are by default constructed as symmetrically around the origin as possible.  
 
-{!kernel/reference/RCBase/GeoShape/GeoBox.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoBox.md!}
 
-{!kernel/reference/RCBase/GeoShape/GeoCons.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoCons.md!}
 
-{!kernel/reference/RCBase/GeoShape/GeoPara.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoPara.md!}
 
-{!kernel/reference/RCBase/GeoShape/GeoPcon.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoPcon.md!}
 
-{!kernel/reference/RCBase/GeoShape/GeoPgon.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoPgon.md!}
 
-{!kernel/reference/RCBase/GeoShape/GeoTrap.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoTrap.md!}
 
-{!kernel/reference/RCBase/GeoShape/GeoTube.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoTube.md!}
 
-{!kernel/reference/RCBase/GeoShape/GeoTubs.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoTubs.md!}
 
-{!kernel/reference/RCBase/GeoShape/GeoTrd.md!}
+{!components/kernel/reference/RCBase/GeoShape/GeoTrd.md!}
 
 
 

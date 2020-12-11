@@ -1,7 +1,7 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # === Preamble ===
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.12...3.19.1)
 
 # === Project's settings ===
 # Make the 'cmake' module directory visible to CMake.

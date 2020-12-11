@@ -44,16 +44,17 @@ On request, additional packages, libraries, and tools can be built:
   - GeoModel2G4
 - FullSimLight
 
-!!! note
+**Note:**
 
-    Some of the optional packages bring in additional dependencies, for example libraries to handle 3D graphics and Geant4 for standalone detector simulations.
-    In particular, these are the additional dependencies and the packages that bring them:
+Some of the optional packages bring in additional dependencies, for example libraries to handle 3D graphics and Geant4 for standalone detector simulations.
 
-    - GeoModelTools: Xerces-C, nlohmann_json
-    - GeoModelVisualization: Qt5, Coin3D, SoQt, nlohmann_json
-    - Examples about the classes handling the GeoModel->Geant4 translation: Geant4
-    - GeoModelG4: Geant4
-    - FullSimLight: Geant4
+In particular, these are the additional dependencies and the packages that bring them:
+
+- GeoModelTools: Xerces-C, nlohmann_json
+- GeoModelVisualization: Qt5, Coin3D, SoQt, nlohmann_json
+- Examples about the classes handling the GeoModel->Geant4 translation: Geant4
+- GeoModelG4: Geant4
+- FullSimLight: Geant4
 
 
 ### Build

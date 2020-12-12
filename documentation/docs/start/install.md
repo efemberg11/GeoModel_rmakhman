@@ -34,7 +34,10 @@ Get some example geometry input files:
 ```
 sudo apt install geometry-data
 ```
-Geometry input files can then be found in /usr/share/geometry-data. 
+Geometry input files can then be found in /usr/share/geometry-data. You can visualize by typing
+```
+gmex /usr/share/geometry-data/geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
+```
 
 
 ### macOS

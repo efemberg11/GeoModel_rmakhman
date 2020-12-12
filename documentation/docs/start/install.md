@@ -1,15 +1,18 @@
-# Install the GeoModel Libraries and Tools
+# Install the GeoModel Applications and Development kits
 
-In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel libraries and tools on different platforms. 
+In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel applications and development kits on different platforms.  The GeoModel applications include
 
-## Install the GeoModel visualizer and all the libraries
+* gmex, the geometry explorer, an interactive 3d geometry visualizer
+* fullsimlight, a command-line tool to run Geant4 simulation.
+* gmclash, a Geant4 based command-line tool too perform clash detection
+* gmgeantino, a Geant4 based command-line tool to generate geantino maps
+* gm2gdml and gdml2gm, command line tools to convert GeoModel to and from GDML
+* gmcat, a command line tool to assemble geometry from multiple inputs
 
-By installing the GeoModelVisualization package, you will install the visualization tool as well as all the base GeoModel libraries and tools, and all ther dependencies.
-
-Therefore, this is the **quickest**  way to get all the libraries and tools you will need to **create**, **store**, **restore**, **visualize**, and **debug** *detector description data*.
+The development kits include header files and precompiled libraries for the development of detector description code. On some platforms (Mac) the development environment is installed together with the prebuild applications and libraries.  
 
 
-### Ubuntu 20.0.4 (focal, LTS) or 20.0.10 (groovy)
+## Ubuntu 20.0.4 (focal, LTS) or 20.0.10 (groovy)
 
 Add the geomodel repository to your source list: 
 
@@ -40,7 +43,7 @@ gmex /usr/share/geometry-data/geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
 ```
 
 
-### macOS
+## macOS
 
 On macOS, we use the Homebrew package manager to handle and install the GeoModel packages. If you don't have Homebrew installed on your machine, you should install it by following the instructions on the Homebrew website: <http://brew.sh>.
 
@@ -73,7 +76,7 @@ For older macOS releases, Homebrew will try to compile the packages from source.
 
 
 
-### Installation from source code.
+## Installation from source code.
 
 On any other platform, you can build GeoModel from sources, following [these instructions](../dev/index.md)
 

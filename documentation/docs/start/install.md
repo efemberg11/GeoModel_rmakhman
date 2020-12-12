@@ -2,7 +2,14 @@
 
 In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel libraries and tools on different platforms. 
 
-## Ubuntu 20.0.4 (focal, LTS) or 20.0.10 (groovy)
+## Install the GeoModel visualizer and all the libraries
+
+By installing the GeoModelVisualization package, you will install the visualization tool as well as all the base GeoModel libraries and tools, and all ther dependencies.
+
+Therefore, this is the **quickest**  way to get all the libraries and tools you will need to **create**, **store**, **restore**, **visualize**, and **debug** *detector description data*.
+
+
+### Ubuntu 20.0.4 (focal, LTS) or 20.0.10 (groovy)
 
 Add the geomodel repository to your source list: 
 
@@ -27,13 +34,8 @@ Get some example geometry input files:
 ```
 sudo apt install geometry-data
 ```
+Geometry input files can then be found in /usr/share/geometry-data. 
 
-
-## Install the GeoModel visualizer and all the libraries
-
-By installing the GeoModelVisualization package, you will install the visualization tool as well as all the base GeoModel libraries and tools, and all ther dependencies.
-
-Therefore, this is the **quickest**  way to get all the libraries and tools you will need to **create**, **store**, **restore**, **visualize**, and **debug** *detector description data*.
 
 ### macOS
 
@@ -67,11 +69,8 @@ For older macOS releases, Homebrew will try to compile the packages from source.
 
 
 
-### Ubuntu
 
-_Coming soon_
-
-### Other platforms
+### Installation from source code.
 
 On any other platform, you can build GeoModel from sources, following [these instructions](../dev/index.md)
 

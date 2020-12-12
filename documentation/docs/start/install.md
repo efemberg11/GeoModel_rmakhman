@@ -2,6 +2,32 @@
 
 In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel libraries and tools on different platforms. 
 
+## Ubuntu 20.0.4 (focal, LTS) or 20.0.10 (groovy)
+
+Add the geomodel repository to your source list: 
+
+```
+sudo add-apt-repository ppa:kaktusjoe/geomodel
+sudo apt-get update
+```
+Install geomodel precompiled applications
+```
+sudo apt install geomodel-visualization  # to get gmex  (the geometry explorer)
+sudo apt install fullsimlight            # to get fullsimlight,gm2gdml,gmclash, gmgeantino
+sudo apt install geomodeltools           # to get gmcat, gdml2gm
+```
+Install the geomodel development kits (header files and precompiled libraries)
+```
+sudo apt install geomodelcore-dev
+sudo apt install geomodeltools-dev
+sudo apt install geomodelg4-dev
+sudo apt install geomodel-visualization-dev
+```
+Get some example geometry input files:
+```
+sudo apt install geometry-data
+```
+
 
 ## Install the GeoModel visualizer and all the libraries
 

@@ -2,12 +2,12 @@
 
 In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel applications and development kits on different platforms.  The GeoModel applications include
 
-* gmex, the geometry explorer, an interactive 3d geometry visualizer
-* fullsimlight, a command-line tool to run Geant4 simulation.
-* gmclash, a Geant4 based command-line tool too perform clash detection
-* gmgeantino, a Geant4 based command-line tool to generate geantino maps
-* gm2gdml and gdml2gm, command line tools to convert GeoModel to and from GDML
-* gmcat, a command line tool to assemble geometry from multiple inputs
+* **gmex**, the geometry explorer, an interactive 3d geometry visualizer
+* **fullsimlight**, a command-line tool to run Geant4 simulation.
+* **gmclash**, a Geant4 based command-line tool too perform clash detection
+* **gmgeantino**, a Geant4 based command-line tool to generate geantino maps
+* **gm2gdml** and **gdml2gm**, command line tools to convert GeoModel to and from GDML
+* **gmcat**, a command line tool to assemble geometry from multiple inputs
 
 The development kits include header files and precompiled libraries for the development of detector description code. On some platforms (Mac) the development environment is installed together with the prebuild applications and libraries.  
 

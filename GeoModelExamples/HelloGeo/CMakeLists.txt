@@ -12,11 +12,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-project(HelloGeo)
+#project(HelloGeo)
 
 # Find the needed dependencies, when building individually
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # when building individually
-  find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
+  message (${CMAKE_SOURCE_DIR}) 
+  message (${PROJECT_SOURCE_DIR})
+  
+if ( CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR ) # when buildingindividually
+   find_package( GeoModelCore REQUIRED  ) 
 endif()
 
 # Find includes in current dir

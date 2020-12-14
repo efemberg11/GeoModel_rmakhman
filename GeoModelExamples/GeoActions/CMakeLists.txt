@@ -7,7 +7,7 @@
 
 cmake_minimum_required(VERSION 3.1.0)
 
-project(GeoActions)
+#project(GeoActions)
 
 # Compile with C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -15,8 +15,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # when building individually
-  find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
-  find_package( GeoModelIO REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder 
+  find_package( GeoModelCore REQUIRED  ) 
+  find_package( GeoModelIO REQUIRED ) 
 endif()
 
 # Find includes in current dir

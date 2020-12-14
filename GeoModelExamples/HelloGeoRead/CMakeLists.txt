@@ -7,7 +7,7 @@
 
 cmake_minimum_required(VERSION 3.1.0)
 
-project(HelloGeoRead)
+#project(HelloGeoRead)
 
 # Compile with C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -16,8 +16,8 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 # Find the needed dependencies, when building individually
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) 
-  find_package( GeoModelCore REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder
-  find_package( GeoModelIO REQUIRED 4.1.0 ) #TODO: the version should be se in the root folder 
+  find_package( GeoModelCore REQUIRED ) 
+  find_package( GeoModelIO REQUIRED )
 endif()
 
 # Find includes in current dir

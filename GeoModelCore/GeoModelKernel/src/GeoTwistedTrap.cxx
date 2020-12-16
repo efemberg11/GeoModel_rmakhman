@@ -67,13 +67,18 @@ m_alph(pAlph)
          )
      {
       std::cout<< "EXCEPTION!!! Invalid dimensions. Too small, or twist angle too big: "<< std::endl
-               << "fDx 1-4 = " << m_dx1/SYSTEM_OF_UNITS::cm << ", " << m_dx2/SYSTEM_OF_UNITS::cm << ", "
+               << " fDx 1-4 = " << m_dx1/SYSTEM_OF_UNITS::cm << ", " << m_dx2/SYSTEM_OF_UNITS::cm << ", "
                << m_dx3/SYSTEM_OF_UNITS::cm << ", " << m_dx4/SYSTEM_OF_UNITS::cm << " cm" << std::endl
-               << "fDy 1-2 = " << m_dy1/SYSTEM_OF_UNITS::cm << ", " << m_dy2/SYSTEM_OF_UNITS::cm << ", "
+               << " fDy 1-2 = " << m_dy1/SYSTEM_OF_UNITS::cm << ", " << m_dy2/SYSTEM_OF_UNITS::cm << ", "
                << " cm" << std::endl
-               << "fDz = " << m_dz/SYSTEM_OF_UNITS::cm << " cm" << std::endl
-               << " twistangle " << m_phiTwist/SYSTEM_OF_UNITS::deg << " deg"<< std::endl
-               << " phi,theta = " << m_phi/SYSTEM_OF_UNITS::deg << ", "  << m_theta/SYSTEM_OF_UNITS::deg << " deg";
+               << " fDz = " << m_dz/SYSTEM_OF_UNITS::cm << " cm" << std::endl
+               << " twist angle " << m_phiTwist/SYSTEM_OF_UNITS::deg << " deg"<< std::endl
+               << " phi,theta = " << m_phi/SYSTEM_OF_UNITS::deg << ", "  << m_theta/SYSTEM_OF_UNITS::deg << " deg"<< std::endl
+               << " tilt angle alpha = " << m_alph/SYSTEM_OF_UNITS::deg << " deg"<< std::endl
+               << " twistangle should be > "<< (2*m_AngTolerance)/SYSTEM_OF_UNITS::deg<<" and < "<< (SYSTEM_OF_UNITS::pi/2)/SYSTEM_OF_UNITS::deg << " deg"<<std::endl
+               << " theta should be >= 0 and < "<< (SYSTEM_OF_UNITS::pi/2)/SYSTEM_OF_UNITS::deg << " deg"<< std::endl
+               << " tilt angle alpha should be < "<< (SYSTEM_OF_UNITS::pi/2)/SYSTEM_OF_UNITS::deg << " deg"<<std::endl
+               << std::endl;
     
      }
 }

@@ -1,0 +1,29 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+# Find the dependencies of the GeoModelDataManagers target(s).
+include( CMakeFindDependencyMacro )
+find_dependency( GeoModelCore @GeoModelCore_VERSION@ CONFIG EXACT )
+find_dependency( GeoModelTools @GeoModelTools_VERSION@ CONFIG EXACT )
+find_dependency( XercesC @XercesC_VERSION@ CONFIG EXACT )
+
+# Include the exported configuration of GeoModelCore.
+get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )
+include( ${SELF_DIR}/GeoModelDataManagersTargets.cmake )
+
+# Set the version of the installed project.
+set( GeoModelDataManagers_VERSION "@PROJECT_VERSION@" )
+
+# Print some standard messages about the package being found.
+include( FindPackageHandleStandardArgs )
+find_package_handle_standard_args( GeoModelDataManagers
+    FOUND_VAR GeoModelDataManagers_FOUND
+    REQUIRED_VARS SELF_DIR
+    VERSION_VAR GeoModelDataManagers_VERSION )
+
+# Clean up.
+unset( SELF_DIR )
+
+#get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+#include(${SELF_DIR}/GeoModelDataManagers-GeoXmlMatManager.cmake)
+#include(${SELF_DIR}/GeoModelDataManagers-GeoXmlInpManager.cmake)
+

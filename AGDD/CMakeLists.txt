@@ -1,19 +1,27 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required( VERSION 3.12 )
 
 # Set up the project.
 project( "AGDD" VERSION 1.0.0 LANGUAGES CXX )
 
+# --- External dependencies ---
+# GeoModel dependencies
+find_package( GeoModelCore REQUIRED )
+find_package( GeoModelTools REQUIRED )
+# Third-party dependencies
+find_package( XercesC REQUIRED )
 
 
+# --- Add sub-projects ---
 add_subdirectory(AGDDKernel)
-#add_subdirectory(AGDDModel)
-#add_subdirectory(AGDDControl)
-#add_subdirectory(AGDDHandlers)
-#add_subdirectory(AGDDPlugin)
+add_subdirectory(AGDDModel)
+add_subdirectory(AGDDHandlers)
+add_subdirectory(AGDDControl)
+add_subdirectory(AGDDPlugin)
 
 
+# -- Export & Install the project --
 # Create and install the version description of the project.
 include( WriteBasicConfigVersionFile )
 write_basic_config_version_file(

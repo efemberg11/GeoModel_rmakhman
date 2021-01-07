@@ -44,9 +44,9 @@ find_package( GeoModelCore )
 
 # switches to let users build specific packages on request
 option( GEOMODELATLAS_BUILD_DATAMANAGERS "Enable the build of GeoModelDataManagers" OFF )
-option( GEOMODELATLAS_BUILD_AGDD "Enable the build of AGDD" ON )
+option( GEOMODELATLAS_BUILD_AGDD "Enable the build of AGDD" OFF )
 option( GEOMODELATLAS_BUILD_MUONDD "Enable the build of MuonDD" OFF )
-option( GEOMODELATLAS_BUILD_XML "Enable the build of GeoModelXML" OFF )
+option( GEOMODELATLAS_BUILD_GEOMODELXML "Enable the build of GeoModelXML" OFF )
 
 # a list to keep track of the packages we build
 set(BUILT_PACKAGES "")
@@ -68,7 +68,7 @@ if( GEOMODELATLAS_BUILD_DATAMANAGERS )
     list( APPEND BUILT_PACKAGES "GeoModelDataManagers" )
 endif()
 
-if( GEOMODELATLAS_BUILD_XML )
+if( GEOMODELATLAS_BUILD_GEOMODELXML )
     add_subdirectory(GeoModelXML)
     list( APPEND BUILT_PACKAGES "GeoModelXML" )
 endif()

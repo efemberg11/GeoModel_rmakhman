@@ -43,6 +43,7 @@ find_package( GeoModelCore )
 # === Main targets built by this project ===
 
 # switches to let users build specific packages on request
+option( GEOMODELATLAS_BUILD_ALL "Enable the build of all GeoModelATLAS sub-projects" OFF )
 option( GEOMODELATLAS_BUILD_DATAMANAGERS "Enable the build of GeoModelDataManagers" OFF )
 option( GEOMODELATLAS_BUILD_AGDD "Enable the build of AGDD" OFF )
 option( GEOMODELATLAS_BUILD_MUONDD "Enable the build of MuonDD" OFF )
@@ -50,6 +51,11 @@ option( GEOMODELATLAS_BUILD_GEOMODELXML "Enable the build of GeoModelXML" OFF )
 
 # a list to keep track of the packages we build
 set(BUILT_PACKAGES "")
+
+if( GEOMODELATLAS_BUILD_ALL )
+    set ( GEOMODELATLAS_BUILD_MUONDD TRUE ) # this also triggers AGDD and GeoModelDataManagers
+    set ( GEOMODELATLAS_BUILD_GEOMODELXML TRUE )
+endif()
 
 if( GEOMODELATLAS_BUILD_MUONDD )
     set ( GEOMODELATLAS_BUILD_AGDD TRUE )

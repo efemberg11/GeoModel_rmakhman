@@ -35,6 +35,8 @@ public:
   virtual void handlePcon(const GeoPcon *pcon);
 
   virtual void handleTrap(const GeoTrap *trap);
+    
+  virtual void handleTwistedTrap(const GeoTwistedTrap *twistedtrap);
 
   virtual void handleTrd(const GeoTrd *trd);
 

@@ -17,6 +17,7 @@
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoPara.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
@@ -37,6 +38,7 @@
 #include "G4Cons.hh"
 #include "G4Polyhedra.hh"
 #include "G4Trap.hh"
+#include "G4TwistedTrap.hh"
 #include "G4Para.hh"
 #include "G4UnionSolid.hh"
 #include "G4DisplacedSolid.hh"
@@ -359,6 +361,28 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
                             theTrap->getDxdyndzp(),
                             theTrap->getDxdypdzp(),
                             theTrap->getAngleydzp());
+    }
+  //
+  // GeoTwistedTrap
+  //
+  else if(geoShape->typeID() == GeoTwistedTrap::getClassTypeID())
+    {
+      const GeoTwistedTrap* theTwistedTrap = dynamic_cast<const GeoTwistedTrap*>(geoShape);
+      if (nullptr==theTwistedTrap) throw std::runtime_error("TypeID did not match cast for trap");
+      if (n.empty()) n="G4TwistedTrap";
+      if (theTwistedTrap->getZHalfLength()<=0.){ std::cout<<"TwistedTrap " << n << " has an z side of " << theTwistedTrap->getZHalfLength() <<" - using std::abs."<<std::endl;}
+      theSolid = new G4TwistedTrap(n,
+                            theTwistedTrap->getPhiTwist(),
+                            std::abs(theTwistedTrap->getZHalfLength()),
+                            theTwistedTrap->getTheta(),
+                            theTwistedTrap->getPhi(),
+                            theTwistedTrap->getY1HalfLength(),
+                            theTwistedTrap->getX1HalfLength(),
+                            theTwistedTrap->getX2HalfLength(),
+                            theTwistedTrap->getY2HalfLength(),
+                            theTwistedTrap->getX3HalfLength(),
+                            theTwistedTrap->getX4HalfLength(),
+                            theTwistedTrap->getTiltAngleAlpha());
     }
   //
   // Simple Polygon Brep

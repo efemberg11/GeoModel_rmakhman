@@ -3,32 +3,33 @@
 This is the set of libraries for the ATLAS AGDD system (muon passive material implementation), including the 
 plugin (`AGDDPlugin`) needed to run it with `geomodelexplorer` (`gmex`).
 
-Installation requires that the [GeoModel](https://gitlab.cern.ch/GeoModelDev/GeoModel) suite and [GeoModelDataManagers](https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers) are installed. Please refer to https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/master/README.md and https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers/-/blob/master/README.md for additional documentation.
-
-## Installation of GeoModelDataManagers
-
-```bash
-git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers
-mkdir build_datamanagers && cd build_datamanagers
-cmake -DCMAKE_INSTALL_PREFIX=../install/ ../GeoModelDataManagers/
-make
-make install
-cd ..
-```
+Installation requires that the [GeoModel](https://gitlab.cern.ch/GeoModelDev/GeoModel) suite is installed. Please refer to https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/master/README.md for additional documentation.
 
 ## Cloning and building
 
-If `GeoModel` and `GeoModelDataManagers` are installed:
+If `GeoModel` is installed:
 
 ```bash
-git clone https://gitlab.cern.ch/GeoModelATLAS/agdd.git
-mkdir build_agdd ; cd build_agdd
-cmake  -DCMAKE_INSTALL_PREFIX=../install/ ../agdd
-make install
+git clone ssh://git@gitlab.cern.ch:7999/atlas/geomodelatlas/GeoModelATLAS.git
+mkdir build_geomodelatlas; cd build_geomodelatlas
+cmake -DCMAKE_INSTALL_PREFIX=../install/ -DGEOMODELATLAS_BUILD_AGDD=1 ../GeoModelATLAS
+make
+sudo make install
 cd ..
 ```
 
 ## Running gmex with AGDD
+
+In case you did not do it already, to run `gmex`, you need:
+
+On MacOS:
+```
+install_name_tool -add_rpath ../install/lib ../install/bin/gmex
+```
+On Ubuntu:
+```
+export LD_LIBRARY_PATH=${PWD}/../install/lib/
+```
 
 Running the AGDDPlugin executes the xerces parser to parse the xml file. The expression evaluator only works if the system language is set to USEnglish, thus do:
 ```bash
@@ -41,10 +42,10 @@ export LC_NUMERIC=en_US.UTF-8
 
 **NOTE**: If the `GEOMODEL_XML_DIR` environment variable is not set, the `AGDDPlugin` will crash with a segmentation violation, since the `GeoXmlMatManager` cannot find the material definitions. Thus, set this variable to:
 ```bash
-export GEOMODEL_XML_DIR=../GeoModelDataManagers/GeoXmlMatManager/SampleInput/
+export GEOMODEL_XML_DIR=../GeoModelATLAS/GeoModelDataManagers/GeoXmlMatManager/SampleInput/
 ```
 
-To display an AGDD example xml file:
+To display an AGDD example xml file (the `.xml` file must be called `AMDC.xml` to use the plugin):
 ```bash
 cd install
 cp ../agdd/AGDDPlugin/data/AMDC.xml .

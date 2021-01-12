@@ -7,6 +7,7 @@
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
@@ -142,6 +143,17 @@ void SoVisualizeAction::handleTrap(const GeoTrap *trap)
 				trap->getDydzp(), trap->getDxdyndzp(), trap->getDxdypdzp(),
 				trap->getAngleydzn(), trap->getAngleydzp());
   m_shape=gb;
+}
+
+void SoVisualizeAction::handleTwistedTrap(const GeoTwistedTrap *twistedtrap)
+{
+    SbPolyhedrizeAction a;
+    twistedtrap->exec(&a);
+    const SbPolyhedron *poly =a.getPolyhedron();
+    if (poly) {
+      SoPolyhedron *myPoly = new SoPolyhedron(poly);
+      m_shape=myPoly;
+    }
 }
 
 void SoVisualizeAction::handleTrd(const GeoTrd *trd)

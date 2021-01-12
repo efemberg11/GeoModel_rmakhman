@@ -22,7 +22,7 @@ pip install mkdocs-mermaid2-plugin # adds support for mermaid diagrams / flowcha
 
 
 
-echo "\n\n\nSuccess!!\nYou can now build and serve the web iste locally by running: 'brew serve'"
+echo "\n\n\nSuccess!!\nYou can now build and serve the web iste locally by running: 'mkdocs serve'"
 echo "\n[Note: if you have mkdocs installed on your system folders already, to avoid errors about missing packages, you might have to run the one in the virtualenv explicitely, by running: './venvp3/bin/mkdocs serve']"
 
 echo "\nThen, when you finished working with mkdocs, you can close the virtual environment by running: 'deactivate'\n\n"

@@ -44,6 +44,8 @@ class SbPolyhedrizeAction : public GeoShapeAction
       virtual void handlePgon(const GeoPgon *pgon);
 
       virtual void handleTrap(const GeoTrap *trap);
+    
+      virtual void handleTwistedTrap(const GeoTwistedTrap *twistedtrap);
 
       virtual void handleTrd(const GeoTrd *trd);
 

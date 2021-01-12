@@ -11,7 +11,7 @@ void volumeHandler::ElementHandle()
 	shape=nullptr;
 	name=getAttributeAsString("name");
 	//name=stripPointer(getAttributeAsString("name"));
-	//std::cout<<" this is volumeHandler: name "<<name<<std::endl;
+	std::cout<<" this is volumeHandler: name "<<name<<std::endl;
 
 	StopLoop(true);
 	xercesc::DOMNode *child;

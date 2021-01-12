@@ -6,8 +6,10 @@
 #include "GDMLInterface/GDMLController.h"
 #include "GDMLInterface/fraction.h"
 #include "GDMLInterface/densityHandler.h"
+#include "GDMLInterface/atomHandler.h"
 
 #include "GeoModelKernel/GeoMaterial.h"
+#include "GeoModelKernel/GeoElement.h"
 
 #include "GeoModelXMLParser/XercesParser.h"
 
@@ -18,8 +20,8 @@ public:
 	void ElementHandle() {
 		//name=stripPointer(getAttributeAsString("name"));
 		name=getAttributeAsString("name");
+		Z=getAttributeAsInt("Z",explicitMaterial);
 		density=0;
-
 		StopLoop(true);
 		xercesc::DOMNode *child;
 
@@ -41,7 +43,11 @@ public:
                         if (!dH) std::cout<<" something is wrong! can not retrieve densityHandler!!!"<<std::endl;
                         density=dH->getDensity();
                     }
-                    
+                    else if (nH=="atom") {
+			atomHandler* aH=dynamic_cast<atomHandler*>(h);
+			if (!aH) std::cout<<" something is wrong! can not retrieve atomHandler!!!"<<std::endl;
+			A=aH->atomicWeight();
+                    }                    
                 }
                 else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
                 
@@ -52,7 +58,12 @@ public:
 	{
 		//std::cout<<"new material "<<name<<" density "<<density<<std::endl;
 		GeoMaterial* newMaterial=new GeoMaterial(stripPointer(name),density);
-		for (auto f: fractionList)
+		if (explicitMaterial)
+		{
+			GeoElement* newElement=new GeoElement(name,name,Z,A);
+			newMaterial->add(newElement,1.0);
+		}
+		else for (auto f: fractionList)
 		{
 			//std::cout<<"\t fraction "<<" f.ref "<<f.ref<<" f.weight "<<f.weight<<std::endl;
 			GeoElement* e=theController->retrieveElement(stripPointer(f.ref));
@@ -67,6 +78,9 @@ public:
 private:
 	std::string name;
 	double density;
+	bool explicitMaterial=false;
+	int Z=0;
+	double A=0;
   std::vector<fraction> fractionList;
 };
 

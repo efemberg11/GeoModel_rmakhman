@@ -15,4 +15,12 @@ The external dependencies are minimal:
 
 ----
 
-*This Documentation is Work In Progress*
+<i>Last update:</i> 
+{% if git.status %}
+  <i> {{ git.date.strftime("%b %d, %Y -- %H:%M") or now() }} </i>
+{% else %}
+  <i> {{ now() }} </i> 
+{% endif %}
+
+
+

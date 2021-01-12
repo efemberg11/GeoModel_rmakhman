@@ -4,6 +4,7 @@ site_author: ATLAS Collaboration & Contributors
 site_url: https://cern.ch/geomodel/home
 repo_name: GeoModel
 repo_url: https://gitlab.cern.ch/GeoModelDev/GeoModel
+site_author: geomodel-developers@cern.ch
 
 theme:
     name: material
@@ -29,6 +30,7 @@ nav:
         - Kernel:
             - 'Overview': 'components/kernel/overview/index.md'
             - 'Class Reference': 'components/kernel/reference/index.md'
+              #- 'Box': 'components/kernel/reference/RCBase/GeoShape/GeoBox.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'
         - 'Install single packages': 'dev/install-single-packages.md'
@@ -60,9 +62,11 @@ markdown_extensions:
 
 plugins:
   - search
-  - macros
+  - macros:
+        module_name: imgutils
+        verbose: true # enables debug through the 'chatter' method
   - mermaid2 # for diagrams
-  #- git-revision-date #TODO: teh mkdocs docker image apparently lacks the git exec, so this cannot be used. Update the image!
+  #- git-revision-date #TODO: the mkdocs docker image apparently lacks the git exec, so this cannot be used. Update the image!
 
 extra_javascript:
   - javascripts/config.js

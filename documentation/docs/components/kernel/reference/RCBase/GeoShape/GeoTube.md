@@ -18,10 +18,13 @@ The `GeoTube` class represents a tube, specified by an inner radius (`RMin`), an
 The constructor fills these quantities and the accessors return them.
 
 
-<figure>
-  <img src="/components/kernel/reference/RCBase/GeoShape/GeoTube.png" width="400" />
-  <figcaption>Figure 2: A GeoTube object, representing a tube or "pipe".</figcaption>
-</figure>
+
+{{ imgutils_image_caption('RCBase/GeoShape/GeoTube.png', 
+   alt='The GeoTube shape', 
+   cap='Figure N: A GeoTube object, representing a tube or "pipe".',
+   urlFix=False) 
+}}
+
 
 
 

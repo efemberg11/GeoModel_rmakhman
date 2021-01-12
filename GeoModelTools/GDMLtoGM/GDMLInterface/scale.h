@@ -9,6 +9,7 @@ struct scale {
 	double scalex=0;
 	double scaley=0;
 	double scalez=0;
+        double unit;
 };
 
 #endif

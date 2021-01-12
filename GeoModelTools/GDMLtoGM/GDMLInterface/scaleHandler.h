@@ -22,6 +22,7 @@ public:
 			p.scalex=getAttributeAsDouble("x");
 			p.scaley=getAttributeAsDouble("y");
 			p.scalez=getAttributeAsDouble("z");
+                        p.unit=getAttributeAsDouble("unit", 1);
 			
 			theController->saveScale(p.name,p);
 		}

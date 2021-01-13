@@ -22,14 +22,16 @@ nav:
         - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
         - 'Load a geometry from a file': 'how/how_load_geo.md'
         - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
-    - Papers & Presentations:
-        - 'Public': 'papers/public.md'
-        - 'Internal': 'papers/internal.md'
     - GeoModel Components:
         - Kernel:
             - 'Overview': 'components/kernel/overview/index.md'
             - 'Class Reference': 'components/kernel/reference/index.md'
               #- 'Box': 'components/kernel/reference/RCBase/GeoShape/GeoBox.md'
+    - FullSimLight tools:
+        - 'FullSimLight': 'fullsimlight/fullsimlight/index.md'
+        - 'GeoModelClash (gmclash)': 'fullsimlight/gmclash/index.md'
+        - 'GeoModelGeantino (gmgeantino)': 'fullsimlight/gmgeantino/index.md'
+        - 'GeoModeltoGDML (gmtogdml)': 'fullsimlight/gmtogdml/index.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'
         - 'Build FullSimLight': 'dev/build_fullsimlight.md'
@@ -38,6 +40,9 @@ nav:
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
         - 'Contributing to the Documentation': 'dev/docs-contrib.md'
         - 'FAQ': 'dev/dev-faq.md'
+    - Papers & Presentations:
+        - 'Public': 'papers/public.md'
+        - 'Internal': 'papers/internal.md'
     - Team & History: 'about/team.md'
     - Contacts: 'about/contacts.md'
 

@@ -11,9 +11,11 @@
 
 class densityHandler:public GDMLHandler {
 public:
+
 	densityHandler(std::string n, GDMLController* c);
 	void ElementHandle();
 	double getDensity();
+
 private:
 	double unit;
 	double value;

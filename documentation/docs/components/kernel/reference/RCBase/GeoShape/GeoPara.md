@@ -23,7 +23,7 @@ The `GeoPara` class represents a parallelepiped. Faces at $\pm z$ are parallel t
 
 !!! warning
 
-    Visualization of GeoPgon is on the to-do list.
+    Visualization of GeoPara is on the to-do list.
 
 
 

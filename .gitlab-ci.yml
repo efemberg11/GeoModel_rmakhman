@@ -521,7 +521,7 @@ build_full_docker:
     # all submodules will be cloned recursively upon start of CI job
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SSL_NO_VERIFY: "true"
-    BUILD_ARG: BASEIMAGE='$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Full'
+    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Base
   tags:
     - docker-image-build
   script:
@@ -537,7 +537,7 @@ build_light_docker:
     # all submodules will be cloned recursively upon start of CI job
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SSL_NO_VERIFY: "true"
-    BUILD_ARG: BASEIMAGE='$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Full'
+    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Base
   tags:
     - docker-image-build
   script:

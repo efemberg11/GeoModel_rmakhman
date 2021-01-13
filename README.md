@@ -4,40 +4,79 @@ This repository contains plugins that create GeoModel geometries.
 
 ## Build from source.
 
-To build  plugins for the GeometryExplorer <https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization>:
- 
-* Install the GeoModelCore development kit (quick method):
+### Build the whole GeoModel, GeoModelATLAS, GeoModelPlugins software stack
 
-```bash
-sudo add-apt-repository ppa:kaktusjoe/geomodel
-sudo apt-get update
-sudo apt install geomodel-core-dev
+#### Dependencies
+
+
+##### Build GeoModel
+
+These instructions assume you build GeoModel from sources; however, if you're not interested in developing the GeoModel code itself, you can simply install it by using, on supported platforms, a package manager. Refer to the main documentation for that: https://geomodel.web.cern.ch/home/start/install/
+
+As external dependencies, you need at least Eigen3, nlohmann_josn, Xerces-C on your computer. Plus, Coin, SoQt, and Qt5 if you want to build the visualization tools. Refer to the GeoModel documentation for more details: https://geomodel.web.cern.ch/home/dev/
+
+After that, you can build GeoModel:
+
+
+```
+git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModel.git
+
+mkdir build_gm
+cd build_gm
+
+cmake -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_BUILD_TOOLS=1 -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel
 ```
 
-* Install the GeoModelCore development kit (from source):
+You should see this output message on your screen:
 
-      follow instructions at <https://gitlab.cern.ch/GeoModelDev/GeoModelCore>
+```
+-- -----
+-- Building the following 3 packages: GeoModelCore, GeoModelIO, GeoModelTools, GeoModelVisualization
+-- -----
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/rbianchi/code_work_local/atlas/GeoModelDev/test_geomodelplugins_build_geomodelatlas_monorepo_13Jan2021/b_gm
+```
 
-* Build and install the plugins from source
+Then, you can compile GeoModel:
 
-Make sure you have built and installed the following packages:
+```
+make -j4
+make install
+cd ..
+```
 
-- GeoModelCore (from GeoModelDev)
-- GeoModelTools (from GeoModelDev)
-- GeoModelDataManagers (GeoModelATLAS)
 
-After that proceed with building the plugins and installing them into ${PLUGIN_INSTALL_DIR} as follows:
 
-```bash
-git clone https://gitlab.cern.ch/atlas/GeoModelPlugins
+##### Build GeoModelATLAS
+
+
+```
+git clone ssh://git@gitlab.cern.ch:7999/atlas/geomodelatlas/GeoModelATLAS.git
+mkdir build_gmatlas
+cd build_gmatlas
+
+cmake -DCMAKE_INSTALL_PREFIX=../install -DGEOMODELATLAS_BUILD_ALL=1 ../GeoModelATLAS
+make -j4
+make install
+cd ..
+```
+
+## Build GeoModelPlugins
+
+```
+git ckone ssh://git@gitlab.cern.ch:7999/atlas/GeoModelPlugins.git
 mkdir build_plugins
 cd build_plugins
-cmake -DCMAKE_INSTALL_PREFIX=${PLUGIN_INSTALL_DIR} ../GeoModelPlugins
+
+cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelPlugins
 make -j4
-make instal
+make install
 ```
-      
-* Your plugins are ready!  Run them with gmex (see <https://gitlab.cern.ch/GeoModelDev/GeoModelVisualization> )
+
+
+
+* Your plugins are ready!  Run them with gmex (see <https://gitlab.cern.ch/GeoModelDev/GeoModel/GeoModelVisualization> )
 
 ## ToyGeometryPlugin
 

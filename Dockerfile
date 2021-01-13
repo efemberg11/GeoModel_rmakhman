@@ -26,8 +26,7 @@ RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev
 RUN apt-get update && apt-get install -y mesa-utils build-essential libgl1-mesa-dev
 
 # Set up the ATLAS user, and give it super user rights.
-RUN echo '%wheel	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers && \
-    adduser atlas && chmod 755 /home/atlas && \
+RUN adduser atlas && chmod 755 /home/atlas && \
     usermod -aG wheel atlas && \
     usermod -aG root atlas && \
     mkdir /workdir && chown "atlas:atlas" /workdir && \

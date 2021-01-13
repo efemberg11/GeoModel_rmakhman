@@ -4,8 +4,8 @@
 include( CMakeFindDependencyMacro )
 find_dependency( GeoModelCore @GeoModel_VERSION@ CONFIG EXACT )
 find_dependency( GeoModelIO @GeoModel_VERSION@ CONFIG EXACT )
-find_dependency( nlohmann_json @nlohmann_json_VERSION@ EXACT )
-find_dependency( XercesC @XercesC_VERSION@ EXACT )
+find_dependency( nlohmann_json @nlohmann_json_VERSION@ )
+find_dependency( XercesC @XercesC_VERSION@ )
 
 # Include the exported configuration of GeoModelTools.
 get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )

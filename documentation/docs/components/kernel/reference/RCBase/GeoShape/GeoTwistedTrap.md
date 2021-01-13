@@ -38,7 +38,8 @@ The face at $+ \Delta z$ is twisted with respect to the one at $- \Delta z$  of 
 
 The constructor fills the `GeoTwistedTrap` with these values and the accessors return them.
 
-<figure>
-  <img src="/reference/RCBase/GeoShape/GeoTwistedTrap.png" width="400" />
-  <figcaption>Figure 2: A GeoTwistedTrap object, representing a twisted trapezoid.</figcaption>
-</figure>
+{{ imgutils_image_caption('RCBase/GeoShape/GeoTwistedTrap.png', 
+   alt='The GeoTwistedTrap shape', 
+   cap='Figure:  GeoTwistedTrap object, representing a twisted trapezoid.',
+   urlFix=False) 
+}}

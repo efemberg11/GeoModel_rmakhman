@@ -503,6 +503,7 @@ build_docker:
   stage: step-A
   variables:
     TO: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    DOCKER_FILE: 'CI/Dockerfile'
     # all submodules will be cloned recursively upon start of CI job
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SSL_NO_VERIFY: "true"

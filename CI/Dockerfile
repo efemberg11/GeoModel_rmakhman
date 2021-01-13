@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y tzdata && ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
 
 ### Install C++, cmake and python
-RUN apt-get update && apt-get install -y cmake g++ python
+RUN apt-get update && apt-get install -y cmake g++ python git sudo
 
 ### Boost installation
 RUN apt-get update && apt-get install -y libboost-all-dev
@@ -26,16 +26,27 @@ RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev
 RUN apt-get update && apt-get install -y mesa-utils build-essential libgl1-mesa-dev
 
 # Set up the ATLAS user, and give it super user rights.
-RUN addgroup wheel && \    
-    echo '%wheel	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers && \
-    adduser atlas && chmod 755 /home/atlas && \
-    usermod -aG wheel atlas && \
-    usermod -aG root atlas && \
-    mkdir /workdir && chown "atlas:atlas" /workdir && \
-    chmod 755 /workdir
+#RUN addgroup wheel && \    
+#    echo '%wheel	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers && \
+#    adduser atlas && chmod 755 /home/atlas && \
+#    usermod -aG wheel atlas && \
+#    usermod -aG root atlas && \
+#    mkdir /workdir && chown "atlas:atlas" /workdir && \
+#    chmod 755 /workdir
 
 USER atlas
 WORKDIR /workdir
+
+### First install Geant4 as we want to have the full functionallity
+#RUN git clone https://gitlab.cern.ch/geant4/geant4.git --branch 'v10.6.0' && \
+#    mkdir build_geant4 && \
+#    cd build_geant4 && \
+#    cmake -DCMAKE_INSTALL_PREFIX=../install-DCMAKE_BUILD_TYPE=Release -DGEANT4_INSTALL_DATA=ON-DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON ../geant4/ \
+#    make -j2  && \
+#    make install
+    
+
+
 
 COPY . /workdir/GeoModel_src/
 

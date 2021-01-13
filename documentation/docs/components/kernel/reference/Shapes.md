@@ -19,6 +19,7 @@ The shape classes in the geometry kernel are data structures designed to describ
 | GeoTrd  | Trapezoid (simple) |
 | GeoTube | Tube |
 | GeoTubs | Tube Section |
+| GeoTwistedTrap | Twisted Trapezoid |
 
 Table 1: Existing geometrical shapes in the GeoModel kernel.
 
@@ -104,6 +105,8 @@ We now present the interfaces to specific shapes.  In general these shapes are b
 {% include 'components/kernel/reference/RCBase/GeoShape/GeoTubs.md' %}
 
 {% include 'components/kernel/reference/RCBase/GeoShape/GeoTrd.md' %}
+
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoTwistedTrap.md' %}
 
 
 

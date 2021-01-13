@@ -27,7 +27,7 @@ RUN mkdir -p /workdir/build_geomodel/ && \
     make -j2 && \
     sudo make install && \
     cd .. && \
-    rm -rf build_geomodel GeoModel_src && \
+    sudo rm -rf build_geomodel GeoModel_src && \
     echo "export PATH=\"/usr/local/GeoModel/bin:${PATH}\"" >> ~/.bashrc && \
     echo "export LD_LIBRARY_PATH=\"/usr/local/GeoModel/lib:${LD_LIBRARY_PATH}\"" >> ~/.bashrc
     

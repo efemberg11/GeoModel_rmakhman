@@ -62,7 +62,7 @@ make install
 cd ..
 ```
 
-## Build GeoModelPlugins
+#### Build GeoModelPlugins
 
 ```
 git ckone ssh://git@gitlab.cern.ch:7999/atlas/GeoModelPlugins.git

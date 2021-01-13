@@ -8,12 +8,10 @@ cmake_minimum_required(VERSION 3.1)
 project( "MagFieldServices" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
 # External dependencies:
-find_package( Eigen3 REQUIRED )
-
-if( Eigen3_FOUND )
- message(STATUS "Eigen3 found in: ${EIGEN3_INCLUDE_DIR}")
-else()
- message(STATUS "Eigen3 not found")
+if( GEOMODEL_USE_BUILTIN_EIGEN3 )
+   add_dependencies( GeoModelKernel Eigen3 )
+else
+   find_package( Eigen3 REQUIRED )
 endif()
 
 #----------------------------------------------------------------------------

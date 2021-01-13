@@ -2,10 +2,6 @@
 ARG BASEIMAGE=gitlab-registry.cern.ch/jojungge/geomodel:docker_imageBase
 FROM ${BASEIMAGE}
 
-USER atlas
-WORKDIR /workdir
-
-### First install Geant4 as we want to have the full functionallity
 
 RUN cp -r . /workdir/GeoModel_src/ && 
     mkdir -p /workdir/build_geomodel/ && \
@@ -18,3 +14,5 @@ RUN cp -r . /workdir/GeoModel_src/ &&
     echo "export PATH=\"/usr/local/GeoModel/bin:${PATH}\"" >> /.bashrc && \
     echo "export LD_LIBRARY_PATH=\"/usr/local/GeoModel/lib:${LD_LIBRARY_PATH}\"" >> /.bashrc
    
+USER atlas
+WORKDIR /workdir

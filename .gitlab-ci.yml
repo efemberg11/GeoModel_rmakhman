@@ -511,3 +511,34 @@ build_system_docker:
     - docker-image-build
   script:
     - ignore
+##  Construct one docker image containing
+##  also Geant4
+build_full_docker:
+  stage: step-B
+  variables:
+    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Full
+    DOCKER_FILE: 'CI/DockerfileFull'
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+    BUILD_ARG: BASEIMAGE='$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Full'
+  tags:
+    - docker-image-build
+  script:
+    - ignore
+
+##  Construct one docker image only for
+##  viewer puposes
+build_light_docker:
+  stage: step-B
+  variables:
+    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}
+    DOCKER_FILE: 'CI/DockerfileLight'
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+    BUILD_ARG: BASEIMAGE='$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Full'
+  tags:
+    - docker-image-build
+  script:
+    - ignore

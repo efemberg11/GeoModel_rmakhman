@@ -21,7 +21,7 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/LArGeoUtils ${CMAKE_CURRENT_SOU
 
 
 add_library( LArGeoPlugin SHARED ${SOURCES} )
-target_link_libraries( LArGeoPlugin PUBLIC GeoModelCore::GeoModelKernel GeoXmlInpManager GeoXmlMatManager GeoModelTools::GeoModelXMLParser) 
+target_link_libraries( LArGeoPlugin PUBLIC GeoModelCore::GeoModelKernel GeoModelDataManagers::GeoXmlInpManager GeoModelDataManagers::GeoXmlMatManager GeoModelTools::GeoModelXMLParser) 
 set_target_properties( LArGeoPlugin PROPERTIES
 		       VERSION ${PROJECT_VERSION}
 		       SOVERSION ${PROJECT_VERSION_MAJOR} )

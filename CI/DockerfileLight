@@ -2,7 +2,7 @@
 ARG BASEIMAGE=gitlab-registry.cern.ch/jojungge/geomodel:docker_imageBase
 FROM ${BASEIMAGE}
 
-ADD . /workdir/GeoModel_src/ 
+COPY . /workdir/GeoModel_src/ 
 RUN mkdir -p /workdir/build_geomodel/ && \
     cd /workdir/build_geomodel/ && \
     cmake -DCMAKE_INSTALL_PREFIX=/usr/local/GeoModel -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_USE_BUILTIN_JSON=1 -DGEOMODEL_USE_BUILTIN_EIGEN3=1 -DGEOMODEL_BUILD_TOOLS=1 -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_COIN3D=1 ../GeoModel_src/ && \

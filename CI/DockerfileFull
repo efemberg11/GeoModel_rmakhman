@@ -9,7 +9,7 @@ WORKDIR /workdir
 RUN git clone https://gitlab.cern.ch/geant4/geant4.git --branch 'v10.6.0' && \
     mkdir build_geant4 && \
     cd build_geant4 && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local/geant4 -DCMAKE_BUILD_TYPE=Release -DGEANT4_INSTALL_DATA=ON-DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON ../geant4/ \
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local/geant4 -DCMAKE_BUILD_TYPE=Release -DGEANT4_INSTALL_DATA=ON-DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON ../geant4/ &&\
     make -j2  && \
     make install && \
     cd .. && \

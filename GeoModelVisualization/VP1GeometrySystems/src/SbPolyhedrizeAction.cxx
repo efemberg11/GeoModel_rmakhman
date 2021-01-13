@@ -11,6 +11,7 @@
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
@@ -169,6 +170,21 @@ void SbPolyhedrizeAction::handleTrap(const GeoTrap *trap)
 				      trap->getDydzp(),
 				      trap->getDxdyndzp(),
 				      trap->getDxdypdzp(),0);
+}
+
+void SbPolyhedrizeAction::handleTwistedTrap(const GeoTwistedTrap *twistedtrap)
+{
+  m_polyhedron = new SbPolyhedronTwistedTrap (twistedtrap->getPhiTwist(),
+                      twistedtrap->getZHalfLength(),
+                      twistedtrap->getTheta(),
+                      twistedtrap->getPhi(),
+                      twistedtrap->getY1HalfLength(),
+                      twistedtrap->getX1HalfLength(),
+                      twistedtrap->getX2HalfLength(),
+                      twistedtrap->getY2HalfLength(),
+                      twistedtrap->getX3HalfLength(),
+                      twistedtrap->getX4HalfLength(),
+                      twistedtrap->getTiltAngleAlpha());
 }
 
 void SbPolyhedrizeAction::handleTrd(const GeoTrd *trd)

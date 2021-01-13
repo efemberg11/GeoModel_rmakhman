@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOPOLYHEDRIZEACTION_H
@@ -53,6 +53,9 @@ class GeoPolyhedrizeAction : public GeoShapeAction
   
   //	Handles a trap shape.
   virtual void handleTrap (const GeoTrap *trap);
+    
+  //    Handles a twistedtrap shape.
+  virtual void handleTwistedTrap (const GeoTwistedTrap *twistedtrap);
   
   //	Handles a  trd shape.
   virtual void handleTrd (const GeoTrd *trd);

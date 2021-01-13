@@ -32,6 +32,7 @@
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
@@ -922,6 +923,22 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		pars.push_back("Dxdypdzp=" + to_string_with_precision(shapeIn->getDxdypdzp())) ;
 		pars.push_back("Angleydzp=" + to_string_with_precision(shapeIn->getAngleydzp())) ;
 	}
+  else if (shapeType == "TwistedTrap") {
+      
+      const GeoTwistedTrap* shapeIn = dynamic_cast<const GeoTwistedTrap*>(shape);
+      pars.push_back("PhiTwist=" + to_string_with_precision(shapeIn->getPhiTwist())) ;
+      pars.push_back("ZHalfLength=" + to_string_with_precision(shapeIn->getZHalfLength())) ;
+      pars.push_back("Theta=" + to_string_with_precision(shapeIn->getTheta())) ;
+      pars.push_back("Phi=" + to_string_with_precision(shapeIn->getPhi())) ;
+      pars.push_back("DY1HalfLength=" + to_string_with_precision(shapeIn->getY1HalfLength())) ;
+      pars.push_back("DX1HalfLength=" + to_string_with_precision(shapeIn->getX1HalfLength())) ;
+      pars.push_back("DX2HalfLength=" + to_string_with_precision(shapeIn->getX2HalfLength())) ;
+      pars.push_back("DY2HalfLength=" + to_string_with_precision(shapeIn->getY2HalfLength())) ;
+      pars.push_back("DX3HalfLength=" + to_string_with_precision(shapeIn->getX3HalfLength())) ;
+      pars.push_back("DX4HalfLength=" + to_string_with_precision(shapeIn->getX4HalfLength())) ;
+      pars.push_back("DTiltAngleAlpha=" + to_string_with_precision(shapeIn->getTiltAngleAlpha())) ;
+
+  }
   else if (shapeType == "Trd") {
 		const GeoTrd* shapeIn = dynamic_cast<const GeoTrd*>(shape);
 		pars.push_back("XHalfLength1=" + to_string_with_precision(shapeIn->getXHalfLength1())) ;

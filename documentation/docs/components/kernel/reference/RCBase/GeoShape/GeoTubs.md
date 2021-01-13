@@ -20,8 +20,13 @@ A `GeoTubs` is a tube section; a tube that subtends some plane angle (less than 
 
 Member functions provide access to these quantities.
 
-<figure>
-  <img src="/components/kernel/reference/RCBase/GeoShape/GeoTubs.png" width="400" />
-  <figcaption>Figure 7: A GeoTubs object, representing a tube section.</figcaption>
-</figure>
+
+{{ imgutils_image_caption('RCBase/GeoShape/GeoTubs.png', 
+   alt='The GeoTubs shape', 
+   cap='Figure: A GeoTubs object, representing a tube section.',
+   urlFix=False) 
+}}
+
+
+
 

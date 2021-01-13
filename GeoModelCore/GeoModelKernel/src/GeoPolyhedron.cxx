@@ -1686,6 +1686,150 @@ GeoPolyhedronTrap::~GeoPolyhedronTrap ()
 {
 }
 
+GeoPolyhedronTwistedTrap::GeoPolyhedronTwistedTrap (double TwistPhi, double Dz,
+              double Theta,
+              double Phi,
+              double Dy1,
+              double Dx1,
+              double Dx2,
+              double Dy2,
+              double Dx3,
+              double Dx4,
+              double Alp)
+/***********************************************************************
+ *
+ * Name: GeoPolyhedronTwistedTrap         Date:    26.11.2020
+ * Author: Marilena Bandieramonte
+ *
+ * Function: Create TwistedTrap - trapezoid for visualization
+ *
+ * A TwistedTrap is a general twisted trapezoid: The faces perpendicular to the
+ * z planes are trapezia, and their centres are not necessarily on
+ * a line parallel to the z axis.
+ *
+ *      TwistPhi  Phi twist angle
+ *      Dz      Half-length along the z-axis
+ *      Theta  Polar angle of the line joining the centres of the faces at -/+pDz
+ *      Phi     Azimuthal angle of the line joing the centre of the face at -pDz to the centre of the face at +pDz
+ *      Dy1    Half-length along y of the face at -pDz
+ *      Dx1    Half-length along x of the side at y=-pDy1 of the face at -pDz
+ *      Dx2    Half-length along x of the side at y=+pDy1 of the face at -pDz
+ *
+ *      Dy2    Half-length along y of the face at +pDz
+ *      Dx3    Half-length along x of the side at y=-pDy2 of the face at +pDz
+ *      Dx4    Half-length along x of the side at y=+pDy2 of the face at +pDz
+ *      Alp   Angle with respect to the y axis from the centre of the side
+ *
+ ***********************************************************************/
+{
+    AllocateMemory(12,18);
+    std::cout<<"Creating a GeoPolyhedronTwistedTrap"<<std::endl;
+    float xy1[4][2]; //quadrilateral at the bottom -DZ
+                     //     2 ------ 3
+                     //        1 ------ 4
+    float xy2[4][2]; //quadrilateral at the top    +DZ
+                     //     6 ------ 7
+                     //        5 ------ 8
+    
+    const float tanTheta(tan(Theta));
+    const float TthetaCphi = tanTheta*cos(Phi);
+    const float TthetaSphi = tanTheta*sin(Phi);
+    const float Talp = tan(Alp);
+    
+    //BOTTOM - clockwise
+    xy1[0][0]= -Dx2+Dy1*Talp; //5
+    xy1[0][1]=  Dy1;
+    xy1[1][0]= -Dx1-Dy1*Talp; //6
+    xy1[1][1]= -Dy1;
+    xy1[2][0]=  Dx1-Dy1*Talp; //7
+    xy1[2][1]= -Dy1;
+    xy1[3][0]=  Dx2+Dy1*Talp; //8
+    xy1[3][1]=  Dy1;
+
+    //TOP - clockwise
+    xy2[0][0]= -Dx4+Dy2*Talp; //1
+    xy2[0][1]=  Dy2;
+    xy2[1][0]= -Dx3-Dy2*Talp; //2
+    xy2[1][1]= -Dy2;
+    xy2[2][0]=  Dx3-Dy2*Talp; //3
+    xy2[2][1]= -Dy2;
+    xy2[3][0]=  Dx4+Dy2*Talp; //4
+    xy2[3][1]=  Dy2;
+
+    const float dzTthetaCphi(Dz*TthetaCphi);
+    const float dzTthetaSphi(Dz*TthetaSphi);
+    
+    for (int i=0;i<4;i++) {
+      xy1[i][0]-=dzTthetaCphi;
+      xy1[i][1]-=dzTthetaSphi;
+      xy2[i][0]+=dzTthetaCphi;
+      xy2[i][1]+=dzTthetaSphi;
+    }
+
+    float xtmp, ytmp;
+    const float cPhiTwist=cos(TwistPhi);
+    const float sPhiTwist=sin(TwistPhi);
+    
+    //Apply twist (rotate aroud Z of an angle TwistPhi) to the top surface only
+    for (int i=0;i<4;i++) {
+      xtmp =xy2[i][0];
+      ytmp =xy2[i][1];
+      xy2[i][0]= xtmp * cPhiTwist - ytmp * sPhiTwist;
+      xy2[i][1]= xtmp * sPhiTwist + ytmp * cPhiTwist;
+    }
+    
+    m_pV[ 1] = GeoTrf::Vector3D(xy1[0][0],xy1[0][1],-Dz);
+    m_pV[ 2] = GeoTrf::Vector3D(xy1[1][0],xy1[1][1],-Dz);
+    m_pV[ 3] = GeoTrf::Vector3D(xy1[2][0],xy1[2][1],-Dz);
+    m_pV[ 4] = GeoTrf::Vector3D(xy1[3][0],xy1[3][1],-Dz);
+
+    m_pV[ 5] = GeoTrf::Vector3D(xy2[0][0],xy2[0][1], Dz);
+    m_pV[ 6] = GeoTrf::Vector3D(xy2[1][0],xy2[1][1], Dz);
+    m_pV[ 7] = GeoTrf::Vector3D(xy2[2][0],xy2[2][1], Dz);
+    m_pV[ 8] = GeoTrf::Vector3D(xy2[3][0],xy2[3][1], Dz);
+    
+     m_pV[ 9] = (m_pV[1]+m_pV[2]+m_pV[5]+m_pV[6])/4.;
+     m_pV[10] = (m_pV[2]+m_pV[3]+m_pV[6]+m_pV[7])/4.;
+     m_pV[11] = (m_pV[3]+m_pV[4]+m_pV[7]+m_pV[8])/4.;
+     m_pV[12] = (m_pV[4]+m_pV[1]+m_pV[8]+m_pV[5])/4.;
+
+     enum {DUMMY, BOTTOM,
+           LEFT_BOTTOM,  LEFT_FRONT,   LEFT_TOP,  LEFT_BACK,
+           BACK_BOTTOM,  BACK_LEFT,    BACK_TOP,  BACK_RIGHT,
+           RIGHT_BOTTOM, RIGHT_BACK,   RIGHT_TOP, RIGHT_FRONT,
+           FRONT_BOTTOM, FRONT_RIGHT,  FRONT_TOP, FRONT_LEFT,
+           TOP};
+
+     m_pF[ 1]=GeoFacet(1,LEFT_BOTTOM, 4,BACK_BOTTOM, 3,RIGHT_BOTTOM, 2,FRONT_BOTTOM);
+
+     m_pF[ 2]=GeoFacet(4,BOTTOM,     -1,LEFT_FRONT,  -12,LEFT_BACK,    0,0);
+     m_pF[ 3]=GeoFacet(1,FRONT_LEFT, -5,LEFT_TOP,    -12,LEFT_BOTTOM,  0,0);
+     m_pF[ 4]=GeoFacet(5,TOP,        -8,LEFT_BACK,   -12,LEFT_FRONT,   0,0);
+     m_pF[ 5]=GeoFacet(8,BACK_LEFT,  -4,LEFT_BOTTOM, -12,LEFT_TOP,     0,0);
+
+     m_pF[ 6]=GeoFacet(3,BOTTOM,     -4,BACK_LEFT,   -11,BACK_RIGHT,   0,0);
+     m_pF[ 7]=GeoFacet(4,LEFT_BACK,  -8,BACK_TOP,    -11,BACK_BOTTOM,  0,0);
+     m_pF[ 8]=GeoFacet(8,TOP,        -7,BACK_RIGHT,  -11,BACK_LEFT,    0,0);
+     m_pF[ 9]=GeoFacet(7,RIGHT_BACK, -3,BACK_BOTTOM, -11,BACK_TOP,     0,0);
+
+     m_pF[10]=GeoFacet(2,BOTTOM,     -3,RIGHT_BACK,  -10,RIGHT_FRONT,  0,0);
+     m_pF[11]=GeoFacet(3,BACK_RIGHT, -7,RIGHT_TOP,   -10,RIGHT_BOTTOM, 0,0);
+     m_pF[12]=GeoFacet(7,TOP,        -6,RIGHT_FRONT, -10,RIGHT_BACK,   0,0);
+     m_pF[13]=GeoFacet(6,FRONT_RIGHT,-2,RIGHT_BOTTOM,-10,RIGHT_TOP,    0,0);
+
+     m_pF[14]=GeoFacet(1,BOTTOM,     -2,FRONT_RIGHT,  -9,FRONT_LEFT,   0,0);
+     m_pF[15]=GeoFacet(2,RIGHT_FRONT,-6,FRONT_TOP,    -9,FRONT_BOTTOM, 0,0);
+     m_pF[16]=GeoFacet(6,TOP,        -5,FRONT_LEFT,   -9,FRONT_RIGHT,  0,0);
+     m_pF[17]=GeoFacet(5,LEFT_FRONT, -1,FRONT_BOTTOM, -9,FRONT_TOP,    0,0);
+
+     m_pF[18]=GeoFacet(5,FRONT_TOP, 6,RIGHT_TOP, 7,BACK_TOP, 8,LEFT_TOP);
+    
+}
+
+GeoPolyhedronTwistedTrap::~GeoPolyhedronTwistedTrap ()
+{
+}
+
 GeoPolyhedronPara::GeoPolyhedronPara (double Dx, double Dy, double Dz,
               double Alpha, double Theta, double Phi):
 GeoPolyhedronTrap (Dz, Theta, Phi, Dy, Dx, Dx, Alpha, Dy, Dx, Dx, Alpha)

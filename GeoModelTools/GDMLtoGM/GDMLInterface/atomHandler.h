@@ -1,4 +1,3 @@
-
 #ifndef atomHandler_H
 #define atomHandler_H
 
@@ -14,6 +13,7 @@ class atomHandler:public GDMLHandler {
 public:
 	atomHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
 	void ElementHandle() {
+		// std::cout <<" atomHandling handle "<<std::endl;
 		unit=value=atomic_weight=0;
 		unit=getAttributeAsDouble("unit", GeoModelKernelUnits::g/GeoModelKernelUnits::mole);
 		value=getAttributeAsDouble("value");
@@ -22,7 +22,7 @@ public:
 	void postLoopHandling()
 	{
 		XMLHandler* h=theController->XMLStore()->GetHandler(s_currentElement->getParentNode());
-		// if (h) std::cout<<h->GetName();
+		if (h->GetName() != "isotope") return;
 		isotopeHandler* theParentHandler=dynamic_cast<isotopeHandler*> (h);
 		if (theParentHandler) theParentHandler->setAtomicWeight(atomic_weight);
 		//else std::cout<<" Help!!!! wrong type of Handler!!!!"<<std::endl;

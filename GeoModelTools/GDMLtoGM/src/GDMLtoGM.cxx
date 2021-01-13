@@ -61,9 +61,10 @@ void GDMLtoGM::create(GeoPhysVol *world, bool /* 'publish' is not used here */)
 	
   	std::cout<< "GDMLtoGeo: GDML to GeoModel Interface. Parsing gdml file "<<fileName<<" and setting world volume"<<std::endl;
 	GDMLController controller("GDMLController");
+	std::cout<<"controller created, now parsing "<<std::endl;
 	XercesParser xercesParser;
   	xercesParser.ParseFileAndNavigate(fileName);
-	//std::cout << "done parsing "<<std::endl;
+	std::cout << "done parsing "<<std::endl;
 	GeoPhysVol* w=controller.getWorld();
 	const std::string nameTag=stripPointer(w->getLogVol()->getName());
 	//std::cout<< "GDMLtoGeo: setting top volume name to: "<<nameTag<<std::endl;

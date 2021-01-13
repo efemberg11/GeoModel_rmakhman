@@ -1035,9 +1035,6 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 	QString topMaterialName = QString::fromStdString(it->pV->getLogVol()->getMaterial()->getName());
 	VP1Msg::messageDebug("topMaterial: " + topMaterialName);
 	SoMaterial* topMaterial = detVisAttributes->get(it->volname);
-	if (!topMaterial) {
-	  theclass->message("Warning: Did not find a predefined material for volume: "+QString(it->volname.c_str()));
-	}
 
 	// replace with special Dummy material if user uses this
 	if (topMaterialName == "Dummy") {

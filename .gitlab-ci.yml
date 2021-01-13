@@ -526,6 +526,8 @@ build_full_docker:
     - docker-image-build
   script:
     - ignore
+  only:
+    - master
 
 ##  Construct one docker image only for
 ##  viewer puposes

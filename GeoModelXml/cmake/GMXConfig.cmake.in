@@ -4,8 +4,8 @@
 include( CMakeFindDependencyMacro )
 find_dependency( GeoModelCore @GeoModelCore_VERSION@ CONFIG EXACT )
 find_dependency( GeoModelTools @GeoModelTools_VERSION@ CONFIG EXACT )
-find_dependency( XercesC @XercesC_VERSION@ CONFIG EXACT )
-find_dependency( ZLIB @ZLIB_VERSION@ CONFIG EXACT )
+find_dependency( XercesC @XercesC_VERSION@ )
+find_dependency( ZLIB @ZLIB_VERSION@ )
 
 # Include the exported configuration of GeoModelCore.
 get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )

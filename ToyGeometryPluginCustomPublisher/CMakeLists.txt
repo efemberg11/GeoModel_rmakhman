@@ -18,7 +18,7 @@ file( GLOB SOURCES src/*.cxx )
 
 # Set up the library.
 add_library( ToyGeometryPluginCustomPublisher SHARED ${SOURCES} )
-target_link_libraries( ToyGeometryPluginCustomPublisher PUBLIC GeoModelCore::GeoModelKernel GeoXmlMatManager GeoModelTools::GeoModelXMLParser )
+target_link_libraries( ToyGeometryPluginCustomPublisher PUBLIC GeoModelCore::GeoModelKernel GeoModelDataManagers::GeoXmlMatManager GeoModelTools::GeoModelXMLParser )
 target_include_directories( ToyGeometryPluginCustomPublisher PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

@@ -17,7 +17,7 @@ include( GNUInstallDirs )
 file( GLOB SOURCES src/*.cxx)
 
 add_library( TRTGeoPlugin SHARED ${SOURCES} )
-target_link_libraries( TRTGeoPlugin PUBLIC GeoModelCore::GeoModelKernel GeoXmlInpManager GeoXmlMatManager GeoModelTools::GeoModelXMLParser) 
+target_link_libraries( TRTGeoPlugin PUBLIC GeoModelCore::GeoModelKernel GeoModelDataManagers::GeoXmlInpManager GeoModelDataManagers::GeoXmlMatManager GeoModelTools::GeoModelXMLParser) 
 set_target_properties( TRTGeoPlugin PROPERTIES
 		       VERSION ${PROJECT_VERSION}
 		       SOVERSION ${PROJECT_VERSION_MAJOR} )

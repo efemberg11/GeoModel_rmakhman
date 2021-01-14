@@ -388,10 +388,13 @@ To execute a clash detection on a geometry described with one of the [GeoModelPl
 
 # GeoModelGeantino: run and options
 
-GeoModelGeantino (gmgeantino) is a Geant4 based application that allows you to produce geantino maps for the geometry specified as input. It supports .db/.gdml/.dylib/.so geomtry formats and it writes out the geantino maps in a ROOT file. However, it does not depend on ROOT, cause it uses the G4AnalysisManager to create/fill/write 1D and 2D Profiles.
-The 1D and 2D profiles are filled during the simulation, per Event or per Step. The creation of different profiles can be tunes with command line flags. In general XY,ZR,etaPhi RadiationLength/InteractionLength profiles can be created per DetectorVolume/Material/Element.
+GeoModelGeantino (gmgeantino) is a Geant4 based application that allows you to produce geantino maps for the geometry specified as input. It supports .db/.gdml/.dylib/.so geometry formats and it writes out the geantino maps in a ROOT file. However, it does not depend on ROOT, cause it uses the G4AnalysisManager to create/fill/write 1D and 2D Profiles.
+The 1D and 2D profiles are filled during the simulation, per Event or per Step. The creation of different profiles can be tuned with command line flags. In general X-Y, Z-R, eta-Phi RadiationLength/InteractionLength profiles can be created per DetectorVolume/Material/Element.
 
-gmgeantino uses a default geant4 macro to take some input parameters. You should find this macro under your <install-path>/share/FullSimLight directory. You can edit this macro to change some parameters, like the verbosity, the n. of threads, the n. of primaries per event, the primary particle energy.. etc. By default the primary particles shot by 'gmgeantino' are geantinos (this parameter should not be changed). By default the number of simulated geantinos is set to 1000. To increase the resolution of the maps, the n. of simulated events can be increased, editing the geantino.g4 macro and changing value at the following line:
+gmgeantino uses a default geant4 macro, called *geantino.g4*,  to take some input parameters. You should find this macro under your <install-path>/share/FullSimLight directory. You can edit this macro to change some parameters, like the verbosity, the n. of threads, the n. of primaries per event, the primary particle energy.. etc. 
+
+By default the primary particles shot by 'gmgeantino' are geantinos (this parameter should not be changed). By default the number of simulated geantinos is set to 1000. To increase the resolution of the maps, the n. of simulated events can be increased, editing the macro and changing the value at the following line:
+
 ```bash
 /run/beamOn <n. of events>
 ```
@@ -438,7 +441,8 @@ Run the executable with the --help option to see the available options:
 
 ## Examples
 
-To run GeoModelGeantino one has to specify with the -g flag the geometry file (this is mandatory). By default a 'geantinoMaps.root' is created and it containts RZ RadiationLenght and Interaction Lenght 2D profiles. To run gmgeantino on *LArBarrel.db* geometry, with the default *geantino.g4* macro file, and producing eta-phi maps and detector maps:
+To run *gmgeantino* one has to specify with the -g flag the input geometry file (mandatory option). By default a 'geantinoMaps.root' file is created as output and it contains R-Z RadiationLenght and Interaction Lenght 2D profiles. To run gmgeantino on *LArBarrel.db* geometry, with the default *geantino.g4* macro file, and producing eta-phi maps and detector maps:
+
 ``` bash
 ./gmgeantino -m ../share/FullSimLight/geantino.g4 -g LArBarrel.db -e -d 
 ``` 

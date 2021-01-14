@@ -1,7 +1,7 @@
  FullSimLight Project
  ==========================
 
-FullSimLight project consists of different tools based on [Geant4] (https://geant4.web.cern.ch) toolkit, that can be run on multiple geometries: 
+FullSimLight project consists of different tools based on [Geant4](https://geant4.web.cern.ch) toolkit, that can be run on multiple geometries: 
 
 - fullSimLight: a Geant4 based light simulation (geometry, transport in magnetic field and basic physics scoring)
 - gmclash: a tool that runs clash detection on your input geometry, producing a json file report

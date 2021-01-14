@@ -41,7 +41,7 @@ cmake -DGEOMODELATLAS_BUILD_ALL=1 ../GeoModelATLAS
 
 #### DATAMANAGERS 
 
-| Default: | OFF |
+| Default: | `OFF` |
 
 
 The `GEOMODELATLAS_BUILD_DATAMANAGERS` option builds `GeoModelDataManagers` only: 
@@ -52,7 +52,7 @@ cmake -DGEOMODELATLAS_BUILD_DATAMANAGERS=1 ../GeoModelATLAS
 
 #### AGDD 
 
-| Default: | OFF |
+| Default: | `OFF` |
 
 The `GEOMODELATLAS_BUILD_AGDD` option builds the `AGDD` and the `GeoModelDataManagers` packages:
 
@@ -62,7 +62,7 @@ cmake -DGEOMODELATLAS_BUILD_AGDD=1 ../GeoModelATLAS
 
 #### MUONDD 
 
-| Default: | OFF |
+| Default: | `OFF` |
 
 The `GEOMODELATLAS_BUILD_MUONDD` option builds the `MuonDD`, `AGDD`, and `GeoModelDataManagers` packages:
 
@@ -72,7 +72,7 @@ cmake -DGEOMODELATLAS_BUILD_MUONDD=1 ../GeoModelATLAS
 
 #### GEOMODELXML 
 
-| Default: | OFF |
+| Default: | `OFF` |
 
 
 The `GEOMODELATLAS_BUILD_GEOMODELXML` builds the `GeoModelXML` package only:

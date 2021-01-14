@@ -106,4 +106,14 @@ cmake -DGEOMODELATLAS_BUILD_ALL=1 -DCMAKE_INSTALL_PREFIX=../install ../GeoModelA
 In the example above, `make install` will install everything in the folder `../install`, with the path relative to the `build` folder.
 
 
+## LICENSE
+
+Following the ATLAS Experiment, CERN, and HSF reccomandations, GeoModelATLAS is released under an Apache 2.0 license.
+
+
+## Contacts
+
+For all questions, you can write at [geomodel-developers@cern.ch](mailto:geomodel-developers@cern.ch)
+
+
 

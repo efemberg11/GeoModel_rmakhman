@@ -457,7 +457,7 @@ To produce geantino maps of a geometry described by one of the [GeoModelPlugins 
 GeoModelToGDML (gmtogdml) is a command line tool based on Geant4, to convert geometries and dump them in gdml.
 The geometry is first built in GeoModel, converted in Geant4 and dumped in gdml format.
 The supported input geometries are : sqlite (.db), plugin (.so/dylib) and gdml.
-Before the dump operation the geometry is revised and the unidentified volumes are pulled from the geometry.
+Before the dump operation the geometry is revised and the unidentified volumes are pulled out from the geometry.
 Run the executable with the --help option to see the available options:
 
 ``` bash

@@ -30,13 +30,16 @@ wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geom
 ```
 ## FullSimLight: run and options
 
-The fullSimLight application can be built and used both with sequential and multithreaded Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will run in proper multithreaded mode. You can find the executables under the build/bin directory and/or under the *&lt path-to-install &gt/bin* dir. 
+The fullSimLight application can be built and used both with sequential and multithreaded Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will run in proper multithreaded mode. You can find the executables under the build/bin directory and/or under the *<  path-to-install > /bin* dir. 
 
 NB: Before running fullSimLight make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
+
 ```bash
 source <path_to_geant4_install_dir>/bin/geant4.sh
 ```
+
 Alternatively, you can modifiy the .bash_profile file in the following way:
+
 ```bash
 #GEANT4
 export G4INSTALL=<full_path_to_Geant4_install_dir>
@@ -64,6 +67,7 @@ Run the executable with the --help option to see the available options:
 -p :   flag  ==> run the application in performance mode i.e. no user actions 
    :   -     ==> run the application in NON performance mode i.e. with user actions (default) 
 ``` 
+
 FullSimLight uses by default the Geant4 particle gun as primary generator, but it supports also
 input events from the Pythia generator (see the Primary generator section for more details)
 A minimal set of "observable" is collected during the simulation per-primary
@@ -85,35 +89,41 @@ in this case.
 
 ## Examples
 
-During the installation a default macro file *&lt macro.g4 &gt* will be installed in your *&lt install-path &gt/share/FullSimLight* directory.
+During the installation a default macro file *<  macro.g4 >* will be installed in your *< install-path >/share/FullSimLight* directory.
 
-To execute the application using the &lt macro.g4 &gt macro file, with the default FTFP_BERT
-Physics List, not in performance mode and building the detector from &lt mygeometry.gdml &gt file:
+To execute the application using the < macro.g4 >  macro file, with the default FTFP_BERT
+Physics List, not in performance mode and building the detector from < mygeometry.gdml > file:
+
 ``` bash
 ./fullSimLight -m ../share/FullSimLight/macro.g4 -g mygeometry.gdml
 ``` 
-To execute the application using the &lt macro.g4 &gt macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin* :
+
+To execute the application using the <  macro.g4 >  macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin* :
+
 ``` bash
 ./fullSimLight -m ../share/FullSimLight/macro.g4  -g libHGTDPlugin.1.0.0.dylib
 ``` 
-To execute the application using the &lt macro.g4 &gt macro file, with the customized ATLAS FTFP_BERT_ATL Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db file :
+
+To execute the application using the <  macro.g4 >  macro file, with the customized ATLAS FTFP_BERT_ATL Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db file :
 
 ``` bash
 ./fullSimLight -m ../share/FullSimLight/macro.g4 -f FTFP_BERT_ATL -p -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
 ``` 
+
 N.B. In order to have the FTFP_BERT_ATL available in Geant4, you need to install an ATLAS patched version of Geant4, that you can find [here](https://gitlab.cern.ch/atlas-simulation-team/geant4/-/tags).
 
 ## Parameters settings via Geant4 macro
 
-FullSimLight and in general Geant4 based simulations, need a Geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the *&lt install-path &gt/share/FullSimLight* directory. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
+FullSimLight and in general Geant4 based simulations, need a Geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the *<  install-path > /share/FullSimLight* directory. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
 
 ## Magnetic field
  
  A constant magnetic field can be set through the macro command:
  
 ``` bash
-     /mydet/setField <field-value> <unit>
+/mydet/setField <field-value> <unit>
 ```
+
 The default value is a uniform magnetic field of 4 Tesla.
 
 ## ATLAS Magnetic Field
@@ -130,6 +140,7 @@ Please notice that no dependency on ROOT is introduced, because the histograms a
 
 ### testMagneticField examples:
 Run the application with the --help flag to see the options:
+
 ``` bash
 ./testMagneticField --help
 
@@ -138,6 +149,7 @@ Run the application with the --help flag to see the options:
 -s :  FLAG:     set Solenoid Off 
 -t :  FLAG:     set Toroids Off 
 ```
+
 By default the file tested is the *bmagatlas_09_fullAsym20400.data*. Use the -r option to test the ROOT file maps, add the -s flag to set the solenoid off and use the *toroid_bfieldmap_0_20400_14m_version5.root*:
 
 ``` bash
@@ -173,7 +185,7 @@ By default, i.e. if it is not specified by the above command, the number of prim
 The primary particle energy can be set through the macro command:
 
 ``` bash
-     /mygun/energy  <energy-value> <unit>
+/mygun/energy  <energy-value> <unit>
 ```
 By default, i.e. if it is not specified by the above command, the kinetic energy will be randomly selected for each individual primary particle from the [1 GeV, 100 GeV] uniformly.
 
@@ -181,7 +193,7 @@ By default, i.e. if it is not specified by the above command, the kinetic energy
 The primary particle momentum direction can be set through the macro command: 
 
 ``` bash
-     /mygun/direction  <xdir-value> <ydir-value> <zdir-value>
+/mygun/direction  <xdir-value> <ydir-value> <zdir-value>
 ```
 By default, i.e. if it is not specified by the above command, the momentum direction will be randomly selected for each individual primary particle from isotropic distribution.
 
@@ -189,7 +201,7 @@ By default, i.e. if it is not specified by the above command, the momentum direc
 The primary particle type can be set through the macro command:
 
 ``` bash
-     /mygun/particle <particle-name>
+/mygun/particle <particle-name>
 ``` 
 By default, i.e. if it is not specified by the above command, the type will be randomly selected from a pre-defined list for each individual primary particle uniformly. The current list of particles includes e-, e+ and gamma particles. It can be extended by adding more particles to the list in the MyPrimaryGeneratorAction class.
 
@@ -201,6 +213,7 @@ By default, i.e. if it is not specified by the above command, the type will be r
   ``` bash
  -P :   generate events with Pythia [config. available: ttbar/higgs/minbias or use ascii input file]
  ``` 
+ 
  Alternatively the user can plug their own Pythia configuration file to simulate the desired events. 
  For example, in order to simulate the default *ttbar* events, the command to be run is the following:
  
@@ -208,7 +221,7 @@ By default, i.e. if it is not specified by the above command, the type will be r
 ./fullSimLight -m ../share/FullSimLight/pythia.g4 -P ttbar -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db 
  ``` 
  
- The number of events that the user wants to simulate must be specified in the Geant4 macro file. A specific *pythia.g4* macro file can be found in the *&lt path-to-install &gt/share/FullSimLight* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 
+ The number of events that the user wants to simulate must be specified in the Geant4 macro file. A specific *pythia.g4* macro file can be found in the *<  path-to-install >/share/FullSimLight* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 
 
 ## Physics List
 

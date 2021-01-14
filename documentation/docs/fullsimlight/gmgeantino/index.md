@@ -26,7 +26,7 @@ The 1D and 2D profiles are filled during the simulation, per Event or per Step. 
    urlFix=False) 
 }}
 
-gmgeantino uses a default geant4 macro, called *geantino.g4*, to take some input parameters. You should find this macro under your *&lt install-path &gt/share/FullSimLight* directory. You can edit this macro to change some parameters, like the verbosity, the n. of threads, the n. of primaries per event, the primary particle energy.. etc. 
+gmgeantino uses a default geant4 macro, called *geantino.g4*, to take some input parameters. You should find this macro under your *<  install-path > /share/FullSimLight* directory. You can edit this macro to change some parameters, like the verbosity, the n. of threads, the n. of primaries per event, the primary particle energy.. etc. 
 
 By default the primary particles shot by 'gmgeantino' are geantinos (this parameter should not be changed). The default number of simulated geantinos is set to 1000. To increase the resolution of the maps, the n. of simulated events can be increased, editing the macro and changing the value at the following line:
 

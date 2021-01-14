@@ -28,20 +28,10 @@ To build `GeoModelATLAS`, `GeoModel` must be installed. You can find the instruc
 
 The CMake setup has been configured to offer the developers several build options, which are briefly summarized here below.
 
-#### ALL 
-
-| Default: | `OFF` | 
-
-By enabling the `GEOMODELATLAS_BUILD_ALL` option, all the sub-projects contained in GeoModelATLAS are built. You can enable it at configuration time by using:
-
-```
-cmake -DGEOMODELATLAS_BUILD_ALL=1 ../GeoModelATLAS
-```
-
 
 #### DATAMANAGERS 
 
-| Default: | `OFF` |
+| Default: | `ON` |
 
 
 The `GEOMODELATLAS_BUILD_DATAMANAGERS` option builds `GeoModelDataManagers` only: 
@@ -81,11 +71,24 @@ The `GEOMODELATLAS_BUILD_GEOMODELXML` builds the `GeoModelXML` package only:
 cmake -DGEOMODELATLAS_BUILD_GEOMODELXML=1  ../GeoModelATLAS
 ```
 
+#### ALL 
+
+| Default: | `OFF` | 
+
+By enabling the `GEOMODELATLAS_BUILD_ALL` option, all the sub-projects contained in GeoModelATLAS are built. You can enable it at configuration time by using:
+
+```
+cmake -DGEOMODELATLAS_BUILD_ALL=1 ../GeoModelATLAS
+```
+
+
 ### Build 
 
 Once you have decided the configuration you need, you can build by following the instructions below. 
 
-Let's say you want to build all the packages, then you can build GeoModelATLAS with:
+If no options have been given to `cmake`, it will build the packages which are set as `ON` by default.
+
+As an example, let's say you want to build all the packages, then you can build GeoModelATLAS with:
 
 ```
 mkdir build

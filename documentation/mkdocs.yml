@@ -29,9 +29,9 @@ nav:
               #- 'Box': 'components/kernel/reference/RCBase/GeoShape/GeoBox.md'
     - FullSimLight tools:
         - 'FullSimLight': 'fullsimlight/fullsimlight/index.md'
-        - 'GeoModelClash (gmclash)': 'fullsimlight/gmclash/index.md'
-        - 'GeoModelGeantino (gmgeantino)': 'fullsimlight/gmgeantino/index.md'
-        - 'GeoModeltoGDML (gmtogdml)': 'fullsimlight/gmtogdml/index.md'
+        - 'GeoModelClash': 'fullsimlight/gmclash/index.md'
+        - 'GeoModelGeantino': 'fullsimlight/gmgeantino/index.md'
+        - 'GeoModelToGDML': 'fullsimlight/gmtogdml/index.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'
         - 'Build FullSimLight': 'dev/build_fullsimlight.md'

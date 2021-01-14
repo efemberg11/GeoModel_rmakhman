@@ -103,9 +103,9 @@ To execute the application using the <macro.g4> macro file, with the customized 
 ``` 
 N.B. In order to have the FTFP_BERT_ATL available in Geant4, you need to install an ATLAS patched version of Geant4, that you can find [here](https://gitlab.cern.ch/atlas-simulation-team/geant4/-/tags).
 
-## Parameters settings via geant4 macro
+## Parameters settings via Geant4 macro
 
-Fullsimlight and in general Geant4 based simulations, need a Geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the <install-path>/share/FullSimLight directory. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
+FullSimLight and in general Geant4 based simulations, need a Geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the <install-path>/share/FullSimLight directory. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
 
 ## Magnetic field
  
@@ -119,6 +119,7 @@ The default value is a uniform magnetic field of 4 Tesla.
 ## ATLAS Magnetic Field
 
 The ATLAS magnetic field is integrated in FullSimLight and can be used from it.  The Magnetic field map file used and supported are:
+
 - full_bfieldmap_7730_20400_14m_version5.root
 - solenoid_bfieldmap_7730_0_14m_version5.root
 - toroid_bfieldmap_0_20400_14m_version5.root
@@ -154,6 +155,7 @@ Use the -t to set the Toroids off, and test the solenoid_bfieldmap_7730_0_14m_ve
 The primary generator used by default is the Geant4 particle gun, but FullSimLight also supports the  [Pythia generator](http://home.thep.lu.se/Pythia/)
  
  ## Particle gun
+ 
  The particle gun used by default  will generate primary particles
  at the (0,0,0) position with the following options:
 
@@ -193,7 +195,7 @@ By default, i.e. if it is not specified by the above command, the type will be r
 
  ## Pythia generator
  
- FullSimLight supports Pythia as primary particles generator. In order to use Pythia, the user should have it installed in their system and if Pythia is found FullSImLight will be compiled with the support on. There are three different default options available when using the -P or --pythia flag (i.e. ttbar, higgs and minbias):
+ FullSimLight supports Pythia as primary particles generator. In order to use Pythia, the user should have it installed in their system and if Pythia is found FullSimLight will be compiled with the support on. There are three different default options available when using the -P or --pythia flag (i.e. ttbar, higgs and minbias):
   ``` bash
  -P :   generate events with Pythia [config. available: ttbar/higgs/minbias or use ascii input file]
  ``` 

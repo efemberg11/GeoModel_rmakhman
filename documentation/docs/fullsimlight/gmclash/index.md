@@ -24,11 +24,12 @@ The output json file format is the following:
 "z": -166.75403155804725
 ``` 
 where:
-* *distance* is the minimum estimated distance of the overlap
-* *typeOfClash* can be 0 for *withMother*, 1 for *withSister*, 2 for *fullyEncapsSister*, 3 for *invalidSolid*
-* *x,y,z* are the global coordinates of the point of impact in cm
 
-N.B. A solid is considered invalid, when it is the results of boolean operations that are "not safe"or wrong (i.e. summing up two solids that do not share any portion of their volumes). Usually an invalid solid is a solid for which it is not possible to correctly generate points on the surface. One example can be of a *solidC* that is the result of the subtraction of *solidA* - *solidB*, where *solidB* is bigger than *solidA*. This operation leads to a  *NULL* volume that is considered as an invalid solid in *gmclash*.
+-  *distance* is the minimum estimated distance of the overlap
+- *typeOfClash* can be 0 for *withMother*, 1 for *withSister*, 2 for *fullyEncapsSister*, 3 for *invalidSolid*
+-  *x,y,z* are the global coordinates of the point of impact in cm
+
+N.B. A solid is considered invalid, when it is the results of boolean operations that are "not safe"or wrong (i.e. summing up two solids that do not share any portion of their volumes). Usually an invalid solid is a solid for which it is not possible to correctly generate points on the surface. One example can be of a *solidC* that is the result of the subtraction of *solidA* - *solidB*, where *solidB* is bigger than *solidA*. This operation leads to a  *NULL* volume that is considered as an invalid solid by *gmclash*.
 
 ## Examples
 

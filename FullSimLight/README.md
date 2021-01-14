@@ -369,7 +369,7 @@ The output json file format is the following:
 where:
 * *distance* is the minimum estimated distance of the overlap
 * *typeOfClash* can be 0 for *withMother*, 1 for *withSister*, 2 for *fullyEncapsSister*, 3 for *invalidSolid*
-* *x,y,z* are the global coordinates of the point of impact
+* *x,y,z* are the global coordinates of the point of impact in cm
 
 ## Examples
 

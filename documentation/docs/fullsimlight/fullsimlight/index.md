@@ -30,7 +30,7 @@ wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geom
 ```
 ## FullSimLight: run and options
 
-The fullSimLight application can be built and used both with sequential and multithreaded Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will run in proper multithreaded mode. You can find the executables under the build/bin directory and/or under the install/bin dir. 
+The fullSimLight application can be built and used both with sequential and multithreaded Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will run in proper multithreaded mode. You can find the executables under the build/bin directory and/or under the *&lt path-to-install &gt/bin* dir. 
 
 NB: Before running fullSimLight make sure to source the *geant4.sh* file to set correctly all the Geant4 environment variables. 
 ```bash
@@ -85,18 +85,18 @@ in this case.
 
 ## Examples
 
-During the installation a default macro file <macro.g4> will be installed in your <install-path>/share/FullSimLight directory.
+During the installation a default macro file *&lt macro.g4 &gt* will be installed in your *&lt install-path &gt/share/FullSimLight* directory.
 
-To execute the application using the <macro.g4> macro file, with the default FTFP_BERT
-Physics List, not in performance mode and building the detector from <mygeometry.gdml> file:
+To execute the application using the &lt macro.g4 &gt macro file, with the default FTFP_BERT
+Physics List, not in performance mode and building the detector from &lt mygeometry.gdml &gt file:
 ``` bash
 ./fullSimLight -m ../share/FullSimLight/macro.g4 -g mygeometry.gdml
 ``` 
-To execute the application using the <macro.g4> macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin* :
+To execute the application using the &lt macro.g4 &gt macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin* :
 ``` bash
 ./fullSimLight -m ../share/FullSimLight/macro.g4  -g libHGTDPlugin.1.0.0.dylib
 ``` 
-To execute the application using the <macro.g4> macro file, with the customized ATLAS FTFP_BERT_ATL Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db file :
+To execute the application using the &lt macro.g4 &gt macro file, with the customized ATLAS FTFP_BERT_ATL Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db file :
 
 ``` bash
 ./fullSimLight -m ../share/FullSimLight/macro.g4 -f FTFP_BERT_ATL -p -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
@@ -105,7 +105,7 @@ N.B. In order to have the FTFP_BERT_ATL available in Geant4, you need to install
 
 ## Parameters settings via Geant4 macro
 
-FullSimLight and in general Geant4 based simulations, need a Geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the <install-path>/share/FullSimLight directory. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
+FullSimLight and in general Geant4 based simulations, need a Geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the *&lt install-path &gt/share/FullSimLight* directory. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
 
 ## Magnetic field
  
@@ -118,15 +118,15 @@ The default value is a uniform magnetic field of 4 Tesla.
 
 ## ATLAS Magnetic Field
 
-The ATLAS magnetic field is integrated in FullSimLight and can be used from it.  The Magnetic field map file used and supported are:
+The ATLAS magnetic field is integrated in FullSimLight and can be used from it.  The magnetic field map file used and supported are:
 
 - full_bfieldmap_7730_20400_14m_version5.root
 - solenoid_bfieldmap_7730_0_14m_version5.root
 - toroid_bfieldmap_0_20400_14m_version5.root
 - bmagatlas_09_fullAsym20400.data
 
-If the magnetic field maps are not available, a constant magnetic field can be set through the macro file. The test application "testMagneticField" can be used to test the different magnetic field maps and produce Maps in 2D histograms that are saved in a ROOT file (i.e 'ATLAS_BField_default.root') .
-However there is no dependency on ROOT, because the histograms are created, filled and saved using the G4AnalysisManager.
+If the magnetic field maps are not available to the user, a constant magnetic field can be set through the macro file. The test application "testMagneticField" can be used to test the different magnetic field maps and produce Maps in 2D histograms that are saved in a ROOT file (i.e 'ATLAS_BField_default.root') .
+Please notice that no dependency on ROOT is introduced, because the histograms are created, filled and saved using the *G4AnalysisManager*.
 
 ### testMagneticField examples:
 Run the application with the --help flag to see the options:
@@ -138,13 +138,13 @@ Run the application with the --help flag to see the options:
 -s :  FLAG:     set Solenoid Off 
 -t :  FLAG:     set Toroids Off 
 ```
-By default the file tested is the bmagatlas_09_fullAsym20400.data. Use the -r option to test the ROOT file maps, add the -s flag to set the solenoid off and use the toroid_bfieldmap_0_20400_14m_version5.root:
+By default the file tested is the *bmagatlas_09_fullAsym20400.data*. Use the -r option to test the ROOT file maps, add the -s flag to set the solenoid off and use the *toroid_bfieldmap_0_20400_14m_version5.root*:
 
 ``` bash
 ./testMagneticField -r -s 
 ```
 
-Use the -t to set the Toroids off, and test the solenoid_bfieldmap_7730_0_14m_version5.root file. 
+Use the -t to set the Toroids off, and test the *solenoid_bfieldmap_7730_0_14m_version5.root* file. 
 
 ``` bash
 ./testMagneticField -r -t 
@@ -153,8 +153,8 @@ Use the -t to set the Toroids off, and test the solenoid_bfieldmap_7730_0_14m_ve
 ## Primary Generators
 
 The primary generator used by default is the Geant4 particle gun, but FullSimLight also supports the  [Pythia generator](http://home.thep.lu.se/Pythia/)
- 
- ## Particle gun
+
+## Particle gun
  
  The particle gun used by default  will generate primary particles
  at the (0,0,0) position with the following options:
@@ -193,9 +193,11 @@ The primary particle type can be set through the macro command:
 ``` 
 By default, i.e. if it is not specified by the above command, the type will be randomly selected from a pre-defined list for each individual primary particle uniformly. The current list of particles includes e-, e+ and gamma particles. It can be extended by adding more particles to the list in the MyPrimaryGeneratorAction class.
 
- ## Pythia generator
+
+## Pythia generator
  
- FullSimLight supports Pythia as primary particles generator. In order to use Pythia, the user should have it installed in their system and if Pythia is found FullSimLight will be compiled with the support on. There are three different default options available when using the -P or --pythia flag (i.e. ttbar, higgs and minbias):
+ FullSimLight supports Pythia as primary particles generator. In order to use Pythia, the user should have it installed in their system and if Pythia is found FullSimLight will be compiled with the support on. There are three different default options available when using the -P or --pythia flag (i.e. *ttbar*, *higgs* and *minbias*):
+ 
   ``` bash
  -P :   generate events with Pythia [config. available: ttbar/higgs/minbias or use ascii input file]
  ``` 
@@ -205,7 +207,8 @@ By default, i.e. if it is not specified by the above command, the type will be r
  ``` bash
 ./fullSimLight -m ../share/FullSimLight/pythia.g4 -P ttbar -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db 
  ``` 
- The number of events that the user wants to simulate must be specified in the g4 macro file. A specific *pythia.g4* macro file can be found in the *share* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 
+ 
+ The number of events that the user wants to simulate must be specified in the Geant4 macro file. A specific *pythia.g4* macro file can be found in the *&lt path-to-install &gt/share/FullSimLight* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 
 
 ## Physics List
 

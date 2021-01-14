@@ -34,7 +34,8 @@ The CMake setup has been configured to offer the developers several build option
 | Default: | `ON` |
 
 
-The `GEOMODELATLAS_BUILD_DATAMANAGERS` option builds `GeoModelDataManagers` only: 
+The `GEOMODELATLAS_BUILD_DATAMANAGERS` option builds `GeoModelDataManagers` only. This is set as `ON` by default, so `GeoModelDataManagers` is built even if no build options are given to the `cmake` command. 
+
 
 ```
 cmake -DGEOMODELATLAS_BUILD_DATAMANAGERS=1 ../GeoModelATLAS

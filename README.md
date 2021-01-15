@@ -25,7 +25,8 @@ To build `GeoModelATLAS`, the latest version of `GeoModel` must be compiled and 
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModel.git
 mkdir build_gm 
 cmake -DGEOMODEL_BUILD_TOOLS=1 -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel 
-make -j4make install
+make -j4
+make install
 cd ..
 ```
 

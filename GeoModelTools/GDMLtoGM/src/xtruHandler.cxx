@@ -6,6 +6,7 @@
 #include "GeoModelXMLParser/XercesParser.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoDefinitions.h"
+#include "GeoModelKernel/Units.h"
 #include "GDMLInterface/sectionHandler.h"
 #include "GDMLInterface/twoDimVertexHandler.h"
 
@@ -20,8 +21,8 @@ void xtruHandler::ElementHandle()
 {
 
   std::string name=getAttributeAsString("name");
-  double lunit=getAttributeAsDouble("lunit"); 
-  
+  double lunit=getAttributeAsDouble("lunit",GeoModelKernelUnits::mm); 
+  //std::cout <<" handling for xtru "<<name<<std::endl;  
   // This interface is only for GeoSimplePolygonBrep.Checks are performed to
   // ensure a GSPB can be built out of the parameters being collected, in any
   // other case an exception is thrown

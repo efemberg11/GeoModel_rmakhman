@@ -22,9 +22,11 @@ A `GeoTrd` is a simple trapezoid.  Two faces at $\pm \Delta z$ are parallel to e
 The constructor fills the object with these values and the accessors return them.
 
 
-<figure>
-  <img src="/components/kernel/reference/RCBase/GeoShape/GeoTrd.png" width="400" />
-  <figcaption>Figure 8: A GeoTrd object, representing a simple trapezoid.</figcaption>
-</figure>
+
+{{ imgutils_image_caption('RCBase/GeoShape/GeoTrd.png', 
+   alt='The GeoTrd shape', 
+   cap='Figure: A GeoTrd object, representing a simple trapezoid.',
+   urlFix=False) 
+}}
 
 

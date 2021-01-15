@@ -2,9 +2,10 @@
 
 ##	Shapes
 
+
 ### Introduction
 
-The shape classes in the geometry kernel are data structures designed to describe several geometrical primitives. Table 1 describes the different shapes presently provided within the geometry kernel.  This set is extensible; one only needs to derive a new shape from the base class and insure that it fits the pattern described below. Shapes are reference- counted objects, as described in [1.3.2.6][#].
+The shape classes in the geometry kernel are data structures designed to describe several geometrical primitives. Table 1 describes the different shapes presently provided within the geometry kernel.  This set is extensible; one only needs to derive a new shape from the base class and insure that it fits the pattern described below. Shapes are reference-counted objects, as described in [Reference Counting](#reference-counting).
 
 
 | Class   | Shape |
@@ -18,6 +19,7 @@ The shape classes in the geometry kernel are data structures designed to describ
 | GeoTrd  | Trapezoid (simple) |
 | GeoTube | Tube |
 | GeoTubs | Tube Section |
+| GeoTwistedTrap | Twisted Trapezoid |
 
 Table 1: Existing geometrical shapes in the GeoModel kernel.
 
@@ -86,23 +88,25 @@ The classes `GeoShapeShift`, `GeoShapeUnion`, `GeoShapeSubtraction`, and `GeoSha
 
 We now present the interfaces to specific shapes.  In general these shapes are by default constructed as symmetrically around the origin as possible.  
 
-{!components/kernel/reference/RCBase/GeoShape/GeoBox.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoBox.md' %}
 
-{!components/kernel/reference/RCBase/GeoShape/GeoCons.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoCons.md' %}
 
-{!components/kernel/reference/RCBase/GeoShape/GeoPara.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoPara.md' %}
 
-{!components/kernel/reference/RCBase/GeoShape/GeoPcon.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoPcon.md' %}
 
-{!components/kernel/reference/RCBase/GeoShape/GeoPgon.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoPgon.md' %}
 
-{!components/kernel/reference/RCBase/GeoShape/GeoTrap.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoTrap.md' %}
 
-{!components/kernel/reference/RCBase/GeoShape/GeoTube.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoTube.md' %}
 
-{!components/kernel/reference/RCBase/GeoShape/GeoTubs.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoTubs.md' %}
 
-{!components/kernel/reference/RCBase/GeoShape/GeoTrd.md!}
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoTrd.md' %}
+
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoTwistedTrap.md' %}
 
 
 

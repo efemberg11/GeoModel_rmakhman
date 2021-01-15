@@ -19,7 +19,21 @@ A note: a proper version of `ZLIB` is usually installed together with the operat
 
 ### GeoModel 
 
-To build `GeoModelATLAS`, `GeoModel` must be installed. You can find the instructions to install or build it on the GeoModel website: https://geomodel.web.cern.ch/home/start/install/
+To build `GeoModelATLAS`, the latest version of `GeoModel` must be compiled and installed (pre-compiled packages have not been updated yet)
+
+```
+git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModel.git
+mkdir build_gm 
+cmake -DGEOMODEL_BUILD_TOOLS=1 -DGEOMODEL_BUILD_VISUALIZATION=1 ../GeoModel 
+make -j4make install
+cd ..
+```
+
+The commands above will build the latest version of `GeoModelCore`, `GeoModelIO`, `GeoModelTools`, and `GeoModelVisualization` (`gmex`). 
+
+By default, those will be installed in a system folder (*e.g.*, in `/usr/local` on macOS). However, if you want to have them installed locally, for example if you have other versions installed on your system, you can install them locally by using the CMake option `-DCMAKE_INSTALL_PREFIX=../install`.
+
+**Please note** that if you have other versions of `GeoModel` installed in default system folders, or if you installed them with package managers (like `brew` on macOS), CMake will try to use them at first. So you'll probably get errors while trying to compile `GeoModelATLAS`. Please be sure you pick the right, latest version of `GeoModel` when compiling `GeoModelATLAS`.
 
 
 ## Build GeoModelATLAS

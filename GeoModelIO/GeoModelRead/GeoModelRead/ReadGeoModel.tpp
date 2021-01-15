@@ -19,11 +19,11 @@ namespace GeoModelIO {
         std::map<T, N> mapNodes;
         std::string keyType = "";
 
-        std::vector<std::vector<std::string>> vecFPVs;
+        std::vector<std::vector<std::string>> vecRecords;
         if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
-            vecFPVs = m_dbManager->getPublishedFPVTable( publisherName );
+            vecRecords = m_dbManager->getPublishedFPVTable( publisherName );
         } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
-            vecFPVs = m_dbManager->getPublishedAXFTable( publisherName );
+            vecRecords = m_dbManager->getPublishedAXFTable( publisherName );
         } else {
             std::cout << "ERROR! The node type '" << typeid(N).name() 
                 << "' is not currently supported.\n"
@@ -32,7 +32,7 @@ namespace GeoModelIO {
             exit(EXIT_FAILURE);
         }
         unsigned ii = 0;
-        for( auto const record : vecFPVs ) {
+        for( auto const &record : vecRecords ) {
             // record[0] is the record's ID in the DB table, we skip that.
             std::string keyStr  = record[1];
             std::string volID   = record[2];

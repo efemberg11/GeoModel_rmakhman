@@ -17,6 +17,7 @@ class G4VPhysicalVolume;
 class G4Box;
 class G4Trd;
 class G4Trap;
+class G4TwistedTrap;
 class G4Cons;
 class G4Sphere;
 class G4Torus;
@@ -52,6 +53,7 @@ private:
   void ComputeDimensions (G4Box&,const G4int,const G4VPhysicalVolume*) const {}
   void ComputeDimensions (G4Trd&,const G4int,const G4VPhysicalVolume*) const {}
   void ComputeDimensions (G4Trap&,const G4int,const G4VPhysicalVolume*) const {}
+  void ComputeDimensions (G4TwistedTrap&,const G4int,const G4VPhysicalVolume*) const {}
   void ComputeDimensions (G4Cons&,const G4int,const G4VPhysicalVolume*) const {}
   void ComputeDimensions (G4Sphere&,const G4int,const G4VPhysicalVolume*) const {}
   void ComputeDimensions (G4Torus&,const G4int,const G4VPhysicalVolume*) const {}

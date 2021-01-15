@@ -1,0 +1,30 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+# Find the dependencies of the GeoModelVisualization target(s).
+include( CMakeFindDependencyMacro )
+find_dependency( GeoModelCore @GeoModel_VERSION@ CONFIG EXACT )
+find_dependency( GeoModelIO @GeoModel_VERSION@ CONFIG EXACT )
+find_dependency( Coin3D )
+find_dependency( SoQt )
+find_dependency( Qt5 @Qt5_VERSION@
+   COMPONENTS Core Gui Widgets Sql PrintSupport
+   EXACT )
+find_dependency( OpenGL )
+find_dependency( nlohmann_json @nlohmann_json_VERSION@ EXACT )
+
+# Include the exported configuration of GeoModelVisualization.
+get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )
+include( ${SELF_DIR}/GeoModelVisualizationTargets.cmake )
+
+# Set the version of the installed project.
+set( GeoModelVisualization_VERSION "@PROJECT_VERSION@" )
+
+# Print some standard messages about the package being found.
+include( FindPackageHandleStandardArgs )
+find_package_handle_standard_args( GeoModelVisualization
+   FOUND_VAR GeoModelVisualization_FOUND
+   REQUIRED_VARS SELF_DIR
+   VERSION_VAR GeoModelVisualization_VERSION )
+
+# Clean up.
+unset( SELF_DIR )

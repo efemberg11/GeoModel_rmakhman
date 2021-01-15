@@ -1,68 +1,38 @@
-################################################################################
-# Package: VP1GuideLinePlugin
-################################################################################
-
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 0)
-set(MYLIB_VERSION_PATCH 0)
-project ( "GXGuideLineSystems" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
-
-find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-find_package( Coin REQUIRED )
-find_package( SoQt REQUIRED )
-if ( APPLE )
-  find_package(OpenGL REQUIRED)
-endif()
-
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1GuideLineSystems/*.h )
-file( GLOB UIS src/*.ui VP1GuideLineSystems/*.ui )
+file( GLOB UIS src/*.ui )
 
-
-set (CMAKE_INCLUDE_CURRENT_DIR ON)
-set (CMAKE_AUTOMOC ON)
-set (CMAKE_AUTOUIC ON)
-unset (AUTOUIC_SEARCH_PATHS)
-set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
-QT5_WRAP_UI(UI_HDRS ${UIS})
-
-
-include_directories ("${PROJECT_SOURCE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}/src")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
-add_library ( GXGuideLineSystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
-
-# External dependencies:
-include_directories(${Qt5Core_INCLUDE_DIRS} )
-include_directories(${Qt5Gui_INCLUDE_DIRS} )
-include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Sql_INCLUDE_DIRS} )
-include_directories(${Coin_INCLUDE_DIR} )
-include_directories(${SoQt_INCLUDE_DIRS} )
-include_directories(${VP1HEPVis_INCLUDE_DIRS} )
-
-if ( APPLE )
-  target_link_directories (GXGuideLineSystems PUBLIC ${Coin_LIB_DIR} )
-  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-  else()
-  target_link_libraries (GXGuideLineSystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
+# Add the library.
+add_library( GXGuideLineSystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
+target_link_libraries( GXGuideLineSystems
+   PUBLIC Coin::Coin Qt5::Core Qt5::Gui Qt5::Widgets GXBase
+   PRIVATE GeoModelCore::GeoModelKernel GXHEPVis )
+target_include_directories( GXGuideLineSystems PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+   $<INSTALL_INTERFACE:include> )
+source_group( "VP1GuideLineSystems" FILES ${HEADERS} )
+source_group( "src" FILES ${SOURCES} ${UIS} )
+set_target_properties( GXGuideLineSystems PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
+if( GEOMODEL_USE_BUILTIN_COIN3D )
+   add_dependencies( GXGuideLineSystems Coin3DBuiltIn )
 endif()
 
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelVisualization::GXGuideLineSystems ALIAS
+  GXGuideLineSystems )
 
-
-add_definitions (${Qt5Core_DEFINITIONS})
-
-install(TARGETS GXGuideLineSystems
-  LIBRARY
-  DESTINATION lib
-  COMPONENT Libraries
-  )
-
-set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
-
-set_target_properties(GXGuideLineSystems PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
+# Install the library.
+install( TARGETS GXGuideLineSystems
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   COMPONENT Runtime
+   NAMELINK_COMPONENT Development )
+install( FILES ${HEADERS}
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/VP1GuideLineSystems
+   COMPONENT Development )

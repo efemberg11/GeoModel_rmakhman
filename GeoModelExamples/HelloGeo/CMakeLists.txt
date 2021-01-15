@@ -7,7 +7,20 @@
 
 cmake_minimum_required(VERSION 3.1.0)
 
-project(HelloGeo)
+# Compile with C++17
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
+
+#project(HelloGeo)
+
+# Find the needed dependencies, when building individually
+  message (${CMAKE_SOURCE_DIR}) 
+  message (${PROJECT_SOURCE_DIR})
+  
+if ( CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR ) # when buildingindividually
+   find_package( GeoModelCore REQUIRED  ) 
+endif()
 
 # Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -19,4 +32,4 @@ set(SRCS main.cpp )
 add_executable( hellogeo ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeo GeoModelKernel)
+target_link_libraries( hellogeo GeoModelCore::GeoModelKernel)

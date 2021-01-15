@@ -266,7 +266,7 @@ void VP1GeometrySystem::Imp::addSubSystem(const VP1GeoFlags::SubSystemFlag& f,
     theclass->message(("Error: Problems retrieving checkbox for subsystem "+f).c_str());
     return;
   }
-  int counter(0);
+  //int counter(0); // RMB: removed to stop the 'unused variable' warning
   for (auto i=subsysInfoList.begin();i!=subsysInfoList.end();i++) {
     if (systemName==(*i)->systemName) {
       //std::cout << "Very severe warning. You create duplicate systems! " << std::endl;
@@ -915,7 +915,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
       SbVec3f    t,s,axis;
       SbRotation r,so;
       float      angle;
-      mtx.getTransform(t,r,s,so);
+      mtx.getTransform(t,r,s,so); // translation, rotation, scaling, scale orientation -- in this order
       translation_x=t[0];
       translation_y=t[1];
       translation_z=t[2];
@@ -923,6 +923,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
       rotaxis_x=axis[0];
       rotaxis_y=axis[1];
       rotaxis_z=axis[2];
+      rotangle_radians=angle;
     }
     message("===> Local Translation:");
     message("        x = "+QString::number(translation_x/SYSTEM_OF_UNITS::mm)+" mm");
@@ -947,6 +948,7 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
       rotaxis_x=axis[0];
       rotaxis_y=axis[1];
       rotaxis_z=axis[2];
+      rotangle_radians=angle;
     }
     message("===> Global Translation:");
     message("        x = "+QString::number(translation_x/SYSTEM_OF_UNITS::mm)+" mm");
@@ -1033,9 +1035,6 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 	QString topMaterialName = QString::fromStdString(it->pV->getLogVol()->getMaterial()->getName());
 	VP1Msg::messageDebug("topMaterial: " + topMaterialName);
 	SoMaterial* topMaterial = detVisAttributes->get(it->volname);
-	if (!topMaterial) {
-	  theclass->message("Warning: Did not find a predefined material for volume: "+QString(it->volname.c_str()));
-	}
 
 	// replace with special Dummy material if user uses this
 	if (topMaterialName == "Dummy") {

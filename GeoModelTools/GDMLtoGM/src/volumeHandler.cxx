@@ -11,7 +11,7 @@ void volumeHandler::ElementHandle()
 	shape=nullptr;
 	name=getAttributeAsString("name");
 	//name=stripPointer(getAttributeAsString("name"));
-	//std::cout<<" this is volumeHandler: name "<<name<<std::endl;
+	std::cout<<" this is volumeHandler: name "<<name<<std::endl;
 
 	StopLoop(true);
 	xercesc::DOMNode *child;
@@ -56,7 +56,7 @@ void volumeHandler::ElementHandle()
 	theVolume=std::make_pair(tempLV,tempPV);
 	if (tempPhys.size()!=0)
 	{
-		for (int i=0;i<tempPhys.size();i++)
+		for (unsigned long i=0; i< tempPhys.size(); i++)
 		{
 			GeoPhysVol* pV=tempPhys[i];
 			if (tempTransform[i]) 

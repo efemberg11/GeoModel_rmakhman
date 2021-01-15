@@ -13,6 +13,7 @@
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
@@ -111,6 +112,11 @@ void GeoShapeAction::handlePgon (const GeoPgon *pgon)
 void GeoShapeAction::handleTrap (const GeoTrap *trap)
 {
   handleShape(trap);
+}
+
+void GeoShapeAction::handleTwistedTrap (const GeoTwistedTrap *twistedtrap)
+{
+  handleShape(twistedtrap);
 }
 
 void GeoShapeAction::handleTrd (const GeoTrd *trd)

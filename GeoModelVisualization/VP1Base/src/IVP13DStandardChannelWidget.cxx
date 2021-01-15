@@ -429,7 +429,7 @@ void IVP13DStandardChannelWidget::stopSpinning()
     m_d->viewer->stopAnimating();
 }
 //___________________________________________________________________________
-QPixmap IVP13DStandardChannelWidget::getSnapshot(bool transp, int width, bool batch)
+QPixmap IVP13DStandardChannelWidget::getSnapshot(bool transp, int width, bool /*batch*/)
 {
  
 

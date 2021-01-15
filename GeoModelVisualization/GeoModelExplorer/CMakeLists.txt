@@ -1,47 +1,14 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 0)
-set(MYLIB_VERSION_PATCH 0)
+# Add the executable.
+add_executable( gmex src/main.cxx )
+target_link_libraries( gmex PRIVATE GXGui Qt5::Core )
+target_compile_definitions( gmex PRIVATE
+   GEOMODEL_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" )
+source_group( "src" FILES "src/main.cxx" )
 
-project ( "gmex" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
-
-find_package( Coin REQUIRED )
-find_package( SoQt REQUIRED )
-find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-if ( APPLE )
-	find_package(OpenGL REQUIRED)
-endif()
-
-
-# Find the header and source files.
-file( GLOB SOURCES src/*.cxx )
-file( GLOB HEADERS RunVP1Light/*.h )
-
-
-include_directories ("${PROJECT_SOURCE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}/src")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1Gui")
-add_executable ( gmex ${SOURCES} ${HEADERS}  )
-
-# External dependencies:
-include_directories(${Qt5Core_INCLUDE_DIRS} )
-include_directories(${Qt5Gui_INCLUDE_DIRS} )
-include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Network_INCLUDE_DIRS} )
-
-include_directories(${Coin_INCLUDE_DIRS} )
-include_directories(${SoQt_INCLUDE_DIRS} )
-
-# Set a variable storing the CMake install prefix.
-# -- It is passed to the C++ preprocessor to load the plugins from the C++ code
-add_definitions ( -DGEOMODEL_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX})
-
-add_definitions (${Qt5Core_DEFINITIONS})
-add_definitions (${Qt5Gui_DEFINITIONS})
-add_definitions (${Qt5OpenGL_DEFINITIONS})
-add_definitions (${Qt5Widgets_DEFINITIONS})
-add_definitions (${Qt5PrintSupport_DEFINITIONS})
-target_link_libraries( gmex GXGui GXBase GXHEPVis ${Qt5Gui_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-install(TARGETS gmex DESTINATION bin)
+# Install the executable.
+install( TARGETS gmex
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
+   COMPONENT Runtime )

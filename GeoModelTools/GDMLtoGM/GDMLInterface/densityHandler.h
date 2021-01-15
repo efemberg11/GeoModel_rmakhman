@@ -15,7 +15,7 @@ public:
 	densityHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
 	void ElementHandle() {
 		unit=value=density=0;
-		unit=getAttributeAsDouble("unit");
+		unit=getAttributeAsDouble("unit",GeoModelKernelUnits::g/GeoModelKernelUnits::mole);
 		value=getAttributeAsDouble("value");
 		density=unit*value;
 		// std::cout<<" this is densityHandler: density= "<<density<<std::endl;

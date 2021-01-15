@@ -51,6 +51,8 @@
 //                                        - create polyhedron for G3 Trd2;
 //   SbPolyhedronTrap (dz,theta,phi, h1,bl1,tl1,alp1, h2,bl2,tl2,alp2)
 //                                        - create polyhedron for G3 Trap;
+//   SbPolyhedronTwistedTrap (phitwist, dz,theta,phi, h1,bl1,tl1, h2,bl2,tl2,alp)
+//                                        - create polyhedron for TwistedTrap;
 //   SbPolyhedronPara (dx,dy,dz,alpha,theta,phi)
 //                                        - create polyhedron for G3 Para;
 //   SbPolyhedronTube (rmin,rmax,dz)
@@ -164,6 +166,8 @@
 //   needed for the new BooleanProcessor.h from Geant4 4.9.6
 // - added a new GetVertexFast(), from Guy Barrand.
 //
+// 08.12.2020 M. Bandieramonte <marilena.bandieramonte@cern.ch>
+// - twisted trapezoid polyhedron implementation - SbPolyhedronTwistedTrap
 
 #include <Inventor/C/errors/debugerror.h>
 #include <Inventor/SbLinear.h>
@@ -171,6 +175,7 @@
 
 // VP1 change
 #include <VP1HEPVis/SbRotation.h> //using doubles instead of floats.
+#include <VP1HEPVis/SbTwistSurface.h>
 //---
 
 
@@ -289,6 +294,14 @@ class SbPolyhedron {
   // Assignment
   virtual SbPolyhedron & operator=(const SbPolyhedron & from);
 
+  /* @param  Nnodes number of nodes
+   * @param  Nfaces number of faces
+   * @param  xyz    nodes
+   * @param  faces  faces (quadrilaterals or triangles)
+   * @return status of the operation - is non-zero in case of problem
+   */
+  int createPolyhedron(int Nnodes, int Nfaces,
+                         const double xyz[][3], const int faces[][4]);
   // Get number of vertices
   int GetNoVertices() const { return m_nvert; }
 
@@ -433,6 +446,40 @@ public:
   virtual SbPolyhedron& operator = (const SbPolyhedron& from) {
     return SbPolyhedron::operator = (from);
   }
+};
+
+class SbPolyhedronTwistedTrap : public SbPolyhedron {
+public:
+  SbPolyhedronTwistedTrap(double phiTwist, double Dz, double Theta, double Phi,
+                    double Dy1,
+                    double Dx1, double Dx2,
+                    double Dy2,
+                    double Dx3, double Dx4, double Alp);
+  virtual ~SbPolyhedronTwistedTrap();
+  virtual SbPolyhedron& operator = (const SbPolyhedron& from) {
+    return SbPolyhedron::operator = (from);
+  }
+private:
+    void CreateSurfaces();
+    void CreatePolyhedron();
+    double fPhiTwist;
+    double fDz;
+    double fTheta;
+    double fPhi;
+    double fDy1;
+    double fDx1;
+    double fDx2;
+    double fDy2;
+    double fDx3;
+    double fDx4;
+    double fAlph;
+    
+    SbTwistSurface* fLowerEndcap ;  // surface of -ve z
+    SbTwistSurface* fUpperEndcap ;  // surface of +ve z
+    SbTwistSurface* fSide0 ;    // Twisted Side at phi = 0 deg
+    SbTwistSurface* fSide90 ;   // Twisted Side at phi = 90 deg
+    SbTwistSurface* fSide180 ;  // Twisted Side at phi = 180 deg
+    SbTwistSurface* fSide270 ;  // Twisted Side at phi = 270 deg
 };
 
 class SbPolyhedronPara : public SbPolyhedronTrap {

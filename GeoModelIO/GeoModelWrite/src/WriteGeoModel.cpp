@@ -32,6 +32,7 @@
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
@@ -922,6 +923,22 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape)
 		pars.push_back("Dxdypdzp=" + to_string_with_precision(shapeIn->getDxdypdzp())) ;
 		pars.push_back("Angleydzp=" + to_string_with_precision(shapeIn->getAngleydzp())) ;
 	}
+  else if (shapeType == "TwistedTrap") {
+      
+      const GeoTwistedTrap* shapeIn = dynamic_cast<const GeoTwistedTrap*>(shape);
+      pars.push_back("PhiTwist=" + to_string_with_precision(shapeIn->getPhiTwist())) ;
+      pars.push_back("ZHalfLength=" + to_string_with_precision(shapeIn->getZHalfLength())) ;
+      pars.push_back("Theta=" + to_string_with_precision(shapeIn->getTheta())) ;
+      pars.push_back("Phi=" + to_string_with_precision(shapeIn->getPhi())) ;
+      pars.push_back("DY1HalfLength=" + to_string_with_precision(shapeIn->getY1HalfLength())) ;
+      pars.push_back("DX1HalfLength=" + to_string_with_precision(shapeIn->getX1HalfLength())) ;
+      pars.push_back("DX2HalfLength=" + to_string_with_precision(shapeIn->getX2HalfLength())) ;
+      pars.push_back("DY2HalfLength=" + to_string_with_precision(shapeIn->getY2HalfLength())) ;
+      pars.push_back("DX3HalfLength=" + to_string_with_precision(shapeIn->getX3HalfLength())) ;
+      pars.push_back("DX4HalfLength=" + to_string_with_precision(shapeIn->getX4HalfLength())) ;
+      pars.push_back("DTiltAngleAlpha=" + to_string_with_precision(shapeIn->getTiltAngleAlpha())) ;
+
+  }
   else if (shapeType == "Trd") {
 		const GeoTrd* shapeIn = dynamic_cast<const GeoTrd*>(shape);
 		pars.push_back("XHalfLength1=" + to_string_with_precision(shapeIn->getXHalfLength1())) ;
@@ -1020,7 +1037,7 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape)
 	  const GeoGenericTrap * shapeIn = dynamic_cast<const GeoGenericTrap*>(shape);
 	  pars.push_back("ZHalfLength=" + to_string_with_precision(shapeIn->getZHalfLength()));
 	  pars.push_back("NVertices="   + to_string_with_precision(shapeIn->getVertices().size()));
-	  for (int i=0; i<shapeIn->getVertices().size(); ++i) {
+	  for (unsigned long i=0; i<shapeIn->getVertices().size(); ++i) {
 	    pars.push_back("X=" + to_string_with_precision(shapeIn->getVertices()[i](0)));
 	    pars.push_back("Y=" + to_string_with_precision(shapeIn->getVertices()[i](1)));
 	  }
@@ -1450,7 +1467,7 @@ unsigned int WriteGeoModel::addTransform(const std::vector<double> &params)
 }
 
 
-unsigned int WriteGeoModel::addPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume)
+unsigned int WriteGeoModel::addPhysVol(const unsigned int &logVolId, const unsigned int & /*parentPhysVolId*/, const bool &isRootVolume)
 {
 	std::vector<std::vector<std::string>>* container = &m_physVols;
     std::vector<std::string> values;
@@ -1465,7 +1482,7 @@ unsigned int WriteGeoModel::addPhysVol(const unsigned int &logVolId, const unsig
 }
 
 
-unsigned int WriteGeoModel::addFullPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume)
+unsigned int WriteGeoModel::addFullPhysVol(const unsigned int &logVolId, const unsigned int & /*parentPhysVolId*/, const bool &isRootVolume)
 {
 	std::vector<std::vector<std::string>>* container = &m_fullPhysVols;
 	std::vector<std::string> values;
@@ -1632,7 +1649,8 @@ template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT st
         values.push_back(std::to_string(volID));
         values.push_back(keyTypeStr); // TODO: store the key type in a metadata table, not in the records' table; so it can be stored once only.
 
-        unsigned int recordID = addRecord(cachePublishedNodes, values);
+        // save the published nodes to the cache, to be later stored into the DB
+        /*unsigned int recordID = */addRecord(cachePublishedNodes, values);
         //std::cout << "Pushed record: " << recordID << std::endl; // debug msg
     }
 }

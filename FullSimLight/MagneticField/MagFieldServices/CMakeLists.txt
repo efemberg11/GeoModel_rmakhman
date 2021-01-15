@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.1) 
 
 # Declare the package name:
-project( "MagFieldServices" VERSION 1.0.1 LANGUAGES CXX )
+project( "MagFieldServices" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
 # External dependencies:
 find_package( Eigen3 REQUIRED )
@@ -15,6 +15,7 @@ if( Eigen3_FOUND )
 else()
  message(STATUS "Eigen3 not found")
 endif()
+
 #----------------------------------------------------------------------------
 # Find Geant4 package, batch mode only executable (i.e. no need ui and vis).
 #
@@ -60,6 +61,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 
 # Set target and properties
 add_library( MagFieldServices SHARED ${HEADERS} ${SOURCES} )
+# If the in-house build of the Xerces-C library is used, add explicit dependency: for Geant4
+if( GEOMODEL_USE_BUILTIN_XERCESC )
+    add_dependencies( MagFieldServices XercesCBuiltIn )
+endif()
 target_link_libraries( MagFieldServices PUBLIC ${Geant4_LIBRARIES} MagFieldInterfaces)
 target_include_directories( MagFieldServices PUBLIC ${EIGEN3_INCLUDE_DIR}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

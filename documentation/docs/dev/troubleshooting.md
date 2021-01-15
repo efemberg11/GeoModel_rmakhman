@@ -5,20 +5,52 @@
 
 ### macOS / Homebrew
 
-#### General error
+#### Cleaning your environment
 
-Sometimes, cleaning the system from old packages helps in resolving "brew"-related issues.
+**PACKAGES**
 
-Also, please clean your system from old packages before installing new packages, or new versions of the packages.
+Sometimes, cleaning the system from old packages helps to solve `brew`-related issues.
 
-To do so, just type:
+Also, please clean your system from old packages before installing new packages, or new versions of the packages. This will fix installation issues, in case `brew` does not succeed to correctly upgrade the installed packages.
+
+You can see the list of all `brew` packages installed on your system with: 
+
+```
+brew list
+```
+
+Then, you can clean the system by removing the GeoModel packages. 
+To do so, just type `brew remove` and the name of the packages that need to be removed (you might be asked to use `brew uninstall` for specific cases; in that case, you will get a clear error message from `brew` about that and you should merely follow the on-screen instructions).
+
+If you see packages like `geomodelcore` in the output of `brew list`, that means that you have old versions of the GeoModel packages installed. Please remove them and update to the latest packages; for example, by using (please remove from the commands below the packages that are not present on your system, otherwise `brew` will complain):
 
 ```bash
-brew remove geomodelexplorer geomodelio geomodelcore
+brew remove geomodelexplorer geomodelio geomodelcore geomodelvisualization
 brew remove soqt-bb coin-bb simage
 ```
 
-Also, check the Taps that are installed on your systems; please, type:
+Also, if you see packages like `geomodel`, please remove them before trying to compile GeoModel from sources.
+You can clean your system from recent versions of the packages by running:
+
+```
+brew remove geomodel geomodelvisualization
+```
+
+You can also remove the graphical libraries by running:
+
+```
+brew remove coin-geomodel soqt-geomodel simage-geomodel
+```
+
+
+**TAPS**
+
+*Taps* are remote repositories used to store `brew` formulas. GeoModel has a Tap called `atlas/geomodel`, which is stored on the CERN GitLab server:
+https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel
+
+In order to have a clean environment, you should remove old GeoModel related Taps.
+
+At first, check the Taps that are installed on your systems; please, type:
 
 ```
 brew tap
@@ -41,6 +73,7 @@ In particular, if you see taps like the ones here below:
 ric-bianchi/coin3d
 ric-bianchi/vp1light
 jfb3615/repo
+atlas/graphics
 ```
 
 those are old repositories containing old formulas, which conflict with the latest version of the formulas hosted in the `atlas/geomodel` tap.
@@ -48,7 +81,7 @@ those are old repositories containing old formulas, which conflict with the late
 Please remove those taps by typing:
 
 ```
-brew untap ric-bianchi/coin3d  ric-bianchi/vp1light
+brew untap ric-bianchi/coin3d  ric-bianchi/vp1light jfb3615/repo atlas/graphics
 ```
 
 

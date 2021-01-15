@@ -1,4 +1,8 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+# Find the dependencies of the GeoModelCore target(s).
+include( CMakeFindDependencyMacro )
+find_dependency( Eigen3 @Eigen3_VERSION@ CONFIG )
 
 # Include the exported configuration of GeoModelCore.
 get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )

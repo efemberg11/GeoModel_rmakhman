@@ -1,101 +1,49 @@
-################################################################################
-# Package: VP1GeometrySystems
-################################################################################
-
-
-set(MYLIB_VERSION_MAJOR 1)
-set(MYLIB_VERSION_MINOR 0)
-set(MYLIB_VERSION_PATCH 0)
-project ( "GXGeometrySystems" VERSION ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH} LANGUAGES CXX )
-
-find_package( Qt5 COMPONENTS Core Gui Widgets OpenGL PrintSupport Network )
-find_package( Coin REQUIRED )
-find_package( SoQt REQUIRED )
-# find_package( Eigen3 REQUIRED )
-find_package(nlohmann_json QUIET)
-if ( APPLE )
-  find_package(OpenGL REQUIRED)
-endif()
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS VP1GeometrySystems/*.h )
-file( GLOB UIS src/*.ui VP1GeometrySystems/*.ui )
+file( GLOB UIS src/*.ui )
 file( GLOB DATA share/*.jpg share/*.json )
 
-
-set (CMAKE_INCLUDE_CURRENT_DIR ON)
-set (CMAKE_AUTOMOC ON)
-set (CMAKE_AUTOUIC ON)
-unset (AUTOUIC_SEARCH_PATHS)
-set (CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/src)
-QT5_WRAP_UI(UI_HDRS ${UIS})
-
-
-include_directories ("${EIGEN3_INCLUDE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}")
-include_directories ("${PROJECT_SOURCE_DIR}/src")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1HEPVis")
-include_directories ("${PROJECT_SOURCE_DIR}/../VP1Base")
-
-add_library ( GXGeometrySystems SHARED ${SOURCES} ${HEADERS} ${UI_HDRS}  )
-
-# If we use standalone-build of the nlohmann_json library, add explicit dependency
+# Add the library.
+add_library( GXGeometrySystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
+target_link_libraries( GXGeometrySystems
+   PUBLIC Coin::Coin Qt5::Core Qt5::Gui Qt5::Widgets
+          GeoModelCore::GeoModelKernel GXBase
+   PRIVATE nlohmann_json::nlohmann_json GeoModelIO::GeoModelRead
+           GeoModelIO::GeoModelWrite GeoModelIO::GeoModelDBManager GXHEPVis )
+target_include_directories( GXGeometrySystems PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+   $<INSTALL_INTERFACE:include> )
+target_compile_definitions( GXGeometrySystems PRIVATE
+   GEOMODEL_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" )
+source_group( "VP1GeometrySystems" FILES ${HEADERS} )
+source_group( "src" FILES ${SOURCES} ${UIS} ${RCS} )
+set_target_properties( GXGeometrySystems PROPERTIES
+   VERSION ${PROJECT_VERSION}
+   SOVERSION ${PROJECT_VERSION_MAJOR} )
+if( GEOMODEL_USE_BUILTIN_COIN3D )
+   add_dependencies( GXGeometrySystems Coin3DBuiltIn )
+endif()
 if( GEOMODEL_USE_BUILTIN_JSON )
-  add_dependencies( GXGeometrySystems JSONExt )
-  # Acquire Installation Directory of JSONExt
-  ExternalProject_Get_Property (JSONExt install_dir)
-  # Include the installed 'include' PATH
-  include_directories (${install_dir}/include)
+   add_dependencies( GXGeometrySystems JSONExt )
 endif()
 
+# Set up an alias with the same name that you would get by "finding" a pre-built
+# version of the library.
+add_library( GeoModelVisualization::GXGeometrySystems ALIAS GXGeometrySystems )
 
-# External dependencies:
-include_directories(${Qt5Core_INCLUDE_DIRS} )
-include_directories(${Qt5Gui_INCLUDE_DIRS} )
-include_directories(${Qt5OpenGL_INCLUDE_DIRS} )
-include_directories(${Qt5Widgets_INCLUDE_DIRS} )
-include_directories(${Qt5PrintSupport_INCLUDE_DIRS} )
-include_directories(${Qt5Sql_INCLUDE_DIRS} )
-include_directories(${Coin_INCLUDE_DIR} )
-include_directories(${SoQt_INCLUDE_DIRS} )
-include_directories(${VP1HEPVis_INCLUDE_DIRS} )
+# Install the library.
+install( TARGETS GXGeometrySystems
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   COMPONENT Runtime
+   NAMELINK_COMPONENT Development )
+install( FILES ${HEADERS}
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/VP1GeometrySystems
+   COMPONENT Development )
 
-
-# We link to `nlohmann_json` only  if we use a version of nlohmann_json
-# that provides a CMake config file (i.e., either built from source, or also
-# installed with Homebrew on macOS).
-# This is not needed if the single-header library is installed in a regular
-# system include folder (e.g., '/usr/local/include', '/usr/include', ...)
-if ( nlohmann_json_FOUND )
-  target_link_libraries( GXGeometrySystems nlohmann_json::nlohmann_json )
-endif()
-
-if ( APPLE )
-  target_link_directories (GXGeometrySystems PUBLIC ${Coin_LIB_DIR} )
-  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelRead GeoModelWrite  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-  else()
-  target_link_libraries (GXGeometrySystems SoQt::SoQt Coin::Coin GeoModelKernel ${Qt5Core_LIBRARIES} GXGui GXBase GXHEPVis GeoModelRead GeoModelWrite  ${SoQt_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} )
-endif()
-
-
-# Set a variable storing the CMake install prefix.
-# -- It is passed to the C++ preprocessor to load, from the C++ code,
-#    the JSON files storing the default materials and volume attributes
-#    for Coin3D.
-add_definitions ( -DGEOMODEL_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX})
-
-
-
-add_definitions (${Qt5Core_DEFINITIONS})
-
-install(TARGETS GXGeometrySystems
-  LIBRARY
-  DESTINATION lib
-  COMPONENT Libraries
-  )
-install( FILES ${DATA} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gmex)
-
-set(MYLIB_VERSION_STRING ${MYLIB_VERSION_MAJOR}.${MYLIB_VERSION_MINOR}.${MYLIB_VERSION_PATCH})
-
-set_target_properties(GXGeometrySystems PROPERTIES VERSION ${MYLIB_VERSION_STRING} SOVERSION ${MYLIB_VERSION_MAJOR})
+# Install additional files from the package.
+install( FILES ${DATA}
+   DESTINATION ${CMAKE_INSTALL_DATADIR}/gmex )

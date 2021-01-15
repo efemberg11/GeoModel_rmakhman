@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
 ################################################################################
 # Package: GeoModel2G4
 ################################################################################
@@ -5,13 +7,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Declare the package name
-project( "GeoModel2G4" VERSION 1.1.0 LANGUAGES CXX )
-
-# # External dependencies:
-# find_package( Geant4 REQUIRED )
-
-# GeoModel dependencies
-# find_package( GeoModelCore 3.2.0 REQUIRED )
+project( "GeoModel2G4" VERSION ${GeoModel_VERSION}  LANGUAGES CXX )
 
 ##########################################################
 # NOTE! The original package also needs this Athena stuff:
@@ -25,13 +21,8 @@ project( "GeoModel2G4" VERSION 1.1.0 LANGUAGES CXX )
 
 # Project's Settings
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 # Use the GNU install directory names.
 include( GNUInstallDirs )  # it defines CMAKE_INSTALL_LIBDIR
-
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -45,7 +36,18 @@ add_library( GeoModel2G4 SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModel2G4
   PUBLIC  ${GEANT4_LIBRARIES}
   PRIVATE GeoMaterial2G4 GeoSpecialShapes)
-target_include_directories( GeoModel2G4 SYSTEM PUBLIC ${GEANT4_INCLUDE_DIRS} PRIVATE ${GeoModelCore_INCLUDE_DIRS} )
+# Check if we are building FullSimLight individually,
+# or as a part of the main GeoModel.
+# In the first case, we link against the imported targets, which are taken
+# from the base GeoModel packages already installed on the system.^[OB
+# This is used when building distribution packages.
+if ( GeoModelG4_INDIVIDUAL_BUILD ) # if built individually
+    target_link_libraries( GeoModel2G4 PRIVATE GeoModelCore::GeoModelKernel )
+else()
+    target_link_libraries( GeoModel2G4 PRIVATE GeoModelKernel )
+endif()
+
+target_include_directories( GeoModel2G4 SYSTEM PUBLIC ${GEANT4_INCLUDE_DIRS} )
 target_include_directories( GeoModel2G4 PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
@@ -53,24 +55,10 @@ target_include_directories( GeoModel2G4 PUBLIC
 # Set installation of library headers
 set_property( TARGET GeoModel2G4 PROPERTY PUBLIC_HEADER ${HEADERS} )
 
-# # Install the library.
-# install( TARGETS GeoModel2G4
-#    EXPORT GeoModel2G4
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModel2G4 )
-#
-# install( TARGETS GeoModel2G4
-#    EXPORT GeoModel2G4Config
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModel2G4 )
-#
-# # Install a CMake description of the project/library.
-# install( EXPORT GeoModel2G4Config DESTINATION cmake )
-
+# Set the library SONAME
 set_target_properties( GeoModel2G4 PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
-
-# new test GeoModelG4
+# Install the library.
 install( TARGETS GeoModel2G4 EXPORT GeoModel2G4-export LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModel2G4 )

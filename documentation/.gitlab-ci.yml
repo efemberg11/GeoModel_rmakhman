@@ -23,6 +23,7 @@ building:
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
     before_script:
         - pip install markdown-include
+        - pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
     script:
         - mkdocs build --clean --site-dir public
         - cp .htaccess public/papers/internal/

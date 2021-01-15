@@ -7,10 +7,16 @@
 
 cmake_minimum_required(VERSION 3.1.0)
 
-project(HelloGeoRead2G4)
+#project(HelloGeoRead2G4)
 
 # Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# Find the needed dependencies, when building individually
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) 
+  find_package( GeoModelCore REQUIRED  )
+  find_package( GeoModelIO REQUIRED ) 
+endif()
 
 ## External dependencies.
 find_package( Geant4 REQUIRED )

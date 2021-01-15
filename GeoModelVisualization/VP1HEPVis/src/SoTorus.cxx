@@ -67,7 +67,7 @@ template <typename T> inline T Clamp(T a, T minV, T maxV) { return Min(Max(minV,
 // Constructor
 SoTorus::SoTorus()
   // : m_internalShapeCache( new SoNodeDependencies )
-  : m_internalShape(nullptr)
+  //: m_internalShape(nullptr) // RMB: not used right now; removed to stop the 'unused variable' warning
 {
   // This statement is required
   SO_NODE_CONSTRUCTOR(SoTorus);
@@ -85,6 +85,7 @@ SoTorus::SoTorus()
 
   setNodeType(EXTENSION);
 
+  // CACHE methods ===> TODO: implement them!!
   // Add dependency to the torus fields. This allows the cache handler
   // to automatically invalidate itself when the fields are changed.
   // m_internalShapeCache->addDependency( fRMajor );
@@ -521,7 +522,7 @@ SoTorus::getNormal( const SbVec3f& vert, int subdiv, int numSubdivs, bool doInve
 
 // Computes vertex normal for the endcap
 SbVec3f
-SoTorus::getNormalEndCap( const SbVec3f& vert, int subdiv, int numSubdivs, bool doInvert )
+SoTorus::getNormalEndCap( const SbVec3f& /*vert*/, int subdiv, int numSubdivs, bool doInvert )
 {
   const double angle = fSPhi.getValue() + fDPhi.getValue() * static_cast<double>( subdiv ) / static_cast<double>( numSubdivs );
 

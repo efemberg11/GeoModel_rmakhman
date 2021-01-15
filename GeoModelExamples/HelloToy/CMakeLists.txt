@@ -7,10 +7,18 @@
 
 cmake_minimum_required(VERSION 3.1.0)
 
-project(HelloToy)
+#project(HelloToy)
 
-#find_package(GeoModelCore REQUIRED)
-#find_package(GeoModelIO REQUIRED)
+# Compile with C++17
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
+
+# Find the needed dependencies, when building individually
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) 
+  find_package( GeoModelCore REQUIRED  ) 
+  find_package( GeoModelIO REQUIRED  ) 
+endif()
 
 # Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -24,5 +32,5 @@ add_executable( helloToy ${SRCS} )
 add_executable( read_helloToy_and_publishedNodes ${SRCS_READ} )
 
 # Link all needed libraries
-target_link_libraries( helloToy GeoModelKernel GeoModelDBManager GeoModelWrite )
-target_link_libraries( read_helloToy_and_publishedNodes GeoModelKernel GeoModelDBManager GeoModelRead )
+target_link_libraries( helloToy GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite )
+target_link_libraries( read_helloToy_and_publishedNodes GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead )

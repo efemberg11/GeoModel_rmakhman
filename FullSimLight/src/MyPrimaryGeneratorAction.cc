@@ -28,8 +28,9 @@ G4ThreeVector    MyPrimaryGeneratorAction::gPrimaryDir(0.,0.,0.);
 
 
 // These are the particle types that can be used as primary beam particle, on a event-by-event based.
-const G4int MyPrimaryGeneratorAction::gNumberCandidateParticles = 5;
-const G4String MyPrimaryGeneratorAction::gNameParticlesVector[MyPrimaryGeneratorAction::gNumberCandidateParticles] = {
+const G4int MyPrimaryGeneratorAction::gNumberCandidateParticles = 3; //only e-/e+ and gammas can be chosen randomly
+const G4int MyPrimaryGeneratorAction::gTotalNumberParticles = 5;
+const G4String MyPrimaryGeneratorAction::gNameParticlesVector[MyPrimaryGeneratorAction::gTotalNumberParticles] = {
   "e-",
   "e+",
   "gamma",

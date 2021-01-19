@@ -41,8 +41,12 @@ public:
   float       getFloat  (const std::string& field) const;
   double      getDouble (const std::string& field) const;
   std::string getString (const std::string& field) const;
+  
+  std::map<std::string,GeoInp> getRecord() const;
+  void dumpRecord() const;
 
   void dump() const;
+
 protected:
   void addValue(const std::string& field
 		, GeoInp value);

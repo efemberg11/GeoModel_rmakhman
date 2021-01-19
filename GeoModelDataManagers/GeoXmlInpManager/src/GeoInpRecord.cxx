@@ -5,6 +5,9 @@
 #include "GeoXmlInpManager/GeoInpRecord.h"
 #include <iostream>
 #include <iomanip>
+//#include <typeinfo>
+//#include <type_traits>
+#include <vector>
 
 GeoInpRecord::GeoInpRecord(std::shared_ptr<GeoInpDef> def)
   : m_def(def)
@@ -84,4 +87,17 @@ void GeoInpRecord::dump() const
     }
   }
   std::cout << std::endl;
+}
+
+void GeoInpRecord::dumpRecord() const 
+{
+  // get each value                                                             
+  for (const auto &v: m_record){
+      std::cout << "first: " << v.first << " - "; 
+    std::visit( [](auto&& arg){ std::cout << "second: [" << typeid(arg).name() << "] " << arg << " \n"; }, v.second );
+  }
+}
+std::map<std::string, GeoInp> GeoInpRecord::getRecord( ) const 
+{
+    return m_record;
 }

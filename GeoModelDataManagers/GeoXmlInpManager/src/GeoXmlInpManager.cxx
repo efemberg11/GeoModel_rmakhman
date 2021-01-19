@@ -121,6 +121,55 @@ void GeoXmlInpManager::parse(const std::string& filename)
   xercesParser.ParseFileAndNavigate(path);
 }
 
+std::map<std::string, std::vector<std::string>> GeoXmlInpManager::getRecordsetData(const std::string& nodeName)
+{
+    std::vector<std::string> colNames;
+    std::vector<std::string> colTypes;
+
+    std::cout << "***TEST***\n";
+    for( auto& entry : m_pImpl->m_tableDefs ) {
+        std::string tableName = entry.first;
+        GeoInpDef_ptr inpDefPtr  = entry.second;
+        std::cout << tableName << ", " << inpDefPtr << "\n";
+        for( auto& def : *inpDefPtr ) {
+            std::string colName = def.first;
+            GeoInpType  colType = def.second;
+            std::string colTypeStr;
+            std::cout << colName << ", " << colType;
+            if(colType == GEOINP_INT)    colTypeStr = "GEOINP_INT";
+            if(colType == GEOINP_LONG)   colTypeStr = "GEOINP_LONG";
+            if(colType == GEOINP_FLOAT)  colTypeStr = "GEOINP_FLOAT";
+            if(colType == GEOINP_DOUBLE) colTypeStr = "GEOINP_DOUBLE";
+            if(colType == GEOINP_STRING) colTypeStr = "GEOINP_STRING";
+            std::cout << ", " << colTypeStr << "\n";
+        }
+    }
+    std::cout << "***TEST***\n";
+    std::cout << std::endl;
+
+    std::map<std::string, std::vector<std::string>> defs;
+    defs["names"] = colNames;
+    defs["types"] = colTypes;
+   
+    // init the data vector
+    unsigned nCols = colNames.size();
+    std::vector<std::string> vect(nCols, "NULL");
+
+    GeoInpRecordset_ptr recordSet = getRecordsetPtr(nodeName);
+    for( const GeoInpRecord& record : *recordSet ) {
+        std::map<std::string, GeoInp> recordMap = record.getRecord();
+        for( const auto& entry : recordMap ) {
+            std::string geoInpCol = entry.first;
+            GeoInp geoInp    = entry.second;
+            std::cout << "geoInpCol: " << geoInpCol << " - ";  
+            std::visit( [](auto&& arg){ std::cout << "second: [" << typeid(arg).name() << "] " 
+                                                  << arg << " \n"; }, geoInp );
+        }
+    }
+
+    return defs;
+}
+
 GeoInpRecordset_ptr GeoXmlInpManager::getRecordsetPtr(const std::string& nodeName)
 {
   auto result = m_pImpl->m_recordsets.find(nodeName);

@@ -24,6 +24,7 @@ class GeoXmlInpManager {
 
   void parse(const std::string& filename);
   GeoInpRecordset_ptr getRecordsetPtr(const std::string& nodeName);
+  std::map<std::string, std::vector<std::string>> getRecordsetData(const std::string& nodeName);
 
  protected:
   void addTable(const std::string& name);

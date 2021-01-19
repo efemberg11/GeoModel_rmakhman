@@ -126,11 +126,12 @@ std::map<std::string, std::vector<std::string>> GeoXmlInpManager::getRecordsetDa
     std::vector<std::string> colNames;
     std::vector<std::string> colTypes;
 
+    /* //TODO: put this as a separate method as getTables() ??
     std::cout << "***TEST***\n";
     for( auto& entry : m_pImpl->m_tableDefs ) {
         std::string tableName = entry.first;
         GeoInpDef_ptr inpDefPtr  = entry.second;
-        std::cout << tableName << ", " << inpDefPtr << "\n";
+        std::cout << "TableName: " << tableName << ", " << inpDefPtr << "\n";
         for( auto& def : *inpDefPtr ) {
             std::string colName = def.first;
             GeoInpType  colType = def.second;
@@ -142,14 +143,40 @@ std::map<std::string, std::vector<std::string>> GeoXmlInpManager::getRecordsetDa
             if(colType == GEOINP_DOUBLE) colTypeStr = "GEOINP_DOUBLE";
             if(colType == GEOINP_STRING) colTypeStr = "GEOINP_STRING";
             std::cout << ", " << colTypeStr << "\n";
+            col
         }
     }
     std::cout << "***TEST***\n";
     std::cout << std::endl;
+    */
+
+    GeoInpDef_ptr tableDefPtr = m_pImpl->m_tableDefs[nodeName];
+    std::cout << "\n***TABLE DEF***\n";
+        std::cout << "Node Name: " << nodeName << ", " << tableDefPtr << "\n";
+        for( auto& def : *tableDefPtr ) {
+            std::string colName = def.first;
+            GeoInpType  colType = def.second;
+            std::string colTypeStr;
+            std::cout << colName << ", " << colType;
+            if(colType == GEOINP_INT)    colTypeStr = "GEOINP_INT";
+            if(colType == GEOINP_LONG)   colTypeStr = "GEOINP_LONG";
+            if(colType == GEOINP_FLOAT)  colTypeStr = "GEOINP_FLOAT";
+            if(colType == GEOINP_DOUBLE) colTypeStr = "GEOINP_DOUBLE";
+            if(colType == GEOINP_STRING) colTypeStr = "GEOINP_STRING";
+            std::cout << ", " << colTypeStr << "\n";
+        }
+    std::cout << "***TABLE DEF***\n";
+    std::cout << std::endl;
+
 
     std::map<std::string, std::vector<std::string>> defs;
     defs["names"] = colNames;
     defs["types"] = colTypes;
+
+    // debug
+    for( unsigned ii=0; ii<colNames.size(); ++ii )
+        std::cout << "col: " << colNames[ii] << "\n" ;
+
    
     // init the data vector
     unsigned nCols = colNames.size();

@@ -51,6 +51,7 @@ Once the json clashes report has been produced, it can be plugged into *gmex* to
 
 {{ imgutils_image_caption('gmclash_1.png', 
    alt='ClashPoints in gmex', 
+   width=600,
    cap='Figure 1: How to load the clash points report file in gmex.',
    urlFix=False) 
 }}
@@ -59,6 +60,7 @@ Once the clash report file has been opened, the clash points will be displayed i
 
 {{ imgutils_image_caption('gmclash_2.png', 
    alt='cp', 
+   width=600,
    cap='Figure 2 : Clash points detected with gmclash and visualized in gmex.',
    urlFix=False) 
 }}

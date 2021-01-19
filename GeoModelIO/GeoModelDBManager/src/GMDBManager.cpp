@@ -309,8 +309,7 @@ bool GMDBManager::addListOfChildrenPositions(const std::vector<std::vector<std::
 	//return addListOfRecordsToTableOld("ChildrenPositions", records); // old SQLite versions
 }
 
-bool GMDBManager::addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records,
-std::string suffix /* optional parameter */)
+bool GMDBManager::addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records, std::string suffix /* optional parameter */)
 {
     std::string tableName = "PublishedAlignableTransforms"; // default table name
     std::string nodeType = "GeoAlignableTransform";
@@ -328,8 +327,7 @@ std::string suffix /* optional parameter */)
     //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
 }
 
-bool GMDBManager::addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records, std::string
-suffix /* optional parameter */)
+bool GMDBManager::addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records, std::string suffix /* optional parameter */)
 {
     std::string tableName = "PublishedFullPhysVols"; // default table name
     std::string nodeType = "GeoFullPhysVol";
@@ -345,6 +343,20 @@ suffix /* optional parameter */)
     return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
     //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
 }
+
+/*
+bool GMDBManager::addListOfRecordsToCustomTable(const std::vector<std::vector<std::string>> &records, std::string tableName )
+{
+    std::string nodeType = "GeoFullPhysVol";
+    const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
+    // create custom table first
+    createTableCustomPublishedNodes( tableName, nodeType, &keyType );
+    // add records to the newly-created table
+    return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+    //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
+}
+*/
+
 
 
 bool GMDBManager::addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records)
@@ -965,7 +977,6 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
 
   std::vector<std::string> tab;
 
-  //tableName = "dbversion";
   tab.insert(tab.begin(), {tableName, "id", "key", "nodeID", "keyType"});
   storeTableColumnNames(tab);
 
@@ -976,6 +987,50 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
   //std::cout << "Created the custom table: '" << tableName << "'." << std::endl; // debug msg
   return rc;
 }
+
+
+// create a user-defined custom table to store auxiliary data
+bool GMDBManager::createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::string>> &records )
+{
+    if( tableColNames.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' names is empty!!");
+    if( tableColTypes.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' types is empty!!");
+
+  int rc = -1; // sqlite's return code
+  std::string queryStr;
+
+  std::vector<std::string> tab;
+
+  tab.push_back(tableName);
+  tab.push_back( "id" ); // this is the column to store the records' IDs
+  for( auto& colName : tableColNames )
+    tab.push_back( colName );
+
+  storeTableColumnNames(tab);
+
+
+  // prepare the dynamic query to create the custom table
+  queryStr = fmt::format( "create table {0} ( id integer primary key ", tab[0] );
+  for( int ii=0; ii<tableColNames.size(); ++ii) {
+    std::string colStr = fmt::format( ", {0} {1} ", tableColNames[ii], tableColTypes[ii] );
+    queryStr += colStr;
+  }
+  queryStr += ")";
+
+  //std::cout << "Creating table with query: '" << queryStr << "'..." << std::endl; // debug msg
+  rc = execQuery(queryStr);
+  tab.clear();
+  return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+
+  //std::cout << "Created the custom table: '" << tableName << "'." << std::endl; // debug msg
+  //return rc;
+}
+
+
+
+
+
+
+
 
 
 bool GMDBManager::createTables()

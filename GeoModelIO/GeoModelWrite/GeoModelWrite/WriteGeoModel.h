@@ -33,6 +33,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 // FWD declarations
 class GeoPublisher;
@@ -67,6 +68,8 @@ public:
 	virtual void handleSerialTransformer (const GeoSerialTransformer *obj);
 	virtual void handleTransform (const GeoTransform *);
 	virtual void handleNameTag (const GeoNameTag *);
+
+    void addDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::string>> tableData );
 
 	void saveToDB(GeoPublisher* store = nullptr);
     void saveToDB( std::vector<GeoPublisher*>& vecStores);
@@ -195,6 +198,12 @@ private:
 	std::vector<std::vector<std::string>> m_childrenPositions;
 	std::vector<std::vector<std::string>> m_publishedAlignableTransforms_String;
 	std::vector<std::vector<std::string>> m_publishedFullPhysVols_String;
+
+    // cache to store custom tables to store auxiliary data in the DB: 
+    // ---> map( tableName, columnsNames, columnsTypes ) 
+    std::unordered_map<std::string, std::pair<std::vector<std::string>, std::vector<std::string>>> m_auxiliaryTables; 
+    std::unordered_map<std::string, std::vector<std::vector<std::string>>> m_auxiliaryTablesData; 
+
 
     // cache to store the node that could not have persistified. 
     // Usually, that means that persistification code has not been developed

@@ -207,6 +207,15 @@ public:
 
   std::vector<std::vector<std::string>> getTableRecords(std::string tableName) const; // TODO: should be private?
 
+  /**
+   * @brief Create a custom DB table to store auxiliary data.
+   * @param tableName The name of the custom table
+   * @param tableColNames A vector of strings defining the names of the table's columns
+   * @param tableColTypes A vector of strings defining the types of the table's columns
+   */
+  bool createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::string>> &records );
+
+
 
 private:
 
@@ -221,7 +230,7 @@ private:
    * @param keyType The type of the 'key' that identifies the linked node. 
    */
   bool createTableCustomPublishedNodes(const std::string tableName, const std::string nodeType, const std::type_info* keyType);
-
+  
   bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
 //  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
 

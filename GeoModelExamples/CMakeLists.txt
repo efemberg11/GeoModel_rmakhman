@@ -18,6 +18,7 @@ add_subdirectory( HelloGeoWrite )
 #add_subdirectory( HelloDummyMaterial )
 #add_subdirectory( HelloToy )
 #add_subdirectory( HelloToyDetectorFactory )
+add_subdirectory( HelloToyXML )
 
 # GeoModel reference examples
 #add_subdirectory( GeoActions )

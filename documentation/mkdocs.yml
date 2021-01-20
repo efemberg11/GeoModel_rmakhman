@@ -38,6 +38,7 @@ nav:
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
         - 'Contributing to the Documentation': 'dev/docs-contrib.md'
         - 'FAQ': 'dev/dev-faq.md'
+    - FAQ: 'faq.md'
     - Team & History: 'about/team.md'
     - Contacts: 'about/contacts.md'
 

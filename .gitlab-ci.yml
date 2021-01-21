@@ -488,11 +488,11 @@ docs-deploy:
     rules:
       - changes:
         - documentation/**/*
+      - only:
+        - master
     variables:
       "EOS_PATH": "/eos/project/g/geomodel/www/home"
     image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
-    only:
-        - master
     script:
         - ls
         - cd documentation

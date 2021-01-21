@@ -491,8 +491,8 @@ docs-deploy:
     variables:
       "EOS_PATH": "/eos/project/g/geomodel/www/home"
     image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
-    #only:
-    #    - master
+    only:
+        - master
     script:
         - ls
         - cd documentation

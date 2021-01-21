@@ -40,7 +40,7 @@ nav:
         - 'Troubleshooting': 'dev/troubleshooting.md'
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
         - 'Contributing to the Documentation': 'dev/docs-contrib.md'
-        - 'FAQ': 'dev/dev-faq.md'
+        - 'Dev FAQ': 'dev/dev-faq.md'
     - Papers & Presentations:
         - 'Public': 'papers/public.md'
         - 'Internal': 'papers/internal.md'

@@ -1,9 +1,5 @@
 # Frequent Asked Questions (FAQ)
 
-!!! note 
-
-    test - 3
-
 
 ## Visualization
 

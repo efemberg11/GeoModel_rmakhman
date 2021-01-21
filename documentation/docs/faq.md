@@ -1,4 +1,3 @@
-
 # Frequent Asked Questions (FAQ)
 
 

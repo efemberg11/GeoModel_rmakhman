@@ -44,6 +44,7 @@ By default, those will be installed in a system folder (*e.g.*, in `/usr/local` 
 
 The CMake setup has been configured to offer the developers several build options, which are briefly summarized here below.
 
+**Please, also take a look at additional, package-specific instructions contained in the packages' README files.**
 
 #### DATAMANAGERS 
 

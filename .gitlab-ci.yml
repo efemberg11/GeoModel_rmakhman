@@ -486,10 +486,10 @@ docs-deploy:
     stage: step-B
     needs: ["docs-build"]
     rules:
-      - changes:
+      - if: '$CI_COMMIT_BRANCH == "master"' #If changes are pushed to master.
+        changes:
         - documentation/**/*
-      - only:
-        - master
+      
     variables:
       "EOS_PATH": "/eos/project/g/geomodel/www/home"
     image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest

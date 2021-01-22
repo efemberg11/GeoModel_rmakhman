@@ -1,10 +1,10 @@
 // Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 /*
- * HelloGeo.cpp
+ *  HelloToyXML.cpp
  *
- *  Author:     Riccardo Maria BIANCHI @ CERN
- *  Created on: Nov, 2018
+ *  Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+ *  Created on: Dec, 2020
  *
  */
 
@@ -147,8 +147,8 @@ int main(int argc, char *argv[])
   //       - <integer-based key, GeoFullPhysVol*> 
   //       - <string-based key, GeoAlignableTransform*>
   //       Thus, we now get them back from the DB with the same key types we originally used:
-  std::map<unsigned int, GeoFullPhysVol*> mapFPV = readInGeo.getPublishedNodes<unsigned int, GeoFullPhysVol*>("HelloToyExample");
-  std::map<std::string, GeoAlignableTransform*> mapAXF = readInGeo.getPublishedNodes<std::string, GeoAlignableTransform*>("HelloToyExample");
+  std::map<unsigned int, GeoFullPhysVol*> mapFPV = readInGeo.getPublishedNodes<unsigned int, GeoFullPhysVol*>("HelloToyXML");
+  std::map<std::string, GeoAlignableTransform*> mapAXF = readInGeo.getPublishedNodes<std::string, GeoAlignableTransform*>("HelloToyXML");
 
   unsigned int ii=0;
   std::cout << "\n\nPublished AlignableTransforms from the DB...\n";
@@ -177,7 +177,13 @@ int main(int argc, char *argv[])
       std::cout << "\txf:"; GeoUtilFunctions::printTrf(vol->getAbsoluteTransform());
       ++ii;
   }
-  
+ 
+
+  std::cout << "\n\nWe now read back the tables containing auxiliary data, which have been stored in the data file as additional custom tables\n\n";
+readInGeo.printAllDBTables();
+readInGeo.printDBTable("HelloBoxes");
+
+
   std::cout << "Everything done." << std::endl;
 
   return 0;

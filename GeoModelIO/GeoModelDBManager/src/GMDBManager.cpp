@@ -221,6 +221,7 @@ void GMDBManager::printAllRecords(const std::string &tableName) const
   // --- print table name
   std::cout << tableName << " in db:" << std::endl;
   // --- print table column names
+  if( m_tableNames.find(tableName) == m_tableNames.end() ) throw std::runtime_error("ERROR! Not table " + tableName + " found!\n\n\n");   
   std::cout << "- " <<  joinVectorStrings(m_tableNames.at(tableName), ", ") << std::endl;
   // --- print records
   std::vector<std::vector<std::string>> records;

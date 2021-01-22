@@ -200,41 +200,22 @@ std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vect
 
     // loop over table rows
     for( const GeoInpRecord& record : *recordSet ) {
+        
+        // init the records with a default 'NULL' string. 
+        // NOTE: It will be replaced by an appropriate value with 
+        //       another type supported by the variant, 
+        //       if an entry for that field exist
         std::vector<GeoInp> vFields(nCols, "NULL");
+        
+        // get the table's record/row
         std::map<std::string, GeoInp> recordMap = record.getRecord();
+        
         // loop over row's items (i.e., entries for the table's columns)
         for( const auto& entry : recordMap ) {
             std::string fieldName = entry.first;
             GeoInp fieldValue    = entry.second; // that's a std::variant
-            
-            /*
-            std::cout << "fieldName: " << fieldName << " - ";  
-            std::string fieldValueStr = "NULL";
-            // debug
-            std::visit( [](auto&& arg){ std::cout << "fieldType: " << typeid(arg).name() 
-                                                  << ", fieldVal: " 
-                                                  << arg << " \n"; }, fieldValue );
-            switch( colTypesMap[fieldName] ) {
-                case GEOINP_INT:
-                    fieldValueStr = std::to_string( std::get<int>(fieldValue) );
-                    break;
-                case GEOINP_LONG:
-                    fieldValueStr = std::to_string( std::get<long>(fieldValue) );
-                    break;
-                case GEOINP_FLOAT:
-                    fieldValueStr = std::to_string( std::get<float>(fieldValue) );
-                    break;
-                case GEOINP_DOUBLE:
-                    fieldValueStr = std::to_string( std::get<double>(fieldValue) );
-                    break;
-                case GEOINP_STRING:
-                    fieldValueStr = std::get<std::string>(fieldValue);
-                    break;
-            }
-            std::cout << "fieldValueStr: " << fieldValueStr << "\n";
-            */
-            // replace the default "NULL" string value in the data vector with the value
-            // at the index stored for the given column
+            // replace the default "NULL" string value in the data vector 
+            // with the value at the index stored for the given column
             vFields[ colIndexes[fieldName] ] = fieldValue;
         }
         // store the data vector for the current row 

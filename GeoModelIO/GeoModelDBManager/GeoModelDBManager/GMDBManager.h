@@ -152,6 +152,7 @@ public:
 	 */
 	void printDBVersion() const;
 
+  void printAllRecords(const std::string &tableName) const;
 
   void printAllDBTables();
   void getAllDBTables();
@@ -235,6 +236,7 @@ private:
   bool createTableCustomPublishedNodes(const std::string tableName, const std::string nodeType, const std::type_info* keyType);
   
   bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
+  bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> records);
 //  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
 
   void addDBversion(std::string version);
@@ -254,7 +256,6 @@ private:
 
   std::vector<std::string> getTableColumnNames(const std::string &tableName);
 
-  void printAllRecords(const std::string &tableName) const;
 
   int getTableColIndex(const std::string &tableName, const std::string &colName);
 

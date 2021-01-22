@@ -3,12 +3,15 @@
 */
 
 /*
-* author: Riccardo Maria Bianchi @ CERN - 2020
+* author: Riccardo Maria Bianchi <riccardo.maria.bianchi@cern.ch> - Dec 2020
 *
-* The example show how to write a more complex Toy detector geometry, 
+* The example shows how to write a more complex Toy detector geometry, 
 * through the use of GeoSerialTransformers. 
+* 
 * It also shows how to publish the list of FullPhysVol and AlignableTransform nodes,
 * to be retrieved later (for example, when setting the readout geometry up).
+* 
+* It also shows how to store custom data tables in the output SQLite file, both taken from an external XML data file or defined in the C++ code itself.
 * 
 */
 
@@ -317,6 +320,7 @@ int main(int argc, char *argv[])
   
   tableName = "HelloBoxes";
   std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> helloBoxesData = inpman->getRecordsetData(tableName);
+  dumpGeoModelGraph.storeDataTable( tableName, (helloBoxesData.first)["colNames"], (helloBoxesData.first)["colTypes"], helloBoxesData.second );
 
   
 

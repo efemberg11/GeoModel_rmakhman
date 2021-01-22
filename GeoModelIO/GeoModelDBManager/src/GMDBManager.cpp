@@ -407,7 +407,7 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     ++id;
     std::vector<std::string> items;
     for ( const std::string& item : rec) {
-      items.push_back("'" + item + "'");
+      items.push_back("'" + item + "'"); // TODO: we should differentiate strings from other values when inserting them in the table, as we now do for the std::variant version!
     }
     std::string values = joinVectorStrings(items, ",");
     sql += " (" + std::to_string(id) + "," + values + ")";
@@ -426,6 +426,66 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
   }
   return true;
 }
+
+
+bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> records)
+{
+  // get table columns and format them for query
+  std::string tableColString = "(" + joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
+  if(m_debug) std::cout << "tableColString:" << tableColString << std::endl;
+
+  unsigned int nRecords = records.size();
+  std::cout << "Info: number of " << tableName << " records to dump into the DB:" << nRecords << std::endl;
+
+  // preparing the SQL query
+  std::string sql = fmt::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
+  unsigned int id = 0;
+  for( const std::vector<std::variant<int,long,float,double,std::string>>& rec : records) {
+    ++id;
+    // a vector to store string-conversions of values, to build the SQL query
+    std::vector<std::string> items;
+    // loop over all entries in a row/record
+    for ( const std::variant<int,long,float,double,std::string>& item : rec) {
+        if( std::holds_alternative<int>(item) )
+            items.push_back(std::to_string( std::get<int>(item) )); // we need to encapsulate records' values into quotes for the SQL query string
+        else if( std::holds_alternative<long>(item) )
+            items.push_back(std::to_string( std::get<long>(item) ));
+        else if( std::holds_alternative<float>(item) )
+            items.push_back(std::to_string( std::get<float>(item) ));
+        else if( std::holds_alternative<double>(item) )
+            items.push_back(std::to_string( std::get<double>(item) ));
+        else if( std::holds_alternative<std::string>(item) ) {
+            std::string str = std::get<std::string>(item);
+            // NOTE: if item is a "NULL" string, we don't encapsulate it into quotes,
+            // so it is taken as the SQL's NULL value in the SQL string,
+            // and inserted as a NULL value in the table,
+            // instead of as a "NULL" text string 
+            if (str == "NULL") items.push_back( str );
+            else items.push_back( "'" + str + "'"  );
+        }
+        else throw std::runtime_error("No std::variant alternative found!\n"); 
+    }
+    // we build the long string containing all values
+    std::string values = joinVectorStrings(items, ",");
+    sql += " (" + std::to_string(id) + "," + values + ")";
+    if (id != nRecords) {
+      sql += ",";
+    } else {
+      sql += ";";
+    }
+
+  }
+std::cout << "Query string:" << sql << std::endl; // debug
+  if(m_debug) std::cout << "Query string:" << sql << std::endl; // debug
+
+  // executing the SQL query
+  if ( ! (execQuery(sql)) ) {
+    return false;
+  }
+  return true;
+}
+
+
 
 // TODO: this is for the old SQLite. Not needed anymore, I guess. ==> Just put a requirement on the newer version of SQLite3 in CMakeLists.txt. Perhaps, also check that GeoModelIO can run smoothly on older ATLAS releases, like 21.9 by taking a newer SQLite3 from LCG.
 // ***Note***
@@ -1040,7 +1100,15 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
   // prepare the dynamic query to create the custom table
   queryStr = fmt::format( "create table {0} ( id integer primary key ", tab[0] );
   for( int ii=0; ii<tableColNames.size(); ++ii) {
-    std::string colStr = fmt::format( ", {0} {1} ", tableColNames[ii], tableColTypes[ii] );
+      std::string colType = "";
+    // convert std::variant types to SQLite data types (see SQLite documentation)
+    if( std::holds_alternative<int>(records[0][ii]) ) colType = "INTEGER";
+    else if( std::holds_alternative<long>(records[0][ii]) ) colType = "INTEGER";
+    else if( std::holds_alternative<float>(records[0][ii]) ) colType = "REAL";
+    else if( std::holds_alternative<double>(records[0][ii]) ) colType = "REAL";
+    else if( std::holds_alternative<std::string>(records[0][ii]) ) colType = "TEXT";
+    else throw std::runtime_error("No std::variant alternative found!\n"); 
+    std::string colStr = fmt::format( ", {0} {1} ", tableColNames[ii], colType );
     queryStr += colStr;
   }
   queryStr += ")";
@@ -1050,8 +1118,7 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
 
   rc = execQuery(queryStr);
   tab.clear();
-  //return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
-  return true;
+  return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
 }
 
 

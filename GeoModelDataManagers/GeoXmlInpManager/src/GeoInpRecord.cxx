@@ -97,7 +97,12 @@ void GeoInpRecord::dumpRecord() const
     std::visit( [](auto&& arg){ std::cout << "second: [" << typeid(arg).name() << "] " << arg << " \n"; }, v.second );
   }
 }
+
+
+
 std::map<std::string, GeoInp> GeoInpRecord::getRecord( ) const 
 {
     return m_record;
 }
+
+

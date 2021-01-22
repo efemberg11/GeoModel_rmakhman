@@ -30,6 +30,7 @@
 #include "GeoModelKernel/GeoDefinitions.h" 
 
 // C++ includes
+#include <variant>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -69,7 +70,10 @@ public:
 	virtual void handleTransform (const GeoTransform *);
 	virtual void handleNameTag (const GeoNameTag *);
 
-    void addDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::string>> tableData );
+    void storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::string>> tableData );
+    void storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData );
+
+    void storeRecordset(  );
 
 	void saveToDB(GeoPublisher* store = nullptr);
     void saveToDB( std::vector<GeoPublisher*>& vecStores);
@@ -201,8 +205,10 @@ private:
 
     // cache to store custom tables to store auxiliary data in the DB: 
     // ---> map( tableName, columnsNames, columnsTypes ) 
-    std::unordered_map<std::string, std::pair<std::vector<std::string>, std::vector<std::string>>> m_auxiliaryTables; 
-    std::unordered_map<std::string, std::vector<std::vector<std::string>>> m_auxiliaryTablesData; 
+    std::unordered_map<std::string, std::pair<std::vector<std::string>, std::vector<std::string>>> m_auxiliaryTablesStr; 
+    std::unordered_map<std::string, std::pair<std::vector<std::string>, std::vector<std::string>>> m_auxiliaryTablesVar; 
+    std::unordered_map<std::string, std::vector<std::vector<std::string>>> m_auxiliaryTablesStrData; 
+    std::unordered_map<std::string, std::vector<std::vector<std::variant<int,long,float,double,std::string>>>> m_auxiliaryTablesVarData; 
 
 
     // cache to store the node that could not have persistified. 

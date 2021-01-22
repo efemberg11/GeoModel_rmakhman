@@ -1565,13 +1565,22 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
 	}
 
     // save auxiliary data stored in custom tables
-    if ( m_auxiliaryTables.size() ) {
+    if ( m_auxiliaryTablesStr.size() ) {
              std::cout << "\nINFO: Custom tables to store auxiliary data have been added, "
                 << "so we create these custom tables in the DB:" 
                 << std::endl; 
-       for ( auto& tableData : m_auxiliaryTables ) {
+       for ( auto& tableData : m_auxiliaryTablesStr ) {
             std::cout << "\tsaving table: " << tableData.first << std::endl; 
-            m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, m_auxiliaryTablesData[ tableData.first ] );
+            m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, m_auxiliaryTablesStrData[ tableData.first ] );
+       }
+    }
+    if ( m_auxiliaryTablesVar.size() ) {
+             std::cout << "\nINFO: Custom tables to store auxiliary data have been added, "
+                << "so we create these custom tables in the DB:" 
+                << std::endl; 
+       for ( auto& tableData : m_auxiliaryTablesVar ) {
+            std::cout << "\tsaving table: " << tableData.first << std::endl; 
+            m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, m_auxiliaryTablesVarData[ tableData.first ] );
        }
     }
 
@@ -1675,9 +1684,16 @@ template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT st
 
 void WriteGeoModel::storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::string>> tableData )
 {
-    m_auxiliaryTables[ tableName ] = std::make_pair(colNames, colTypes);
-    m_auxiliaryTablesData[ tableName ] = tableData;
+    m_auxiliaryTablesStr[ tableName ] = std::make_pair(colNames, colTypes);
+    m_auxiliaryTablesStrData[ tableName ] = tableData;
 }
+
+void WriteGeoModel::storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData )
+{
+    m_auxiliaryTablesVar[ tableName ] = std::make_pair(colNames, colTypes);
+    m_auxiliaryTablesVarData[ tableName ] = tableData;
+}
+
 
 
   void WriteGeoModel::storeAddress(const std::string &address, const unsigned int &id)

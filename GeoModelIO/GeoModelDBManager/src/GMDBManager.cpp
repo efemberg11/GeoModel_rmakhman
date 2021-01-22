@@ -989,7 +989,7 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
 }
 
 
-// create a user-defined custom table to store auxiliary data
+// create a user-defined custom table to store auxiliary data, from vector<vector<string>>
 bool GMDBManager::createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::string>> &records )
 {
     if( tableColNames.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' names is empty!!");
@@ -1007,6 +1007,35 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
 
   storeTableColumnNames(tab);
 
+  // prepare the dynamic query to create the custom table
+  queryStr = fmt::format( "create table {0} ( id integer primary key ", tab[0] );
+  for( int ii=0; ii<tableColNames.size(); ++ii) {
+    std::string colStr = fmt::format( ", {0} {1} ", tableColNames[ii], tableColTypes[ii] );
+    queryStr += colStr;
+  }
+  queryStr += ")";
+
+  rc = execQuery(queryStr);
+  tab.clear();
+  return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+}
+// create a user-defined custom table to store auxiliary data, from vector<vector<variant>>
+bool GMDBManager::createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> &records )
+{
+    if( tableColNames.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' names is empty!!");
+    if( tableColTypes.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' types is empty!!");
+
+  int rc = -1; // sqlite's return code
+  std::string queryStr;
+
+  std::vector<std::string> tab;
+
+  tab.push_back(tableName);
+  tab.push_back( "id" ); // this is the column to store the records' IDs
+  for( auto& colName : tableColNames )
+    tab.push_back( colName );
+
+  storeTableColumnNames(tab);
 
   // prepare the dynamic query to create the custom table
   queryStr = fmt::format( "create table {0} ( id integer primary key ", tab[0] );
@@ -1016,14 +1045,15 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
   }
   queryStr += ")";
 
-  //std::cout << "Creating table with query: '" << queryStr << "'..." << std::endl; // debug msg
+  // debug
+  std::cout << "Creating table with query string: " << queryStr << std::endl;
+
   rc = execQuery(queryStr);
   tab.clear();
-  return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
-
-  //std::cout << "Created the custom table: '" << tableName << "'." << std::endl; // debug msg
-  //return rc;
+  //return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+  return true;
 }
+
 
 
 

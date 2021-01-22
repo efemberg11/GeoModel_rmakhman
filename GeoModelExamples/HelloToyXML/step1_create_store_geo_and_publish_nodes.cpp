@@ -293,12 +293,12 @@ int main(int argc, char *argv[])
   //dumpGeoModelGraph.storeAuxiliaryData( my_map_data  );
   //
   std::string tableName = "HelloTest";
-  std::vector<std::string> tableColNames = {"BARRELMDBOXES_DATA_ID", "BOXNAME"};
-  std::vector<std::string> tableColTypes = {"long", "string"};
-  std::vector<std::string> vec1 = {"1", "Ped1"};
-  std::vector<std::string> vec2 = {"3", "Crate2"};
+  std::vector<std::string> tableColNames = {"BARRELMDBOXES_DATA_ID", "FAKE", "BOXNAME"};
+  std::vector<std::string> tableColTypes = {"long", "double", "string"};
+  std::vector<std::string> vec1 = {"1", "15", "Ped1"};
+  std::vector<std::string> vec2 = {"3", "NULL", "Crate2"};
   std::vector<std::vector<std::string>> tableData = { vec1, vec2 };
-  dumpGeoModelGraph.addDataTable( tableName, tableColNames, tableColTypes, tableData );
+  dumpGeoModelGraph.storeDataTable( tableName, tableColNames, tableColTypes, tableData );
 
   // Get XML Input Manager
   GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
@@ -310,8 +310,14 @@ int main(int argc, char *argv[])
   //std::vector<std::string> helloCablesColNames = helloCablesDefs["columns"];
   //std::vector<std::string> helloCablesColTypes = helloCablesDefs["types"];
   //std::vector<std::string>> helloCablesData = inpman->getRecordsetData("HelloCables");
-  std::map<std::string, std::vector<std::string>> helloCablesData = inpman->getRecordsetData("HelloCables");
-  std::map<std::string, std::vector<std::string>> helloBoxesData = inpman->getRecordsetData("HelloBoxes");
+  
+  tableName = "HelloCables";
+  std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> helloCablesData = inpman->getRecordsetData(tableName);
+  dumpGeoModelGraph.storeDataTable( tableName, (helloCablesData.first)["colNames"], (helloCablesData.first)["colTypes"], helloCablesData.second );
+  
+  tableName = "HelloBoxes";
+  std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> helloBoxesData = inpman->getRecordsetData(tableName);
+
   
 
 

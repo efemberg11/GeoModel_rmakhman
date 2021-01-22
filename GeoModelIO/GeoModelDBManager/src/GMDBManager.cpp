@@ -214,28 +214,39 @@ void GMDBManager::printDBVersion() const
 }
 
 
-
+void GMDBManager::createTableDataCaches()
+{
+    getAllDBTables();
+    getAllDBTableColumns();
+}
 
 void GMDBManager::printAllRecords(const std::string &tableName) const
 {
   // --- print table name
-  std::cout << tableName << " in db:" << std::endl;
+  std::cout << "\n---" << std::endl;
+  std::cout << "'" << tableName << "' in db:" << std::endl;
+  // --- check if we stored table's data
+  if( m_tableNames.find(tableName) == m_tableNames.end() ) {
+      std::cout << "\n*** ERROR!! No table '" << tableName << "' found! ***\n\n";   
+      return;
+  }
   // --- print table column names
-  if( m_tableNames.find(tableName) == m_tableNames.end() ) throw std::runtime_error("ERROR! Not table " + tableName + " found!\n\n\n");   
   std::cout << "- " <<  joinVectorStrings(m_tableNames.at(tableName), ", ") << std::endl;
   // --- print records
   std::vector<std::vector<std::string>> records;
 //  std::vector<std::string> nodeParams;
   records = getTableRecords(tableName);
-  for( auto& row : records) {
-    std::cout << "* ";
-    for( auto& item : row) {
-      std::cout << item << ", ";
-    }
-    std::cout << std::endl;
+  if (records.size()) {
+      for( auto& row : records) {
+          std::cout << "* ";
+          for( auto& item : row) {
+              std::cout << item << ", ";
+          }
+          std::cout << std::endl;
+      }
   }
   std::cout << "---" << std::endl;
-	// TODO: I want to have a symbol like '---' to mean empty line when query gives 0 results.
+  // TODO: I want to have a symbol like '---' to mean empty line when query gives 0 results.
 }
 
 
@@ -266,7 +277,10 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(std::string t
         std::vector<std::string> nodeParams; // stores the data items contained in a single row
         for ( int i = 0; i < ctotal; i++ )  // Loop times the number of columns in the table
         {
-          std::string s = (char*)sqlite3_column_text(stmt, i);  // Read each Column in the row as text FIXME: is there a method to get the right type, e.g. double, instead of text?
+          std::string s;
+          const char* cc = (char*)sqlite3_column_text(stmt, i);  // Read each Column in the row as text FIXME: is there a method to get the right type, e.g. double, instead of text?
+          if (cc==NULL) s = "NULL";
+          else s = cc;
           nodeParams.push_back( s );
         }
         records.push_back(nodeParams);
@@ -978,6 +992,48 @@ void GMDBManager::getAllDBTables()
 }
 
 
+void GMDBManager::getAllDBTableColumns()  
+{
+
+    std::vector<std::string> cols;
+    std::string colName;
+
+    // populate the cache with tables' names, if needed
+    if( ! m_cache_tables.size() ) {
+        std::cout << "*** ERROR! Tables' cache is empty! ***\n";
+        return;
+    }
+
+    for( auto& tableName : m_cache_tables ) {
+        std::cout << "Processing table '" << tableName << "'...\n";
+        sqlite3_stmt *stmt;
+        // get the 'name' column from the PRAGMA's table's definition
+        // see: https://stackoverflow.com/a/54962853/320369
+        std::string queryStr = "select name from pragma_table_info('" + tableName + "')";
+        int rc = sqlite3_prepare_v2(m_d->m_dbSqlite, queryStr.c_str() , -1, &stmt, NULL);
+        if (rc==SQLITE_OK)
+        {
+            //OK, now looping over table's columns...
+            //will continue to go down the rows (columns in your table) till there are no more
+            while(sqlite3_step(stmt) == SQLITE_ROW)
+            {
+                //sprintf(colName, "%s", sqlite3_column_text(stmt, 1));
+                colName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+                
+                //do something with colName because it contains the column's name
+                m_tableNames[tableName].push_back(colName);
+                std::cout << "col: " << colName << "\n";
+            }
+        }
+    } // end of for loop
+}
+
+
+
+
+
+
+// TODO: currently, we retrieve published data as strings, but we want to retrieve that according to the original data type
 std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable( std::string suffix )
 {
     std::string tableName = "PublishedFullPhysVols"; // default table name
@@ -988,6 +1044,7 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable( std::st
 
     return getTableRecords( tableName );
 }
+// TODO: currently, we retrieve published data as strings, but we want to retrieve that according to the original data type
 std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable( std::string suffix )
 {
     std::string tableName = "PublishedAlignableTransforms"; // default table name

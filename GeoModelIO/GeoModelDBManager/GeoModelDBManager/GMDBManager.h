@@ -155,7 +155,11 @@ public:
   void printAllRecords(const std::string &tableName) const;
 
   void printAllDBTables();
+
+  void createTableDataCaches();
   void getAllDBTables();
+  void getAllDBTableColumns();
+
   int execQuery(std::string queryStr);
 
 

@@ -181,6 +181,7 @@ int main(int argc, char *argv[])
 
   std::cout << "\n\nWe now read back the tables containing auxiliary data, which have been stored in the data file as additional custom tables\n\n";
 readInGeo.printAllDBTables();
+readInGeo.printDBTable("dbversion");
 readInGeo.printDBTable("HelloBoxes");
 
 

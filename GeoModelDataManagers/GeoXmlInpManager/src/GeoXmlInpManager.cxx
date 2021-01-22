@@ -121,39 +121,15 @@ void GeoXmlInpManager::parse(const std::string& filename)
   xercesParser.ParseFileAndNavigate(path);
 }
 
-std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> GeoXmlInpManager::getRecordsetData(const std::string& nodeName)
+GeoInpRecordsetData GeoXmlInpManager::getRecordsetData(const std::string& nodeName)
 {
-    // the map storing the data to be returned by the function
+    // the map storing the data to be returned by the function (aka, 'GeoInpRecordsetData' typedef)
     std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> tableMap;
     
     // the vectors and map storing the table's columns' name and type
     std::map<std::string, std::vector<std::string>> colsMap;
     std::vector<std::string> colNames;
     std::vector<std::string> colTypes;
-
-    /* //TODO: put this as a separate method as getTables() ??
-    std::cout << "***TEST***\n";
-    for( auto& entry : m_pImpl->m_tableDefs ) {
-        std::string tableName = entry.first;
-        GeoInpDef_ptr inpDefPtr  = entry.second;
-        std::cout << "TableName: " << tableName << ", " << inpDefPtr << "\n";
-        for( auto& def : *inpDefPtr ) {
-            std::string colName = def.first;
-            GeoInpType  colType = def.second;
-            std::string colTypeStr;
-            std::cout << colName << ", " << colType;
-            if(colType == GEOINP_INT)    colTypeStr = "GEOINP_INT";
-            if(colType == GEOINP_LONG)   colTypeStr = "GEOINP_LONG";
-            if(colType == GEOINP_FLOAT)  colTypeStr = "GEOINP_FLOAT";
-            if(colType == GEOINP_DOUBLE) colTypeStr = "GEOINP_DOUBLE";
-            if(colType == GEOINP_STRING) colTypeStr = "GEOINP_STRING";
-            std::cout << ", " << colTypeStr << "\n";
-            col
-        }
-    }
-    std::cout << "***TEST***\n";
-    std::cout << std::endl;
-    */
 
     // get the table's definition: columns' names and types
     GeoInpDef_ptr tableDefPtr = m_pImpl->m_tableDefs[nodeName];
@@ -188,7 +164,6 @@ std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vect
     for( unsigned ii=0; ii<colNames.size(); ++ii )
         std::cout << "col: " << colNames[ii] << "\n" ;
 
-   
     // init the vector to contain the table's data
     std::vector<std::vector<GeoInp>> rowsData;
 

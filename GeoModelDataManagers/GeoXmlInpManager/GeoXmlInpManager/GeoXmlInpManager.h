@@ -11,6 +11,7 @@
 class Impl;
 
 typedef std::shared_ptr<GeoInpRecordset> GeoInpRecordset_ptr;
+typedef std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> GeoInpRecordsetData;
 
 class GeoXmlInpManager {
   friend class GeoInpColDefHandler;
@@ -24,7 +25,7 @@ class GeoXmlInpManager {
 
   void parse(const std::string& filename);
   GeoInpRecordset_ptr getRecordsetPtr(const std::string& nodeName);
-  std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> getRecordsetData(const std::string& nodeName);
+  GeoInpRecordsetData getRecordsetData(const std::string& nodeName);
 
  protected:
   void addTable(const std::string& name);

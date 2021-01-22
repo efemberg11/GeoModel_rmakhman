@@ -26,6 +26,7 @@ typedef std::variant<int
 		     , std::string> GeoInp;
 
 typedef std::map<std::string,GeoInpType> GeoInpDef;
+typedef std::map<std::string,GeoInp> GeoInpData;
 typedef std::shared_ptr<GeoInpDef> GeoInpDef_ptr;
 
 class GeoInpRecord {
@@ -42,8 +43,7 @@ public:
   double      getDouble (const std::string& field) const;
   std::string getString (const std::string& field) const;
   
-  std::map<std::string,GeoInp> getRecord() const;
-  void dumpRecord() const;
+  GeoInpData getRecord() const;
 
   void dump() const;
 

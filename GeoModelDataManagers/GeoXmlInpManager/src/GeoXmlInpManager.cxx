@@ -160,10 +160,6 @@ GeoInpRecordsetData GeoXmlInpManager::getRecordsetData(const std::string& nodeNa
     colsMap["colNames"] = colNames;
     colsMap["colTypes"] = colTypes;
 
-    // debug
-    for( unsigned ii=0; ii<colNames.size(); ++ii )
-        std::cout << "col: " << colNames[ii] << "\n" ;
-
     // init the vector to contain the table's data
     std::vector<std::vector<GeoInp>> rowsData;
 

@@ -287,14 +287,50 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  // Dump the tree volumes to a local file
-  std::cout << "Dumping the GeoModel geometry to the DB file..." << std::endl;
+  // Dump the GeoModel tree 
+  std::cout << "Dumping the GeoModel geometry tree..." << std::endl;
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db); // init the GeoModel node action
   toyPhys->exec(&dumpGeoModelGraph); // visit all GeoModel nodes
 
-  //dumpGeoModelGraph.storePublisher( publisher );
-  //dumpGeoModelGraph.storeAuxiliaryData( my_map_data  );
+
+  //=====================
+  // Auxiliary Data
+  //=====================
+
+  // Now, we save auxiliary data to the output DB file
+  // in additional custom DB tables
+  // Those data are meant to be used by detector code later in the workflow
+  // so, it must be stored in the DB besides the actual GeoModel data themselves.
   //
+
+  // In these first two examples, we load auxiliary data from custom XML files
+  // through the use of the GeoModelATLAS/GeoModelDataManagers
+  // Then, we store the auxiliary data directly to the DB files.
+  //
+  // At first, we need to get the GeoModelDataManagers' XML Input Manager
+  // As per GeoModelDataManagers' architecture, we need to load both the file
+  // containing the tables' defiintions and the one containing the actual tables' data
+  GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
+  inpman->parse("Hello-Defs.xml");
+  inpman->parse("Hello-Data.xml");
+  // Then, we set the name of the first of the tables that we want to store in the DB...
+  tableName = "HelloCables";
+  // ...we get the corresponding "Recordset"'s data (i.e., the table's columns definitions and data rows
+  std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> helloCablesData = inpman->getRecordsetData(tableName);
+  // ...and we store that table to the output DB
+  dumpGeoModelGraph.storeDataTable( tableName, (helloCablesData.first)["colNames"], (helloCablesData.first)["colTypes"], helloCablesData.second );
+  
+  // Here an example for a second table of auxiliary data, which we want to store in the DB for later use 
+  tableName = "HelloBoxes";
+  std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> helloBoxesData = inpman->getRecordsetData(tableName);
+  dumpGeoModelGraph.storeDataTable( tableName, (helloBoxesData.first)["colNames"], (helloBoxesData.first)["colTypes"], helloBoxesData.second );
+
+  // Not all auxiliary data need to come from XML files.
+  // Here, we create a custom table made of strings, directly in the code.
+  // We define a table's name
+  // Then, we define the names and types of the columns, storing them as vectors of strings
+  // Then, we populate vectors of strings with the table's data. One vector for each table's row.
+  // Then, we store the data into the DB.
   std::string tableName = "HelloTest";
   std::vector<std::string> tableColNames = {"BARRELMDBOXES_DATA_ID", "FAKE", "BOXNAME"};
   std::vector<std::string> tableColTypes = {"long", "double", "string"};
@@ -303,28 +339,10 @@ int main(int argc, char *argv[])
   std::vector<std::vector<std::string>> tableData = { vec1, vec2 };
   dumpGeoModelGraph.storeDataTable( tableName, tableColNames, tableColTypes, tableData );
 
-  // Get XML Input Manager
-  GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
-  inpman->parse("Hello-Defs.xml");
-  inpman->parse("Hello-Data.xml");
 
-  GeoInpRecordset_ptr helloCables = inpman->getRecordsetPtr("HelloCables");
-  //std::map<std::string, std::vector<std::string>> helloCablesDefs = inpman->getRecordsetDefs("HelloCables");
-  //std::vector<std::string> helloCablesColNames = helloCablesDefs["columns"];
-  //std::vector<std::string> helloCablesColTypes = helloCablesDefs["types"];
-  //std::vector<std::string>> helloCablesData = inpman->getRecordsetData("HelloCables");
-  
-  tableName = "HelloCables";
-  std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> helloCablesData = inpman->getRecordsetData(tableName);
-  dumpGeoModelGraph.storeDataTable( tableName, (helloCablesData.first)["colNames"], (helloCablesData.first)["colTypes"], helloCablesData.second );
-  
-  tableName = "HelloBoxes";
-  std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> helloBoxesData = inpman->getRecordsetData(tableName);
-  dumpGeoModelGraph.storeDataTable( tableName, (helloBoxesData.first)["colNames"], (helloBoxesData.first)["colTypes"], helloBoxesData.second );
-
-  
-
-
+  //=====================
+  // Save to the DB 
+  //=====================
   // Save the GeoModel tree to the SQlite DB file.
   // We pass a pointer to the GeoPublisher as well, so the list of published 
   // FullPhysVol and AlignableTransform nodes will be stored into the DB too.

@@ -490,7 +490,6 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     }
 
   }
-std::cout << "Query string:" << sql << std::endl; // debug
   if(m_debug) std::cout << "Query string:" << sql << std::endl; // debug
 
   // executing the SQL query
@@ -1169,9 +1168,6 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
     queryStr += colStr;
   }
   queryStr += ")";
-
-  // debug
-  std::cout << "Creating table with query string: " << queryStr << std::endl;
 
   rc = execQuery(queryStr);
   tab.clear();

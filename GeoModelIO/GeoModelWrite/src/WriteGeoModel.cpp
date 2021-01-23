@@ -1557,14 +1557,16 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
     // save data stored in instances of GeoPublisher
     if(publishers.size()) {
             std::cout << "\nINFO: A pointer to a GeoPublisher instance has been provided, "
-                << "so we dump the published list of FullPhysVol and AlignableTransforms\n" 
+                << "so we dump the published list of FullPhysVol and AlignableTransforms nodes and auxiliary data, if any.\n" 
                 << std::endl;
         for(GeoPublisher* publisher : publishers) {
             storePublishedNodes(publisher);
+            storePublishedAuxiliaryData(publisher);
         }
 	}
 
-    // save auxiliary data stored in custom tables
+    // save auxiliary data stored through WriteGeoModel directly
+    /*
     if ( m_auxiliaryTablesStr.size() ) {
              std::cout << "\nINFO: Custom tables to store auxiliary data have been added, "
                 << "so we create these custom tables in the DB:" 
@@ -1573,7 +1575,7 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
             std::cout << "\tsaving table: " << tableData.first << std::endl; 
             m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, m_auxiliaryTablesStrData[ tableData.first ] );
        }
-    }
+    }*/
     if ( m_auxiliaryTablesVar.size() ) {
              std::cout << "\nINFO: Custom tables to store auxiliary data have been added, "
                 << "so we create these custom tables in the DB:" 
@@ -1594,6 +1596,21 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
 	return;
 }
 
+void WriteGeoModel::storePublishedAuxiliaryData(GeoPublisher* publisher)
+{
+    AuxTableDefs tableDefs = publisher->getPublishedAuxData().first;
+    AuxTableData tableAuxData = publisher->getPublishedAuxData().second;
+    if ( tableDefs.size() ) {
+             std::cout << "\nINFO: Custom tables to store auxiliary data have been added to an instance of GeoPublisher, "
+                << "so we create these custom tables in the DB:" 
+                << std::endl; 
+       for ( auto& tableData : tableDefs ) {
+            std::cout << "\tsaving table: " << tableData.first << std::endl; 
+            m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, tableAuxData[ tableData.first ] );
+       }
+    }
+
+}
 
 void WriteGeoModel::storePublishedNodes(GeoPublisher* store)
 {
@@ -1681,12 +1698,13 @@ template <typename TT> void WriteGeoModel::storeRecordPublishedNodes(const TT st
     }
 }
 
-
+/*
 void WriteGeoModel::storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::string>> tableData )
 {
     m_auxiliaryTablesStr[ tableName ] = std::make_pair(colNames, colTypes);
     m_auxiliaryTablesStrData[ tableName ] = tableData;
 }
+*/
 
 void WriteGeoModel::storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData )
 {

@@ -1022,7 +1022,6 @@ void GMDBManager::getAllDBTableColumns()
                 
                 //do something with colName because it contains the column's name
                 m_tableNames[tableName].push_back(colName);
-                std::cout << "col: " << colName << "\n";
             }
         }
     } // end of for loop

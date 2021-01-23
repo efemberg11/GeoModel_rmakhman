@@ -42,7 +42,6 @@
 #include "GeoXmlMatManager/GeoXmlMatManager.h"
 #include "GeoXmlInpManager/GeoXmlInpManager.h"
 #include "GeoXmlInpManager/GeoInpRecordset.h"
-//#include "LArGeoUtils/LArGeoInpUtils.h"
 
 
 // Units
@@ -103,50 +102,6 @@ int main(int argc, char *argv[])
         GeoMaterial* carbon = new GeoMaterial("Carbon", 2.329 *gr/cm3);
         carbon->add(const_cast<GeoElement*> (Carbon), 1.0);
         carbon->lock();
-
-
-
-/*
-        // Get XML Input Manager
-        GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
-        inpman->parse("Hello-Defs.xml");
-        inpman->parse("Hello-Data.xml");
-        
-        //GeoInpRecordset_ptr larPosition = inpman->getRecordsetPtr("LArPosition");
-        //if (larPosition->size()==0) throw std::runtime_error("Error, no lar position table in database!");
-        
-        GeoInpRecordset_ptr helloCables = inpman->getRecordsetPtr("HelloCables");
-        double DCU = (*helloCables)[0].getDouble("DCU");
-        double DLAR = (*helloCables)[0].getDouble("DLAR");
-        
-        GeoInpRecordset_ptr helloBoxes = inpman->getRecordsetPtr("HelloBoxes");
-        std::string helloBoxName = (*helloBoxes)[0].getString("BOXNAME");
-
-
-        printf( "%f %f %s \n", DCU, DLAR, helloBoxName.c_str() );
-
-
-        //GeoPcon* emecMotherShape = new GeoPcon(phiPosition - phiSize, 2.*phiSize);  //start phi,total phi
-        for(unsigned int i = 0; i < helloBoxes->size(); ++ i){
-            const GeoInpRecord& currentRecord = (*helloBoxes)[i];
-            long data_id = currentRecord.getLong("BARRELDMBOXES_DATA_ID");
-            std::string name = std::string( currentRecord.getString("BOXNAME") );
-            double hlen = currentRecord.getDouble("HLEN");
-            double hwdt = currentRecord.getDouble("HWDT");
-            double hhgt = currentRecord.getDouble("HHGT");
-            //double xtr = currentRecord.getDouble("XTR");
-            printf("id: %li, name: %s, hlen: %f, hwdt: %f, hhgt: %f \n", data_id, name.c_str(), hlen, hwdt, hhgt);
-        }
-
-        //helloBoxes->dump();
-
-        for( const GeoInpRecord& record : *helloBoxes ) {
-            //record.dump();
-            record.test();
-        }
-*/
-
-
 
  
   //--------------------------------------//
@@ -314,7 +269,7 @@ int main(int argc, char *argv[])
   inpman->parse("Hello-Defs.xml");
   inpman->parse("Hello-Data.xml");
   // Then, we set the name of the first of the tables that we want to store in the DB...
-  tableName = "HelloCables";
+  std::string tableName = "HelloCables";
   // ...we get the corresponding "Recordset"'s data (i.e., the table's columns definitions and data rows
   std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> helloCablesData = inpman->getRecordsetData(tableName);
   // ...and we store that table to the output DB
@@ -331,12 +286,12 @@ int main(int argc, char *argv[])
   // Then, we define the names and types of the columns, storing them as vectors of strings
   // Then, we populate vectors of strings with the table's data. One vector for each table's row.
   // Then, we store the data into the DB.
-  std::string tableName = "HelloTest";
-  std::vector<std::string> tableColNames = {"BARRELMDBOXES_DATA_ID", "FAKE", "BOXNAME"};
+  tableName = "HelloTest";
+  std::vector<std::string> tableColNames = {"MY_DATA_ID", "WEIGTH", "NAME"};
   std::vector<std::string> tableColTypes = {"long", "double", "string"};
-  std::vector<std::string> vec1 = {"1", "15", "Ped1"};
-  std::vector<std::string> vec2 = {"3", "NULL", "Crate2"};
-  std::vector<std::vector<std::string>> tableData = { vec1, vec2 };
+  std::vector<std::variant<int,long,float,double,std::string>> vec1 = {1, 15, "Ped1"};
+  std::vector<std::variant<int,long,float,double,std::string>> vec2 = {3, "NULL", "Crate2"};
+  std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData = { vec1, vec2 };
   dumpGeoModelGraph.storeDataTable( tableName, tableColNames, tableColTypes, tableData );
 
 

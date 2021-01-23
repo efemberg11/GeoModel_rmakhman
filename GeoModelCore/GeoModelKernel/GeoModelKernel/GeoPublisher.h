@@ -21,19 +21,25 @@
  * alignment corrections
  */
 
-// Author: Riccardo Maria Bianchi @ CERN
-// August 2020
+// Author: Riccardo Maria Bianchi <riccardo.maria.bianchi@cern.ch> - Aug 2020
+// Major updates: 
+// - Jan 2021 - riccardo.maria.bianchi@cern.ch - Added support for XML auxiliary data
 
 
 // C++ includes
 #include <any> // needs C++17
 #include <map>
+#include <unordered_map>
 #include <string>
+#include <variant>
 #include <iostream>
 
 
 class GeoAlignableTransform;
 class GeoVFullPhysVol;
+
+typedef std::unordered_map<std::string, std::pair<std::vector<std::string>, std::vector<std::string>>> AuxTableDefs;
+typedef std::unordered_map<std::string, std::vector<std::vector<std::variant<int,long,float,double,std::string>>>> AuxTableData;
 
 class GeoPublisher
 {
@@ -49,6 +55,10 @@ class GeoPublisher
   void setName(std::string name);
   std::string getName() { return m_name; }
 
+  void storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData );
+
+    std::pair<AuxTableDefs, AuxTableData> getPublishedAuxData() { return std::make_pair(m_auxiliaryTablesVar, m_auxiliaryTablesVarData); }
+
  private:
 
   std::map<GeoVFullPhysVol*, std::any> m_publishedFPV;
@@ -57,6 +67,12 @@ class GeoPublisher
   template<typename Iter> void printInsertionStatus(Iter it, bool success);
 
   std::string m_name;
+
+  // cache to store custom tables to store auxiliary data in the DB:
+    // ---> map( tableName, columnsNames, columnsTypes )
+    AuxTableDefs m_auxiliaryTablesVar;
+    AuxTableData m_auxiliaryTablesVarData;
+
 
 }; 
 

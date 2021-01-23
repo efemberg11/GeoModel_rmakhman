@@ -18,7 +18,7 @@ set_target_properties( MuonGeoModel PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::MuonGeoModel ALIAS MuonGeoModel )
+add_library( MuonDD::MuonGeoModel ALIAS MuonGeoModel )
 
 # Install the library.
 install(TARGETS MuonGeoModel

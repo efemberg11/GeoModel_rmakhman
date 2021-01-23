@@ -20,7 +20,7 @@ set_target_properties( GeoXmlMatManager PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::GeoXmlMatManager ALIAS GeoXmlMatManager )
+add_library( GeoModelDataManagers::GeoXmlMatManager ALIAS GeoXmlMatManager )
 
 # Install the library.
 install(TARGETS GeoXmlMatManager

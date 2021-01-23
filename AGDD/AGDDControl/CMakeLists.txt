@@ -18,7 +18,7 @@ set_target_properties( AGDDControl PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::AGDDControl ALIAS AGDDControl )
+add_library( AGDD::AGDDControl ALIAS AGDDControl )
 
 
 # Install the library.

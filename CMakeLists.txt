@@ -44,10 +44,12 @@ find_package( GeoModelCore )
 
 # switches to let users build specific packages on request
 option( GEOMODELATLAS_BUILD_ALL "Enable the build of all GeoModelATLAS sub-projects" OFF )
+option( GEOMODELATLAS_BUILD_BASE "Enable the build of all base GeoModelATLAS sub-projects (i.e., no GeoModelPlugins)" OFF )
 option( GEOMODELATLAS_BUILD_DATAMANAGERS "Enable the build of GeoModelDataManagers" ON )
 option( GEOMODELATLAS_BUILD_AGDD "Enable the build of AGDD" OFF )
 option( GEOMODELATLAS_BUILD_MUONDD "Enable the build of MuonDD" OFF )
 option( GEOMODELATLAS_BUILD_GEOMODELXML "Enable the build of GeoModelXML" OFF )
+option( GEOMODELATLAS_BUILD_PLUGINS "Enable the build of GeoModelPlugins" OFF )
 
 # a list to keep track of the packages we build
 set(BUILT_PACKAGES "")
@@ -55,6 +57,18 @@ set(BUILT_PACKAGES "")
 if( GEOMODELATLAS_BUILD_ALL )
     set ( GEOMODELATLAS_BUILD_MUONDD TRUE ) # this also triggers AGDD and GeoModelDataManagers
     set ( GEOMODELATLAS_BUILD_GEOMODELXML TRUE )
+    set ( GEOMODELATLAS_BUILD_PLUGINS TRUE )
+endif()
+
+if( GEOMODELATLAS_BUILD_BASE )
+    set ( GEOMODELATLAS_BUILD_MUONDD TRUE ) # this also triggers AGDD and GeoModelDataManagers
+    set ( GEOMODELATLAS_BUILD_GEOMODELXML TRUE )
+endif()
+
+if( GEOMODELATLAS_BUILD_PLUGINS )
+    set ( GEOMODELATLAS_BUILD_DATAMANAGERS TRUE )
+    add_subdirectory(GeoModelPlugins)
+    list( APPEND BUILT_PACKAGES "GeoModelPlugins" )
 endif()
 
 if( GEOMODELATLAS_BUILD_MUONDD )

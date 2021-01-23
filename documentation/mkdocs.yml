@@ -11,10 +11,10 @@ theme:
 
 nav:
     - Home: 'index.md'
-    - Getting Started:
-        - 'Install Libraries & Tools': 'start/install.md'
-        - 'The Basic Concepts': 'start/basic_concepts.md'
-        - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
+    #- Getting Started:
+    - 'Install Libraries & Tools': 'start/install.md'
+    #    - 'The Basic Concepts': 'start/basic_concepts.md'
+    #   - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
     - How To:
         - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
         - 'Build a simple detector': 'how/how_simple_detector_cpp.md'

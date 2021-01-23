@@ -6,7 +6,7 @@
 #define INDETGEOMODELUTILS_TOPLEVELPLACEMENTS_H
 
 #include "GeoXmlInpManager/GeoXmlInpManager.h"
-#include "GeoXmlInpManager/GeoInpRecordSet.h"
+#include "GeoXmlInpManager/GeoInpRecordset.h"
 #include "GeoXmlInpManager/GeoInpRecord.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 

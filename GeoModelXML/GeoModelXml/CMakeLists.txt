@@ -28,7 +28,7 @@ set_target_properties( GeoModelXml PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::GeoModelXml ALIAS GeoModelXml )
+add_library( GeoModelXML::GeoModelXml ALIAS GeoModelXml )
 
 # Install the library.
 install(TARGETS GeoModelXml

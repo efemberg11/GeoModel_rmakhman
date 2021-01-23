@@ -18,7 +18,7 @@ set_target_properties( MuonAGDDPlugin PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::MuonAGDDPlugin ALIAS MuonAGDDPlugin )
+add_library( MuonDD::MuonAGDDPlugin ALIAS MuonAGDDPlugin )
 
 # Install the library.
 install(TARGETS MuonAGDDPlugin

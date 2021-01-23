@@ -18,7 +18,7 @@ set_target_properties( MuonAGDDDescription PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::MuonAGDDDescription ALIAS MuonAGDDDescription )
+add_library( MuonDD::MuonAGDDDescription ALIAS MuonAGDDDescription )
 
 # Install the library.
 install(TARGETS MuonAGDDDescription

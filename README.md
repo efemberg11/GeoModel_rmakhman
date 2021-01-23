@@ -89,11 +89,34 @@ The `GEOMODELATLAS_BUILD_GEOMODELXML` builds the `GeoModelXML` package only:
 cmake -DGEOMODELATLAS_BUILD_GEOMODELXML=1  ../GeoModelATLAS
 ```
 
+#### PLUGINS
+
+| Default: | `OFF` |
+
+
+The `GEOMODELATLAS_BUILD_PLUGINS` builds the `GeoModelPlugins` and the `GeoModelDataManagers` packages:
+
+```
+cmake -DGEOMODELATLAS_BUILD_PLUGINS=1  ../GeoModelATLAS
+```
+
+
+#### BASE 
+
+| Default: | `OFF` | 
+
+By enabling the `GEOMODELATLAS_BUILD_BASE` option, all the sub-projects contained in `GeoModelATLAS` except `GeoModelPlugins` are built. You can enable it at configuration time by using:
+
+```
+cmake -DGEOMODELATLAS_BUILD_BASE=1 ../GeoModelATLAS
+```
+
+
 #### ALL 
 
 | Default: | `OFF` | 
 
-By enabling the `GEOMODELATLAS_BUILD_ALL` option, all the sub-projects contained in GeoModelATLAS are built. You can enable it at configuration time by using:
+By enabling the `GEOMODELATLAS_BUILD_ALL` option, all the sub-projects contained in `GeoModelATLAS` are built (`GeoModelPlugins` included). You can enable it at configuration time by using:
 
 ```
 cmake -DGEOMODELATLAS_BUILD_ALL=1 ../GeoModelATLAS

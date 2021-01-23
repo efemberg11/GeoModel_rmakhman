@@ -18,7 +18,7 @@ set_target_properties( AGDDPlugin PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::AGDDPlugin ALIAS AGDDPlugin )
+add_library( AGDD::AGDDPlugin ALIAS AGDDPlugin )
 
 # Install the library.
 install(TARGETS AGDDPlugin

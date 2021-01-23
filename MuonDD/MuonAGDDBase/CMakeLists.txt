@@ -18,7 +18,7 @@ set_target_properties( MuonAGDDBase PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::MuonAGDDBase ALIAS MuonAGDDBase )
+add_library( MuonDD::MuonAGDDBase ALIAS MuonAGDDBase )
 
 # Install the library.
 install(TARGETS MuonAGDDBase

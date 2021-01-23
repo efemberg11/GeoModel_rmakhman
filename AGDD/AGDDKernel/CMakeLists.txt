@@ -18,7 +18,7 @@ set_target_properties( AGDDKernel PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelATLAS::AGDDKernel ALIAS AGDDKernel )
+add_library( AGDD::AGDDKernel ALIAS AGDDKernel )
 
 # Install the library.
 install(TARGETS AGDDKernel

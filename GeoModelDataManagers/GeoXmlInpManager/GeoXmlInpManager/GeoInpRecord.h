@@ -77,4 +77,10 @@ inline GeoInpDef_ptr GeoInpRecord::getDef() const
   return m_def;
 }
 
+inline GeoInpData GeoInpRecord::getRecord( ) const 
+{
+  return m_record;
+}
+
+
 #endif

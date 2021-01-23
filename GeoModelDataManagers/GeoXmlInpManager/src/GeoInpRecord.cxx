@@ -87,9 +87,4 @@ void GeoInpRecord::dump() const
   std::cout << std::endl;
 }
 
-GeoInpData GeoInpRecord::getRecord( ) const 
-{
-    return m_record;
-}
-
 

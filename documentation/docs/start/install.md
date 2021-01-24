@@ -24,13 +24,13 @@ Install geomodel precompiled applications
 ```
 sudo apt install geomodel-visualization  # to get gmex  (the geometry explorer)
 sudo apt install fullsimlight            # to get fullsimlight,gm2gdml,gmclash, gmgeantino
-sudo apt install geomodeltools           # to get gmcat, gdml2gm
+sudo apt install geomodel-tools           # to get gmcat, gdml2gm
 ```
 Install the geomodel development kits (header files and precompiled libraries)
 ```
-sudo apt install geomodelcore-dev
-sudo apt install geomodeltools-dev
-sudo apt install geomodelg4-dev
+sudo apt install geomodel-core-dev
+sudo apt install geomodel-tools-dev
+sudo apt install geomodel-g4-dev
 sudo apt install geomodel-visualization-dev
 ```
 Get some example geometry input files:

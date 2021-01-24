@@ -12,7 +12,7 @@ The shape classes in the geometry kernel are data structures designed to describ
 | ------- | ----- |
 | GeoBox  | Box |
 | GeoCons | Cone Section |
-| GeoPara |Parallelapiped |
+| GeoPara |Parallelepiped |
 | GeoPcon | Polycone |
 | GeoPgon | Polygon |
 | GeoTrap | Trapezoid  (complex) |
@@ -100,11 +100,11 @@ We now present the interfaces to specific shapes.  In general these shapes are b
 
 {% include 'components/kernel/reference/RCBase/GeoShape/GeoTrap.md' %}
 
+{% include 'components/kernel/reference/RCBase/GeoShape/GeoTrd.md' %}
+
 {% include 'components/kernel/reference/RCBase/GeoShape/GeoTube.md' %}
 
 {% include 'components/kernel/reference/RCBase/GeoShape/GeoTubs.md' %}
-
-{% include 'components/kernel/reference/RCBase/GeoShape/GeoTrd.md' %}
 
 {% include 'components/kernel/reference/RCBase/GeoShape/GeoTwistedTrap.md' %}
 

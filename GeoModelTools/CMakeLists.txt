@@ -8,7 +8,7 @@ project( "GeoModelTools" )
 
 #Set up the project. Check if we build it with GeoModel or individually
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-    # I am top-level project.
+    # I am built as a top-level project.
     # Make the root module directory visible to CMake.
     list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
     # get global GeoModel version

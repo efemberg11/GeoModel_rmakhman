@@ -23,6 +23,9 @@ public:
 		Z=getAttributeAsInt("Z",explicitMaterial);
 		density=0;
 		StopLoop(true);
+// clear fractionList for new material (D.Casper)
+		fractionList.clear();
+
 		xercesc::DOMNode *child;
 
 		for (child=XercesParser::GetCurrentElement()->getFirstChild();child!=0;child=child->getNextSibling())

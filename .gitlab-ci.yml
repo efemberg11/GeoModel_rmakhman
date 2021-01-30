@@ -39,7 +39,7 @@ variables:
   tags:
     - docker
   rules:
-    -when: always
+    - when: always
 
 
 # NOTE

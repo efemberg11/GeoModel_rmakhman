@@ -38,6 +38,8 @@ variables:
   image: ubuntu:18.04
   tags:
     - docker
+  rules:
+    - when: always
 
 
 # NOTE

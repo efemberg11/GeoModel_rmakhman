@@ -29,6 +29,7 @@
 // C++ includes
 #include <any> // needs C++17
 #include <map>
+#include <vector>
 #include <unordered_map>
 #include <string>
 #include <variant>

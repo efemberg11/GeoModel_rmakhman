@@ -22,8 +22,12 @@ set(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations" ) # very basic
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # when building individually
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
-find_package( GeoModelDataManagers REQUIRED )
 endif()
+
+# this is needed, we use it to access GeoModel input data from XML files
+# ==> That's why this example cannot be built together with all the others 
+#     when using using the `GEOMODEL_BUILD_EXAMPLES` build option
+find_package( GeoModelDataManagers REQUIRED )
 
 # Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

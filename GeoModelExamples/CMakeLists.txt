@@ -18,7 +18,7 @@ add_subdirectory( HelloGeoWrite )
 #add_subdirectory( HelloDummyMaterial )
 #add_subdirectory( HelloToy )
 #add_subdirectory( HelloToyDetectorFactory )
-add_subdirectory( HelloToyXML )
+#add_subdirectory( HelloToyXML ) # this should be moved to GeoModelATLAS, because it uses GeoModelDataManagers
 
 # GeoModel reference examples
 #add_subdirectory( GeoActions )

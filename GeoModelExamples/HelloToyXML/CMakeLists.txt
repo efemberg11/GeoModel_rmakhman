@@ -19,10 +19,11 @@ set( CMAKE_CXX_STANDARD_REQUIRED TRUE CACHE BOOL
 # Setting CMAKE_CXX_FLAGS to avoid "deprecated" warnings
 set(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations" ) # very basic
 
-
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) # when building individually
 find_package( GeoModelCore REQUIRED )
 find_package( GeoModelIO REQUIRED )
 find_package( GeoModelDataManagers REQUIRED )
+endif()
 
 # Find includes in current dir
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

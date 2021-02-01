@@ -105,7 +105,7 @@ add_executable(fillHistogramExample fillHistogramExample.cc src/Histo.cc include
 add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 #add_executable(plotGeantinoMaps plotGeantinoMaps.cc)
 add_executable(testMagneticField testMagneticField.cc)
-add_executable(gmtogdml geoModeltoGDML.cc ${sources} ${headers})
+add_executable(gm2gdml geoModel2GDML.cc ${sources} ${headers})
 
 if(Pythia_FOUND)
   target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
@@ -122,7 +122,7 @@ if( GEOMODEL_USE_BUILTIN_JSON )
   add_dependencies( fillHistogramExample JSONExt )
   add_dependencies( gmgeantino JSONExt )
   add_dependencies( testMagneticField JSONExt )
-  add_dependencies( gmtogdml JSONExt )
+  add_dependencies( gm2gdml JSONExt )
   # Acquire Installation Directory of JSONExt
   ExternalProject_Get_Property (JSONExt install_dir)
   # Include the installed 'include' PATH
@@ -135,7 +135,7 @@ if( GEOMODEL_USE_BUILTIN_XERCESC )
     add_dependencies( fillHistogramExample XercesCBuiltIn )
     add_dependencies( gmgeantino XercesCBuiltIn )
     add_dependencies( testMagneticField XercesCBuiltIn )
-    add_dependencies( gmtogdml XercesCBuiltIn )
+    add_dependencies( gm2gdml XercesCBuiltIn )
 endif()
 #----------------------------------------------------------------------------
 # Link all needed libraries
@@ -148,7 +148,7 @@ target_link_libraries(testMagneticField ${Geant4_LIBRARIES} MagFieldServices Mag
 target_link_libraries(gmclash PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 target_link_libraries(fullSimLight PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 target_link_libraries(gmgeantino PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-target_link_libraries(gmtogdml PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(gm2gdml PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
 
 # Check if we are building FullSimLight individually,
 # or as a part of the main GeoModel.
@@ -159,12 +159,12 @@ if ( ${PROJECT_NAME}_INDIVIDUAL_BUILD ) # if built individually
     target_link_libraries( gmclash PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
     target_link_libraries( fullSimLight PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
     target_link_libraries( gmgeantino PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-    target_link_libraries( gmtogdml PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
+    target_link_libraries( gm2gdml PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
 else() # if built as a part of GeoModel
     target_link_libraries( gmclash PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
     target_link_libraries( fullSimLight PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
     target_link_libraries( gmgeantino PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
-    target_link_libraries( gmtogdml PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
+    target_link_libraries( gm2gdml PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
 endif()
 
 # targets that need 'nlohmann_json'
@@ -177,7 +177,7 @@ if( nlohmann_json_FOUND )
     target_link_libraries( gmclash PRIVATE nlohmann_json::nlohmann_json )
     target_link_libraries( fullSimLight PRIVATE nlohmann_json::nlohmann_json )
     target_link_libraries( gmgeantino PRIVATE nlohmann_json::nlohmann_json )
-    target_link_libraries( gmtogdml PRIVATE nlohmann_json::nlohmann_json )
+    target_link_libraries( gm2gdml PRIVATE nlohmann_json::nlohmann_json )
 else()
     message(STATUS "WARNING - 'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
 endif()
@@ -213,5 +213,5 @@ install(TARGETS gmclash DESTINATION ${OUTPUT})
 install(TARGETS fillHistogramExample DESTINATION ${OUTPUT})
 install(TARGETS gmgeantino DESTINATION ${OUTPUT})
 install(TARGETS testMagneticField DESTINATION ${OUTPUT})
-install(TARGETS gmtogdml DESTINATION ${OUTPUT})
+install(TARGETS gm2gdml DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION share/FullSimLight)

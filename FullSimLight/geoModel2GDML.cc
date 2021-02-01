@@ -1,6 +1,6 @@
 
 //--------------------------------------------------------
-// gmtogdml application: 8th June 2020 (README)
+// gm2gdml application: 8th June 2020 (README)
 //--------------------------------------------------------
 
 #include "G4Version.hh"
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
     GetInputArguments(argc, argv);
     
     G4cout
-    << " ===================  Running GeoModeltoGDML =================== "      << G4endl
+    << " ===================  Running GeoModel2GDML =================== "      << G4endl
     << "   Input geometry file name          =    " << inputGeometryFileName    << G4endl
     << "   Output GDML geometry file name    =    " << outputGDMLFileName       << G4endl
     << " ============================================================== "       << G4endl;
@@ -80,13 +80,13 @@ static struct option options[] = {
 
 void Help() {
   std::cout <<"\n " << std::setw(100) << std::setfill('=') << "" << std::setfill(' ') << std::endl;
-  G4cout <<"  GeoModeltoGDML Geant4 application.    \n"
+  G4cout <<"  GeoModel2GDML Geant4 application.    \n"
             << std::endl
             <<"  **** Parameters: \n\n"
             <<"      -g :   [MANDATORY] input  geometry file name [.db/.gdml/.dylib/.so] \n"
             <<"      -o :   [OPTIONAL]  output GDML geometry file name (default: geometry.gdml)\n"
             << std::endl;
-  std::cout <<"\nUsage: ./gmtogdml [OPTIONS]\n" <<std::endl;
+  std::cout <<"\nUsage: ./gm2gdml [OPTIONS]\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
     printf("\t-%c  --%s\t\n", options[i].val, options[i].name);
   }

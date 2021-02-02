@@ -90,6 +90,9 @@ public:
 	GeoPhysVol* buildGeoModel();
 
     template <typename T, class N> std::map<T,N> getPublishedNodes( std::string publisherName = "" /*optional variable*/);
+
+    void printDBTable(const std::string &tableName) { m_dbManager->printAllRecords(tableName); }
+    void printAllDBTables() { m_dbManager->printAllDBTables(); }
   
 
 private:

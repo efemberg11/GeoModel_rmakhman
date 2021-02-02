@@ -55,6 +55,10 @@ option( GEOMODELATLAS_BUILD_EXAMPLE_PLUGINS "Enable the build of ExamplePlugins"
 # a list to keep track of the packages we build
 set(BUILT_PACKAGES "")
 
+# reset the default option to FALSE, if any other option is set to TRUE
+if( GEOMODELATLAS_BUILD_DATAMANAGERS OR GEOMODELATLAS_BUILD_AGDD OR GEOMODELATLAS_BUILD_MUONDD OR GEOMODELATLAS_BUILD_GEOMODELXML OR GEOMODELATLAS_BUILD_PLUGINS OR GEOMODELATLAS_BUILD_EXAMPLE_PLUGINS )
+    set( GEOMODELATLAS_BUILD_BASE FALSE )
+endif()
 
 
 if( GEOMODELATLAS_BUILD_ALL )
@@ -76,7 +80,7 @@ if( GEOMODELATLAS_BUILD_PLUGINS )
 endif() 
 
 if( GEOMODELATLAS_BUILD_EXAMPLE_PLUGINS ) 
-    set ( GEOMODELATLAS_BUILD_DATAMANAGERS TRUE ) 
+    set ( GEOMODELATLAS_BUILD_DATAMANAGERS TRUE ) # HelloToyXMLDataPlugin needs GeoModelDataManagers
     add_subdirectory(ExamplePlugins) 
     list( APPEND BUILT_PACKAGES "ExamplePlugins" ) 
 endif() 

@@ -1,52 +1,60 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+
+cmake_minimum_required( VERSION 3.12 )
+project( "MuonGeoPlugin" )
+
+
+#Set up the project. Check if we build it with GeoModel or individually
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    # I am built as a top-level project.
+    # Make the root module directory visible to CMake.
+    list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../../cmake )
+    # get global GeoModel version
+    include( GeoModelATLAS-version ) 
+    # set the project, with the version taken from the GeoModel parent project
+    project( "MuonGeoPlugin" VERSION ${GeoModelATLAS_VERSION} LANGUAGES CXX )
+    # Define color codes for CMake messages
+    include( cmake_colors_defs )
+    # Warn the users about what they are doing
+    message(STATUS "${BoldGreen}Building ${PROJECT_NAME} individually, as a top-level project.${ColourReset}")
+    # Set default build and C++ options
+    include( configure_cpp_options )
+    set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
+         "Framework finding behaviour on macOS" )
+    # Find the base GeoModelATLAS packages, which must be installed on the target system already
+    find_package( GeoModelDataManagers REQUIRED ${GeoModelATLAS_VERSION} )
+    find_package( GeoModelXML REQUIRED )
+else()
+    # I am called from other project with add_subdirectory().
+    message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModelATLAS project.")
+    # Set the project
+    project( "MuonGeoPlugin" VERSION ${GeoModelATLAS_VERSION} LANGUAGES CXX )
+endif()
+
+# GeoModel dependencies
+find_package( GeoModelCore REQUIRED )
+find_package( GeoModelTools REQUIRED )
+# External dependencies
+find_package( XercesC REQUIRED )
+find_package( ZLIB REQUIRED )
+
+# Use the GNU install directory names.
+include( GNUInstallDirs )
+
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 
-# External dependencies
-find_package( GeoModelCore REQUIRED )
-find_package( GeoModelTools REQUIRED )
-find_package( XercesC REQUIRED )
-find_package( ZLIB REQUIRED )
-
-
 # Create the library.
-add_library( MuonPlugin SHARED ${SOURCES} )
-target_link_libraries( MuonPlugin PUBLIC GeoModelCore::GeoModelKernel XercesC::XercesC GeoModelXml )
-target_include_directories( MuonPlugin PUBLIC 
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
-source_group( "MuonPlugin" FILES ${HEADERS} )
-source_group( "src" FILES ${SOURCES} )
-set_target_properties( MuonPlugin PROPERTIES
+add_library( MuonGeoPlugin SHARED ${SOURCES} )
+target_link_libraries( MuonGeoPlugin PUBLIC GeoModelCore::GeoModelKernel XercesC::XercesC GeoModelXML::GeoModelXml )
+set_target_properties( MuonGeoPlugin PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 
-# Set up an alias with the same name that you would get by "finding" a pre-built
-# version of the library.
-add_library( GeoModelPlugins::MuonPlugin ALIAS MuonPlugin )
-
-# Install the library.
-install(TARGETS MuonPlugin
-    EXPORT ${PROJECT_NAME}-export
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT Runtime
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT          Runtime
-            NAMELINK_COMPONENT Development   # Requires CMake 3.12
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT Development
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/MuonPlugin
-            COMPONENT Development
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install( FILES ${HEADERS}
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/MuonPlugin
-   COMPONENT Development )
-
-# set ( PLUGIN_NAME  "MuonPlugin.so" )
-   
-# ADD_CUSTOM_TARGET( Muon_plugin ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${MuonPlugin} ${PLUGIN_NAME} )
+install( TARGETS MuonGeoPlugin
+	 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	 COMPONENT Runtime
+	 NAMELINK_SKIP )
 
 

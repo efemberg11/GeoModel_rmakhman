@@ -55,19 +55,22 @@ option( GEOMODELATLAS_BUILD_EXAMPLE_PLUGINS "Enable the build of ExamplePlugins"
 # a list to keep track of the packages we build
 set(BUILT_PACKAGES "")
 
+
+
 if( GEOMODELATLAS_BUILD_ALL )
-    set ( GEOMODELATLAS_BUILD_MUONDD TRUE ) # this also triggers AGDD and GeoModelDataManagers
+    set ( GEOMODELATLAS_BUILD_MUONDD      TRUE ) # this also triggers AGDD and GeoModelDataManagers
     set ( GEOMODELATLAS_BUILD_GEOMODELXML TRUE )
-    set ( GEOMODELATLAS_BUILD_PLUGINS TRUE )
+    set ( GEOMODELATLAS_BUILD_PLUGINS     TRUE )
 endif()
 
 if( GEOMODELATLAS_BUILD_BASE )
-    set ( GEOMODELATLAS_BUILD_MUONDD TRUE ) # this also triggers AGDD and GeoModelDataManagers
+    set ( GEOMODELATLAS_BUILD_MUONDD      TRUE ) # this also triggers AGDD and GeoModelDataManagers
     set ( GEOMODELATLAS_BUILD_GEOMODELXML TRUE )
 endif()
 
 if( GEOMODELATLAS_BUILD_PLUGINS ) 
     set ( GEOMODELATLAS_BUILD_DATAMANAGERS TRUE ) 
+    set ( GEOMODELATLAS_BUILD_GEOMODELXML  TRUE ) # MuonPlugin needs GeoModelXML 
     add_subdirectory(GeoModelPlugins) 
     list( APPEND BUILT_PACKAGES "GeoModelPlugins" ) 
 endif() 

@@ -62,9 +62,9 @@ GeoVFullPhysVol* LArGeo::FCALConstruction::GetEnvelope(bool bPos)
   const GeoXmlMatManager* materialManager = GeoXmlMatManager::getManager();
   
   if(m_absPhysical1==0) {
-    inpman->parse("LAr-fcalelec1.xml");
-    inpman->parse("LAr-fcalelec2.xml");
-    inpman->parse("LAr-fcalelec3.xml");
+    inpman->parse("LAr/LAr-fcalelec1.xml");
+    inpman->parse("LAr/LAr-fcalelec2.xml");
+    inpman->parse("LAr/LAr-fcalelec3.xml");
 
     m_fcalMod = inpman->getRecordsetPtr("FCalMod");        
     m_LArPosition = inpman->getRecordsetPtr("LArPosition");

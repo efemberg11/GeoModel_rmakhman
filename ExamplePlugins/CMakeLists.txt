@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
-project( "GeoModelPlugins" )
+project( "ExamplePlugins" )
 
 #Set up the project. Check if we build it with GeoModel or individually
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
@@ -47,8 +47,9 @@ find_package( XercesC REQUIRED )
 include( GNUInstallDirs )
 
 # Set sub-packages to build.
-add_subdirectory( HGTDPlugin )
-add_subdirectory( LArPlugin )
-add_subdirectory( TRTPlugin )
-add_subdirectory( MuonPlugin)
+add_subdirectory( ToyGeometryPlugin )
+add_subdirectory( ToyGeometryPluginCustomPublisher )
+add_subdirectory( AccordionPlugin )
+add_subdirectory( Test )
+
 

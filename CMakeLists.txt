@@ -49,7 +49,8 @@ option( GEOMODELATLAS_BUILD_DATAMANAGERS "Enable the build of GeoModelDataManage
 option( GEOMODELATLAS_BUILD_AGDD "Enable the build of AGDD" OFF )
 option( GEOMODELATLAS_BUILD_MUONDD "Enable the build of MuonDD" OFF )
 option( GEOMODELATLAS_BUILD_GEOMODELXML "Enable the build of GeoModelXML" OFF )
-option( GEOMODELATLAS_BUILD_PLUGINS "Enable the build of GeoModelPlugins" OFF )
+option( GEOMODELATLAS_BUILD_PLUGINS "Enable the build of GeoModelPlugins" OFF ) 
+option( GEOMODELATLAS_BUILD_EXAMPLE_PLUGINS "Enable the build of ExamplePlugins" OFF ) 
 
 # a list to keep track of the packages we build
 set(BUILT_PACKAGES "")
@@ -65,11 +66,17 @@ if( GEOMODELATLAS_BUILD_BASE )
     set ( GEOMODELATLAS_BUILD_GEOMODELXML TRUE )
 endif()
 
-if( GEOMODELATLAS_BUILD_PLUGINS )
-    set ( GEOMODELATLAS_BUILD_DATAMANAGERS TRUE )
-    add_subdirectory(GeoModelPlugins)
-    list( APPEND BUILT_PACKAGES "GeoModelPlugins" )
-endif()
+if( GEOMODELATLAS_BUILD_PLUGINS ) 
+    set ( GEOMODELATLAS_BUILD_DATAMANAGERS TRUE ) 
+    add_subdirectory(GeoModelPlugins) 
+    list( APPEND BUILT_PACKAGES "GeoModelPlugins" ) 
+endif() 
+
+if( GEOMODELATLAS_BUILD_EXAMPLE_PLUGINS ) 
+    set ( GEOMODELATLAS_BUILD_DATAMANAGERS TRUE ) 
+    add_subdirectory(ExamplePlugins) 
+    list( APPEND BUILT_PACKAGES "ExamplePlugins" ) 
+endif() 
 
 if( GEOMODELATLAS_BUILD_MUONDD )
     set ( GEOMODELATLAS_BUILD_AGDD TRUE )

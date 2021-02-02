@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+
 cmake_minimum_required( VERSION 3.12 )
 project( "LArGeoPlugin" )
 

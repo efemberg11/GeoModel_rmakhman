@@ -50,5 +50,5 @@ include( GNUInstallDirs )
 add_subdirectory( HGTDPlugin )
 add_subdirectory( LArPlugin )
 add_subdirectory( TRTPlugin )
-#add_subdirectory( MuonPlugin)
+add_subdirectory( MuonPlugin)
 

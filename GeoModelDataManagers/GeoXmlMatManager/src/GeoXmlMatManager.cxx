@@ -78,8 +78,8 @@ GeoXmlMatManager::GeoXmlMatManager()
   }
 
   std::string strPath(path);
-  std::vector<std::string> paths { strPath + "/" + std::string(ELEMENTS_FILENAME)
-				, strPath + "/" + std::string(MATERIALS_FILENAME) };
+  std::vector<std::string> paths { strPath + "/Materials/" + std::string(ELEMENTS_FILENAME)
+				, strPath + "/Materials/" + std::string(MATERIALS_FILENAME) };
 
   for(const std::string& p : paths) {
     FILE* pFile = fopen(p.c_str(),"r");

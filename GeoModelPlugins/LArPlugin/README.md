@@ -4,7 +4,7 @@ LAr plugin builds GeoModel description of the ATLAS Liquid Argon Calorimeter. It
 
  * Setup runtime for `gmex`
  * `mkdir geomodel-xml`
- * `cp ${path_to_GeoModelPlugins_source_root_dir}/LArPlugin/SampleInput/*.xml geomodel-xml`
- * `cp ${path_to_GeoModelDataManagers_source_root_dir}/GeoXmlMatManager/SampleInput/*.xml geomodel-xml`
+ * `cp ${path_to_GeoModelPlugins_source_root_dir}/LArPlugin/SampleInput/*.xml geomodel-xml/LAr`
+ * `cp ${path_to_GeoModelDataManagers_source_root_dir}/GeoXmlMatManager/SampleInput/*.xml geomodel-xml/Materials`
  * `export GEOMODEL_XML_DIR=$PWD/geomodel-xml`
  * `gmex $INSTALL/lib/libLArGeoPlugin.1.(so,dylib)`

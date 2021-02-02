@@ -95,8 +95,8 @@ void LArGeoPlugin::create(GeoPhysVol* world, bool publish)
   
   // Get XML Input Manager
   GeoXmlInpManager* inpman = GeoXmlInpManager::getManager();
-  inpman->parse("LAr-Defs.xml");
-  inpman->parse("LAr-noelec.xml");
+  inpman->parse("LAr/LAr-Defs.xml");
+  inpman->parse("LAr/LAr-noelec.xml");
   
   GeoInpRecordset_ptr larPosition = inpman->getRecordsetPtr("LArPosition");
   if (larPosition->size()==0) throw std::runtime_error("Error, no lar position table in database!");

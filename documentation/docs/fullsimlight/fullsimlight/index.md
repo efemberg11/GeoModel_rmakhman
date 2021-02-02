@@ -5,7 +5,7 @@ FullSimLight package consists of different tools based on [Geant4](https://geant
 - fullSimLight: a light particle transport simulation (geometry, transport in magnetic field and basic physics scoring)
 - gmclash: a tool that runs clash detection on your input geometry, producing a json file report
 - gmgeantino: a tool to generate geantino maps from your input geometry
-- gmtogdml: a tool to convert geometries and dump them in gdml format.
+- gm2gdml: a tool to convert geometries and dump them in gdml format.
 
 ## Detector Construction
 

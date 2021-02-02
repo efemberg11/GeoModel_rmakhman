@@ -49,7 +49,7 @@ include( GNUInstallDirs )
 # Set sub-packages to build.
 add_subdirectory( ToyGeometryPlugin )
 add_subdirectory( ToyGeometryPluginCustomPublisher )
+add_subdirectory( ToyXMLAuxDataPlugin )
 add_subdirectory( AccordionPlugin )
 add_subdirectory( Test )
-
 

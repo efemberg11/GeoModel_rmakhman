@@ -43,8 +43,8 @@ include( GNUInstallDirs )
 
 
 # Find the header and source files.
-file( GLOB SOURCES src/*.cxx )
-
+file( GLOB SOURCES src/*.cxx)
+include_directories( ../GeoModelPlugins )
 # Create the library.
 add_library( MuonGeoPlugin SHARED ${SOURCES} )
 target_link_libraries( MuonGeoPlugin PUBLIC GeoModelCore::GeoModelKernel XercesC::XercesC GeoModelXML::GeoModelXml )

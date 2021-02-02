@@ -121,6 +121,85 @@ void GeoXmlInpManager::parse(const std::string& filename)
   xercesParser.ParseFileAndNavigate(path);
 }
 
+GeoInpRecordsetData GeoXmlInpManager::getRecordsetData(const std::string& nodeName)
+{
+    // the map storing the data to be returned by the function (aka, 'GeoInpRecordsetData' typedef)
+    std::pair<std::map<std::string, std::vector<std::string>>, std::vector<std::vector<GeoInp>>> tableMap;
+    
+    // the vectors and map storing the table's columns' name and type
+    std::map<std::string, std::vector<std::string>> colsMap;
+    std::vector<std::string> colNames;
+    std::vector<std::string> colTypes;
+
+    // get the table's definition: columns' names and types
+    GeoInpDef_ptr tableDefPtr = m_pImpl->m_tableDefs[nodeName];
+
+    // a map to store indexes of the table's columns
+    std::map<std::string, unsigned> colIndexes;
+    
+    // a map to store the columns' GeoInp type
+    std::map<std::string, GeoInpType> colTypesMap;
+
+    // loop over the table's columns
+    for( auto& def : *tableDefPtr ) {
+        std::string colName = def.first;
+        GeoInpType  colType = def.second;
+        std::string colTypeStr;
+        if(colType == GEOINP_INT)    colTypeStr = "GEOINP_INT";
+        if(colType == GEOINP_LONG)   colTypeStr = "GEOINP_LONG";
+        if(colType == GEOINP_FLOAT)  colTypeStr = "GEOINP_FLOAT";
+        if(colType == GEOINP_DOUBLE) colTypeStr = "GEOINP_DOUBLE";
+        if(colType == GEOINP_STRING) colTypeStr = "GEOINP_STRING";
+        colNames.push_back(colName);
+        colTypes.push_back(colTypeStr);
+        colIndexes[colName] = colNames.size() - 1;
+        colTypesMap[colName] = colType;
+    }
+
+    // store the table's columns' names and types
+    colsMap["colNames"] = colNames;
+    colsMap["colTypes"] = colTypes;
+
+    // init the vector to contain the table's data
+    std::vector<std::vector<GeoInp>> rowsData;
+
+    // get number of columns, to init the vector storing row's data
+    unsigned nCols = colNames.size();
+    
+    // get a pointer to the table's records (i.e., the table's data)
+    GeoInpRecordset_ptr recordSet = getRecordsetPtr(nodeName);
+
+    // loop over table rows
+    for( const GeoInpRecord& record : *recordSet ) {
+        
+        // init the records with a default 'NULL' string. 
+        // NOTE: It will be replaced by an appropriate value with 
+        //       another type supported by the variant, 
+        //       if an entry for that field exist
+        std::vector<GeoInp> vFields(nCols, "NULL");
+        
+        // get the table's record/row
+        std::map<std::string, GeoInp> recordMap = record.getRecord();
+        
+        // loop over row's items (i.e., entries for the table's columns)
+        for( const auto& entry : recordMap ) {
+            std::string fieldName = entry.first;
+            GeoInp fieldValue    = entry.second; // that's a std::variant
+            // replace the default "NULL" string value in the data vector 
+            // with the value at the index stored for the given column
+            vFields[ colIndexes[fieldName] ] = fieldValue;
+        }
+        // store the data vector for the current row 
+        rowsData.push_back( vFields );
+    }
+
+    // store the table's data
+    tableMap = std::make_pair( colsMap, rowsData );
+
+    return tableMap;
+}
+
+
 GeoInpRecordset_ptr GeoXmlInpManager::getRecordsetPtr(const std::string& nodeName)
 {
   auto result = m_pImpl->m_recordsets.find(nodeName);

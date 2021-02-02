@@ -5,6 +5,7 @@
 #include "GeoXmlInpManager/GeoInpRecord.h"
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 GeoInpRecord::GeoInpRecord(std::shared_ptr<GeoInpDef> def)
   : m_def(def)
@@ -85,3 +86,5 @@ void GeoInpRecord::dump() const
   }
   std::cout << std::endl;
 }
+
+

@@ -363,7 +363,7 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
 
         }
         //fill the singleMassReport struct
-        singleMassReport.volumeName=daughter->GetName();
+        singleMassReport.volumeName=daughterLV->GetName();
         singleMassReport.volumeCopyNo =daughter->GetCopyNo();
         singleMassReport.volumeEntityType=daughterLV->GetSolid()->GetEntityType();
         singleMassReport.mass = tmp/(CLHEP::kg);
@@ -374,6 +374,18 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         // write prettified JSON to another file
         jlist.push_back(jSingleMassReport);
     }
+    
+    //fill the finalMassReport struct
+    singleMassReport.volumeName="Total Geometry World Volume";
+    singleMassReport.volumeCopyNo =worldg4->GetCopyNo();
+    singleMassReport.volumeEntityType=worldg4->GetLogicalVolume()->GetSolid()->GetEntityType();
+    singleMassReport.mass = massG4/(CLHEP::kg);
+    
+    
+    //write the finalMassReport in the json file
+    to_json(jSingleMassReport, singleMassReport);
+    // write prettified JSON to another file
+    jlist.push_back(jSingleMassReport);
     
     
     std::cout<<"\nGeant4: Total mass of the detector is ... "<<massG4 / (CLHEP::kg) <<" [kg]."<<std::endl;

@@ -36,10 +36,10 @@ public:
   void SetRunOverlapCheck(const bool runOvCheck)     { fRunOverlapCheck = runOvCheck; }
   void SetRunMassCalculator(const bool runMassCalc)     { fRunMassCalculator = runMassCalc; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
+  void SetPrefixLogicalVolume(const G4String &prefixLV) { fPrefixLogicalVolume = prefixLV; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
   void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
   void SetDumpGDML(const bool dumpGDML)              {fDumpGDML=dumpGDML;}
-
   /// Common method to construct a driver with a stepper of requested type.
   G4VIntegrationDriver*
   createDriverAndStepper(std::string stepperType) const;
@@ -73,6 +73,10 @@ public:
   // Iterate from the volume envelope through all the daughter volumes, and look for the ancestors of
   // 'volume', populating the fTree vector of G4VPhysicalVolumes
   bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
+    
+  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist);
+    
+  void iterateFromWorldMass(G4LogicalVolume* envelope, G4String prefix, std::vector<json>& jlist);
   
   GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
 
@@ -90,6 +94,7 @@ private:
   G4bool   fDumpGDML;
   G4double fMinStep;
   G4String fGeometryFileName;
+  G4String fPrefixLogicalVolume;
   G4String fReportFileName;
   G4String fOutputGDMLFileName;
   G4double fFieldValue;

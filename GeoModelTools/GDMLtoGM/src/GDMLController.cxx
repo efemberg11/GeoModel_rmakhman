@@ -245,6 +245,7 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 #include "GDMLInterface/arb8Handler.h"
 #include "GDMLInterface/sectionHandler.h"
 #include "GDMLInterface/twoDimVertexHandler.h"
+#include "GDMLInterface/unidentifiedShapeHandler.h"
 
 void GDMLController::registerHandlers()
 {
@@ -301,4 +302,5 @@ void GDMLController::registerHandlers()
 	new arb8Handler("arb8",this);
 	new twoDimVertexHandler("twoDimVertex",this);
 	new sectionHandler("section",this);
+        new unidentifiedShapeHandler("cutTube",this);
 }

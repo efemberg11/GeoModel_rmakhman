@@ -114,19 +114,20 @@ namespace masscalc {
         std::string volumeName;
         G4int       volumeCopyNo;
         std::string volumeEntityType;
-        //double x,y,z;
-        G4double mass;
+        G4double inclusiveMass; //mass of the volume, that includes the real mass of the daughters volumes
+        G4double exclusiveMass; //mass of the volume, from which the mass of the daughters is subtracted
     };
     
     void to_json(json& j, const massReport& p) {
-        j = json{{"volumeName", p.volumeName}, {"volumeCopyNo", p.volumeCopyNo}, {"volumeEntityType", p.volumeEntityType}, {"mass[kg]", p.mass} };
+        j = json{{"volumeName", p.volumeName}, {"volumeCopyNo", p.volumeCopyNo}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass}  };
     }
     
     void from_json(const json& j, massReport& p) {
       p.volumeName=j.at("volumeName").get<std::string>();
       p.volumeCopyNo=j.at("volumeCopyNo").get<int>();
       p.volumeEntityType=j.at("volumeEntityType").get<std::string>();
-      p.mass=j.at("mass[kg]").get<double>();
+      p.inclusiveMass=j.at("inclusiveMass[kg]").get<double>();
+      p.exclusiveMass=j.at("exclusiveMass[kg]").get<double>();
      }
 } // namespace masscalc
 
@@ -339,7 +340,9 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     std::cout<<"-----> World mass is: "<<globalDensityWorld * cubicVolumeWorld / (CLHEP::kg) <<" [Kg]"<<std::endl;
     std::cout<<"\n *** --------------- ***\n"<<std::endl;
     
-    double massG4 = 0., massGeoModel = 0., tmp;
+    double inclusiveMassG4 = 0., exclusiveMassG4=0.;
+    double inclusiveMassGeoModel = 0., exclusiveMassGeoModel = 0.;
+    double tmpInclusive=0., tmpExclusive=0.;
     
     for (int n=0; n<localNoDaughters; n++)
     {
@@ -355,19 +358,29 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         G4double globalDensity = daughterLV->GetMaterial()->GetDensity();
         std::cout<<"---> DaughterLV Solid density is: "<<globalDensity/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
         
-        tmp = daughterLV->GetMass(false, true);
-        massG4+= tmp;
+        //By setting the 'propagate' boolean flag - the second one -  to 'false' the
+        //       method returns the mass of the present logical volume only
+        //       (subtracted for the volume occupied by the daughter volumes).
+        
+        tmpInclusive = daughterLV->GetMass(true, true);  //real mass of the LV, inclusive of the masses of the daughters
+        tmpExclusive = daughterLV->GetMass(true, false); //mass of the LV substracted for the volume occupied by the daughters
+       
+        inclusiveMassG4+= tmpInclusive; 
+        exclusiveMassG4+= tmpExclusive;
+        
         if (!fGeometryFileName.contains(".gdml")){
             const PVConstLink mypv = worldgeoModel->getChildVol(n);
-            massGeoModel+= inclusiveMass(mypv);
+            inclusiveMassGeoModel+= inclusiveMass(mypv); //real mass of the whole volume, including the real masses of the daughters
+            exclusiveMassGeoModel+= exclusiveMass(mypv); //mass of the whole volume, as it would not have daughters
 
         }
         //fill the singleMassReport struct
         singleMassReport.volumeName=daughterLV->GetName();
         singleMassReport.volumeCopyNo =daughter->GetCopyNo();
         singleMassReport.volumeEntityType=daughterLV->GetSolid()->GetEntityType();
-        singleMassReport.mass = tmp/(CLHEP::kg);
-        std::cout<<"-----> DaughterLV mass is: "<<singleMassReport.mass<<" [kg]"<<std::endl;
+        singleMassReport.inclusiveMass = tmpInclusive/(CLHEP::kg);
+        singleMassReport.exclusiveMass = tmpExclusive/(CLHEP::kg);
+        std::cout<<"-----> DaughterLV inclusive mass is: "<<singleMassReport.inclusiveMass<<" [kg]"<<std::endl;
         
         //write the singleMassReport in the json file
         to_json(jSingleMassReport, singleMassReport);
@@ -376,10 +389,11 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     }
     
     //fill the finalMassReport struct
-    singleMassReport.volumeName="Total Geometry World Volume";
+    singleMassReport.volumeName="Total Geometry";
     singleMassReport.volumeCopyNo =worldg4->GetCopyNo();
-    singleMassReport.volumeEntityType=worldg4->GetLogicalVolume()->GetSolid()->GetEntityType();
-    singleMassReport.mass = massG4/(CLHEP::kg);
+    singleMassReport.volumeEntityType="World Volume";
+    singleMassReport.inclusiveMass = inclusiveMassG4/(CLHEP::kg);
+    singleMassReport.exclusiveMass = exclusiveMassG4/(CLHEP::kg);
     
     
     //write the finalMassReport in the json file
@@ -387,16 +401,15 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     // write prettified JSON to another file
     jlist.push_back(jSingleMassReport);
     
-    
-    std::cout<<"\nGeant4: Total mass of the detector is ... "<<massG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
+    std::cout<<"\nGeant4: Total inclusive mass of the detector is ... "<<inclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
+     std::cout<<"Geant4: Total exclusive mass of the detector is ... "<<exclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
     
     if (!fGeometryFileName.contains(".gdml")){
-        std::cout<<"GeoModel: Total mass of the detector is ... "<<massGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
+        std::cout<<"GeoModel: Total inclusive mass of the detector is ... "<<inclusiveMassGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
+        std::cout<<"GeoModel: Total exclusive mass of the detector is ... "<<exclusiveMassGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
     }
-    
-    
-}
 
+}
 
 void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope,std::vector<json>& jlist){
     

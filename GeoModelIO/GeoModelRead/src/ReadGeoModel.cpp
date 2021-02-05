@@ -135,7 +135,8 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress) : m_deepDeb
 	}
   // build caches
   m_dbManager->loadGeoNodeTypesAndBuildCache();
-
+  m_dbManager->createTableDataCaches();
+  
 
   // Check if the user asked for running in serial or multi-threading mode
   if ( "" != getEnvVar("GEOMODEL_ENV_IO_NTHREADS"))

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoXF.h"
@@ -134,11 +134,23 @@ namespace GeoXF
     return m_arg2->dimensionality ();
   }
 
+#if defined(FLATTEN) && defined(__GNUC__)
+// We compile this package with optimization, even in debug builds; otherwise,
+// the heavy use of Eigen makes it too slow.  However, from here we may call
+// to out-of-line Eigen code that is linked from other DSOs; in that case,
+// it would not be optimized.  Avoid this by forcing all Eigen code
+// to be inlined here if possible.
+__attribute__ ((flatten))
+#endif
   GeoTrf::Transform3D PreMult::operator        () (double x) const
   {
     return m_arg1 * (*m_arg2) (x);
   }
 
+#if defined(FLATTEN) && defined(__GNUC__)
+// See above.
+__attribute__ ((flatten))
+#endif
   GeoTrf::Transform3D PreMult::operator        () (const GeoGenfun::Argument & x) const
   {
     return m_arg1 * (*m_arg2) (x);
@@ -181,11 +193,19 @@ namespace GeoXF
     return m_arg1->dimensionality ();
   }
 
+#if defined(FLATTEN) && defined(__GNUC__)
+// See above.
+__attribute__ ((flatten))
+#endif
   GeoTrf::Transform3D PostMult::operator        () (double x) const
   {
     return (*m_arg1) (x) * m_arg2;
   }
 
+#if defined(FLATTEN) && defined(__GNUC__)
+// See above.
+__attribute__ ((flatten))
+#endif
   GeoTrf::Transform3D PostMult::operator        () (const GeoGenfun::Argument & x) const
   {
     return (*m_arg1) (x) * m_arg2;
@@ -202,6 +222,10 @@ namespace GeoXF
     delete m_function;
   }
 
+#if defined(FLATTEN) && defined(__GNUC__)
+// See above.
+__attribute__ ((flatten))
+#endif
   GeoTrf::Transform3D Pow::operator() (double x) const
   {
     //

@@ -1,6 +1,6 @@
 # GeoModelMassCalculator
 
-GeoModelMassCalculator (gmmasscalculator) it's a command line tool that calculates the inclusive and exclusive mass of a geometry file specified as input with the -g flag. The mass report is given in an output json file (default: *gmmasscalculator_report.json*).
+GeoModelMassCalculator (gmmasscalculator) is a command line tool that calculates the inclusive and exclusive mass of a geometry specified as input with the -g flag. The mass report is given in an output json file (default: *gmmasscalculator_report.json*).
 
 Run the executable with the --help option to see the available options:
 
@@ -19,7 +19,7 @@ By default *gmmasscalculator*, takes the main *World Volume*, and calculates the
 ``` 
 where:
 
-- *exclusiveMass* is the mass of the considered volume only (from which the volumes occupied by the daughters volumes has been subtracted)
+- *exclusiveMass* is the mass of the considered volume only (from which the volumes occupied by the daughters volumes have been subtracted)
 - *inclusiveMass* is the mass of the considered volume, comprehensive of the masses of the respective daughters (propagated in an iterative way to their daughter volumes).
 
 ## Examples

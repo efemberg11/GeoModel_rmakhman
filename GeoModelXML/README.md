@@ -6,6 +6,10 @@ used with `gmex` (GeoModelExplorer) and the corresponding plugin (GMXPlugin)
 Installation requires that the [GeoModel](https://gitlab.cern.ch/GeoModelDev/GeoModel) suite is installed. Please refer to https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/master/README.md for additional documentation.
 
 
+## Nigel's documentation
+
+https://twiki.atlas-canada.ca/pub/AtlasCanada/ITk/gmx2geo.pdf
+
 ## How to build it
 
 If `GeoModel` is installed:

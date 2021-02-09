@@ -2134,7 +2134,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
       std::cout << "\tINFO --> UnidentifiedShape parameters' list is empty or one datum is missing!! --> parameters: " << parameters << std::endl;
       std::cout << "\tINFO --> parameters: " << parameters << std::endl << std::endl;
       muxCout.unlock();
-      exit(EXIT_FAILURE);
+      std::runtime_error("UnidentifiedShape parameters' list are empty or incomplete!!");
     }
     shape = new GeoUnidentifiedShape(name,asciiData);
 

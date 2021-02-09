@@ -890,11 +890,11 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id)
     const std::vector<std::string> elements = splitString(matElements, ';');
     for( auto& par : elements) {
 
-		  if (m_deepDebug) {
-        muxCout.lock();
-        std::cout << "par:" << par;
-        muxCout.unlock();
-      }
+        if (m_deepDebug) {
+            muxCout.lock();
+            std::cout << "par: " << par << std::endl;
+            muxCout.unlock();
+        }
       std::vector<std::string> vars = splitString(par, ':');
       const unsigned int elId = std::stoi(vars[0]);
       double elFraction = std::stod(vars[1]);
@@ -2090,6 +2090,12 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
   else if (type=="UnidentifiedShape") {
     std::string name = "";
     std::string asciiData = "";
+   
+    // debug
+    muxCout.lock();
+    if (m_deepDebug) std::cout << "GeoModelRead - loading 'UnidentifiedShape' - parameters: " << parameters << std::endl;
+    muxCout.unlock();
+    
     // check parameters
     // this complex test is needed to handle null strings in the DB records
     bool okPars = false;
@@ -2097,21 +2103,36 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
       std::string str = par.substr( par.find("=") );     // get from "=" to the end
       if (str.size() > 0) okPars = true;
     }
-    //if ( shapePars.size() > 0 && ((shapePars.filter("=")).size() > 0) )  // this complex test is needed to handle null strings
     if ( shapePars.size() > 0 && okPars )
-  	{
-      // get parameters
-      for( auto& par : shapePars) {
-        std::vector<std::string> vars = splitString(par, '=');
-        std::string varName = vars[0];
-        std::string varValue = vars[1];
-        if (varName == "name")      name = varValue;
-        if (varName == "asciiData") asciiData = varValue;
-      }
+    {
+        // get parameters
+        for( auto& par : shapePars) {
+            
+            // debug
+            muxCout.lock();
+            if (m_deepDebug) std::cout << "GeoModelRead - loading 'UnidentifiedShape' - par: " << par << std::endl;
+            muxCout.unlock();
+            
+            std::vector<std::string> vars = splitString(par, '=');
+            if (vars.size() > 1) {
+            std::string varName = vars[0];
+            std::string varValue = vars[1];
+            if (varName == "name")      name = varValue;
+            if (varName == "asciiData") asciiData = varValue;
+            } else {
+                okPars = false;
+            }
+        }
     } else {
+        okPars = false;
+    }
+    if ( !okPars ) {
       // throw std::invalid_argument("UnidentifiedShape parameters' list is empty!!");
       muxCout.lock();
-      std::cout << "ERROR!!! --> UnidentifiedShape parameters' list is empty!! It seems the geometry file you are running on is corrupted." << std::endl;
+      std::cout << "\n\n\tERROR!!! --> UnidentifiedShape is not properly defined!! It seems the geometry file you are running on is corrupted." << std::endl;
+      std::cout << "\tINFO --> UnidentifiedShape should be defined from two strings: a string defining its type/name; and a ASCII data string defining its parameters. The latter can be set to an empty string if not used/needed." << std::endl;
+      std::cout << "\tINFO --> UnidentifiedShape parameters' list is empty or one datum is missing!! --> parameters: " << parameters << std::endl;
+      std::cout << "\tINFO --> parameters: " << parameters << std::endl << std::endl;
       muxCout.unlock();
       exit(EXIT_FAILURE);
     }

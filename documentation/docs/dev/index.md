@@ -156,7 +156,7 @@ make install
 cd ..
 
 # Build SoQt
-wget -O soqt.zip http://cern.ch/atlas-software-dist-eos/externals/SoQt/soqt_5796270_1Dec2020.zip
+wget -O soqt.zip http://atlas-vp1.web.cern.ch/atlas-vp1/sources/soqt_5796270_1Dec2020.zip
 unzip soqt.zip
 mkdir build_soqt
 cd build_soqt

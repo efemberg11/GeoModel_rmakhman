@@ -35,6 +35,11 @@ brew install qt5
 echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 ```
 
+!!! note 
+
+    After having installed `qt` with brew, and having run the `echo` command stated above, you should either open a new shell or run `source ~/.zshrc` in order to get the `qt` in the `PATH`.
+     
+
 !!! warning
 
     Before building the GeoModel libraries from source, please check if you have old versions of them installed on your system and remove them.

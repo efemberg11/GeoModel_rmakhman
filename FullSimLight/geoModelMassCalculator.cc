@@ -14,6 +14,7 @@
 
 static G4String geometryFileName   ;
 static G4String prefixLogicalVolume= "";
+static G4String material= "";
 static G4String reportFileName     = "gmmasscalculator_report.json";
 
 void GetInputArguments(int argc, char** argv);
@@ -27,7 +28,8 @@ int main(int argc, char** argv) {
     G4cout
     << " ===================  Running GeoModelMassCalculator =================== "       << G4endl
     << "   Geometry file name                     =  " << geometryFileName               << G4endl
-    << "   Prefiz of Logical Volumes of interest  =  " << prefixLogicalVolume            << G4endl
+    << "   Prefix of Logical Volumes of interest  =  " << prefixLogicalVolume            << G4endl
+    << "   Material of interest                   =  " << material                       << G4endl
     << "   Output mass report file name           =  " << reportFileName                 << G4endl
     << " ============================================================== "                << G4endl;
     
@@ -65,6 +67,7 @@ int main(int argc, char** argv) {
     MyDetectorConstruction* detector = new MyDetectorConstruction;
     detector->SetRunMassCalculator(true);
     detector->SetPrefixLogicalVolume(prefixLogicalVolume);
+    detector->SetMaterial(material);
     detector->SetGeometryFileName (geometryFileName);
     detector->SetReportFileName (reportFileName);
     detector->Construct();
@@ -76,6 +79,7 @@ int main(int argc, char** argv) {
 static struct option options[] = {
     {"geometry file name                       "  , required_argument, 0, 'g'},
     {"prefix of the logical volume of interest "  , required_argument, 0, 'p'},
+    {"material of interest "  , required_argument, 0, 'm'},
     {"output mass report file name             "  , required_argument, 0, 'o'},
     {"help"                                       , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
@@ -89,6 +93,7 @@ void Help() {
             <<"  **** Parameters: \n\n"
             <<"      -g :   [MANDATORY] the Geometry file name [.db/.gdml/.dylib/.so] \n"
             <<"      -p :   [OPTIONAL] prefix of the Logical Volumes of interest (i.e. Pixel::) \n"
+            <<"      -m :   [OPTIONAL] material of interest (i.e. Aluminium) \n"
             <<"      -o :   [OPTIONAL] mass report file name (default: gmmasscalculator_report)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmmasscalculator [OPTIONS]\n" <<std::endl;
@@ -109,7 +114,7 @@ void GetInputArguments(int argc, char** argv) {
  }
  while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:p:o:h", options, &optidx);
+   c = getopt_long(argc, argv, "g:p:m:o:h", options, &optidx);
    if (c == -1)
      break;
    //
@@ -122,6 +127,9 @@ void GetInputArguments(int argc, char** argv) {
      break;
    case 'p':
      prefixLogicalVolume = optarg;
+     break;
+   case 'm':
+     material = optarg;
      break;
    case 'o':
      reportFileName = optarg;

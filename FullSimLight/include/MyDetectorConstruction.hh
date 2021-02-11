@@ -37,6 +37,7 @@ public:
   void SetRunMassCalculator(const bool runMassCalc)     { fRunMassCalculator = runMassCalc; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
   void SetPrefixLogicalVolume(const G4String &prefixLV) { fPrefixLogicalVolume = prefixLV; }
+  void SetMaterial(const G4String &material) { fMaterial = material; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
   void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
   void SetDumpGDML(const bool dumpGDML)              {fDumpGDML=dumpGDML;}
@@ -74,9 +75,9 @@ public:
   // 'volume', populating the fTree vector of G4VPhysicalVolumes
   bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
     
-  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist);
+  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass);
     
-  void iterateFromWorldMass(G4LogicalVolume* envelope, G4String prefix, std::vector<json>& jlist);
+  void iterateFromWorldMass(G4LogicalVolume* envelope, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix="", G4String material="");
   
   GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
 
@@ -95,6 +96,7 @@ private:
   G4double fMinStep;
   G4String fGeometryFileName;
   G4String fPrefixLogicalVolume;
+  G4String fMaterial;
   G4String fReportFileName;
   G4String fOutputGDMLFileName;
   G4double fFieldValue;

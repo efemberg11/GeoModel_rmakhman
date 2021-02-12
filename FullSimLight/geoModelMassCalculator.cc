@@ -94,7 +94,7 @@ void Help() {
             <<"      -g :   [MANDATORY] the Geometry file name [.db/.gdml/.dylib/.so] \n"
             <<"      -p :   [OPTIONAL] prefix of the Logical Volumes of interest (i.e. Pixel::) \n"
             <<"      -m :   [OPTIONAL] material of interest (i.e. Aluminium) \n"
-            <<"      -o :   [OPTIONAL] mass report file name (default: gmmasscalculator_report)\n"
+            <<"      -o :   [OPTIONAL] mass report json file name (default: gmmasscalculator_report.json)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmmasscalculator [OPTIONS]\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {

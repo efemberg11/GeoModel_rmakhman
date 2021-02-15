@@ -33,14 +33,7 @@ sudo apt install geomodel-tools-dev
 sudo apt install geomodel-g4-dev
 sudo apt install geomodel-visualization-dev
 ```
-Get some example geometry input files:
-```
-sudo apt install geometry-data
-```
-Geometry input files can then be found in /usr/share/geometry-data. You can visualize by typing
-```
-gmex /usr/share/geometry/geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
-```
+
 
 
 ## macOS

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "MuonGeoModel/sTGC.h"
@@ -38,6 +38,7 @@ sTGC::sTGC(Component* ss): DetectorElement(ss->name)
   width = s->dx1;
   longWidth = s->dx2;
   yCutout= s->yCutout;
+  yCutoutCathode= s->yCutoutCathode;
   length = s->dy;
   name=s->name;
   index = s->index;
@@ -199,21 +200,34 @@ GeoFullPhysVol* sTGC::build(int minimalgeo, int , std::vector<Cutout*> )
         ptrdgas->add(ptrdframe);
     } else {
       double W = width/2.+((longWidth-width)/2.)*f5/(length);
-      GeoSimplePolygonBrep *sGasV = new GeoSimplePolygonBrep(gasTck);
+      // This describes the active area
+      GeoSimplePolygonBrep *sGasV = new GeoSimplePolygonBrep(gasTck/2);
       sGasV->addVertex(longWidthActive/2.-f6,lengthActive/2.-f4);
       sGasV->addVertex(-longWidthActive/2.+f6,lengthActive/2.-f4);
-      sGasV->addVertex(-longWidthActive/2.+f6,lengthActive/2.-yCutout);
+      sGasV->addVertex(-longWidthActive/2.+f6,lengthActive/2.-f4-yCutoutCathode);
       sGasV->addVertex(-W+f6,-lengthActive/2.+f5);
       sGasV->addVertex(W-f6,-lengthActive/2.+f5);
-      sGasV->addVertex(longWidthActive/2.-f6,lengthActive/2.-yCutout);
+      sGasV->addVertex(longWidthActive/2.-f6,lengthActive/2.-f4-yCutoutCathode);
 
-      const GeoShape *sGasV1 = new GeoShapeShift(sGasV,rot);
-      const GeoShape* sGasV2 = &(sGasVolume1->subtract(*sGasV1));
+      // This describes the envelope (active area + frames)
+      GeoSimplePolygonBrep *sGasV2=new GeoSimplePolygonBrep(gasTck/2);
+      sGasV2->addVertex(longWidth/2.,length/2.);
+      sGasV2->addVertex(-longWidth/2.,length/2.);
+      sGasV2->addVertex(-longWidth/2.,length/2.-yCutout);
+      sGasV2->addVertex(-width/2.,-length/2.);
+      sGasV2->addVertex(width/2.,-length/2.);
+      sGasV2->addVertex(longWidth/2.,length/2.-yCutout);
 
-      GeoLogVol* ltrdframe = new GeoLogVol("sTGC_Frame", sGasV2,
+      // define the final geo shapes
+      const GeoShape *sGasV1=new GeoShapeShift(sGasV,rot);
+      const GeoShape *sGasV3=new GeoShapeShift(sGasV2,rot);
+      // Remove active from active+frames to only get frames
+      sGasV3= &(sGasV3->subtract( (*sGasV1)));
+
+      GeoLogVol* ltrdframe = new GeoLogVol("sTGC_Frame", sGasV3,
                                            MaterialManager::getMaterial("std::Aluminium"));
       GeoPhysVol* ptrdframe = new GeoPhysVol(ltrdframe);
-
+      // Add frame volume to QL3
       ptrdgas->add(ptrdframe);
     }
 

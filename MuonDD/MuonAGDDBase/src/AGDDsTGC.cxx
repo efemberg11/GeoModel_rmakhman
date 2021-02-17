@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -47,7 +47,8 @@ void AGDDsTGC::CreateVolume()
 	stgc_comp->dy=y();
 	stgc_comp->subType=subType();
 	stgc_comp->yCutout=yCutout();
-	
+	stgc_comp->yCutoutCathode=yCutoutCathode();
+
 	MuonGM::sTGC *cham=new MuonGM::sTGC(stgc_comp);
 	GeoPhysVol *vvv=(GeoPhysVol*)cham->build(1);
 

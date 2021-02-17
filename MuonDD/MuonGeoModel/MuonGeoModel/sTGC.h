@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2011 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef sTGC_H
@@ -22,6 +22,7 @@ public:
   double thickness;
   double longWidth;   // for trapezoidal layers
   double yCutout;     // for Hexagonal layer
+  double yCutoutCathode; // for Hexagonal layer
   int index;
 	
   sTGC(Component* s);

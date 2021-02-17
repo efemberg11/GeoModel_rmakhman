@@ -40,15 +40,18 @@ Eventually, although your system language is set to USEnglish, it could still be
 export LC_NUMERIC=en_US.UTF-8
 ```
 
-**NOTE**: If the `GEOMODEL_XML_DIR` environment variable is not set, the `AGDDPlugin` will crash with a segmentation violation, since the `GeoXmlMatManager` cannot find the material definitions. Thus, set this variable to:
+**NOTE**: If the `GEOMODEL_XML_DIR` environment variable is not set, the `AGDDPlugin` will crash with a segmentation violation, since the `GeoXmlMatManager` cannot find the material definitions. Thus, set this variable by doing:
 ```bash
-export GEOMODEL_XML_DIR=../GeoModelATLAS/GeoModelDataManagers/GeoXmlMatManager/SampleInput/
+cd install
+mkdir Materials
+cp ../GeoModelATLAS/GeoModelDataManagers/GeoXmlMatManager/SampleInput/* Materials/
+export GEOMODEL_XML_DIR=${PWD}
 ```
 
 To display an AGDD example xml file (the `.xml` file must be called `AMDC.xml` to use the plugin):
 ```bash
 cd install
-cp ../agdd/AGDDPlugin/data/AMDC.xml .
+cp ../GeoModelATLAS/AGDD/AGDDPlugin/data/AMDC.xml .
 bin/gmex lib/libAGDDPlugin.1.0.0.dylib
 ```
 

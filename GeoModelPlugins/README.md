@@ -45,9 +45,9 @@ Note, because of the plugin mechanism.
 
 If you wish to add an additional plugin, these conventions must be respected in order that the plugin properly loads. 
 
-The plugin code includes a list of files to be accessed, that is relative to the directory GEOMODEL_XML_DIR.  In the above example, that is only one file.  But, you can add as many as you like.  They can be added in the initializer, or they can be added programmatically in the creation method.  
+The plugin code includes a list of files to be accessed, that is relative to the directory $GEOMODEL_XML_DIR.  In the above example, that is only one file.  But, you can add as many as you like.  They can be added in the initializer, or they can be added programmatically in the creation method.  
 
-That's all! You can now load your plugin into gmex. For example
+That's all! You can now load your plugin into gmex. (Don't forget to set the GEOMODEL_XML_DIR to your local repository as described above.) For example
 
 on linux:
 

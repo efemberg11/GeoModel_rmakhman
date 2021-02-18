@@ -61,4 +61,4 @@ on mac:
 gmex /path/to/libMuonPlugin.dylib
 ```
 
-In addition, you may now use any of the other tools in the tool suite (gmclash, gmgeantino, gmcat, fullSimLight...)
+In addition, you may now use your plugin as input to any of the other tools in the tool suite such as gmclash, gmgeantino, gmcat, fullSimLight.

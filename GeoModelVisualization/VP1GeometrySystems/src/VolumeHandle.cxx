@@ -138,7 +138,7 @@ void VolumeHandle::initialiseChildren()
   while (!av.atEnd()) {
 
     //Add transformation between parent and child to find the complete transformation of the child:
-    const GeoTrf::Transform3D::MatrixType & mtx=av.getTransform().matrix();
+    const GeoTrf::Transform3D::MatrixType  mtx=av.getTransform().matrix();
     SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, conventions
 		  mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // differ!
 		  mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),

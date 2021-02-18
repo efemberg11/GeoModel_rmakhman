@@ -13,14 +13,16 @@ void rotationHandler::ElementHandle()
 	//std::cout<<" handling for rotation "<<std::endl;
 	if (hName=="rotation"|| hName=="firstrotation")
 	{
-		p.name="";
+        double unit = 1.0;
+        bool isPresent;
+        p.name="";
 		p.rotx=p.roty=p.rotz=0;
-		p.name=getAttributeAsString("name");
-		double unit=getAttributeAsDouble("unit");
+		p.name=getAttributeAsString("name", isPresent);
+		double unit=getAttributeAsDouble("unit", isPresent);
 		//std::cout<< " rotation: unit "<<unit<<std::endl;
-		p.rotx=unit*getAttributeAsDouble("x");
-		p.roty=unit*getAttributeAsDouble("y");
-		p.rotz=unit*getAttributeAsDouble("z");
+		p.rotx=unit*getAttributeAsDouble("x", isPresent);
+		p.roty=unit*getAttributeAsDouble("y", isPresent);
+		p.rotz=unit*getAttributeAsDouble("z", isPresent);
 			
 		theController->saveRotation(p.name,p);
 	}

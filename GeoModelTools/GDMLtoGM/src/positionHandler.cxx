@@ -14,13 +14,16 @@ void positionHandler::ElementHandle()
 	if (hName=="position" || hName=="firstposition")
 	{
 		//std::cout<<"handling position "<<std::endl;
+        //NB: unit and all the other fields are not mandatory in gdml
+        bool isPresent;
+        double unit=1.0;
 		p.name="";
 		p.x=p.y=p.z=0;
-		p.name=getAttributeAsString("name");
-		double unit=getAttributeAsDouble("unit");
-		p.x=unit*getAttributeAsDouble("x");
-		p.y=unit*getAttributeAsDouble("y");
-		p.z=unit*getAttributeAsDouble("z");
+		p.name=getAttributeAsString("name", isPresent);
+		double unit=getAttributeAsDouble("unit", isPresent);
+		p.x=unit*getAttributeAsDouble("x", isPresent);
+		p.y=unit*getAttributeAsDouble("y", isPresent);
+		p.z=unit*getAttributeAsDouble("z", isPresent);
 			
 		p.v3d=GeoTrf::Vector3D(p.x,p.y,p.z);
 		

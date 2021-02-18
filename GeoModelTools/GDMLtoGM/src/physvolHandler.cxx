@@ -18,13 +18,16 @@ physvolHandler::physvolHandler(std::string n, GDMLController* c): GDMLHandler(n,
 }
 void physvolHandler::ElementHandle() {
 	thePhysicalVolume=0;
-		
-	name=getAttributeAsString("name");
+        
+    //NB the attribute 'name' is not mandatory
+    //better to use the getAttributeAsString with the boolean option
+    bool isPresent;
+	name=getAttributeAsString("name", isPresent);
 	//std::cout<<" this is physvolHandler: name "<<name<<std::endl;
 
 	StopLoop(true);
 	xercesc::DOMNode *child;
-
+        
 //	GeoTrf::Transform3D pVRotation=GeoTrf::Transform3D::Identity();
 //	GeoTrf::Vector3D pVTranslation=GeoTrf::Vector3D(0,0,0);
     

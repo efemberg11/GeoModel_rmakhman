@@ -23,7 +23,7 @@ Set the environment variable GEOMODEL_XML_DIR to point to this directory. This t
 
 The directory structure is not yet extensive and is experimental.  The idea is to partition it by subystem, with further levels of hierarchy for subsubsystem and so forth. This is up to you to decide.  
 
-## Make your plugin aware of the files in the local copy of the database.
+## Make your plugin aware of the files in the local copy of the database
 
 The embryonic muon system plugin provides an easy example to follow.  It appears in its entirety here: 
 
@@ -37,13 +37,13 @@ The embryonic muon system plugin provides an easy example to follow.  It appears
       return new MuonPlugin;
     }
 
-Note, because of the plugin mechanism.
+Note, because of the plugin mechanism:
 
 * The name of the class matches the PLUGINNAME macro definition
 * The name of the source code file (MuonPlugin.cxx) matches the name of the class. 
 * The name and signature of the creation method (extern "C" MuonPlugin* createMuonPlugin() ) matches the name of the class. 
 
-If you wish to add an additional plugin, these conventions must be respected in order that the plugin properly loads. 
+If you wish to add an additional plugin, these conventions must be respected in order that the plugin properly loads into gmex and other tools. 
 
 The plugin code includes a list of files to be accessed, that is relative to the directory $GEOMODEL_XML_DIR.  In the above example, that is only one file.  But, you can add as many as you like.  They can be added in the initializer, or they can be added programmatically in the creation method.  
 

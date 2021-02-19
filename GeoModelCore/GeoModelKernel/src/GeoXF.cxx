@@ -231,23 +231,25 @@ __attribute__ ((flatten))
     //
     // Get the translation part and the rotation part:
     //
-    GeoTrf::RotationMatrix3D rotate = m_xf.rotation ();
+    Eigen::Matrix3d linear = m_xf.linear ();
+    Eigen::EigenSolver<GeoTrf::RotationMatrix3D> solver(linear);
+    Eigen::MatrixXcd D = solver.eigenvalues().asDiagonal();
+    Eigen::MatrixXcd V = solver.eigenvectors();
+        
     GeoTrf::Vector3D translate = m_xf.translation ();
-    Eigen::AngleAxis<double> aa(rotate);
-    //
-    // Evaluate the function
-    //
     double nTimes = (*m_function) (x);
     //
     // Modify:
     //
     translate *= nTimes;
-    double& delta = aa.angle();
-    delta *= nTimes;
+    Eigen::Matrix3cd DPowN=Eigen::Matrix3cd::Zero();
+    for (unsigned int i=0;i<3;i++) DPowN(i,i)=pow(D(i,i),nTimes);
     //
     // Now compose these and return a result:
     //
-    return GeoTrf::Translation3D (translate) * GeoTrf::Transform3D(aa);
+    GeoTrf::Transform3D tRPowN;
+    tRPowN.linear()=(V*DPowN*V.inverse()).real();
+    return GeoTrf::Translation3D (translate) * tRPowN;
   }
 
   GeoTrf::Transform3D Pow::operator        () (const GeoGenfun::Argument & argument) const

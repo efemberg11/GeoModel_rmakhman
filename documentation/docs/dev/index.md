@@ -78,7 +78,7 @@ dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial
 
 On macOS, you can install the needed graphics dependencies with `brew`.
 
-If you have not installed the `atlas/geomodel` Tap already, please install it now, by running the command below; otherwise, jspi this and jump to the next point.
+If you have not installed the `atlas/geomodel` Tap already, please install it now, by running the command below; otherwise, skip this and jump to the next point.
 
 ```
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
@@ -89,10 +89,10 @@ Now, update your `atlas/geomodel` Tap to the latest version and install the grap
 
 ```
 brew update
-brew install soqt-geomodel  
+brew install geomodel-thirdparty-soqt 
 ```
 
-The second command will install all the latest graphics libraries needed by the visualization tools of GeoModel:  `simage-geomodel`, `coin-geomodel`, and `soqt-geomodel`.
+The second command will install all the latest graphics libraries needed by the visualization tools of GeoModel:  `geomodel-thirdparty-simage`, `geomodel-thirdparty-coin`, and `geomodel-thirdparty-soqt`.
 
 
 ### 3D graphics dependencies - Linux
@@ -106,12 +106,13 @@ On all platforms *except Centos7*, you can build Simage by followoing these inst
 
 ```bash
 # Build Simage
-wget http://cern.ch/atlas-software-dist-eos/externals/Simage/Coin3D-simage-2c958a61ea8b.zip
-unzip Coin3D-simage-2c958a61ea8b.zip
-cd Coin3D-simage-2c958a61ea8b
-./configure --prefix=$PWD/../install
-make -j
-make install 
+wget http://cern.ch/atlas-software-dist-eos/externals/Simage/simage-1.8.1-src.zip
+unzip simage-1.8.1-src.zip
+mkdir build_simage
+cd build_simage
+cmake -DCMAKE_INSTALL_PREFIX=../install -DSIMAGE_BUILD_DOCUMENTATION=0 -DSIMAGE_BUILD_EXAMPLES=0 -DSIMAGE_LIBSNDFILE_SUPPORT=0 -DSIMAGE_MPEG2ENC_SUPPORT=0 -DSIMAGE_OGGVORBIS_SUPPORT=0 ../simage
+make -j4
+make install
 cd ..
 ```
 
@@ -125,7 +126,7 @@ cd Coin3D-simage-2c958a61ea8b
 ./configure --prefix=$PWD/../install
 wget -O cc7.patch https://gitlab.cern.ch/atlas/atlasexternals/-/raw/master/External/Simage/patches/libpng_centos7.patch?inline=false 
 patch -p1 < cc7.patch
-make -j
+make -j4
 make install 
 cd ..
 ```
@@ -133,40 +134,27 @@ cd ..
 
 #### b) Coin3D & SoQt
 
-!!! warning
-
-    The Coin sources are not compatible with CMake 3.19 (see https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/7). Therefore, for the moment, until the Coin sources will be ported to CMake 3.19, you should use CMake <= 3.18.X to compile Coin. 
-
-    Please note that, at the time of writing, Homebrew, the package manager for macOS, has updated its version of CMake from 3.18.4 to 3.19. Thus, you cannot build Coin on macOS with the CMake version installed by the `brew` command.
-
-    You can install CMake on your system by downloading the installer from the [CMake website](https://cmake.org/download/).
-
-    Or, you could have still  an older version on your system, which you can use. On macOS, and if those were installed with `brew`, you can check which versions of CMake you have in the path `/usr/local/Cellar/cmake/`. Then, you can use one of the ones you have installed by running its `cmake` binary command directly; for example: `/usr/local/Cellar/cmake/3.18.4/bin/cmake ...` .
-
-
-
 Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):
 
 
 ```bash
 # Build Coin3D
-wget -O coin.zip https://atlas-vp1.web.cern.ch/atlas-vp1/sources/coin_c8a8003d4_1Dec2020.zip
-unzip coin.zip
+wget https://geomodel.web.cern.ch/sources/coin-5a97506-20210210.zip -O coin.zip
+unzip coin.zip; mv coin-master coin
 mkdir build_coin
 cd build_coin
-# NOTE: replace the path below with the patch of your CMake <= 3.18.X installation
-path-to-cmake-3.18/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DCOIN_BUILD_TESTS=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../coin
-make -j
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release -DCOIN_BUILD_TESTS=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../coin
+make -j4
 make install
 cd ..
 
 # Build SoQt
-wget -O soqt.zip http://atlas-vp1.web.cern.ch/atlas-vp1/sources/soqt_5796270_1Dec2020.zip
+wget https://geomodel.web.cern.ch/sources/soqt_6b1c74f_20210210.zip -O soqt.zip 
 unzip soqt.zip
 mkdir build_soqt
 cd build_soqt
-path-to-cmake-3.18/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DSOQT_BUILD_DOCUMENTATION=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../soqt
-make -j
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release -DSOQT_BUILD_DOCUMENTATION=0 -DSOQT_BUILD_MAC_X11=0 -DSOQT_BUILD_TESTS=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../soqt
+make -j4
 make install
 cd ..
 ```

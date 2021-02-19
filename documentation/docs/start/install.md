@@ -66,7 +66,7 @@ For older macOS releases, Homebrew will try to compile the packages from source.
 
 !!! note
 
-    Brew is usually smart enough to figure out that the `geomodelvisualization` formula belongs to the `atlas/geomodel` Tap. However, if that's not the case, or in case you have other packages with similar names on your system, you can install the GeoModel formulas by passing to `brew` their complete name; *e.g.*,
+    Homebrew is usually smart enough to figure out that the `geomodelvisualization` formula belongs to the `atlas/geomodel` Tap. However, if that's not the case, or in case you have other packages with similar names on your system, you can install the GeoModel formulas by passing to `brew` their complete name; *e.g.*,
 
     ```
     brew install atlas/geomodel/geomodelvisualization

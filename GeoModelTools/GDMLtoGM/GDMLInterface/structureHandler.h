@@ -11,7 +11,6 @@ class structureHandler:public GDMLHandler {
 public:
 	structureHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
 	void ElementHandle() {;}
-  void postLoopHandling() {;}
 };
 
 

@@ -7,16 +7,14 @@
 
 #include "GeoModelKernel/GeoMaterial.h"
 
+#include <string>
+
 class materialrefHandler:public GDMLHandler {
 public:
 
-	materialrefHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
-	void ElementHandle() {
-		theMaterial=0;
-		ref=getAttributeAsString("ref");
-		theMaterial=theController->retrieveMaterial(ref);
-	}
-	GeoMaterial* getMaterial() {return theMaterial;}
+	materialrefHandler(std::string n, GDMLController* c);
+	void ElementHandle();
+	GeoMaterial* getMaterial();
 private:
 	std::string ref="";
 	GeoMaterial* theMaterial=0;

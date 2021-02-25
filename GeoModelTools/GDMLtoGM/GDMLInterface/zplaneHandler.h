@@ -3,7 +3,10 @@
 #define zplaneHandler_H
 
 #include "GDMLInterface/GDMLHandler.h"
-#include "GDMLInterface/GDMLController.h"
+
+#include <string>
+
+class GDMLController;
 
 struct zPlane {
 	double rmin;
@@ -13,14 +16,9 @@ struct zPlane {
 
 class zplaneHandler:public GDMLHandler {
 public:
-	zplaneHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
-	void ElementHandle() {
-		//std::cout<<"handling zplane "<<std::endl;
-		p.rmin=getAttributeAsDouble("rmin");
-		p.rmax=getAttributeAsDouble("rmax");
-		p.z=getAttributeAsDouble("z");
-	}
-	zPlane& getZPlane() {return p;}
+	zplaneHandler(std::string n, GDMLController* c);
+	void ElementHandle();
+	zPlane& getZPlane();
 private:
 	zPlane p;
 };

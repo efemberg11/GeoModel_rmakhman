@@ -1,5 +1,9 @@
 #include "GDMLInterface/volumeHandler.h"
 
+#include "GeoModelXMLParser/XercesParser.h"
+
+#include "GeoModelKernel/GeoTransform.h"
+
 volumeHandler::volumeHandler(std::string n, GDMLController* c): GDMLHandler(n,c) 
 {
 }

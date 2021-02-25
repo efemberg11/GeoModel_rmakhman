@@ -12,6 +12,10 @@
 #include "G4Cache.hh"
 #include "G4MagneticField.hh"
 
+//G4AnalysisMananager
+#include "MyAnalysis.hh"
+
+
 using json = nlohmann::json;
 
 class G4VPhysicalVolume;
@@ -84,12 +88,15 @@ public:
   /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
   void PullUnidentifiedVolumes( G4LogicalVolume* v );
 
+  static G4AnalysisManager* fAnalysisManager;
+
 protected:
   G4Timer fTimer;
     
 private:
   // this static member is for the print out
   static G4double gFieldValue;
+  G4int    fHistoID; //density histogram ID
   G4bool   fRunOverlapCheck;
   G4bool   fRunMassCalculator;
   G4bool   fDumpGDML;

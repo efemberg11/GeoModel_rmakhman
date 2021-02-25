@@ -72,6 +72,7 @@
 
 #include "GeoModelKernel/GeoVolumeCursor.h"
 
+G4AnalysisManager* MyDetectorConstruction::fAnalysisManager = nullptr;
 
 namespace clashdet {
     enum typeOfClash{ withMother=0, withSister, fullyEncapsSister, invalidSolid};
@@ -250,14 +251,21 @@ void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, st
     
     int nDaughters = logVolume->GetNoDaughters();
     //std::cout<<"Total n. of Daughters of "<<logVolume->GetName()<<" is : "<<nDaughters<<std::endl;
-    G4VPhysicalVolume *daughterPV;
-    G4LogicalVolume *daughterLV;
-    
+    G4VPhysicalVolume *daughterPV = nullptr;
+    G4LogicalVolume *daughterLV   = nullptr;
+    G4double density;
     
     for (int n=0; n<nDaughters; n++)
     {
         daughterPV=logVolume->GetDaughter(n);
         daughterLV = daughterPV->GetLogicalVolume();
+        density=daughterLV->GetMaterial()->GetDensity();
+        fAnalysisManager->FillH1(fHistoID, density/(SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3), 1);
+        
+//        std::cout<<"-----> Daughter Name is: "<<daughterPV->GetName()<<std::endl;
+//        std::cout<<"Material "<<daughterLV->GetMaterial()->GetName()<<" density "<<density<<std::endl;
+//        std::cout<<"Material "<<daughterLV->GetMaterial()->GetName()<<" density[g/cm3] "<<density/(SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3)<<std::endl;
+        
         //std::cout<<"Checking daughter "<<n<<" out of "<<nDaughters<<std::endl;
         //std::cout<<"-----> Daughter Name is: "<<daughterPV->GetName()<<std::endl;
         //std::cout<<"-----> DaughterLV Name is: "<<daughterLV->GetName()<< " it has daughterLV->GetNoDaughters(): "<<daughterLV->GetNoDaughters()<<std::endl;
@@ -412,6 +420,17 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     G4LogicalVolume *daughterLV;
     G4double cubicVolumeWorld, globalDensityWorld;
     
+    fAnalysisManager = G4AnalysisManager::Instance();
+    if (!fAnalysisManager->OpenFile("density_histogram")){
+        G4cout<<"RecursiveMassCalculation ERROR: File cannot be opened!"<<G4endl;
+        exit(-1);
+    } else
+        G4cout<<"\n...output File density_histogram opened!"<<G4endl;
+    fHistoID = fAnalysisManager->CreateH1("density", "density", 300, 10e-3, 30, "none", "none", "log");
+    fAnalysisManager->SetH1Ascii(fHistoID,true);  // misi: always ascii
+    fAnalysisManager->SetH1XAxisTitle(fHistoID, "density [g/cm3]]");
+    //fAnalysisManager->SetH1YAxisTitle(fHistoID, "#lambda");
+    
     std::cout<<"Checking World volume "<<std::endl;
     std::cout<<"-----> World Name is: "<<worldg4->GetName()<<std::endl;
     std::cout<<"-----> WorldLV Name is: "<<worldg4->GetLogicalVolume()->GetName()<< " it has  "<<localNoDaughters<<" daughters."<<std::endl;
@@ -421,9 +440,14 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     std::cout<<"-----> World Solid cubic volume is: "<<cubicVolumeWorld/CLHEP::m3<<" m3"<<std::endl;
     std::cout<<"-----> World Solid entity type: "<<worldg4->GetLogicalVolume()->GetSolid()->GetEntityType()<<std::endl;
     globalDensityWorld = worldg4->GetLogicalVolume()->GetMaterial()->GetDensity();
-    std::cout<<"-----> World Solid density is: "<<globalDensityWorld/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
+    std::cout<<"-----> World Solid density is: "<<globalDensityWorld/ (CLHEP::g / CLHEP::cm3)<<" [g/cm3]"<<std::endl;
+    std::cout<<"-----> World Solid density is: "<<globalDensityWorld/ (CLHEP::kg / CLHEP::m3)<<" [kg/m3]"<<std::endl;
+    std::cout<<"-----> Minimum density is: "<<0/ (CLHEP::g / CLHEP::cm3)<<" [g/cm3]"<<std::endl;
+    std::cout<<"-----> Maximum density is: "<<30<<" [g/cm3]"<<std::endl;
+    
     std::cout<<"-----> World mass is: "<<globalDensityWorld * cubicVolumeWorld / (CLHEP::kg) <<" [Kg]"<<std::endl;
     std::cout<<"\n *** --------------- ***\n"<<std::endl;
+    //exit(-1);
     
     double inclusiveMassG4 = 0., exclusiveMassG4=0.;
     double inclusiveMassGeoModel = 0., exclusiveMassGeoModel = 0.;
@@ -491,6 +515,9 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     
     std::cout<<"\nGeant4: Total inclusive mass for the requested Geometry is ... "<<inclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
     std::cout<<"Geant4: Total exclusive mass for the requested Geometry is ... "<<exclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
+    
+    fAnalysisManager->Write();
+    fAnalysisManager->CloseFile();
     
 }
 

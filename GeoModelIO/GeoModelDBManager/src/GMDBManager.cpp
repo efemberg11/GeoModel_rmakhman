@@ -1104,7 +1104,7 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
   return rc;
 }
 
-
+/* --- not used anymore, we now have std::variant, below ---
 // create a user-defined custom table to store auxiliary data, from vector<vector<string>>
 bool GMDBManager::createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::string>> &records )
 {
@@ -1135,6 +1135,8 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
   tab.clear();
   return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
 }
+*/
+
 // create a user-defined custom table to store auxiliary data, from vector<vector<variant>>
 bool GMDBManager::createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> &records )
 {
@@ -1157,17 +1159,32 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
   queryStr = fmt::format( "create table {0} ( id integer primary key ", tab[0] );
   for( int ii=0; ii<tableColNames.size(); ++ii) {
       std::string colType = "";
+    
+    // -- Here we check the datum's type, which is more universal than using string-encoded types
+    // -- but this does not work if the first entry of a given column is empty.
+    // -- If so, the 'null' entry is taken as string, and the column is set as containing TEXT...
     // convert std::variant types to SQLite data types (see SQLite documentation)
-    if( std::holds_alternative<int>(records[0][ii]) ) colType = "INTEGER";
-    else if( std::holds_alternative<long>(records[0][ii]) ) colType = "INTEGER";
-    else if( std::holds_alternative<float>(records[0][ii]) ) colType = "REAL";
-    else if( std::holds_alternative<double>(records[0][ii]) ) colType = "REAL";
+    /*
+    if(      std::holds_alternative<int>(records[0][ii]) )         colType = "INTEGER";
+    else if( std::holds_alternative<long>(records[0][ii]) )        colType = "INTEGER";
+    else if( std::holds_alternative<float>(records[0][ii]) )       colType = "REAL";
+    else if( std::holds_alternative<double>(records[0][ii]) )      colType = "REAL";
     else if( std::holds_alternative<std::string>(records[0][ii]) ) colType = "TEXT";
-    else throw std::runtime_error("No std::variant alternative found!\n"); 
+    else throw std::runtime_error("No std::variant alternative has been found!\n"); 
+    */
+
+    if(tableColTypes[ii]      == "INT")    colType = "INTEGER";
+    else if(tableColTypes[ii] == "LONG")   colType = "INTEGER";
+    else if(tableColTypes[ii] == "FLOAT")  colType = "REAL";
+    else if(tableColTypes[ii] == "DOUBLE") colType = "REAL";
+    else if(tableColTypes[ii] == "STRING") colType = "TEXT";
+    else throw std::runtime_error("No suitable column type has been found ==> " + tableColTypes[ii] + "\n"); 
+
     std::string colStr = fmt::format( ", {0} {1} ", tableColNames[ii], colType );
     queryStr += colStr;
   }
   queryStr += ")";
+  std::cout << "- table definition: " << queryStr << std::endl;
 
   rc = execQuery(queryStr);
   tab.clear();

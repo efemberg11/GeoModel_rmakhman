@@ -79,7 +79,7 @@ public:
   // 'volume', populating the fTree vector of G4VPhysicalVolumes
   bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
     
-  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass);
+  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, bool writeRep);
     
   void iterateFromWorldMass(G4LogicalVolume* envelope, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix="", G4String material="");
   

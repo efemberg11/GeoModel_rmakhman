@@ -13,6 +13,7 @@ Run the executable with the --help option to see the available options:
 By default (if the optional flag are not used) *gmmasscalculator*, takes the main *World Volume*, and calculates the inclusive and exclusive masses of the respective daughters, saving the calculated quantities in the output json file. At the end of the report, the total masses are reported for the whole *World Volume*. The output json file format is the following:
 
 ``` bash
+"apparentWeightInAir[kg]": -999.0,
 "exclusiveMass[kg]": 1.3358800280858636,
 "inclusiveMass[kg]": 133.81273262584054,
 "logicalVolumeName": "SCT_ForwardC",
@@ -23,6 +24,7 @@ By default (if the optional flag are not used) *gmmasscalculator*, takes the mai
 ``` 
 where:
 
+- *apparent weight in Air* by definition, the weight of a body as affected by the buoyancy of a fluid (such as air) in which it is immersed. It is calculated only on the total geometry, assuming that the World Volume is made of Air
 - *exclusiveMass* is the mass of the considered volume only (from which the volumes occupied by the daughters volumes have been subtracted)
 - *inclusiveMass* is the mass of the considered volume, comprehensive of the masses of the respective daughters (propagated in an iterative way to their daughter volumes).
 
@@ -36,13 +38,14 @@ In any case, at the end of the report, the total inclusive and exclusive masses 
 
 ```bash
 {
-"exclusiveMass[kg]": 22.8290395217687,
-"inclusiveMass[kg]": 22.8290395217687,
-"logicalVolumeName": "BRLSensor",
-"material": "Silicon",
-"physicalVolumeName": "",
+"apparentWeightInAir[kg]": 2405.2018407511378,
+"exclusiveMass[kg]": 1.3704943478464804,
+"inclusiveMass[kg]": 2421.156760687377,
+"logicalVolumeName": "Total Geometry",
+"material": "Air",
+"physicalVolumeName": "newWorldLog",
 "volumeCopyNo": 0,
-"volumeEntityType": "Total for requested Geometry"
+"volumeEntityType": "World Volume"
 }
 
 ```

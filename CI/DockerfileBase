@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y tzdata && ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
 
 ### Install C++, cmake and python
-RUN apt-get update && apt-get install -y cmake g++ python git sudo nano
+RUN apt-get update && apt-get install -y cmake g++ python git sudo nano wget
 
 ### Boost installation
 RUN apt-get update && apt-get install -y libboost-all-dev

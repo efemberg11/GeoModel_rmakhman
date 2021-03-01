@@ -6,6 +6,9 @@ FROM  ubuntu:20.04
 
 USER root
 WORKDIR /root
+
+ARG XercesC_VERSION=3.2.3
+
 ENV DEBIAN_FRONTEND noninteractive
 
 ### Install tzdata package
@@ -28,6 +31,15 @@ RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev
 
 ### Install eigen to avoid the own installation
 RUN apt-get update && apt-get install -y libeigen3-dev 
+
+### Another layer of building xer
+RUN wget https://cern.ch/lcgpackages/tarFiles/sources/xerces-c-${XercesC_VERSION}.tar.gz && \
+         tar -xzf xerces-c-${XercesC_VERSION}.tar.gz && \
+         cd xerces-c-${XercesC_VERSION}.tar.gz && \
+         ./confgiure --disable-static && \
+         make -j2  && \
+         make install
+
 
 ### Last but very important, the installation of the OpenGL module
 RUN apt-get update && apt-get install -y mesa-utils build-essential libgl1-mesa-dev

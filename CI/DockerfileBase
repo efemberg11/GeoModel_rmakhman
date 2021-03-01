@@ -27,7 +27,7 @@ RUN  apt-get update &&  apt-get install -y qt5-default qt5-qmake qtbase5-dev-too
 RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev
 
 ### Install eigen to avoid the own installation
-RUN apt-get update && apt-get install -y libeigen3-dev libxerces-c-dev
+RUN apt-get update && apt-get install -y libeigen3-dev 
 
 ### Last but very important, the installation of the OpenGL module
 RUN apt-get update && apt-get install -y mesa-utils build-essential libgl1-mesa-dev

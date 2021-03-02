@@ -29,7 +29,7 @@ RUN mkdir -p /workdir/build_geomodel/ && \
     sudo make install && \
     cd .. && \
     sudo rm -rf build_geomodel GeoModel_src && \
-    echo "\#\!/bin/bash" > ~/setup_docker.sh && \
+    echo "#!/bin/bash" > ~/setup_docker.sh && \
     echo "export PATH=\"/usr/local/GeoModel/bin:\${PATH}\"" >> ~/setup_docker.sh && \
     echo "export LD_LIBRARY_PATH=\"/usr/local/GeoModel/lib:\${LD_LIBRARY_PATH}\"" >> ~/setup_docker.sh  && \
     sudo mv ~/setup_docker.sh /usr/local/GeoModel/setup_docker.sh && \

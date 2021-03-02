@@ -4,7 +4,7 @@ FROM ${BASEIMAGE}
 
 ADD . /workdir/GeoModelXML
 RUN  export  && \
-     source ~/.bashrc && \
+     . ~/.bashrc && \
      cd /workdir && \
      mkdir -p build  && \
      cd build && \

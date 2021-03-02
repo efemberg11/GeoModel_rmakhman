@@ -22,7 +22,7 @@ build_docker:
     # all submodules will be cloned recursively upon start of CI job
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SSL_NO_VERIFY: "true"
-    BUILD_ARG: BASEIMAGE=gitlab-registry.cern.ch/jojungge/geomodel:jojungge-master-patch-06358Full
+    BUILD_ARG: BASEIMAGE=gitlab-registry.cern.ch/geomodeldev/geomodel:masterFull
   tags:
     - docker-image-build
   script:

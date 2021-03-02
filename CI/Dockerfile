@@ -10,7 +10,7 @@ RUN . /usr/local/geant4/setup_docker.sh  && \
      cd /workdir && \
      mkdir -p build  && \
      cd build && \
-     cmake ../GeoModelXML && \
+     cmake -DGEOMODELATLAS_BUILD_ALL=1 ../GeoModelXML && \
      make -j2 && \
      sudo make install
  

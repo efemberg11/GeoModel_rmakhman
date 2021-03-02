@@ -27,5 +27,3 @@ build_docker:
     - docker-image-build
   script:
     - ignore
-  needs:
-    - build_system_docker

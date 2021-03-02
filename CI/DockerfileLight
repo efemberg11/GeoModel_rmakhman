@@ -10,6 +10,8 @@ RUN mkdir -p /workdir/build_geomodel/ && \
     sudo make install && \
     cd .. && \
     sudo rm -rf build_geomodel GeoModel_src && \
-    echo "export PATH=\"/usr/local/GeoModel/bin:\${PATH}\"" >> /home/atlas/.bashrc && \
-    echo "export LD_LIBRARY_PATH=\"/usr/local/GeoModel/lib:\${LD_LIBRARY_PATH}\"" >> /home/atlas/.bashrc
-   
+    sudo echo "#!/bin/bash" > /usr/local/GeoModel/setup_docker.sh && \
+    sudo echo "export PATH=\"/usr/local/GeoModel/bin:\${PATH}\"" >> /usr/local/GeoModel/setup_docker.sh && \
+    sudo echo "export LD_LIBRARY_PATH=\"/usr/local/GeoModel/lib:\${LD_LIBRARY_PATH}\"" >> /usr/local/GeoModel/setup_docker.sh  && \
+    echo "source /usr/local/GeoModel/setup_docker.sh" > ~/.bashrc
+    

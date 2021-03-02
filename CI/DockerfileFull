@@ -12,9 +12,11 @@ RUN git clone https://gitlab.cern.ch/geant4/geant4.git --branch 'v10.6.0' && \
     sudo make install > /dev/null && \
     cd .. && \
     rm -rf build_geant4 geant4 && \
-    echo "cd /usr/local/geant4/bin" >> ~/.bashrc && \
-    echo "source geant4.sh" >> ~/.bashrc && \
-    echo "cd -" >> ~/.bashrc
+    sudo echo "#!/bin/bash" > /usr/local/geant4/setup_docker.sh && \
+    sudo echo "cd /usr/local/geant4/bin" >> /usr/local/geant4/setup_docker.sh && \
+    sudo echo "source geant4.sh" >> /usr/local/geant4/setup_docker.sh && \
+    sudo echo "cd -" >> /usr/local/geant4/setup_docker.sh && \
+    echo "source /usr/local/geant4/setup_docker.sh" >> ~/.bashrc
 
 ### Compile then geo model
 COPY . /workdir/GeoModel_src/ 
@@ -26,6 +28,8 @@ RUN mkdir -p /workdir/build_geomodel/ && \
     sudo make install && \
     cd .. && \
     sudo rm -rf build_geomodel GeoModel_src && \
-    echo "export PATH=\"/usr/local/GeoModel/bin:\${PATH}\"" >> ~/.bashrc && \
-    echo "export LD_LIBRARY_PATH=\"/usr/local/GeoModel/lib:\${LD_LIBRARY_PATH}\"" >> ~/.bashrc
+    sudo echo "#!/bin/bash" > /usr/local/GeoModel/setup_docker.sh && \
+    sudo echo "export PATH=\"/usr/local/GeoModel/bin:\${PATH}\"" >> /usr/local/GeoModel/setup_docker.sh && \
+    sudo echo "export LD_LIBRARY_PATH=\"/usr/local/GeoModel/lib:\${LD_LIBRARY_PATH}\"" >> /usr/local/GeoModel/setup_docker.sh  && \
+    echo "source /usr/local/GeoModel/setup_docker.sh" > ~/.bashrc
     

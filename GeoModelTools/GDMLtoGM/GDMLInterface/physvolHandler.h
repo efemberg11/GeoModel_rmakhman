@@ -6,7 +6,6 @@
 
 #include <string>
 
-class GDMLHandler;
 class GeoPhysVol;
 class GeoTransform;
 

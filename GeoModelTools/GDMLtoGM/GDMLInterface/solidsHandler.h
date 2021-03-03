@@ -3,15 +3,17 @@
 #define solidsHandler_H
 
 #include "GDMLInterface/GDMLHandler.h"
-#include "GDMLInterface/GDMLController.h"
+
+
 #include <string>
-#include <iostream>
+
+class GDMLController;
 
 class solidsHandler:public GDMLHandler {
 public:
-	solidsHandler(std::string n, GDMLController* c):GDMLHandler(n,c) {}
-	void ElementHandle() {;}
-	void postLoopHandling() {;}
+	solidsHandler(std::string n, GDMLController* c);
+	void ElementHandle();
+	void postLoopHandling();
 
 };
 

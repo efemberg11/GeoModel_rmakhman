@@ -1,0 +1,29 @@
+# List of the CI build stages.
+stages:
+  - step-A
+ 
+
+# List global variables
+variables:
+  CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  XERCESC_VERSION_BASE: 3.2.2
+  # also, 'CMAKE_EXTRA_FLAGS' will be specified by specific jobs when needed, and used by job templates like 'geomodel-job'
+  GIT_SUBMODULE_STRATEGY: recursive
+  
+
+##  Construct one docker image only for
+##  viewer puposes
+build_docker:
+  stage: step-A
+  variables:
+    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}
+    DOCKER_FILE: 'CI/Dockerfile'
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+    BUILD_ARG: BASEIMAGE=gitlab-registry.cern.ch/geomodeldev/geomodel:masterFull
+  tags:
+    - docker-image-build
+  script:
+    - ignore

@@ -1581,7 +1581,7 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
                 << "so we create these custom tables in the DB:" 
                 << std::endl; 
        for ( auto& tableData : m_auxiliaryTablesVar ) {
-            std::cout << "\tsaving table: " << tableData.first << std::endl; 
+            std::cout << "\nsaving table: " << tableData.first << std::endl; 
             m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, m_auxiliaryTablesVarData[ tableData.first ] );
        }
     }
@@ -1605,7 +1605,7 @@ void WriteGeoModel::storePublishedAuxiliaryData(GeoPublisher* publisher)
                 << "so we create these custom tables in the DB:" 
                 << std::endl; 
        for ( auto& tableData : tableDefs ) {
-            std::cout << "\tsaving table: " << tableData.first << std::endl; 
+            std::cout << "\nsaving table: " << tableData.first << std::endl; 
             m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, tableAuxData[ tableData.first ] );
        }
     }

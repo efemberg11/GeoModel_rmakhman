@@ -218,10 +218,10 @@ public:
    * @param tableName The name of the custom table
    * @param tableColNames A vector of strings defining the names of the table's columns
    * @param tableColTypes A vector of strings defining the types of the table's columns
-   * @param records A vector of strings storing the table's rows' data
+   * @param records A vector of std:variant<int,long,float,double,std::string> storing the table's rows' data
    */
-  bool createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::string>> &records );
   bool createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> &records );
+  //bool createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::string>> &records ); // not used anymore!!
 
 
 

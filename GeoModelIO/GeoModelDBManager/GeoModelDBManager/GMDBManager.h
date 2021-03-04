@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <variant>
 #include <typeindex> // std::type_index, needs C++11
 
 
@@ -151,9 +152,14 @@ public:
 	 */
 	void printDBVersion() const;
 
+  void printAllRecords(const std::string &tableName) const;
 
   void printAllDBTables();
+
+  void createTableDataCaches();
   void getAllDBTables();
+  void getAllDBTableColumns();
+
   int execQuery(std::string queryStr);
 
 
@@ -207,6 +213,17 @@ public:
 
   std::vector<std::vector<std::string>> getTableRecords(std::string tableName) const; // TODO: should be private?
 
+  /**
+   * @brief Create a custom DB table to store auxiliary data.
+   * @param tableName The name of the custom table
+   * @param tableColNames A vector of strings defining the names of the table's columns
+   * @param tableColTypes A vector of strings defining the types of the table's columns
+   * @param records A vector of std:variant<int,long,float,double,std::string> storing the table's rows' data
+   */
+  bool createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> &records );
+  //bool createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::string>> &records ); // not used anymore!!
+
+
 
 private:
 
@@ -221,8 +238,9 @@ private:
    * @param keyType The type of the 'key' that identifies the linked node. 
    */
   bool createTableCustomPublishedNodes(const std::string tableName, const std::string nodeType, const std::type_info* keyType);
-
+  
   bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::string>> records);
+  bool addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> records);
 //  bool addListOfRecordsToTableOld(const QString tableName, const std::vector<QStringList> records); // for the old SQlite only
 
   void addDBversion(std::string version);
@@ -242,7 +260,6 @@ private:
 
   std::vector<std::string> getTableColumnNames(const std::string &tableName);
 
-  void printAllRecords(const std::string &tableName) const;
 
   int getTableColIndex(const std::string &tableName, const std::string &colName);
 

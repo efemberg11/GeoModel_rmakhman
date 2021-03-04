@@ -11,17 +11,16 @@ theme:
 
 nav:
     - Home: 'index.md'
-    - Getting Started:
-        - 'Intro': 'start/index.md'
-        - 'Install Libraries & Tools': 'start/install.md'
-        - 'The Basic Concepts': 'start/basic_concepts.md'
-        - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
-    - How To:
-        - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
-        - 'Build a simple detector': 'how/how_simple_detector_cpp.md'
-        - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
-        - 'Load a geometry from a file': 'how/how_load_geo.md'
-        - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
+    #- Getting Started:
+    - 'Install Libraries & Tools': 'start/install.md'
+    #    - 'The Basic Concepts': 'start/basic_concepts.md'
+    #   - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
+    #- How To:
+    #    - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
+    #    - 'Build a simple detector': 'how/how_simple_detector_cpp.md'
+    #    - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
+    #    - 'Load a geometry from a file': 'how/how_load_geo.md'
+    #    - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
     - GeoModel Components:
         - Kernel:
             - 'Overview': 'components/kernel/overview/index.md'
@@ -31,7 +30,7 @@ nav:
         - 'FullSimLight': 'fullsimlight/fullsimlight/index.md'
         - 'GeoModelClash': 'fullsimlight/gmclash/index.md'
         - 'GeoModelGeantino': 'fullsimlight/gmgeantino/index.md'
-        - 'GeoModelToGDML': 'fullsimlight/gmtogdml/index.md'
+        - 'GeoModel2GDML': 'fullsimlight/gm2gdml/index.md'
     - FAQ: 'faq.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'

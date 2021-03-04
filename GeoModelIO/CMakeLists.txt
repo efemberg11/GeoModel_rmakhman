@@ -3,11 +3,6 @@
 # Set up the (sub-)project.
 project( "GeoModelIO" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
-# Set up the version of GeoModelIO as a cache variable, so that other
-# sub-projects could use this value.
-#set( GeoModelIO_VERSION "${GeoModelIO_VERSION}" CACHE STRING
-#   "Version of the GeoModelIO (sub-)project" )
-
 # Set sub-packages to build.
 # add_subdirectory( GeoModelErrorHandler ) // unused at the moment.
 add_subdirectory( GeoModelDBManager )

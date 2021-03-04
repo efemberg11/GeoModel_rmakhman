@@ -16,7 +16,7 @@ class GeoMaterial;
 class GeoLogVol;
 class GeoPhysVol;
 
-typedef std::pair<GeoLogVol*,GeoPhysVol*> GeoVolume;
+typedef std::pair<GeoLogVol*,GeoPhysVol* > GeoVolume;
 
 typedef std::map<std::string, GeoShape*, std::less<std::string> > solidStore;
 

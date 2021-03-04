@@ -200,8 +200,6 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 }
 
 #include "GDMLInterface/defineHandler.h"
-#include "GDMLInterface/boxHandler.h"
-#include "GDMLInterface/tubeHandler.h"
 #include "GDMLInterface/topTreeHandler.h"
 #include "GDMLInterface/materialsHandler.h"
 #include "GDMLInterface/solidsHandler.h"
@@ -224,34 +222,13 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 #include "GDMLInterface/setupHandler.h"
 #include "GDMLInterface/worldHandler.h"
 #include "GDMLInterface/physvolHandler.h"
-#include "GDMLInterface/coneHandler.h"
-#include "GDMLInterface/eltubeHandler.h"
-#include "GDMLInterface/paraHandler.h"
-#include "GDMLInterface/torusHandler.h"
-#include "GDMLInterface/trdHandler.h"
-#include "GDMLInterface/polyconeHandler.h"
-#include "GDMLInterface/polyhedraHandler.h"
-#include "GDMLInterface/zplaneHandler.h"
-#include "GDMLInterface/unionHandler.h"
-#include "GDMLInterface/subtractionHandler.h"
-#include "GDMLInterface/intersectionHandler.h"
-#include "GDMLInterface/booleanHandler.h"
-#include "GDMLInterface/trapHandler.h"
-#include "GDMLInterface/twistedTrapHandler.h"
-#include "GDMLInterface/tessellatedHandler.h"
-#include "GDMLInterface/triangularHandler.h"
-#include "GDMLInterface/quadrangularHandler.h"
-#include "GDMLInterface/xtruHandler.h"
-#include "GDMLInterface/arb8Handler.h"
-#include "GDMLInterface/sectionHandler.h"
-#include "GDMLInterface/twoDimVertexHandler.h"
+
 
 void GDMLController::registerHandlers()
 {
 	//std::cout << "This is GDMLController::registerHandlers()" << std::endl;
 	new defineHandler("define",this);
-	new boxHandler("box",this);
-	new tubeHandler("tube",this);
+
 	new topTreeHandler("gdml",this);
 	new materialsHandler("materials",this);
 	new solidsHandler("solids",this);
@@ -279,26 +256,5 @@ void GDMLController::registerHandlers()
 	new physvolHandler("physvol",this);
 	new setupHandler("setup",this);
 	new worldHandler("world",this);
-	new coneHandler("cone",this);
-	new eltubeHandler("eltube",this);
-	new paraHandler("para",this);
-	new torusHandler("torus",this);
-	new trdHandler("trd",this);
-	new polyconeHandler("polycone",this);
-	new polyhedraHandler("polyhedra",this);
-	new zplaneHandler("zplane",this);
-	new booleanHandler("first",this);
-	new booleanHandler("second",this);
-	new unionHandler("union",this);
-	new subtractionHandler("subtraction",this);
-	new intersectionHandler("intersection",this);
-	new trapHandler("trap",this);
-        new twistedTrapHandler("twistedtrap",this);
-	new tessellatedHandler("tessellated",this);
-	new triangularHandler("triangular",this);
-	new quadrangularHandler("quadrangular",this);
-	new xtruHandler("xtru",this);
-	new arb8Handler("arb8",this);
-	new twoDimVertexHandler("twoDimVertex",this);
-	new sectionHandler("section",this);
+
 }

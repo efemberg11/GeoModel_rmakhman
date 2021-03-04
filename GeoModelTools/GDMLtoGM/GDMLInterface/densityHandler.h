@@ -6,21 +6,14 @@
 
 #include "GDMLInterface/GDMLHandler.h"
 #include "GDMLInterface/GDMLController.h"
-#include "GDMLInterface/materialHandler.h"
 #include <string>
 #include <iostream>
 
 class densityHandler:public GDMLHandler {
 public:
-	densityHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
-	void ElementHandle() {
-		unit=value=density=0;
-		unit=getAttributeAsDouble("unit",GeoModelKernelUnits::g/GeoModelKernelUnits::mole);
-		value=getAttributeAsDouble("value");
-		density=unit*value;
-		// std::cout<<" this is densityHandler: density= "<<density<<std::endl;
-	}
-	double getDensity() {return density;}
+	densityHandler(std::string n, GDMLController* c);
+	void ElementHandle();
+	double getDensity();
 private:
 	double unit;
 	double value;

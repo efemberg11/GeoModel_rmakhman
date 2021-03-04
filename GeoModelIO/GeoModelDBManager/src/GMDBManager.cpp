@@ -214,27 +214,39 @@ void GMDBManager::printDBVersion() const
 }
 
 
-
+void GMDBManager::createTableDataCaches()
+{
+    getAllDBTables();
+    getAllDBTableColumns();
+}
 
 void GMDBManager::printAllRecords(const std::string &tableName) const
 {
   // --- print table name
-  std::cout << tableName << " in db:" << std::endl;
+  std::cout << "\n---" << std::endl;
+  std::cout << "'" << tableName << "' in db:" << std::endl;
+  // --- check if we stored table's data
+  if( m_tableNames.find(tableName) == m_tableNames.end() ) {
+      std::cout << "\n*** ERROR!! No table '" << tableName << "' found! ***\n\n";   
+      return;
+  }
   // --- print table column names
   std::cout << "- " <<  joinVectorStrings(m_tableNames.at(tableName), ", ") << std::endl;
   // --- print records
   std::vector<std::vector<std::string>> records;
 //  std::vector<std::string> nodeParams;
   records = getTableRecords(tableName);
-  for( auto& row : records) {
-    std::cout << "* ";
-    for( auto& item : row) {
-      std::cout << item << ", ";
-    }
-    std::cout << std::endl;
+  if (records.size()) {
+      for( auto& row : records) {
+          std::cout << "* ";
+          for( auto& item : row) {
+              std::cout << item << ", ";
+          }
+          std::cout << std::endl;
+      }
   }
   std::cout << "---" << std::endl;
-	// TODO: I want to have a symbol like '---' to mean empty line when query gives 0 results.
+  // TODO: I want to have a symbol like '---' to mean empty line when query gives 0 results.
 }
 
 
@@ -265,7 +277,10 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(std::string t
         std::vector<std::string> nodeParams; // stores the data items contained in a single row
         for ( int i = 0; i < ctotal; i++ )  // Loop times the number of columns in the table
         {
-          std::string s = (char*)sqlite3_column_text(stmt, i);  // Read each Column in the row as text FIXME: is there a method to get the right type, e.g. double, instead of text?
+          std::string s;
+          const char* cc = (char*)sqlite3_column_text(stmt, i);  // Read each Column in the row as text FIXME: is there a method to get the right type, e.g. double, instead of text?
+          if (cc==NULL) s = "NULL";
+          else s = cc;
           nodeParams.push_back( s );
         }
         records.push_back(nodeParams);
@@ -309,8 +324,7 @@ bool GMDBManager::addListOfChildrenPositions(const std::vector<std::vector<std::
 	//return addListOfRecordsToTableOld("ChildrenPositions", records); // old SQLite versions
 }
 
-bool GMDBManager::addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records,
-std::string suffix /* optional parameter */)
+bool GMDBManager::addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records, std::string suffix /* optional parameter */)
 {
     std::string tableName = "PublishedAlignableTransforms"; // default table name
     std::string nodeType = "GeoAlignableTransform";
@@ -328,8 +342,7 @@ std::string suffix /* optional parameter */)
     //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
 }
 
-bool GMDBManager::addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records, std::string
-suffix /* optional parameter */)
+bool GMDBManager::addListOfPublishedFullPhysVols(const std::vector<std::vector<std::string>> &records, std::string suffix /* optional parameter */)
 {
     std::string tableName = "PublishedFullPhysVols"; // default table name
     std::string nodeType = "GeoFullPhysVol";
@@ -345,6 +358,20 @@ suffix /* optional parameter */)
     return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
     //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
 }
+
+/*
+bool GMDBManager::addListOfRecordsToCustomTable(const std::vector<std::vector<std::string>> &records, std::string tableName )
+{
+    std::string nodeType = "GeoFullPhysVol";
+    const std::type_info &keyType(typeid(std::string));//TODO: type should be custom too!!
+    // create custom table first
+    createTableCustomPublishedNodes( tableName, nodeType, &keyType );
+    // add records to the newly-created table
+    return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+    //return addListOfRecordsToTableOld( tableName, records ); // old SQLite versions
+}
+*/
+
 
 
 bool GMDBManager::addListOfRecords(const std::string geoType, const std::vector<std::vector<std::string>> records)
@@ -395,7 +422,7 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
     ++id;
     std::vector<std::string> items;
     for ( const std::string& item : rec) {
-      items.push_back("'" + item + "'");
+      items.push_back("'" + item + "'"); // TODO: we should differentiate strings from other values when inserting them in the table, as we now do for the std::variant version!
     }
     std::string values = joinVectorStrings(items, ",");
     sql += " (" + std::to_string(id) + "," + values + ")";
@@ -414,6 +441,65 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
   }
   return true;
 }
+
+
+bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> records)
+{
+  // get table columns and format them for query
+  std::string tableColString = "(" + joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
+  if(m_debug) std::cout << "tableColString:" << tableColString << std::endl;
+
+  unsigned int nRecords = records.size();
+  std::cout << "Info: number of " << tableName << " records to dump into the DB:" << nRecords << std::endl;
+
+  // preparing the SQL query
+  std::string sql = fmt::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
+  unsigned int id = 0;
+  for( const std::vector<std::variant<int,long,float,double,std::string>>& rec : records) {
+    ++id;
+    // a vector to store string-conversions of values, to build the SQL query
+    std::vector<std::string> items;
+    // loop over all entries in a row/record
+    for ( const std::variant<int,long,float,double,std::string>& item : rec) {
+        if( std::holds_alternative<int>(item) )
+            items.push_back(std::to_string( std::get<int>(item) )); // we need to encapsulate records' values into quotes for the SQL query string
+        else if( std::holds_alternative<long>(item) )
+            items.push_back(std::to_string( std::get<long>(item) ));
+        else if( std::holds_alternative<float>(item) )
+            items.push_back(std::to_string( std::get<float>(item) ));
+        else if( std::holds_alternative<double>(item) )
+            items.push_back(std::to_string( std::get<double>(item) ));
+        else if( std::holds_alternative<std::string>(item) ) {
+            std::string str = std::get<std::string>(item);
+            // NOTE: if item is a "NULL" string, we don't encapsulate it into quotes,
+            // so it is taken as the SQL's NULL value in the SQL string,
+            // and inserted as a NULL value in the table,
+            // instead of as a "NULL" text string 
+            if (str == "NULL") items.push_back( str );
+            else items.push_back( "'" + str + "'"  );
+        }
+        else throw std::runtime_error("No std::variant alternative found!\n"); 
+    }
+    // we build the long string containing all values
+    std::string values = joinVectorStrings(items, ",");
+    sql += " (" + std::to_string(id) + "," + values + ")";
+    if (id != nRecords) {
+      sql += ",";
+    } else {
+      sql += ";";
+    }
+
+  }
+  if(m_debug) std::cout << "Query string:" << sql << std::endl; // debug
+
+  // executing the SQL query
+  if ( ! (execQuery(sql)) ) {
+    return false;
+  }
+  return true;
+}
+
+
 
 // TODO: this is for the old SQLite. Not needed anymore, I guess. ==> Just put a requirement on the newer version of SQLite3 in CMakeLists.txt. Perhaps, also check that GeoModelIO can run smoothly on older ATLAS releases, like 21.9 by taking a newer SQLite3 from LCG.
 // ***Note***
@@ -905,6 +991,47 @@ void GMDBManager::getAllDBTables()
 }
 
 
+void GMDBManager::getAllDBTableColumns()  
+{
+
+    std::vector<std::string> cols;
+    std::string colName;
+
+    // populate the cache with tables' names, if needed
+    if( ! m_cache_tables.size() ) {
+        std::cout << "*** ERROR! Tables' cache is empty! ***\n";
+        return;
+    }
+
+    for( auto& tableName : m_cache_tables ) {
+        std::cout << "Processing table '" << tableName << "'...\n";
+        sqlite3_stmt *stmt;
+        // get the 'name' column from the PRAGMA's table's definition
+        // see: https://stackoverflow.com/a/54962853/320369
+        std::string queryStr = "select name from pragma_table_info('" + tableName + "')";
+        int rc = sqlite3_prepare_v2(m_d->m_dbSqlite, queryStr.c_str() , -1, &stmt, NULL);
+        if (rc==SQLITE_OK)
+        {
+            //OK, now looping over table's columns...
+            //will continue to go down the rows (columns in your table) till there are no more
+            while(sqlite3_step(stmt) == SQLITE_ROW)
+            {
+                //sprintf(colName, "%s", sqlite3_column_text(stmt, 1));
+                colName = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+                
+                //do something with colName because it contains the column's name
+                m_tableNames[tableName].push_back(colName);
+            }
+        }
+    } // end of for loop
+}
+
+
+
+
+
+
+// TODO: currently, we retrieve published data as strings, but we want to retrieve that according to the original data type
 std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable( std::string suffix )
 {
     std::string tableName = "PublishedFullPhysVols"; // default table name
@@ -915,6 +1042,7 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable( std::st
 
     return getTableRecords( tableName );
 }
+// TODO: currently, we retrieve published data as strings, but we want to retrieve that according to the original data type
 std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable( std::string suffix )
 {
     std::string tableName = "PublishedAlignableTransforms"; // default table name
@@ -965,7 +1093,6 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
 
   std::vector<std::string> tab;
 
-  //tableName = "dbversion";
   tab.insert(tab.begin(), {tableName, "id", "key", "nodeID", "keyType"});
   storeTableColumnNames(tab);
 
@@ -976,6 +1103,101 @@ bool GMDBManager::createTableCustomPublishedNodes(const std::string tableName, c
   //std::cout << "Created the custom table: '" << tableName << "'." << std::endl; // debug msg
   return rc;
 }
+
+/* --- not used anymore, we now have std::variant, below ---
+// create a user-defined custom table to store auxiliary data, from vector<vector<string>>
+bool GMDBManager::createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::string>> &records )
+{
+    if( tableColNames.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' names is empty!!");
+    if( tableColTypes.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' types is empty!!");
+
+  int rc = -1; // sqlite's return code
+  std::string queryStr;
+
+  std::vector<std::string> tab;
+
+  tab.push_back(tableName);
+  tab.push_back( "id" ); // this is the column to store the records' IDs
+  for( auto& colName : tableColNames )
+    tab.push_back( colName );
+
+  storeTableColumnNames(tab);
+
+  // prepare the dynamic query to create the custom table
+  queryStr = fmt::format( "create table {0} ( id integer primary key ", tab[0] );
+  for( int ii=0; ii<tableColNames.size(); ++ii) {
+    std::string colStr = fmt::format( ", {0} {1} ", tableColNames[ii], tableColTypes[ii] );
+    queryStr += colStr;
+  }
+  queryStr += ")";
+
+  rc = execQuery(queryStr);
+  tab.clear();
+  return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+}
+*/
+
+// create a user-defined custom table to store auxiliary data, from vector<vector<variant>>
+bool GMDBManager::createCustomTable(const std::string tableName, const std::vector<std::string> tableColNames, const std::vector<std::string> tableColTypes, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> &records )
+{
+    if( tableColNames.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' names is empty!!");
+    if( tableColTypes.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' types is empty!!");
+
+  int rc = -1; // sqlite's return code
+  std::string queryStr;
+
+  std::vector<std::string> tab;
+
+  tab.push_back(tableName);
+  tab.push_back( "id" ); // this is the column to store the records' IDs
+  for( auto& colName : tableColNames )
+    tab.push_back( colName );
+
+  storeTableColumnNames(tab);
+
+  // prepare the dynamic query to create the custom table
+  queryStr = fmt::format( "create table {0} ( id integer primary key ", tab[0] );
+  for( int ii=0; ii<tableColNames.size(); ++ii) {
+      std::string colType = "";
+    
+    // -- Here we check the datum's type, which is more universal than using string-encoded types
+    // -- but this does not work if the first entry of a given column is empty.
+    // -- If so, the 'null' entry is taken as string, and the column is set as containing TEXT...
+    // convert std::variant types to SQLite data types (see SQLite documentation)
+    /*
+    if(      std::holds_alternative<int>(records[0][ii]) )         colType = "INTEGER";
+    else if( std::holds_alternative<long>(records[0][ii]) )        colType = "INTEGER";
+    else if( std::holds_alternative<float>(records[0][ii]) )       colType = "REAL";
+    else if( std::holds_alternative<double>(records[0][ii]) )      colType = "REAL";
+    else if( std::holds_alternative<std::string>(records[0][ii]) ) colType = "TEXT";
+    else throw std::runtime_error("No std::variant alternative has been found!\n"); 
+    */
+
+    if(tableColTypes[ii]      == "INT")    colType = "INTEGER";
+    else if(tableColTypes[ii] == "LONG")   colType = "INTEGER";
+    else if(tableColTypes[ii] == "FLOAT")  colType = "REAL";
+    else if(tableColTypes[ii] == "DOUBLE") colType = "REAL";
+    else if(tableColTypes[ii] == "STRING") colType = "TEXT";
+    else throw std::runtime_error("No suitable column type has been found ==> " + tableColTypes[ii] + "\n"); 
+
+    std::string colStr = fmt::format( ", {0} {1} ", tableColNames[ii], colType );
+    queryStr += colStr;
+  }
+  queryStr += ")";
+  std::cout << "- table definition: " << queryStr << std::endl;
+
+  rc = execQuery(queryStr);
+  tab.clear();
+  return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
+}
+
+
+
+
+
+
+
+
 
 
 bool GMDBManager::createTables()

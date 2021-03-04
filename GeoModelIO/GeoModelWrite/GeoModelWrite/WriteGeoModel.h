@@ -30,13 +30,17 @@
 #include "GeoModelKernel/GeoDefinitions.h" 
 
 // C++ includes
+#include <variant>
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 // FWD declarations
 class GeoPublisher;
 
+typedef std::unordered_map<std::string, std::pair<std::vector<std::string>, std::vector<std::string>>> AuxTableDefs;
+typedef std::unordered_map<std::string, std::vector<std::vector<std::variant<int,long,float,double,std::string>>>> AuxTableData;
 namespace GeoModelIO {
 
 /**
@@ -67,6 +71,9 @@ public:
 	virtual void handleSerialTransformer (const GeoSerialTransformer *obj);
 	virtual void handleTransform (const GeoTransform *);
 	virtual void handleNameTag (const GeoNameTag *);
+
+    //void storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::string>> tableData );
+    void storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData );
 
 	void saveToDB(GeoPublisher* store = nullptr);
     void saveToDB( std::vector<GeoPublisher*>& vecStores);
@@ -156,6 +163,8 @@ private:
   void storePublishedNodes(GeoPublisher* store);
   template <typename TT> void storeRecordPublishedNodes(const TT storeMap, std::vector<std::vector<std::string>>* cachePublishedNodes);
 
+  void storePublishedAuxiliaryData(GeoPublisher* store);
+
   std::string m_dbpath;
 	GMDBManager* m_dbManager;
 
@@ -195,6 +204,14 @@ private:
 	std::vector<std::vector<std::string>> m_childrenPositions;
 	std::vector<std::vector<std::string>> m_publishedAlignableTransforms_String;
 	std::vector<std::vector<std::string>> m_publishedFullPhysVols_String;
+
+    // cache to store custom tables to store auxiliary data in the DB: 
+    // ---> map( tableName, columnsNames, columnsTypes ) 
+    //std::unordered_map<std::string, std::pair<std::vector<std::string>, std::vector<std::string>>> m_auxiliaryTablesStr; 
+    AuxTableDefs m_auxiliaryTablesVar; 
+    //std::unordered_map<std::string, std::vector<std::vector<std::string>>> m_auxiliaryTablesStrData; 
+    AuxTableData m_auxiliaryTablesVarData; 
+
 
     // cache to store the node that could not have persistified. 
     // Usually, that means that persistification code has not been developed

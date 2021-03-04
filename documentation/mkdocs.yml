@@ -51,6 +51,7 @@ extra_css:
     - material_nested_lists_rendering.css
 
 markdown_extensions:
+    - smarty                # to use 'SmartyPants' typography extensions as '---' for em-dashes
     - admonition            # to use notes, warnings, tips, ...
     - footnotes             # to set footnotes
     - pymdownx.superfences  

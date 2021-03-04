@@ -21,6 +21,8 @@ Detailed descriptions of the geometry kernel classes follow.
 
 {% include 'components/kernel/reference/NameTags.md' %}
 
+{% include 'components/kernel/reference/Parametrization.md' %}
+
 
 
 

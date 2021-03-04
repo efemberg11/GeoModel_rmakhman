@@ -247,7 +247,7 @@ __attribute__ ((flatten))
     //
     // Now compose these and return a result:
     //
-    GeoTrf::Transform3D tRPowN;
+    GeoTrf::Transform3D tRPowN = GeoTrf::Transform3D::Identity();
     tRPowN.linear()=(V*DPowN*V.inverse()).real();
     return GeoTrf::Translation3D (translate) * tRPowN;
   }

@@ -126,7 +126,7 @@ namespace masscalc {
         double inclusiveMass;  //total inclusice mass of the geometry, that includes the real mass of the daughters volumes
         double exclusiveMass;  //total exclusive mass of the geometry, from which the mass of the daughters is subtracted
         double apparentWeight; //apparent weight in Air of the whole geometry
-        double inclusiveMassFiltered;  //total mass of the volumes with density > threshold
+        double exclusiveMassFiltered;  //total mass of the volumes with density > threshold
         double excludedMass;  //total mass of the volumes with density < threshold
 };
     
@@ -146,7 +146,7 @@ namespace masscalc {
      }
 
     void to_json(json& j, const finalMassReport& p) {
-       j = json{{"logicalVolumeName", p.logicalVolumeName}, {"material", p.material},  {"densityThreshold[g/cm3]", p.densityThreshold}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass}, {"apparentWeightInAir[kg]", p.apparentWeight}, {"inclusiveFilteredMass[kg]", p.inclusiveMassFiltered}, {"excludedFilteredMass[kg]", p.excludedMass}   };
+       j = json{{"logicalVolumeName", p.logicalVolumeName}, {"material", p.material},  {"densityThreshold[g/cm3]", p.densityThreshold}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass}, {"apparentWeightInAir[kg]", p.apparentWeight}, {"exclusiveFilteredMass[kg]", p.exclusiveMassFiltered}, {"excludedFilteredMass[kg]", p.excludedMass}   };
    }
    
    void from_json(const json& j, finalMassReport& p) {
@@ -157,7 +157,7 @@ namespace masscalc {
      p.inclusiveMass=j.at("inclusiveMass[kg]").get<double>();
      p.exclusiveMass=j.at("exclusiveMass[kg]").get<double>();
      p.apparentWeight=j.at("apparentWeightInAir[kg]").get<double>();
-     p.inclusiveMassFiltered=j.at("inclusiveFilteredMass[kg]").get<double>();
+     p.exclusiveMassFiltered=j.at("exclusiveFilteredMass[kg]").get<double>();
      p.excludedMass=j.at("excludedFilteredMass[kg]").get<double>();
      
     }
@@ -577,15 +577,15 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         std::cout<<"Total apparent weight in Air of the detector is ... "<<apparentWeightG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
         
         //Do the same calculation but with a filter on the density
-        double inclusiveFilteredMass=0.;
+        double exclusiveFilteredMass=0.;
         double excludedFilteredMass=0.;
-        iterateFromWorldMass(worldg4->GetLogicalVolume(),jlist, inclusiveFilteredMass, excludedFilteredMass, fPrefixLogicalVolume, fMaterial);
+        iterateFromWorldMass(worldg4->GetLogicalVolume(),jlist, exclusiveFilteredMass, excludedFilteredMass, fPrefixLogicalVolume, fMaterial);
         
-        finalMassReport.inclusiveMassFiltered = inclusiveFilteredMass/(CLHEP::kg);
+        finalMassReport.exclusiveMassFiltered = exclusiveFilteredMass/(CLHEP::kg);
         finalMassReport.excludedMass = excludedFilteredMass/(CLHEP::kg);
         
         std::cout<<"\n==== Filters by density ===="<<std::endl;
-        std::cout<<"Total inclusive mass for Geometry filtered by density ... "<<inclusiveFilteredMass / (CLHEP::kg) <<" [kg]."<<std::endl;
+        std::cout<<"Total exclusive mass for Geometry filtered by density ... "<<exclusiveFilteredMass / (CLHEP::kg) <<" [kg]."<<std::endl;
         std::cout<<"Total ignored mass cause below density threshold ... "<<excludedFilteredMass / (CLHEP::kg) <<" [kg]."<<std::endl;
         
 //        //This might be misleading, better to comment it out

@@ -21,7 +21,7 @@
 `GeoMaterial` is a class that describes a material, which is a list of elements. It is created “empty”; subsequently, elements are added one-by-one until the material is "locked". When the material is locked, no further editing is possible, and a series of derived quantities (radiation length, interaction length, etc.) is computed for the material.
 
 
-`GeoMaterial (const std::string & Name, double Density) const` Constructs the material with a name and a density[^n1]
+`GeoMaterial (const std::string & Name, double Density) const` Constructs the material with a name and a density[^gmat1]
 
 
 `void add (GeoElement * element, double fraction = 1.0)`  Adds an element to the material, with a specified mass fraction.
@@ -32,7 +32,7 @@
 
 `std::string getName () const` Accesses the name of the material.
 
-`double getDensity () const` Returns the density of the material[^n1].
+`double getDensity () const` Returns the density of the material[^gmat1].
 
 `unsigned int getID() const`  Returns the id of the material.  The id is generated automatically by counting instances of materials.
 
@@ -63,4 +63,6 @@ double getDeDxMin () const  Returns an approximation for the ionization of a min
 
 
 
-[^n1] The density is normally specified using CLHEP units.  The native unit of mass is the MeV, the native unit for length is the mm.  A material with a density of 1 g/cm3 has a density of 1.7 x 10-22, in these units.  
+[^gmat1]: The density is normally specified using `GeoModel` units, ported from CLHEP[^gmat2].  The native unit of mass is the MeV, the native unit for length is the mm.  A material with a density of 1 g/cm3 has a density of 1.7 x 10-22, in these units.  
+
+[^gmat2]: CLHEP - A Class Library for High Energy Physics,  <https://proj-clhep.web.cern.ch/proj-clhep/>

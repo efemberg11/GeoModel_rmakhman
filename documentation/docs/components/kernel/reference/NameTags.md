@@ -22,7 +22,7 @@ The generation of names using `GeoNameTag` and `GeoSerialDenominator` applies al
 
 In many cases it is useful to assign an identifier, or "serial number", to physical volumes.  One use case is to enable a simulation engine such as GEANT4[^NT1] to make a correspondence between a piece of geometry designated as sensitive, and the readout element corresponding to that piece.  For such cases, we provide a `GeoIdentifierTag`, similar to a `GeoNameTag`.  It provides a way of labeling physical volumes with an unsigned int.   `GeoIdentifierTag` tags, however, apply only to the physical volume that immediately follows the tag in the geometry graph.  Its interface follows:
 
-[^NT1]: https://geant4.web.cern.ch/
+[^NT1]: <https://geant4.web.cern.ch/>
 
 
 {!components/kernel/reference/RCBase/GeoGraphNode/GeoIdentifierTag.md!}

@@ -44,7 +44,7 @@ void volumeHandler::ElementHandle()
                     			if (!sH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
                     			else shape=sH->getSolid();
                 		}
-                		else if (nH=="physvol") {
+                        else if (nH=="physvol") {
                     			physvolHandler* pH=dynamic_cast<physvolHandler*>(h);
                     			if (!pH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
                     			else
@@ -53,18 +53,23 @@ void volumeHandler::ElementHandle()
                         			tempTransform.push_back(pH->getTransform());
                     			}
                 		}
-				else if (nH=="replicavol") {
-					replicaHandler* rH=dynamic_cast<replicaHandler*>(h);
-					if (!rH) std::cout<<" something is wrong! can not retrieve replicaHandler!!!"<<std::endl;
-					else
-					{
-						std::cout<<" from replicaHandler: nCopies="<<rH->getNCopies()<<std::endl;
-					}
-				}
-                		else std::cout<<" handler name not defined "<<nH<<std::endl;
-            		}
+				        else if (nH=="replicavol") {
+					        replicaHandler* rH=dynamic_cast<replicaHandler*>(h);
+					        if (!rH) std::cout<<" something is wrong! can not retrieve replicaHandler!!!"<<std::endl;
+					        else
+					        {
+						        std::cout<<" from replicaHandler: nCopies="<<rH->getNCopies()<<std::endl;
+						        for (int i=0;i<rH->getNCopies();i++)
+						        {
+						            tempPhys.push_back(rH->getPhysicalVolume());
+                                    tempTransform.push_back(rH->getTransform(i));
+						        }
+					        }
+				        }
+                        else std::cout<<" handler name not defined "<<nH<<std::endl;
+            }
             
-        	} //else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
+        } //else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
 	}
 	//std::cout << "Creating logical volume "<<name<<" shape "<<shape<<" mat "<<material<<std::endl;
 	GeoLogVol* tempLV=new GeoLogVol(name,shape,material);

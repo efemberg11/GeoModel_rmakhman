@@ -21,30 +21,30 @@
 `GeoMaterial` is a class that describes a material, which is a list of elements. It is created “empty”; subsequently, elements are added one-by-one until the material is "locked". When the material is locked, no further editing is possible, and a series of derived quantities (radiation length, interaction length, etc.) is computed for the material.
 
 
-`GeoMaterial (const std::string & Name, double Density) const` Constructs the material with a name and a density[^gmat1]
+The construvctor, `GeoMaterial(const std::string & Name, double Density)` Constructs the material with a name and a density[^gmat1].
 
 
-`void add (GeoElement * element, double fraction = 1.0)`  Adds an element to the material, with a specified mass fraction.
+The method `add(GeoElement * element, double fraction = 1.0)` adds an element to the material, with a specified mass fraction.
 
-`void add (GeoMaterial * material, double fraction)`  Adds a material to the material, with a specified mass fraction.  This is useful for combining precombined materials, such as argon + ethane.
+The method `add(GeoMaterial * material, double fraction)` adds a material to the material, with a specified mass fraction.  This is useful for combining precombined materials, such as argon + ethane.
 
-`void lock ()` Locks the material against further editing, and computes all derived quanties such as radiation length and interaction length.
+The method `lock()` Locks the material against further editing, and computes all derived quanties such as radiation length and interaction length.
 
-`std::string getName () const` Accesses the name of the material.
+The method `getName()` returns the name of the material as a string.
 
-`double getDensity () const` Returns the density of the material[^gmat1].
+The method `getDensity()` returns the density of the material[^gmat1].
 
-`unsigned int getID() const`  Returns the id of the material.  The id is generated automatically by counting instances of materials.
+The method `getID()` returns the *id* of the material as an integere.  The *id* is generated automatically by counting instances of materials.
 
-`unsigned int getNumElements () const`  Returns the number of elements in a material.
+The method `getNumElements()`  returns the number of elements in a material.
 
-`const GeoElement * getElement (unsigned int i) const` Returns a pointer to the ith element.
+The method `getElement(i)` returns a pointer to the $i^{th}$ element.
 
-`double getFraction (int i) const` Returns the fraction of the ith element.
+The method `getFraction(i)` returns the fraction of the $i^{th}$ element.
 
-`double getRadLength () const`  Returns the radiation length of the material, computed from the density, the list of constituents, and their properties.
+The method `getRadLength()` returns the radiation length of the material, computed from the density, the list of constituents, and their properties.
 
-`double getIntLength () const` Returns the interaction length of the material, computed from the density the list of constituents, and their properties.
+The method `getIntLength()` returns the interaction length of the material, computed from the density the list of constituents, and their properties.
 
 The following methods refer to ionization energy loss, specifically, the following formulation:
 
@@ -54,11 +54,11 @@ $$
 $$
 
 
-`double getDeDxConstant () const`  Returns the constant, $K$, which depends upon the material properties (mostly the density).
+The method `getDeDxConstant()` returns the constant, $K$, which depends upon the material properties (mostly the density).
 
-`double getDeDxI0 () const`  Returns the effective ionization potential $I_0$, which is a property of the material.
+While the method `getDeDxI0()` returns the effective ionization potential $I_0$, which is a property of the material.
 
-double getDeDxMin () const  Returns an approximation for the ionization of a minimum ionizing particle ($\beta\gamma=3.4$), given by: $K \times 11.528$.
+The method `getDeDxMin()` returns an approximation for the ionization of a minimum ionizing particle ($\beta\gamma=3.4$), given by: $K \times 11.528$.
 
 
 

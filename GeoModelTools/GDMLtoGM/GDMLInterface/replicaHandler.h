@@ -16,14 +16,14 @@ public:
 
 	replicaHandler(std::string n, GDMLController* c);
 	void ElementHandle();
-	GeoPhysVol* getPhysicalVolume(int);
+	GeoPhysVol* getPhysicalVolume();
 	GeoTransform* getTransform(int);
 	int getNCopies();
 	void postLoopHandling();
 private:
 	std::string name;
 	int nCopies=0;
-	std::vector<GeoPhysVol*> thePhysicalVolumes;
+	GeoPhysVol* thePhysicalVolume;
 	std::vector<GeoTransform*> transforms;
 };
 

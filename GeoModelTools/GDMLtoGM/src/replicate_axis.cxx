@@ -26,40 +26,38 @@ void replicate_axisHandler::ElementHandle() {
 		{
 			XercesParser::elementLoop(child);
 			XMLHandler *h=theController->XMLStore()->GetHandler(child);
-                	if(h){
-                    		std::string nH=h->GetName();
-                    		//std::cout<<" handler name "<<nH<<std::endl;
-                    		if (nH=="direction") {
-                        		directionHandler* dH=dynamic_cast<directionHandler*>(h);
-                        		if (!dH) std::cout<<" something is wrong! can not retrieve directionHandler!!!"<<std::endl;
-                        		else ;
-                   		 }
-                    		else if (nH=="width") 
-				{
-                        		widthHandler* wH=dynamic_cast<widthHandler*>(h);
-                        		if (!wH) std::cout<<" something is wrong! can not retrieve widthHandler!!!"<<std::endl;
-                        		else 
-					{
-                            			;
-                        		}
-					
-                    		}
-                    		else if (nH=="offset") 
-				{
-                        		offsetHandler* oH=dynamic_cast<offsetHandler*>(h);
-                        		if (!oH) std::cout<<" something is wrong! can not retrieve offsetHandler!!!"<<std::endl;
-                        		else 
-					{
-                            			;
-                        		}
-                    		}
-                    		else std::cout<<" Name of the handler not defined "<<nH<<std::endl;
-                	}
-                	else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
-                
-            	}
-			
-	}
+            if(h){
+                std::string nH=h->GetName();
+                //std::cout<<" handler name "<<nH<<std::endl;
+                if (nH=="direction") {
+                    directionHandler* dH=dynamic_cast<directionHandler*>(h);
+                    if (!dH) std::cout<<" something is wrong! can not retrieve directionHandler!!!"<<std::endl;
+                    else parameters.a=dH->getAxis();
+                }
+                else if (nH=="width")
+                {
+                    widthHandler* wH=dynamic_cast<widthHandler*>(h);
+                    if (!wH) std::cout<<" something is wrong! can not retrieve widthHandler!!!"<<std::endl;
+                    else
+                    {
+                        parameters.w=wH->getWidth();
+                    }
+			    }
+                else if (nH=="offset")
+                {
+                    offsetHandler* oH=dynamic_cast<offsetHandler*>(h);
+                    if (!oH) std::cout<<" something is wrong! can not retrieve offsetHandler!!!"<<std::endl;
+                    else
+                    {
+                        parameters.o=oH->getOffset();
+                    }
+                }
+                else std::cout<<" Name of the handler not defined "<<nH<<std::endl;
+            }
+            else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
 
+        }
+    }
+    std::cout << " this is the handle : "<<parameters.w<<" "<<parameters.o<< std::endl;
 }
 

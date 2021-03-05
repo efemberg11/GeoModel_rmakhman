@@ -10,7 +10,6 @@ class eltubeHandler:public GDMLHandler {
 public:
 	eltubeHandler(std::string, GDMLController*);
 	void ElementHandle();
-
 };
 
 

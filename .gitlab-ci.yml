@@ -467,7 +467,7 @@ docs-build:
         - pip install markdown
         - pip install mkdocs-material
         - pip install markdown-include
-        - pip install mkdocs-macros-plugin
+        - pip install 'mkdocs-macros-plugin==0.5.0'
         - pip install mkdocs-mermaid2-plugin # adds support for mermaid diagrams / flowcharts
         #- pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
     script:

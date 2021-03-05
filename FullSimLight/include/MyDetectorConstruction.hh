@@ -15,6 +15,11 @@
 //G4AnalysisMananager
 #include "MyAnalysis.hh"
 
+// Units
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
+// ****
+
 
 using json = nlohmann::json;
 
@@ -79,7 +84,7 @@ public:
   // 'volume', populating the fTree vector of G4VPhysicalVolumes
   bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
     
-  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, bool writeRep);
+  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep);
     
   void iterateFromWorldMass(G4LogicalVolume* envelope, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix="", G4String material="");
   
@@ -96,6 +101,7 @@ protected:
 private:
   // this static member is for the print out
   static G4double gFieldValue;
+  const G4double fDensityThreshold = 0.02 * SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3;
   G4int    fHistoID; //density histogram ID
   G4bool   fRunOverlapCheck;
   G4bool   fRunMassCalculator;

@@ -61,12 +61,6 @@
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 
-
-// Units
-#include "GeoModelKernel/Units.h"
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
-// ****
-
 #include "MagFieldServices/AtlasFieldSvc.h"
 #include "StandardFieldSvc.h"
 
@@ -119,11 +113,25 @@ namespace masscalc {
         std::string volumeEntityType;
         double inclusiveMass;  //mass of the volume, that includes the real mass of the daughters volumes
         double exclusiveMass;  //mass of the volume, from which the mass of the daughters is subtracted
-        double apparentWeight; //apparent weight in Air of the whole geometry
     };
+
+    // a simple struct to model a mass calculation report
+    struct finalMassReport {
+        std::string logicalVolumeName;
+        //std::string physicalVolumeName;
+        //int         volumeCopyNo;
+        std::string material;
+        double densityThreshold;
+        std::string volumeEntityType;
+        double inclusiveMass;  //total inclusice mass of the geometry, that includes the real mass of the daughters volumes
+        double exclusiveMass;  //total exclusive mass of the geometry, from which the mass of the daughters is subtracted
+        double apparentWeight; //apparent weight in Air of the whole geometry
+        double inclusiveMassFiltered;  //total mass of the volumes with density > threshold
+        double excludedMass;  //total mass of the volumes with density < threshold
+};
     
     void to_json(json& j, const massReport& p) {
-        j = json{{"logicalVolumeName", p.logicalVolumeName}, json{"physicalVolumeName", p.physicalVolumeName}, {"volumeCopyNo", p.volumeCopyNo}, {"material", p.material}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass}, {"apparentWeightInAir[kg]", p.apparentWeight}  };
+        j = json{{"logicalVolumeName", p.logicalVolumeName}, json{"physicalVolumeName", p.physicalVolumeName}, {"volumeCopyNo", p.volumeCopyNo}, {"material", p.material}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass} };
     }
     
     void from_json(const json& j, massReport& p) {
@@ -134,9 +142,25 @@ namespace masscalc {
       p.volumeEntityType=j.at("volumeEntityType").get<std::string>();
       p.inclusiveMass=j.at("inclusiveMass[kg]").get<double>();
       p.exclusiveMass=j.at("exclusiveMass[kg]").get<double>();
-      p.apparentWeight=j.at("apparentWeightInAir[kg]").get<double>();
       
      }
+
+    void to_json(json& j, const finalMassReport& p) {
+       j = json{{"logicalVolumeName", p.logicalVolumeName}, {"material", p.material},  {"densityThreshold[g/cm3]", p.densityThreshold}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass}, {"apparentWeightInAir[kg]", p.apparentWeight}, {"inclusiveFilteredMass[kg]", p.inclusiveMassFiltered}, {"excludedFilteredMass[kg]", p.excludedMass}   };
+   }
+   
+   void from_json(const json& j, finalMassReport& p) {
+     p.logicalVolumeName=j.at("logicalVolumeName").get<std::string>();
+     p.material=j.at("material").get<std::string>();
+     p.densityThreshold=j.at("densityThreshold[g/cm3]").get<double>();
+     p.volumeEntityType=j.at("volumeEntityType").get<std::string>();
+     p.inclusiveMass=j.at("inclusiveMass[kg]").get<double>();
+     p.exclusiveMass=j.at("exclusiveMass[kg]").get<double>();
+     p.apparentWeight=j.at("apparentWeightInAir[kg]").get<double>();
+     p.inclusiveMassFiltered=j.at("inclusiveFilteredMass[kg]").get<double>();
+     p.excludedMass=j.at("excludedFilteredMass[kg]").get<double>();
+     
+    }
 } // namespace masscalc
 
 
@@ -210,6 +234,7 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
   fMinStep             = 1.0e-2;
   fField.Put(0);
   fOutputGDMLFileName = "geometry.gdml";
+
 }
 
 MyDetectorConstruction::~MyDetectorConstruction()
@@ -217,10 +242,9 @@ MyDetectorConstruction::~MyDetectorConstruction()
   delete fDetectorMessenger;
 }
 
-void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, bool writeRep){
+void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep){
     
     double tmpInclusive,tmpExclusive;
-    
     
     //By setting the 'propagate' boolean flag - the second one -  to 'false' the
     //       method returns the mass of the present logical volume only
@@ -229,7 +253,9 @@ void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalV
     tmpInclusive = logVol->GetMass(true, true);  //real mass of the LV, inclusive of the masses of the daughters
     tmpExclusive = logVol->GetMass(true, false); //mass of the LV substracted for the volume occupied by the daughters
     
-    inclusiveMass+= tmpInclusive;
+    //if the method is called iteratively, the only mass cumulative mass that makes sense
+    //to retrieve is the sum of the exclusive masses of all the volumes
+    //satisfying the filters criteria
     exclusiveMass+= tmpExclusive;
     
     if(writeRep){
@@ -243,8 +269,6 @@ void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalV
         singleMassReport.volumeEntityType=logVol->GetSolid()->GetEntityType();
         singleMassReport.inclusiveMass = tmpInclusive/(CLHEP::kg);
         singleMassReport.exclusiveMass = tmpExclusive/(CLHEP::kg);
-        singleMassReport.apparentWeight = -999;
-        //std::cout<<"-----> DaughterLV inclusive mass is: "<<singleMassReport.inclusiveMass<<" [kg]"<<std::endl;
     
         //write the singleMassReport in the json file
         to_json(jSingleMassReport, singleMassReport);
@@ -269,43 +293,48 @@ void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, st
         density=daughterLV->GetMaterial()->GetDensity();
         fAnalysisManager->FillH1(fHistoID, density/(SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3), 1);
         
-        //look only for the logVol
+        //1. look only for the logVol
         if(prefix!="" && material==""){
             if (daughterLV->GetName().contains(prefix) || daughterPV->GetName().contains(prefix)){
                 //std::cout<<"Found the LV "<<prefix<<" and its full name is "<<daughterLV->GetName()<<std::endl;
                 //std::cout<<"Found the Daughter "<<prefix<<" and its full name is "<<daughterPV->GetName()<<std::endl;
-                calculateMass(daughterLV, daughterPV, jlist, inclusiveMass, exclusiveMass, true );
+                calculateMass(daughterLV, daughterPV, jlist, exclusiveMass, true );
             }
             
         }
-        //look only for the material
+        //2. look only for the material
         else if(prefix=="" && material!=""){
 //            std::cout<<"Looking for a specific material: "<<material<<std::endl;
 //            std::cout<<"daughterLV->GetMaterial()->GetName(): "<<daughterLV->GetMaterial()->GetName()<<std::endl;
             if (daughterLV->GetMaterial()->GetName().contains(material)){
-                calculateMass(daughterLV, daughterPV, jlist, inclusiveMass, exclusiveMass, true );
+                calculateMass(daughterLV, daughterPV, jlist, exclusiveMass, true );
             }
             
         }
-        //look for both
+        //3. look for both
         else if(prefix!="" && material!=""){
             if ((daughterLV->GetName().contains(prefix) || daughterPV->GetName().contains(prefix)) && daughterLV->GetMaterial()->GetName().contains(material)){
-                calculateMass(daughterLV, daughterPV, jlist, inclusiveMass, exclusiveMass, true );
+                calculateMass(daughterLV, daughterPV, jlist, exclusiveMass, true );
             }
             
         }
-        //loop on the whole geometry tree, filtering w.r.t density of the material
-//        else {
-//            std::cout<<"CASE 4, daughterLV->GetName(): "<<daughterLV->GetName()<<" daughterPV->GetName(): "<<daughterPV->GetName()<<std::endl;
-//            std::cout<<"Material is: "<<daughterLV->GetMaterial()->GetName()<<std::endl;
-//            std::cout<<"Density is: "<<density/(SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3)<<" [g/cm3]"<<std::endl;
-//            std::cout<<"Density "<<density<<std::endl;
-//            std::cout<<"0.02*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3 is: "<<0.02*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3<<std::endl;
-//            if (density > 0.02*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3){
-//                calculateMass(daughterLV, daughterPV, jlist, inclusiveMass, exclusiveMass, false );}
-//            else std::cout<<"Ignoring the volume, not dense enough"<<std::endl;
-//            exit(-1);
-//        }
+        //4. loop on the whole geometry tree, filtering w.r.t density of the material
+        else
+        {
+            //Calculate the mass of volumes that are above a certain density threshold
+            if (density > fDensityThreshold)
+            {
+                //sum of the exclusive masses of all the volumes that have density > threshold
+                inclusiveMass+=daughterLV->GetMass(true, false);
+               
+            }
+            else
+            {
+                //Sum of the ignored mass
+                exclusiveMass+=daughterLV->GetMass(true, false);
+            }
+            
+        }
         if (daughterLV->GetNoDaughters()>0){
                 iterateFromWorldMass(daughterLV, jlist, inclusiveMass, exclusiveMass,  prefix, material);
         }
@@ -422,7 +451,7 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool s
     return globalPoint;
 }
 
-void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoPhysVol* worldgeoModel, std::vector<json>& jlist){
+void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoPhysVol* /*worldgeoModel*/, std::vector<json>& jlist){
     
     masscalc::massReport singleMassReport;
     json jSingleMassReport;
@@ -432,16 +461,19 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     G4LogicalVolume *daughterLV;
     G4double cubicVolumeWorld, globalDensityWorld, globalMassWorld;
     
+    //Instance of the G4AnalysisManager used to fill the density_histogram
     fAnalysisManager = G4AnalysisManager::Instance();
     if (!fAnalysisManager->OpenFile("density_histogram")){
         G4cout<<"RecursiveMassCalculation ERROR: File cannot be opened!"<<G4endl;
         exit(-1);
     } else
         G4cout<<"\n...output File density_histogram opened!"<<G4endl;
+    
     fHistoID = fAnalysisManager->CreateH1("density", "density", 300, 10e-3, 30, "none", "none", "log");
     fAnalysisManager->SetH1Ascii(fHistoID,true);  // misi: always ascii
     fAnalysisManager->SetH1XAxisTitle(fHistoID, "density [g/cm3]]");
     
+    //Debug information about World volume, Name, Material, Solid name of the LV, density and cubic volume
     std::cout<<"Checking World volume "<<std::endl;
     std::cout<<"-----> World Name is: "<<worldg4->GetName()<<std::endl;
     std::cout<<"-----> WorldLV Name is: "<<worldg4->GetLogicalVolume()->GetName()<< " it has  "<<localNoDaughters<<" daughters."<<std::endl;
@@ -453,21 +485,24 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     globalDensityWorld = worldg4->GetLogicalVolume()->GetMaterial()->GetDensity();
     std::cout<<"-----> World Solid density is: "<<globalDensityWorld/ (CLHEP::g / CLHEP::cm3)<<" [g/cm3]"<<std::endl;
     std::cout<<"-----> World Solid density is: "<<globalDensityWorld/ (CLHEP::kg / CLHEP::m3)<<" [kg/m3]"<<std::endl;
-    std::cout<<"-----> Minimum density is: "<<0/ (CLHEP::g / CLHEP::cm3)<<" [g/cm3]"<<std::endl;
-    std::cout<<"-----> Maximum density is: "<<30<<" [g/cm3]"<<std::endl;
+//    std::cout<<"-----> Minimum density is: "<<0/ (CLHEP::g / CLHEP::cm3)<<" [g/cm3]"<<std::endl;
+//    std::cout<<"-----> Maximum density is: "<<30<<" [g/cm3]"<<std::endl;
     globalMassWorld = globalDensityWorld * cubicVolumeWorld;
     std::cout<<"-----> World mass is: "<< globalMassWorld / (CLHEP::kg) <<" [Kg]"<<std::endl;
     std::cout<<"\n *** --------------- ***\n"<<std::endl;
     
     double inclusiveMassG4 = 0., exclusiveMassG4=0., apparentWeightG4=0.;
-    double inclusiveMassGeoModel = 0., exclusiveMassGeoModel = 0.;
+    double totalInclusiveMassG4 = 0., totalExclusiveMassG4 =0.;
+    //double inclusiveMassGeoModel = 0., exclusiveMassGeoModel = 0.;
     
+    
+    //CASE 1: DEFAULT BEHAVIOUR
     //No filter is applied -- calculate the inclusiveMass, exclusiveMass and apparentWeigth of the whole geometry
     //For the inclusive and exclusive mass calculation uses a filter on the density of the material
     //Ignoring the materials for which density is < 0.02 g/cm3 (density of the less dense solid - aerogel)
     if(fPrefixLogicalVolume=="" && fMaterial=="")
     {
-        
+        //Loop over the daughters of the worls volume - Tree top daughters - only
         for (int n=0; n<localNoDaughters; n++)
         {
             daughter=worldg4->GetLogicalVolume()->GetDaughter(n);
@@ -482,62 +517,96 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
             G4double globalDensity = daughterLV->GetMaterial()->GetDensity();
             std::cout<<"---> DaughterLV Solid density is: "<<globalDensity/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
             
-            if (!fGeometryFileName.contains(".gdml")){
-                const PVConstLink mypv = worldgeoModel->getChildVol(n);
-                inclusiveMassGeoModel+= inclusiveMass(mypv); //real mass of the whole volume, including the real masses of the daughters
-                exclusiveMassGeoModel+= exclusiveMass(mypv); //mass of the whole volume, as it would not have daughters
-
-            }
+//            //GeoModel mass calculation invoked only if the geometry is not in GDML format
+//            //NB exclusive mass concept in GeoModel is different than the Geant4 one
+//            //So do not expect that the exclusive masses of the 2 calculations are the same
+//            if (!fGeometryFileName.contains(".gdml")){
+//                const PVConstLink mypv = worldgeoModel->getChildVol(n);
+//                inclusiveMassGeoModel+= inclusiveMass(mypv); //real mass of the whole volume, including the real masses of the daughters
+//                //exclusiveMassGeoModel+= exclusiveMass(mypv); //mass of the whole volume, as it would not have daughters
+//
+//            }
             
             //Here is already excluding the world volume from the calculation,
             //Being it made by AIR by default
-            calculateMass(daughterLV, daughter, jlist, inclusiveMassG4, exclusiveMassG4, true);
+            //calculateMass of each daughter and since the last flag is true, write out results in the json file
+            //I call this only once -- no iteration
+            //calculateMass(daughterLV, daughter, jlist, inclusiveMassG4, exclusiveMassG4, true);
             
+            inclusiveMassG4 = daughterLV->GetMass(true, true);  //real mass of the LV, inclusive of the masses of the daughters
+            exclusiveMassG4 = daughterLV->GetMass(true, false); //mass of the LV substracted for the volume occupied by the daughters
+            totalInclusiveMassG4+=inclusiveMassG4;
+            totalExclusiveMassG4+=exclusiveMassG4;
+            
+            //fill the singleMassReport struct
+            singleMassReport.logicalVolumeName=daughterLV->GetName();
+            singleMassReport.physicalVolumeName=daughter->GetName();
+            singleMassReport.volumeCopyNo =daughter->GetCopyNo();
+            singleMassReport.material =daughterLV->GetMaterial()->GetName();
+            singleMassReport.volumeEntityType=daughterLV->GetSolid()->GetEntityType();
+            singleMassReport.inclusiveMass = inclusiveMassG4/(CLHEP::kg);
+            singleMassReport.exclusiveMass = exclusiveMassG4/(CLHEP::kg);
+            //std::cout<<"-----> DaughterLV inclusive mass is: "<<singleMassReport.inclusiveMass<<" [kg]"<<std::endl;
+            
+            //write the singleMassReport in the json file
+            to_json(jSingleMassReport, singleMassReport);
+            // write prettified JSON to another file
+            jlist.push_back(jSingleMassReport);
+        
         }
-        double exclusiveWorld = worldg4->GetLogicalVolume()->GetMass(true, false); //mass of the LV substracted for the volume occupied by the daughters
-        //apparentWeightG4 = inclusiveMassG4 - globalMassWorld;
-        apparentWeightG4 = exclusiveWorld + inclusiveMassG4 - globalMassWorld; //exclusiveWorld + inclusiveMassG4 = inclusive weight of the world
+        
+        //Calculate the apparentWeight for the whole geometry
+        //mass of the LV substracted for the volume occupied by the daughters
+        double exclusiveWorld = worldg4->GetLogicalVolume()->GetMass(true, false);
+        apparentWeightG4 = exclusiveWorld + totalInclusiveMassG4 - globalMassWorld;
+        
+        masscalc::finalMassReport finalMassReport;
+        json jsonFinalMassReport;
         //fill the finalMassReport struct
-        singleMassReport.logicalVolumeName="Total Geometry";
-        singleMassReport.physicalVolumeName=worldg4->GetName();
-        singleMassReport.volumeCopyNo =worldg4->GetCopyNo();
-        singleMassReport.material =worldg4->GetLogicalVolume()->GetMaterial()->GetName();
-        singleMassReport.volumeEntityType="World Volume";
-        singleMassReport.inclusiveMass = inclusiveMassG4/(CLHEP::kg);
-        singleMassReport.exclusiveMass = exclusiveMassG4/(CLHEP::kg);
-        singleMassReport.apparentWeight = apparentWeightG4/(CLHEP::kg);
+        finalMassReport.logicalVolumeName = worldg4->GetLogicalVolume()->GetName();
+        finalMassReport.densityThreshold = 0.02;
+        finalMassReport.material = worldg4->GetLogicalVolume()->GetMaterial()->GetName();
+        finalMassReport.volumeEntityType="World Volume";
+        finalMassReport.inclusiveMass = totalInclusiveMassG4/(CLHEP::kg);
+        finalMassReport.exclusiveMass = totalExclusiveMassG4/(CLHEP::kg);
+        finalMassReport.apparentWeight = apparentWeightG4/(CLHEP::kg);
         
-//        //write the finalMassReport in the json file
-//        to_json(jSingleMassReport, singleMassReport);
-//        // write prettified JSON to another file
-//        jlist.push_back(jSingleMassReport);
-        
-        std::cout<<"\nTotal inclusive mass of the detector is ... "<<inclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
-        std::cout<<"Total exclusive mass of the detector is ... "<<exclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
+        std::cout<<"\n=== Calculated total masses ==="<<std::endl;
+        std::cout<<"Total inclusive mass of the detector is ... "<<totalInclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
+        std::cout<<"Total exclusive mass of the detector is ... "<<totalExclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
         std::cout<<"Total apparent weight in Air of the detector is ... "<<apparentWeightG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
         
-        //This might be misleading, better to comment it out
-        if (!fGeometryFileName.contains(".gdml")){
-            std::cout<<"\nGeoModel: Total inclusive mass of the detector is ... "<<inclusiveMassGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
-            std::cout<<"GeoModel: Total exclusive mass of the detector is ... "<<exclusiveMassGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
-        }
+        //Do the same calculation but with a filter on the density
+        double inclusiveFilteredMass=0.;
+        double excludedFilteredMass=0.;
+        iterateFromWorldMass(worldg4->GetLogicalVolume(),jlist, inclusiveFilteredMass, excludedFilteredMass, fPrefixLogicalVolume, fMaterial);
         
-        //do the same calculation but with a filter on the density
-//        inclusiveMassG4=0.;
-//        exclusiveMassG4=0.;
-//        iterateFromWorldMass(worldg4->GetLogicalVolume(),jlist, inclusiveMassG4, exclusiveMassG4, fPrefixLogicalVolume, fMaterial);
+        finalMassReport.inclusiveMassFiltered = inclusiveFilteredMass/(CLHEP::kg);
+        finalMassReport.excludedMass = excludedFilteredMass/(CLHEP::kg);
+        
+        std::cout<<"\n==== Filters by density ===="<<std::endl;
+        std::cout<<"Total inclusive mass for Geometry filtered by density ... "<<inclusiveFilteredMass / (CLHEP::kg) <<" [kg]."<<std::endl;
+        std::cout<<"Total ignored mass cause below density threshold ... "<<excludedFilteredMass / (CLHEP::kg) <<" [kg]."<<std::endl;
+        
+//        //This might be misleading, better to comment it out
+//        if (!fGeometryFileName.contains(".gdml")){
+//            std::cout<<"\nGeoModel: Total inclusive mass of the detector is ... "<<inclusiveMassGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
+//            std::cout<<"GeoModel: Total exclusive mass of the detector is ... "<<exclusiveMassGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
+//        }
 //
-//        //fill the finalMassReport struct
-//        singleMassReport.logicalVolumeName = fPrefixLogicalVolume;
-//        //singleMassReport.physicalVolumeName = fPrefixLogicalVolume;
-//        singleMassReport.volumeCopyNo = worldg4->GetCopyNo();
-//        singleMassReport.material = fMaterial;
-//        singleMassReport.volumeEntityType="Total Geometry filtered by density";
-//        singleMassReport.inclusiveMass = inclusiveMassG4/(CLHEP::kg);
-//        singleMassReport.exclusiveMass = exclusiveMassG4/(CLHEP::kg);
-//        singleMassReport.apparentWeight = -999;
+        //write the finalMassReport in the json file
+        to_json(jsonFinalMassReport, finalMassReport);
+        // write prettified JSON to another file
+        jlist.push_back(jsonFinalMassReport);
         
-    } else {
+        
+    }
+    //CASE 2: One of the 2 filters or both are used
+    // Iterate on the whole geometry tree, looking for the logical volumes that correspond to the
+    // filter research and for those calculate the inclusive and exclusive masses, and write the
+    // corresponding filled struct in the json file
+    else
+    {
         iterateFromWorldMass(worldg4->GetLogicalVolume(),jlist, inclusiveMassG4, exclusiveMassG4, fPrefixLogicalVolume, fMaterial);
         
         //fill the finalMassReport struct
@@ -545,20 +614,22 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         //singleMassReport.physicalVolumeName = fPrefixLogicalVolume;
         singleMassReport.volumeCopyNo = worldg4->GetCopyNo();
         singleMassReport.material = fMaterial;
-        singleMassReport.volumeEntityType="Total for requested Geometry";
-        singleMassReport.inclusiveMass = inclusiveMassG4/(CLHEP::kg);
+        singleMassReport.volumeEntityType="Total for filtered Geometry";
+        singleMassReport.inclusiveMass = -999; //inclusiveMassG4/(CLHEP::kg);
         singleMassReport.exclusiveMass = exclusiveMassG4/(CLHEP::kg);
-        singleMassReport.apparentWeight = -999;
+
+        
+        //std::cout<<"\nTotal inclusive mass for the requested Geometry is ... "<<inclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
+        std::cout<<"Total exclusive mass for the filtered Geometry is ... "<<exclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
+        
+        
+        //write the finalMassReport in the json file
+        to_json(jSingleMassReport, singleMassReport);
+        // write prettified JSON to another file
+        jlist.push_back(jSingleMassReport);
     }
     
-    //write the finalMassReport in the json file
-    to_json(jSingleMassReport, singleMassReport);
-    // write prettified JSON to another file
-    jlist.push_back(jSingleMassReport);
-    
-    std::cout<<"\nGeant4: Total inclusive mass for the requested Geometry is ... "<<inclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
-    std::cout<<"Geant4: Total exclusive mass for the requested Geometry is ... "<<exclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
-    
+
     fAnalysisManager->Write();
     fAnalysisManager->CloseFile();
     

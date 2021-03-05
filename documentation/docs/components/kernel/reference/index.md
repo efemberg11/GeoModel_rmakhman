@@ -23,6 +23,7 @@ Detailed descriptions of the geometry kernel classes follow.
 
 {% include 'components/kernel/reference/Parametrization.md' %}
 
+{% include 'components/kernel/reference/Actions.md' %}
 
 
 

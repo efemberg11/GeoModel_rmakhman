@@ -41,9 +41,9 @@ nav:
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
         - 'Contributing to the Documentation': 'dev/docs-contrib.md'
         - 'Dev FAQ': 'dev/dev-faq.md'
-    - Papers & Presentations:
-        - 'Public': 'papers/public.md'
-        - 'Internal': 'papers/internal.md'
+    - Papers & Presentations: 'papers.md'
+      #   - 'Public': 'papers/public.md'
+      #  - 'Internal': 'papers/internal.md'
     - Team & History: 'about/team.md'
     - Contacts: 'about/contacts.md'
 

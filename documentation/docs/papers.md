@@ -1,4 +1,4 @@
-# The GeoModel Toolkit - Public Papers and Notes
+# The GeoModel Toolkit - Papers and Notes
 
 
 

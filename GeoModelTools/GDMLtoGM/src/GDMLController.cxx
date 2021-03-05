@@ -237,6 +237,7 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 #include "GDMLInterface/temperatureHandler.h"
 #include "GDMLInterface/positionHandler.h"
 #include "GDMLInterface/rotationHandler.h"
+#include "GDMLInterface/scaleHandler.h"
 #include "GDMLInterface/materialrefHandler.h"
 #include "GDMLInterface/solidrefHandler.h"
 #include "GDMLInterface/volumerefHandler.h"
@@ -268,8 +269,8 @@ void GDMLController::registerHandlers()
 	new positionHandler("positionref",this);
 	new rotationHandler("rotation",this);
 	new rotationHandler("rotationref",this);
-        new scaleHandler("scale",this);
-        new scaleHandler("scaleref",this);
+    new scaleHandler("scale",this);
+    new scaleHandler("scaleref",this);
 	new positionHandler("firstposition",this);
 	new positionHandler("firstpositionref",this);
 	new rotationHandler("firstrotation",this);

@@ -20,7 +20,7 @@ void positionHandler::ElementHandle()
 		p.name="";
 		p.x=p.y=p.z=0;
 		p.name=getAttributeAsString("name", isPresent);
-		double unit=getAttributeAsDouble("unit", isPresent);
+		unit=getAttributeAsDouble("unit", isPresent);
 		p.x=unit*getAttributeAsDouble("x", isPresent);
 		p.y=unit*getAttributeAsDouble("y", isPresent);
 		p.z=unit*getAttributeAsDouble("z", isPresent);

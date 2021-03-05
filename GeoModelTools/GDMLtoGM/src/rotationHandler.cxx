@@ -18,7 +18,7 @@ void rotationHandler::ElementHandle()
         p.name="";
 		p.rotx=p.roty=p.rotz=0;
 		p.name=getAttributeAsString("name", isPresent);
-		double unit=getAttributeAsDouble("unit", isPresent);
+		unit=getAttributeAsDouble("unit", isPresent);
 		//std::cout<< " rotation: unit "<<unit<<std::endl;
 		p.rotx=unit*getAttributeAsDouble("x", isPresent);
 		p.roty=unit*getAttributeAsDouble("y", isPresent);

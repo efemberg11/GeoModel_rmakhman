@@ -2,6 +2,7 @@
 
 ## Parametrization
 
+### Introduction
 
 A principle goal in the design of the geometry kernel has been to limit memory usage.  A powerful way of doing this is to parameterize the volumes rather than to create them, say, inside of a single, double, or other multiple loop.
 
@@ -68,3 +69,68 @@ The next step, in which `TRANSFUNCTIONS` are constructed, parametrizes the rigid
 ```cpp
 HepTransform3D tx = xf(j);
 ```
+
+The expansion of the `TRANSFUNCTION` is as follows.  Let  $X_i (i  = 1, 2, … N)$ represent any transformation, either a rotation, a translation, or even some combination of these.  The rotations may be about a coordinate axis, or even some other axis.  Furthermore, let us denote by $f_i(x) ( \textrm{where}\ i =1, 2… N)$  a function of a single variable.  Then, the expansion of an arbitrary function is:
+
+$$
+T(x) = X_1^{f_1(x)} * X_2^{f_2(x)} * X_3^{f_3(x)} \cdots X_n^{f_n(x)}
+$$
+
+In this expression, $T(x)$ is the resulting transformation, which is now a function of the single input parameter, $x$. The expansion is both simple, and completely general.  A single term in this expansion (for example $X_2^{f_2(x)}$), will be referred to as an exponentiated transformation.  It is implemented in terms of the class `Pow`, which has the following constructor:
+
+```cpp
+Pow(const HepTransform3D &, GENFUNCTION f);
+```
+
+Exponentiated transformations are simple transfunctions, and can be composed to make other `TRANSFUNCTIONS`.  The `TRANSFUNCTION` interface also allows one to compose fixed transformations with exponentiated transformations. 
+
+The interface to `GENFUNCTION` and `TRANSFUNCTION` provide all the necessary operations on these types of object.  The interfaces to these types of objects are not simple to read, so we will not attempt to explain them in this document.  Instead, one should assume that all well-defined mathematical properties that apply to functions are properties of `GENFUNCTIONS`, and all mathematical properties that apply to parameterizations of elements of the Euclidean group are properties of `TRANSFUNCTIONS`.
+
+Once one has a a `TRANSFUNCTION` in hand, it can be used together with a `GeoSerialTransformer` object to repeatedly place a physical volume.  To do this, use the following constructor:
+
+```cpp
+GeoSerialTransformer(const GeoPhysVol *pVol,
+                     TRANSFUNCTION xf,
+                     unsigned int N);
+```
+
+
+In this constructor, `pVol` is the volume to be repeatedly placed, `xf` is the `TRANSFUNCTION` that specifies how to place it, and `N` is the desired number of copies.
+
+The `GeoSerialTransformer` can then be added to the geometry graph.  During any subsequent volume traversal, the geometry graph will appear to contain multiple physical volumes at different locations.  However, only the memory of a single physical volume and a `TRANSFUNCTION` is actually allocated.  
+
+During node traversal (using `GeoNodeActions`) one can recover, from the geometry graph, the actual recipe for generating volumes.  This is sometimes useful; for example, in case one wishes to create a GEANT4 parameterization from a GeoModel parameterization.
+
+
+
+
+
+!!! note
+
+    One further word about parameterizations is in order: parameterizations, as they are usually understood, allows for the shape or composition of an object to vary as a function of copy number.  This is presently not a part of the `GeoModelKernel`.  
+
+    However, we intend to include this in subsequent releases.  The basic design strategy is to start with a concrete shape class, such as GeoBox, and to use this a basis of a new class for parameterizing boxes.  In the new class—call it `GeoBoxParameterization`—we replace all of the floating point member data with `GENFUNCTION` member data, and all of the floating point constructor arguments with `GENFUNCTION` constructor arguments.  In this way we create a very flexible recipe for generating a box.  
+
+    The same technique can be used to vary an objects composition as a function of copy number.
+
+
+
+
+### GeoSerialTransformer
+
+
+```cpp
+//=== GeoSerialTransformer ===
+
+  // Constructors:
+  GeoSerialTransformer (const GeoVPhysVol * volume, const GeoXF::Function * func, unsigned int copies)
+
+  // Public Methods:
+  HepTransform3D getTransform (int  i) const
+  unsigned int getNCopies() const
+  PVConstLink getVolume() const;
+ 
+  // Public Methods from GeoGraphNode
+  void exec (GeoNodeAction * action)
+```
+

@@ -46,6 +46,8 @@ The materials are then used to together with shapes to form logical volumes, dis
 
 Shapes are created using the new operator. Essentially, shapes within this system are required to store and provide access to the geometrical constants that describe their geometrical form. This data is, insofar as possible, to be specified on the constructor.
 
+Shapes are extensible and custom shapes can be built.
+
 Here is how one builds a box:
 
 ```cpp

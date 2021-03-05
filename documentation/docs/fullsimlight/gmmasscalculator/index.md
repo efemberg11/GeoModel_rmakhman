@@ -13,7 +13,6 @@ Run the executable with the --help option to see the available options:
 By default (if the optional flag are not used) *gmmasscalculator*, takes the main *World Volume*, and calculates the inclusive and exclusive masses of the respective daughters, saving the calculated quantities in the output json file. At the end of the report, the total masses are reported for the whole *World Volume*. The output json file format is the following:
 
 ``` bash
-"apparentWeightInAir[kg]": -999.0,
 "exclusiveMass[kg]": 1.3358800280858636,
 "inclusiveMass[kg]": 133.81273262584054,
 "logicalVolumeName": "SCT_ForwardC",
@@ -23,10 +22,28 @@ By default (if the optional flag are not used) *gmmasscalculator*, takes the mai
 "volumeEntityType": "G4Tubs"
 ``` 
 where:
-
-- *apparent weight in Air* by definition, the weight of a body as affected by the buoyancy of a fluid (such as air) in which it is immersed. It is calculated only on the total geometry, assuming that the World Volume is made of Air
 - *exclusiveMass* is the mass of the considered volume only (from which the volumes occupied by the daughters volumes have been subtracted)
 - *inclusiveMass* is the mass of the considered volume, comprehensive of the masses of the respective daughters (propagated in an iterative way to their daughter volumes).
+
+At the end of the report, additional information about the whole geometry is reported. The last item of the json file will look like the following:
+
+``` bash
+"apparentWeightInAir[kg]": 2405.2018407511378,
+"densityThreshold[g/cm3]": 0.02,
+"excludedFilteredMass[kg]": 14.649883998898723,
+"exclusiveMass[kg]": 1.3704943478464804,
+"inclusiveFilteredMass[kg]": 2406.500411630485,
+"inclusiveMass[kg]": 2421.156760687377,
+"logicalVolumeName": "newWorldLog",
+"material": "Air",
+"volumeEntityType": "World Volume"
+``` 
+where:
+- *apparent weight in Air* by definition, the weight of a body as affected by the buoyancy of a fluid (such as air) in which it is immersed. It is calculated only on the total geometry, assuming that the World Volume is made of Air
+- *exclusiveFilteredMass* is the sum of the exclusive masses of all the volumes with density>densityThreshold (0.02 g/cm3)
+-*excludedFilteredMass*  is the sum of the exclusive masses of all the volumes with density<densityThreshold (0.02 g/cm3)
+
+In addition to the default behaviour, *gmmasscalculator* offers the possibility to apply 2 filters to the geometry, described in what follows. 
 
 The -p (--prefix) option allows to indicate the prefix of the volumes of interest. In this case  *gmmasscalculator* will loop over the geometry tree and calculate the mass of every Logical Volume that has the specified prefix in its name. For every Logical volume found, a different entry will be filled in the output report file.
 
@@ -34,23 +51,21 @@ The -m (--material) option allows to specify to which material the user is inter
 
 If both the -p and -m flags are used, *gmmasscalculator* will combine the 2 filters and retrieve in the output file only the masses of the volumes containing the specified prefix and made of the desired material. 
 
-In any case, at the end of the report, the total inclusive and exclusive masses are reported for all the volumes that satisfy the user request. The last item in the report will look like the following:
+At the end of the report, the total exclusive mass for the requested geometry is  reported for all the volumes that satisfy the user request. The last item in the report will look like the following:
 
 ```bash
 {
-"apparentWeightInAir[kg]": 2405.2018407511378,
-"exclusiveMass[kg]": 1.3704943478464804,
-"inclusiveMass[kg]": 2421.156760687377,
-"logicalVolumeName": "Total Geometry",
-"material": "Air",
-"physicalVolumeName": "newWorldLog",
+"exclusiveMass[kg]": 14.676774220119631,
+"inclusiveMass[kg]": -999.0,
+"logicalVolumeName": "",
+"material": "CO2",
+"physicalVolumeName": "",
 "volumeCopyNo": 0,
-"volumeEntityType": "World Volume"
+"volumeEntityType": "Total for filtered Geometry"
 }
 
 ```
 where:
-
 - *logicalVolumeName*  and *material* are respectively the prefix used as filter for the Logical Volume names in the geometry tree navigation, and the material used as a second filter in the search. 
 
 

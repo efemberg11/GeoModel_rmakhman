@@ -23,6 +23,8 @@ To open a volume you should first enable the *"Selection Mode"* by clicking the 
 
     If by accident the volume gets selected, first click on the black background to deselect all volumes, then `Ctrl/Cmd+click` on the volume again to open it.
 
+ 
+
 
 
 

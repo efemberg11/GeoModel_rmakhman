@@ -11,16 +11,17 @@ theme:
 
 nav:
     - Home: 'index.md'
-    #- Getting Started:
-    - 'Install Libraries & Tools': 'start/install.md'
-    #    - 'The Basic Concepts': 'start/basic_concepts.md'
-    #   - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
-    #- How To:
-    #    - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
-    #    - 'Build a simple detector': 'how/how_simple_detector_cpp.md'
-    #    - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
-    #    - 'Load a geometry from a file': 'how/how_load_geo.md'
-    #    - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
+    - Getting Started:
+        - 'Intro': 'start/index.md'
+        - 'Install Libraries & Tools': 'start/install.md'
+        - 'The Basic Concepts': 'start/basic_concepts.md'
+        - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
+    - How To:
+        - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
+        - 'Build a simple detector': 'how/how_simple_detector_cpp.md'
+        - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
+        - 'Load a geometry from a file': 'how/how_load_geo.md'
+        - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
     - GeoModel Components:
         - Kernel:
             - 'Overview': 'components/kernel/overview/index.md'
@@ -30,7 +31,7 @@ nav:
         - 'FullSimLight': 'fullsimlight/fullsimlight/index.md'
         - 'GeoModelClash': 'fullsimlight/gmclash/index.md'
         - 'GeoModelGeantino': 'fullsimlight/gmgeantino/index.md'
-        - 'GeoModel2GDML': 'fullsimlight/gm2gdml/index.md'
+        - 'GeoModelToGDML': 'fullsimlight/gmtogdml/index.md'
     - FAQ: 'faq.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'
@@ -50,6 +51,7 @@ extra_css:
     - material_nested_lists_rendering.css
 
 markdown_extensions:
+    - smarty                # to use 'SmartyPants' typography extensions as '---' for em-dashes
     - admonition            # to use notes, warnings, tips, ...
     - footnotes             # to set footnotes
     - pymdownx.superfences  
@@ -65,6 +67,7 @@ markdown_extensions:
         base_path: docs
     - pymdownx.arithmatex:  # to use LaTeX syntax in Markdown files
         generic: true
+    #- markdown.extensions.attr_list # to use custom css settings, e.g. {: .center}. Not used now
 
 plugins:
   - search

@@ -27,7 +27,7 @@ Ionization energy loss in materials follows the Bethe-Bloch formula and is gover
 
 Both materials and elements are reference-counted; the reference count of an element is incremented when it added to a material and decremented when a referencing material is destroyed; materials are reference counted when they are used in logical volumes and decremented when the referencing logical volume is destroyed.
 
-[^ME1]: http://pdg.lbl.gov/
+[^ME1]: <http://pdg.lbl.gov/>
 
 
 {!components/kernel/reference/RCBase/GeoElement.md!}

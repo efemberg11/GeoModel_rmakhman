@@ -10,8 +10,8 @@
     double getN() const
 ```
 
-`GeoElement` has a constructor which takes a name, a chemical symbol, an atomic number, and an atomic weight[^n2]. The public methods provide access to this information. The `getN()` method returns the effective number of nucleons in the material, Z+A.
+`GeoElement` has a constructor which takes a name, a chemical symbol, an atomic number, and an atomic weight[^gel1]. The public methods provide access to this information. The `getN()` method returns the effective number of nucleons in the material, $Z+A$.
 
-[^n2]: The atomic weight should be specified using units such as g/cm3.
+[^gel1]: The atomic weight should be specified using units such as g/cm3 (also known as CLHEP[^gmat2] units).
 
 

@@ -8,20 +8,38 @@
 The shape classes in the geometry kernel are data structures designed to describe several geometrical primitives. Table 1 describes the different shapes presently provided within the geometry kernel.  This set is extensible; one only needs to derive a new shape from the base class and insure that it fits the pattern described below. Shapes are reference-counted objects, as described in [Reference Counting](#reference-counting).
 
 
+In the table here below, a list of the existing geometrical shapes in the GeoModelKernel package is given:
+
+
 | Class   | Shape |
 | ------- | ----- |
-| GeoBox  | Box |
-| GeoCons | Cone Section |
-| GeoPara |Parallelepiped |
-| GeoPcon | Polycone |
-| GeoPgon | Polygon |
-| GeoTrap | Trapezoid  (complex) |
-| GeoTrd  | Trapezoid (simple) |
-| GeoTube | Tube |
-| GeoTubs | Tube Section |
-| GeoTwistedTrap | Twisted Trapezoid |
+| [GeoBox](#geobox)  | Box |
+| [GeoCons](#geocons) | Cone Section |
+| GeoEllipticalTube | |
+| GeoGenericTrap | |
+| [GeoPara](#geopara) |Parallelepiped |
+| [GeoPcon](#geopcon) | Polycone |
+| [GeoPgon](#geopgon) | Polygon |
+| GeoSimplePolygonBrep | |
+| GeoTessellatedSolid | |
+| GeoTorus | |
+| [GeoTrap](#geotrap) | Trapezoid  (complex) |
+| [GeoTrd](#geotrd)  | Trapezoid (simple) |
+| [GeoTube](#geotube) | Tube |
+| [GeoTubs](#geotubs) | Tube Section |
+| [GeoTwistedTrap](#geotwistedtrap) | Twisted Trapezoid |
+| GeoUnidentifiedShape | |
 
-Table 1: Existing geometrical shapes in the GeoModel kernel.
+
+In addition to the geometrical shapes listed above, a set of *boolean operator* shapes is also added:
+
+| Class   | Operation |
+| ------- | ----- |
+| GeoShapeIntersection | Intersection |
+| GeoShapeShift | Shift |
+| GeoShapeSubtraction | Subtraction |
+| GeoShapeUnion | Intersection |
+
 
 
 All shapes provide access to their geometry attributes (height, width, & cetera), and in addition perform several other services:

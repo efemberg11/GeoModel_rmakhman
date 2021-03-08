@@ -32,7 +32,7 @@ brew install cmake eigen doxygen wget boost xerces-c nlohmann-json sqlite
 
 # if you want to build the visualization tools as well, please install and configure Qt5
 brew install qt5
-echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
+echo 'export PATH="/usr/local/opt/qt@5/bin:$PATH"' >> ~/.zshrc
 ```
 
 !!! note 

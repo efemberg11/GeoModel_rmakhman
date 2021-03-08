@@ -58,6 +58,6 @@ void replicate_axisHandler::ElementHandle() {
 
         }
     }
-    std::cout << " this is the handle : "<<parameters.w<<" "<<parameters.o<< std::endl;
+    //  std::cout << " this is the handle : "<<parameters.w<<" "<<parameters.o<< std::endl;
 }
 

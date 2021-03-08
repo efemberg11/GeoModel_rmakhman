@@ -21,8 +21,8 @@ replicaHandler::replicaHandler(std::string n, GDMLController* c): GDMLHandler(n,
 } 
 void replicaHandler::ElementHandle()
 {
-    std::cout<<"this is replicaHandler::ElementHandle() "<<std::endl;
     nCopies=getAttributeAsInt("number");
+    std::cout<<"this is replicaHandler::ElementHandle(): nCopies= "<<nCopies<<std::endl;
 
 	StopLoop(true);
     xercesc::DOMNode *child;
@@ -58,11 +58,9 @@ void replicaHandler::ElementHandle()
         }
     }
 
-    std::cout<< " replicaHandler"<<p.w<<" "<<p.o<<std::endl;
-
     double pStartXYZ,pStartPhi, pCurrent;
     GeoTransform *tr;
-    pStartXYZ=-nCopies*p.w+p.o/2.;
+    pStartXYZ=-0.5*nCopies*p.w+p.o;
     pStartPhi=p.o;
 
     for (int i=0;i<nCopies;i++)
@@ -70,19 +68,19 @@ void replicaHandler::ElementHandle()
         switch (p.a)
         {
             case PHI_axis:
-                pCurrent=pStartPhi + 2*i*p.w + p.w;
+                pCurrent=pStartPhi + i*p.w + p.w/2.;
                 tr=new GeoTransform(GeoTrf::RotateZ3D(pCurrent));
                 break;
             case X_axis:
-                pCurrent=pStartXYZ+2*i*p.w + p.w;
+                pCurrent=pStartXYZ+i*p.w + p.w/2.;
                 tr=new GeoTransform(GeoTrf::TranslateX3D(pCurrent));
                 break;
             case Y_axis:
-                pCurrent=pStartXYZ+2*i*p.w + p.w;
+                pCurrent=pStartXYZ+i*p.w + p.w/2.;
                 tr=new GeoTransform(GeoTrf::TranslateY3D(pCurrent));
                 break;
             case Z_axis:
-                pCurrent=pStartXYZ+2*i*p.w + p.w;
+                pCurrent=pStartXYZ+i*p.w + p.w/2.;
                 tr=new GeoTransform(GeoTrf::TranslateZ3D(pCurrent));
                 break;
             default:

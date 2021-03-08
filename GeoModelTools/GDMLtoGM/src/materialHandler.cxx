@@ -62,7 +62,7 @@ void materialHandler::postLoopHandling()
 	GeoMaterial* newMaterial=new GeoMaterial(stripPointer(name),density);
 	if (explicitMaterial)
 	{
-		std::cout<<" creating an explicit material: name "<<name<<" Z="<<m_Z<<" A="<<m_A<<std::endl;
+		// std::cout<<" creating an explicit material: name "<<name<<" Z="<<m_Z<<" A="<<m_A<<std::endl;
 		GeoElement* newElement=new GeoElement(name,name,m_Z,m_A);
 		newMaterial->add(newElement,1.0);
 	}

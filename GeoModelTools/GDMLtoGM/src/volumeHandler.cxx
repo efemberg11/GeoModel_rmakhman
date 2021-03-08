@@ -19,7 +19,7 @@ void volumeHandler::ElementHandle()
 	shape=nullptr;
 	name=getAttributeAsString("name");
 	//name=stripPointer(getAttributeAsString("name"));
-	std::cout<<" this is volumeHandler: name "<<name<<std::endl;
+	//  std::cout<<" this is volumeHandler: name "<<name<<std::endl;
 
 	StopLoop(true);
 	xercesc::DOMNode *child;
@@ -58,7 +58,7 @@ void volumeHandler::ElementHandle()
 					        if (!rH) std::cout<<" something is wrong! can not retrieve replicaHandler!!!"<<std::endl;
 					        else
 					        {
-						        std::cout<<" from replicaHandler: nCopies="<<rH->getNCopies()<<std::endl;
+						        // std::cout<<" from replicaHandler: nCopies="<<rH->getNCopies()<<std::endl;
 						        for (int i=0;i<rH->getNCopies();i++)
 						        {
 						            tempPhys.push_back(rH->getPhysicalVolume());

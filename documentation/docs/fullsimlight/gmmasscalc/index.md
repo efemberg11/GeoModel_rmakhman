@@ -1,6 +1,6 @@
 # GeoModelMassCalculator
 
-GeoModelMassCalculator (gmmasscalculator) is a command line tool that calculates the inclusive and exclusive mass of a geometry specified as input with the -g flag. The mass report is given in an output json file (default: *gmmasscalculator_report.json*).
+GeoModelMassCalculator (gmmasscalc) is a command line tool that calculates the inclusive and exclusive mass of a geometry specified as input with the -g flag. The mass report is given in an output json file (default: *gmmasscalc_report.json*).
 
 Run the executable with the --help option to see the available options:
 
@@ -8,9 +8,9 @@ Run the executable with the --help option to see the available options:
 -g :   [MANDATORY] the Geometry file name [.db/.gdml/.dylib/.so] 
 -p :   [OPTIONAL] prefix of the Logical Volumes of interest (i.e. Pixel::) 
 -m :   [OPTIONAL] material of interest (i.e. Aluminium) 
--o :   [OPTIONAL] mass report json file name (default: gmmasscalculator_report.json)
+-o :   [OPTIONAL] mass report json file name (default: gmmasscalc_report.json)
 ``` 
-By default (if the optional flag are not used) *gmmasscalculator*, takes the main *World Volume*, and calculates the inclusive and exclusive masses of the respective daughters, saving the calculated quantities in the output json file. At the end of the report, the total masses are reported for the whole *World Volume*. The output json file format is the following:
+By default (if the optional flag are not used) *gmmasscalc*, takes the main *World Volume*, and calculates the inclusive and exclusive masses of the respective daughters, saving the calculated quantities in the output json file. At the end of the report, the total masses are reported for the whole *World Volume*. The output json file format is the following:
 
 ``` bash
 "exclusiveMass[kg]": 1.3358800280858636,
@@ -43,13 +43,13 @@ where:
 - *exclusiveFilteredMass* is the sum of the exclusive masses of all the volumes with density>densityThreshold (0.02 g/cm3)
 -*excludedFilteredMass*  is the sum of the exclusive masses of all the volumes with density<densityThreshold (0.02 g/cm3)
 
-In addition to the default behaviour, *gmmasscalculator* offers the possibility to apply 2 filters to the geometry, described in what follows. 
+In addition to the default behaviour, *gmmasscalc* offers the possibility to apply 2 filters to the geometry, described in what follows. 
 
-The -p (--prefix) option allows to indicate the prefix of the volumes of interest. In this case  *gmmasscalculator* will loop over the geometry tree and calculate the mass of every Logical Volume that has the specified prefix in its name. For every Logical volume found, a different entry will be filled in the output report file.
+The -p (--prefix) option allows to indicate the prefix of the volumes of interest. In this case  *gmmasscalc* will loop over the geometry tree and calculate the mass of every Logical Volume that has the specified prefix in its name. For every Logical volume found, a different entry will be filled in the output report file.
 
-The -m (--material) option allows to specify to which material the user is interested. In this case  *gmmasscalculator* will loop over the geometry tree and calculate the mass of those volumes that are made of the material of interest. 
+The -m (--material) option allows to specify to which material the user is interested. In this case  *gmmasscalc* will loop over the geometry tree and calculate the mass of those volumes that are made of the material of interest. 
 
-If both the -p and -m flags are used, *gmmasscalculator* will combine the 2 filters and retrieve in the output file only the masses of the volumes containing the specified prefix and made of the desired material. 
+If both the -p and -m flags are used, *gmmasscalc* will combine the 2 filters and retrieve in the output file only the masses of the volumes containing the specified prefix and made of the desired material. 
 
 At the end of the report, the total exclusive mass for the requested geometry is  reported for all the volumes that satisfy the user request. The last item in the report will look like the following:
 
@@ -71,20 +71,20 @@ where:
 
 ## Examples
 
-To run GeoModelMassCalculator one has to specify with the -g flag the geometry file (this is mandatory). By default *gmmasscalculator* writes out the masses report in the *gmmasscalculator_report.json* file:
+To run GeoModelMassCalculator one has to specify with the -g flag the geometry file (this is mandatory). By default *gmmasscalc* writes out the masses report in the *gmmasscalc_report.json* file:
 ``` bash
-./gmmasscalculator -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
+./gmmasscalc -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
 ``` 
 To calculate the mass of a geometry described with the SQLite file *LArBarrel.db* and write out the masses report in the *mass_LArBarrel.json* file :
 ``` bash
-./gmmasscalculator -g LArBarrel.db -o mass_LArBarrel.json 
+./gmmasscalc -g LArBarrel.db -o mass_LArBarrel.json 
 ``` 
 To calculate the mass of a geometry described with the SQLite file *SCT.db*, only for the logical volumes that have *BRLSensor* in their names, and only for those volumes that are made of *Silicon* and write out the masses report in the *mass_SCT.json* file:
 
 ``` bash
-./gmmasscalculator -g SCT.db -p BRLSensor -m Silicon -o mass_SCT.json 
+./gmmasscalc -g SCT.db -p BRLSensor -m Silicon -o mass_SCT.json 
 ``` 
 To calculate the mass of a geometry described with one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin*, looking for volumes made of *Aluminium* and write out the masses report in the *mass_HGTD.json* file :
 ``` bash
-./gmmasscalculator -g libHGTDPlugin.1.0.0.dylib -m Aluminium -o mass_HGTD.json 
+./gmmasscalc -g libHGTDPlugin.1.0.0.dylib -m Aluminium -o mass_HGTD.json 
 ``` 

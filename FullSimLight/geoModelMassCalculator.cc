@@ -1,6 +1,6 @@
 
 //--------------------------------------------------------
-// gmmasscalculator application: November 2020 (README)
+// gmmasscalc application: November 2020 (README)
 //--------------------------------------------------------
 
 #include "G4Version.hh"
@@ -15,7 +15,7 @@
 static G4String geometryFileName   ;
 static G4String prefixLogicalVolume= "";
 static G4String material= "";
-static G4String reportFileName     = "gmmasscalculator_report.json";
+static G4String reportFileName     = "gmmasscalc_report.json";
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -94,9 +94,9 @@ void Help() {
             <<"      -g :   [MANDATORY] the Geometry file name [.db/.gdml/.dylib/.so] \n"
             <<"      -p :   [OPTIONAL] prefix of the Logical Volumes of interest (i.e. Pixel::) \n"
             <<"      -m :   [OPTIONAL] material of interest (i.e. Aluminium) \n"
-            <<"      -o :   [OPTIONAL] mass report json file name (default: gmmasscalculator_report.json)\n"
+            <<"      -o :   [OPTIONAL] mass report json file name (default: gmmasscalc_report.json)\n"
             << std::endl;
-  std::cout <<"\nUsage: ./gmmasscalculator [OPTIONS]\n" <<std::endl;
+  std::cout <<"\nUsage: ./gmmasscalc [OPTIONS]\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
     printf("\t-%c  --%s\t\n", options[i].val, options[i].name);
   }

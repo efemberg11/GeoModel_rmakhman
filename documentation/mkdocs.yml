@@ -30,7 +30,7 @@ nav:
         - 'FullSimLight': 'fullsimlight/fullsimlight/index.md'
         - 'GeoModelClash': 'fullsimlight/gmclash/index.md'
         - 'GeoModelGeantino': 'fullsimlight/gmgeantino/index.md'
-        - 'GeoModelMassCalculator': 'fullsimlight/gmmasscalculator/index.md'
+        - 'GeoModelMassCalculator': 'fullsimlight/gmmasscalc/index.md'
         - 'GeoModel2GDML': 'fullsimlight/gm2gdml/index.md'
     - FAQ: 'faq.md'
     - For Developers:

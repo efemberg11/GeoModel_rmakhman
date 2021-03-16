@@ -12,6 +12,15 @@
 #include "G4Cache.hh"
 #include "G4MagneticField.hh"
 
+//G4AnalysisMananager
+#include "MyAnalysis.hh"
+
+// Units
+#include "GeoModelKernel/Units.h"
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
+// ****
+
+
 using json = nlohmann::json;
 
 class G4VPhysicalVolume;
@@ -34,11 +43,14 @@ public:
 
   void SetGDMLFileName  (const G4String &gdmlfile)   { fGeometryFileName = gdmlfile;}
   void SetRunOverlapCheck(const bool runOvCheck)     { fRunOverlapCheck = runOvCheck; }
+  void SetRunMassCalculator(const bool runMassCalc)  { fRunMassCalculator = runMassCalc; }
+  void SetVerbosity(const int verbosity)            { fVerbosityFlag = verbosity; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
+  void SetPrefixLogicalVolume(const G4String &prefixLV) { fPrefixLogicalVolume = prefixLV; }
+  void SetMaterial(const G4String &material) { fMaterial = material; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
   void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
   void SetDumpGDML(const bool dumpGDML)              {fDumpGDML=dumpGDML;}
-
   /// Common method to construct a driver with a stepper of requested type.
   G4VIntegrationDriver*
   createDriverAndStepper(std::string stepperType) const;
@@ -51,6 +63,8 @@ public:
   }
 
   static G4double GetFieldValue() { return gFieldValue; }
+    
+  void RecursiveMassCalculation (G4VPhysicalVolume* worldg4,GeoPhysVol* worldgeoModel, std::vector<json>& jlist);
     
   void RecursivelyCheckOverlap(G4LogicalVolume* envelope, std::vector<json>& jlist);
   
@@ -70,11 +84,19 @@ public:
   // Iterate from the volume envelope through all the daughter volumes, and look for the ancestors of
   // 'volume', populating the fTree vector of G4VPhysicalVolumes
   bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
-  
+    
+  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep);
+    
+  void iterateFromWorldMass(G4LogicalVolume* envelope, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix="", G4String material="");
+    
   GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
 
   /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
   void PullUnidentifiedVolumes( G4LogicalVolume* v );
+    
+  void printGeometryInfo(G4LogicalVolume* lv, G4int verbosity);
+
+  static G4AnalysisManager* fAnalysisManager;
 
 protected:
   G4Timer fTimer;
@@ -82,10 +104,16 @@ protected:
 private:
   // this static member is for the print out
   static G4double gFieldValue;
+  const G4double fDensityThreshold = 0.02 * SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3;
+  //G4int    fHistoID; //density histogram ID
   G4bool   fRunOverlapCheck;
+  G4bool   fRunMassCalculator;
+  G4int    fVerbosityFlag;
   G4bool   fDumpGDML;
   G4double fMinStep;
   G4String fGeometryFileName;
+  G4String fPrefixLogicalVolume;
+  G4String fMaterial;
   G4String fReportFileName;
   G4String fOutputGDMLFileName;
   G4double fFieldValue;

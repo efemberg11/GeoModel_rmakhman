@@ -43,7 +43,8 @@ public:
 
   void SetGDMLFileName  (const G4String &gdmlfile)   { fGeometryFileName = gdmlfile;}
   void SetRunOverlapCheck(const bool runOvCheck)     { fRunOverlapCheck = runOvCheck; }
-  void SetRunMassCalculator(const bool runMassCalc)     { fRunMassCalculator = runMassCalc; }
+  void SetRunMassCalculator(const bool runMassCalc)  { fRunMassCalculator = runMassCalc; }
+  void SetVerbosity(const int verbosity)            { fVerbosityFlag = verbosity; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
   void SetPrefixLogicalVolume(const G4String &prefixLV) { fPrefixLogicalVolume = prefixLV; }
   void SetMaterial(const G4String &material) { fMaterial = material; }
@@ -92,6 +93,8 @@ public:
 
   /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
   void PullUnidentifiedVolumes( G4LogicalVolume* v );
+    
+  void printGeometryInfo(G4LogicalVolume* lv, G4int verbosity);
 
   static G4AnalysisManager* fAnalysisManager;
 
@@ -105,6 +108,7 @@ private:
   G4int    fHistoID; //density histogram ID
   G4bool   fRunOverlapCheck;
   G4bool   fRunMassCalculator;
+  G4int    fVerbosityFlag;
   G4bool   fDumpGDML;
   G4double fMinStep;
   G4String fGeometryFileName;

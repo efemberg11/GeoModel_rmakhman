@@ -16,6 +16,7 @@ static G4String geometryFileName   ;
 static G4String prefixLogicalVolume= "";
 static G4String material= "";
 static G4String reportFileName     = "gmmasscalc_report.json";
+static G4int verbosityFlag = -1;
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -70,6 +71,7 @@ int main(int argc, char** argv) {
     detector->SetMaterial(material);
     detector->SetGeometryFileName (geometryFileName);
     detector->SetReportFileName (reportFileName);
+    detector->SetVerbosity(verbosityFlag);
     detector->Construct();
     
     delete detector;
@@ -77,11 +79,12 @@ int main(int argc, char** argv) {
 }
 
 static struct option options[] = {
-    {"geometry file name                       "  , required_argument, 0, 'g'},
+    {"geometry file name"                         , required_argument, 0, 'g'},
     {"prefix of the logical volume of interest "  , required_argument, 0, 'p'},
-    {"material of interest "  , required_argument, 0, 'm'},
-    {"output mass report file name             "  , required_argument, 0, 'o'},
-    {"help"                                       , no_argument      , 0, 'h'},
+    {"material of interest "                      , required_argument, 0, 'm'},
+    {"output mass report file name"               , required_argument, 0, 'o'},
+    {"verbosity flag"                             , required_argument, 0, 'v'},
+    {"help"                                       , no_argument,       0, 'h'},
     {0, 0, 0, 0}
 };
 
@@ -95,6 +98,7 @@ void Help() {
             <<"      -p :   [OPTIONAL] prefix of the Logical Volumes of interest (i.e. Pixel::) \n"
             <<"      -m :   [OPTIONAL] material of interest (i.e. Aluminium) \n"
             <<"      -o :   [OPTIONAL] mass report json file name (default: gmmasscalc_report.json)\n"
+            <<"      -v :   [OPTIONAL] verbose mode: 1 - print all the Logical Volume names and materials, 2 - print materials composition (default: off)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmmasscalc [OPTIONS]\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -114,7 +118,7 @@ void GetInputArguments(int argc, char** argv) {
  }
  while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:p:m:o:h", options, &optidx);
+   c = getopt_long(argc, argv, "g:p:m:o:hv:", options, &optidx);
    if (c == -1)
      break;
    //
@@ -133,6 +137,9 @@ void GetInputArguments(int argc, char** argv) {
      break;
    case 'o':
      reportFileName = optarg;
+     break;
+   case 'v':
+     verbosityFlag = atoi(optarg);
      break;
    case 'h':
      Help();

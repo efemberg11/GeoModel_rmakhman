@@ -1,5 +1,6 @@
-
 #include "MyDetectorConstruction.hh"
+
+#include <iomanip>
 
 #include "globals.hh"
 #include "G4SystemOfUnits.hh"
@@ -225,6 +226,7 @@ G4double MyDetectorConstruction::gFieldValue = 0.0;
 MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
   fFieldValue          = 0.0;
+  fVerbosityFlag       = -1;
   fFieldConstant       = false;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
@@ -468,6 +470,13 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         exit(-1);
     } else
         G4cout<<"\n...output File density_histogram opened!"<<G4endl;
+    
+    if (fVerbosityFlag>0) {
+        std::cout<<"\n========== Printing geometry info ============\n "<<std::endl;
+        printGeometryInfo (worldg4->GetLogicalVolume(), fVerbosityFlag);
+        std::cout<<"\n========== Printing geometry info: DONE! ============ \n"<<std::endl;
+        
+    }
     
     fHistoID = fAnalysisManager->CreateH1("density", "density", 300, 10e-3, 30, "none", "none", "log");
     fAnalysisManager->SetH1Ascii(fHistoID,true);  // misi: always ascii
@@ -1443,4 +1452,26 @@ void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
     }
     
     
+}
+
+void MyDetectorConstruction::printGeometryInfo(G4LogicalVolume* lv, G4int verbosity){
+    
+    int localNoDaughters = lv->GetNoDaughters();
+    G4VPhysicalVolume *daughter;
+    G4LogicalVolume *daughterLV;
+    for (int n=0; n<localNoDaughters; n++)
+    {
+        daughter=lv->GetDaughter(n);
+        daughterLV = daughter->GetLogicalVolume();
+        
+        std::cout<< "LV_name: ";
+        std::cout.width(40); std::cout << std::left <<daughter->GetLogicalVolume()->GetName();
+        std::cout << std::left << "\tMaterial:  "<<daughter->GetLogicalVolume()->GetMaterial()->GetName()<<std::endl;
+        if (verbosity>1)
+            std::cout <<daughter->GetLogicalVolume()->GetMaterial()<<std::endl;
+       
+        if(daughterLV->GetNoDaughters()>0)
+            printGeometryInfo(daughterLV, verbosity);
+    }
+        
 }

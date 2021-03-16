@@ -111,6 +111,7 @@ namespace masscalc {
         std::string physicalVolumeName;
         int         volumeCopyNo;
         std::string material;
+        double density;
         std::string volumeEntityType;
         double inclusiveMass;  //mass of the volume, that includes the real mass of the daughters volumes
         double exclusiveMass;  //mass of the volume, from which the mass of the daughters is subtracted
@@ -132,7 +133,7 @@ namespace masscalc {
 };
     
     void to_json(json& j, const massReport& p) {
-        j = json{{"logicalVolumeName", p.logicalVolumeName}, json{"physicalVolumeName", p.physicalVolumeName}, {"volumeCopyNo", p.volumeCopyNo}, {"material", p.material}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass} };
+        j = json{{"logicalVolumeName", p.logicalVolumeName}, json{"physicalVolumeName", p.physicalVolumeName}, {"volumeCopyNo", p.volumeCopyNo}, {"material", p.material},{"density[g/cm3]", p.density}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass} };
     }
     
     void from_json(const json& j, massReport& p) {
@@ -140,6 +141,7 @@ namespace masscalc {
       p.physicalVolumeName=j.at("physicalVolumeName").get<std::string>();
       p.volumeCopyNo=j.at("volumeCopyNo").get<int>();
       p.material=j.at("material").get<std::string>();
+      p.density=j.at("density[g/cm3]").get<double>();
       p.volumeEntityType=j.at("volumeEntityType").get<std::string>();
       p.inclusiveMass=j.at("inclusiveMass[kg]").get<double>();
       p.exclusiveMass=j.at("exclusiveMass[kg]").get<double>();
@@ -268,6 +270,7 @@ void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalV
         singleMassReport.physicalVolumeName=physVol->GetName();
         singleMassReport.volumeCopyNo =physVol->GetCopyNo();
         singleMassReport.material =logVol->GetMaterial()->GetName();
+        singleMassReport.density =logVol->GetMaterial()->GetDensity()/SYSTEM_OF_UNITS::g*SYSTEM_OF_UNITS::cm3;
         singleMassReport.volumeEntityType=logVol->GetSolid()->GetEntityType();
         singleMassReport.inclusiveMass = tmpInclusive/(CLHEP::kg);
         singleMassReport.exclusiveMass = tmpExclusive/(CLHEP::kg);
@@ -298,8 +301,10 @@ void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, st
         //1. look only for the logVol
         if(prefix!="" && material==""){
             if (daughterLV->GetName().contains(prefix) || daughterPV->GetName().contains(prefix)){
-                //std::cout<<"Found the LV "<<prefix<<" and its full name is "<<daughterLV->GetName()<<std::endl;
-                //std::cout<<"Found the Daughter "<<prefix<<" and its full name is "<<daughterPV->GetName()<<std::endl;
+//                std::cout<<"Found the LV "<<prefix<<" and its full name is "<<daughterLV->GetName()<<std::endl;
+//                std::cout<<"Found the Daughter "<<prefix<<" and its full name is "<<daughterPV->GetName()<<std::endl;
+                std::cout<<"Cubic Volume of "<<daughterLV->GetName()<<" is "<<daughterLV->GetSolid()->GetCubicVolume()/SYSTEM_OF_UNITS::cm3<<" [cm3]"<<std::endl;
+                
                 calculateMass(daughterLV, daughterPV, jlist, exclusiveMass, true );
             }
             
@@ -552,6 +557,7 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
             singleMassReport.physicalVolumeName=daughter->GetName();
             singleMassReport.volumeCopyNo =daughter->GetCopyNo();
             singleMassReport.material =daughterLV->GetMaterial()->GetName();
+            singleMassReport.density =daughterLV->GetMaterial()->GetDensity()/SYSTEM_OF_UNITS::g*SYSTEM_OF_UNITS::cm3;
             singleMassReport.volumeEntityType=daughterLV->GetSolid()->GetEntityType();
             singleMassReport.inclusiveMass = inclusiveMassG4/(CLHEP::kg);
             singleMassReport.exclusiveMass = exclusiveMassG4/(CLHEP::kg);

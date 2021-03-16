@@ -455,6 +455,8 @@ To produce geantino maps of a geometry described by one of the [GeoModelPlugins 
 
 # GeoModelMassCalculator: run and options
 
+# GeoModelMassCalculator
+
 GeoModelMassCalculator (gmmasscalc) is a command line tool that calculates the inclusive and exclusive mass of a geometry specified as input with the -g flag. The mass report is given in an output json file (default: *gmmasscalc_report.json*).
 
 Run the executable with the --help option to see the available options:
@@ -464,6 +466,7 @@ Run the executable with the --help option to see the available options:
 -p :   [OPTIONAL] prefix of the Logical Volumes of interest (i.e. Pixel::) 
 -m :   [OPTIONAL] material of interest (i.e. Aluminium) 
 -o :   [OPTIONAL] mass report json file name (default: gmmasscalc_report.json)
+-v :   [OPTIONAL] verbose mode: 1 - print all the Logical Volume names and materials, 2 - print materials composition (default: off)
 ``` 
 By default (if the optional flag are not used) *gmmasscalc*, takes the main *World Volume*, and calculates the inclusive and exclusive masses of the respective daughters, saving the calculated quantities in the output json file. At the end of the report, the total masses are reported for the whole *World Volume*. The output json file format is the following:
 
@@ -523,6 +526,7 @@ At the end of the report, the total exclusive mass for the requested geometry is
 where:
 - *logicalVolumeName*  and *material* are respectively the prefix used as filter for the Logical Volume names in the geometry tree navigation, and the material used as a second filter in the search. 
 
+The -v flag is a verbosity flag. Two different levels of verbosity can be set: level 1 prints all the logical volume names and respective materials, level 2 adds also the material composition for each material in the geometry. 
 
 ## Examples
 
@@ -543,9 +547,6 @@ To calculate the mass of a geometry described with one of the [GeoModelPlugins r
 ``` bash
 ./gmmasscalc -g libHGTDPlugin.1.0.0.dylib -m Aluminium -o mass_HGTD.json 
 ``` 
-
-
-
 
 # GeoModel2GDML: run and options
 

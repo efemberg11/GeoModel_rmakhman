@@ -88,7 +88,7 @@ public:
   void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep);
     
   void iterateFromWorldMass(G4LogicalVolume* envelope, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix="", G4String material="");
-  
+    
   GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
 
   /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
@@ -105,7 +105,7 @@ private:
   // this static member is for the print out
   static G4double gFieldValue;
   const G4double fDensityThreshold = 0.02 * SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3;
-  G4int    fHistoID; //density histogram ID
+  //G4int    fHistoID; //density histogram ID
   G4bool   fRunOverlapCheck;
   G4bool   fRunMassCalculator;
   G4int    fVerbosityFlag;

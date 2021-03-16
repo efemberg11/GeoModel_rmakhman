@@ -293,7 +293,7 @@ void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, st
         daughterPV=logVolume->GetDaughter(n);
         daughterLV = daughterPV->GetLogicalVolume();
         density=daughterLV->GetMaterial()->GetDensity();
-        fAnalysisManager->FillH1(fHistoID, density/(SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3), 1);
+        //fAnalysisManager->FillH1(fHistoID, density/(SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3), 1);
         
         //1. look only for the logVol
         if(prefix!="" && material==""){
@@ -464,12 +464,12 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     G4double cubicVolumeWorld, globalDensityWorld, globalMassWorld;
     
     //Instance of the G4AnalysisManager used to fill the density_histogram
-    fAnalysisManager = G4AnalysisManager::Instance();
-    if (!fAnalysisManager->OpenFile("density_histogram")){
-        G4cout<<"RecursiveMassCalculation ERROR: File cannot be opened!"<<G4endl;
-        exit(-1);
-    } else
-        G4cout<<"\n...output File density_histogram opened!"<<G4endl;
+//    fAnalysisManager = G4AnalysisManager::Instance();
+//    if (!fAnalysisManager->OpenFile("density_histogram")){
+//        G4cout<<"RecursiveMassCalculation ERROR: File cannot be opened!"<<G4endl;
+//        exit(-1);
+//    } else
+//        G4cout<<"\n...output File density_histogram opened!"<<G4endl;
     
     if (fVerbosityFlag>0) {
         std::cout<<"\n========== Printing geometry info ============\n "<<std::endl;
@@ -478,9 +478,9 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         
     }
     
-    fHistoID = fAnalysisManager->CreateH1("density", "density", 300, 10e-3, 30, "none", "none", "log");
-    fAnalysisManager->SetH1Ascii(fHistoID,true);  // misi: always ascii
-    fAnalysisManager->SetH1XAxisTitle(fHistoID, "density [g/cm3]]");
+//    fHistoID = fAnalysisManager->CreateH1("density", "density", 300, 10e-3, 30, "none", "none", "log");
+//    fAnalysisManager->SetH1Ascii(fHistoID,true);  // misi: always ascii
+//    fAnalysisManager->SetH1XAxisTitle(fHistoID, "density [g/cm3]]");
     
     //Debug information about World volume, Name, Material, Solid name of the LV, density and cubic volume
     std::cout<<"Checking World volume "<<std::endl;
@@ -639,8 +639,8 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     }
     
 
-    fAnalysisManager->Write();
-    fAnalysisManager->CloseFile();
+//    fAnalysisManager->Write();
+//    fAnalysisManager->CloseFile();
     
 }
 

@@ -23,8 +23,10 @@
 #include <sys/resource.h>
 #ifdef __APPLE__
 const std::string shared_obj_extension=".dylib";
+double factor=1000000.0;
 #else
 const std::string shared_obj_extension=".so";
+double factor=1000.0;
 #endif
 
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
@@ -124,7 +126,7 @@ int main(int argc, char ** argv) {
     factory->create(world, true);
     int net=snoop()-before;
     std::cout.rdbuf(coutBuff);
-    std::cout << basename((char *) plugin.c_str()) << " allocates " << net/1000.0 << " MB" << std::endl;
+    std::cout << basename((char *) plugin.c_str()) << " allocates " << net/factor << " MB" << std::endl;
     std::cout.rdbuf(fileBuff);
  
    }

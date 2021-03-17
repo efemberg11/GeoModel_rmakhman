@@ -26,6 +26,10 @@ nav:
             - 'Overview': 'components/kernel/overview/index.md'
             - 'Class Reference': 'components/kernel/reference/index.md'
               #- 'Box': 'components/kernel/reference/RCBase/GeoShape/GeoBox.md'
+        - GeoModelTools:
+            - 'GDML2GeoModel': 'components/geomodeltools/gdml2gm/index.md'
+        - GeoModelVisualization:
+            - 'GeoModelExplorer': 'components/geomodelvisualization/gmex/index.md'
     - FullSimLight tools:
         - 'FullSimLight': 'fullsimlight/fullsimlight/index.md'
         - 'GeoModelClash': 'fullsimlight/gmclash/index.md'

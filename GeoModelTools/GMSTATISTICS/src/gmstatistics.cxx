@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 #include <unistd.h>
-
+#include <libgen.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #ifdef __APPLE__
@@ -124,7 +124,7 @@ int main(int argc, char ** argv) {
     factory->create(world, true);
     int net=snoop()-before;
     std::cout.rdbuf(coutBuff);
-    std::cout << basename(plugin.c_str()) << " allocates " << net/1000.0 << " MB" << std::endl;
+    std::cout << basename((char *) plugin.c_str()) << " allocates " << net/1000.0 << " MB" << std::endl;
     std::cout.rdbuf(fileBuff);
  
    }

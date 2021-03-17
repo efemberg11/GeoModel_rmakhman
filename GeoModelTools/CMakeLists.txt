@@ -52,6 +52,7 @@ add_subdirectory( GeoModelXMLParser )
 add_subdirectory( GeoModelJSONParser )
 add_subdirectory( ExpressionEvaluator )
 add_subdirectory( GMCAT )
+add_subdirectory( GMSTATISTICS )
 add_subdirectory( GDMLtoGM )
 
 # Create and install the version description of the project.

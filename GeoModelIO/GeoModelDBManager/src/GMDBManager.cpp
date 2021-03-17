@@ -1004,7 +1004,6 @@ void GMDBManager::getAllDBTableColumns()
     }
 
     for( auto& tableName : m_cache_tables ) {
-        std::cout << "Processing table '" << tableName << "'...\n";
         sqlite3_stmt *stmt;
         // get the 'name' column from the PRAGMA's table's definition
         // see: https://stackoverflow.com/a/54962853/320369

@@ -129,6 +129,29 @@ rotation& GDMLController::retrieveRotation(std::string name)
 	}
 }
 
+void GDMLController::saveScale(std::string name, scale p)
+{
+    if (theScales.find(name)!=theScales.end())
+    {
+         std::cout << " Warning! scale "<< name << " already in store!"<<std::endl;
+    }
+    else
+        theScales[name]=p;
+}
+scale& GDMLController::retrieveScale(std::string name)
+{
+    if (theScales.find(name)!=theScales.end())
+    {
+        return theScales[name];
+    }
+    else
+    {
+        static scale empty=scale();
+        std::cout << " Warning! scale "<< name << " not found in store! returning empty"<<std::endl;
+        return empty;
+    }
+}
+
 void GDMLController::saveElement(std::string name, GeoElement* e)
 {
 	if (theElements.find(name)!=theElements.end())
@@ -214,6 +237,7 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 #include "GDMLInterface/temperatureHandler.h"
 #include "GDMLInterface/positionHandler.h"
 #include "GDMLInterface/rotationHandler.h"
+#include "GDMLInterface/scaleHandler.h"
 #include "GDMLInterface/materialrefHandler.h"
 #include "GDMLInterface/solidrefHandler.h"
 #include "GDMLInterface/volumerefHandler.h"
@@ -245,6 +269,8 @@ void GDMLController::registerHandlers()
 	new positionHandler("positionref",this);
 	new rotationHandler("rotation",this);
 	new rotationHandler("rotationref",this);
+    new scaleHandler("scale",this);
+    new scaleHandler("scaleref",this);
 	new positionHandler("firstposition",this);
 	new positionHandler("firstpositionref",this);
 	new rotationHandler("firstrotation",this);

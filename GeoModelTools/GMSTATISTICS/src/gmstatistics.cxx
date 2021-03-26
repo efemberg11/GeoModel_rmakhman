@@ -31,7 +31,7 @@ std::string xtraOpts="[-h]";
 #else
 const std::string shared_obj_extension=".so";
 double factor=1000.0;
-std::string xtraOpts="[-s]"
+std::string xtraOpts="[-s]";
 #endif
 
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'

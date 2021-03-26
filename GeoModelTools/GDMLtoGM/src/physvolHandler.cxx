@@ -7,6 +7,7 @@
 #include "GDMLInterface/volumerefHandler.h"
 #include "GDMLInterface/positionHandler.h"
 #include "GDMLInterface/rotationHandler.h"
+#include "GDMLInterface/scaleHandler.h"
 
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoDefinitions.h"
@@ -17,15 +18,22 @@ physvolHandler::physvolHandler(std::string n, GDMLController* c): GDMLHandler(n,
 }
 void physvolHandler::ElementHandle() {
 	thePhysicalVolume=0;
-		
-	name=getAttributeAsString("name");
+        
+    //NB the attribute 'name' is not mandatory
+    //better to use the getAttributeAsString with the boolean option
+    bool isPresent;
+	name=getAttributeAsString("name", isPresent);
 	//std::cout<<" this is physvolHandler: name "<<name<<std::endl;
 
 	StopLoop(true);
 	xercesc::DOMNode *child;
-
-	GeoTrf::Transform3D pVRotation=GeoTrf::Transform3D::Identity();
-	GeoTrf::Vector3D pVTranslation=GeoTrf::Vector3D(0,0,0);
+        
+//	GeoTrf::Transform3D pVRotation=GeoTrf::Transform3D::Identity();
+//	GeoTrf::Vector3D pVTranslation=GeoTrf::Vector3D(0,0,0);
+    
+    GeoTrf::Transform3D pVRotation=GeoTrf::Transform3D::Identity();
+    GeoTrf::Vector3D pVTranslation=GeoTrf::Vector3D(0,0,0);
+    GeoTrf::Transform3D pVScale=GeoTrf::Scale3D::Identity();
 
 	for (child=XercesParser::GetCurrentElement()->getFirstChild();child!=0;child=child->getNextSibling())
 	{
@@ -60,12 +68,21 @@ void physvolHandler::ElementHandle() {
                         pVRotation=GeoTrf::RotateX3D(-r.rotx)*GeoTrf::RotateY3D(-r.roty)*GeoTrf::RotateZ3D(-r.rotz);
                     }
                 }
+                else if (nH=="scale") {
+                    scaleHandler* rH=dynamic_cast<scaleHandler*>(h);
+                    if (!rH) std::cout<<" something is wrong! can not retrieve scaleHandler!!!"<<std::endl;
+                    else {
+                        scale r=rH->getScale();
+                        pVScale=GeoTrf::Scale3D(r.scalex, r.scaley, r.scalez);
+                    }
+                }
                 else std::cout<<" Name of the handler not defined "<<nH<<std::endl;
             }
             else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
         }
 	}
-	trf=new GeoTransform(GeoTrf::Translate3D(pVTranslation.x(),pVTranslation.y(),pVTranslation.z())*pVRotation);
+	//trf=new GeoTransform(GeoTrf::Translate3D(pVTranslation.x(),pVTranslation.y(),pVTranslation.z())*pVRotation);
+    trf=new GeoTransform(GeoTrf::Translate3D(pVTranslation.x(),pVTranslation.y(),pVTranslation.z())*pVRotation*pVScale);
 }
 GeoPhysVol* physvolHandler::getPhysicalVolume() 
 {

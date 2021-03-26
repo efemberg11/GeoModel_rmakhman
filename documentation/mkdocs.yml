@@ -11,21 +11,21 @@ theme:
 
 nav:
     - Home: 'index.md'
-    - Getting Started:
-        - 'Install Libraries & Tools': 'start/install.md'
-        - 'The Basic Concepts': 'start/basic_concepts.md'
-        - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
-    - How To:
-        - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
-        - 'Build a simple detector': 'how/how_simple_detector_cpp.md'
-        - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
-        - 'Load a geometry from a file': 'how/how_load_geo.md'
-        - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
+    - 'Install Libraries & Tools': 'start/install.md'
+    # - Getting Started:
+    #     - 'Install Libraries & Tools': 'start/install.md'
+    #     - 'The Basic Concepts': 'start/basic_concepts.md'
+    #     - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
+    # - How To:
+    #     - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
+    #     - 'Build a simple detector': 'how/how_simple_detector_cpp.md'
+    #     - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
+    #     - 'Load a geometry from a file': 'how/how_load_geo.md'
+    #     - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
     - GeoModel Components:
         - Kernel:
             - 'Overview': 'components/kernel/overview/index.md'
             - 'Class Reference': 'components/kernel/reference/index.md'
-              #- 'Box': 'components/kernel/reference/RCBase/GeoShape/GeoBox.md'
         - GeoModelTools:
             - 'GDML2GeoModel': 'components/geomodeltools/gdml2gm/index.md'
         - GeoModelVisualization:

@@ -9,9 +9,11 @@ class GDMLController;
 
 class rotationHandler:public GDMLHandler {
 public:
+
 	rotationHandler(std::string n, GDMLController* c);
 	void ElementHandle();
 	rotation& getRotation();
+private:
 	rotation p;
 };
 

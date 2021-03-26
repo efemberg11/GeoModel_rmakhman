@@ -1,7 +1,7 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # Declare the package's executable.
-add_executable( gmstatistics src/gmstatistics.cxx )
+add_executable( gmstatistics src/gmstatistics.cxx  src/GeoInventoryGraphAction.cxx )
 target_link_libraries( gmstatistics PRIVATE GeoModelCore::GeoModelKernel
     GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite
     GeoModelIO::GeoModelDBManager )

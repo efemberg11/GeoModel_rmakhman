@@ -12,21 +12,26 @@
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelKernel/GeoNameTag.h"
-
+#include "GeoInventoryGraphAction.h"
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
+#include <cstdlib>
 #include <unistd.h>
 #include <libgen.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+
 #ifdef __APPLE__
 const std::string shared_obj_extension=".dylib";
 double factor=1000000.0;
+std::string xtraOpts="[-h]";
 #else
 const std::string shared_obj_extension=".so";
 double factor=1000.0;
+std::string xtraOpts="[-s]"
 #endif
 
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
@@ -41,9 +46,10 @@ int main(int argc, char ** argv) {
    //
   // Usage message:
   //
-
+  bool printTree=false;
+  bool heap=false;
   std::string gmstat= argv[0];
-  std::string usage= "usage: " + gmstat + " [plugin1"+shared_obj_extension
+  std::string usage= "usage: " + gmstat + " [-p] " + xtraOpts +  "[plugin1"+shared_obj_extension
     + "] [plugin2" + shared_obj_extension
     + "] ";
   //
@@ -63,6 +69,12 @@ int main(int argc, char ** argv) {
     std::string argument=argv[argi];
     if (argument.find(shared_obj_extension)!=std::string::npos) {
       inputPlugins.push_back(argument);
+    }
+    else if (argument=="-p") {
+      printTree=true;
+    }
+    else if (argument=="-h") {
+      heap=true;
     }
     else {
       std::cerr << "Unrecognized argument " << argument << std::endl;
@@ -110,9 +122,7 @@ int main(int argc, char ** argv) {
   std::streambuf *fileBuff=file.rdbuf();
   std::cout.rdbuf(fileBuff); 
 
-
   
-
   for (const std::string & plugin : inputPlugins) {
     GeoGeometryPluginLoader loader;
     GeoVGeometryPlugin *factory=loader.load(plugin);
@@ -123,13 +133,39 @@ int main(int argc, char ** argv) {
     }
     
     int before=snoop();
-    factory->create(world, true);
+    factory->create(world);
     int net=snoop()-before;
     std::cout.rdbuf(coutBuff);
     std::cout << basename((char *) plugin.c_str()) << " allocates " << net/factor << " MB" << std::endl;
+
+    if (printTree) {
+      GeoInventoryGraphAction action(std::cout);
+      world->exec(&action);
+    }
     std::cout.rdbuf(fileBuff);
- 
+
    }
   std::cout.rdbuf(coutBuff);
+  if (heap) {
+    //
+    // Ceci n'est pas une pipe:
+    //
+    FILE *pipe=popen(("heap --guessNonObjects " + std::to_string(getpid()) + " | grep GeoModel" ).c_str(),"r");
+    //
+    char *line;
+    size_t linecap=0;
+    int sum=0.0;
+    while ( getline(&line, &linecap, pipe) > 0) {
+      std::istringstream stream(line);
+      unsigned int total, number;
+      double average;
+      std::string object;
 
+      stream >> number >> total >> average >> object;
+      std::cout << std::setw(30) << object << " " << std::setw(15) << number << " instances " << std::setw(20) <<  total << " bytes" << std::endl;
+      sum +=total;
+    }
+    std::cout << "Total GeoModel object allocation:  " << sum/1000000.0 << "MB" << std::endl; 
+  }
+ 
 }

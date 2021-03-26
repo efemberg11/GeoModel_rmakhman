@@ -23,7 +23,7 @@ nav:
     #     - 'Load a geometry from a file': 'how/how_load_geo.md'
     #     - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
     - GeoModel Components:
-        - Kernel (GeoModelCore):
+        - Kernel:
             - 'Overview': 'components/kernel/overview/index.md'
             - 'Class Reference': 'components/kernel/reference/index.md'
         - GeoModelTools:

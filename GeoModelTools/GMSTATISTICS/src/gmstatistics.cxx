@@ -81,7 +81,11 @@ void * operator new(size_t size)
 }
 
 // global operator delete
-void operator delete(void * ptr) _NOEXCEPT
+
+void operator delete(void * ptr)
+#ifdef __APPLE__
+  _NOEXCEPT
+#endif
 {
     free(ptr);
 }

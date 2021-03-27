@@ -81,7 +81,7 @@ void * operator new(size_t size)
 }
 
 // global operator delete
-void operator delete(void * ptr)
+void operator delete(void * ptr) _NOEXCEPT
 {
     free(ptr);
 }

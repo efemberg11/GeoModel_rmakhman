@@ -23,22 +23,87 @@
 #include <libgen.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <execinfo.h>
+using namespace std;
+// global operator new
+size_t gsize=0;
+bool heap=false;
+
+#define BT_BUF_SIZE 100
+bool tGeo(void)
+{
+  int j, nptrs;
+  void *buffer[BT_BUF_SIZE];
+  char **strings;
+  
+  nptrs = backtrace(buffer, BT_BUF_SIZE);
+
+  strings = backtrace_symbols(buffer, nptrs);
+  if (strings == NULL) {
+    perror("backtrace_symbols");
+    exit(EXIT_FAILURE);
+  }
+  
+  for (j = 0; j < nptrs; j++) {
+    if (strstr(strings[j],"GeoModelKernel")) {
+      
+      //   for (int k=0;k<nptrs;k++) printf("%s\n",strings[k]);
+      // printf("\n\n");
+      
+      free(strings);
+      return true;
+    }
+  }
+  free(strings);
+  return false;
+}
+
+
+void * operator new(size_t size)
+{
+#ifndef __APPLE__
+  if (heap) {
+    if (tGeo()) gsize += size;
+  }
+#endif
+  void * ptr;
+    ptr = malloc(size); // attempt to allocate memory
+
+    if (!ptr) // if memory is not allocated, then an exception is thrown
+    {
+        bad_alloc ba;
+        throw ba;
+    }
+    else
+    {
+        return ptr;
+    }
+}
+
+// global operator delete
+void operator delete(void * ptr)
+{
+    free(ptr);
+}
+
+
+
 
 #ifdef __APPLE__
 const std::string shared_obj_extension=".dylib";
 double factor=1000000.0;
-std::string xtraOpts="[-h]";
 #else
 const std::string shared_obj_extension=".so";
 double factor=1000.0;
-std::string xtraOpts="[-s]"
 #endif
 
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 int  snoop() {
+ 
   struct rusage usage;
   getrusage(RUSAGE_SELF,&usage);
   return usage.ru_maxrss;
+
 }
 
 int main(int argc, char ** argv) {
@@ -46,10 +111,10 @@ int main(int argc, char ** argv) {
    //
   // Usage message:
   //
+  std::string xtraOpts="";
   bool printTree=false;
-  bool heap=false;
   std::string gmstat= argv[0];
-  std::string usage= "usage: " + gmstat + " [-p] " + xtraOpts +  "[plugin1"+shared_obj_extension
+  std::string usage= "usage: " + gmstat + " [-p] [-h] " + xtraOpts +  "[plugin1"+shared_obj_extension
     + "] [plugin2" + shared_obj_extension
     + "] ";
   //
@@ -75,6 +140,10 @@ int main(int argc, char ** argv) {
     }
     else if (argument=="-h") {
       heap=true;
+#ifndef __APPLE__
+      std::cout << "Warning, heap analysis on Linux takes far greater time" << std::endl;  
+      std::cout << "and is less informative than on MacOS            " << std::endl;
+#endif      
     }
     else {
       std::cerr << "Unrecognized argument " << argument << std::endl;
@@ -146,16 +215,18 @@ int main(int argc, char ** argv) {
 
    }
   std::cout.rdbuf(coutBuff);
+  
   if (heap) {
+#ifdef __APPLE__
     //
     // Ceci n'est pas une pipe:
     //
-    FILE *pipe=popen(("heap --guessNonObjects " + std::to_string(getpid()) + " | grep GeoModel" ).c_str(),"r");
+    FILE *ceci=popen(("heap --guessNonObjects " + std::to_string(getpid()) + " | grep GeoModel" ).c_str(),"r");
     //
     char *line;
     size_t linecap=0;
     int sum=0.0;
-    while ( getline(&line, &linecap, pipe) > 0) {
+    while ( getline(&line, &linecap, ceci) > 0) {
       std::istringstream stream(line);
       unsigned int total, number;
       double average;
@@ -165,7 +236,10 @@ int main(int argc, char ** argv) {
       std::cout << std::setw(30) << object << " " << std::setw(15) << number << " instances " << std::setw(20) <<  total << " bytes" << std::endl;
       sum +=total;
     }
-    std::cout << "Total GeoModel object allocation:  " << sum/1000000.0 << "MB" << std::endl; 
+    std::cout << "Total GeoModel object allocation:  " << sum/1000000.0 << "MB" << std::endl;
+#else
+    std::cout << "Total GeoModel object allocation:  " << gsize/1000000.0 << std::endl;
+#endif
   }
- 
+
 }

@@ -141,8 +141,8 @@ int main(int argc, char ** argv) {
     else if (argument=="-h") {
       heap=true;
 #ifndef __APPLE__
-      std::cout << "Warning, heap analysis on Linux takes far greater time" << std::endl;  
-      std::cout << "and is less informative than on MacOS            " << std::endl;
+      std::cout << "Warning, heap analysis on Linux takes far greater time"    << std::endl;  
+      std::cout << "and is less informative than on MacOS. Patience required." << std::endl;
 #endif      
     }
     else {

@@ -175,7 +175,7 @@ int main(int argc, char ** argv) {
   //
   // Ceci n'est pas une pipe:
   //
-  FILE *ceci=popen(("heap --guessNonObjects " + std::to_string(getpid()) + " | grep GeoModel" ).c_str(),"r");
+  FILE *ceci=popen(("heap --guessNonObjects " + std::to_string(getpid()) + " | grep -e GeoModelKernel -e GeoGenericFunctions " ).c_str(),"r");
   //
   char *line;
   size_t linecap=0;

@@ -54,6 +54,12 @@ option(GEOMODEL_BUILD_EXAMPLES_W_GEANT4 "Enable the build of GeoModelExamples, i
 option(GEOMODEL_BUILD_VISUALIZATION "Enable the build of GeoModelVisualization" OFF)
 option(GEOMODEL_BUILD_GEOMODELG4 "Enable the build of GeoModelG4" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT "Enable the build of FullSimLight" OFF)
+option(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING "Enable FullSimLight profiling targets" OFF)
+
+if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
+  set(GEOMODEL_BUILD_FULLSIMLIGHT ON CACHE BOOL "Enable the build of FullSimLight" FORCE)
+  include(CTest) # needs to be included at the top level
+endif()
 
 # a list to keep track of the packages we build
 set(BUILT_PACKAGES "")

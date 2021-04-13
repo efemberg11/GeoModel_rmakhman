@@ -28,6 +28,7 @@ set_target_properties( GeoModelKernel PROPERTIES
 if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
   set_source_files_properties(
      ${CMAKE_CURRENT_SOURCE_DIR}/src/GeoXF.cxx
+     ${CMAKE_CURRENT_SOURCE_DIR}/src/GeoAlignableTransform.cxx
      PROPERTIES
      COMPILE_FLAGS "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}"
      COMPILE_DEFINITIONS "FLATTEN" )

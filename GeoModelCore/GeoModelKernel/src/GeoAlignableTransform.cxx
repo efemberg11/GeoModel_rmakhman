@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoAlignableTransform.h"
@@ -19,6 +19,14 @@ GeoAlignableTransform::~GeoAlignableTransform()
   delete m_delta;
 }
 
+#if defined(FLATTEN) && defined(__GNUC__)
+// We compile this package with optimization, even in debug builds; otherwise,
+// the heavy use of Eigen makes it too slow.  However, from here we may call
+// to out-of-line Eigen code that is linked from other DSOs; in that case,
+// it would not be optimized.  Avoid this by forcing all Eigen code
+// to be inlined here if possible.
+__attribute__ ((flatten))
+#endif
 GeoTrf::Transform3D GeoAlignableTransform::getTransform(const GeoVAlignmentStore* store) const
 {
   const GeoTrf::Transform3D* delta = (store==nullptr ? m_delta : store->getDelta(this));

@@ -2,7 +2,7 @@
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
-file( GLOB HEADERS ExpressionEvaluator/*.h )
+file( GLOB HEADERS ExpressionEvaluator/*.h ExpressionEvaluator/*.hpp )
 
 # Create the library.
 add_library( ExpressionEvaluator SHARED ${HEADERS} ${SOURCES} )

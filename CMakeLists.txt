@@ -9,17 +9,6 @@ list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 # Define color codes for CMake messages
 include( cmake_colors_defs )
 
-# === Dev toolchain on Apple ===
-# If building on Apple, let's set the CommandLineTools toolchain by default
-# This must be set before calling the 'project' command
-option( GEOMODEL_APPLE_USE_CLT "While building on Apple machine, force the use of the CommandLineTools toolchain. You can switch it OFF if you want to build against another toolchain (e.g., the Xcode toolchain)" ON )
-if( APPLE AND GEOMODEL_APPLE_USE_CLT )
-	set( ENV{DEVELOPER_DIR} /Library/Developer/CommandLineTools/ )
-	message(STATUS "${BoldWhite}-----${ColourReset}")
-	message ( STATUS "${BoldMagenta}Building on APPLE -- NOTE: we are using this toolchain by default: $ENV{DEVELOPER_DIR}. Switch off the GEOMODEL_APPLE_USE_CLT option to select another macOS toolchain.${ColourReset}")
-	message(STATUS "${BoldWhite}-----${ColourReset}")
-endif()
-
 
 # === Project's settings ===
 include( GeoModel-version )
@@ -41,8 +30,10 @@ include( configure_cpp_options )
 # But use it at a "LAST" resource, if no other options worked.
 # For details on the behaviour of this cache variable, see:
 # - https://cmake.org/cmake/help/v3.0/command/find_file.html
+if( APPLE )
 set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
    "Framework finding behaviour on macOS" )
+endif()
 
 # Set up how the project handle some of its dependenices. Either by picking them
 # up from the environment, or building them itself.

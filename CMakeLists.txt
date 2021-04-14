@@ -3,15 +3,29 @@
 # === Preamble ===
 cmake_minimum_required(VERSION 3.12...3.19.1)
 
-# === Project's settings ===
 # Make the 'cmake' module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+
+# Define color codes for CMake messages
+include( cmake_colors_defs )
+
+# === Dev toolchain on Apple ===
+# If building on Apple, let's set the CommandLineTools toolchain by default
+# This must be set before calling the 'project' command
+option( GEOMODEL_APPLE_USE_CLT "While building on Apple machine, force the use of the CommandLineTools toolchain. You can switch it OFF if you want to build against another toolchain (e.g., the Xcode toolchain)" ON )
+if( APPLE AND GEOMODEL_APPLE_USE_CLT )
+	set( ENV{DEVELOPER_DIR} /Library/Developer/CommandLineTools/ )
+	message(STATUS "${BoldWhite}-----${ColourReset}")
+	message ( STATUS "${BoldMagenta}Building on APPLE -- NOTE: we are using this toolchain by default: $ENV{DEVELOPER_DIR}. Switch off the GEOMODEL_APPLE_USE_CLT option to select another macOS toolchain.${ColourReset}")
+	message(STATUS "${BoldWhite}-----${ColourReset}")
+endif()
+
+
+# === Project's settings ===
 include( GeoModel-version )
 project( "GeoModel" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
 # === Project wide setup ===
-# Define color codes for CMake messages
-include( cmake_colors_defs )
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 # Set a default build type

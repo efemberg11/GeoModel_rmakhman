@@ -13,14 +13,23 @@ https://twiki.atlas-canada.ca/pub/AtlasCanada/ITk/gmx2geo.pdf
 ## How to build it
 
 If `GeoModel` is installed:
+
 ```
+# Clone
 git clone ssh://git@gitlab.cern.ch:7999/atlas/geomodelatlas/GeoModelATLAS.git
+
+# Configure, build, install locally:
 mkdir build_geomodelatlas; cd build_geomodelatlas
 cmake -DCMAKE_INSTALL_PREFIX=../install/ -DGEOMODELATLAS_BUILD_GEOMODELXML=1 ../GeoModelATLAS
 make
 make install
+
+# EXTRA STEP: Add a rpath, only needed when using a local 'install' folder 
+install_name_tool -add_rpath ../install/lib ../install/lib/libGMXPlugin.dylib
+
 cd ..
 ```
+
 
 ## How to run it
 
@@ -33,7 +42,7 @@ From e.g. your home directory
 
 ```
 cd install
-export GMX_FILES="../GeoModelATLAS/GeoModelXml/data/example1.xml"
+export GMX_FILES="../GeoModelATLAS/GeoModelXML/data/example1.xml"
 bin/gmex lib/libGMXPlugin.1.0.0.dylib (or .so on Linux)
 ```
 

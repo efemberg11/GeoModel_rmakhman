@@ -24,12 +24,19 @@ cmake -DCMAKE_INSTALL_PREFIX=../install/ -DGEOMODELATLAS_BUILD_GEOMODELXML=1 ../
 make
 make install
 
-# EXTRA STEP: Add a rpath, only needed when using a local 'install' folder 
-install_name_tool -add_rpath ../install/lib ../install/lib/libGMXPlugin.dylib
-
 cd ..
 ```
 
+### Post-build setup
+
+**NOTE:** This is only needed on macOS, and only when using a local `install` folder (instead of system folders like `usr/local/`). 
+
+This extra step tells the `GMXPlugin` where it can find the other libraries, when loaded as a plugin at runtime:
+
+```
+# EXTRA STEP: Add a rpath, only needed on macOS and when using a local 'install' folder 
+install_name_tool -add_rpath install/lib install/lib/libGMXPlugin.dylib
+```
 
 ## How to run it
 

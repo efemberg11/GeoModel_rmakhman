@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<GeoInpTables>
+
+<Table name="HelloCables">
+  <Row BARRELACCORDIONCABLES_DATA_ID="0" DLAR="1.396" DKAP="1.46" DCU="8.96" PERKAP="38" PERCU="62" PERAIR="14" HEIGHT="7" THICKIN=".1" THICKFAC=".517" ACCORCAB="64" CLEARANCE=".6"/>
+</Table>
+
+
+<Table name="HelloBoxes">
+  <Row BARRELDMBOXES_DATA_ID="1" BOXNAME="Ped1" HLEN="67" HWDT="380.18" HHGT="245.65"/>
+  <Row BARRELDMBOXES_DATA_ID="3" BOXNAME="Crate2" HLEN="250" HWDT="396.87" HHGT="245.55"/>
+  <Row BARRELDMBOXES_DATA_ID="4" BOXNAME="Crate3" HLEN="186.5" HWDT="3.175" HHGT="245.55" XTR="6.7"/>
+</Table>
+
+</GeoInpTables>

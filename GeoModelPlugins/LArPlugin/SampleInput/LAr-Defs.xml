@@ -1,0 +1,1973 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<GeoInpDefs>
+<TableDef name="BarrelAccordionCables">
+  <ColDef name="BARRELACCORDIONCABLES_DATA_ID" type="LONG"/>
+  <ColDef name="DLAR" type="DOUBLE"/>
+  <ColDef name="DKAP" type="DOUBLE"/>
+  <ColDef name="DCU" type="DOUBLE"/>
+  <ColDef name="PERKAP" type="DOUBLE"/>
+  <ColDef name="PERCU" type="DOUBLE"/>
+  <ColDef name="PERAIR" type="DOUBLE"/>
+  <ColDef name="HEIGHT" type="DOUBLE"/>
+  <ColDef name="THICKIN" type="DOUBLE"/>
+  <ColDef name="THICKFAC" type="DOUBLE"/>
+  <ColDef name="ACCORCAB" type="INT"/>
+  <ColDef name="CLEARANCE" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="BarrelDMBoxes">
+  <ColDef name="BARRELDMBOXES_DATA_ID" type="LONG"/>
+  <ColDef name="BOXNAME" type="STRING"/>
+  <ColDef name="HLEN" type="DOUBLE"/>
+  <ColDef name="HWDT" type="DOUBLE"/>
+  <ColDef name="HHGT" type="DOUBLE"/>
+  <ColDef name="XTR" type="DOUBLE"/>
+  <ColDef name="YTR" type="DOUBLE"/>
+  <ColDef name="ZTR" type="DOUBLE"/>
+  <ColDef name="XROT" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="BarrelDMTraps">
+  <ColDef name="BARRELDMTRAPS_DATA_ID" type="LONG"/>
+  <ColDef name="TRAPNAME" type="STRING"/>
+  <ColDef name="ZHLEN" type="DOUBLE"/>
+  <ColDef name="THETA" type="DOUBLE"/>
+  <ColDef name="PHI" type="DOUBLE"/>
+  <ColDef name="YZN" type="DOUBLE"/>
+  <ColDef name="XYNZN" type="DOUBLE"/>
+  <ColDef name="XYPZN" type="DOUBLE"/>
+  <ColDef name="ANGN" type="DOUBLE"/>
+  <ColDef name="YZP" type="DOUBLE"/>
+  <ColDef name="XYNZP" type="DOUBLE"/>
+  <ColDef name="XYPZP" type="DOUBLE"/>
+  <ColDef name="ANGP" type="DOUBLE"/>
+  <ColDef name="XTR" type="DOUBLE"/>
+  <ColDef name="YTR" type="DOUBLE"/>
+  <ColDef name="ZTR" type="DOUBLE"/>
+  <ColDef name="XROT" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="BarrelDMTrds">
+  <ColDef name="BARRELDMTRDS_DATA_ID" type="LONG"/>
+  <ColDef name="TRDNAME" type="STRING"/>
+  <ColDef name="XHLEN1" type="DOUBLE"/>
+  <ColDef name="XHLEN2" type="DOUBLE"/>
+  <ColDef name="YHLEN1" type="DOUBLE"/>
+  <ColDef name="YHLEN2" type="DOUBLE"/>
+  <ColDef name="ZHLEN" type="DOUBLE"/>
+  <ColDef name="XTR" type="DOUBLE"/>
+  <ColDef name="YTR" type="DOUBLE"/>
+  <ColDef name="ZTR" type="DOUBLE"/>
+  <ColDef name="XROT" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="BarrelDMTubes">
+  <ColDef name="BARRELDMTUBES_DATA_ID" type="LONG"/>
+  <ColDef name="TUBENAME" type="STRING"/>
+  <ColDef name="MINR" type="DOUBLE"/>
+  <ColDef name="MAXR" type="DOUBLE"/>
+  <ColDef name="ZHLEN" type="DOUBLE"/>
+  <ColDef name="XTR" type="DOUBLE"/>
+  <ColDef name="YTR" type="DOUBLE"/>
+  <ColDef name="ZTR" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="BarrelEtaTrans">
+  <ColDef name="BARRELETATRANS_DATA_ID" type="LONG"/>
+  <ColDef name="ETATRANS" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="BarrelGeometry">
+  <ColDef name="G10FRONTDELTAZ" type="DOUBLE"/>
+  <ColDef name="RMINHIGHZ" type="DOUBLE"/>
+  <ColDef name="DELTARS12" type="DOUBLE"/>
+  <ColDef name="BEND2" type="DOUBLE"/>
+  <ColDef name="BEND3" type="DOUBLE"/>
+  <ColDef name="RHOCEN_0" type="DOUBLE"/>
+  <ColDef name="RHOCEN_1" type="DOUBLE"/>
+  <ColDef name="RHOCEN_2" type="DOUBLE"/>
+  <ColDef name="RHOCEN_3" type="DOUBLE"/>
+  <ColDef name="RHOCEN_4" type="DOUBLE"/>
+  <ColDef name="RHOCEN_5" type="DOUBLE"/>
+  <ColDef name="RHOCEN_6" type="DOUBLE"/>
+  <ColDef name="RHOCEN_7" type="DOUBLE"/>
+  <ColDef name="RHOCEN_8" type="DOUBLE"/>
+  <ColDef name="RHOCEN_9" type="DOUBLE"/>
+  <ColDef name="RHOCEN_10" type="DOUBLE"/>
+  <ColDef name="RHOCEN_11" type="DOUBLE"/>
+  <ColDef name="RHOCEN_12" type="DOUBLE"/>
+  <ColDef name="RHOCEN_13" type="DOUBLE"/>
+  <ColDef name="RHOCEN_14" type="DOUBLE"/>
+  <ColDef name="RHOCEN_15" type="DOUBLE"/>
+  <ColDef name="RHOCEN_16" type="DOUBLE"/>
+  <ColDef name="RHOCEN_17" type="DOUBLE"/>
+  <ColDef name="RHOCEN_18" type="DOUBLE"/>
+  <ColDef name="RHOCEN_19" type="DOUBLE"/>
+  <ColDef name="PHICEN_0" type="DOUBLE"/>
+  <ColDef name="PHICEN_1" type="DOUBLE"/>
+  <ColDef name="PHICEN_2" type="DOUBLE"/>
+  <ColDef name="PHICEN_3" type="DOUBLE"/>
+  <ColDef name="PHICEN_4" type="DOUBLE"/>
+  <ColDef name="PHICEN_5" type="DOUBLE"/>
+  <ColDef name="PHICEN_6" type="DOUBLE"/>
+  <ColDef name="PHICEN_7" type="DOUBLE"/>
+  <ColDef name="PHICEN_8" type="DOUBLE"/>
+  <ColDef name="PHICEN_9" type="DOUBLE"/>
+  <ColDef name="PHICEN_10" type="DOUBLE"/>
+  <ColDef name="PHICEN_11" type="DOUBLE"/>
+  <ColDef name="PHICEN_12" type="DOUBLE"/>
+  <ColDef name="PHICEN_13" type="DOUBLE"/>
+  <ColDef name="PHICEN_14" type="DOUBLE"/>
+  <ColDef name="PHICEN_15" type="DOUBLE"/>
+  <ColDef name="PHICEN_16" type="DOUBLE"/>
+  <ColDef name="PHICEN_17" type="DOUBLE"/>
+  <ColDef name="PHICEN_18" type="DOUBLE"/>
+  <ColDef name="PHICEN_19" type="DOUBLE"/>
+  <ColDef name="DELTA_0" type="DOUBLE"/>
+  <ColDef name="DELTA_1" type="DOUBLE"/>
+  <ColDef name="DELTA_2" type="DOUBLE"/>
+  <ColDef name="DELTA_3" type="DOUBLE"/>
+  <ColDef name="DELTA_4" type="DOUBLE"/>
+  <ColDef name="DELTA_5" type="DOUBLE"/>
+  <ColDef name="DELTA_6" type="DOUBLE"/>
+  <ColDef name="DELTA_7" type="DOUBLE"/>
+  <ColDef name="DELTA_8" type="DOUBLE"/>
+  <ColDef name="DELTA_9" type="DOUBLE"/>
+  <ColDef name="DELTA_10" type="DOUBLE"/>
+  <ColDef name="DELTA_11" type="DOUBLE"/>
+  <ColDef name="DELTA_12" type="DOUBLE"/>
+  <ColDef name="DELTA_13" type="DOUBLE"/>
+  <ColDef name="DELTA_14" type="DOUBLE"/>
+  <ColDef name="DELTA_15" type="DOUBLE"/>
+  <ColDef name="DELTA_16" type="DOUBLE"/>
+  <ColDef name="DELTA_17" type="DOUBLE"/>
+  <ColDef name="DELTA_18" type="DOUBLE"/>
+  <ColDef name="DELTA_19" type="DOUBLE"/>
+  <ColDef name="ETACU2" type="DOUBLE"/>
+  <ColDef name="PHIFIRST" type="DOUBLE"/>
+  <ColDef name="PHIMAXBARREL" type="DOUBLE"/>
+  <ColDef name="BARRELGEOMETRY_DATA_ID" type="LONG"/>
+  <ColDef name="NBRT" type="INT"/>
+  <ColDef name="NCELMX" type="INT"/>
+  <ColDef name="IDELFI" type="INT"/>
+  <ColDef name="NSTAMX" type="INT"/>
+  <ColDef name="IRUNC" type="INT"/>
+  <ColDef name="ETACUT" type="DOUBLE"/>
+  <ColDef name="PHIGAP" type="DOUBLE"/>
+  <ColDef name="XCLA" type="DOUBLE"/>
+  <ColDef name="DELETA" type="DOUBLE"/>
+  <ColDef name="ETACU1" type="DOUBLE"/>
+  <ColDef name="GAMMA" type="DOUBLE"/>
+  <ColDef name="ALFA" type="DOUBLE"/>
+  <ColDef name="PSI" type="DOUBLE"/>
+  <ColDef name="THCU" type="DOUBLE"/>
+  <ColDef name="THFG" type="DOUBLE"/>
+  <ColDef name="RINT" type="DOUBLE"/>
+  <ColDef name="RCF" type="DOUBLE"/>
+  <ColDef name="ZMIN" type="DOUBLE"/>
+  <ColDef name="ZMAX" type="DOUBLE"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="XLA1" type="DOUBLE"/>
+  <ColDef name="XEL1" type="DOUBLE"/>
+  <ColDef name="XLA2" type="DOUBLE"/>
+  <ColDef name="XEL2" type="DOUBLE"/>
+  <ColDef name="XG10" type="DOUBLE"/>
+  <ColDef name="XTAL" type="DOUBLE"/>
+  <ColDef name="XGSB" type="DOUBLE"/>
+  <ColDef name="XTIP_PB" type="DOUBLE"/>
+  <ColDef name="XTIP_GT" type="DOUBLE"/>
+  <ColDef name="XTIP_GS" type="DOUBLE"/>
+  <ColDef name="XTIP_PC" type="DOUBLE"/>
+  <ColDef name="RCUT12" type="DOUBLE"/>
+  <ColDef name="RCUT23" type="DOUBLE"/>
+  <ColDef name="RHOMIN" type="DOUBLE"/>
+  <ColDef name="RHOMAX" type="DOUBLE"/>
+  <ColDef name="PHIIXT1" type="DOUBLE"/>
+  <ColDef name="PHIIXT2" type="DOUBLE"/>
+  <ColDef name="COEP" type="DOUBLE"/>
+  <ColDef name="ISEGME" type="INT"/>
+  <ColDef name="IFIGEM" type="INT"/>
+  <ColDef name="MDETA" type="INT"/>
+  <ColDef name="NDETA" type="INT"/>
+  <ColDef name="IWGEM" type="INT"/>
+  <ColDef name="PACHAM" type="DOUBLE"/>
+  <ColDef name="THPB" type="DOUBLE"/>
+  <ColDef name="THGL" type="DOUBLE"/>
+  <ColDef name="THFE" type="DOUBLE"/>
+  <ColDef name="TGPB" type="DOUBLE"/>
+  <ColDef name="TGGL" type="DOUBLE"/>
+  <ColDef name="TGFE" type="DOUBLE"/>
+  <ColDef name="TAPER_1" type="DOUBLE"/>
+  <ColDef name="TAPER_2" type="DOUBLE"/>
+  <ColDef name="RIN_AC" type="DOUBLE"/>
+  <ColDef name="ROUT_AC" type="DOUBLE"/>
+  <ColDef name="X0_INFRACC" type="DOUBLE"/>
+  <ColDef name="RDIST_RES" type="DOUBLE"/>
+  <ColDef name="DMIN_SEC3" type="DOUBLE"/>
+  <ColDef name="TOT1_X0" type="DOUBLE"/>
+  <ColDef name="TOT2_X0" type="DOUBLE"/>
+  <ColDef name="DENS_STEP" type="DOUBLE"/>
+  <ColDef name="DENS_H" type="DOUBLE"/>
+  <ColDef name="DENS_L" type="DOUBLE"/>
+  <ColDef name="BEND1" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="BarrelLongDiv">
+  <ColDef name="RMX23_26" type="DOUBLE"/>
+  <ColDef name="RMX23_27" type="DOUBLE"/>
+  <ColDef name="RMX23_28" type="DOUBLE"/>
+  <ColDef name="RMX23_29" type="DOUBLE"/>
+  <ColDef name="RMX23_30" type="DOUBLE"/>
+  <ColDef name="RMX23_31" type="DOUBLE"/>
+  <ColDef name="RMX23_32" type="DOUBLE"/>
+  <ColDef name="RMX23_33" type="DOUBLE"/>
+  <ColDef name="RMX23_34" type="DOUBLE"/>
+  <ColDef name="RMX23_35" type="DOUBLE"/>
+  <ColDef name="RMX23_36" type="DOUBLE"/>
+  <ColDef name="RMX23_37" type="DOUBLE"/>
+  <ColDef name="RMX23_38" type="DOUBLE"/>
+  <ColDef name="RMX23_39" type="DOUBLE"/>
+  <ColDef name="RMX23_40" type="DOUBLE"/>
+  <ColDef name="RMX23_41" type="DOUBLE"/>
+  <ColDef name="RMX23_42" type="DOUBLE"/>
+  <ColDef name="RMX23_43" type="DOUBLE"/>
+  <ColDef name="RMX23_44" type="DOUBLE"/>
+  <ColDef name="RMX23_45" type="DOUBLE"/>
+  <ColDef name="RMX23_46" type="DOUBLE"/>
+  <ColDef name="RMX23_47" type="DOUBLE"/>
+  <ColDef name="RMX23_48" type="DOUBLE"/>
+  <ColDef name="RMX23_49" type="DOUBLE"/>
+  <ColDef name="RMX23_50" type="DOUBLE"/>
+  <ColDef name="RMX23_51" type="DOUBLE"/>
+  <ColDef name="RMX23_52" type="DOUBLE"/>
+  <ColDef name="ZMINACT" type="DOUBLE"/>
+  <ColDef name="BARRELLONGDIV_DATA_ID" type="LONG"/>
+  <ColDef name="NS" type="INT"/>
+  <ColDef name="NP" type="INT"/>
+  <ColDef name="E0" type="DOUBLE"/>
+  <ColDef name="R0" type="DOUBLE"/>
+  <ColDef name="Z0" type="DOUBLE"/>
+  <ColDef name="E1" type="DOUBLE"/>
+  <ColDef name="DSTRIP1" type="DOUBLE"/>
+  <ColDef name="DSTRIP2" type="DOUBLE"/>
+  <ColDef name="ZMAXACT" type="DOUBLE"/>
+  <ColDef name="DZSTRIP" type="DOUBLE"/>
+  <ColDef name="EE_0" type="DOUBLE"/>
+  <ColDef name="EE_1" type="DOUBLE"/>
+  <ColDef name="EE_2" type="DOUBLE"/>
+  <ColDef name="EE_3" type="DOUBLE"/>
+  <ColDef name="EE_4" type="DOUBLE"/>
+  <ColDef name="EE_5" type="DOUBLE"/>
+  <ColDef name="EE_6" type="DOUBLE"/>
+  <ColDef name="EE_7" type="DOUBLE"/>
+  <ColDef name="RMX12_0" type="DOUBLE"/>
+  <ColDef name="RMX12_1" type="DOUBLE"/>
+  <ColDef name="RMX12_2" type="DOUBLE"/>
+  <ColDef name="RMX12_3" type="DOUBLE"/>
+  <ColDef name="RMX12_4" type="DOUBLE"/>
+  <ColDef name="RMX12_5" type="DOUBLE"/>
+  <ColDef name="RMX12_6" type="DOUBLE"/>
+  <ColDef name="RMX12_7" type="DOUBLE"/>
+  <ColDef name="RMX23_0" type="DOUBLE"/>
+  <ColDef name="RMX23_1" type="DOUBLE"/>
+  <ColDef name="RMX23_2" type="DOUBLE"/>
+  <ColDef name="RMX23_3" type="DOUBLE"/>
+  <ColDef name="RMX23_4" type="DOUBLE"/>
+  <ColDef name="RMX23_5" type="DOUBLE"/>
+  <ColDef name="RMX23_6" type="DOUBLE"/>
+  <ColDef name="RMX23_7" type="DOUBLE"/>
+  <ColDef name="RMX23_8" type="DOUBLE"/>
+  <ColDef name="RMX23_9" type="DOUBLE"/>
+  <ColDef name="RMX23_10" type="DOUBLE"/>
+  <ColDef name="RMX23_11" type="DOUBLE"/>
+  <ColDef name="RMX23_12" type="DOUBLE"/>
+  <ColDef name="RMX23_13" type="DOUBLE"/>
+  <ColDef name="RMX23_14" type="DOUBLE"/>
+  <ColDef name="RMX23_15" type="DOUBLE"/>
+  <ColDef name="RMX23_16" type="DOUBLE"/>
+  <ColDef name="RMX23_17" type="DOUBLE"/>
+  <ColDef name="RMX23_18" type="DOUBLE"/>
+  <ColDef name="RMX23_19" type="DOUBLE"/>
+  <ColDef name="RMX23_20" type="DOUBLE"/>
+  <ColDef name="RMX23_21" type="DOUBLE"/>
+  <ColDef name="RMX23_22" type="DOUBLE"/>
+  <ColDef name="RMX23_23" type="DOUBLE"/>
+  <ColDef name="RMX23_24" type="DOUBLE"/>
+  <ColDef name="RMX23_25" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="BarrelMotherboards">
+  <ColDef name="BARRELMOTHERBOARDS_DATA_ID" type="LONG"/>
+  <ColDef name="DG10" type="DOUBLE"/>
+  <ColDef name="DCU" type="DOUBLE"/>
+  <ColDef name="THIG10" type="DOUBLE"/>
+  <ColDef name="THICU" type="DOUBLE"/>
+  <ColDef name="THIMB" type="DOUBLE"/>
+  <ColDef name="HEIGHTMB" type="DOUBLE"/>
+  <ColDef name="MOTHBOAR" type="INT"/>
+  <ColDef name="CLEARANCE" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="BarrelSagging">
+  <ColDef name="SAG_0_X" type="DOUBLE"/>
+  <ColDef name="SAG_1_X" type="DOUBLE"/>
+  <ColDef name="SAG_2_X" type="DOUBLE"/>
+  <ColDef name="SAG_3_X" type="DOUBLE"/>
+  <ColDef name="SAG_4_X" type="DOUBLE"/>
+  <ColDef name="SAG_5_X" type="DOUBLE"/>
+  <ColDef name="SAG_6_X" type="DOUBLE"/>
+  <ColDef name="SAG_7_X" type="DOUBLE"/>
+  <ColDef name="SAG_8_X" type="DOUBLE"/>
+  <ColDef name="SAG_9_X" type="DOUBLE"/>
+  <ColDef name="SAG_10_X" type="DOUBLE"/>
+  <ColDef name="SAG_11_X" type="DOUBLE"/>
+  <ColDef name="SAG_12_X" type="DOUBLE"/>
+  <ColDef name="SAG_13_X" type="DOUBLE"/>
+  <ColDef name="SAG_14_X" type="DOUBLE"/>
+  <ColDef name="BARRELSAGGING_DATA_ID" type="LONG"/>
+  <ColDef name="NSAG" type="INT"/>
+  <ColDef name="SAG_0" type="DOUBLE"/>
+  <ColDef name="SAG_1" type="DOUBLE"/>
+  <ColDef name="SAG_2" type="DOUBLE"/>
+  <ColDef name="SAG_3" type="DOUBLE"/>
+  <ColDef name="SAG_4" type="DOUBLE"/>
+  <ColDef name="SAG_5" type="DOUBLE"/>
+  <ColDef name="SAG_6" type="DOUBLE"/>
+  <ColDef name="SAG_7" type="DOUBLE"/>
+  <ColDef name="SAG_8" type="DOUBLE"/>
+  <ColDef name="SAG_9" type="DOUBLE"/>
+  <ColDef name="SAG_10" type="DOUBLE"/>
+  <ColDef name="SAG_11" type="DOUBLE"/>
+  <ColDef name="SAG_12" type="DOUBLE"/>
+  <ColDef name="SAG_13" type="DOUBLE"/>
+  <ColDef name="SAG_14" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="ColdContraction">
+  <ColDef name="COLDCONTRACTION_DATA_ID" type="LONG"/>
+  <ColDef name="ABSORBERCONTRACTION" type="DOUBLE"/>
+  <ColDef name="G10RINGCONTRACTION" type="DOUBLE"/>
+  <ColDef name="MOTHERBOARDCONTRACTION" type="DOUBLE"/>
+  <ColDef name="CABLECONTRACTION" type="DOUBLE"/>
+  <ColDef name="COLDWINDOWCONTRACTION" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="CryoCylinders">
+  <ColDef name="QUALIFIER" type="STRING"/>
+  <ColDef name="CYLCOMMENT" type="STRING"/>
+  <ColDef name="CRYOCYLINDERS_DATA_ID" type="LONG"/>
+  <ColDef name="CYL_LOCATION" type="STRING"/>
+  <ColDef name="CYL_ID" type="INT"/>
+  <ColDef name="CYL_NUMBER" type="INT"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="DR" type="DOUBLE"/>
+  <ColDef name="ZMIN" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="CryoEars">
+  <ColDef name="CRYOEARS_DATA_ID" type="LONG"/>
+  <ColDef name="EARVERTICALEXTENT" type="DOUBLE"/>
+  <ColDef name="EARRMIN" type="DOUBLE"/>
+  <ColDef name="EARRMAX" type="DOUBLE"/>
+  <ColDef name="EARZTHICKNESS" type="DOUBLE"/>
+  <ColDef name="LEGANGLE" type="DOUBLE"/>
+  <ColDef name="LEGRMIN" type="DOUBLE"/>
+  <ColDef name="LEGRMAX" type="DOUBLE"/>
+  <ColDef name="LEGYMAX" type="DOUBLE"/>
+  <ColDef name="LEGZTHICKNESS" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="CryoPconPhiSect">
+  <ColDef name="CRYOPCONPHISECT_DATA_ID" type="LONG"/>
+  <ColDef name="PCON" type="STRING"/>
+  <ColDef name="STARTPHI" type="DOUBLE"/>
+  <ColDef name="DPHI" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+<TableDef name="CryoPcons">
+  <ColDef name="CRYOPCONS_DATA_ID" type="LONG"/>
+  <ColDef name="PCON" type="STRING"/>
+  <ColDef name="PLANE_ID" type="INT"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="ZPLANE" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EMBSampSep">
+  <ColDef name="EMBSAMPSEP_DATA_ID" type="LONG"/>
+  <ColDef name="IND" type="INT"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EMBSamplingSepInner">
+  <ColDef name="RMAX_379" type="DOUBLE"/>
+  <ColDef name="RMAX_380" type="DOUBLE"/>
+  <ColDef name="RMAX_381" type="DOUBLE"/>
+  <ColDef name="RMAX_382" type="DOUBLE"/>
+  <ColDef name="RMAX_383" type="DOUBLE"/>
+  <ColDef name="RMAX_384" type="DOUBLE"/>
+  <ColDef name="RMAX_385" type="DOUBLE"/>
+  <ColDef name="RMAX_386" type="DOUBLE"/>
+  <ColDef name="RMAX_387" type="DOUBLE"/>
+  <ColDef name="RMAX_388" type="DOUBLE"/>
+  <ColDef name="RMAX_389" type="DOUBLE"/>
+  <ColDef name="RMAX_390" type="DOUBLE"/>
+  <ColDef name="RMAX_391" type="DOUBLE"/>
+  <ColDef name="RMAX_392" type="DOUBLE"/>
+  <ColDef name="RMAX_393" type="DOUBLE"/>
+  <ColDef name="RMAX_394" type="DOUBLE"/>
+  <ColDef name="RMAX_395" type="DOUBLE"/>
+  <ColDef name="RMAX_396" type="DOUBLE"/>
+  <ColDef name="RMAX_397" type="DOUBLE"/>
+  <ColDef name="RMAX_398" type="DOUBLE"/>
+  <ColDef name="RMAX_399" type="DOUBLE"/>
+  <ColDef name="RMAX_400" type="DOUBLE"/>
+  <ColDef name="RMAX_401" type="DOUBLE"/>
+  <ColDef name="RMAX_402" type="DOUBLE"/>
+  <ColDef name="RMAX_403" type="DOUBLE"/>
+  <ColDef name="RMAX_404" type="DOUBLE"/>
+  <ColDef name="RMAX_405" type="DOUBLE"/>
+  <ColDef name="RMAX_406" type="DOUBLE"/>
+  <ColDef name="RMAX_407" type="DOUBLE"/>
+  <ColDef name="RMAX_408" type="DOUBLE"/>
+  <ColDef name="RMAX_409" type="DOUBLE"/>
+  <ColDef name="RMAX_410" type="DOUBLE"/>
+  <ColDef name="RMAX_411" type="DOUBLE"/>
+  <ColDef name="RMAX_412" type="DOUBLE"/>
+  <ColDef name="RMAX_413" type="DOUBLE"/>
+  <ColDef name="RMAX_414" type="DOUBLE"/>
+  <ColDef name="RMAX_415" type="DOUBLE"/>
+  <ColDef name="RMAX_416" type="DOUBLE"/>
+  <ColDef name="RMAX_417" type="DOUBLE"/>
+  <ColDef name="RMAX_418" type="DOUBLE"/>
+  <ColDef name="RMAX_419" type="DOUBLE"/>
+  <ColDef name="RMAX_420" type="DOUBLE"/>
+  <ColDef name="RMAX_421" type="DOUBLE"/>
+  <ColDef name="RMAX_422" type="DOUBLE"/>
+  <ColDef name="RMAX_423" type="DOUBLE"/>
+  <ColDef name="RMAX_424" type="DOUBLE"/>
+  <ColDef name="RMAX_425" type="DOUBLE"/>
+  <ColDef name="RMAX_426" type="DOUBLE"/>
+  <ColDef name="RMAX_427" type="DOUBLE"/>
+  <ColDef name="RMAX_428" type="DOUBLE"/>
+  <ColDef name="RMAX_429" type="DOUBLE"/>
+  <ColDef name="RMAX_430" type="DOUBLE"/>
+  <ColDef name="RMAX_431" type="DOUBLE"/>
+  <ColDef name="RMAX_432" type="DOUBLE"/>
+  <ColDef name="RMAX_433" type="DOUBLE"/>
+  <ColDef name="RMAX_434" type="DOUBLE"/>
+  <ColDef name="RMAX_435" type="DOUBLE"/>
+  <ColDef name="RMAX_436" type="DOUBLE"/>
+  <ColDef name="RMAX_437" type="DOUBLE"/>
+  <ColDef name="RMAX_438" type="DOUBLE"/>
+  <ColDef name="RMAX_439" type="DOUBLE"/>
+  <ColDef name="RMAX_440" type="DOUBLE"/>
+  <ColDef name="RMAX_441" type="DOUBLE"/>
+  <ColDef name="RMAX_442" type="DOUBLE"/>
+  <ColDef name="RMAX_443" type="DOUBLE"/>
+  <ColDef name="RMAX_444" type="DOUBLE"/>
+  <ColDef name="RMAX_445" type="DOUBLE"/>
+  <ColDef name="RMAX_446" type="DOUBLE"/>
+  <ColDef name="RMAX_447" type="DOUBLE"/>
+  <ColDef name="RMAX_295" type="DOUBLE"/>
+  <ColDef name="RMAX_296" type="DOUBLE"/>
+  <ColDef name="RMAX_297" type="DOUBLE"/>
+  <ColDef name="RMAX_298" type="DOUBLE"/>
+  <ColDef name="RMAX_299" type="DOUBLE"/>
+  <ColDef name="RMAX_300" type="DOUBLE"/>
+  <ColDef name="RMAX_301" type="DOUBLE"/>
+  <ColDef name="RMAX_302" type="DOUBLE"/>
+  <ColDef name="RMAX_303" type="DOUBLE"/>
+  <ColDef name="RMAX_304" type="DOUBLE"/>
+  <ColDef name="RMAX_305" type="DOUBLE"/>
+  <ColDef name="RMAX_306" type="DOUBLE"/>
+  <ColDef name="RMAX_307" type="DOUBLE"/>
+  <ColDef name="RMAX_308" type="DOUBLE"/>
+  <ColDef name="RMAX_309" type="DOUBLE"/>
+  <ColDef name="RMAX_310" type="DOUBLE"/>
+  <ColDef name="RMAX_311" type="DOUBLE"/>
+  <ColDef name="RMAX_312" type="DOUBLE"/>
+  <ColDef name="RMAX_313" type="DOUBLE"/>
+  <ColDef name="RMAX_314" type="DOUBLE"/>
+  <ColDef name="RMAX_315" type="DOUBLE"/>
+  <ColDef name="RMAX_316" type="DOUBLE"/>
+  <ColDef name="RMAX_317" type="DOUBLE"/>
+  <ColDef name="RMAX_318" type="DOUBLE"/>
+  <ColDef name="RMAX_319" type="DOUBLE"/>
+  <ColDef name="RMAX_320" type="DOUBLE"/>
+  <ColDef name="RMAX_321" type="DOUBLE"/>
+  <ColDef name="RMAX_322" type="DOUBLE"/>
+  <ColDef name="RMAX_323" type="DOUBLE"/>
+  <ColDef name="RMAX_324" type="DOUBLE"/>
+  <ColDef name="RMAX_325" type="DOUBLE"/>
+  <ColDef name="RMAX_326" type="DOUBLE"/>
+  <ColDef name="RMAX_327" type="DOUBLE"/>
+  <ColDef name="RMAX_328" type="DOUBLE"/>
+  <ColDef name="RMAX_329" type="DOUBLE"/>
+  <ColDef name="RMAX_330" type="DOUBLE"/>
+  <ColDef name="RMAX_331" type="DOUBLE"/>
+  <ColDef name="RMAX_332" type="DOUBLE"/>
+  <ColDef name="RMAX_333" type="DOUBLE"/>
+  <ColDef name="RMAX_334" type="DOUBLE"/>
+  <ColDef name="RMAX_335" type="DOUBLE"/>
+  <ColDef name="RMAX_336" type="DOUBLE"/>
+  <ColDef name="RMAX_337" type="DOUBLE"/>
+  <ColDef name="RMAX_338" type="DOUBLE"/>
+  <ColDef name="RMAX_339" type="DOUBLE"/>
+  <ColDef name="RMAX_340" type="DOUBLE"/>
+  <ColDef name="RMAX_341" type="DOUBLE"/>
+  <ColDef name="RMAX_342" type="DOUBLE"/>
+  <ColDef name="RMAX_343" type="DOUBLE"/>
+  <ColDef name="RMAX_344" type="DOUBLE"/>
+  <ColDef name="RMAX_345" type="DOUBLE"/>
+  <ColDef name="RMAX_346" type="DOUBLE"/>
+  <ColDef name="RMAX_347" type="DOUBLE"/>
+  <ColDef name="RMAX_348" type="DOUBLE"/>
+  <ColDef name="RMAX_349" type="DOUBLE"/>
+  <ColDef name="RMAX_350" type="DOUBLE"/>
+  <ColDef name="RMAX_351" type="DOUBLE"/>
+  <ColDef name="RMAX_352" type="DOUBLE"/>
+  <ColDef name="RMAX_353" type="DOUBLE"/>
+  <ColDef name="RMAX_354" type="DOUBLE"/>
+  <ColDef name="RMAX_355" type="DOUBLE"/>
+  <ColDef name="RMAX_356" type="DOUBLE"/>
+  <ColDef name="RMAX_357" type="DOUBLE"/>
+  <ColDef name="RMAX_358" type="DOUBLE"/>
+  <ColDef name="RMAX_359" type="DOUBLE"/>
+  <ColDef name="RMAX_360" type="DOUBLE"/>
+  <ColDef name="RMAX_361" type="DOUBLE"/>
+  <ColDef name="RMAX_362" type="DOUBLE"/>
+  <ColDef name="RMAX_363" type="DOUBLE"/>
+  <ColDef name="RMAX_364" type="DOUBLE"/>
+  <ColDef name="RMAX_365" type="DOUBLE"/>
+  <ColDef name="RMAX_366" type="DOUBLE"/>
+  <ColDef name="RMAX_367" type="DOUBLE"/>
+  <ColDef name="RMAX_368" type="DOUBLE"/>
+  <ColDef name="RMAX_369" type="DOUBLE"/>
+  <ColDef name="RMAX_370" type="DOUBLE"/>
+  <ColDef name="RMAX_371" type="DOUBLE"/>
+  <ColDef name="RMAX_372" type="DOUBLE"/>
+  <ColDef name="RMAX_373" type="DOUBLE"/>
+  <ColDef name="RMAX_374" type="DOUBLE"/>
+  <ColDef name="RMAX_375" type="DOUBLE"/>
+  <ColDef name="RMAX_376" type="DOUBLE"/>
+  <ColDef name="RMAX_377" type="DOUBLE"/>
+  <ColDef name="RMAX_378" type="DOUBLE"/>
+  <ColDef name="RMAX_224" type="DOUBLE"/>
+  <ColDef name="RMAX_225" type="DOUBLE"/>
+  <ColDef name="RMAX_226" type="DOUBLE"/>
+  <ColDef name="RMAX_227" type="DOUBLE"/>
+  <ColDef name="RMAX_228" type="DOUBLE"/>
+  <ColDef name="RMAX_229" type="DOUBLE"/>
+  <ColDef name="RMAX_230" type="DOUBLE"/>
+  <ColDef name="RMAX_231" type="DOUBLE"/>
+  <ColDef name="RMAX_232" type="DOUBLE"/>
+  <ColDef name="RMAX_233" type="DOUBLE"/>
+  <ColDef name="RMAX_234" type="DOUBLE"/>
+  <ColDef name="RMAX_235" type="DOUBLE"/>
+  <ColDef name="RMAX_236" type="DOUBLE"/>
+  <ColDef name="RMAX_237" type="DOUBLE"/>
+  <ColDef name="RMAX_238" type="DOUBLE"/>
+  <ColDef name="RMAX_239" type="DOUBLE"/>
+  <ColDef name="RMAX_240" type="DOUBLE"/>
+  <ColDef name="RMAX_241" type="DOUBLE"/>
+  <ColDef name="RMAX_242" type="DOUBLE"/>
+  <ColDef name="RMAX_243" type="DOUBLE"/>
+  <ColDef name="RMAX_244" type="DOUBLE"/>
+  <ColDef name="RMAX_245" type="DOUBLE"/>
+  <ColDef name="RMAX_246" type="DOUBLE"/>
+  <ColDef name="RMAX_247" type="DOUBLE"/>
+  <ColDef name="RMAX_248" type="DOUBLE"/>
+  <ColDef name="RMAX_249" type="DOUBLE"/>
+  <ColDef name="RMAX_250" type="DOUBLE"/>
+  <ColDef name="RMAX_251" type="DOUBLE"/>
+  <ColDef name="RMAX_252" type="DOUBLE"/>
+  <ColDef name="RMAX_253" type="DOUBLE"/>
+  <ColDef name="RMAX_254" type="DOUBLE"/>
+  <ColDef name="RMAX_255" type="DOUBLE"/>
+  <ColDef name="RMAX_256" type="DOUBLE"/>
+  <ColDef name="RMAX_257" type="DOUBLE"/>
+  <ColDef name="RMAX_258" type="DOUBLE"/>
+  <ColDef name="RMAX_259" type="DOUBLE"/>
+  <ColDef name="RMAX_260" type="DOUBLE"/>
+  <ColDef name="RMAX_261" type="DOUBLE"/>
+  <ColDef name="RMAX_262" type="DOUBLE"/>
+  <ColDef name="RMAX_263" type="DOUBLE"/>
+  <ColDef name="RMAX_264" type="DOUBLE"/>
+  <ColDef name="RMAX_265" type="DOUBLE"/>
+  <ColDef name="RMAX_266" type="DOUBLE"/>
+  <ColDef name="RMAX_267" type="DOUBLE"/>
+  <ColDef name="RMAX_268" type="DOUBLE"/>
+  <ColDef name="RMAX_269" type="DOUBLE"/>
+  <ColDef name="RMAX_270" type="DOUBLE"/>
+  <ColDef name="RMAX_271" type="DOUBLE"/>
+  <ColDef name="RMAX_272" type="DOUBLE"/>
+  <ColDef name="RMAX_273" type="DOUBLE"/>
+  <ColDef name="RMAX_274" type="DOUBLE"/>
+  <ColDef name="RMAX_275" type="DOUBLE"/>
+  <ColDef name="RMAX_276" type="DOUBLE"/>
+  <ColDef name="RMAX_277" type="DOUBLE"/>
+  <ColDef name="RMAX_278" type="DOUBLE"/>
+  <ColDef name="RMAX_279" type="DOUBLE"/>
+  <ColDef name="RMAX_280" type="DOUBLE"/>
+  <ColDef name="RMAX_281" type="DOUBLE"/>
+  <ColDef name="RMAX_282" type="DOUBLE"/>
+  <ColDef name="RMAX_283" type="DOUBLE"/>
+  <ColDef name="RMAX_284" type="DOUBLE"/>
+  <ColDef name="RMAX_285" type="DOUBLE"/>
+  <ColDef name="RMAX_286" type="DOUBLE"/>
+  <ColDef name="RMAX_287" type="DOUBLE"/>
+  <ColDef name="RMAX_288" type="DOUBLE"/>
+  <ColDef name="RMAX_289" type="DOUBLE"/>
+  <ColDef name="RMAX_290" type="DOUBLE"/>
+  <ColDef name="RMAX_291" type="DOUBLE"/>
+  <ColDef name="RMAX_292" type="DOUBLE"/>
+  <ColDef name="RMAX_293" type="DOUBLE"/>
+  <ColDef name="RMAX_294" type="DOUBLE"/>
+  <ColDef name="RMAX_99" type="DOUBLE"/>
+  <ColDef name="RMAX_100" type="DOUBLE"/>
+  <ColDef name="RMAX_101" type="DOUBLE"/>
+  <ColDef name="RMAX_102" type="DOUBLE"/>
+  <ColDef name="RMAX_103" type="DOUBLE"/>
+  <ColDef name="RMAX_104" type="DOUBLE"/>
+  <ColDef name="RMAX_105" type="DOUBLE"/>
+  <ColDef name="RMAX_106" type="DOUBLE"/>
+  <ColDef name="RMAX_107" type="DOUBLE"/>
+  <ColDef name="RMAX_108" type="DOUBLE"/>
+  <ColDef name="RMAX_109" type="DOUBLE"/>
+  <ColDef name="RMAX_110" type="DOUBLE"/>
+  <ColDef name="RMAX_111" type="DOUBLE"/>
+  <ColDef name="RMAX_112" type="DOUBLE"/>
+  <ColDef name="RMAX_113" type="DOUBLE"/>
+  <ColDef name="RMAX_114" type="DOUBLE"/>
+  <ColDef name="RMAX_115" type="DOUBLE"/>
+  <ColDef name="RMAX_116" type="DOUBLE"/>
+  <ColDef name="RMAX_117" type="DOUBLE"/>
+  <ColDef name="RMAX_118" type="DOUBLE"/>
+  <ColDef name="RMAX_119" type="DOUBLE"/>
+  <ColDef name="RMAX_120" type="DOUBLE"/>
+  <ColDef name="RMAX_121" type="DOUBLE"/>
+  <ColDef name="RMAX_122" type="DOUBLE"/>
+  <ColDef name="RMAX_123" type="DOUBLE"/>
+  <ColDef name="RMAX_124" type="DOUBLE"/>
+  <ColDef name="RMAX_125" type="DOUBLE"/>
+  <ColDef name="RMAX_126" type="DOUBLE"/>
+  <ColDef name="RMAX_127" type="DOUBLE"/>
+  <ColDef name="RMAX_128" type="DOUBLE"/>
+  <ColDef name="RMAX_129" type="DOUBLE"/>
+  <ColDef name="RMAX_130" type="DOUBLE"/>
+  <ColDef name="RMAX_131" type="DOUBLE"/>
+  <ColDef name="RMAX_132" type="DOUBLE"/>
+  <ColDef name="RMAX_133" type="DOUBLE"/>
+  <ColDef name="RMAX_134" type="DOUBLE"/>
+  <ColDef name="RMAX_135" type="DOUBLE"/>
+  <ColDef name="RMAX_136" type="DOUBLE"/>
+  <ColDef name="RMAX_137" type="DOUBLE"/>
+  <ColDef name="RMAX_138" type="DOUBLE"/>
+  <ColDef name="RMAX_139" type="DOUBLE"/>
+  <ColDef name="RMAX_140" type="DOUBLE"/>
+  <ColDef name="RMAX_141" type="DOUBLE"/>
+  <ColDef name="RMAX_142" type="DOUBLE"/>
+  <ColDef name="RMAX_143" type="DOUBLE"/>
+  <ColDef name="RMAX_144" type="DOUBLE"/>
+  <ColDef name="RMAX_145" type="DOUBLE"/>
+  <ColDef name="RMAX_146" type="DOUBLE"/>
+  <ColDef name="RMAX_147" type="DOUBLE"/>
+  <ColDef name="RMAX_148" type="DOUBLE"/>
+  <ColDef name="RMAX_149" type="DOUBLE"/>
+  <ColDef name="RMAX_150" type="DOUBLE"/>
+  <ColDef name="RMAX_151" type="DOUBLE"/>
+  <ColDef name="RMAX_152" type="DOUBLE"/>
+  <ColDef name="RMAX_153" type="DOUBLE"/>
+  <ColDef name="RMAX_154" type="DOUBLE"/>
+  <ColDef name="RMAX_155" type="DOUBLE"/>
+  <ColDef name="RMAX_156" type="DOUBLE"/>
+  <ColDef name="RMAX_157" type="DOUBLE"/>
+  <ColDef name="RMAX_158" type="DOUBLE"/>
+  <ColDef name="RMAX_159" type="DOUBLE"/>
+  <ColDef name="RMAX_160" type="DOUBLE"/>
+  <ColDef name="RMAX_161" type="DOUBLE"/>
+  <ColDef name="RMAX_162" type="DOUBLE"/>
+  <ColDef name="RMAX_163" type="DOUBLE"/>
+  <ColDef name="RMAX_164" type="DOUBLE"/>
+  <ColDef name="RMAX_165" type="DOUBLE"/>
+  <ColDef name="RMAX_166" type="DOUBLE"/>
+  <ColDef name="RMAX_167" type="DOUBLE"/>
+  <ColDef name="RMAX_168" type="DOUBLE"/>
+  <ColDef name="RMAX_169" type="DOUBLE"/>
+  <ColDef name="RMAX_170" type="DOUBLE"/>
+  <ColDef name="RMAX_171" type="DOUBLE"/>
+  <ColDef name="RMAX_172" type="DOUBLE"/>
+  <ColDef name="RMAX_173" type="DOUBLE"/>
+  <ColDef name="RMAX_174" type="DOUBLE"/>
+  <ColDef name="RMAX_175" type="DOUBLE"/>
+  <ColDef name="RMAX_176" type="DOUBLE"/>
+  <ColDef name="RMAX_177" type="DOUBLE"/>
+  <ColDef name="RMAX_178" type="DOUBLE"/>
+  <ColDef name="RMAX_179" type="DOUBLE"/>
+  <ColDef name="RMAX_180" type="DOUBLE"/>
+  <ColDef name="RMAX_181" type="DOUBLE"/>
+  <ColDef name="RMAX_182" type="DOUBLE"/>
+  <ColDef name="RMAX_183" type="DOUBLE"/>
+  <ColDef name="RMAX_184" type="DOUBLE"/>
+  <ColDef name="RMAX_185" type="DOUBLE"/>
+  <ColDef name="RMAX_186" type="DOUBLE"/>
+  <ColDef name="RMAX_187" type="DOUBLE"/>
+  <ColDef name="RMAX_188" type="DOUBLE"/>
+  <ColDef name="RMAX_189" type="DOUBLE"/>
+  <ColDef name="RMAX_190" type="DOUBLE"/>
+  <ColDef name="RMAX_191" type="DOUBLE"/>
+  <ColDef name="RMAX_192" type="DOUBLE"/>
+  <ColDef name="RMAX_193" type="DOUBLE"/>
+  <ColDef name="RMAX_194" type="DOUBLE"/>
+  <ColDef name="RMAX_195" type="DOUBLE"/>
+  <ColDef name="RMAX_196" type="DOUBLE"/>
+  <ColDef name="RMAX_197" type="DOUBLE"/>
+  <ColDef name="RMAX_198" type="DOUBLE"/>
+  <ColDef name="RMAX_199" type="DOUBLE"/>
+  <ColDef name="RMAX_200" type="DOUBLE"/>
+  <ColDef name="RMAX_201" type="DOUBLE"/>
+  <ColDef name="RMAX_202" type="DOUBLE"/>
+  <ColDef name="RMAX_203" type="DOUBLE"/>
+  <ColDef name="RMAX_204" type="DOUBLE"/>
+  <ColDef name="RMAX_205" type="DOUBLE"/>
+  <ColDef name="RMAX_206" type="DOUBLE"/>
+  <ColDef name="RMAX_207" type="DOUBLE"/>
+  <ColDef name="RMAX_208" type="DOUBLE"/>
+  <ColDef name="RMAX_209" type="DOUBLE"/>
+  <ColDef name="RMAX_210" type="DOUBLE"/>
+  <ColDef name="RMAX_211" type="DOUBLE"/>
+  <ColDef name="RMAX_212" type="DOUBLE"/>
+  <ColDef name="RMAX_213" type="DOUBLE"/>
+  <ColDef name="RMAX_214" type="DOUBLE"/>
+  <ColDef name="RMAX_215" type="DOUBLE"/>
+  <ColDef name="RMAX_216" type="DOUBLE"/>
+  <ColDef name="RMAX_217" type="DOUBLE"/>
+  <ColDef name="RMAX_218" type="DOUBLE"/>
+  <ColDef name="RMAX_219" type="DOUBLE"/>
+  <ColDef name="RMAX_220" type="DOUBLE"/>
+  <ColDef name="RMAX_221" type="DOUBLE"/>
+  <ColDef name="RMAX_222" type="DOUBLE"/>
+  <ColDef name="RMAX_223" type="DOUBLE"/>
+  <ColDef name="EMBSAMPLINGSEPINNER_DATA_ID" type="LONG"/>
+  <ColDef name="RMAX_0" type="DOUBLE"/>
+  <ColDef name="RMAX_1" type="DOUBLE"/>
+  <ColDef name="RMAX_2" type="DOUBLE"/>
+  <ColDef name="RMAX_3" type="DOUBLE"/>
+  <ColDef name="RMAX_4" type="DOUBLE"/>
+  <ColDef name="RMAX_5" type="DOUBLE"/>
+  <ColDef name="RMAX_6" type="DOUBLE"/>
+  <ColDef name="RMAX_7" type="DOUBLE"/>
+  <ColDef name="RMAX_8" type="DOUBLE"/>
+  <ColDef name="RMAX_9" type="DOUBLE"/>
+  <ColDef name="RMAX_10" type="DOUBLE"/>
+  <ColDef name="RMAX_11" type="DOUBLE"/>
+  <ColDef name="RMAX_12" type="DOUBLE"/>
+  <ColDef name="RMAX_13" type="DOUBLE"/>
+  <ColDef name="RMAX_14" type="DOUBLE"/>
+  <ColDef name="RMAX_15" type="DOUBLE"/>
+  <ColDef name="RMAX_16" type="DOUBLE"/>
+  <ColDef name="RMAX_17" type="DOUBLE"/>
+  <ColDef name="RMAX_18" type="DOUBLE"/>
+  <ColDef name="RMAX_19" type="DOUBLE"/>
+  <ColDef name="RMAX_20" type="DOUBLE"/>
+  <ColDef name="RMAX_21" type="DOUBLE"/>
+  <ColDef name="RMAX_22" type="DOUBLE"/>
+  <ColDef name="RMAX_23" type="DOUBLE"/>
+  <ColDef name="RMAX_24" type="DOUBLE"/>
+  <ColDef name="RMAX_25" type="DOUBLE"/>
+  <ColDef name="RMAX_26" type="DOUBLE"/>
+  <ColDef name="RMAX_27" type="DOUBLE"/>
+  <ColDef name="RMAX_28" type="DOUBLE"/>
+  <ColDef name="RMAX_29" type="DOUBLE"/>
+  <ColDef name="RMAX_30" type="DOUBLE"/>
+  <ColDef name="RMAX_31" type="DOUBLE"/>
+  <ColDef name="RMAX_32" type="DOUBLE"/>
+  <ColDef name="RMAX_33" type="DOUBLE"/>
+  <ColDef name="RMAX_34" type="DOUBLE"/>
+  <ColDef name="RMAX_35" type="DOUBLE"/>
+  <ColDef name="RMAX_36" type="DOUBLE"/>
+  <ColDef name="RMAX_37" type="DOUBLE"/>
+  <ColDef name="RMAX_38" type="DOUBLE"/>
+  <ColDef name="RMAX_39" type="DOUBLE"/>
+  <ColDef name="RMAX_40" type="DOUBLE"/>
+  <ColDef name="RMAX_41" type="DOUBLE"/>
+  <ColDef name="RMAX_42" type="DOUBLE"/>
+  <ColDef name="RMAX_43" type="DOUBLE"/>
+  <ColDef name="RMAX_44" type="DOUBLE"/>
+  <ColDef name="RMAX_45" type="DOUBLE"/>
+  <ColDef name="RMAX_46" type="DOUBLE"/>
+  <ColDef name="RMAX_47" type="DOUBLE"/>
+  <ColDef name="RMAX_48" type="DOUBLE"/>
+  <ColDef name="RMAX_49" type="DOUBLE"/>
+  <ColDef name="RMAX_50" type="DOUBLE"/>
+  <ColDef name="RMAX_51" type="DOUBLE"/>
+  <ColDef name="RMAX_52" type="DOUBLE"/>
+  <ColDef name="RMAX_53" type="DOUBLE"/>
+  <ColDef name="RMAX_54" type="DOUBLE"/>
+  <ColDef name="RMAX_55" type="DOUBLE"/>
+  <ColDef name="RMAX_56" type="DOUBLE"/>
+  <ColDef name="RMAX_57" type="DOUBLE"/>
+  <ColDef name="RMAX_58" type="DOUBLE"/>
+  <ColDef name="RMAX_59" type="DOUBLE"/>
+  <ColDef name="RMAX_60" type="DOUBLE"/>
+  <ColDef name="RMAX_61" type="DOUBLE"/>
+  <ColDef name="RMAX_62" type="DOUBLE"/>
+  <ColDef name="RMAX_63" type="DOUBLE"/>
+  <ColDef name="RMAX_64" type="DOUBLE"/>
+  <ColDef name="RMAX_65" type="DOUBLE"/>
+  <ColDef name="RMAX_66" type="DOUBLE"/>
+  <ColDef name="RMAX_67" type="DOUBLE"/>
+  <ColDef name="RMAX_68" type="DOUBLE"/>
+  <ColDef name="RMAX_69" type="DOUBLE"/>
+  <ColDef name="RMAX_70" type="DOUBLE"/>
+  <ColDef name="RMAX_71" type="DOUBLE"/>
+  <ColDef name="RMAX_72" type="DOUBLE"/>
+  <ColDef name="RMAX_73" type="DOUBLE"/>
+  <ColDef name="RMAX_74" type="DOUBLE"/>
+  <ColDef name="RMAX_75" type="DOUBLE"/>
+  <ColDef name="RMAX_76" type="DOUBLE"/>
+  <ColDef name="RMAX_77" type="DOUBLE"/>
+  <ColDef name="RMAX_78" type="DOUBLE"/>
+  <ColDef name="RMAX_79" type="DOUBLE"/>
+  <ColDef name="RMAX_80" type="DOUBLE"/>
+  <ColDef name="RMAX_81" type="DOUBLE"/>
+  <ColDef name="RMAX_82" type="DOUBLE"/>
+  <ColDef name="RMAX_83" type="DOUBLE"/>
+  <ColDef name="RMAX_84" type="DOUBLE"/>
+  <ColDef name="RMAX_85" type="DOUBLE"/>
+  <ColDef name="RMAX_86" type="DOUBLE"/>
+  <ColDef name="RMAX_87" type="DOUBLE"/>
+  <ColDef name="RMAX_88" type="DOUBLE"/>
+  <ColDef name="RMAX_89" type="DOUBLE"/>
+  <ColDef name="RMAX_90" type="DOUBLE"/>
+  <ColDef name="RMAX_91" type="DOUBLE"/>
+  <ColDef name="RMAX_92" type="DOUBLE"/>
+  <ColDef name="RMAX_93" type="DOUBLE"/>
+  <ColDef name="RMAX_94" type="DOUBLE"/>
+  <ColDef name="RMAX_95" type="DOUBLE"/>
+  <ColDef name="RMAX_96" type="DOUBLE"/>
+  <ColDef name="RMAX_97" type="DOUBLE"/>
+  <ColDef name="RMAX_98" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EMBSamplingSepOuter">
+  <ColDef name="RMAX_38" type="DOUBLE"/>
+  <ColDef name="RMAX_39" type="DOUBLE"/>
+  <ColDef name="RMAX_40" type="DOUBLE"/>
+  <ColDef name="RMAX_41" type="DOUBLE"/>
+  <ColDef name="RMAX_42" type="DOUBLE"/>
+  <ColDef name="RMAX_43" type="DOUBLE"/>
+  <ColDef name="RMAX_44" type="DOUBLE"/>
+  <ColDef name="RMAX_45" type="DOUBLE"/>
+  <ColDef name="RMAX_46" type="DOUBLE"/>
+  <ColDef name="RMAX_47" type="DOUBLE"/>
+  <ColDef name="RMAX_48" type="DOUBLE"/>
+  <ColDef name="RMAX_49" type="DOUBLE"/>
+  <ColDef name="RMAX_50" type="DOUBLE"/>
+  <ColDef name="RMAX_51" type="DOUBLE"/>
+  <ColDef name="RMAX_52" type="DOUBLE"/>
+  <ColDef name="RMAX_53" type="DOUBLE"/>
+  <ColDef name="RMAX_54" type="DOUBLE"/>
+  <ColDef name="RMAX_55" type="DOUBLE"/>
+  <ColDef name="EMBSAMPLINGSEPOUTER_DATA_ID" type="LONG"/>
+  <ColDef name="RMAX_0" type="DOUBLE"/>
+  <ColDef name="RMAX_1" type="DOUBLE"/>
+  <ColDef name="RMAX_2" type="DOUBLE"/>
+  <ColDef name="RMAX_3" type="DOUBLE"/>
+  <ColDef name="RMAX_4" type="DOUBLE"/>
+  <ColDef name="RMAX_5" type="DOUBLE"/>
+  <ColDef name="RMAX_6" type="DOUBLE"/>
+  <ColDef name="RMAX_7" type="DOUBLE"/>
+  <ColDef name="RMAX_8" type="DOUBLE"/>
+  <ColDef name="RMAX_9" type="DOUBLE"/>
+  <ColDef name="RMAX_10" type="DOUBLE"/>
+  <ColDef name="RMAX_11" type="DOUBLE"/>
+  <ColDef name="RMAX_12" type="DOUBLE"/>
+  <ColDef name="RMAX_13" type="DOUBLE"/>
+  <ColDef name="RMAX_14" type="DOUBLE"/>
+  <ColDef name="RMAX_15" type="DOUBLE"/>
+  <ColDef name="RMAX_16" type="DOUBLE"/>
+  <ColDef name="RMAX_17" type="DOUBLE"/>
+  <ColDef name="RMAX_18" type="DOUBLE"/>
+  <ColDef name="RMAX_19" type="DOUBLE"/>
+  <ColDef name="RMAX_20" type="DOUBLE"/>
+  <ColDef name="RMAX_21" type="DOUBLE"/>
+  <ColDef name="RMAX_22" type="DOUBLE"/>
+  <ColDef name="RMAX_23" type="DOUBLE"/>
+  <ColDef name="RMAX_24" type="DOUBLE"/>
+  <ColDef name="RMAX_25" type="DOUBLE"/>
+  <ColDef name="RMAX_26" type="DOUBLE"/>
+  <ColDef name="RMAX_27" type="DOUBLE"/>
+  <ColDef name="RMAX_28" type="DOUBLE"/>
+  <ColDef name="RMAX_29" type="DOUBLE"/>
+  <ColDef name="RMAX_30" type="DOUBLE"/>
+  <ColDef name="RMAX_31" type="DOUBLE"/>
+  <ColDef name="RMAX_32" type="DOUBLE"/>
+  <ColDef name="RMAX_33" type="DOUBLE"/>
+  <ColDef name="RMAX_34" type="DOUBLE"/>
+  <ColDef name="RMAX_35" type="DOUBLE"/>
+  <ColDef name="RMAX_36" type="DOUBLE"/>
+  <ColDef name="RMAX_37" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EMECParams">
+  <ColDef name="EMECPARAMS_DATA_ID" type="LONG"/>
+  <ColDef name="PHIROTATION" type="STRING"/>
+  <ColDef name="SAGGING" type="STRING"/>
+  <ColDef name="INNERSLANTPARAM" type="STRING"/>
+  <ColDef name="OUTERSLANTPARAM" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="EmecCylLayer">
+  <ColDef name="EMECCYLLAYER_DATA_ID" type="LONG"/>
+  <ColDef name="LAYER" type="INT"/>
+  <ColDef name="RADIL" type="DOUBLE"/>
+  <ColDef name="RADOL" type="DOUBLE"/>
+  <ColDef name="ALFIL" type="DOUBLE"/>
+  <ColDef name="ALFOL" type="DOUBLE"/>
+  <ColDef name="TCKIL" type="DOUBLE"/>
+  <ColDef name="TCKOL" type="DOUBLE"/>
+  <ColDef name="CILETL" type="DOUBLE"/>
+  <ColDef name="ALFCILL" type="DOUBLE"/>
+  <ColDef name="XCNCL" type="DOUBLE"/>
+  <ColDef name="CILTEKL" type="DOUBLE"/>
+  <ColDef name="XCNCKL" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecDMBoxes">
+  <ColDef name="EMECDMBOXES_DATA_ID" type="LONG"/>
+  <ColDef name="BOXNAME" type="STRING"/>
+  <ColDef name="HLEN" type="DOUBLE"/>
+  <ColDef name="HWDT" type="DOUBLE"/>
+  <ColDef name="HHGT" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecDMNumbers">
+  <ColDef name="EMECDMNUMBERS_DATA_ID" type="LONG"/>
+  <ColDef name="OBJECTNAME" type="STRING"/>
+  <ColDef name="PARNAME" type="STRING"/>
+  <ColDef name="PARVALUE" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecDMPCons">
+  <ColDef name="EMECDMPCONS_DATA_ID" type="LONG"/>
+  <ColDef name="PCONNAME" type="STRING"/>
+  <ColDef name="NZPLANE" type="INT"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecDMTubes">
+  <ColDef name="EMECDMTUBES_DATA_ID" type="LONG"/>
+  <ColDef name="TUBENAME" type="STRING"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecGeometry">
+  <ColDef name="EMECGEOMETRY_DATA_ID" type="LONG"/>
+  <ColDef name="EFIELD" type="DOUBLE"/>
+  <ColDef name="MLGAP" type="DOUBLE"/>
+  <ColDef name="SABL" type="DOUBLE"/>
+  <ColDef name="SBAR" type="DOUBLE"/>
+  <ColDef name="SBRN" type="DOUBLE"/>
+  <ColDef name="SCRB" type="DOUBLE"/>
+  <ColDef name="Z1" type="DOUBLE"/>
+  <ColDef name="Z0" type="DOUBLE"/>
+  <ColDef name="DCF" type="DOUBLE"/>
+  <ColDef name="RLIMIT" type="DOUBLE"/>
+  <ColDef name="EPS" type="DOUBLE"/>
+  <ColDef name="RHOIN" type="DOUBLE"/>
+  <ColDef name="RCKP" type="DOUBLE"/>
+  <ColDef name="ETOT" type="DOUBLE"/>
+  <ColDef name="EKAP" type="DOUBLE"/>
+  <ColDef name="ECU" type="DOUBLE"/>
+  <ColDef name="EPREP" type="DOUBLE"/>
+  <ColDef name="EINOX" type="DOUBLE"/>
+  <ColDef name="NLAYER" type="INT"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="DZENDE" type="DOUBLE"/>
+  <ColDef name="ZORIG" type="DOUBLE"/>
+  <ColDef name="DCRACK" type="DOUBLE"/>
+  <ColDef name="DZPLA" type="DOUBLE"/>
+  <ColDef name="DZDSE" type="DOUBLE"/>
+  <ColDef name="DZDSM" type="DOUBLE"/>
+  <ColDef name="DZDSI" type="DOUBLE"/>
+  <ColDef name="NUREG" type="INT"/>
+  <ColDef name="DETA_0" type="DOUBLE"/>
+  <ColDef name="DETA_1" type="DOUBLE"/>
+  <ColDef name="DETA_2" type="DOUBLE"/>
+  <ColDef name="DETA_3" type="DOUBLE"/>
+  <ColDef name="DETA_4" type="DOUBLE"/>
+  <ColDef name="DETA_5" type="DOUBLE"/>
+  <ColDef name="DETA_6" type="DOUBLE"/>
+  <ColDef name="DETA_7" type="DOUBLE"/>
+  <ColDef name="DETA_8" type="DOUBLE"/>
+  <ColDef name="DETA_9" type="DOUBLE"/>
+  <ColDef name="DETA_10" type="DOUBLE"/>
+  <ColDef name="DPHI_0" type="DOUBLE"/>
+  <ColDef name="DPHI_1" type="DOUBLE"/>
+  <ColDef name="DPHI_2" type="DOUBLE"/>
+  <ColDef name="DPHI_3" type="DOUBLE"/>
+  <ColDef name="DPHI_4" type="DOUBLE"/>
+  <ColDef name="DPHI_5" type="DOUBLE"/>
+  <ColDef name="DPHI_6" type="DOUBLE"/>
+  <ColDef name="DPHI_7" type="DOUBLE"/>
+  <ColDef name="DPHI_8" type="DOUBLE"/>
+  <ColDef name="DPHI_9" type="DOUBLE"/>
+  <ColDef name="DPHI_10" type="DOUBLE"/>
+  <ColDef name="ETASTR_0" type="DOUBLE"/>
+  <ColDef name="ETASTR_1" type="DOUBLE"/>
+  <ColDef name="ETASTR_2" type="DOUBLE"/>
+  <ColDef name="ETASTR_3" type="DOUBLE"/>
+  <ColDef name="ETASTR_4" type="DOUBLE"/>
+  <ColDef name="ETASTR_5" type="DOUBLE"/>
+  <ColDef name="ETASTR_6" type="DOUBLE"/>
+  <ColDef name="EMHIT" type="DOUBLE"/>
+  <ColDef name="EMDIGI" type="DOUBLE"/>
+  <ColDef name="GAP0" type="DOUBLE"/>
+  <ColDef name="ZSHIFT" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecMagicNumbers">
+  <ColDef name="STRAIGHTSTARTSECTION" type="DOUBLE"/>
+  <ColDef name="EMECMAGICNUMBERS_DATA_ID" type="LONG"/>
+  <ColDef name="FOCALTOREF" type="DOUBLE"/>
+  <ColDef name="REFTOACTIVE" type="DOUBLE"/>
+  <ColDef name="ACTIVELENGTH" type="DOUBLE"/>
+  <ColDef name="REFTOPRESAMPLER" type="DOUBLE"/>
+  <ColDef name="PRESAMPLERLENGTH" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecRapRegion">
+  <ColDef name="EMECRAPREGION_DATA_ID" type="LONG"/>
+  <ColDef name="IPART" type="INT"/>
+  <ColDef name="ETA1" type="DOUBLE"/>
+  <ColDef name="ETA2" type="DOUBLE"/>
+  <ColDef name="ZMN_0" type="DOUBLE"/>
+  <ColDef name="ZMN_1" type="DOUBLE"/>
+  <ColDef name="ZMX_0" type="DOUBLE"/>
+  <ColDef name="ZMX_1" type="DOUBLE"/>
+  <ColDef name="NBIN" type="INT"/>
+  <ColDef name="DETA" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecSamplingSep">
+  <ColDef name="ZSEP12_9" type="DOUBLE"/>
+  <ColDef name="ZSEP12_10" type="DOUBLE"/>
+  <ColDef name="ZSEP12_11" type="DOUBLE"/>
+  <ColDef name="ZSEP12_12" type="DOUBLE"/>
+  <ColDef name="ZSEP12_13" type="DOUBLE"/>
+  <ColDef name="ZSEP12_14" type="DOUBLE"/>
+  <ColDef name="ZSEP12_15" type="DOUBLE"/>
+  <ColDef name="ZSEP12_16" type="DOUBLE"/>
+  <ColDef name="ZSEP12_17" type="DOUBLE"/>
+  <ColDef name="ZSEP12_18" type="DOUBLE"/>
+  <ColDef name="ZSEP12_19" type="DOUBLE"/>
+  <ColDef name="ZSEP12_20" type="DOUBLE"/>
+  <ColDef name="ZSEP12_21" type="DOUBLE"/>
+  <ColDef name="ZSEP12_22" type="DOUBLE"/>
+  <ColDef name="ZSEP12_23" type="DOUBLE"/>
+  <ColDef name="ZSEP12_24" type="DOUBLE"/>
+  <ColDef name="ZSEP12_25" type="DOUBLE"/>
+  <ColDef name="ZSEP12_26" type="DOUBLE"/>
+  <ColDef name="ZSEP12_27" type="DOUBLE"/>
+  <ColDef name="ZSEP12_28" type="DOUBLE"/>
+  <ColDef name="ZSEP12_29" type="DOUBLE"/>
+  <ColDef name="ZSEP12_30" type="DOUBLE"/>
+  <ColDef name="ZSEP12_31" type="DOUBLE"/>
+  <ColDef name="ZSEP12_32" type="DOUBLE"/>
+  <ColDef name="ZSEP12_33" type="DOUBLE"/>
+  <ColDef name="ZSEP12_34" type="DOUBLE"/>
+  <ColDef name="ZSEP12_35" type="DOUBLE"/>
+  <ColDef name="ZSEP12_36" type="DOUBLE"/>
+  <ColDef name="ZSEP12_37" type="DOUBLE"/>
+  <ColDef name="ZSEP12_38" type="DOUBLE"/>
+  <ColDef name="ZSEP12_39" type="DOUBLE"/>
+  <ColDef name="ZSEP12_40" type="DOUBLE"/>
+  <ColDef name="ZSEP12_41" type="DOUBLE"/>
+  <ColDef name="ZSEP12_42" type="DOUBLE"/>
+  <ColDef name="ZSEP12_43" type="DOUBLE"/>
+  <ColDef name="ZSEP23_0" type="DOUBLE"/>
+  <ColDef name="ZSEP23_1" type="DOUBLE"/>
+  <ColDef name="ZSEP23_2" type="DOUBLE"/>
+  <ColDef name="ZSEP23_3" type="DOUBLE"/>
+  <ColDef name="ZSEP23_4" type="DOUBLE"/>
+  <ColDef name="ZSEP23_5" type="DOUBLE"/>
+  <ColDef name="ZSEP23_6" type="DOUBLE"/>
+  <ColDef name="ZSEP23_7" type="DOUBLE"/>
+  <ColDef name="ZSEP23_8" type="DOUBLE"/>
+  <ColDef name="ZSEP23_9" type="DOUBLE"/>
+  <ColDef name="ZSEP23_10" type="DOUBLE"/>
+  <ColDef name="ZSEP23_11" type="DOUBLE"/>
+  <ColDef name="ZSEP23_12" type="DOUBLE"/>
+  <ColDef name="ZSEP23_13" type="DOUBLE"/>
+  <ColDef name="ZSEP23_14" type="DOUBLE"/>
+  <ColDef name="ZSEP23_15" type="DOUBLE"/>
+  <ColDef name="ZSEP23_16" type="DOUBLE"/>
+  <ColDef name="ZSEP23_17" type="DOUBLE"/>
+  <ColDef name="ZSEP23_18" type="DOUBLE"/>
+  <ColDef name="ZSEP23_19" type="DOUBLE"/>
+  <ColDef name="ZSEP23_20" type="DOUBLE"/>
+  <ColDef name="ZSEP23_21" type="DOUBLE"/>
+  <ColDef name="EMECSAMPLINGSEP_DATA_ID" type="LONG"/>
+  <ColDef name="ETAMIN" type="DOUBLE"/>
+  <ColDef name="DETA" type="DOUBLE"/>
+  <ColDef name="NSEP_0" type="INT"/>
+  <ColDef name="NSEP_1" type="INT"/>
+  <ColDef name="NSEP_2" type="INT"/>
+  <ColDef name="ZIW_0" type="DOUBLE"/>
+  <ColDef name="ZIW_1" type="DOUBLE"/>
+  <ColDef name="ZIW_2" type="DOUBLE"/>
+  <ColDef name="ZIW_3" type="DOUBLE"/>
+  <ColDef name="ZIW_4" type="DOUBLE"/>
+  <ColDef name="ZIW_5" type="DOUBLE"/>
+  <ColDef name="ZIW_6" type="DOUBLE"/>
+  <ColDef name="ZSEP12_0" type="DOUBLE"/>
+  <ColDef name="ZSEP12_1" type="DOUBLE"/>
+  <ColDef name="ZSEP12_2" type="DOUBLE"/>
+  <ColDef name="ZSEP12_3" type="DOUBLE"/>
+  <ColDef name="ZSEP12_4" type="DOUBLE"/>
+  <ColDef name="ZSEP12_5" type="DOUBLE"/>
+  <ColDef name="ZSEP12_6" type="DOUBLE"/>
+  <ColDef name="ZSEP12_7" type="DOUBLE"/>
+  <ColDef name="ZSEP12_8" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="EmecWheelParameters">
+  <ColDef name="EMECWHEELPARAMETERS_DATA_ID" type="LONG"/>
+  <ColDef name="IWHEEL" type="INT"/>
+  <ColDef name="NABS" type="INT"/>
+  <ColDef name="NACC" type="INT"/>
+  <ColDef name="ETAINT" type="DOUBLE"/>
+  <ColDef name="ETAEXT" type="DOUBLE"/>
+  <ColDef name="NWSAMP" type="INT"/>
+</TableDef>
+
+
+
+<TableDef name="EmecWhlOptParm">
+  <ColDef name="EMECWHLOPTPARM_DATA_ID" type="LONG"/>
+  <ColDef name="IWHEEL" type="INT"/>
+  <ColDef name="BETX" type="DOUBLE"/>
+  <ColDef name="ALFINT" type="DOUBLE"/>
+  <ColDef name="ALFEXT" type="DOUBLE"/>
+  <ColDef name="PBTH" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="FCalMod">
+  <ColDef name="TUBESPACING" type="DOUBLE"/>
+  <ColDef name="FCALMOD_DATA_ID" type="LONG"/>
+  <ColDef name="FCALSAMPLING" type="INT"/>
+  <ColDef name="INNERMODULERADIUS" type="DOUBLE"/>
+  <ColDef name="OUTERMODULERADIUS" type="DOUBLE"/>
+  <ColDef name="FULLMODULEDEPTH" type="DOUBLE"/>
+  <ColDef name="INNERGAPRADIUS" type="DOUBLE"/>
+  <ColDef name="OUTERGAPRADIUS" type="DOUBLE"/>
+  <ColDef name="FULLGAPDEPTH" type="DOUBLE"/>
+  <ColDef name="STARTPOSITION" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="FCalNominals">
+  <ColDef name="FCALNOMINALS_DATA_ID" type="LONG"/>
+  <ColDef name="FCALMOD" type="INT"/>
+  <ColDef name="ETAMIN" type="DOUBLE"/>
+  <ColDef name="ETAMAX" type="DOUBLE"/>
+  <ColDef name="PHIMIN" type="DOUBLE"/>
+  <ColDef name="PHIMAX" type="DOUBLE"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="INDEPTH" type="DOUBLE"/>
+  <ColDef name="OUTDEPTH" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="FastSimParams">
+  <ColDef name="FASTSIMPARAMS_DATA_ID" type="LONG"/>
+  <ColDef name="EMB" type="DOUBLE"/>
+  <ColDef name="EMEC" type="DOUBLE"/>
+  <ColDef name="FCAL" type="DOUBLE"/>
+  <ColDef name="FCAL2" type="DOUBLE"/>
+  <ColDef name="HEC" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="HGTDBox">
+  <ColDef name="HGTDBOX_DATA_ID" type="LONG"/>
+  <ColDef name="BOX" type="STRING"/>
+  <ColDef name="DX" type="DOUBLE"/>
+  <ColDef name="DY" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="HGTDTubs">
+  <ColDef name="DELTAY" type="DOUBLE"/>
+  <ColDef name="HGTDTUBS_DATA_ID" type="LONG"/>
+  <ColDef name="TUBE" type="STRING"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="HadronicEndcap">
+  <ColDef name="DRMODOVERLAP" type="DOUBLE"/>
+  <ColDef name="HADRONICENDCAP_DATA_ID" type="LONG"/>
+  <ColDef name="NSCT" type="INT"/>
+  <ColDef name="NSCTMN" type="INT"/>
+  <ColDef name="NSCTMX" type="INT"/>
+  <ColDef name="NBLC" type="INT"/>
+  <ColDef name="NBLCMN" type="INT"/>
+  <ColDef name="NBLCMX" type="INT"/>
+  <ColDef name="ROORIG" type="DOUBLE"/>
+  <ColDef name="REND" type="DOUBLE"/>
+  <ColDef name="ZORIG" type="DOUBLE"/>
+  <ColDef name="ZSTART" type="DOUBLE"/>
+  <ColDef name="ZEND" type="DOUBLE"/>
+  <ColDef name="CELL_0" type="DOUBLE"/>
+  <ColDef name="CELL_1" type="DOUBLE"/>
+  <ColDef name="LARG" type="DOUBLE"/>
+  <ColDef name="PLATE_0" type="DOUBLE"/>
+  <ColDef name="PLATE_1" type="DOUBLE"/>
+  <ColDef name="COPPER" type="DOUBLE"/>
+  <ColDef name="PADPL" type="DOUBLE"/>
+  <ColDef name="ESTPL" type="DOUBLE"/>
+  <ColDef name="GAPWHL" type="DOUBLE"/>
+  <ColDef name="GAPPLT" type="DOUBLE"/>
+  <ColDef name="GAPCEL" type="DOUBLE"/>
+  <ColDef name="GAPROB" type="DOUBLE"/>
+  <ColDef name="KAPTON" type="DOUBLE"/>
+  <ColDef name="KPTPOS_0" type="DOUBLE"/>
+  <ColDef name="KPTPOS_1" type="DOUBLE"/>
+  <ColDef name="KPTPOS_2" type="DOUBLE"/>
+  <ColDef name="KPTWID_0" type="DOUBLE"/>
+  <ColDef name="KPTWID_1" type="DOUBLE"/>
+  <ColDef name="KPTWID_2" type="DOUBLE"/>
+  <ColDef name="RODDIM_0" type="DOUBLE"/>
+  <ColDef name="RODDIM_1" type="DOUBLE"/>
+  <ColDef name="SPCDIM_0" type="DOUBLE"/>
+  <ColDef name="SPCDIM_1" type="DOUBLE"/>
+  <ColDef name="RODPOSR_0" type="DOUBLE"/>
+  <ColDef name="RODPOSR_1" type="DOUBLE"/>
+  <ColDef name="RODPOSR_2" type="DOUBLE"/>
+  <ColDef name="RODPOSR_3" type="DOUBLE"/>
+  <ColDef name="RODPOSX_0" type="DOUBLE"/>
+  <ColDef name="RODPOSX_1" type="DOUBLE"/>
+  <ColDef name="RODPOSX_2" type="DOUBLE"/>
+  <ColDef name="RODPOSX_3" type="DOUBLE"/>
+  <ColDef name="ZSHIFT" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="HecGridValues">
+  <ColDef name="HECGRIDVALUES_DATA_ID" type="LONG"/>
+  <ColDef name="ETAGR" type="DOUBLE"/>
+  <ColDef name="PHIGR" type="DOUBLE"/>
+  <ColDef name="ETAMX" type="DOUBLE"/>
+  <ColDef name="NETA" type="INT"/>
+  <ColDef name="ETA_0" type="DOUBLE"/>
+  <ColDef name="ETA_1" type="DOUBLE"/>
+  <ColDef name="ETA_2" type="DOUBLE"/>
+  <ColDef name="ETA_3" type="DOUBLE"/>
+  <ColDef name="ETA_4" type="DOUBLE"/>
+  <ColDef name="ETA_5" type="DOUBLE"/>
+  <ColDef name="ETA_6" type="DOUBLE"/>
+  <ColDef name="ETA_7" type="DOUBLE"/>
+  <ColDef name="ETA_8" type="DOUBLE"/>
+  <ColDef name="ETA_9" type="DOUBLE"/>
+  <ColDef name="ETA_10" type="DOUBLE"/>
+  <ColDef name="ETA_11" type="DOUBLE"/>
+  <ColDef name="ETA_12" type="DOUBLE"/>
+  <ColDef name="ETA_13" type="DOUBLE"/>
+  <ColDef name="ETA_14" type="DOUBLE"/>
+  <ColDef name="ETA_15" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="HecLongitudinalBlock">
+  <ColDef name="PLATE0" type="DOUBLE"/>
+  <ColDef name="PLATEE" type="DOUBLE"/>
+  <ColDef name="BLMOD" type="DOUBLE"/>
+  <ColDef name="HECLONGITUDINALBLOCK_DATA_ID" type="LONG"/>
+  <ColDef name="IBLC" type="DOUBLE"/>
+  <ColDef name="BLRMN" type="DOUBLE"/>
+  <ColDef name="BLRMX" type="DOUBLE"/>
+  <ColDef name="BLDPTH" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="HecNominals">
+  <ColDef name="HECNOMINALS_DATA_ID" type="LONG"/>
+  <ColDef name="HECMOD" type="INT"/>
+  <ColDef name="ETAMIN" type="DOUBLE"/>
+  <ColDef name="ETAMAX" type="DOUBLE"/>
+  <ColDef name="PHIMIN" type="DOUBLE"/>
+  <ColDef name="PHIMAX" type="DOUBLE"/>
+  <ColDef name="INDEPTH" type="DOUBLE"/>
+  <ColDef name="OUTDEPTH" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="HecPad">
+  <ColDef name="HECPAD_DATA_ID" type="LONG"/>
+  <ColDef name="ETA_0" type="DOUBLE"/>
+  <ColDef name="ETA_1" type="DOUBLE"/>
+  <ColDef name="ETA_2" type="DOUBLE"/>
+  <ColDef name="ETA_3" type="DOUBLE"/>
+  <ColDef name="ETA_4" type="DOUBLE"/>
+  <ColDef name="ETA_5" type="DOUBLE"/>
+  <ColDef name="ETA_6" type="DOUBLE"/>
+  <ColDef name="ETA_7" type="DOUBLE"/>
+  <ColDef name="ETA_8" type="DOUBLE"/>
+  <ColDef name="ETA_9" type="DOUBLE"/>
+  <ColDef name="ETA_10" type="DOUBLE"/>
+  <ColDef name="ETA_11" type="DOUBLE"/>
+  <ColDef name="ETA_12" type="DOUBLE"/>
+  <ColDef name="ETA_13" type="DOUBLE"/>
+  <ColDef name="ETA_14" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="IdSupportRail">
+  <ColDef name="IDSUPPORTRAIL_DATA_ID" type="LONG"/>
+  <ColDef name="ZLENGTH" type="DOUBLE"/>
+  <ColDef name="YWIDTH" type="DOUBLE"/>
+  <ColDef name="XDEPTH" type="DOUBLE"/>
+  <ColDef name="MIDNOTCHDEPTH" type="DOUBLE"/>
+  <ColDef name="OUTNOTCHDEPTH" type="DOUBLE"/>
+  <ColDef name="MIDNOTCHINNEREXTENT" type="DOUBLE"/>
+  <ColDef name="MIDNOTCHOUTEREXTENT" type="DOUBLE"/>
+  <ColDef name="LOWERLIPTOPPOS" type="DOUBLE"/>
+  <ColDef name="LOWERLIPBOTTOMPOS" type="DOUBLE"/>
+  <ColDef name="TOPLIPANGLE" type="DOUBLE"/>
+  <ColDef name="CURVERADIUS" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArAlignment">
+  <ColDef name="LARALIGNMENT_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+  <ColDef name="THETA" type="DOUBLE"/>
+  <ColDef name="PHI" type="DOUBLE"/>
+  <ColDef name="ROTATIONANGLE" type="DOUBLE"/>
+  <ColDef name="TRANSX" type="DOUBLE"/>
+  <ColDef name="TRANSY" type="DOUBLE"/>
+  <ColDef name="TRANSZ" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArBarBumperBlocks">
+  <ColDef name="LARBARBUMPERBLOCKS_DATA_ID" type="LONG"/>
+  <ColDef name="LENGTH" type="DOUBLE"/>
+  <ColDef name="HEIGHT" type="DOUBLE"/>
+  <ColDef name="WIDTH" type="DOUBLE"/>
+  <ColDef name="PAIRSEP" type="DOUBLE"/>
+  <ColDef name="DISTANCEFROMRIDGE" type="DOUBLE"/>
+  <ColDef name="NPAIRTOT" type="INT"/>
+  <ColDef name="INDEXWALL" type="INT"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArBarrelCryoBolts">
+  <ColDef name="INDEXWALL2" type="INT"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+  <ColDef name="LARBARRELCRYOBOLTS_DATA_ID" type="LONG"/>
+  <ColDef name="NBOLT" type="INT"/>
+  <ColDef name="PHI0" type="DOUBLE"/>
+  <ColDef name="RADIUS" type="DOUBLE"/>
+  <ColDef name="RBOLT" type="DOUBLE"/>
+  <ColDef name="INDEXWALL1" type="INT"/>
+</TableDef>
+
+
+
+<TableDef name="LArCellVolumes">
+  <ColDef name="LARCELLVOLUMES_DATA_ID" type="LONG"/>
+  <ColDef name="SUBCALO" type="INT"/>
+  <ColDef name="POSNEG" type="INT"/>
+  <ColDef name="SAMPLING" type="INT"/>
+  <ColDef name="REGION" type="INT"/>
+  <ColDef name="ETA" type="INT"/>
+  <ColDef name="PHI" type="INT"/>
+  <ColDef name="VOLUME" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArCones">
+  <ColDef name="LARCONES_DATA_ID" type="LONG"/>
+  <ColDef name="CONE" type="STRING"/>
+  <ColDef name="RMIN1" type="DOUBLE"/>
+  <ColDef name="RMIN2" type="DOUBLE"/>
+  <ColDef name="RMAX1" type="DOUBLE"/>
+  <ColDef name="RMAX2" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="PHI0" type="DOUBLE"/>
+  <ColDef name="DPHI" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArDMEnv1PhiBox">
+  <ColDef name="LARDMENV1PHIBOX_DATA_ID" type="LONG"/>
+  <ColDef name="BOXNAME" type="STRING"/>
+  <ColDef name="ETA" type="DOUBLE"/>
+  <ColDef name="DELTAR" type="DOUBLE"/>
+  <ColDef name="DELTARPHI" type="DOUBLE"/>
+  <ColDef name="THICKNESS" type="DOUBLE"/>
+  <ColDef name="PHI0" type="DOUBLE"/>
+  <ColDef name="NPHI" type="INT"/>
+  <ColDef name="NOHORIZ" type="INT"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArDMEnv1Ring">
+  <ColDef name="LARDMENV1RING_DATA_ID" type="LONG"/>
+  <ColDef name="RINGNAME" type="STRING"/>
+  <ColDef name="ETAMIN" type="DOUBLE"/>
+  <ColDef name="ETAMAX" type="DOUBLE"/>
+  <ColDef name="THICKNESS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArEndcapCrate">
+  <ColDef name="LARENDCAPCRATE_DATA_ID" type="LONG"/>
+  <ColDef name="BOXNAME" type="STRING"/>
+  <ColDef name="XTR" type="DOUBLE"/>
+  <ColDef name="ZTR" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArEndcapCratePhiPos">
+  <ColDef name="LARENDCAPCRATEPHIPOS_DATA_ID" type="LONG"/>
+  <ColDef name="CRATENUM" type="INT"/>
+  <ColDef name="PHIPOS" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArEndcapDMTubes">
+  <ColDef name="LARENDCAPDMTUBES_DATA_ID" type="LONG"/>
+  <ColDef name="TUBENAME" type="STRING"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="LArFCalElectrodesMod1">
+  <ColDef name="LARFCALELECTRODES_DATA_ID" type="LONG"/>
+  <ColDef name="TILENAME" type="STRING"/>
+  <ColDef name="MODNUMBER" type="INT"/>
+  <ColDef name="ID" type="INT"/>
+  <ColDef name="I" type="INT"/>
+  <ColDef name="J" type="INT"/>
+  <ColDef name="X" type="DOUBLE"/>
+  <ColDef name="Y" type="DOUBLE"/>
+  <ColDef name="HVFEEDTHROUGHID" type="STRING"/>
+  <ColDef name="HVLINE" type="STRING"/>
+  <ColDef name="RESISTANCE" type="DOUBLE"/>
+</TableDef>
+
+<TableDef name="LArFCalElectrodesMod2">
+  <ColDef name="LARFCALELECTRODES_DATA_ID" type="LONG"/>
+  <ColDef name="TILENAME" type="STRING"/>
+  <ColDef name="MODNUMBER" type="INT"/>
+  <ColDef name="ID" type="INT"/>
+  <ColDef name="I" type="INT"/>
+  <ColDef name="J" type="INT"/>
+  <ColDef name="X" type="DOUBLE"/>
+  <ColDef name="Y" type="DOUBLE"/>
+  <ColDef name="HVFEEDTHROUGHID" type="STRING"/>
+  <ColDef name="HVLINE" type="STRING"/>
+  <ColDef name="RESISTANCE" type="DOUBLE"/>
+</TableDef>
+
+<TableDef name="LArFCalElectrodesMod3">
+  <ColDef name="LARFCALELECTRODES_DATA_ID" type="LONG"/>
+  <ColDef name="TILENAME" type="STRING"/>
+  <ColDef name="MODNUMBER" type="INT"/>
+  <ColDef name="ID" type="INT"/>
+  <ColDef name="I" type="INT"/>
+  <ColDef name="J" type="INT"/>
+  <ColDef name="X" type="DOUBLE"/>
+  <ColDef name="Y" type="DOUBLE"/>
+  <ColDef name="HVFEEDTHROUGHID" type="STRING"/>
+  <ColDef name="HVLINE" type="STRING"/>
+  <ColDef name="RESISTANCE" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictEtaPhi">
+  <ColDef name="LARIDDICTETAPHI_DATA_ID" type="LONG"/>
+  <ColDef name="REGIONNAME" type="STRING"/>
+  <ColDef name="ETA0" type="DOUBLE"/>
+  <ColDef name="DETA" type="DOUBLE"/>
+  <ColDef name="PHI0" type="DOUBLE"/>
+  <ColDef name="DPHI" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictFieldLabel">
+  <ColDef name="LARIDDICTFIELDLABEL_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+  <ColDef name="VALUE" type="INT"/>
+  <ColDef name="FIELDNAME" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictFieldName">
+  <ColDef name="LARIDDICTFIELDNAME_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictNeighbors">
+  <ColDef name="LARIDDICTNEIGHBORS_DATA_ID" type="LONG"/>
+  <ColDef name="REGNAME" type="STRING"/>
+  <ColDef name="PREV_ABS_ETA" type="STRING"/>
+  <ColDef name="NEXT_ABS_ETA" type="STRING"/>
+  <ColDef name="PREV_SAMP" type="STRING"/>
+  <ColDef name="NEXT_SAMP" type="STRING"/>
+  <ColDef name="PREV_SUBDET" type="STRING"/>
+  <ColDef name="NEXT_SUBDET" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictRegionName">
+  <ColDef name="LARIDDICTREGIONNAME_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+  <ColDef name="GROUPNAME" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictRegionRange">
+  <ColDef name="LARIDDICTREGIONRANGE_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+  <ColDef name="MINVAL" type="INT"/>
+  <ColDef name="MAXVAL" type="INT"/>
+  <ColDef name="REGIONNAME" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictSubregLink">
+  <ColDef name="LARIDDICTSUBREGLINK_DATA_ID" type="LONG"/>
+  <ColDef name="REGNAME" type="STRING"/>
+  <ColDef name="SUBREGNAME" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictSubregName">
+  <ColDef name="LARIDDICTSUBREGNAME_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdDictSubregRange">
+  <ColDef name="LARIDDICTSUBREGRANGE_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+  <ColDef name="MINVAL" type="INT"/>
+  <ColDef name="MAXVAL" type="INT"/>
+  <ColDef name="WRAP" type="INT"/>
+  <ColDef name="SUBREGNAME" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArIdentifier">
+  <ColDef name="LARIDENTIFIER_DATA_ID" type="LONG"/>
+  <ColDef name="DICT_NAME" type="STRING"/>
+  <ColDef name="DICT_FILENAME" type="STRING"/>
+  <ColDef name="DICT_TAG" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="LArMatComponents">
+  <ColDef name="LARMATCOMPONENTS_DATA_ID" type="LONG"/>
+  <ColDef name="MATERIAL_ID" type="LONG"/>
+  <ColDef name="COMPNAME" type="STRING"/>
+  <ColDef name="FRACTION" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArMaterials">
+  <ColDef name="LARMATERIALS_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+  <ColDef name="DENSITY" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArPosition">
+  <ColDef name="LARPOSITION_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+  <ColDef name="THETA" type="DOUBLE"/>
+  <ColDef name="PHI" type="DOUBLE"/>
+  <ColDef name="ROTATIONANGLE" type="DOUBLE"/>
+  <ColDef name="TRANSX" type="DOUBLE"/>
+  <ColDef name="TRANSY" type="DOUBLE"/>
+  <ColDef name="TRANSZ" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArScintTB">
+  <ColDef name="LARSCINTTB_DATA_ID" type="LONG"/>
+  <ColDef name="NAME" type="STRING"/>
+  <ColDef name="XDIM" type="DOUBLE"/>
+  <ColDef name="YDIM" type="DOUBLE"/>
+  <ColDef name="ZDIM" type="DOUBLE"/>
+  <ColDef name="XPOS" type="DOUBLE"/>
+  <ColDef name="YPOS" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArSubdetPos">
+  <ColDef name="ROTX" type="DOUBLE"/>
+  <ColDef name="ROTY" type="DOUBLE"/>
+  <ColDef name="ROTZ" type="DOUBLE"/>
+  <ColDef name="LARSUBDETPOS_DATA_ID" type="LONG"/>
+  <ColDef name="LARSUBDET" type="STRING"/>
+  <ColDef name="X" type="DOUBLE"/>
+  <ColDef name="Y" type="DOUBLE"/>
+  <ColDef name="Z" type="DOUBLE"/>
+  <ColDef name="THETA" type="DOUBLE"/>
+  <ColDef name="PHI" type="DOUBLE"/>
+  <ColDef name="PSI" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="LArSwitches">
+  <ColDef name="DETAILED_ABSORBER" type="INT"/>
+  <ColDef name="DETAILED_ABSORBER_EC" type="INT"/>
+  <ColDef name="FCAL_GEOTYPE" type="STRING"/>
+  <ColDef name="LARSWITCHES_DATA_ID" type="LONG"/>
+  <ColDef name="SAGGING" type="INT"/>
+  <ColDef name="BARREL_ON" type="INT"/>
+  <ColDef name="ENDCAP_ON" type="INT"/>
+</TableDef>
+
+
+
+<TableDef name="MBTSGen">
+  <ColDef name="MBTSGEN_DATA_ID" type="LONG"/>
+  <ColDef name="NSCIN" type="INT"/>
+  <ColDef name="STARTPHI" type="DOUBLE"/>
+  <ColDef name="ZPOSENV" type="DOUBLE"/>
+  <ColDef name="RPOSENV" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="MBTSPcons">
+  <ColDef name="MBTSPCONS_DATA_ID" type="LONG"/>
+  <ColDef name="PCON" type="STRING"/>
+  <ColDef name="PLANE_ID" type="INT"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="ZPLANE" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="MBTSScin">
+  <ColDef name="MBTSSCIN_DATA_ID" type="LONG"/>
+  <ColDef name="SCIN_ID" type="INT"/>
+  <ColDef name="SCINNUM" type="INT"/>
+  <ColDef name="DX1" type="DOUBLE"/>
+  <ColDef name="DX2" type="DOUBLE"/>
+  <ColDef name="DY1" type="DOUBLE"/>
+  <ColDef name="DY2" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="RPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+  <ColDef name="STARTPHI" type="DOUBLE"/>
+  <ColDef name="ETA" type="DOUBLE"/>
+  <ColDef name="DETA" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="MBTSTrds">
+  <ColDef name="ETA" type="DOUBLE"/>
+  <ColDef name="DETA" type="DOUBLE"/>
+  <ColDef name="SCIN_ID" type="INT"/>
+  <ColDef name="PARENT" type="STRING"/>
+  <ColDef name="XPOS" type="DOUBLE"/>
+  <ColDef name="MBTSTRDS_DATA_ID" type="LONG"/>
+  <ColDef name="TRD" type="STRING"/>
+  <ColDef name="DX1" type="DOUBLE"/>
+  <ColDef name="DX2" type="DOUBLE"/>
+  <ColDef name="DY1" type="DOUBLE"/>
+  <ColDef name="DY2" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="YPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="MBTSTubs">
+  <ColDef name="MBTSTUBS_DATA_ID" type="LONG"/>
+  <ColDef name="TUBE" type="STRING"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="MiniFcalCommon">
+  <ColDef name="MINIFCALCOMMON_DATA_ID" type="LONG"/>
+  <ColDef name="ABSORBERTHICKNESS" type="DOUBLE"/>
+  <ColDef name="LAYERTHICKNESS" type="DOUBLE"/>
+  <ColDef name="WAFERTHICKNESS" type="DOUBLE"/>
+  <ColDef name="WAFERSIZEX" type="DOUBLE"/>
+  <ColDef name="WAFERSIZEY" type="DOUBLE"/>
+  <ColDef name="NLAYERS" type="INT"/>
+</TableDef>
+
+
+
+<TableDef name="MiniFcalCondEnv">
+  <ColDef name="YPOS" type="DOUBLE"/>
+  <ColDef name="MINIFCALCONDENV_DATA_ID" type="LONG"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="MiniFcalCryoEnv">
+  <ColDef name="MINIFCALCRYOENV_DATA_ID" type="LONG"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="HALFTHICKNESS" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="MiniFcalElectrodes">
+  <ColDef name="MINIFCALELECTRODES_DATA_ID" type="LONG"/>
+  <ColDef name="TILENAME" type="STRING"/>
+  <ColDef name="ID" type="INT"/>
+  <ColDef name="I" type="INT"/>
+  <ColDef name="J" type="INT"/>
+  <ColDef name="X" type="DOUBLE"/>
+  <ColDef name="Y" type="DOUBLE"/>
+  <ColDef name="HVFEEDTHROUGH" type="STRING"/>
+  <ColDef name="HVLINE" type="STRING"/>
+  <ColDef name="RESISTANCE" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="MiniFcalEnvelope">
+  <ColDef name="MINIFCALENVELOPE_DATA_ID" type="LONG"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="DZ" type="DOUBLE"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="MATERIAL" type="STRING"/>
+</TableDef>
+
+
+
+<TableDef name="MiniFcalLayers">
+  <ColDef name="MINIFCALLAYERS_DATA_ID" type="LONG"/>
+  <ColDef name="LAYERNUM" type="INT"/>
+  <ColDef name="RSHIFT" type="DOUBLE"/>
+  <ColDef name="PHISHIFT" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="MiniFcalMod">
+  <ColDef name="MINIFCALMOD_DATA_ID" type="LONG"/>
+  <ColDef name="INNERMODULERADIUS" type="DOUBLE"/>
+  <ColDef name="OUTERMODULERADIUS" type="DOUBLE"/>
+  <ColDef name="FULLMODULEDEPTH" type="DOUBLE"/>
+  <ColDef name="INNERGAPRADIUS" type="DOUBLE"/>
+  <ColDef name="OUTERGAPRADIUS" type="DOUBLE"/>
+  <ColDef name="FULLGAPDEPTH" type="DOUBLE"/>
+  <ColDef name="STARTPOSITION" type="DOUBLE"/>
+  <ColDef name="TUBESPACING" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="MiniFcalRings">
+  <ColDef name="MINIFCALRINGS_DATA_ID" type="LONG"/>
+  <ColDef name="RINGNUM" type="INT"/>
+  <ColDef name="NWAFERS" type="INT"/>
+  <ColDef name="RINNER" type="DOUBLE"/>
+  <ColDef name="ROUTER" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="PresamplerGeometry">
+  <ColDef name="PRESAMPLERGEOMETRY_DATA_ID" type="LONG"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+  <ColDef name="NMODZ" type="INT"/>
+  <ColDef name="NSLANT" type="INT"/>
+  <ColDef name="NMODPHI" type="INT"/>
+  <ColDef name="RACTIVE" type="DOUBLE"/>
+  <ColDef name="HACTIVE" type="DOUBLE"/>
+  <ColDef name="HEXTRA" type="DOUBLE"/>
+  <ColDef name="ELECGAP" type="DOUBLE"/>
+  <ColDef name="TILT" type="DOUBLE"/>
+  <ColDef name="TCOPPERA" type="DOUBLE"/>
+  <ColDef name="TG10ANOD" type="DOUBLE"/>
+  <ColDef name="TCOPPERC" type="DOUBLE"/>
+  <ColDef name="TG10CATH" type="DOUBLE"/>
+  <ColDef name="HSUPPOR1" type="DOUBLE"/>
+  <ColDef name="HSUPPOR2" type="DOUBLE"/>
+  <ColDef name="HCABLES" type="DOUBLE"/>
+  <ColDef name="TSKIRT" type="DOUBLE"/>
+  <ColDef name="DSKSUP1" type="DOUBLE"/>
+  <ColDef name="SKIRTGAP" type="DOUBLE"/>
+  <ColDef name="FDIV" type="DOUBLE"/>
+</TableDef>
+
+
+
+<TableDef name="PresamplerModules">
+  <ColDef name="PRESAMPLERMODULES_DATA_ID" type="LONG"/>
+  <ColDef name="MODULE_ID" type="INT"/>
+  <ColDef name="LENGTH" type="DOUBLE"/>
+  <ColDef name="NANODES" type="INT"/>
+  <ColDef name="NCATHODES" type="INT"/>
+  <ColDef name="CELLTILT" type="DOUBLE"/>
+  <ColDef name="PITCH" type="DOUBLE"/>
+  <ColDef name="FIRSTCATHODE" type="DOUBLE"/>
+</TableDef>
+
+<TableDef name="PresamplerPosition">
+  <ColDef name="PRESAMPLERPOSITION_DATA_ID" type="LONG"/>
+  <ColDef name="ZPOS" type="DOUBLE"/>
+  <ColDef name="TCK" type="DOUBLE"/>
+  <ColDef name="RMIN" type="DOUBLE"/>
+  <ColDef name="RMAX" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="TiBlocks">
+  <ColDef name="TIBLOCKS_DATA_ID" type="LONG"/>
+  <ColDef name="LENGTH" type="DOUBLE"/>
+  <ColDef name="HEIGHT" type="DOUBLE"/>
+  <ColDef name="WIDTH" type="DOUBLE"/>
+  <ColDef name="PAIRSEP" type="DOUBLE"/>
+  <ColDef name="DISTANCEFROMRIDGE" type="DOUBLE"/>
+  <ColDef name="NPAIRTOT" type="INT"/>
+</TableDef>
+
+</GeoInpDefs>

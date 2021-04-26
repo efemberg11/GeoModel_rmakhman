@@ -177,7 +177,7 @@ GeoLogVol * GmxUtil::makeAssemblyLV() {
                 msglog << MSG::ERROR << "GmxUtil::makeAssemblyLV: Unable to access Material Manager" << endmsg;
         }
         else {
-            GeoMaterial *assembly_material = theMaterialManager->getMaterial("special::HyperUranium");
+            const GeoMaterial *assembly_material = theMaterialManager->getMaterial("special::HyperUranium");
             GeoBox *box = new GeoBox(1., 1., 1.); // Simplest shape; it is irrelevant
             GeoLogVol *lv = new GeoLogVol(string("AssemblyLV"), box, assembly_material);
             return lv;

@@ -6,10 +6,7 @@ file( GLOB HEADERS GeoModelXml/*.h )
 file( GLOB SHAPEHEADERS GeoModelXml/shape/*.h )
 
 # External dependencies
-find_package( GeoModelCore REQUIRED )
-find_package( Eigen3 REQUIRED )
-find_package( GeoModelTools REQUIRED )
-find_package( XercesC REQUIRED )
+#find_package( Eigen3 REQUIRED )
 find_package( ZLIB REQUIRED )
 
 
@@ -28,7 +25,7 @@ set_target_properties( GeoModelXml PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelXML::GeoModelXml ALIAS GeoModelXml )
+add_library( GeoModelTools::GeoModelXml ALIAS GeoModelXml )
 
 # Install the library.
 install(TARGETS GeoModelXml

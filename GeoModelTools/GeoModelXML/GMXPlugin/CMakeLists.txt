@@ -4,10 +4,8 @@
 file( GLOB SOURCES src/*.cxx )
 
 # External dependencies
-find_package( GeoModelCore REQUIRED )
-find_package( GeoModelTools REQUIRED )
-find_package( XercesC REQUIRED )
-find_package( ZLIB REQUIRED )
+#find_package( XercesC REQUIRED )
+#find_package( ZLIB REQUIRED )
 
 
 # Create the library.
@@ -24,7 +22,7 @@ set_target_properties( GMXPlugin PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelXML::GMXPlugin ALIAS GMXPlugin )
+add_library( GeoModelTools::GMXPlugin ALIAS GMXPlugin )
 
 # Install the library.
 install(TARGETS GMXPlugin

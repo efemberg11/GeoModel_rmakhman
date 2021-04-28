@@ -3,11 +3,11 @@
 // ----------------------------------------------------------------------
 
 #include "ExpressionEvaluator/defs.h"
-#include "ExpressionEvaluator/Evaluator.h"
+#include "ExpressionEvaluator/IEvaluator.h"
 
 //  namespace HepTool {
 
-void Evaluator::setSystemOfUnits(double meter,
+void IEvaluator::setSystemOfUnits(double meter,
 				 double kilogram,
 				 double second,
 				 double ampere,

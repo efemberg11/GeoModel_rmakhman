@@ -246,6 +246,8 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 #include "GDMLInterface/setupHandler.h"
 #include "GDMLInterface/worldHandler.h"
 #include "GDMLInterface/physvolHandler.h"
+#include "GDMLInterface/variableHandler.h"
+#include "GDMLInterface/constantHandler.h"
 
 
 void GDMLController::registerHandlers()
@@ -282,5 +284,7 @@ void GDMLController::registerHandlers()
 	new physvolHandler("physvol",this);
 	new setupHandler("setup",this);
 	new worldHandler("world",this);
-
+	new variableHandler("variable",this);
+	new constantHandler("constant",this);
+	new constantHandler("quantity",this);
 }

@@ -3,11 +3,6 @@
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
 
-# External dependencies
-#find_package( XercesC REQUIRED )
-#find_package( ZLIB REQUIRED )
-
-
 # Create the library.
 add_library( GMXPlugin SHARED ${SOURCES} )
 target_link_libraries( GMXPlugin PUBLIC GeoModelCore::GeoModelKernel XercesC::XercesC GeoModelXml )
@@ -44,7 +39,6 @@ install( FILES ${HEADERS}
    COMPONENT Development )
 
 # set ( PLUGIN_NAME  "GMXPlugin.so" )
-   
 # ADD_CUSTOM_TARGET( GMX_plugin ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${GMXPlugin} ${PLUGIN_NAME} )
 
 

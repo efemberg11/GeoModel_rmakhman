@@ -6,7 +6,6 @@ file( GLOB HEADERS GeoModelXml/*.h )
 file( GLOB SHAPEHEADERS GeoModelXml/shape/*.h )
 
 # External dependencies
-#find_package( Eigen3 REQUIRED )
 find_package( ZLIB REQUIRED )
 
 

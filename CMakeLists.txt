@@ -47,6 +47,7 @@ find_package( SQLite3 3.7.17 )
 # === Main targets built by this project ===
 
 # switches to let users build specific packages on request
+option(GEOMODEL_BUILD_ALL "Enable the build of all GeoModel sub-packages" OFF)
 option(GEOMODEL_BUILD_TOOLS "Enable the build of GeoModelTools" OFF)
 option(GEOMODEL_BUILD_EXAMPLES "Enable the build of GeoModelExamples" OFF)
 option(GEOMODEL_BUILD_EXAMPLES_W_GEANT4 "Enable the build of GeoModelExamples, including the ones concerning the interface GeoModel->Geant4" OFF)
@@ -62,6 +63,12 @@ list( APPEND BUILT_PACKAGES "GeoModelCore")
 add_subdirectory(GeoModelIO)
 list( APPEND BUILT_PACKAGES "GeoModelIO")
 
+
+if(GEOMODEL_BUILD_ALL)
+    set(GEOMODEL_BUILD_TOOLS         TRUE)
+    set(GEOMODEL_BUILD_VISUALIZATION TRUE)
+    set(GEOMODEL_BUILD_FULLSIMLIGHT  TRUE) 
+endif()
 
 if(GEOMODEL_BUILD_TOOLS)
   add_subdirectory(GeoModelTools)

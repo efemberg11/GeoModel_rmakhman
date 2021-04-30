@@ -12,7 +12,9 @@ find_package( ZLIB REQUIRED )
 
 # Create the library.
 add_library( GeoModelXml SHARED ${HEADERS} ${SOURCES} )
+# Add custom definitions
 target_compile_definitions( GeoModelXml PUBLIC -DSTANDALONE_GMX )
+# link libraries
 target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel GeoModelTools::ExpressionEvaluator XercesC::XercesC ZLIB::ZLIB  )
 target_include_directories( GeoModelXml PUBLIC 
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -44,7 +46,7 @@ install(TARGETS GeoModelXml
 
 install( FILES ${HEADERS}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXml
-   COMPONENT Development )
+    COMPONENT Development )
 install( FILES ${SHAPEHEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXml/shape)
 
 

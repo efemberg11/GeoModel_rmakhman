@@ -1,5 +1,5 @@
 # Setup the most basic image
-ARG BASEIMAGE=gitlab-registry.cern.ch/geomodeldev/geomodel:master-Base
+ARG BASEIMAGE=gitlab-registry.cern.ch/geomodeldev/geomodel:master-base
 FROM ${BASEIMAGE}
 
 

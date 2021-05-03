@@ -1,5 +1,5 @@
 # Setup the most basic image
-ARG BASEIMAGE=gitlab-registry.cern.ch/jojungge/geomodel:docker_imageBase
+ARG BASEIMAGE=gitlab-registry.cern.ch/geomodeldev/geomodel:docker_image-Base
 FROM ${BASEIMAGE}
 
 

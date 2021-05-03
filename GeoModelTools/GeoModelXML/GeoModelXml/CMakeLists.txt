@@ -14,7 +14,7 @@ add_library( GeoModelXml SHARED ${HEADERS} ${SOURCES} )
 # Add custom definitions
 target_compile_definitions( GeoModelXml PUBLIC -DSTANDALONE_GMX )
 # link libraries
-target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel GeoModelTools::ExpressionEvaluator XercesC::XercesC ZLIB::ZLIB  )
+target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel GeoModelTools::ExpressionEvaluator XercesC::XercesC PRIVATE ZLIB::ZLIB  )
 target_include_directories( GeoModelXml PUBLIC 
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

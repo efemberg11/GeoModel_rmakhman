@@ -503,7 +503,7 @@ docs-deploy:
 build_system_docker:
   stage: step-A
   variables:
-    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Base
+    TO: $CI_REGISTRY_IMAGE:GeoModel-${CI_COMMIT_REF_NAME}-Base
     DOCKER_FILE: 'CI/DockerfileBase'
     # all submodules will be cloned recursively upon start of CI job
     GIT_SUBMODULE_STRATEGY: recursive
@@ -517,12 +517,12 @@ build_system_docker:
 build_full_docker:
   stage: step-B
   variables:
-    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Full
+    TO: $CI_REGISTRY_IMAGE:GeoModel-${CI_COMMIT_REF_NAME}-Full
     DOCKER_FILE: 'CI/DockerfileFull'
     # all submodules will be cloned recursively upon start of CI job
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SSL_NO_VERIFY: "true"
-    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Base
+    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:GeoModel-${CI_COMMIT_REF_NAME}-Base
   tags:
     - docker-image-build
   script:
@@ -535,12 +535,12 @@ build_full_docker:
 build_light_docker:
   stage: step-B
   variables:
-    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}
+    TO: $CI_REGISTRY_IMAGE:GeoModel-${CI_COMMIT_REF_NAME}-Light
     DOCKER_FILE: 'CI/DockerfileLight'
     # all submodules will be cloned recursively upon start of CI job
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SSL_NO_VERIFY: "true"
-    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}Base
+    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:GeoModel-${CI_COMMIT_REF_NAME}-Base
   tags:
     - docker-image-build
   script:

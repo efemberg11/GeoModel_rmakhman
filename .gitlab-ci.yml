@@ -488,7 +488,7 @@ docs-deploy:
     stage: step-B
     needs: ["docs-build"]
     rules:
-      - if: '$CI_COMMIT_BRANCH == "master"' #If changes are pushed to master.
+      - if: '$CI_COMMIT_BRANCH == "master"' # Deploy, only if changes are pushed to master.
         changes:
         - documentation/**/*
     variables:
@@ -500,8 +500,15 @@ docs-deploy:
         - ls
         - deploy-eos
 
+## Build a 'base' docket image
+## containing the GeoModel base packages
+##  Note: we build the docker image only from 'master' and tags
 build_system_docker:
   stage: step-A
+  only:
+    refs:
+      - master
+      - tags
   variables:
     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
     DOCKER_FILE: 'CI/DockerfileBase'
@@ -514,8 +521,13 @@ build_system_docker:
     - ignore
 ##  Construct one docker image containing
 ##  also Geant4
+##  Note: we build the docker image only from 'master' and tags
 build_full_docker:
   stage: step-B
+  only:
+    refs:
+      - master
+      - tags
   variables:
     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-full
     DOCKER_FILE: 'CI/DockerfileFull'
@@ -532,8 +544,13 @@ build_full_docker:
 
 ##  Construct one docker image only for
 ##  viewer puposes
+##  Note: we build the docker image only from 'master' and tags
 build_light_docker:
   stage: step-B
+  only:
+    refs: 
+      - master
+      - tags
   variables:
     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-light
     DOCKER_FILE: 'CI/DockerfileLight'

@@ -524,6 +524,7 @@ build_system_docker:
 ##  Note: we build the docker image only from 'master' and tags
 build_full_docker:
   stage: step-B
+  allow_failure: true
   only:
     refs:
       - master

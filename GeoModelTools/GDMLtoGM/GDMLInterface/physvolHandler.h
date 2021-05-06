@@ -16,10 +16,12 @@ public:
 	void ElementHandle();
 	GeoPhysVol* getPhysicalVolume();
 	GeoTransform* getTransform();
-
+	void setPhysicalVolume(GeoPhysVol* pV) {thePhysicalVolume=pV;}
+	void setMotherVolume(GeoPhysVol* lV) {theMotherVolume=lV;}
 private:
 	std::string name;
 	GeoPhysVol* thePhysicalVolume=0;
+	GeoPhysVol* theMotherVolume=0;
 	GeoTransform* trf=0;
 };
 

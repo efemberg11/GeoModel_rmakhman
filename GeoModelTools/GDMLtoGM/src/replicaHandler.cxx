@@ -29,7 +29,7 @@ void replicaHandler::ElementHandle()
 {
 
     nCopies=getAttributeAsInt("number");
-    std::cout<<"this is replicaHandler::ElementHandle(): nCopies= "<<nCopies<<std::endl;
+    //std::cout<<"this is replicaHandler::ElementHandle(): nCopies= "<<nCopies<<std::endl;
 
     StopLoop(true);
     xercesc::DOMNode *child;
@@ -49,7 +49,7 @@ void replicaHandler::ElementHandle()
 		
 		XercesParser::elementLoop(child);
 		XMLHandler *h=theController->XMLStore()->GetHandler(child);
-		std::cout<<" namenamename "<<h->GetName()<<std::endl;
+		//std::cout<<" namenamename "<<h->GetName()<<std::endl;
             	if(h){
                 	std::string nH=h->GetName();
                 	//std::cout<<" handler name "<<nH<<std::endl;
@@ -66,7 +66,7 @@ void replicaHandler::ElementHandle()
                     		else
 				{
 		     			theLogicalVolume=(vH->getVolume()).first;
-					std::cout<<" replicaHandler: log vol name  "<<theLogicalVolume->getName()<<std::endl;
+					//std::cout<<" replicaHandler: log vol name  "<<theLogicalVolume->getName()<<std::endl;
 					thePhysicalVolume=new GeoPhysVol(theLogicalVolume);
 					//thePhysicalVolume=(vH->getVolume()).second;
 
@@ -76,15 +76,11 @@ void replicaHandler::ElementHandle()
         }
     }
 
-    std::cout<<" start serial transform "<<std::endl;
+    //std::cout<<" start serial transform "<<std::endl;
 
     double pStartXYZ,pStartPhi;
     pStartXYZ=-0.5*nCopies*p.w+p.o;
     pStartPhi=p.o;
-    
-    
-    std::cout << " pW = "<<p.w<<std::endl;
-
     
     const unsigned int NREPLICAS=nCopies;
     GeoGenfun::Variable i;
@@ -119,15 +115,9 @@ void replicaHandler::ElementHandle()
         }
         else
                 std::cout<< " WARNING - GDMLtoGM::replicaHandle: unknown axis!"<<std::endl;
-		
-		
-	std::cout<<"this is a test "<<std::endl;
 
-    	//GeoTransform* trf=new GeoTransform(GeoTrf::Translate3D(pVTranslation.x(),pVTranslation.y(),pVTranslation.z()));
-
-///	theMotherVolume->add(thePhysicalVolume);
 	theMotherVolume->add(s1);
-        //transform=s1;
+
 }
 GeoPhysVol* replicaHandler::getPhysicalVolume()
 {

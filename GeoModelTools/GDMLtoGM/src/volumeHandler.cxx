@@ -19,7 +19,7 @@ void volumeHandler::ElementHandle()
 	shape=nullptr;
 	name=getAttributeAsString("name");
 	//name=stripPointer(getAttributeAsString("name"));
-	std::cout<<" this is volumeHandler: name "<<name<<std::endl;
+	//std::cout<<" this is volumeHandler: name "<<name<<std::endl;
 
 	StopLoop(true);
 	xercesc::DOMNode *child;
@@ -35,7 +35,7 @@ void volumeHandler::ElementHandle()
 			XMLHandler *h=theController->XMLStore()->GetHandler(child);
             		if (h){
 	              		std::string nH=h->GetName();
-                		std::cout<<" handler name "<<nH<<std::endl;
+                		//std::cout<<" handler name "<<nH<<std::endl;
 				
                 		if (nH=="materialref") {
 					XercesParser::elementLoop(child);
@@ -57,7 +57,7 @@ void volumeHandler::ElementHandle()
 						GeoPhysVol* tempPV;
 						if (!tempLV) 
 						{
-							std::cout<<" volumeHandler new volume "<<name<<std::endl;
+							//std::cout<<" volumeHandler new volume "<<name<<std::endl;
 							// std::cout<<" replicaHandler: tempLV is 0!!!!!!"<<std::endl;
 							tempLV=new GeoLogVol(name,shape,material);
 							tempPV=new GeoPhysVol(tempLV);
@@ -92,9 +92,8 @@ void volumeHandler::ElementHandle()
 	}
 	if (!tempLV) 
 	{
-		std::cout<< " creating new GeoLogVol "<<name<<" ";
+		//std::cout<< " creating new GeoLogVol "<<name<<" ";
 		tempLV=new GeoLogVol(name,shape,material);
-		std::cout<<tempLV<<std::endl;
 		
 		GeoPhysVol* tempPV=new GeoPhysVol(tempLV);
 		

@@ -22,7 +22,7 @@ void physvolHandler::ElementHandle() {
     //better to use the getAttributeAsString with the boolean option
     	bool isPresent;
 	name=getAttributeAsString("name", isPresent);
-	std::cout<<" this is physvolHandler: name "<<name<<std::endl;
+	//std::cout<<" this is physvolHandler: name "<<name<<std::endl;
 
 	StopLoop(true);
 	xercesc::DOMNode *child;
@@ -45,7 +45,7 @@ void physvolHandler::ElementHandle() {
             		if(h)
 			{
                 		std::string nH=h->GetName();
-                		std::cout<<" handler name "<<nH<<std::endl;
+                		//std::cout<<" handler name "<<nH<<std::endl;
                 		if (nH=="volumeref") 
 				{
                     			volumerefHandler* vH=dynamic_cast<volumerefHandler*>(h);
@@ -53,10 +53,9 @@ void physvolHandler::ElementHandle() {
                      			else 
 		     			{
 		     				theLogicalVolume=(vH->getVolume()).first;
-						std::cout<<" blablabla "<<theLogicalVolume->getName()<<std::endl;
 						thePhysicalVolume=(vH->getVolume()).second;
 		     			}
-		     			std::cout<<" physvol "<<thePhysicalVolume<<std::endl;
+		     			//std::cout<<" physvol "<<thePhysicalVolume<<std::endl;
                 		}
                 		else if (nH=="positionref" || nH=="position")
                 		{

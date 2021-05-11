@@ -9,7 +9,8 @@ class GDMLController;
 #include <vector>
 
 class GeoPhysVol;
-class GeoTransform;
+class GeoSerialTransformer;
+class GeoLogVol;
 
 class replicaHandler:public GDMLHandler {
 public:
@@ -17,14 +18,17 @@ public:
 	replicaHandler(std::string n, GDMLController* c);
 	void ElementHandle();
 	GeoPhysVol* getPhysicalVolume();
-	GeoTransform* getTransform(int);
+	GeoSerialTransformer* getTransform();
 	int getNCopies();
 	void postLoopHandling();
+	void setPhysicalVolume(GeoPhysVol* pV) {thePhysicalVolume=pV;}
+	void setMotherVolume(GeoPhysVol* lV) {theMotherVolume=lV;}
 private:
 	std::string name;
 	int nCopies=0;
 	GeoPhysVol* thePhysicalVolume;
-	std::vector<GeoTransform*> transforms;
+	GeoPhysVol* theMotherVolume;
+	GeoSerialTransformer* transform;
 };
 
 

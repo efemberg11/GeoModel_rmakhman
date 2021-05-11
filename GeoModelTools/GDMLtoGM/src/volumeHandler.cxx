@@ -5,6 +5,7 @@
 #include "GDMLInterface/replicaHandler.h"
 
 #include "GeoModelKernel/GeoTransform.h"
+#include "GeoModelKernel/GeoSerialTransformer.h"
 
 
 volumeHandler::volumeHandler(std::string n, GDMLController* c): GDMLHandler(n,c) 
@@ -14,80 +15,92 @@ volumeHandler::volumeHandler(std::string n, GDMLController* c): GDMLHandler(n,c)
 
 void volumeHandler::ElementHandle() 
 {
-	theVolume=std::make_pair(nullptr,nullptr);
 	material=nullptr;
 	shape=nullptr;
 	name=getAttributeAsString("name");
 	//name=stripPointer(getAttributeAsString("name"));
-	//  std::cout<<" this is volumeHandler: name "<<name<<std::endl;
+	//std::cout<<" this is volumeHandler: name "<<name<<std::endl;
 
 	StopLoop(true);
 	xercesc::DOMNode *child;
-	std::vector<GeoPhysVol*> tempPhys;
-	std::vector<GeoTransform*> tempTransform;
+	GeoPhysVol* tempPhys=0;
+	GeoGraphNode* tempTransform=0;
+	
+	GeoLogVol* tempLV=0;
 
 	for (child=XercesParser::GetCurrentElement()->getFirstChild();child!=0;child=child->getNextSibling())
 	{
 		if (child->getNodeType()==xercesc::DOMNode::ELEMENT_NODE) {
-			XercesParser::elementLoop(child);
+			// XercesParser::elementLoop(child);
 			XMLHandler *h=theController->XMLStore()->GetHandler(child);
             		if (h){
-                		std::string nH=h->GetName();
+	              		std::string nH=h->GetName();
                 		//std::cout<<" handler name "<<nH<<std::endl;
+				
                 		if (nH=="materialref") {
+					XercesParser::elementLoop(child);
                     			materialrefHandler* mH=dynamic_cast<materialrefHandler*>(h);
                     			if (!mH) std::cout<<" something is wrong! can not retrieve materialrefHandler!!!"<<std::endl;
                     			else material=mH->getMaterial();
                 		}
                 		else if (nH=="solidref") {
+					XercesParser::elementLoop(child);
                     			solidrefHandler* sH=dynamic_cast<solidrefHandler*>(h);
                     			if (!sH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
                     			else shape=sH->getSolid();
                 		}
-                        else if (nH=="physvol") {
+				else if (nH=="physvol") {
                     			physvolHandler* pH=dynamic_cast<physvolHandler*>(h);
                     			if (!pH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
                     			else
                     			{
-                        			tempPhys.push_back(pH->getPhysicalVolume());
-                        			tempTransform.push_back(pH->getTransform());
+						GeoPhysVol* tempPV;
+						if (!tempLV) 
+						{
+							//std::cout<<" volumeHandler new volume "<<name<<std::endl;
+							// std::cout<<" replicaHandler: tempLV is 0!!!!!!"<<std::endl;
+							tempLV=new GeoLogVol(name,shape,material);
+							tempPV=new GeoPhysVol(tempLV);
+							
+							theVolume=std::make_pair(tempLV,tempPV);
+							theController->saveLogicalVolume(name,theVolume);
+						}
+						pH->setMotherVolume(tempPV);
                     			}
+					XercesParser::elementLoop(child);
                 		}
-				        else if (nH=="replicavol") {
-					        replicaHandler* rH=dynamic_cast<replicaHandler*>(h);
-					        if (!rH) std::cout<<" something is wrong! can not retrieve replicaHandler!!!"<<std::endl;
-					        else
-					        {
-						        // std::cout<<" from replicaHandler: nCopies="<<rH->getNCopies()<<std::endl;
-						        for (int i=0;i<rH->getNCopies();i++)
-						        {
-						            tempPhys.push_back(rH->getPhysicalVolume());
-                                    tempTransform.push_back(rH->getTransform(i));
-						        }
-					        }
-				        }
-                        else std::cout<<" handler name not defined "<<nH<<std::endl;
-            }
+				else if (nH=="replicavol") {
+					replicaHandler* rH=dynamic_cast<replicaHandler*>(h);
+					if (!rH) std::cout<<" something is wrong! can not retrieve replicaHandler!!!"<<std::endl;
+					else
+					{
+						GeoPhysVol* tempPV;
+						if (!tempLV) 
+						{
+							tempLV=new GeoLogVol(name,shape,material);
+							tempPV=new GeoPhysVol(tempLV);
+							theVolume=std::make_pair(tempLV,tempPV);
+							theController->saveLogicalVolume(name,theVolume);
+						}
+						rH->setMotherVolume(tempPV);
+					}
+					XercesParser::elementLoop(child);
+				}
+            		}
             
-        } //else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
+        	} //else std::cout<<"WARNING: handler not defined.. continuing"<<std::endl;
 	}
-	//std::cout << "Creating logical volume "<<name<<" shape "<<shape<<" mat "<<material<<std::endl;
-	GeoLogVol* tempLV=new GeoLogVol(name,shape,material);
-	GeoPhysVol* tempPV=new GeoPhysVol(tempLV);
-	theVolume=std::make_pair(tempLV,tempPV);
-	if (tempPhys.size()!=0)
+	if (!tempLV) 
 	{
-		for (unsigned long i=0; i< tempPhys.size(); i++)
-		{
-			GeoPhysVol* pV=tempPhys[i];
-			if (tempTransform[i]) 
-			{	
-				theVolume.second->add(tempTransform[i]);
-			}
-			theVolume.second->add(pV);
-		}
+		//std::cout<< " creating new GeoLogVol "<<name<<" ";
+		tempLV=new GeoLogVol(name,shape,material);
+		
+		GeoPhysVol* tempPV=new GeoPhysVol(tempLV);
+		
+		theVolume=std::make_pair(tempLV,tempPV);
+		theController->saveLogicalVolume(name,theVolume);
 	}
-	theController->saveLogicalVolume(name,theVolume);
+
 }
 void volumeHandler::postLoopHandling()
 {

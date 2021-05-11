@@ -218,6 +218,7 @@ GeoVolume GDMLController::retrieveLogicalVolume(std::string name)
 	else
 	{
 		std::cout << " Warning! logical volume "<< name << " not found in store! returning empty"<<std::endl;
+		std::vector<GeoPhysVol*> v;
 		return std::make_pair(nullptr,nullptr);
 	}
 }

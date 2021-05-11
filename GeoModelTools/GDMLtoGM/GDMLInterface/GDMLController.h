@@ -17,7 +17,7 @@ class GeoMaterial;
 class GeoLogVol;
 class GeoPhysVol;
 
-typedef std::pair<GeoLogVol*,GeoPhysVol* > GeoVolume;
+typedef std::pair<GeoLogVol*,GeoPhysVol*> GeoVolume;
 
 typedef std::map<std::string, GeoShape*, std::less<std::string> > solidStore;
 
@@ -63,7 +63,7 @@ public:
 	GeoVolume retrieveLogicalVolume(std::string);
 	
 	void setWorld(GeoVolume v) {world=v;}
-	GeoPhysVol* getWorld() {return world.second;}
+	GeoPhysVol* getWorld() {return (world.second);}
 
 protected:
 	void registerHandlers();

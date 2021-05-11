@@ -6,8 +6,8 @@ volumerefHandler::volumerefHandler(std::string n, GDMLController* c): GDMLHandle
 
 void volumerefHandler::ElementHandle() 
 {
-	theVolume=std::make_pair(nullptr,nullptr);
 	ref=getAttributeAsString("ref");
+	//std::cout<<" volumeref name "<<ref<<std::endl;
 	theVolume=theController->retrieveLogicalVolume(ref);
 	//theVolume=theController->retrieveLogicalVolume(stripPointer(ref));
 }

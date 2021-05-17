@@ -67,7 +67,10 @@ std::string XMLHandler::getAttributeAsString(const std::string name) const
 {
 	bool isPresent;
 	std::string temp=getAttribute(name,isPresent);
-	if (!isPresent) throw;
+	if (!isPresent) {
+        std::cerr << "\nERROR!! XMLHandler::getAttributeAsString(name) --> Attribute '" << name << "' is not present! Check your data!" << std::endl;
+        throw std::runtime_error ("XML attribute not found!");;
+    }
 	return temp;
 }
 double XMLHandler::getAttributeAsDouble(const std::string name) const

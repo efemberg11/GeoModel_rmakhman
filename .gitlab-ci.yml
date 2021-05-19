@@ -245,6 +245,8 @@ mac-coin:
   <<: *macos-job
   <<: *coin-job
   stage: step-A
+  before_script:
+    - brew bundle --file=CI/Brewfile
   # needs: ["mac-config"]
 
 

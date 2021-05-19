@@ -1,0 +1,7 @@
+brew "wget"
+brew "qt5" 
+brew "expat"
+brew "boost"
+brew "nlohmann-json"
+brew "xerces-c"
+brew "eigen"

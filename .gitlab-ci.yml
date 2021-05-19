@@ -201,73 +201,72 @@ debug-job:
 # At the end, we clean the build machine with a cleaning script
 # (Of course, we could install all needed packages on the build machine by hand at once; but we prefer to have a clean build machine everytime; to test even the third-party packages)
 
-# macOS configuration script.
-# It installs all the needed third-party dependencies
-mac-config:
-  <<: *macos-job 
-  stage: step-A
-  script:
-    - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
-    - brew update
-    - brew install qt5 wget expat boost nlohmann-json xerces-c eigen
-    - brew install atlas/geomodel/cmake-geomodel # TODO: remove this as soon as we update Coin/SoQt sources to latest version for CMake 3.19
+# # macOS configuration script.
+# # It installs all the needed third-party dependencies
+# mac-config:
+#   <<: *macos-job 
+#   stage: step-A
+#   script:
+#     - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
+#     - brew update
+#     - brew install qt5 wget expat boost nlohmann-json xerces-c eigen
+#     - brew install atlas/geomodel/cmake-geomodel # TODO: remove this as soon as we update Coin/SoQt sources to latest version for CMake 3.19
     
 
-# macOS job to install our custom-build of Geant4
-mac-config-g4:
-  <<: *macos-job
-  stage: step-B
-  needs: ["mac-config"]
-  script:
-    - brew install atlas/geomodel/geant4 
+# # macOS job to install our custom-build of Geant4
+# mac-config-g4:
+#   <<: *macos-job
+#   stage: step-B
+#   needs: ["mac-config"]
+#   script:
+#     - brew install atlas/geomodel/geant4 
 
 
-# macOS cleaning script.
-# It removes all the third-party dependencies
-mac-clean:
-  <<: *macos-job 
-  stage: step-E
-  needs: ["mac-gm-visualization", "mac-gm-fullsimlight", "mac-gm-gmg4", "mac-gm-examples-gmg4"]
-  script:
-    - brew uninstall --ignore-dependencies qt5 wget expat boost nlohmann-json xerces-c eigen 
-    - brew remove -f atlas/geomodel/cmake-geomodel #TODO: remove this as soon as we update Coin/SoQt
+# # macOS cleaning script.
+# # It removes all the third-party dependencies
+# mac-clean:
+#   <<: *macos-job 
+#   stage: step-E
+#   needs: ["mac-gm-visualization", "mac-gm-fullsimlight", "mac-gm-gmg4", "mac-gm-examples-gmg4"]
+#   script:
+#     - brew uninstall --ignore-dependencies qt5 wget expat boost nlohmann-json xerces-c eigen 
+#     - brew remove -f atlas/geomodel/cmake-geomodel #TODO: remove this as soon as we update Coin/SoQt
 
-# macOS cleaning job to remove our custom-build of Geant4
-mac-clean-g4:
-  <<: *macos-job
-  stage: step-F
-  needs: ["mac-clean"]
-  script:
-    - brew remove -f atlas/geomodel/geant4 
+# # macOS cleaning job to remove our custom-build of Geant4
+# mac-clean-g4:
+#   <<: *macos-job
+#   stage: step-F
+#   needs: ["mac-clean"]
+#   script:
+#     - brew remove -f atlas/geomodel/geant4 
 
 
 mac-coin:
   <<: *macos-job
   <<: *coin-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
+  # needs: ["mac-config"]
 
 
 mac-soqt:
   <<: *macos-job
   <<: *soqt-job
-  stage: step-C
-  needs: ["mac-coin"]
-  #stage: step-B
+  stage: step-B
+  # needs: ["mac-coin"]
 
 
 mac-gm-base:
   <<: *macos-job
   <<: *geomodel-job
   stage: step-B
-  needs: ["mac-config"]
+  # needs: ["mac-config"]
 
 
 mac-gm-tools:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
+  # needs: ["mac-config"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
@@ -276,8 +275,9 @@ mac-gm-tools:
 mac-gm-visualization:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-D
-  needs: ["mac-config", "mac-coin", "mac-soqt"]
+  stage: step-C
+  # needs: ["mac-config", "mac-coin", "mac-soqt"]
+  needs: ["mac-coin", "mac-soqt"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
@@ -286,8 +286,8 @@ mac-gm-visualization:
 mac-gm-examples:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
+  # needs: ["mac-config"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
@@ -295,8 +295,8 @@ mac-gm-examples:
 mac-gm-gmg4:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-C
-  needs: ["mac-config", "mac-config-g4"]
+  stage: step-A
+  # needs: ["mac-config", "mac-config-g4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
@@ -305,8 +305,8 @@ mac-gm-gmg4:
 mac-gm-examples-gmg4:
   <<: *macos-job
   <<: *geomodel-job
-  needs: ["mac-config", "mac-config-g4"]
-  stage: step-C
+  # needs: ["mac-config", "mac-config-g4"]
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
@@ -315,8 +315,8 @@ mac-gm-examples-gmg4:
 mac-gm-fullsimlight:
   <<: *macos-job
   <<: *geomodel-job
-  needs: ["mac-config", "mac-config-g4"]
-  stage: step-C
+  # needs: ["mac-config", "mac-config-g4"]
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE

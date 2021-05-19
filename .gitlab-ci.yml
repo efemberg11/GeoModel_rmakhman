@@ -27,6 +27,7 @@ variables:
   allow_failure: true
   timeout: 30 minutes
   before_script:
+    - brew bundle --file=CI/Brewfile # install third-party dependencies, if needed
     - export PATH="/usr/local/opt/expat/bin:$PATH" # to make CMake use expat from Homebrew instead of the old one shipped with the system in /usr/lib
     - export LDFLAGS="-L/usr/local/opt/expat/lib"
     - export CPPFLAGS="-I/usr/local/opt/expat/include"
@@ -245,8 +246,6 @@ mac-coin:
   <<: *macos-job
   <<: *coin-job
   stage: step-A
-  before_script:
-    - brew bundle --file=CI/Brewfile
   # needs: ["mac-config"]
 
 

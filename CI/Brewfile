@@ -1,3 +1,11 @@
+# This file lists the third-party dependencies
+# needed by the GeoModel packages.
+# It is used in the CI jobs by the `brew bundle` command
+# to prepare the environment for the macOS CI build jobs.
+#
+# Author: Riccardo Maria BIANCHI, riccardo.maria.bianchi@cern.ch
+# Created: May 2021
+#
 brew "wget"
 brew "qt5" 
 brew "expat"

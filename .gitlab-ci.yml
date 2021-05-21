@@ -402,10 +402,11 @@ ubu-gm-fullsimlight-customxercesc-builtinjson:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
-  allow_failure: true
+  when: manual
 
-
-### Documentation
+#####################
+### Documentation ###
+#####################
 
 docs-build:
     stage: step-A
@@ -451,7 +452,13 @@ docs-deploy:
         - ls
         - deploy-eos
 
-## Build a 'base' docket image
+
+
+#####################
+### Docker images ###
+#####################
+
+## Build a 'base' Docker image
 ## containing the GeoModel base packages
 ##  Note: we build the docker image only from 'master' and tags
 build_system_docker:
@@ -470,7 +477,7 @@ build_system_docker:
     - docker-image-build
   script:
     - ignore
-##  Construct one docker image containing
+##  Construct one Docker image containing
 ##  also Geant4
 ##  Note: we build the docker image only from 'master' and tags
 build_full_docker:
@@ -494,7 +501,7 @@ build_full_docker:
   needs:
     - build_system_docker  
 
-##  Construct one docker image only for
+##  Construct one Docker image only for
 ##  viewer puposes
 ##  Note: we build the docker image only from 'master' and tags
 build_light_docker:

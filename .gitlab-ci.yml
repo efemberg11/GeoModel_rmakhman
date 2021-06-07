@@ -479,9 +479,13 @@ build_system_docker:
     - docker-image-build
   script:
     - ignore
+
 ##  Construct one Docker image containing
 ##  also Geant4
-##  Note: we build the docker image only from 'master' and tags
+##  Note:  
+##  - we build the docker image only from 'master' and tags
+##  - image's final name is, e.g., "geomodel:master-base"
+##
 build_full_docker:
   stage: step-B
   allow_failure: true
@@ -505,7 +509,10 @@ build_full_docker:
 
 ##  Construct one Docker image only for
 ##  viewer puposes
-##  Note: we build the docker image only from 'master' and tags
+##  Note:  
+##  - we build the docker image only from 'master' and tags
+##  - image's final name is, e.g., "geomodel:master-light"
+##
 build_light_docker:
   stage: step-B
   only:

@@ -319,9 +319,12 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType(std::str
 
 bool GMDBManager::addListOfChildrenPositions(const std::vector<std::vector<std::string>> &records)
 {
-    // NOTE: Choose the right function for your version of SQLite!!
-	return addListOfRecordsToTable("ChildrenPositions", records); // needs SQLite >= 3.7.11
-	//return addListOfRecordsToTableOld("ChildrenPositions", records); // old SQLite versions
+    if(records.size() > 0) {
+        // NOTE: Choose the right function for your version of SQLite!!
+        return addListOfRecordsToTable("ChildrenPositions", records); // needs SQLite >= 3.7.11
+        //return addListOfRecordsToTableOld("ChildrenPositions", records); // old SQLite versions
+    }
+    return false;
 }
 
 bool GMDBManager::addListOfPublishedAlignableTransforms(const std::vector<std::vector<std::string>> &records, std::string suffix /* optional parameter */)

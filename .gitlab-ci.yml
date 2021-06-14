@@ -27,10 +27,11 @@ variables:
   allow_failure: true
   timeout: 30 minutes
   before_script:
+    - brew bundle --file=CI/Brewfile # install third-party dependencies, if needed
     - export PATH="/usr/local/opt/expat/bin:$PATH" # to make CMake use expat from Homebrew instead of the old one shipped with the system in /usr/lib
     - export LDFLAGS="-L/usr/local/opt/expat/lib"
     - export CPPFLAGS="-I/usr/local/opt/expat/include"
-    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+    - export PATH="/usr/local/opt/qt5/bin:$PATH" # to make Qt5 discoverable by CMake
   
 
 # general Ubuntu job template
@@ -196,78 +197,31 @@ debug-job:
 # gitlab-runner on needs to be run in user's space "shell executor" on macOS, 
 # thus, it's not possibke to containerize the jobs. 
 # Also, `brew` cannot be run in parallel jobs, as it throw error, making the job fail.
-# Thus, for our macOS pipeline, we first setup the build machine with a configuration script.
-# Then, we run all the macOS jobs.
-# At the end, we clean the build machine with a cleaning script
-# (Of course, we could install all needed packages on the build machine by hand at once; but we prefer to have a clean build machine everytime; to test even the third-party packages)
-
-# macOS configuration script.
-# It installs all the needed third-party dependencies
-mac-config:
-  <<: *macos-job 
-  stage: step-A
-  script:
-    - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
-    - brew update
-    - brew install qt5 wget expat boost nlohmann-json xerces-c eigen
-    - brew install atlas/geomodel/cmake-geomodel # TODO: remove this as soon as we update Coin/SoQt sources to latest version for CMake 3.19
-    
-
-# macOS job to install our custom-build of Geant4
-mac-config-g4:
-  <<: *macos-job
-  stage: step-B
-  needs: ["mac-config"]
-  script:
-    - brew install atlas/geomodel/geant4 
-
-
-# macOS cleaning script.
-# It removes all the third-party dependencies
-mac-clean:
-  <<: *macos-job 
-  stage: step-E
-  needs: ["mac-gm-visualization", "mac-gm-fullsimlight", "mac-gm-gmg4", "mac-gm-examples-gmg4"]
-  script:
-    - brew uninstall --ignore-dependencies qt5 wget expat boost nlohmann-json xerces-c eigen 
-    - brew remove -f atlas/geomodel/cmake-geomodel #TODO: remove this as soon as we update Coin/SoQt
-
-# macOS cleaning job to remove our custom-build of Geant4
-mac-clean-g4:
-  <<: *macos-job
-  stage: step-F
-  needs: ["mac-clean"]
-  script:
-    - brew remove -f atlas/geomodel/geant4 
-
+# Thus, for our macOS pipeline, we use 'brew bundle' to check and install all needed
+# dependencies, which are listed in a custom Brewfile under the CI folder.
 
 mac-coin:
   <<: *macos-job
   <<: *coin-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
 
 
 mac-soqt:
   <<: *macos-job
   <<: *soqt-job
-  stage: step-C
-  needs: ["mac-coin"]
-  #stage: step-B
+  stage: step-B
 
 
 mac-gm-base:
   <<: *macos-job
   <<: *geomodel-job
   stage: step-B
-  needs: ["mac-config"]
 
 
 mac-gm-tools:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
@@ -276,8 +230,8 @@ mac-gm-tools:
 mac-gm-visualization:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-D
-  needs: ["mac-config", "mac-coin", "mac-soqt"]
+  stage: step-C
+  needs: ["mac-coin", "mac-soqt"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
@@ -286,8 +240,8 @@ mac-gm-visualization:
 mac-gm-examples:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
+  # needs: ["mac-config"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
@@ -295,8 +249,7 @@ mac-gm-examples:
 mac-gm-gmg4:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-C
-  needs: ["mac-config", "mac-config-g4"]
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
@@ -305,8 +258,7 @@ mac-gm-gmg4:
 mac-gm-examples-gmg4:
   <<: *macos-job
   <<: *geomodel-job
-  needs: ["mac-config", "mac-config-g4"]
-  stage: step-C
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
@@ -315,8 +267,7 @@ mac-gm-examples-gmg4:
 mac-gm-fullsimlight:
   <<: *macos-job
   <<: *geomodel-job
-  needs: ["mac-config", "mac-config-g4"]
-  stage: step-C
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
@@ -441,20 +392,23 @@ ubu-gm-fullsimlight-builtinxercesc-builtinjson:
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE 
 
 
-ubu-gm-fullsimlight-customxercesc-builtinjson:
-  <<: *ubuntu-job
-  <<: *geomodel-job
-  stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC-323"]
-  variables:
-    XERCESC_VERSION: 3.2.3
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
-  allow_failure: true
+#TODO: this does not work properly. Needs some work... 
+# ubu-gm-fullsimlight-customxercesc-builtinjson:
+#   <<: *ubuntu-job
+#   <<: *geomodel-job
+#   stage: step-C
+#   needs: ["ubu-geant4", "ubu-XercesC-323"]
+#   variables:
+#     XERCESC_VERSION: 3.2.3
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
+#   rules:
+#     - when: manual
 
-
-### Documentation
+#####################
+### Documentation ###
+#####################
 
 docs-build:
     stage: step-A
@@ -500,7 +454,13 @@ docs-deploy:
         - ls
         - deploy-eos
 
-## Build a 'base' docket image
+
+
+#####################
+### Docker images ###
+#####################
+
+## Build a 'base' Docker image
 ## containing the GeoModel base packages
 ##  Note: we build the docker image only from 'master' and tags
 build_system_docker:
@@ -519,9 +479,13 @@ build_system_docker:
     - docker-image-build
   script:
     - ignore
-##  Construct one docker image containing
+
+##  Construct one Docker image containing
 ##  also Geant4
-##  Note: we build the docker image only from 'master' and tags
+##  Note:  
+##  - we build the docker image only from 'master' and tags
+##  - image's final name is, e.g., "geomodel:master-base"
+##
 build_full_docker:
   stage: step-B
   allow_failure: true
@@ -543,9 +507,12 @@ build_full_docker:
   needs:
     - build_system_docker  
 
-##  Construct one docker image only for
+##  Construct one Docker image only for
 ##  viewer puposes
-##  Note: we build the docker image only from 'master' and tags
+##  Note:  
+##  - we build the docker image only from 'master' and tags
+##  - image's final name is, e.g., "geomodel:master-light"
+##
 build_light_docker:
   stage: step-B
   only:

@@ -74,7 +74,7 @@ For older macOS releases, Homebrew will try to compile the packages from source.
 
 !!! tip
     
-    If you experience problems in installing GeoModel packages with brew or using them, please try to clean your system from old packages or repositories. For that, please refer to the [Troubleshooting page](/dev/troubleshooting.md).
+    If you experience problems in installing GeoModel packages with brew or using them, please try to clean your system from old packages or repositories. For that, please refer to the [Troubleshooting page](../dev/troubleshooting.md).
 
 
 

@@ -52,6 +52,8 @@ GmxUtil::GmxUtil(GmxInterface &gmxInterface) {
 //   can appear in a long list in any order. So certainly all shapes; maybe others.
 //
     geoItemRegistry.enregister("simplepolygonbrep", (Element2GeoItem *) &tagHandler.simplepolygonbrep);
+    geoItemRegistry.enregister("twistedtrap", (Element2GeoItem *) &tagHandler.twistedtrap);
+    geoItemRegistry.enregister("ellipticaltube", (Element2GeoItem *) &tagHandler.ellipticaltube);
     geoItemRegistry.enregister("box", (Element2GeoItem *) &tagHandler.box);
     geoItemRegistry.enregister("cons", (Element2GeoItem *) &tagHandler.cons);
     geoItemRegistry.enregister("generictrap", (Element2GeoItem *) &tagHandler.generictrap);

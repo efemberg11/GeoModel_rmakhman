@@ -65,7 +65,7 @@
     <!ELEMENT addindex EMPTY>
         <!ATTLIST addindex name ID #REQUIRED>
 
-  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep|ellipticaltube)+)>
+  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep|ellipticaltube|twistedtrap)+)>
     <!-- All shapes allowed in GeoModel manual. Same name, parameters, parameter order, but always lower case -->
 
     <!ELEMENT simplepolygonbrep EMPTY>

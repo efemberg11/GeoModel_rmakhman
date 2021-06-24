@@ -5,13 +5,15 @@
 #ifndef GEOMATMANAGER_GEOMATMANAGER_H
 #define GEOMATMANAGER_GEOMATMANAGER_H
 
+#include "GeoModelKernel/IGeoMaterialManager.h"
+
 #include <iostream>
 
 class GeoElement;
 class GeoMaterial;
 class Impl;
 
-class GeoMaterialManager {
+class GeoMaterialManager: public IGeoMaterialManager {
   
   friend class Impl;
   
@@ -24,7 +26,6 @@ class GeoMaterialManager {
 
   std::ostream & printAll(std::ostream & o=std::cout) const;
 
- protected:
   void addElement(const std::string &name
 		  , const std::string &symbol
 		  , double z

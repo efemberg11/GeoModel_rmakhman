@@ -1338,7 +1338,7 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 
 
 			// and now loop over the rest of the list, to get the parameters of all Z planes
-			for (unsigned it=2; it < NVertices; it++)
+			for (unsigned it=2; it < NVertices*2+1; it++)
 			{
 				par = shapePars[it];
 				vars = splitString(par, '=');

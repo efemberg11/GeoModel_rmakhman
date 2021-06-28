@@ -39,6 +39,7 @@
 #include "GeoModelXml/shape/MakeSimplePolygonBrep.h"
 #include "GeoModelXml/shape/MakeEllipticalTube.h"
 #include "GeoModelXml/shape/MakeTwistedTrap.h"
+#include "GeoModelXml/shape/MakeTorus.h"
 #include "GeoModelXml/shape/MakeBox.h"
 #include "GeoModelXml/shape/MakeCons.h"
 #include "GeoModelXml/shape/MakeGenericTrap.h"
@@ -93,8 +94,9 @@ public:
         MakeElement element;
         MakeMaterial material;
         MakeSimplePolygonBrep simplepolygonbrep;
-	MakeEllipticalTube ellipticaltube;
-	MakeTwistedTrap twistedtrap;
+        MakeEllipticalTube ellipticaltube;
+        MakeTwistedTrap twistedtrap;
+        MakeTorus torus;
         MakeBox box;
         MakeCons cons;
         MakeGenericTrap generictrap;

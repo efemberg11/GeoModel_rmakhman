@@ -16,16 +16,20 @@
 
   <!-- Definition of variables -->
   <defines>
-  
+
+    <!--Units-->
+    <var name="PI" value="acos(-1.0)"/>
+    <var name="DEG" value="PI/180."/> <!-- Use as value="10*DEG" so it converts to radians for you -->
+
     <var name="TubeInnerRadius" value="0" />
     <var name="TubeOuterRadius" value="600." />
     <var name="TubeHalfLength"  value="1200." />
 
-    <var name="TorusOuterRadius"  value="1200." />
-    <var name="TorusInnerRadius"  value="1000." />
-    <var name="TorusTorusRadius"  value="200." />
-    <var name="TorusStartPhi"  value="0." />
-    <var name="TorusDeltaPhi"  value="270." />
+    <var name="TorusPipeInnerRadius"  value="100." />
+    <var name="TorusPipeOuterRadius"  value="200." />
+    <var name="TorusMainRadius"  value="1200." />
+    <var name="TorusStartPhi"  value="0 * DEG" />
+    <var name="TorusDeltaPhi"  value="270 * DEG" />
 
   </defines>
 
@@ -35,13 +39,13 @@
                        rmax="TubeOuterRadius"
                        zhalflength="TubeHalfLength"/>
 
-    <box name="Box" xhalflength="100" 
-                    yhalflength="100" 
-                    zhalflength="100"/>
+    <box name="Box" xhalflength="500" 
+                    yhalflength="500" 
+                    zhalflength="500"/>
     
-    <torus name="Torus" rmin="TorusInnerRadius"
-                        rmax="TorusOuterRadius"
-                        rtor="TorusTorusRadius"
+    <torus name="Torus" rmin="TorusPipeInnerRadius"
+                        rmax="TorusPipeOuterRadius"
+                        rtor="TorusMainRadius"
                         sphi="TorusStartPhi"
                         dphi="TorusDeltaPhi"/>
   </shapes>
@@ -60,6 +64,10 @@
     </transform>
   </assembly>
 
+  <assembly name="ShapeBox" >
+      <logvolref ref="MyBox"/>
+  </assembly>
+
   <assembly name="ShapeTorus" >
     <transform>
       <transformation name="positiveShift">
@@ -74,7 +82,8 @@
 
   <!-- Adding volume branches -->
   <addbranch>
-      <!--<assemblyref ref="ShapeTube" />-->
+      <assemblyref ref="ShapeTube" />
+      <assemblyref ref="ShapeBox" />
       <assemblyref ref="ShapeTorus" />
   </addbranch>
 

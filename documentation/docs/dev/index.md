@@ -229,32 +229,6 @@ cd ..
 
 
 
-
-## (Optional) Build an example GeoModelPlugin
-
-
-
-```bash
-# Build the GeoModelATLAS/GeoModelDataManagers
-git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers.git
-mkdir build_managers
-cd build_managers
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelDataManagers
-make -j
-make install
-cd ..
-
-# Build atlas/GeoModelPlugins
-git clone https://gitlab.cern.ch/atlas/GeoModelPlugins.git
-mkdir build_plugins
-cd build_plugins
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelPlugins
-make -j
-make install
-cd ..
-```
-
-
 ## Post install settings
 
 Assuming you followed the above instructions and you used `../install` as the installation path, in order to run the applications you need to set a couple of system variables.

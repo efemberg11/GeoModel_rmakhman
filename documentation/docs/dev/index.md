@@ -67,9 +67,23 @@ On Fedora, you can install all the needed third-party dependencies by using the 
 dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial xerces-c-devel unzip freeglut-devel wget eigen3-devel
 ```
 
-### Centos/RedHat
+### Centos7
 
-*coming soon*
+Packages shipped with Centos7, or installed by the YUM package manager, unfortunately are often too old. So, one needs to circumvent that, either by using pre-compiled bundles, RPMs, or building from sources.
+
+For CMake, one way to easily set up a recent version of it, if one has CVMFS access, is the use of LCG bundles:
+
+```bash
+source /cvmfs/sft.cern.ch/lcg/views/LCG_100/x86_64-centos7-gcc9-opt/setup.sh
+```
+
+For Xerces-C, nlohmann-json, Coin3D, Simage, and SoQt, one can use the built-in versions shipeed with GeoModel. They are tested and they avoid the installation from sources of all these packages.
+
+On Centos7, the GeoModel tools-suite, with support for the XML parser and the visualization tools, can be compiled (after having set a modern CMake) with:
+
+```bash
+cmake -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_JSON=1 -DGEOMODEL_USE_BUILTIN_COIN3D=1 -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_TOOLS=1 ../GeoModel/
+```
 
 
 ## Visualization 3D graphics dependencies

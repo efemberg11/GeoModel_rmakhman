@@ -25,10 +25,11 @@
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GmxInterface.h"
 #include "GeoModelXml/createdomdocument.h"
+#include "GeoModelXml/MaterialManager.h"
 
 using namespace std;
 
-Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags) {
+Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager) {
 //
 //    Create the xml tree (DOMDocument)
 //
@@ -48,6 +49,7 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
 //    Set up the CLHEP evaluator and the xml-tag processors, and store the GmxInterface:
 //
     GmxUtil gmxUtil(gmxInterface); 
+    if (useMatManager) gmxUtil.matManager=new MaterialManager();
 //
 //    Process the xml tree, creating all the GeoModel items and adding to the GeoModel tree.
 //

@@ -14,6 +14,7 @@
 #else
 #include "ExpressionEvaluator/Evaluator.h"
 #endif
+#include "GeoModelXml/MaterialManager.h"
 #include "GeoModelXml/ProcessorRegistry.h"
 #include "GeoModelXml/Element2GeoItemRegistry.h"
 
@@ -73,6 +74,7 @@ public:
     Evaluator eval;
 #endif
     PositionIndex positionIndex;
+    MaterialManager* matManager=0;
     ProcessorRegistry processorRegistry;
     Element2GeoItemRegistry geoItemRegistry;
     GeoLogVol * getAssemblyLV() {return m_assemblyLV;};

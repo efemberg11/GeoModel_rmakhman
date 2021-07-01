@@ -6,14 +6,16 @@
 #include "MyEventAction.hh"
 #include "MySteppingAction.hh"
 #include "MyTrackingAction.hh"
-#include "MyLengthIntegratorEventAction.hh"
-#include "MyLengthIntegratorSteppingAction.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
 
+#if G4VERSION_NUMBER >= 1040
 #include "G4MultiRunAction.hh"
 #include "G4MultiEventAction.hh"
 #include "G4MultiTrackingAction.hh"
 #include "G4MultiSteppingAction.hh"
+#include "MyLengthIntegratorEventAction.hh"
+#include "MyLengthIntegratorSteppingAction.hh"
+#endif
 
 
 //const G4AnalysisManager* MyActionInitialization::fMasterAnalysisManager = nullptr;
@@ -64,8 +66,10 @@ void MyActionInitialization::Build() const {
           SetUserAction(new MySteppingAction(evtact));
           
       }
+#if G4VERSION_NUMBER>=1040
       else
       {
+
           //Stepping action
           G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction(runact);
           myLenghtIntSteppingAct->SetRlimit(fRlimit);
@@ -82,6 +86,7 @@ void MyActionInitialization::Build() const {
           SetUserAction(myLenghtIntSteppingAct);
           
       }
+#endif
       //MultiEventActions?? TO DO?
   }
 }

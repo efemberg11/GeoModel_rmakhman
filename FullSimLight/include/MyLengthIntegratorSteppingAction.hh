@@ -73,10 +73,7 @@ namespace G4UA
 
       /// this method checks if a histo is on THsvc already and caches a local pointer to it
       /// if the histo is not present, it creates and registers it
-//      TProfile2D* getOrCreateProfile(std::string regName, TString histoname, TString xtitle, int nbinsx, float xmin, float xmax,TString ytitle, int nbinsy,float ymin, float ymax,TString ztitle);
-      //Geant4 version
       G4int getOrCreateProfile_g4(G4String regName, G4String histoname, G4String xtitle, int nbinsx, float xmin, float xmax,G4String ytitle, int nbinsy,float ymin, float ymax,G4String ztitle);
-
 
   public:
       // TO DO: make it private again and add GetDetThickMap method
@@ -129,4 +126,3 @@ namespace G4UA
 } // namespace G4UA
 
 #endif
-

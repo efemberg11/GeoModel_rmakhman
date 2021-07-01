@@ -2,11 +2,8 @@
   Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 */
 
+#if G4VERSION_NUMBER>=1040
 #include "MyLengthIntegratorSteppingAction.hh"
-
-
-//#include "TProfile.h"
-//#include "TProfile2D.h"
 
 #include "G4PrimaryVertex.hh"
 #include "G4PrimaryParticle.hh"
@@ -20,9 +17,6 @@
 #include "G4Types.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
-
-//#include "TFile.h"
-//#include "TDirectory.h"
 
 // System includes
 #include <mutex>
@@ -481,9 +475,10 @@ namespace G4UA
 //    return nullptr;
 //  }
     
-    //Geant4 version
-    G4int MyLengthIntegratorSteppingAction::getOrCreateProfile_g4(G4String regName,G4String histoname, G4String xtitle, int nbinsx, float xmin, float xmax,G4String ytitle, int nbinsy,float ymin, float ymax,G4String ztitle)
+
+G4int MyLengthIntegratorSteppingAction::getOrCreateProfile_g4(G4String regName,G4String histoname, G4String xtitle, int nbinsx, float xmin, float xmax,G4String ytitle, int nbinsy,float ymin, float ymax,G4String ztitle)
     {
+
 
         auto analysisManager = G4AnalysisManager::Instance();
         G4int id = analysisManager->GetP2Id(regName, false);
@@ -508,6 +503,7 @@ namespace G4UA
         }
         
         return id;
+
     }
 
   //---------------------------------------------------------------------------
@@ -528,3 +524,4 @@ namespace G4UA
 
 } // namespace G4UA
 
+#endif

@@ -86,7 +86,12 @@ int main(int argc, char** argv) {
       return 1;
     }
 
-    // JFB Check that the 
+#if G4VERSION_NUMBER<1040
+    G4cout << "INFO: geantinoMaps creation is not supported for Geant4 versions < 10.4" << G4endl;
+    G4cout << "INFO: Please update your Geant4 version" << G4endl;
+    G4cout << "INFO: Exiting" <<G4endl;
+    return 1;
+#endif
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
     G4Random::setTheEngine(new CLHEP::MixMaxRng);

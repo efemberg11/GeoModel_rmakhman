@@ -1,6 +1,7 @@
 /*
  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
  */
+#if G4VERSION_NUMBER>=1040
 
 #include "MyLengthIntegratorEventAction.hh"
 
@@ -426,8 +427,7 @@ namespace G4UA
     //    profPhiRL->Fill(m_phiPrimary, thicks.first, 1.);
     //    profPhiIL->Fill(m_phiPrimary, thicks.second, 1.);
     //  }
-    
-    //Geant4 VERSION
+
     void MyLengthIntegratorEventAction::regAndFillHist_g4(const std::string& detName,
                                                           const std::pair<double, double>& thicks)
     {
@@ -539,8 +539,9 @@ namespace G4UA
         analysisManager->FillP1(id_PhiRL, m_phiPrimary, thicks.first,  1.);
         //profPhiIL->Fill(m_phiPrimary, thicks.second, 1.);
         analysisManager->FillP1(id_PhiIL, m_phiPrimary, thicks.second, 1.);
-        
+
     }
     
 } // namespace G4UA
 
+#endif

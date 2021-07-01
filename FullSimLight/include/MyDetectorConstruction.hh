@@ -51,9 +51,12 @@ public:
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
   void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
   void SetDumpGDML(const bool dumpGDML)              {fDumpGDML=dumpGDML;}
+#if G4VERSION_NUMBER >= 1040
   /// Common method to construct a driver with a stepper of requested type.
   G4VIntegrationDriver*
   createDriverAndStepper(std::string stepperType) const;
+#endif
+  G4MagIntegratorStepper* CreateStepper(std::string name, G4MagneticField* field) const;
 
   void SetMagFieldValue(const G4double fieldValue)
   {

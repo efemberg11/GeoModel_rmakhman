@@ -1,12 +1,11 @@
 /*
  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
  */
+
+#include "G4Version.hh"
 #if G4VERSION_NUMBER>=1040
 
 #include "MyLengthIntegratorEventAction.hh"
-
-//#include "TProfile.h"
-//#include "TProfile2D.h"
 #include "G4PrimaryVertex.hh"
 #include "G4PrimaryParticle.hh"
 #include "G4Event.hh"
@@ -19,9 +18,6 @@
 #include "G4Types.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
-
-//#include "TFile.h"
-//#include "TDirectory.h"
 
 // System includes
 #include <mutex>

@@ -2,6 +2,7 @@
 
 #include <iomanip>
 
+#include "G4Version.hh"
 #include "globals.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VisAttributes.hh"
@@ -17,7 +18,7 @@
 
 // Geant4 steppers
 
-#if G4VERSION_NUMBER >= 1040
+#if G4VERSION_NUMBER>=1040
 #include "G4BogackiShampine23.hh"
 #include "G4BogackiShampine45.hh"
 #include "G4DoLoMcPriRK34.hh"
@@ -32,7 +33,7 @@
 #include "G4IntegrationDriver.hh"
 #endif
 
-#if G4VERSION_NUMBER >= 1060
+#if G4VERSION_NUMBER>=1060
 #include "G4InterpolationDriver.hh"
 #endif
 
@@ -828,7 +829,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
         
         // Checking overlaps with each 'sister' volume
         //
-        for (int k = 0; k < motherLog->GetNoDaughters(); ++k)
+        for (size_t k = 0; k < motherLog->GetNoDaughters(); ++k)
         {
             G4VPhysicalVolume* daughter = motherLog->GetDaughter(k);
             if (daughter == volume) continue;
@@ -1352,7 +1353,7 @@ void MyDetectorConstruction::ConstructSDandField()
     
   }
 }
-#if G4VERSION_NUMBER >= 1040
+#if G4VERSION_NUMBER>=1040
 //=============================================================================
 // Create the driver with a stepper
 //=============================================================================
@@ -1449,7 +1450,7 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
             driver = new G4IntegrationDriver<G4RKG3_Stepper>(
                                                              fMinStep, stepper, stepper->GetNumberOfVariables());
         }
-#if G4VERSION_NUMBER >= 1060
+#if G4VERSION_NUMBER>=1060
         else if (stepperType=="DormandPrince745Int") {
             G4DormandPrince745* stepper = new G4DormandPrince745(eqRhs);
             driver = new G4InterpolationDriver<G4DormandPrince745>(
@@ -1516,7 +1517,7 @@ MyDetectorConstruction::CreateStepper(std::string name, G4MagneticField* field) 
 
         }
     }
-#if G4VERSION_NUMBER >= 1040
+#if G4VERSION_NUMBER>=1040
     else if (name=="BogackiShampine23") return new G4BogackiShampine23(eqRhs);
     else if (name=="BogackiShampine45") return new G4BogackiShampine45(eqRhs);
     else if (name=="CashKarpRKF45") return new G4CashKarpRKF45(eqRhs);
@@ -1539,7 +1540,7 @@ void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
     
     if (v==0) return;
     std::vector<G4VPhysicalVolume*> pv_to_remove;
-    for (int i=0;i<v->GetNoDaughters();++i){
+    for (size_t i=0;i<v->GetNoDaughters();++i){
         
         G4VPhysicalVolume * n_v = v->GetDaughter(i);
         

@@ -1,5 +1,6 @@
 #include "MyRunAction.hh"
 
+#include "G4Version.hh"
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #else
@@ -40,7 +41,7 @@ G4Run* MyRunAction::GenerateRun() {
 
 void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
-#if G4VERSION_NUMBER >= 1040
+#if G4VERSION_NUMBER>=1040
     
     if(fIsGeantino)
     {
@@ -149,7 +150,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
 void MyRunAction::EndOfRunAction(const G4Run*) {
 
-#if G4VERSION_NUMBER >=1040
+#if G4VERSION_NUMBER>=1040
 
     if(fIsGeantino){
         

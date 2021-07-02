@@ -1,8 +1,9 @@
 /*
   Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 */
-
+#include "G4Version.hh"
 #if G4VERSION_NUMBER>=1040
+
 #include "MyLengthIntegratorSteppingAction.hh"
 
 #include "G4PrimaryVertex.hh"

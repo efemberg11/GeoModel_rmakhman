@@ -8,7 +8,8 @@
 #include "MyTrackingAction.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
 
-#if G4VERSION_NUMBER >= 1040
+#include "G4Version.hh"
+#if G4VERSION_NUMBER>=1040
 #include "G4MultiRunAction.hh"
 #include "G4MultiEventAction.hh"
 #include "G4MultiTrackingAction.hh"

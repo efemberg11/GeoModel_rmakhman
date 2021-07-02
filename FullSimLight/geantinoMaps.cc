@@ -2,7 +2,7 @@
 //--------------------------------------------------------
 // geantinoMaps application: 2 April 2020 (README)
 //--------------------------------------------------------
-
+#include "G4Version.hh"
 #include "G4Types.hh"
 #ifdef G4MULTITHREADED
   #include "G4MTRunManager.hh"
@@ -85,8 +85,17 @@ int main(int argc, char** argv) {
       G4cout << "INFO: Exiting" <<G4endl;
       return 1;
     }
+//#if G4VERSION_NUMBER>=1040
+//    std::cout<<"G4VERSION_NUMBER:::: "<<G4VERSION_NUMBER<<std::endl;
+//    exit(1);
+//#endif
 
-    // JFB Check that the 
+#if G4VERSION_NUMBER<1040
+    G4cout << "INFO: geantinoMaps creation is not supported for Geant4 versions < 10.4" << G4endl;
+    G4cout << "INFO: Please update your Geant4 version" << G4endl;
+    G4cout << "INFO: Exiting" <<G4endl;
+    return 1;
+#endif
     
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
     G4Random::setTheEngine(new CLHEP::MixMaxRng);

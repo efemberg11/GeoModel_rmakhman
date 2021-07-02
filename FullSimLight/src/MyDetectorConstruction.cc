@@ -2,6 +2,7 @@
 
 #include <iomanip>
 
+#include "G4Version.hh"
 #include "globals.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VisAttributes.hh"
@@ -16,34 +17,40 @@
 #include "G4PVPlacement.hh"
 
 // Geant4 steppers
+
+#if G4VERSION_NUMBER>=1040
 #include "G4BogackiShampine23.hh"
 #include "G4BogackiShampine45.hh"
-#include "G4CashKarpRKF45.hh"
-#include "G4ClassicalRK4.hh"
 #include "G4DoLoMcPriRK34.hh"
 #include "G4DormandPrince745.hh"
 #include "G4DormandPrinceRK56.hh"
 #include "G4DormandPrinceRK78.hh"
+#include "G4RK547FEq1.hh"
+#include "G4RK547FEq2.hh"
+#include "G4RK547FEq3.hh"
+#include "G4TsitourasRK45.hh"
+#include "G4VIntegrationDriver.hh"
+#include "G4IntegrationDriver.hh"
+#endif
+
+#if G4VERSION_NUMBER>=1060
+#include "G4InterpolationDriver.hh"
+#endif
+
+#include "G4CashKarpRKF45.hh"
+#include "G4ClassicalRK4.hh"
 #include "G4FieldManager.hh"
 #include "G4HelixExplicitEuler.hh"
 #include "G4HelixImplicitEuler.hh"
 #include "G4HelixSimpleRunge.hh"
 #include "G4NystromRK4.hh"
-#include "G4RK547FEq1.hh"
-#include "G4RK547FEq2.hh"
-#include "G4RK547FEq3.hh"
 #include "G4RKG3_Stepper.hh"
-#include "G4TsitourasRK45.hh"
+
 // Geant4 includes
 #include "G4ChordFinder.hh"
-#include "G4IntegrationDriver.hh"
 #include "G4Mag_UsualEqRhs.hh"
 #include "G4MagIntegratorStepper.hh"
 #include "G4Version.hh"
-#include "G4VIntegrationDriver.hh"
-#if G4VERSION_NUMBER >= 1060
-#include "G4InterpolationDriver.hh"
-#endif
 
 
 // **** INCLUDES for GeoModel
@@ -834,7 +841,12 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
             if (!Td.IsRotated()) {
                 G4ThreeVector offset = Td.NetTranslation();
                 G4ThreeVector pmin, pmax;
+#if G4VERSION_NUMBER>=1040
                 daughterSolid->BoundingLimits(pmin, pmax);
+#else
+                std::cout<<"ERROR, this version of Geant4 doesn't support this check! Update to version >= Geant4.10.6"<<std::endl;
+                exit(-1);
+#endif
                 pmin += offset;
                 pmax += offset;
                 if (pmin.x() >= xmax) continue;
@@ -864,7 +876,12 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 }
             } else {
                 G4ThreeVector pmin, pmax;
+#if G4VERSION_NUMBER>=1040
                 daughterSolid->BoundingLimits(pmin, pmax);
+#else
+                std::cout<<"ERROR, this version of Geant4 doesn't support this check! Update to version >= Geant4.10.6"<<std::endl;
+                exit(-1);
+#endif
                 G4ThreeVector pbox[8] = {
                     G4ThreeVector(pmin.x(), pmin.y(), pmin.z()),
                     G4ThreeVector(pmax.x(), pmin.y(), pmin.z()),
@@ -902,7 +919,13 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                     if (p.y() <= dymin) continue;
                     if (p.z() >= dzmax) continue;
                     if (p.z() <= dzmin) continue;
+#if G4VERSION_NUMBER>1050
                     G4ThreeVector md = Td.InverseTransformPoint(p);
+#else
+                    G4ThreeVector md;
+                    std::cout<<"InverseTransformPoint not available in this Geant4 version! Please update to Geant4.10.6 or greater versions. Exiting. "<<std::endl;
+                    exit(-1);
+#endif
                     if (daughterSolid->Inside(md) == kInside)
                     {
                         G4double dtmp = daughterSolid->DistanceToOut(md);
@@ -947,7 +970,14 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 // and then to current volume's coordinate system
                 //
                 G4ThreeVector mp2 = Td.TransformPoint(plocal);
+
+#if G4VERSION_NUMBER>1050
                 G4ThreeVector msi = Tm.InverseTransformPoint(mp2);
+#else
+                G4ThreeVector msi;
+                std::cout<<"InverseTransformPoint not available in this Geant4 version! Please update to Geant4.10.6 or greater versions. Exiting. "<<std::endl;
+                exit(-1);
+#endif
 
                 iterateFromWorld(fWorld->GetLogicalVolume(), volume, msi);
                 
@@ -988,8 +1018,14 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 // and then to current volume's coordinate system
                 //
                 G4ThreeVector mp2 = Td.TransformPoint(dPoint);
+
+#if G4VERSION_NUMBER>1050
                 G4ThreeVector msi = Tm.InverseTransformPoint(mp2);
-                
+#else
+                G4ThreeVector msi;
+                std::cout<<"InverseTransformPoint not available in this Geant4 version! Please update to Geant4.10.6 or greater versions. Exiting. "<<std::endl;
+                exit(-1);
+#endif
                 if (solid->Inside(msi) == kInside)
                 {
                     ++trials;
@@ -1317,12 +1353,14 @@ void MyDetectorConstruction::ConstructSDandField()
     
   }
 }
+#if G4VERSION_NUMBER>=1040
 //=============================================================================
 // Create the driver with a stepper
 //=============================================================================
 G4VIntegrationDriver*
 MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
 {
+
 
     G4Mag_EqRhs* eqRhs(nullptr);
 //        if (!m_equationOfMotion.empty())
@@ -1357,22 +1395,25 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
             G4ClassicalRK4* stepper = new G4ClassicalRK4(eqRhs);
             driver = new G4IntegrationDriver<G4ClassicalRK4>(
                                                              fMinStep, stepper, stepper->GetNumberOfVariables());
-        } else if (stepperType=="BogackiShampine23") {
-            G4BogackiShampine23* stepper = new G4BogackiShampine23(eqRhs);
-            driver = new G4IntegrationDriver<G4BogackiShampine23>(
-                                                                  fMinStep, stepper, stepper->GetNumberOfVariables());
-        } else if (stepperType=="BogackiShampine45") {
-            G4BogackiShampine45* stepper = new G4BogackiShampine45(eqRhs);
-            driver = new G4IntegrationDriver<G4BogackiShampine45>(
-                                                                  fMinStep, stepper, stepper->GetNumberOfVariables());
-        } else if (stepperType=="CashKarpRKF45") {
+        }  else if (stepperType=="CashKarpRKF45") {
             G4CashKarpRKF45* stepper = new G4CashKarpRKF45(eqRhs);
             driver = new G4IntegrationDriver<G4CashKarpRKF45>(
                                                               fMinStep, stepper, stepper->GetNumberOfVariables());
-        } else if (stepperType=="DoLoMcPriRK34") {
+        }
+        else if (stepperType=="DoLoMcPriRK34") {
             G4DoLoMcPriRK34* stepper = new G4DoLoMcPriRK34(eqRhs);
-            driver = new G4IntegrationDriver<G4DoLoMcPriRK34>(
+        driver = new G4IntegrationDriver<G4DoLoMcPriRK34>(
+                                                          fMinStep, stepper, stepper->GetNumberOfVariables());
+            
+        } else if (stepperType=="BogackiShampine23") {
+            G4BogackiShampine23* stepper = new G4BogackiShampine23(eqRhs);
+            driver = new G4IntegrationDriver<G4BogackiShampine23>(fMinStep, stepper, stepper->GetNumberOfVariables());
+            
+        } else if (stepperType=="BogackiShampine45") {
+            G4BogackiShampine45* stepper = new G4BogackiShampine45(eqRhs);
+            driver = new G4IntegrationDriver<G4BogackiShampine45>(
                                                               fMinStep, stepper, stepper->GetNumberOfVariables());
+            
         } else if (stepperType=="DormandPrince745") {
             G4DormandPrince745* stepper = new G4DormandPrince745(eqRhs);
             driver = new G4IntegrationDriver<G4DormandPrince745>(
@@ -1397,16 +1438,19 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
             G4RK547FEq3* stepper = new G4RK547FEq3(eqRhs);
             driver = new G4IntegrationDriver<G4RK547FEq3>(
                                                           fMinStep, stepper, stepper->GetNumberOfVariables());
-        } else if (stepperType=="RKG3_Stepper") {
+        }
+        else if (stepperType=="TsitourasRK45") {
+            G4TsitourasRK45* stepper = new G4TsitourasRK45(eqRhs);
+            driver = new G4IntegrationDriver<G4TsitourasRK45>(
+                                                          fMinStep, stepper, stepper->GetNumberOfVariables());
+            
+        }
+        else if (stepperType=="RKG3_Stepper") {
             G4RKG3_Stepper* stepper = new G4RKG3_Stepper(eqRhs);
             driver = new G4IntegrationDriver<G4RKG3_Stepper>(
                                                              fMinStep, stepper, stepper->GetNumberOfVariables());
-        } else if (stepperType=="TsitourasRK45") {
-            G4TsitourasRK45* stepper = new G4TsitourasRK45(eqRhs);
-            driver = new G4IntegrationDriver<G4TsitourasRK45>(
-                                                              fMinStep, stepper, stepper->GetNumberOfVariables());
         }
-#if G4VERSION_NUMBER >= 1060
+#if G4VERSION_NUMBER>=1060
         else if (stepperType=="DormandPrince745Int") {
             G4DormandPrince745* stepper = new G4DormandPrince745(eqRhs);
             driver = new G4InterpolationDriver<G4DormandPrince745>(
@@ -1420,7 +1464,77 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
                                                            fMinStep, stepper, stepper->GetNumberOfVariables());
         }
         return driver;
+
     }
+#endif
+
+//=============================================================================
+// Create the stepper (Geant4 < 10.4)
+//=============================================================================
+G4MagIntegratorStepper*
+MyDetectorConstruction::CreateStepper(std::string name, G4MagneticField* field) const
+{
+    std::cout<<"Stepper type is : "<<name<<std::endl;
+    //ATH_MSG_DEBUG("getStepper");
+    G4Mag_EqRhs* eqRhs(nullptr);
+    //if (!m_equationOfMotion.empty())
+
+   //{
+    //    eqRhs = m_equationOfMotion->makeEquationOfMotion(field);
+    //    ATH_MSG_INFO("Configuring alternative equation of motion using " <<
+    //                 m_equationOfMotion.name() );
+    //}
+    //else
+    //{
+    //    ATH_MSG_VERBOSE("Using G4Mag_UsualEqRhs as the equation of motion.");
+    // @TODO Check that this is the  default equation of motion in ATLAS
+    eqRhs = new G4Mag_UsualEqRhs(field);
+    //}
+    // @TODO Add some way of confirming that the choices of Equation of
+    // motion and stepper are compatible.
+    // @TODO consider moving the stepper choice into a tool as well?
+    // Only worthwhile if we envisage adding more stepper choices in the
+    // future.
+    if (name=="HelixImplicitEuler") return new G4HelixImplicitEuler(eqRhs);
+    else if (name=="HelixSimpleRunge") return new G4HelixSimpleRunge(eqRhs);
+    else if (name=="HelixExplicitEuler") return new G4HelixExplicitEuler(eqRhs);
+    else if (name=="NystromRK4") return new G4NystromRK4(eqRhs);
+    else if (name=="ClassicalRK4") return new G4ClassicalRK4(eqRhs);
+    else if (name=="AtlasRK4") {
+        std::string g4tag = G4VERSION_TAG;
+        if (g4tag.find("atlas") != std::string::npos){
+            
+            std::cout<<"Setting AtlasRK4 stepper, in the OLD style"<<std::endl;
+            std::cout<<"CAVEAT: only available with atlas patches of Geant4!"<<std::endl;
+#ifdef G4ATLAS
+            return new G4AtlasRK4(eqRhs);
+#endif
+        } else {
+
+            std::cout<<"ERROR! AtlasRK4 is only available with atlas patches of Geant4!"<<std::endl;
+            std::cout<<"Returning ClassicalRK4!"<<std::endl;
+            return new G4ClassicalRK4(eqRhs);
+
+        }
+    }
+#if G4VERSION_NUMBER>=1040
+    else if (name=="BogackiShampine23") return new G4BogackiShampine23(eqRhs);
+    else if (name=="BogackiShampine45") return new G4BogackiShampine45(eqRhs);
+    else if (name=="CashKarpRKF45") return new G4CashKarpRKF45(eqRhs);
+    else if (name=="DoLoMcPriRK34") return new G4DoLoMcPriRK34(eqRhs);
+    else if (name=="DormandPrince745") return new G4DormandPrince745(eqRhs);
+    else if (name=="DormandPrinceRK56") return new G4DormandPrinceRK56(eqRhs);
+    else if (name=="DormandPrinceRK78") return new G4DormandPrinceRK78(eqRhs);
+    else if (name=="RK547FEq1") return new G4RK547FEq1(eqRhs);
+    else if (name=="RK547FEq2") return new G4RK547FEq2(eqRhs);
+    else if (name=="RK547FEq3") return new G4RK547FEq3(eqRhs);
+    else if (name=="RKG3_Stepper") return new G4RKG3_Stepper(eqRhs);
+    else if (name=="TsitourasRK45") return new G4TsitourasRK45(eqRhs);
+#endif
+    std::cout<<"ERROR: Stepper " << name << " not available! returning NystromRK4!"<<std::endl;
+    return new G4NystromRK4(eqRhs);
+}
+
 
 void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
     

@@ -54,6 +54,7 @@ public:
   /// Common method to construct a driver with a stepper of requested type.
   G4VIntegrationDriver*
   createDriverAndStepper(std::string stepperType) const;
+  G4MagIntegratorStepper* CreateStepper(std::string name, G4MagneticField* field) const;
 
   void SetMagFieldValue(const G4double fieldValue)
   {

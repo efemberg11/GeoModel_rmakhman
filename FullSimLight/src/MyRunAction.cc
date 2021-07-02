@@ -1,5 +1,6 @@
 #include "MyRunAction.hh"
 
+#include "G4Version.hh"
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #else
@@ -39,6 +40,8 @@ G4Run* MyRunAction::GenerateRun() {
 
 
 void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
+
+#if G4VERSION_NUMBER>=1040
     
     if(fIsGeantino)
     {
@@ -98,7 +101,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         }
         
     }
-    
+#endif
     if (isMaster) {
         
         //G4cout<<"\nBeginOfRunAction isMaster, and fMasterAnalysisManager: "<<fMasterAnalysisManager<<G4endl;
@@ -146,7 +149,9 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
 
 void MyRunAction::EndOfRunAction(const G4Run*) {
-    
+
+#if G4VERSION_NUMBER>=1040
+
     if(fIsGeantino){
         
         auto analysisManager= G4AnalysisManager::Instance();
@@ -160,6 +165,8 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
         }
         
     }
+#endif
+    
     if (isMaster) {
         fTimer->Stop();
         // get number of events: even in case of perfomance mode when MyRun-s are not generated in GenerateRun()

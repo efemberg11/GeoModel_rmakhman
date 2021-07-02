@@ -1,6 +1,6 @@
 
 #include "MyGVPhysicsList.hh"
-
+#include "G4Version.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -55,7 +55,9 @@ void MyGVPhysicsList::ConstructProcess() {
 
 void MyGVPhysicsList::BuildEMPhysics() {
   G4EmParameters* param = G4EmParameters::Instance();
+#if G4VERSION_NUMBER>=1040
   param->SetDefaults();
+#endif
   param->SetVerbose(1);
   // inactivate energy loss fluctuations
   param->SetLossFluctuations(false);
@@ -70,7 +72,11 @@ void MyGVPhysicsList::BuildEMPhysics() {
   //
   // Add standard EM physics processes to e-/e+ and gamma that GeantV has
   G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();
-  auto aParticleIterator  = GetParticleIterator();
+#if G4VERSION_NUMBER<1040
+    auto aParticleIterator  =    G4ParticleTable::GetParticleTable()->GetIterator();
+#else
+    auto aParticleIterator  = GetParticleIterator();
+#endif
   aParticleIterator->reset();
   while((*aParticleIterator)()) {
     G4ParticleDefinition* particle = aParticleIterator->value();

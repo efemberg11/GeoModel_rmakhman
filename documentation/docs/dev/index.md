@@ -71,23 +71,31 @@ dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial
 
 Packages shipped with Centos7, or installed by the YUM package manager, unfortunately are often too old. So, one needs to circumvent that, either by using pre-compiled bundles, or building from sources.
 
+#### CMake and Qt 
+
+You need a recent version of `CMake` to build `GeoModel`, so you might need to install a newer version compared to what is installed on your Centos7 machine. Please, refer to the original `CMake` documentation for [updated installation instructions](https://cmake.org/).
+
+You also need a recent version of the Qt graphics framework installed. Please refer to the [official documentation](https://www.qt.io/) for updated instructions. When installing, please be aware that **you only need** the "Community" version of Qt (Open Source), not the commercial one.
+
 #### Using the built-in third-party packages 
 
-For `Xerces-C`, `nlohmann-json`, `Coin3D`, `Simage`, and `SoQt`, one can use the built-in versions shipeed with GeoModel. They are tested and they avoid the installation from sources of all these packages.
+For the `Xerces-C`, `nlohmann-json`, `Coin3D`, `Simage`, and `SoQt` dependencies, one can use the built-in versions shipeed with `GeoModel`. They are **tested** to work smoothly with the related `GeoModel` version, and they avoid the installation from sources of all these packages.
 
-On Centos7, the GeoModel tools-suite, with support for the XML parser and the visualization tools, can be compiled (after having set a modern CMake) with:
+For example, on Centos7, after having set a recent version of `CMake`, you can build the full `GeoModel` tools-suite, with support for the XML parser and the visualization tools, with the command below:
 
 ```bash
-cmake -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_JSON=1 -DGEOMODEL_USE_BUILTIN_COIN3D=1 -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_TOOLS=1 ../GeoModel/
+cmake -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_USE_BUILTIN_EIGEN3=1 -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_JSON=1 -DGEOMODEL_USE_BUILTIN_COIN3D=1 -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_TOOLS=1 ../GeoModel/
 ```
 
 #### Using CVMFS and LCG
 
-If one has CVMFS access, one way to easily set up a recent version of CMake, Qt and the other packages, is the use of LCG bundles provided by the CERN "SFT" group:
+If one has CVMFS access, one way to easily set up a recent version of `CMake`, `Qt` and all the other dependency packages, is the use of the `LCG` bundles provided by the CERN "SFT" group:
 
 ```bash
 source /cvmfs/sft.cern.ch/lcg/views/LCG_100/x86_64-centos7-gcc9-opt/setup.sh
 ```
+
+After that, you can build the `GeoModel` without any extra options. 
 
 
 

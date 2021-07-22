@@ -14,28 +14,31 @@ class GeoMaterial;
 class Impl;
 
 class MaterialManager: public IGeoMaterialManager {
-  
+
   friend class Impl;
   friend class Gmx2Geo;
-  
+
  public:
-  //static const MaterialManager* getManager();
-  
+
   const GeoMaterial *getMaterial(const std::string & name) const;
   const GeoElement *getElement(const std::string & name) const;
   const GeoElement *getElement(unsigned int atomicNumber) const;
 
-  std::ostream & printAll(std::ostream & o=std::cout) const;
+  void printAll() const;
 
   void addElement(const std::string &name
 		  , const std::string &symbol
 		  , double z
 		  , double a);
 
+  void addElement(GeoElement*);
+
   void addNamespace(const std::string &name);
 
   void addMaterial(const std::string &name
 		   , double density);
+
+  void addMaterial(GeoMaterial*);
 
   void addMatComponent(const std::string &name
 		       , double fraction);
@@ -44,15 +47,21 @@ class MaterialManager: public IGeoMaterialManager {
 
   void dump();
 
+  bool isMaterialDefined(const std::string s) const;
+
+  bool isElementDefined(const std::string s) const;
+
+  static MaterialManager* getManager();
  private:
   Impl* m_pImpl;
-  //static MaterialManager* s_instance;
+  static MaterialManager* s_instance;
+
 
   MaterialManager();
   ~MaterialManager();
 
   // Build special materials
-  // void buildSpecialMaterials();
+  void buildSpecialMaterials();
 };
 
 #endif

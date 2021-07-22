@@ -49,7 +49,7 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
 //    Set up the CLHEP evaluator and the xml-tag processors, and store the GmxInterface:
 //
     GmxUtil gmxUtil(gmxInterface); 
-    if (useMatManager) gmxUtil.matManager=new MaterialManager();
+    if (useMatManager) gmxUtil.matManager=MaterialManager::getManager();
 //
 //    Process the xml tree, creating all the GeoModel items and adding to the GeoModel tree.
 //
@@ -67,6 +67,13 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
     XMLCh * name_tmp = XMLString::transcode("name");
     const XMLCh *attribute = element->getAttribute(name_tmp);
     msglog << XMLString::transcode(attribute) << endmsg;
+    
+// 
+// if the material manager is set, create a namespace
+// 
+
+    if (gmxUtil.matManager) gmxUtil.matManager->addNamespace(XMLString::transcode(attribute));
+
 //
 //    Add all constant definitions to the evaluator, so they are ready if needed.
 //

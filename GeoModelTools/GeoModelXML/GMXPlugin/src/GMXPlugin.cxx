@@ -88,7 +88,7 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
   	fileName="gmx.xml";
 	filesToParse.push_back(fileName);
   }
-  
+
   char* matManager=getenv("GMX_USE_MATMANAGER");
   bool matman=0;
   if (matManager!=nullptr)
@@ -109,6 +109,8 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
     GmxInterface gmxInterface;
     Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , matman);
   }
+
+  if (matman) MaterialManager::getManager()->printAll();
 
 }
 

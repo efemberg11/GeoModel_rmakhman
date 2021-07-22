@@ -163,37 +163,24 @@ std::string GmxUtil::debracket(std::string expression) {
 }
 
 GeoLogVol * GmxUtil::makeAssemblyLV() {
-#ifndef STANDALONE_GMX
-    StoreGateSvc *pDetStore = 0;
-    ISvcLocator *svcLocator = Gaudi::svcLocator();
 
-    OUTPUT_STREAM;
+    const GeoMaterial *assembly_material =0;
+    
+    if (matManager)
+    {
+    	assembly_material = matManager->getMaterial("special::HyperUranium");
+    }
+    else
+    {
+    	GeoMaterial* temp_material = new GeoMaterial("special::HyperUranium", 1.e-20);
+	GeoElement *vacuum = new GeoElement("vacuum", "Mt", 1, 1);
+    	temp_material->add(vacuum, 1.0);
+	temp_material->lock();
+	assembly_material=temp_material;
+    }
 
-    StatusCode sc = svcLocator->service("DetectorStore", pDetStore);
-    if (sc.isFailure()) {
-            msglog << MSG::ERROR << "GmxUtil::makeAssemblyLV: Unable to access Detector Store" << endmsg;
-    }
-    else {
-        DataHandle<StoredMaterialManager> theMaterialManager;
-        sc = pDetStore->retrieve(theMaterialManager, "MATERIALS");
-        if(sc.isFailure()) {
-                msglog << MSG::ERROR << "GmxUtil::makeAssemblyLV: Unable to access Material Manager" << endmsg;
-        }
-        else {
-            const GeoMaterial *assembly_material = theMaterialManager->getMaterial("special::HyperUranium");
-            GeoBox *box = new GeoBox(1., 1., 1.); // Simplest shape; it is irrelevant
-            GeoLogVol *lv = new GeoLogVol(string("AssemblyLV"), box, assembly_material);
-            return lv;
-        }
-    }
-    return 0;
-#else
-    GeoMaterial *assembly_material = new GeoMaterial("special::HyperUranium", 1.e-20);
-    GeoElement *vacuum = new GeoElement("vacuum", "Mt", 1, 1);
-    assembly_material->add(vacuum, 1.0);
-    assembly_material->lock();
     GeoBox *box = new GeoBox(1., 1., 1.); // Simplest shape; it is irrelevant
     GeoLogVol *lv = new GeoLogVol(string("AssemblyLV"), box, assembly_material);
     return lv;
-#endif
+    
 }

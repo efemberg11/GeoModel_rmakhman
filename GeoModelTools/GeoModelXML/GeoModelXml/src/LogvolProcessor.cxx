@@ -54,21 +54,21 @@ GeoNameTag *physVolName;
 //
         m_map[name] = LogVolStore();
         LogVolStore *store = &m_map[name];
-        physVolName = new GeoNameTag(name); 
+        physVolName = new GeoNameTag(name);
         store->name = physVolName;
         store->id = 0;
 //
 //    Get the shape.
 //
         DOMDocument *doc = element->getOwnerDocument();
-	XMLCh * shape_tmp = XMLString::transcode("shape");
+        XMLCh * shape_tmp = XMLString::transcode("shape");
         const XMLCh *shape = element->getAttribute(shape_tmp);
         DOMElement *refShape = doc->getElementById(shape);
         // Check it is a shape... its parent should be a <shapes>. DTD cannot do this for us.
         DOMNode *parent = refShape->getParentNode();
         if (XMLString::compareIString(parent->getNodeName(), XMLString::transcode("shapes")) != 0) {
 
-            msglog << MSG::FATAL << "Processing logvol " << name << 
+            msglog << MSG::FATAL << "Processing logvol " << name <<
                     ". Error in gmx file. An IDREF for a logvol shape did not refer to a shape.\n" <<
                     "Shape ref was " << shape << "; exiting" << endmsg;
             exit (1); // Need to improve...
@@ -79,41 +79,58 @@ GeoNameTag *physVolName;
         name2release = XMLString::transcode(refShape->getNodeName());
         string shapeType(name2release);
         XMLString::release(&name2release);
-	XMLString::release(&shape_tmp);
+        XMLString::release(&shape_tmp);
 
         GeoShape *s = (GeoShape *) gmxUtil.geoItemRegistry.find(shapeType)->process(refShape, gmxUtil);
 //
 //    Get the material
 //
-	XMLCh * material_tmp = XMLString::transcode("material");
+        XMLCh * material_tmp = XMLString::transcode("material");
         const XMLCh *material = element->getAttribute(material_tmp);
         DOMElement *refMaterial = doc->getElementById(material);
         // Check it is a material... its parent should be a <materials>. DTD cannot do this for us.
         parent = refMaterial->getParentNode();
-	XMLCh * materials_tmp = XMLString::transcode("materials");
+        XMLCh * materials_tmp = XMLString::transcode("materials");
         if (XMLString::compareIString(parent->getNodeName(), materials_tmp) != 0) {
-            msglog << MSG::FATAL << "Processing logvol " << name << 
+            msglog << MSG::FATAL << "Processing logvol " << name <<
                     ". Error in gmx file. An IDREF for a logvol material did not refer to a material.\n" <<
                     "Material ref was " << material << "; exiting" << endmsg;
             exit (1); // Need to improve...
         }
+	std::string nam_mat=XMLString::transcode(material);
 
-        GeoMaterial *m = (GeoMaterial *) gmxUtil.tagHandler.material.process(refMaterial, gmxUtil);
+	GeoMaterial* m=0;
+
+  if (gmxUtil.matManager)
+  {
+    if (!gmxUtil.matManager->isMaterialDefined(nam_mat))
+    {
+      GeoMaterial* tempMat=(GeoMaterial *) gmxUtil.tagHandler.material.process(refMaterial, gmxUtil);
+      // we let GMX create the material and store it in the MM
+
+      gmxUtil.matManager->addMaterial(tempMat);
+    }
+    //std::cout<<"see if the material must be retrieved"<<std::endl;
+    m=const_cast<GeoMaterial*>(gmxUtil.matManager->getMaterial(nam_mat));
+  }
+  else
+    m=(GeoMaterial *) gmxUtil.tagHandler.material.process(refMaterial, gmxUtil);
 
 //
 //    Make the LogVol and add it to the map ready for next time
 //
-        lv = new GeoLogVol(name, s, m);
-        store->logVol = lv;
+  lv = new GeoLogVol(name, s, m);
+  store->logVol = lv;
+	//std::cout<<"logical Volume has been set!"<<std::endl;
 
 	XMLString::release(&material_tmp);
 	XMLString::release(&materials_tmp);
-    }
-    else { // Already in the registry; use it.
-        physVolName = entry->second.name;
-        lv = entry->second.logVol;
-    }
- 
+}
+else { // Already in the registry; use it.
+  physVolName = entry->second.name;
+  lv = entry->second.logVol;
+}
+
 
 //
 //    Process the logvol children (side effect: sets formulae for indexes before calculating them)
@@ -132,7 +149,7 @@ GeoNameTag *physVolName;
 //   Make a list of things to be added
 //
     toAdd.push_back(physVolName);
-    XMLCh * sensitive_tmp = XMLString::transcode("sensitive"); 
+    XMLCh * sensitive_tmp = XMLString::transcode("sensitive");
     bool sensitive = element->hasAttribute(sensitive_tmp);
     int sensId = 0;
     //std::vector<int> extraSensIds;//extra Identfiers to be used in case we split this volume into multiple DetectorElements
@@ -143,12 +160,12 @@ GeoNameTag *physVolName;
       gmxUtil.positionIndex.indices(index, gmxUtil.eval);
       sensId = gmxUtil.gmxInterface()->sensorId(index);
       //        toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
-      toAdd.push_back(new GeoIdentifierTag(sensId)); 
+      toAdd.push_back(new GeoIdentifierTag(sensId));
     }
     else {
       toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
       gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
-    } 
+    }
     XMLString::release(&sensitive_tmp);
     //
     //    Make a new PhysVol and add everything to it, then add it to the list of things for my caller to add
@@ -199,13 +216,13 @@ GeoNameTag *physVolName;
       }
       toAdd.push_back(pv);
     }
-    
+
     gmxUtil.positionIndex.decrementLevel();
     return;
 }
 
 void LogvolProcessor::zeroId(const xercesc::DOMElement *element) {
-  
+
   XMLCh * name_tmp = XMLString::transcode("name");
   char *name2release = XMLString::transcode(element->getAttribute(name_tmp));
   string name(name2release);

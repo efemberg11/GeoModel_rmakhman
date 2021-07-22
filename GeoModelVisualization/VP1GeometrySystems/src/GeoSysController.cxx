@@ -77,7 +77,7 @@ GeoSysController::GeoSysController(IVP1System * sys)
   //  m_d->ui_disp.widget_drawOptions->setLineWidthsDisabled();
   m_d->ui_disp.widget_drawOptions->setPointSizesDisabled();
 //   m_d->ui_disp.widget_drawOptions->setBaseLightingDisabled();
-  m_d->ui_disp.widget_drawOptions->setComplexity(0.6);
+  m_d->ui_disp.widget_drawOptions->setComplexity(1.0); // default 'curved surface accuracy' value
 
   m_d->pickStyle = new SoPickStyle;
   m_d->pickStyle->ref();

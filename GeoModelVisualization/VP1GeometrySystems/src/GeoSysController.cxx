@@ -1,15 +1,23 @@
 /*
-  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 
 ////////////////////////////////////////////////////////////////
-//                                                            //
-//  Implementation of class GeoSysController                  //
-//                                                            //
-//  Author: Thomas H. Kittelmann (Thomas.Kittelmann@cern.ch)  //
-//  Initial version: October 2008                             //
-//                                                            //
+//                                                           
+//  Implementation of class GeoSysController                  
+//                                                            
+//  Author: Thomas H. Kittelmann (Thomas.Kittelmann@cern.ch)  
+//  Initial version: October 2008
+//  
+//  Major updates:
+// 
+//  - Riccardo Maria BIANCHI (riccardo.maria.bianchi@cern.ch)  
+//    2019
+//
+//  - Riccardo Maria BIANCHI (riccardo.maria.bianchi@cern.ch)  
+//    Jul 2021: Added support to filter volumes based on names
+//                                                            
 ////////////////////////////////////////////////////////////////
 
 #define VP1IMPVARNAME m_d
@@ -118,6 +126,11 @@ GeoSysController::GeoSysController(IVP1System * sys)
   connect(m_d->ui_misc.pushButton_expand_vols_matname,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
   connect(m_d->ui_misc.lineEdit_expand_vols_volname,SIGNAL(returnPressed()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
   connect(m_d->ui_misc.pushButton_expand_vols_volname,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
+
+  // filter volumes
+  connect(m_d->ui_misc.lineEdit_filter_logvolname,SIGNAL(returnPressed()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
+  connect(m_d->ui_misc.pushButton_filter_logvolname,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
+
 
   connect(m_d->ui_int.checkBox_localAxes, SIGNAL(stateChanged(int)), this, SIGNAL(displayLocalAxesChanged(int)));
   connect(m_d->ui_int.slider_AxesScale, SIGNAL(valueChanged(int)), this, SIGNAL(axesScaleChanged(int)));
@@ -344,6 +357,7 @@ bool GeoSysController::showVolumeOutLines() const
 //____________________________________________________________________
 void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
 {
+  /* ORIGINAL CODE  
   bool volname(sender()==m_d->ui_misc.pushButton_expand_vols_volname
 	       ||sender()==m_d->ui_misc.lineEdit_expand_vols_volname);
   QString name(volname?m_d->ui_misc.lineEdit_expand_vols_volname->text()
@@ -352,6 +366,36 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
     return;
   messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+")");
   emit autoExpandByVolumeOrMaterialName(!volname,name);
+  */
+
+  // NEW CODE FOR VOLUME FILTER
+  if (sender()==m_d->ui_misc.pushButton_expand_vols_volname
+			|| sender()==m_d->ui_misc.lineEdit_expand_vols_volname) {
+		bool volname(sender()==m_d->ui_misc.pushButton_expand_vols_volname
+				||sender()==m_d->ui_misc.lineEdit_expand_vols_volname);
+		// get volume's or material's name
+		QString name(volname ? m_d->ui_misc.lineEdit_expand_vols_volname->text()
+				: m_d->ui_misc.lineEdit_expand_vols_matname->text());
+		if (name.isEmpty())
+			return;
+
+		messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+", false)");
+		emit autoExpandByVolumeOrMaterialName(!volname,name,false);
+  }
+  else if (sender()==m_d->ui_misc.pushButton_filter_logvolname
+			|| sender()==m_d->ui_misc.lineEdit_filter_logvolname) {
+
+		bool filter(sender()==m_d->ui_misc.pushButton_filter_logvolname
+				|| sender()==m_d->ui_misc.lineEdit_filter_logvolname);
+		bool volname = true;
+		QString name(m_d->ui_misc.lineEdit_filter_logvolname->text());
+		if (name.isEmpty())
+			return;
+		messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+", "+str(filter)+")");
+		emit autoExpandByVolumeOrMaterialName(!volname,name,filter);
+  }
+  return;
+
 }
 
 //____________________________________________________________________

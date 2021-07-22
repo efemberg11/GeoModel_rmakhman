@@ -14,8 +14,8 @@
 //  Major refactoring october 2008.                                    //
 //                                                                     //
 //  Updates:                                                           //
-//  - Aug 2019, Riccardo Maria Bianchi @ CERN                          //
 //  - Aug 2020, Riccardo Maria Bianchi @ CERN                          //
+//  - Aug 2019, Riccardo Maria Bianchi @ CERN                          //
 //                                                                     //
 /////////////////////////////////////////////////////////////////////////
 
@@ -199,6 +199,7 @@ public:
   const SoKeyboardEvent *kbEvent;
 
   void expandVisibleVolumesRecursively(VolumeHandle*,const QRegExp&,bool bymatname);
+  void filterVolumesRecursively(VolumeHandle*,const QRegExp&,bool bymatname);
 
   SoSeparator* m_textSep;//!< Separator used to hold all visible labels.
 
@@ -295,7 +296,10 @@ QWidget * VP1GeometrySystem::buildController()
   connect(m_d->controller,SIGNAL(loadMaterialsFromFile(QString)),this,SLOT(loadMaterialsFromFile(QString)));
 
   connect(m_d->controller,SIGNAL(transparencyChanged(float)),this,SLOT(updateTransparency()));
-  connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
+  
+  //connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
+  connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString, bool)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString, bool)));
+
   connect(m_d->controller->requestOutputButton(), SIGNAL(clicked()), this, SLOT(saveTrees()));
   connect(m_d->controller,SIGNAL(displayLocalAxesChanged(int)), this, SLOT(toggleLocalAxes(int)));
   connect(m_d->controller,SIGNAL(axesScaleChanged(int)), this, SLOT(setAxesScale(int)));
@@ -1043,8 +1047,13 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 	}
 
 	VolumeHandleSharedData* volhandle_subsysdata = new VolumeHandleSharedData(controller,
-										  si->flag, &sonodesep2volhandle, it->pV, phisectormanager,
-										  topMaterial, matVisAttributes, volVisAttributes,
+										  si->flag, 
+                                          &sonodesep2volhandle, 
+                                          it->pV, 
+                                          phisectormanager,
+										  topMaterial, 
+                                          matVisAttributes, 
+                                          volVisAttributes,
 										  controller->zappedVolumeListModel(),
 										  controller->volumeTreeBrowser(),
 										  m_textSep);
@@ -1275,64 +1284,136 @@ void VP1GeometrySystem::resetSubSystems(VP1GeoFlags::SubSystemFlags f)
 }
 
 //_____________________________________________________________________________________
-void VP1GeometrySystem::autoExpandByVolumeOrMaterialName(bool bymatname,QString targetname)
+//void VP1GeometrySystem::autoExpandByVolumeOrMaterialName(bool bymatname,QString targetname)
+void VP1GeometrySystem::autoExpandByVolumeOrMaterialName(bool bymatname,QString targetname, bool filter = false)
 {
   if (targetname.isEmpty()) {
 	  VP1Msg::messageDebug("targetname is empty.");
     return;
   }
 
-  messageVerbose("Auto expansions of visible volumes requested. Target all volumes with "
+  //messageVerbose("Auto expansions of visible volumes requested. Target all volumes with "
+  //		 +str(bymatname?"material name":"name")+" matching "+targetname);
+  if (filter) {
+  messageVerbose("Filter of volumes requested. Pick all volumes with "
 		 +str(bymatname?"material name":"name")+" matching "+targetname);
+  } else {
+  messageVerbose("Auto expansions of **visible** volumes requested. Target all volumes with "
+		 +str(bymatname?"material name":"name")+" matching "+targetname);
+  }
 
-  QRegExp selregexp(targetname,Qt::CaseSensitive,QRegExp::Wildcard);
+  //QRegExp selregexp(targetname,Qt::CaseSensitive,QRegExp::Wildcard);
+  QRegExp selregexp(targetname, Qt::CaseSensitive, QRegExp::RegExp);
+  VP1Msg::messageDebug("RegExp pattern: " + selregexp.pattern() );
 
   std::vector<std::pair<VolumeHandle::VolumeHandleListItr,VolumeHandle::VolumeHandleListItr> > roothandles;
   m_d->volumetreemodel->getRootHandles(roothandles);
   VolumeHandle::VolumeHandleListItr it, itE;
 
-  bool save = m_d->sceneroot->enableNotify(false);
-  m_d->phisectormanager->largeChangesBegin();
+  //bool save = m_d->sceneroot->enableNotify(false);
+  //m_d->phisectormanager->largeChangesBegin();
 
-  deselectAll();
+  if (roothandles.size() == 0) {
+    VP1Msg::messageWarningRed("No root nodes selected! Please select at least a root node before trying to apply filters. Ideally, you should turn on only the root node containing the volumes you are interested in; e.g., turn on the 'Endcap MDT' root node, if you are looking for an EIL chamber.");
+  } else {
+    bool save = m_d->sceneroot->enableNotify(false);
+    m_d->phisectormanager->largeChangesBegin();
 
-  for (unsigned i = 0; i<roothandles.size();++i) {
-    it = roothandles.at(i).first;
-    itE = roothandles.at(i).second;
-    for(;it!=itE;++it)
-      m_d->expandVisibleVolumesRecursively(*it,selregexp,bymatname);
-  }
+    deselectAll();
 
-  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
-  m_d->phisectormanager->largeChangesEnd();
-  if (save) {
-    m_d->sceneroot->enableNotify(true);
-    m_d->sceneroot->touch();
+    for (unsigned i = 0; i<roothandles.size();++i) {
+      it = roothandles.at(i).first;
+      itE = roothandles.at(i).second;
+      for(;it!=itE;++it) {
+        VolumeHandle* vol = *it;
+        VP1Msg::messageDebug("Looking inside root node - name: " + vol->getName() + " - mat: " + QString::fromStdString(vol->geoMaterial()->getName()) );
+        if (filter) {
+      	  m_d->filterVolumesRecursively(vol,selregexp,bymatname);
+        } else {
+      	  m_d->expandVisibleVolumesRecursively(vol,selregexp,bymatname);
+        }
+      }
+    }
+
+    m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
+    m_d->phisectormanager->largeChangesEnd();
+    if (save) {
+      m_d->sceneroot->enableNotify(true);
+      m_d->sceneroot->touch();
+    }
   }
 }
 
 //_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::expandVisibleVolumesRecursively(VolumeHandle* handle,const QRegExp& selregexp,bool bymatname)
 {
-  if (handle->state()==VP1GeoFlags::ZAPPED)
-    return;
-  if (handle->state()==VP1GeoFlags::CONTRACTED) {
-    //See if we match (and have children) - if so, update state.
-    if (handle->nChildren()>0
-	&& selregexp.exactMatch(bymatname?QString(handle->geoMaterial()->getName().c_str()):handle->getName())) {
-      handle->setState(VP1GeoFlags::EXPANDED);
-    }
+  //if (handle->state()==VP1GeoFlags::ZAPPED)
+  //  return;
+  VP1Msg::messageDebug("VP1GeometrySystem::Imp::expandVisibleVolumesRecursively()");
+  if (handle->state()==VP1GeoFlags::ZAPPED) {
+	VP1Msg::messageDebug(handle->getName() +" is ZAPPED. Returning...");
     return;
   }
-  //Must be expanded: Let us call on any (initialised) children instead.
-  if (handle->nChildren()==0||!handle->childrenAreInitialised())
+
+  if (handle->state()==VP1GeoFlags::CONTRACTED) {
+    VP1Msg::messageDebug(handle->getName() +" is CONTRACTED. Going on...");
+    //See if we match (and have children) - if so, update state.
+    if (handle->nChildren()>0
+	&& selregexp.exactMatch(bymatname?QString(handle->geoMaterial()->getName().c_str()):handle->getName())) 
+    {
+      VP1Msg::messageDebug(handle->getName() +" has >0 children: OK! Setting it to 'EXPANDED'.");
+      handle->setState(VP1GeoFlags::EXPANDED);
+    }
+    VP1Msg::messageDebug(handle->getName() +" - Now returning...");
     return;
+  }
+  
+  //Must be expanded: Let us call on any (initialised) children instead.
+  if (handle->nChildren()==0||!handle->childrenAreInitialised()) {
+    VP1Msg::messageDebug(handle->getName() +" has NO children or they are not initialized. Returning...");
+    return;
+  }
+
+  //TODO: does the code comes here ever??? Check!
+  VP1Msg::messageDebug(handle->getName() +" - Now looping over children...");
   VolumeHandle::VolumeHandleListItr it(handle->childrenBegin()), itE(handle->childrenEnd());
-  for(;it!=itE;++it)
+  for(;it!=itE;++it) {
     expandVisibleVolumesRecursively(*it,selregexp,bymatname);
+  }
 }
 
 
+//See if we match - if so, update state.
+//_____________________________________________________________________________________
+void VP1GeometrySystem::Imp::filterVolumesRecursively(VolumeHandle* handle,const QRegExp& selregexp,bool bymatname)
+{
+	VP1Msg::messageDebug("VP1GeometrySystem::Imp::filterVolumesRecursively()");
+	VP1Msg::messageDebug(handle->getName() +" - regex: " + selregexp.pattern() );
+
+	std::ios::fmtflags ff(std::cout.flags()); // save the format state before changing cout to display HEX numbers
+//	std::cout << "volhandle subsystem (hex code): " << std::hex << handle->subsystem() << std::endl;
+	std::cout.flags(ff); // restore the original format state
+
+	if (selregexp.exactMatch( bymatname ? QString(handle->geoMaterial()->getName().c_str()) : handle->getName()) ) {
+		VP1Msg::messageDebug(handle->getName() +" - 'Contracting' it (-->make it visible)...");
+		handle->setState(VP1GeoFlags::CONTRACTED);
+		return; // if we return here, the children of the contracted volume are not visited.
+	} else {
+		VP1Msg::messageDebug(handle->getName() +" - 'Expanding' it (-->open it to show its children)...");
+		handle->setState(VP1GeoFlags::EXPANDED);
+	}
+    if (handle->nChildren()>0 ) {
+		VP1Msg::messageDebug(handle->getName() +" has children, so we initialize them...");
+		handle->initialiseChildren();
+		VP1Msg::messageDebug(handle->getName() +" - Now looping over " + str(handle->childNumber()) + " children...");
+		VolumeHandle::VolumeHandleListItr it(handle->childrenBegin()), itE(handle->childrenEnd());
+		for(;it!=itE;++it) {
+			VP1Msg::messageDebug("child: " + (*it)->getName());
+			filterVolumesRecursively(*it,selregexp,bymatname);
+		}
+    }
+  return;
+}
 
 
 

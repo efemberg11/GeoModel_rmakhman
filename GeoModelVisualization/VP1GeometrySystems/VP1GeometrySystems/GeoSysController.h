@@ -1,17 +1,22 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 
 ////////////////////////////////////////////////////////////////
-//                                                            //
-//  Header file for class GeoSysController                    //
-//                                                            //
-//  Description: Controller for the geometry system.          //
-//                                                            //
-//  Author: Thomas H. Kittelmann (Thomas.Kittelmann@cern.ch)  //
-//  Initial version: October 2008                             //
-//                                                            //
+//                                                            
+//  Header file for class GeoSysController                    
+//                                                            
+//  Description: Controller for the geometry system.          
+//                                                            
+//  Author: Thomas H. Kittelmann (Thomas.Kittelmann@cern.ch)  
+//  Initial version: October 2008                             
+//
+//  Major updates:
+//   
+//  - Riccardo Maria BIANCHI (riccardo.maria.bianchi@cern.ch)  
+//    Jul 2021: Added support to filter volumes based on names
+//
 ////////////////////////////////////////////////////////////////
 
 #ifndef GEOSYSCONTROLLER_H
@@ -90,7 +95,7 @@ signals:
 
   //Signals without state:
   void resetSubSystems(VP1GeoFlags::SubSystemFlag);
-  void autoExpandByVolumeOrMaterialName(bool,QString);//volname: (false,namestr), matname: (true,namestr)
+  void autoExpandByVolumeOrMaterialName(bool, QString, bool); //volname: (false,namestr), matname: (true,namestr), filter (true/false)
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);//Might not be used atm.
   void volumeResetRequested(VolumeHandle*);
 

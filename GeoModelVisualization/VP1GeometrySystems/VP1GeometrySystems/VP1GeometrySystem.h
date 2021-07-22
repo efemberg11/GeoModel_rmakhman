@@ -60,7 +60,7 @@ protected slots:
   void updateTransparency();
 
   void resetSubSystems(VP1GeoFlags::SubSystemFlags);
-  void autoExpandByVolumeOrMaterialName(bool,QString);//volname: (false,namestr), matname: (true,namestr)
+  void autoExpandByVolumeOrMaterialName(bool, QString, bool);//volname: (false,namestr), matname: (true,namestr), filter (true/false)
 
   // void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE); // not used anymore?
   // void volumeResetRequested(VolumeHandle*); // not used anymore?

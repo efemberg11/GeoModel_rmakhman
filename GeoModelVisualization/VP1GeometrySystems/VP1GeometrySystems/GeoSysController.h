@@ -95,10 +95,11 @@ signals:
 
   //Signals without state:
   void resetSubSystems(VP1GeoFlags::SubSystemFlag);
-  void autoExpandByVolumeOrMaterialName(bool, QString, bool); //volname: (false,namestr), matname: (true,namestr), filter (true/false)
+  //void autoExpandByVolumeOrMaterialName(bool, QString, bool); //volname: (false,namestr), matname: (true,namestr), filter (true/false)
+  void autoExpandByVolumeOrMaterialName(bool, QString, bool, bool stopAtFirst=true, bool doNotVisitChildren=false); //volname: (false,namestr), matname: (true,namestr), filter (true/false)
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);//Might not be used atm.
   void volumeResetRequested(VolumeHandle*);
-
+  void signalFilterVolumes(QString, bool, bool, bool, bool);
   void saveMaterialsToFile(QString,bool);//(filename,onlyChangedMaterials)
   void loadMaterialsFromFile(QString);//filename
   void displayLocalAxesChanged(int);

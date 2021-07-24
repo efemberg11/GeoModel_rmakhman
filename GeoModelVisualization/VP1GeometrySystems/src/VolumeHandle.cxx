@@ -73,6 +73,7 @@ public:
 
   static VolState getChildStates(const VolumeHandle*theclass );
   static void applyChildStates(const VolState&,VolumeHandle*theclass);
+  static bool hasNonStandardShapeChildren(const SoGroup*g);
 
 };
 
@@ -680,6 +681,35 @@ void VolumeHandle::Imp::applyChildStates(const VolState& vs,VolumeHandle*theclas
     }
   }
 }
+
+
+//____________________________________________________________________
+bool VolumeHandle::Imp::hasNonStandardShapeChildren(const SoGroup*g)
+{
+  const int n(g->getNumChildren());
+  for (int i=0; i < n; ++i) {
+    const SoNode*c = g->getChild(i);
+    if (c->getTypeId().isDerivedFrom(SoShape::getClassTypeId())) {
+      if (c->getTypeId().isDerivedFrom(SoPcons::getClassTypeId())
+	  ||c->getTypeId().isDerivedFrom(SoPolyhedron::getClassTypeId())
+	  ||c->getTypeId().isDerivedFrom(SoTransparency::getClassTypeId()))
+	return true;
+    } else if (c->getTypeId().isDerivedFrom(SoGroup::getClassTypeId())) {
+      if (hasNonStandardShapeChildren(static_cast<const SoGroup*>(c)))
+	return true;
+    }
+  }
+  return false;
+}
+
+//____________________________________________________________________
+bool VolumeHandle::isInitialisedAndHasNonStandardShape() const
+{
+  VP1HEPVisUtils::initAllCustomClasses();
+  return m_d->nodesep ? Imp::hasNonStandardShapeChildren(m_d->nodesep) : false;
+}
+
+
 
 
 //____________________________________________________________________

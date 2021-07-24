@@ -20,6 +20,8 @@
 #ifndef BUILDVP1LIGHT   //TODO: Merge the two mechanisms, specifically for VP1
   bool VP1Msg::m_verbose = VP1QtUtils::environmentVariableIsOn("VP1_VERBOSE_OUTPUT");
   bool VP1Msg::m_debug = VP1QtUtils::environmentVariableIsOn("VP1_DEBUG_OUTPUT");
+  bool VP1Msg::m_debug_2 = VP1QtUtils::environmentVariableIsOn("VP1_DEBUG_2_OUTPUT");
+  bool VP1Msg::m_debug_3 = VP1QtUtils::environmentVariableIsOn("VP1_DEBUG_3_OUTPUT");
 #endif
 #ifdef BUILDVP1LIGHT
   bool VP1Msg::m_verbose = VP1QtUtils::expertSettingIsSet("general", "ExpertSettings/VP1_VERBOSE_OUTPUT");
@@ -38,11 +40,30 @@ void VP1Msg::message( const QString& str, IVP1System*sys )
 //____________________________________________________________________
 void VP1Msg::messageDebug( const QString& str )
 {
-  if (!debug()){
+  if ( ! (debug() or debug2() or debug3()) ){
     return;
   }
   std::cout << prefix_debug() << ": "<< str.toStdString()<<std::endl;
 }
+
+//____________________________________________________________________
+void VP1Msg::messageDebug2( const QString& str )
+{
+  if ( ! (debug2() or debug3()) ){
+    return;
+  }
+  std::cout << prefix_debug2() << ": "<< str.toStdString()<<std::endl;
+}
+
+//____________________________________________________________________
+void VP1Msg::messageDebug3( const QString& str )
+{
+  if (!debug3()){
+    return;
+  }
+  std::cout << prefix_debug3() << ": "<< str.toStdString()<<std::endl;
+}
+
 
 //____________________________________________________________________
 void VP1Msg::messageWarning( const QString& str )

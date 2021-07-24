@@ -369,6 +369,7 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
   */
 
   // NEW CODE FOR VOLUME FILTER
+  /*
   if (sender()==m_d->ui_misc.pushButton_expand_vols_volname
 			|| sender()==m_d->ui_misc.lineEdit_expand_vols_volname) {
 		bool volname(sender()==m_d->ui_misc.pushButton_expand_vols_volname
@@ -395,7 +396,58 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
 		emit autoExpandByVolumeOrMaterialName(!volname,name,filter);
   }
   return;
+  */
+  // NEWEST CODE
+  // if we filter on visible objects, then...
+	if (sender()==m_d->ui_misc.pushButton_expand_vols_volname
+			|| sender()==m_d->ui_misc.lineEdit_expand_vols_volname)
+      {
+          // check if a name is set in the 'volume' field
+          bool volname(sender()==m_d->ui_misc.pushButton_expand_vols_volname
+				      ||sender()==m_d->ui_misc.lineEdit_expand_vols_volname);
 
+          // get volume's or material's name
+		      QString name(volname ? m_d->ui_misc.lineEdit_expand_vols_volname->text()
+				      : m_d->ui_misc.lineEdit_expand_vols_matname->text());
+
+          // return if name is empty
+          if (name.isEmpty()) {
+			       return;
+          }
+
+          // emit the signal
+		      messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+", false)");
+		      emit autoExpandByVolumeOrMaterialName(!volname,name,false);
+	}
+  // if we use the 'filter volumes' feature, then...
+	else if (sender()==m_d->ui_misc.pushButton_filter_logvolname
+			|| sender()==m_d->ui_misc.lineEdit_filter_logvolname)
+  {
+        // handle as "filter" if was sent by the 'filter volume' field
+        bool filter(sender()==m_d->ui_misc.pushButton_filter_logvolname
+				      || sender()==m_d->ui_misc.lineEdit_filter_logvolname);
+
+        // get additional options
+        bool stopAtFirst(m_d->ui_misc.radioButton_StopAtFirst->isChecked() ? true : false );
+        bool visitChildren(m_d->ui_misc.radioButton_DoNotVisitChildren->isChecked() ? false : true);
+
+        bool bymatname = false; // TODO: set this in the UI!
+        bool reset = false; // TODO: set this in the UI!
+        QString nameRegEx(m_d->ui_misc.lineEdit_filter_logvolname->text());
+
+        // return if name is empty
+        if (nameRegEx.isEmpty()) {
+			     return;
+        }
+
+        // bool volname = !bymatname;
+        // messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+nameRegEx+", "+str(filter)+")");
+		    // emit autoExpandByVolumeOrMaterialName(!volname, nameRegEx, filter, stopAtFirst, doNotVisitChildren);
+
+        messageDebug("emitting signalFilterVolumes("+nameRegEx + ", " + str(bymatname) + ", " + str(stopAtFirst)+ ", " + str(visitChildren) + ", " + str(reset)+")");
+        emit signalFilterVolumes(nameRegEx, bymatname, stopAtFirst, visitChildren, reset);
+	}
+	return;
 }
 
 //____________________________________________________________________

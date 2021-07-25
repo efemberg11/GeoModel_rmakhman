@@ -202,7 +202,7 @@ p, li { white-space: pre-wrap; }
          <string>Visualize all volumes by removing all filters.</string>
         </property>
         <property name="text">
-         <string>Reset</string>
+         <string>Reset filters</string>
         </property>
        </widget>
       </item>

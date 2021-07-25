@@ -130,6 +130,7 @@ GeoSysController::GeoSysController(IVP1System * sys)
   // filter volumes
   connect(m_d->ui_misc.lineEdit_filter_logvolname,SIGNAL(returnPressed()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
   connect(m_d->ui_misc.pushButton_filter_logvolname,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
+  connect(m_d->ui_misc.pushButton_filter_reset,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
 
 
   connect(m_d->ui_int.checkBox_localAxes, SIGNAL(stateChanged(int)), this, SIGNAL(displayLocalAxesChanged(int)));
@@ -416,23 +417,26 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
           }
 
           // emit the signal
-		      messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+", false)");
-		      emit autoExpandByVolumeOrMaterialName(!volname,name,false);
+		      messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+")");
+		      emit autoExpandByVolumeOrMaterialName(!volname,name);
 	}
   // if we use the 'filter volumes' feature, then...
 	else if (sender()==m_d->ui_misc.pushButton_filter_logvolname
-			|| sender()==m_d->ui_misc.lineEdit_filter_logvolname)
+			|| sender()==m_d->ui_misc.lineEdit_filter_logvolname
+            || sender()==m_d->ui_misc.pushButton_filter_reset)
   {
-        // handle as "filter" if was sent by the 'filter volume' field
+        // handle as "filter" if was sent by the 'filter volume' field or 'Apply' button...
         bool filter(sender()==m_d->ui_misc.pushButton_filter_logvolname
 				      || sender()==m_d->ui_misc.lineEdit_filter_logvolname);
 
+        // handle as "reset the view" if sent by the 'reset filters' button...
+        bool resetView(sender()==m_d->ui_misc.pushButton_filter_reset);
+       
         // get additional options
         bool stopAtFirst(m_d->ui_misc.radioButton_StopAtFirst->isChecked() ? true : false );
         bool visitChildren(m_d->ui_misc.radioButton_DoNotVisitChildren->isChecked() ? false : true);
 
         bool bymatname = false; // TODO: set this in the UI!
-        bool reset = false; // TODO: set this in the UI!
         QString nameRegEx(m_d->ui_misc.lineEdit_filter_logvolname->text());
 
         // return if name is empty
@@ -440,13 +444,14 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
 			     return;
         }
 
-        // bool volname = !bymatname;
-        // messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+nameRegEx+", "+str(filter)+")");
-		    // emit autoExpandByVolumeOrMaterialName(!volname, nameRegEx, filter, stopAtFirst, doNotVisitChildren);
+        // clear regex if we are resetting the filters
+        if (resetView) {
+            m_d->ui_misc.lineEdit_filter_logvolname->clear();
+        }
 
-        messageDebug("emitting signalFilterVolumes("+nameRegEx + ", " + str(bymatname) + ", " + str(stopAtFirst)+ ", " + str(visitChildren) + ", " + str(reset)+")");
-        emit signalFilterVolumes(nameRegEx, bymatname, stopAtFirst, visitChildren, reset);
-	}
+        messageDebug("emitting signalFilterVolumes("+nameRegEx + ", " + str(bymatname) + ", " + str(stopAtFirst)+ ", " + str(visitChildren) + ", " + str(resetView)+")");
+        emit signalFilterVolumes(nameRegEx, bymatname, stopAtFirst, visitChildren, resetView);
+	} 
 	return;
 }
 

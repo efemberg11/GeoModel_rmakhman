@@ -60,14 +60,14 @@ protected slots:
   void updateTransparency();
 
   void resetSubSystems(VP1GeoFlags::SubSystemFlags);
-  //void autoExpandByVolumeOrMaterialName(bool, QString, bool);//volname: (false,namestr), matname: (true,namestr), filter (true/false)
-  void autoExpandByVolumeOrMaterialName(bool, QString, bool, bool, bool);//volname: (false,namestr), matname: (true,namestr), filter (true/false), stopAtFirst (true/false), doNotVisitChildren (true/false)
+  void autoExpandByVolumeOrMaterialName(bool, QString);//volname: (false,namestr), matname: (true,namestr)
+  //void autoExpandByVolumeOrMaterialName(bool, QString, bool, bool, bool);//volname: (false,namestr), matname: (true,namestr), filter (true/false), stopAtFirst (true/false), doNotVisitChildren (true/false)
 
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);
   void volumeResetRequested(VolumeHandle*);
 
   void actionOnAllNonStandardVolumes(bool);//true: zap, false: expand.
-  void actionOnAllVolumes(bool, bool);//true: zap, false: expand; true: standardVolumes
+  void actionOnAllVolumes(bool zap, bool standardVolumes = true);//true: zap, false: expand; true: standardVolumes
   void filterVolumes(QString targetname, bool bymatname, bool stopAtFirst, bool visitChildren, bool reset);
 
   void setShowVolumeOutLines(bool);

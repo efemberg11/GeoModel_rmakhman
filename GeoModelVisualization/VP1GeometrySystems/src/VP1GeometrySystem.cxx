@@ -1731,7 +1731,13 @@ void VP1GeometrySystem::filterVolumes(QString targetname, bool bymatname, bool s
       // unsigned int iter = 0
 
       if (resetView) {
-        // 'contract' (i.e., make visible) the root volume
+        // 'contract' (i.e., make visible) the root volumes
+        // RMB -- Note: I have not found any other way of correctly resetting to the initial view,
+        // if not 'contracting' all volumes in the call to actionOnAllVolumes(contracted) above,
+        // and then expanding / contracting the root volumes excplicitly, here...
+        // This way, it works, after the reset I have the top root volumes contracted and all subvolumes ready to be shown when opening the root volumes,
+        // but I'm wondering if there is another more elegant way to achieve that... :-/
+        handle->setState(VP1GeoFlags::EXPANDED); // TODO: is this call needed, now that we have actionOnAll(CONTRACTED) above???
         handle->setState(VP1GeoFlags::CONTRACTED); // TODO: is this call needed, now that we have actionOnAll(CONTRACTED) above???
       } 
       // filter volumes
@@ -1784,6 +1790,8 @@ bool VP1GeometrySystem::Imp::filterVolumesRec(VolumeHandle* handle, QRegExp selr
       // zap the current volume by default...
       handle->setState(VP1GeoFlags::ZAPPED);
 
+      VP1Msg::messageDebug2("filtering: " + handle->getName() );
+
       if ( !zapAll ) {
         if ( !resetView ) {
           //... then unzap the volume if it matches the filter regex
@@ -1804,6 +1812,7 @@ bool VP1GeometrySystem::Imp::filterVolumesRec(VolumeHandle* handle, QRegExp selr
               }
             }
           } else {
+            VP1Msg::messageDebug2("not matching --> expanding it");
             handle->setState(VP1GeoFlags::EXPANDED); // no match, open the volume to show its children
           }
         }
@@ -1811,6 +1820,7 @@ bool VP1GeometrySystem::Imp::filterVolumesRec(VolumeHandle* handle, QRegExp selr
         // in that case, if the volume matched, we have 'contracted' it but we haven't returned, 
         // and we want to go on visiting the children
         if (unzap && (!visitChildren)) {
+          VP1Msg::messageDebug2("unzap/!visitChildren --> expanding it");
           handle->setState(VP1GeoFlags::EXPANDED); // open the volume to show its children
         }
       } // end if !zapAll

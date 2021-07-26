@@ -446,6 +446,8 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
 
         // clear regex if we are resetting the filters
         if (resetView) {
+            m_d->ui_misc.radioButton_StopAtFirst->setChecked(true);
+            m_d->ui_misc.radioButton_DoNotVisitChildren->setChecked(true);
             m_d->ui_misc.lineEdit_filter_logvolname->clear();
         }
 

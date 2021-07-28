@@ -21,10 +21,16 @@
 #include "VP1GeometrySystems/VP1GeoFlags.h"
 #include "VP1GeometrySystems/VolumeHandle.h"//fixme
 #include "GeoModelKernel/GeoPhysVol.h"
+//#include <Inventor/actions/SoGLRenderAction.h>
 #include <set>
 #include <map>
 #include <QStack>
 #include <QString>
+
+// FWD declarations
+//class SoGLRenderAction;
+
+
 
 class VP1GeometrySystem : public IVP13DSystemSimple {
 
@@ -52,6 +58,9 @@ public:
   QByteArray saveState();
   void restoreFromState(QByteArray);
 
+signals:
+  void updateTransparencyType(unsigned type);
+
 public slots:
 
   void setCurvedSurfaceRealism(int);//Accepts values in the range 0..100.
@@ -68,7 +77,7 @@ protected slots:
 
   void actionOnAllNonStandardVolumes(bool);//true: zap, false: expand.
   void actionOnAllVolumes(bool zap, bool standardVolumes = true);//true: zap, false: expand; true: standardVolumes
-  void filterVolumes(QString targetname, bool bymatname, bool stopAtFirst, bool visitChildren, bool reset);
+  void filterVolumes(QString targetname, bool bymatname, int maxDepth, bool stopAtFirst, bool visitChildren, bool reset);
 
   void setShowVolumeOutLines(bool);
 

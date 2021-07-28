@@ -239,7 +239,7 @@ SoSeparator * VolumeHandle::nodeSoSeparator() const
 //____________________________________________________________________
 void VolumeHandle::ensureBuildNodeSep()
 {
-  VP1Msg::messageDebug("VolumeHandle::ensureBuildNodeSep()");
+  VP1Msg::messageDebug3("VolumeHandle::ensureBuildNodeSep()");
   if (m_d->nodesep && m_d->label_sep)
     return;
 
@@ -345,15 +345,15 @@ void VolumeHandle::ensureBuildNodeSep()
 //____________________________________________________________________
 void VolumeHandle::Imp::attach(VolumeHandle*vh)
 {
-  VP1Msg::messageDebug("VolumeHandle::Imp::attach() - name: " + vh->getName());
+  VP1Msg::messageDebug3("VolumeHandle::Imp::attach() - name: " + vh->getName());
   if (!isattached) {
     vh->ensureBuildNodeSep();
     if (attachsepHelper) {
-      VP1Msg::messageDebug("adding node...");
+      VP1Msg::messageDebug3("adding node...");
       attachsepHelper->addNodeUnderMaterial(nodesep,vh->material());
     }
     if (attachlabelSepHelper) {
-      VP1Msg::messageDebug("adding label...");
+      VP1Msg::messageDebug3("adding label...");
       attachlabelSepHelper->addNode(label_sep);
     }
     isattached=true;

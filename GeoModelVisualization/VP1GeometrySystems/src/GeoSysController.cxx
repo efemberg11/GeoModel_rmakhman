@@ -136,6 +136,11 @@ GeoSysController::GeoSysController(IVP1System * sys)
   connect(m_d->ui_int.checkBox_localAxes, SIGNAL(stateChanged(int)), this, SIGNAL(displayLocalAxesChanged(int)));
   connect(m_d->ui_int.slider_AxesScale, SIGNAL(valueChanged(int)), this, SIGNAL(axesScaleChanged(int)));
 
+  // TODO: shrink the widgets' layout to make the whole form smaller
+  // started, but vonly those settings below are not enough...
+  //m_d->ui_misc.bottomLayout->layout()->setSizeConstraint(QLayout::SetFixedSize);
+  //m_d->ui_misc.actionsGroupBox->layout()->setSizeConstraint(QLayout::SetFixedSize);
+  //m_d->ui_misc.filtersGroupBox->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
   setLastSelectedVolume(0);
 
@@ -280,6 +285,11 @@ PhiSectionWidget * GeoSysController::phiSectionWidget() const
   return m_d->ui_disp.phisectionwidget;
 }
 
+////____________________________________________________________________
+//QTextBrowser* GeoSysController::getFiltersTextOut() const {
+  //return m_d->ui_misc.textOut;
+//}
+
 //____________________________________________________________________
 ZappedVolumeListModel * GeoSysController::zappedVolumeListModel() const
 {
@@ -346,6 +356,20 @@ float GeoSysController::transparency() const
 {
   int v(m_d->ui_disp.spinBox_transp->value());
   return (v>=100?1.0:(v<=0?0.0:v/100.0));
+}
+
+//____________________________________________________________________
+void GeoSysController::setTransparency(float value) const
+{
+  assert( 0. <= value && value <= 100.);
+  m_d->ui_disp.spinBox_transp->setValue(value);
+  return;
+}
+
+//____________________________________________________________________
+bool GeoSysController::isTranspLocked() const
+{
+      return m_d->ui_misc.lockTransp->isChecked();
 }
 
 //____________________________________________________________________
@@ -433,6 +457,7 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
         bool resetView(sender()==m_d->ui_misc.pushButton_filter_reset);
        
         // get additional options
+        int maxDepth(m_d->ui_misc.spinBox_maxDepth->value()==-1 ? 9999 : m_d->ui_misc.spinBox_maxDepth->value());
         bool stopAtFirst(m_d->ui_misc.radioButton_StopAtFirst->isChecked() ? true : false );
         bool visitChildren(m_d->ui_misc.radioButton_DoNotVisitChildren->isChecked() ? false : true);
 
@@ -451,8 +476,8 @@ void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
             m_d->ui_misc.lineEdit_filter_logvolname->clear();
         }
 
-        messageDebug("emitting signalFilterVolumes("+nameRegEx + ", " + str(bymatname) + ", " + str(stopAtFirst)+ ", " + str(visitChildren) + ", " + str(resetView)+")");
-        emit signalFilterVolumes(nameRegEx, bymatname, stopAtFirst, visitChildren, resetView);
+        messageDebug("emitting signalFilterVolumes("+nameRegEx + ", " + str(bymatname) + ", " + str(maxDepth) + ", " + str(stopAtFirst)+ ", " + str(visitChildren) + ", " + str(resetView)+")");
+        emit signalFilterVolumes(nameRegEx, bymatname, maxDepth, stopAtFirst, visitChildren, resetView);
 	} 
 	return;
 }

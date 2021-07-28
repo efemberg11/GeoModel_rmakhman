@@ -30,6 +30,7 @@
 #include <Inventor/actions/SoBoxHighlightRenderAction.h>
 #include <Inventor/nodes/SoPerspectiveCamera.h>
 #include <Inventor/SoOffscreenRenderer.h>
+#include <Inventor/actions/SoGLRenderAction.h>
 
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -252,12 +253,22 @@ void IVP13DStandardChannelWidget::create() {
   m_d->viewer->setTransparencyType( SoGLRenderAction::BLEND ); // this looks better for geometry volumes
 
   //Setup camera info:
-  foreach(IVP13DSystem*sys,m_d->systemsAllowedCameraList)
+  foreach(IVP13DSystem*sys,m_d->systemsAllowedCameraList) {
     sys->registerViewer(m_d->viewer);
+    connect(sys,SIGNAL(updateTransparencyType(unsigned)), this,SLOT(updateTransparencyType(unsigned)));
+  }
 
   snapshotgroupbox->hide();
 }
 
+
+//___________________________________________________________________________
+void IVP13DStandardChannelWidget::updateTransparencyType(unsigned type)
+{
+  //if( VP1Msg::debug())
+      //std::cout << "Changing global transparency type to: " << type << std::endl;
+  m_d->viewer->setTransparencyType( VP1QtInventorUtils::intToTransparencyType(type) );
+}
 //___________________________________________________________________________
 void IVP13DStandardChannelWidget::Imp::setupSplitter(QWidget * rightwidget)
 {

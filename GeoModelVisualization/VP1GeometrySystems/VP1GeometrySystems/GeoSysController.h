@@ -80,6 +80,9 @@ public:
   //Settings with change signals:
 
   float transparency() const;
+  void setTransparency(float value) const;
+  bool isTranspLocked() const;
+
   bool showVolumeOutLines() const;
   int labels() const;
   QList<int> labelPosOffset() ; //!< Offset in x,y,z
@@ -99,7 +102,7 @@ signals:
   //void autoExpandByVolumeOrMaterialName(bool, QString, bool, bool stopAtFirst=true, bool doNotVisitChildren=false); //volname: (false,namestr), matname: (true,namestr), filter (true/false)
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);//Might not be used atm.
   void volumeResetRequested(VolumeHandle*);
-  void signalFilterVolumes(QString, bool, bool, bool, bool);
+  void signalFilterVolumes(QString, bool, int, bool, bool, bool);
   void saveMaterialsToFile(QString,bool);//(filename,onlyChangedMaterials)
   void loadMaterialsFromFile(QString);//filename
   void displayLocalAxesChanged(int);

@@ -337,11 +337,17 @@ QVariant VolumeTreeModel::data(const QModelIndex& index, int role) const
       else
 	return QColor::fromRgbF( 0.5, 0.5, 0.5 );
     }
+    
     //DisplayRole:
-    if (volumeHandle->nChildren()>1)
-      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") [" + QString::number(volumeHandle->nChildren())+"]";
+    
+    QString volState = "e";
+    if(volumeHandle->state()==VP1GeoFlags::CONTRACTED) volState = "c";
+    else if(volumeHandle->state()==VP1GeoFlags::ZAPPED) volState = "z";
+
+    if (volumeHandle->nChildren()>0)
+      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") [" + QString::number(volumeHandle->nChildren())+"] ("+ volState + ")" ;
     else
-      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ")";
+      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") ("+ volState + ")" ;
   }
 
   if (role==Qt::TextColorRole)

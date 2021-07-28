@@ -10,16 +10,46 @@
     <height>701</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Form</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <item>
-    <widget class="QGroupBox" name="groupBox">
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>701</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>387</width>
+    <height>701</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Mis. settings</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="actionsGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>Actions on visible volumes</string>
      </property>
      <layout class="QGridLayout" name="_5">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
       <property name="leftMargin">
        <number>4</number>
       </property>
@@ -98,12 +128,21 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_2">
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="filtersGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>Filter volumes</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
@@ -129,6 +168,61 @@ p, li { white-space: pre-wrap; }
            <string>Apply</string>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_maxDepth">
+          <property name="toolTip">
+           <string>The maximum number of daughter volumes visited. Note: default is '1';  '0' means 'only root/top volumes';  '-1' means 'MAX', but can be VERY slow depending on the geometry complexity.</string>
+          </property>
+          <property name="statusTip">
+           <string>The maximum number of daughter volumes visited. Note: default is '1';  '0' means 'only root/top volumes';  '-1' means 'MAX', but can be VERY slow depending on the geometry complexity.</string>
+          </property>
+          <property name="whatsThis">
+           <string>The maximum number of daughter volumes visited. Note: default is '1';  '0' means 'only root/top volumes';  '-1' means 'MAX', but can be VERY slow depending on the geometry complexity.</string>
+          </property>
+          <property name="text">
+           <string>max. depth</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBox_maxDepth">
+          <property name="toolTip">
+           <string>The maximum number of daughter volumes visited. Note: default is '1';  '0' means 'only root/top volumes';  '-1' means 'MAX', but can be VERY slow depending on the geometry complexity.</string>
+          </property>
+          <property name="statusTip">
+           <string>The maximum number of daughter volumes visited. Note: default is '1';  '0' means 'only root/top volumes';  '-1' means 'MAX', but can be VERY slow depending on the geometry complexity.</string>
+          </property>
+          <property name="whatsThis">
+           <string>The maximum number of daughter volumes visited. Note: default is '1';  '0' means 'only root/top volumes';  '-1' means 'MAX', but can be VERY slow depending on the geometry complexity.</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>99</number>
+          </property>
+          <property name="value">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
@@ -169,8 +263,27 @@ p, li { white-space: pre-wrap; }
         <property name="title">
          <string>Do you want to visit children of matching volumes?</string>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_9">
-         <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="1">
+          <widget class="QRadioButton" name="radioButton_VisitAllChildren">
+           <property name="toolTip">
+            <string>When a volume matches the filter, do visit all its child volumes as well. It can be slow.</string>
+           </property>
+           <property name="statusTip">
+            <string>When a volume matches the filter, do visit all its child volumes as well. It can be slow.</string>
+           </property>
+           <property name="whatsThis">
+            <string>When a volume matches the filter, do visit all its child volumes as well. It can be slow.</string>
+           </property>
+           <property name="accessibleDescription">
+            <string>When a volume matches the filter, do visit all its child volumes as well. It can be slow.</string>
+           </property>
+           <property name="text">
+            <string>Visit All Children</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
           <widget class="QRadioButton" name="radioButton_DoNotVisitChildren">
            <property name="toolTip">
             <string>Default. When a volume matches the filter, do not visit its child volumes.</string>
@@ -183,13 +296,22 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QRadioButton" name="radioButton_VisitAllChildren">
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="lockTransp">
            <property name="toolTip">
-            <string>When a volume matches the filter, do visit all its child volumes as well. NOT RECOMMENDED. It is lengthy and it breaks the &quot;Expand to children&quot; functionality. Use it only if you know what you are doing.</string>
+            <string>When enabling 'Visit All Children', if there are matching daughter to be shown inside a matching mother volume, then the transparency will be automatically set to 50% and set to a given type, to ease the visualization of nested volumes. You can disable this by checking this.</string>
+           </property>
+           <property name="statusTip">
+            <string>When enabling 'Visit All Children', if there are matching daughter to be shown inside a matching mother volume, then the transparency will be automatically set to 50% and set to a given type, to ease the visualization of nested volumes. You can disable this by checking this.</string>
+           </property>
+           <property name="whatsThis">
+            <string>When enabling 'Visit All Children', if there are matching daughter to be shown inside a matching mother volume, then the transparency will be automatically set to 50% and set to a given type, to ease the visualization of nested volumes. You can disable this by checking this.</string>
+           </property>
+           <property name="accessibleDescription">
+            <string>When enabling 'Visit All Children', if there are matching daughter to be shown inside a matching mother volume, then the transparency will be automatically set to 50% and set to a given type. You can disable this by checking this.</string>
            </property>
            <property name="text">
-            <string>Visit All Children</string>
+            <string>[lock transparency]</string>
            </property>
           </widget>
          </item>
@@ -209,29 +331,40 @@ p, li { white-space: pre-wrap; }
      </layout>
     </widget>
    </item>
-   <item>
-    <layout class="QHBoxLayout" name="_10">
-     <item>
-      <spacer>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_close">
-       <property name="text">
-        <string>&amp;Close</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QHBoxLayout" name="bottomLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_close">
+        <property name="text">
+         <string>&amp;Close</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

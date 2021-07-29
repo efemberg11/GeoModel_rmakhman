@@ -26,6 +26,8 @@
 #include "GeoModelXml/TransformProcessor.h"
 #include "GeoModelXml/MulticopyProcessor.h"
 #include "GeoModelXml/ReplicaXProcessor.h"
+#include "GeoModelXml/ReplicaYProcessor.h"
+#include "GeoModelXml/ReplicaZProcessor.h"
 #include "GeoModelXml/IndexProcessor.h"
 
 #include "GeoModelXml/MakeElement.h"
@@ -91,6 +93,8 @@ public:
         TransformProcessor transform;
         MulticopyProcessor multicopy;
 	ReplicaXProcessor replicaX;
+	ReplicaYProcessor replicaY;
+	ReplicaZProcessor replicaZ;
         IndexProcessor index;
 //
 //    Things creating an RCBase *

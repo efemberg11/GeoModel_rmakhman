@@ -65,26 +65,8 @@
     <!ELEMENT addindex EMPTY>
         <!ATTLIST addindex name ID #REQUIRED>
 
-  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep|ellipticaltube|twistedtrap|torus)+)>
+  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union)+)>
     <!-- All shapes allowed in GeoModel manual. Same name, parameters, parameter order, but always lower case -->
-
-    <!ELEMENT simplepolygonbrep EMPTY>
-      <!ATTLIST simplepolygonbrep name        ID    #REQUIRED
-                                  xpoints     CDATA #REQUIRED
-                                  ypoints     CDATA #REQUIRED
-                                  zhalflength CDATA #REQUIRED>
-    <!ELEMENT ellipticaltube EMPTY>
-      <!ATTLIST ellipticaltube name        ID    #REQUIRED
-                               xhalflength CDATA #REQUIRED
-                               yhalflength CDATA #REQUIRED
-                               zhalflength CDATA #REQUIRED>
-    <!ELEMENT torus EMPTY>
-      <!ATTLIST torus name ID    #REQUIRED
-                      rmin CDATA #REQUIRED
-                      rmax CDATA #REQUIRED
-                      rtor CDATA #REQUIRED
-                      sphi CDATA #REQUIRED
-                      dphi CDATA #REQUIRED>
 
     <!ELEMENT box EMPTY>
       <!ATTLIST box name        ID    #REQUIRED
@@ -121,21 +103,7 @@
                             x7          CDATA #REQUIRED
                             y7          CDATA #REQUIRED
                             zhalflength CDATA #REQUIRED>
-    
-    <!ELEMENT twistedtrap EMPTY>
-      <!ATTLIST twistedtrap name        ID    #REQUIRED
-                            twist       CDATA #REQUIRED
-                            dz          CDATA #REQUIRED
-                            theta       CDATA #REQUIRED
-			    phi         CDATA #REQUIRED
-                            dy1         CDATA #REQUIRED
-                            dx1         CDATA #REQUIRED
-                            dx2         CDATA #REQUIRED
-                            dy2         CDATA #REQUIRED
-                            dx3         CDATA #REQUIRED
-                            dx4         CDATA #REQUIRED
-                            alpha       CDATA #REQUIRED>
-    
+
     <!ELEMENT para EMPTY>
       <!ATTLIST para name        ID    #REQUIRED
                      xhalflength CDATA #REQUIRED
@@ -237,14 +205,13 @@
     <!ELEMENT transformationref EMPTY>
       <!ATTLIST transformationref ref IDREF #REQUIRED>
 
-  <!ELEMENT logvol (transform|logvol|logvolref|assembly|assemblyref|multicopy|index)*>
+  <!ELEMENT logvol (transform|logvol|logvolref|assembly|assemblyref|multicopy|replicaX|replicaY|replicaZ|index)*>
     <!-- If sensitive is not given, it is not sensitive. If given, it points to a digitization scheme -->
     <!ATTLIST logvol name ID #REQUIRED
                      shape IDREF #REQUIRED
                      material IDREF #REQUIRED
                      sensitive IDREF #IMPLIED 
-                     alignable (true|false) "false"
-	             splitLevel CDATA #IMPLIED>
+                     alignable (true|false) "false"> 
 
   <!ELEMENT index EMPTY>
     <!ATTLIST index ref   IDREF #REQUIRED
@@ -254,7 +221,7 @@
     <!ATTLIST logvolref ref    IDREF         #REQUIRED
                         zeroid (true|false) "false">
 
-  <!ELEMENT assembly (transform|logvol|logvolref|assembly|assemblyref|multicopy|index)+>
+  <!ELEMENT assembly (transform|logvol|logvolref|assembly|assemblyref|multicopy|replicaX|replicaY|replicaZ|index)+>
     <!ATTLIST assembly name      ID           #REQUIRED
                        alignable (true|false) "false"> 
 
@@ -273,6 +240,24 @@
                         loopvar   CDATA #IMPLIED
                         alignable CDATA #IMPLIED>
     <!-- N.B. no zeroid attribute: the copy-number is always zeroed each time the multicopy is inserted; no choice -->
+  <!ELEMENT replicaX (transform|logvolref|assemblyref)>
+    <!ATTLIST replicaX  name      ID    #REQUIRED
+                        n         CDATA #REQUIRED
+                        offset    CDATA #REQUIRED
+			step      CDATA #REQUIRED
+                        alignable CDATA #IMPLIED>
+  <!ELEMENT replicaY (transform|logvolref|assemblyref)>
+    <!ATTLIST replicaY  name      ID    #REQUIRED
+                        n         CDATA #REQUIRED
+                        offset    CDATA #REQUIRED
+			step      CDATA #REQUIRED
+                        alignable CDATA #IMPLIED>
+  <!ELEMENT replicaZ (transform|logvolref|assemblyref)>
+    <!ATTLIST replicaZ  name      ID    #REQUIRED
+                        n         CDATA #REQUIRED
+                        offset    CDATA #REQUIRED
+			step      CDATA #REQUIRED
+                        alignable CDATA #IMPLIED>
 
   <!ELEMENT addbranch (transform|logvol|logvolref|assembly|assemblyref)+>
 

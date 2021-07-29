@@ -46,6 +46,7 @@ GmxUtil::GmxUtil(GmxInterface &gmxInterface) {
     processorRegistry.enregister("assemblyref", &tagHandler.assemblyref);
     processorRegistry.enregister("transform", &tagHandler.transform);
     processorRegistry.enregister("multicopy", &tagHandler.multicopy);
+    processorRegistry.enregister("replicaX", &tagHandler.replicaX);
     processorRegistry.enregister("index", &tagHandler.index);
 //
 //   Register tag handlers that produce GeoNodes. Only useful for those tags which

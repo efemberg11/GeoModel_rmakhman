@@ -1638,8 +1638,10 @@ GeoPhysVol *VP1GeometrySystem::newWorld()  const {
 void VP1GeometrySystem::filterVolumes(QString targetname, bool bymatname, int maxDepth = 1, bool stopAtFirst = true, bool visitChildren = false, bool resetView = false)
 {
 
+  // initialize the regular expression
   QRegExp selregexp(targetname, Qt::CaseSensitive, QRegExp::RegExp);
   // VP1Msg::messageDebug("RegExp pattern: " + selregexp.pattern()  );
+  
   QStringList ll;
   ll << "VP1GeometrySystem::filterVolumes" << "RegExp pattern:" << selregexp.pattern() 
      << "- maxDepth:" << QString::number(maxDepth)
@@ -1711,6 +1713,7 @@ void VP1GeometrySystem::filterVolumes(QString targetname, bool bymatname, int ma
                  //break;
              //}
              if (resetView) {
+                 VP1Msg::messageDebug("'expanding' and 'contracting' the root volume...");
                  // in the call to 'filterVolumesRec' above, when resetting the view, 
                  // we have 'contracted' the root volume and all the children we had 'zapped' before.
                  // So, now we need to open ('expand'), and then close ('contract') the root volume again,
@@ -1728,12 +1731,15 @@ void VP1GeometrySystem::filterVolumes(QString targetname, bool bymatname, int ma
   } // loop over root handles
 
   // give feedback to the user
-  //m_d->controller->ui_misc.textOut->setText("# of matching volumes: " + QString::number(nFound));
   message("[filter volumes] # of matching volumes: " + QString::number(nFound));
+  
+  //if user chose to visit children of matching volumes,
+  //then we change transparency type to 'Sorted Object Blend', usually better to visualize nested volumes
   if (visitChildren && (nFound>0) ) {
-      //if user chose to visit children of matching volumes,
-      //then we change transoparency type to ''
-      message("[filter volumes] NOTE: to show both matching mother and matching daughter volumes, transparency has been set to 50% and transparency type has been changed to 'Sorted Object Blend', which is usually better to visualize nested geometry volumes. You can disable this auto-setting by checking the 'lock'.");
+      message(  QString("[filter volumes] NOTE: to show both matching mother and matching daughter volumes, ") 
+              + QString("transparency has been set to 50% and transparency type has been changed to 'Sorted Object Blend', ")
+              + QString("which is usually better to visualize nested geometry volumes. ")
+              + QString("You can disable this auto-setting by checking the 'lock'.") );
       if ( ! m_d->controller->isTranspLocked()) {
           m_d->controller->setTransparency(50);
           emit updateTransparencyType( VP1QtInventorUtils::transparencyTypeToInt(SoGLRenderAction::SORTED_OBJECT_BLEND) );
@@ -1741,6 +1747,7 @@ void VP1GeometrySystem::filterVolumes(QString targetname, bool bymatname, int ma
   }
 
 
+  VP1Msg::messageDebug("largeChangesEnding...");
   m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
   m_d->phisectormanager->largeChangesEnd();
   if (save) {

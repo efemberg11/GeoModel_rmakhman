@@ -182,7 +182,7 @@ bool VolumeHandle::hasName(const std::string& n) const
 //____________________________________________________________________
 SoMaterial * VolumeHandle::material()
 {
-  VP1Msg::messageDebug("VolumeHandle::material() - LogVol name: " + QString::fromStdString(m_d->pV->getLogVol()->getName()));
+  VP1Msg::messageDebug2("VolumeHandle::material() - LogVol name: " + QString::fromStdString(m_d->pV->getLogVol()->getName()));
   // if it's not the first time here and
   // the material has been assigned already, then return that
   if (m_d->material)

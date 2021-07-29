@@ -25,10 +25,11 @@
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GmxInterface.h"
 #include "GeoModelXml/createdomdocument.h"
+#include "GeoModelXml/MaterialManager.h"
 
 using namespace std;
 
-Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags) {
+Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager) {
 //
 //    Create the xml tree (DOMDocument)
 //
@@ -48,6 +49,7 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
 //    Set up the CLHEP evaluator and the xml-tag processors, and store the GmxInterface:
 //
     GmxUtil gmxUtil(gmxInterface); 
+    if (useMatManager) gmxUtil.matManager=MaterialManager::getManager();
 //
 //    Process the xml tree, creating all the GeoModel items and adding to the GeoModel tree.
 //
@@ -65,6 +67,13 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
     XMLCh * name_tmp = XMLString::transcode("name");
     const XMLCh *attribute = element->getAttribute(name_tmp);
     msglog << XMLString::transcode(attribute) << endmsg;
+    
+// 
+// if the material manager is set, create a namespace
+// 
+
+    if (gmxUtil.matManager) gmxUtil.matManager->addNamespace(XMLString::transcode(attribute));
+
 //
 //    Add all constant definitions to the evaluator, so they are ready if needed.
 //

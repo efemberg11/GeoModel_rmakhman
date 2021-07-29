@@ -65,7 +65,7 @@
     <!ELEMENT addindex EMPTY>
         <!ATTLIST addindex name ID #REQUIRED>
 
-  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep|ellipticaltube|twistedtrap)+)>
+  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep|ellipticaltube|twistedtrap|torus)+)>
     <!-- All shapes allowed in GeoModel manual. Same name, parameters, parameter order, but always lower case -->
 
     <!ELEMENT simplepolygonbrep EMPTY>
@@ -78,6 +78,13 @@
                                xhalflength CDATA #REQUIRED
                                yhalflength CDATA #REQUIRED
                                zhalflength CDATA #REQUIRED>
+    <!ELEMENT torus EMPTY>
+      <!ATTLIST torus name ID    #REQUIRED
+                      rmin CDATA #REQUIRED
+                      rmax CDATA #REQUIRED
+                      rtor CDATA #REQUIRED
+                      sphi CDATA #REQUIRED
+                      dphi CDATA #REQUIRED>
 
     <!ELEMENT box EMPTY>
       <!ATTLIST box name        ID    #REQUIRED

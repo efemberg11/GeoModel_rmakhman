@@ -89,6 +89,16 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
 	filesToParse.push_back(fileName);
   }
 
+  char* matManager=getenv("GMX_USE_MATMANAGER");
+  bool matman=0;
+  if (matManager!=nullptr)
+  {
+  	std::cout<<" Environment variable GMX_USE_MATMANAGER set to "<<matManager<<std::endl;
+	std::istringstream ss(matManager);
+	ss>>matman;
+	std::cout<<"matman set to "<<matman<<std::endl;
+  }
+
   for (auto f: filesToParse)
   {
     if (!exists(f)) {
@@ -97,8 +107,10 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
    	return;
     }
     GmxInterface gmxInterface;
-    Gmx2Geo gmx2Geo(f, world, gmxInterface, 0);
+    Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , matman);
   }
+
+  if (matman) MaterialManager::getManager()->printAll();
 
 }
 

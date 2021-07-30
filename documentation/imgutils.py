@@ -17,7 +17,11 @@ def define_env(env):
     """
 
     # import the predefined macro
-    fix_url = env.variables.fix_url # make relative urls point to root
+    try:
+        fix_url = env.macros.fix_url # make relative urls point to root
+    except AttributeError:
+        # mkdocs-macros version < 5.10
+        fix_url = env.variables.fix_url # make relative urls point to root
     
     # activate trace
     chatter = env.start_chatting("imgutils")

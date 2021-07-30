@@ -55,7 +55,6 @@ public:
   std::map<VP1GeoFlags::SubSystemFlag,QCheckBox*> subSysCheckBoxMap;
   float last_transparency;
   bool last_showVolumeOutLines;
-  //  VP1GeoFlags::MuonChamberAdaptionStyleFlags last_muonChamberAdaptionStyle;
   int last_labels; //!< needed for POSSIBLECHANGE_IMP macro.
   QList<int> last_labelPosOffset; //!< needed for  POSSIBLECHANGE_IMP macro.
   SoPickStyle * pickStyle;
@@ -64,8 +63,6 @@ public:
 
   QString lastSaveMaterialsFile;
   QString lastLoadMaterialsFile;
-  
-//  std::map<QString, QList<QCheckBox*> > labelProvidingSystems; //!< First is name of system, second is list of types of information provided (system stores actual information)
 };
 
 
@@ -136,17 +133,7 @@ GeoSysController::GeoSysController(IVP1System * sys)
   connect(m_d->ui_int.checkBox_localAxes, SIGNAL(stateChanged(int)), this, SIGNAL(displayLocalAxesChanged(int)));
   connect(m_d->ui_int.slider_AxesScale, SIGNAL(valueChanged(int)), this, SIGNAL(axesScaleChanged(int)));
 
-  // TODO: shrink the widgets' layout to make the whole form smaller
-  // started, but vonly those settings below are not enough...
-  //m_d->ui_misc.bottomLayout->layout()->setSizeConstraint(QLayout::SetFixedSize);
-  //m_d->ui_misc.actionsGroupBox->layout()->setSizeConstraint(QLayout::SetFixedSize);
-  //m_d->ui_misc.filtersGroupBox->layout()->setSizeConstraint(QLayout::SetFixedSize);
-
   setLastSelectedVolume(0);
-
- 
- 
-
 }
 
 //____________________________________________________________________
@@ -285,11 +272,6 @@ PhiSectionWidget * GeoSysController::phiSectionWidget() const
   return m_d->ui_disp.phisectionwidget;
 }
 
-////____________________________________________________________________
-//QTextBrowser* GeoSysController::getFiltersTextOut() const {
-  //return m_d->ui_misc.textOut;
-//}
-
 //____________________________________________________________________
 ZappedVolumeListModel * GeoSysController::zappedVolumeListModel() const
 {
@@ -382,47 +364,6 @@ bool GeoSysController::showVolumeOutLines() const
 //____________________________________________________________________
 void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
 {
-  /* ORIGINAL CODE  
-  bool volname(sender()==m_d->ui_misc.pushButton_expand_vols_volname
-	       ||sender()==m_d->ui_misc.lineEdit_expand_vols_volname);
-  QString name(volname?m_d->ui_misc.lineEdit_expand_vols_volname->text()
-	       :m_d->ui_misc.lineEdit_expand_vols_matname->text());
-  if (name.isEmpty())
-    return;
-  messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+")");
-  emit autoExpandByVolumeOrMaterialName(!volname,name);
-  */
-
-  // NEW CODE FOR VOLUME FILTER
-  /*
-  if (sender()==m_d->ui_misc.pushButton_expand_vols_volname
-			|| sender()==m_d->ui_misc.lineEdit_expand_vols_volname) {
-		bool volname(sender()==m_d->ui_misc.pushButton_expand_vols_volname
-				||sender()==m_d->ui_misc.lineEdit_expand_vols_volname);
-		// get volume's or material's name
-		QString name(volname ? m_d->ui_misc.lineEdit_expand_vols_volname->text()
-				: m_d->ui_misc.lineEdit_expand_vols_matname->text());
-		if (name.isEmpty())
-			return;
-
-		messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+", false)");
-		emit autoExpandByVolumeOrMaterialName(!volname,name,false);
-  }
-  else if (sender()==m_d->ui_misc.pushButton_filter_logvolname
-			|| sender()==m_d->ui_misc.lineEdit_filter_logvolname) {
-
-		bool filter(sender()==m_d->ui_misc.pushButton_filter_logvolname
-				|| sender()==m_d->ui_misc.lineEdit_filter_logvolname);
-		bool volname = true;
-		QString name(m_d->ui_misc.lineEdit_filter_logvolname->text());
-		if (name.isEmpty())
-			return;
-		messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+", "+str(filter)+")");
-		emit autoExpandByVolumeOrMaterialName(!volname,name,filter);
-  }
-  return;
-  */
-  // NEWEST CODE
   // if we filter on visible objects, then...
 	if (sender()==m_d->ui_misc.pushButton_expand_vols_volname
 			|| sender()==m_d->ui_misc.lineEdit_expand_vols_volname)

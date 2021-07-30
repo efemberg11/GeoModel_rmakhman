@@ -6,29 +6,32 @@
 #define VP1GEOMETRYSYSTEM_H
 
 /////////////////////////////////////////////////////////////////////////
-//                                                                     //
-//  Header file for class VP1GeometrySystem                            //
-//                                                                     //
-//  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>              //
-//                                                                     //
-//  Derived from V-atlas geometry system by Joe Boudreau.              //
-//  Origins of initial version dates back to ~1996, initial VP1        //
-//  version by TK (May 2007) and almost entirely rewritten Oct 2007    //
-//                                                                     //
+//                                                                     
+//  Header file for class VP1GeometrySystem                            
+//                                                                     
+//  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>              
+//                                                                     
+//  Derived from V-atlas geometry system by Joe Boudreau.              
+//  Origins of initial version dates back to ~1996, initial VP1        
+//  version by TK (May 2007) and almost entirely rewritten Oct 2007
+//
+//  - Jul 2021, Riccardo Maria Bianchi <riccardo.maria.bianchi@cern.ch>
+//              * Added the 'filter volumes' tool
+//              * Added signal/slot to update transparency type in the 3D window
+//                                                                     
 /////////////////////////////////////////////////////////////////////////
 
 #include "VP1Base/IVP13DSystemSimple.h"
 #include "VP1GeometrySystems/VP1GeoFlags.h"
 #include "VP1GeometrySystems/VolumeHandle.h"//fixme
+
 #include "GeoModelKernel/GeoPhysVol.h"
-//#include <Inventor/actions/SoGLRenderAction.h>
+
 #include <set>
 #include <map>
 #include <QStack>
 #include <QString>
 
-// FWD declarations
-//class SoGLRenderAction;
 
 
 
@@ -70,7 +73,6 @@ protected slots:
 
   void resetSubSystems(VP1GeoFlags::SubSystemFlags);
   void autoExpandByVolumeOrMaterialName(bool, QString);//volname: (false,namestr), matname: (true,namestr)
-  //void autoExpandByVolumeOrMaterialName(bool, QString, bool, bool, bool);//volname: (false,namestr), matname: (true,namestr), filter (true/false), stopAtFirst (true/false), doNotVisitChildren (true/false)
 
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);
   void volumeResetRequested(VolumeHandle*);

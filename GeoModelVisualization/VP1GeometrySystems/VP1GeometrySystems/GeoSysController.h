@@ -99,7 +99,6 @@ signals:
   //Signals without state:
   void resetSubSystems(VP1GeoFlags::SubSystemFlag);
   void autoExpandByVolumeOrMaterialName(bool, QString); //volname: (false,namestr), matname: (true,namestr)
-  //void autoExpandByVolumeOrMaterialName(bool, QString, bool, bool stopAtFirst=true, bool doNotVisitChildren=false); //volname: (false,namestr), matname: (true,namestr), filter (true/false)
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);//Might not be used atm.
   void volumeResetRequested(VolumeHandle*);
   void signalFilterVolumes(QString, bool, int, bool, bool, bool);
@@ -121,7 +120,6 @@ private slots:
   void saveMaterialsRequested();
   void loadMaterialsRequested();
   void emit_autoExpandByVolumeOrMaterialName();
-  // void emit_actionOnAllNonStandardVolumes(); // not used anymore?
 };
 
 #endif

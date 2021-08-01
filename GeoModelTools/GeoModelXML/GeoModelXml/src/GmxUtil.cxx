@@ -49,6 +49,7 @@ GmxUtil::GmxUtil(GmxInterface &gmxInterface) {
     processorRegistry.enregister("replicaX", &tagHandler.replicaX);
     processorRegistry.enregister("replicaY", &tagHandler.replicaY);
     processorRegistry.enregister("replicaZ", &tagHandler.replicaZ);
+    processorRegistry.enregister("replicaRPhi", &tagHandler.replicaRPhi);
     processorRegistry.enregister("index", &tagHandler.index);
 //
 //   Register tag handlers that produce GeoNodes. Only useful for those tags which

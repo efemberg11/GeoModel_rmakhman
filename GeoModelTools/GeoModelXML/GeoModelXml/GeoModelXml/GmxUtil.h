@@ -28,6 +28,7 @@
 #include "GeoModelXml/ReplicaXProcessor.h"
 #include "GeoModelXml/ReplicaYProcessor.h"
 #include "GeoModelXml/ReplicaZProcessor.h"
+#include "GeoModelXml/ReplicaRPhiProcessor.h"
 #include "GeoModelXml/IndexProcessor.h"
 
 #include "GeoModelXml/MakeElement.h"
@@ -95,6 +96,7 @@ public:
 	ReplicaXProcessor replicaX;
 	ReplicaYProcessor replicaY;
 	ReplicaZProcessor replicaZ;
+	ReplicaRPhiProcessor replicaRPhi;
         IndexProcessor index;
 //
 //    Things creating an RCBase *

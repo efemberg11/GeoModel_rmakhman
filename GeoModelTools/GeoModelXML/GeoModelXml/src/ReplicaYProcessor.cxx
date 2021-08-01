@@ -3,10 +3,10 @@
 */
 
 //
-//   replicaX element processor.
+//   replicaY element processor.
 //
 
-#include "GeoModelXml/ReplicaXProcessor.h"
+#include "GeoModelXml/ReplicaYProcessor.h"
 
 #include "GeoModelXml/OutputDirector.h"
 #include <sstream>
@@ -28,7 +28,7 @@
 using namespace xercesc;
 using namespace std;
 
-void ReplicaXProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
+void ReplicaYProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
 char *toRelease;
 XMLCh *ref = XMLString::transcode("ref");
 XMLCh * alignable_tmp = XMLString::transcode("alignable");
@@ -48,21 +48,21 @@ DOMDocument *doc = element->getOwnerDocument();
     XMLString::release(&toRelease);
     XMLString::release(&n_tmp);
 //
-//   offset along X
+//   offset along Y
 //
-    double offsetX=0;
+    double offsetY=0;
     XMLCh * offset_tmp = XMLString::transcode("offset");
     toRelease = XMLString::transcode(element->getAttribute(offset_tmp));
-    offsetX = gmxUtil.evaluate(toRelease);
+    offsetY = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
     XMLString::release(&offset_tmp);
 //
-//   step along X
+//   step along Y
 //
-    double stepX=0;
+    double stepY=0;
     XMLCh * step_tmp = XMLString::transcode("step");
     toRelease = XMLString::transcode(element->getAttribute(step_tmp));
-    stepX = gmxUtil.evaluate(toRelease);
+    stepY = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
     XMLString::release(&step_tmp);
 //
@@ -93,7 +93,7 @@ DOMDocument *doc = element->getOwnerDocument();
 //    If varname not given, we get the CLHEP xForm and raise it to the power i, so NOT applied to first object.
 //    No transform (i.e. identity) for the first; so one less transform than objects
 //
-	  GeoTrf::Transform3D hepXf0=GeoTrf::TranslateX3D(offsetX);
+	  GeoTrf::Transform3D hepXf0=GeoTrf::TranslateY3D(offsetY);
             if (alignable) {
                 geoAXf = new GeoAlignableTransform (hepXf0) ;
                 hepXf0 = geoAXf->getTransform();
@@ -105,7 +105,7 @@ DOMDocument *doc = element->getOwnerDocument();
             GeoTrf::Transform3D hepXf=hepXf0; 
             for (int i = 0; i < nCopies; ++i) {
                 xfList->push_back((GeoGraphNode *) new GeoTransform(hepXf));
-                hepXf = hepXf * GeoTrf::TranslateX3D(stepX) ;
+                hepXf = hepXf * GeoTrf::TranslateY3D(stepY) ;
             }
     }
     else {
@@ -154,7 +154,7 @@ DOMDocument *doc = element->getOwnerDocument();
 	}
 	else {
 	  msglog << MSG::FATAL << 
-	    "ReplicaXProcessor: error in " << name << ". <transform> object was neither assemblyref nor logvolref\n"
+	    "ReplicaYProcessor: error in " << name << ". <transform> object was neither assemblyref nor logvolref\n"
                     << "Exiting " << endmsg;
 	  exit(999); // Should do better
 	}

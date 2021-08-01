@@ -6,7 +6,7 @@
 //   replicaX element processor.
 //
 
-#include "GeoModelXml/ReplicaXProcessor.h"
+#include "GeoModelXml/ReplicaRPhiProcessor.h"
 
 #include "GeoModelXml/OutputDirector.h"
 #include <sstream>
@@ -28,7 +28,7 @@
 using namespace xercesc;
 using namespace std;
 
-void ReplicaXProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
+void ReplicaRPhiProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
 char *toRelease;
 XMLCh *ref = XMLString::transcode("ref");
 XMLCh * alignable_tmp = XMLString::transcode("alignable");
@@ -48,23 +48,42 @@ DOMDocument *doc = element->getOwnerDocument();
     XMLString::release(&toRelease);
     XMLString::release(&n_tmp);
 //
-//   offset along X
+//   offset in phi
 //
-    double offsetX=0;
-    XMLCh * offset_tmp = XMLString::transcode("offset");
+    double offsetPhi=0;
+    XMLCh * offset_tmp = XMLString::transcode("offsetPhi");
     toRelease = XMLString::transcode(element->getAttribute(offset_tmp));
-    offsetX = gmxUtil.evaluate(toRelease);
+    offsetPhi = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
     XMLString::release(&offset_tmp);
 //
-//   step along X
+//   step in phi
 //
-    double stepX=0;
-    XMLCh * step_tmp = XMLString::transcode("step");
+    double stepPhi=0;
+    XMLCh * step_tmp = XMLString::transcode("stepPhi");
     toRelease = XMLString::transcode(element->getAttribute(step_tmp));
-    stepX = gmxUtil.evaluate(toRelease);
+    stepPhi = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
     XMLString::release(&step_tmp);
+    
+//
+//  z value
+// 
+    double zVal=0;
+    XMLCh * z_tmp = XMLString::transcode("zValue");
+    toRelease = XMLString::transcode(element->getAttribute(z_tmp));
+    zVal = gmxUtil.evaluate(toRelease);
+    XMLString::release(&toRelease);
+    XMLString::release(&z_tmp);
+//  
+//  radius
+//
+    double radius=0.;
+    XMLCh * rad_tmp = XMLString::transcode("radius");
+    toRelease = XMLString::transcode(element->getAttribute(rad_tmp));
+    radius = gmxUtil.evaluate(toRelease);
+    XMLString::release(&toRelease);
+    XMLString::release(&rad_tmp);
 //
 //    See if it is in the map; if so, xfList is already done. If not, fill xfList.
 //
@@ -93,7 +112,7 @@ DOMDocument *doc = element->getOwnerDocument();
 //    If varname not given, we get the CLHEP xForm and raise it to the power i, so NOT applied to first object.
 //    No transform (i.e. identity) for the first; so one less transform than objects
 //
-	  GeoTrf::Transform3D hepXf0=GeoTrf::TranslateX3D(offsetX);
+	  GeoTrf::Transform3D hepXf0=GeoTrf::TranslateX3D(radius)*GeoTrf::TranslateZ3D(zVal)*GeoTrf::RotateZ3D(offsetPhi);
             if (alignable) {
                 geoAXf = new GeoAlignableTransform (hepXf0) ;
                 hepXf0 = geoAXf->getTransform();
@@ -105,7 +124,7 @@ DOMDocument *doc = element->getOwnerDocument();
             GeoTrf::Transform3D hepXf=hepXf0; 
             for (int i = 0; i < nCopies; ++i) {
                 xfList->push_back((GeoGraphNode *) new GeoTransform(hepXf));
-                hepXf = hepXf * GeoTrf::TranslateX3D(stepX) ;
+                hepXf = hepXf * GeoTrf::RotateZ3D(stepPhi) ;
             }
     }
     else {

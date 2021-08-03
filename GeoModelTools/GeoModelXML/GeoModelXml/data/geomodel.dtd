@@ -205,7 +205,7 @@
     <!ELEMENT transformationref EMPTY>
       <!ATTLIST transformationref ref IDREF #REQUIRED>
 
-  <!ELEMENT logvol (transform|logvol|logvolref|assembly|assemblyref|multicopy|replicaX|replicaY|replicaZ|replicaRPhi|index)*>
+  <!ELEMENT logvol (transform|logvol|logvolref|assembly|assemblyref|multicopy|replicaX|replicaY|replicaZ|replicaRPhi|replicaXYarrays|index)*>
     <!-- If sensitive is not given, it is not sensitive. If given, it points to a digitization scheme -->
     <!ATTLIST logvol name ID #REQUIRED
                      shape IDREF #REQUIRED
@@ -221,7 +221,7 @@
     <!ATTLIST logvolref ref    IDREF         #REQUIRED
                         zeroid (true|false) "false">
 
-  <!ELEMENT assembly (transform|logvol|logvolref|assembly|assemblyref|multicopy|replicaX|replicaY|replicaZ|replicaRPhi|index)+>
+  <!ELEMENT assembly (transform|logvol|logvolref|assembly|assemblyref|multicopy|replicaX|replicaY|replicaZ|replicaRPhi|replicaXYarrays|index)+>
     <!ATTLIST assembly name      ID           #REQUIRED
                        alignable (true|false) "false"> 
 
@@ -265,6 +265,13 @@
 			zValue    CDATA #REQUIRED
                         offsetPhi CDATA #REQUIRED
 			stepPhi   CDATA #REQUIRED
+                        alignable CDATA #IMPLIED>
+  <!ELEMENT replicaXYarrays (transform|logvolref|assemblyref)>
+    <!ATTLIST replicaXYarrays  name      ID    #REQUIRED
+                        n         CDATA #REQUIRED
+			zValue    CDATA #REQUIRED
+                        xCoordinates CDATA #REQUIRED
+			yCoordinates CDATA #REQUIRED
                         alignable CDATA #IMPLIED>
 
   <!ELEMENT addbranch (transform|logvol|logvolref|assembly|assemblyref)+>

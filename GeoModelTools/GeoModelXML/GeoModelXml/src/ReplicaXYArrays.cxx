@@ -75,11 +75,10 @@ DOMDocument *doc = element->getOwnerDocument();
             }
 	    else
 	    {
-	    	ostringstream tempstr;
 	    	for (int i=0;i<nCopies;i++)
 		{
-		  tempstr.str(x_varname + "_");
-		  tempstr<<i;
+		  ostringstream tempstr;
+		  tempstr<<x_varname + "_"<<i;
 		  if (!gmxUtil.eval.findVariable((tempstr.str()).c_str()))
 		  {
 		  	msglog << MSG::FATAL << "Error whem evaluating xPos, "<<tempstr.str()<<" not found!!"<<endmsg;
@@ -106,11 +105,10 @@ DOMDocument *doc = element->getOwnerDocument();
             }
 	    else
 	    {
-	    	ostringstream tempstr;
 	    	for (int i=0;i<nCopies;i++)
 		{
-		  tempstr.str(y_varname + "_");
-		  tempstr<<i;
+		  ostringstream tempstr;
+		  tempstr<<y_varname + "_"<<i;
 		  if (!gmxUtil.eval.findVariable(tempstr.str().c_str()))
 		  {
 		  	msglog << MSG::FATAL << "Error whem evaluating xPos, "<<tempstr.str()<<" not found!!"<<endmsg;
@@ -158,7 +156,7 @@ DOMDocument *doc = element->getOwnerDocument();
 //    If varname not given, we get the CLHEP xForm and raise it to the power i, so NOT applied to first object.
 //    No transform (i.e. identity) for the first; so one less transform than objects
 //
-	  GeoTrf::Transform3D hepXf0=GeoTrf::TranslateZ3D(zVal);
+	  GeoTrf::Transform3D hepXf0=GeoTrf::Transform3D::Identity();
             if (alignable) {
                 geoAXf = new GeoAlignableTransform (hepXf0) ;
                 hepXf0 = geoAXf->getTransform();
@@ -169,8 +167,8 @@ DOMDocument *doc = element->getOwnerDocument();
             }
             GeoTrf::Transform3D hepXf=hepXf0; 
             for (int i = 0; i < nCopies; ++i) {
+	     	hepXf = GeoTrf::TranslateZ3D(zVal)*GeoTrf::TranslateX3D(xPos[i]) * GeoTrf::TranslateY3D(yPos[i]);
                 xfList->push_back((GeoGraphNode *) new GeoTransform(hepXf));
-                hepXf = hepXf * GeoTrf::TranslateX3D(xPos[i]) * GeoTrf::TranslateY3D(yPos[i]);
             }
     }
     else {

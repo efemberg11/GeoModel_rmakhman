@@ -270,7 +270,7 @@ This will be automated in a future version.
 export LD_LIBRARY_PATH=${PWD}/../install/lib/ # this is a temporary fix
 ```
 
-### Linux/Fedora
+### Linux / Fedora & Centos7
 
 ```bash
 export LD_LIBRARY_PATH=../install/lib:../install/lib64:$LD_LIBRARY_PATH # this is a temporary fix, we will fix the installation on Fedora

@@ -204,8 +204,8 @@ private:
 	std::vector<std::vector<std::string>> m_transforms;
 	std::vector<std::vector<std::string>> m_alignableTransforms;
 	std::vector<std::vector<std::string>> m_serialDenominators;
-	std::vector<std::vector<int>> m_serialIdentifiers;
-	std::vector<std::vector<int>> m_identifierTags;
+	std::vector<std::vector<std::string>> m_serialIdentifiers;
+	std::vector<std::vector<std::string>> m_identifierTags;
 	std::vector<std::vector<std::string>> m_serialTransformers;
 	std::vector<std::vector<std::string>> m_functions;
 	std::vector<std::vector<std::string>> m_nameTags;

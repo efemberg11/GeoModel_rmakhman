@@ -85,10 +85,19 @@ public:
 	void printAllShapes() const;
 
 	/**
-	 * @brief Print names of all GeoSerialDenominators objects in db
+	 * @brief Print names of all GeoSerialDenominator objects in db
 	 */
 	void printAllSerialDenominators() const;
 
+	/**
+	 * @brief Print names of all GeoSeriaIdentifier objects in db
+	 */
+	void printAllSerialIdentifiers() const;
+
+	/**
+	 * @brief Print names of all GeoIdentifierTag objects in db
+	 */
+	void printAllIdentifierTags() const;
 
 	/**
 	 * @brief Print names of all GeoSerialDenominators objects in db

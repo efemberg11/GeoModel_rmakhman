@@ -236,11 +236,11 @@ DOMDocument *doc = element->getOwnerDocument();
         objectProcessor->process(object, gmxUtil, toAdd);
         if (alignable) {
 
-            cout << "copy = " << copy << "; level = " << level << endl;
-            cout << "\nAdd Alignable named " << endl;
-            cout << ((GeoNameTag *) (toAdd[lastTransform + 1]))->getName() << endl;
-            cout << " with id " << endl;
-            cout << ((GeoIdentifierTag *) (toAdd[lastTransform + 2]))->getIdentifier() << endl;
+            msglog << "copy = " << copy << "; level = " << level << endmsg;
+            msglog << "Add Alignable named ";
+            msglog << ((GeoNameTag *) (toAdd[lastTransform + 1]))->getName();
+            msglog << " with id ";
+            msglog << ((GeoIdentifierTag *) (toAdd[lastTransform + 2]))->getIdentifier() << endmsg;
 
             gmxUtil.positionIndex.incrementLevel(); // Logvol has unfortunately already decremented this; temp. restore it
             gmxUtil.positionIndex.indices(index, gmxUtil.eval);

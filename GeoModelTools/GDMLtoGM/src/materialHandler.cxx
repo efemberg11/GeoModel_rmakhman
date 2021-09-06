@@ -64,6 +64,7 @@ void materialHandler::postLoopHandling()
 	{
 		// std::cout<<" creating an explicit material: name "<<name<<" Z="<<m_Z<<" A="<<m_A<<std::endl;
 		GeoElement* newElement=new GeoElement(name,name,m_Z,m_A);
+		theController->saveElement(name,newElement);
 		newMaterial->add(newElement,1.0);
 	}
 	else for (auto f: fractionList)

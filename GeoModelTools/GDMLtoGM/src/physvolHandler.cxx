@@ -93,8 +93,8 @@ void physvolHandler::ElementHandle() {
 	}
 	
     	trf=new GeoTransform(GeoTrf::Translate3D(pVTranslation.x(),pVTranslation.y(),pVTranslation.z())*pVRotation*pVScale);
+	theMotherVolume->add(trf);
 	theMotherVolume->add(thePhysicalVolume);
-    	theMotherVolume->add(trf);
 }
 GeoPhysVol* physvolHandler::getPhysicalVolume() 
 {

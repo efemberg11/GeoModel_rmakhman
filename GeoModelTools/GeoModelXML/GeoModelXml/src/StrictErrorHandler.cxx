@@ -6,7 +6,7 @@
 #include "xercesc/util/XMLString.hpp"
 #include <xercesc/dom/DOMError.hpp>
 #include <xercesc/dom/DOMLocator.hpp>
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 
 StrictErrorHandler::StrictErrorHandler(): m_SawErrors(false) {}
 StrictErrorHandler::~StrictErrorHandler() {}
@@ -15,7 +15,6 @@ using namespace xercesc;
 
 bool StrictErrorHandler::handleError(const xercesc::DOMError &domError) {
 
-    OUTPUT_STREAM;
     msglog << MSG::ERROR << "StrictErrorHandler: Handle an error\n";
 
     m_SawErrors = true;

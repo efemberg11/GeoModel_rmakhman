@@ -4,7 +4,7 @@
 #include <string>
 
 #include "GeoModelXml/Element2GeoItem.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 
 #include "xercesc/util/XercesDefs.hpp"
 #include <xercesc/dom/DOM.hpp>
@@ -48,7 +48,6 @@ const RCBase * Element2GeoItem::process(const xercesc::DOMElement *element, GmxU
 
 const RCBase * Element2GeoItem::make(const xercesc::DOMElement *element, GmxUtil & /* gmxUtil */) const {
     char *name2release = XMLString::transcode(element->getNodeName());
-    OUTPUT_STREAM;
     msglog << MSG::FATAL << "Oh oh: called base class make() method of Element2GeoType object; tag " << name2release << endmsg;
     XMLString::release(&name2release);
 

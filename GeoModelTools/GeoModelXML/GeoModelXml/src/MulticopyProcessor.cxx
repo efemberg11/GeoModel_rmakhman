@@ -21,7 +21,7 @@
 //
 #include "GeoModelXml/MulticopyProcessor.h"
 
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <sstream>
 #include <string>
 #include <cstdlib>
@@ -48,8 +48,6 @@ XMLCh * alignable_tmp = XMLString::transcode("alignable");
 const XMLCh *idref;
 DOMDocument *doc = element->getOwnerDocument();
 
-    OUTPUT_STREAM;
-    
     bool alignable = element->hasAttribute(alignable_tmp);
 //
 //    How many copies?

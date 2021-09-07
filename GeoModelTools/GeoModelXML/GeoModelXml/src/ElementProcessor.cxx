@@ -16,7 +16,7 @@
 //
 #include "GeoModelXml/ElementProcessor.h"
 
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <string>
 #include "xercesc/util/XercesDefs.hpp"
 #include <xercesc/dom/DOM.hpp>
@@ -36,6 +36,5 @@ void ElementProcessor::process(const DOMElement *element, GmxUtil & /* gmxUtil*/
     std::string name(name2release);
     XMLString::release(&name2release);
 
-    OUTPUT_STREAM;
     msglog << MSG::FATAL << "Error!!! Default element processor called for tag-name " << name << endmsg;
 }

@@ -6,7 +6,7 @@
 // Then heavily modified
 #include "GeoModelXml/shape/MakeIntersection.h"
 #include <string>
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/RCBase.h"
@@ -51,7 +51,6 @@ const RCBase * MakeIntersection::make(const xercesc::DOMElement *element, GmxUti
                     break;
                 }
                 default: // More than 3 elements?
-                    OUTPUT_STREAM;
                     msglog << MSG::FATAL << "MakeIntersection: Incompatible DTD? got more than 3 child elements\n";
             }
             elementIndex++;

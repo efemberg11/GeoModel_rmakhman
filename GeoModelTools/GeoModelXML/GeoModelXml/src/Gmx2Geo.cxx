@@ -3,7 +3,7 @@
 */
 
 #include "GeoModelXml/Gmx2Geo.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 
 #include <string>
 #include <iomanip>
@@ -36,7 +36,6 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
 
 // Logging: ref https://wiki.bnl.gov/dayabay/index.php?title=Logging
 // Turn on logging in job-options with: MessageSvc.setDebug += {"GeoModelXml"}
-    OUTPUT_STREAM;
 
     DOMLSParser *parser = 0;
     DOMDocument *doc = createDOMDocument(xmlFile, parser, flags);
@@ -124,7 +123,6 @@ const DOMElement *element;
 //-------------------------------------------------------------------------------------------
 //
 // Turn var printout on and off with message level
-    OUTPUT_STREAM;
     msglog << MSG::DEBUG << "\n\nGmx2Geo GmxUtil matrix, vector and var values:\n";
     msglog << MSG::DEBUG <<     "==============================================\n\n";
 

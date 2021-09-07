@@ -11,7 +11,7 @@
 //   Add them to the physvol.
 //
 #include "GeoModelXml/LogvolProcessor.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 
 #include <map>
 
@@ -34,8 +34,6 @@ using namespace xercesc;
 void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
 GeoLogVol *lv;
 GeoNameTag *physVolName;
-
-    OUTPUT_STREAM;
 
     gmxUtil.positionIndex.incrementLevel();
 
@@ -110,7 +108,6 @@ GeoNameTag *physVolName;
 
       gmxUtil.matManager->addMaterial(tempMat);
     }
-    //std::cout<<"see if the material must be retrieved"<<std::endl;
     m=const_cast<GeoMaterial*>(gmxUtil.matManager->getMaterial(nam_mat));
   }
   else
@@ -121,7 +118,6 @@ GeoNameTag *physVolName;
 //
   lv = new GeoLogVol(name, s, m);
   store->logVol = lv;
-	//std::cout<<"logical Volume has been set!"<<std::endl;
 
 	XMLString::release(&material_tmp);
 	XMLString::release(&materials_tmp);

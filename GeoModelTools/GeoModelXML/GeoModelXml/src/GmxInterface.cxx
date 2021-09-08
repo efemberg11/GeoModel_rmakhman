@@ -8,7 +8,7 @@
 //    Use: create an instance of this, and pass a reference to it in the Gmx2Geo constructor.
 //
 #include "GeoModelXml/GmxInterface.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include "GeoModelKernel/GeoPVConstLink.h"
 #include "GeoModelKernel/Query.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -26,7 +26,6 @@ int GmxInterface::splitSensorId(map<string, int> &/*index*/, std::pair<std::stri
 }
 
 void GmxInterface::addSensorType(string clas, string type, map<string, string> params) {
-    OUTPUT_STREAM;
 
     msglog << MSG::DEBUG << "GmxInterface::addSensorType called for class " << clas << "; type " << type << 
                          "\n    Parameter names and values:\n";
@@ -36,7 +35,6 @@ void GmxInterface::addSensorType(string clas, string type, map<string, string> p
 }
 
 void GmxInterface::addSensor(string name, map<string, int> &index, int sequentialId, GeoVFullPhysVol *fpv) {
-    OUTPUT_STREAM;
 
     msglog << MSG::DEBUG << "GmxInterface::addSensor called for " << fpv->getLogVol()->getName() << ", type " << name << 
                          ". Indices:   ";		
@@ -47,7 +45,6 @@ void GmxInterface::addSensor(string name, map<string, int> &index, int sequentia
 }
 
 void GmxInterface::addSplitSensor(string name, map<string, int> &index, std::pair<std::string, int> &extraIndex, int sequentialId, GeoVFullPhysVol *fpv) {
-    OUTPUT_STREAM;
 
     msglog << MSG::DEBUG << "GmxInterface::addSensor called for " << fpv->getLogVol()->getName() << ", type " << name << 
                          ". Indices:   ";		
@@ -64,7 +61,6 @@ void GmxInterface::addAlignable(int level, map<std::string, int> &index, GeoVFul
 //
 //    Logvol name is not very useful (usually == AssemblyLV). Get PhysVol name (seems surprisingly awkward way needed)
 //
-    OUTPUT_STREAM;
 /* Cannot get this to work.
     string name("New name");
     GeoPVConstLink parent = fpv->getParent();

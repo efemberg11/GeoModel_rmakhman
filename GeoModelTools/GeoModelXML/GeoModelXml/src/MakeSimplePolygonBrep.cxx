@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 #ifndef STANDALONE_GMX
-  #include "GeoModelXml/OutputDirector.h"
+  #include "OutputDirector.h"
   #include "GaudiKernel/IMessageSvc.h"
 #endif
 
@@ -63,7 +63,6 @@ char *toRelease;
   
     if (nx < 3 || ny < 3 || nx != ny) {
 #ifndef STANDALONE_GMX
-        OUTPUT_STREAM;
         msglog << MSG::ERROR << "MakeSimplePolygonBrep: Bad xpoints and/or ypoints\n";
 #endif
         throw std::runtime_error(std::string("MakeSimplePolygonBrep: Unequal number of x and y points, or less than 3\n\n") +

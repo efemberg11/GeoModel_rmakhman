@@ -6,11 +6,6 @@
 
 #include "OutputDirector.h"
 
-#ifndef STANDALONE_GMX
-#include "StoreGate/StoreGateSvc.h"
-#include "GeoModelInterfaces/StoredMaterialManager.h"
-#endif
-
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
@@ -97,10 +92,6 @@ double GmxUtil::evaluate(char const *expression) {
         }
     }
     if (isWhiteSpace) { // Catch a common error early and give best message possible
-#ifndef STANDALONE_GMX
-        msglog << MSG::FATAL << "GeoModelXml Error processing Evaluator expression: empty expression. Exiting program.\n" << 
-               endmsg;
-#endif
         throw runtime_error(string("evaluate: empty or white space expression. Last good expression was " + lastGoodExpression));
 
     }
@@ -114,20 +105,7 @@ double GmxUtil::evaluate(char const *expression) {
 //   And evaluate the result
 //
     double result = eval.evaluate(noBrackets.c_str());
-#ifndef STANDALONE_GMX
-    if (eval.status() != HepTool::Evaluator::OK) {
-#else
     if (eval.status() != Evaluator::OK) {
-#endif
-#ifndef STANDALONE_GMX
-        msglog << MSG::FATAL << "GeoModelXml Error processing Evaluator expression. Error name <" <<
-         eval.error_name() << ">" << endl << "Message: <";
-        eval.print_error();
-        msglog << ">. Original expression <" << expression << ">; Expression after de-bracketing:\n";
-        msglog << noBrackets << endl;
-        msglog << string(eval.error_position(), '-') << '^' << '\n';
-        msglog << "Exiting program.\n" << endmsg;
-#endif
         throw runtime_error(string("evaluate: invalid expression. Last good expression was <" + lastGoodExpression + ">"));
     }
     lastGoodExpression = strExpression;
@@ -144,9 +122,6 @@ std::string GmxUtil::debracket(std::string expression) {
     }
     size_t nextClose = expression.find_first_of(']', lastOpen);
     if (nextClose == string::npos) {
-#ifndef STANDALONE_GMX
-        msglog << MSG::ERROR << "debracket: unpaired opening [; expression was:\n    " << expression << endmsg; 
-#endif
         return expression;
     }
     string toEvaluate = expression.substr(lastOpen + 1, nextClose - lastOpen - 1);

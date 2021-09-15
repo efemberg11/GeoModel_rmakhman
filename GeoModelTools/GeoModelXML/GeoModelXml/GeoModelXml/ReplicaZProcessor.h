@@ -19,6 +19,7 @@ public:
     void process(const xercesc::DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd);
 private:
     std::map <std::string, GeoNodeList> m_map; 
+    void tokenize(std::string&,char,std::vector<std::string>&) const ;
 };
 
 #endif // REPLICAX_PROCESSOR_H

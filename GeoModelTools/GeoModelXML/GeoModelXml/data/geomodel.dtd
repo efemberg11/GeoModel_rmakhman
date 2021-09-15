@@ -245,18 +245,21 @@
                         n         CDATA #REQUIRED
                         offset    CDATA #REQUIRED
 			step      CDATA #REQUIRED
+                        skip      CDATA #IMPLIED
                         alignable CDATA #IMPLIED>
   <!ELEMENT replicaY (transform|logvolref|assemblyref)>
     <!ATTLIST replicaY  name      ID    #REQUIRED
                         n         CDATA #REQUIRED
                         offset    CDATA #REQUIRED
 			step      CDATA #REQUIRED
+                        skip      CDATA #IMPLIED
                         alignable CDATA #IMPLIED>
   <!ELEMENT replicaZ (transform|logvolref|assemblyref)>
     <!ATTLIST replicaZ  name      ID    #REQUIRED
                         n         CDATA #REQUIRED
                         offset    CDATA #REQUIRED
 			step      CDATA #REQUIRED
+                        skip      CDATA #IMPLIED
                         alignable CDATA #IMPLIED>
   <!ELEMENT replicaRPhi (transform|logvolref|assemblyref)>
     <!ATTLIST replicaRPhi  name      ID    #REQUIRED

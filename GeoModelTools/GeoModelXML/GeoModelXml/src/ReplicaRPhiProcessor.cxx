@@ -29,7 +29,7 @@ using namespace xercesc;
 using namespace std;
 
 
-void tokenize(string &str, char delim, vector<string> &out)
+void ReplicaRPhiProcessor::tokenize(string &str, char delim, vector<string> &out) const
 {
 	size_t start;
 	size_t end = 0;

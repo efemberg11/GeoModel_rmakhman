@@ -6,7 +6,7 @@
 //    Process transformationref items: basically, just find the referenced transform and call its processor.
 //
 #include "GeoModelXml/MakeTransformationref.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelXml/GmxUtil.h"
@@ -33,7 +33,6 @@ char *toRelease;
     string nodeName(toRelease);
     XMLString::release(&toRelease);
     if (nodeName != string("transformation")) {
-        OUTPUT_STREAM;
         msglog << MSG::FATAL << "Error in xml/gmx file: transformationref " << XMLString::transcode(idref) << " referenced a " << nodeName << 
                 " instead of a transformation." << endmsg;
         exit(999); // Should do better...

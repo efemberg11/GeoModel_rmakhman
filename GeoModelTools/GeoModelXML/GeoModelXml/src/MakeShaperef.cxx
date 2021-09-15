@@ -6,7 +6,7 @@
 //    Process transformationref items: basically, just find the referenced transform and call its processor.
 //
 #include "GeoModelXml/shape/MakeShaperef.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelXml/GmxUtil.h"
@@ -31,7 +31,6 @@ const RCBase *MakeShaperef::process(const DOMElement *element, GmxUtil &gmxUtil)
 //
     DOMNode *parent = shape->getParentNode();
     if (XMLString::compareIString(parent->getNodeName(), shapes_tmp) != 0) {
-        OUTPUT_STREAM;
         msglog << MSG::FATAL << "Error processing <shaperef> tag: An IDREF for a shape did not refer to a shape.\nShape ref was " << 
                idref << "; exiting" << endmsg;
         exit (1); // Need to improve...

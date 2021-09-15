@@ -47,9 +47,25 @@ class GeoNodeAction
   //	Handles a physical volume.
   virtual void handlePhysVol (const GeoPhysVol *);
   
-  //	Handles a physical volume.
+  //	Handles a full physical volume.
   virtual void handleFullPhysVol (const GeoFullPhysVol *);
+ 
+  //	Handles a Name Tag.
+  virtual void handleNameTag (const GeoNameTag *);
   
+  //	Handles a Serial Denominator.
+  virtual void handleSerialDenominator (const GeoSerialDenominator *);
+  
+  //	Handles a Serial Transformer
+  virtual void handleSerialTransformer (const GeoSerialTransformer  *);
+  
+  //	Handles an Identifier Tag.
+  virtual void handleIdentifierTag (const GeoIdentifierTag *);
+  
+  //	Handles a SerialIdentifier.
+  virtual void handleSerialIdentifier(const GeoSerialIdentifier *);
+
+
   //	Returns a pointer to the path object.
   GeoNodePath* getPath ();
   
@@ -61,26 +77,13 @@ class GeoNodeAction
   //	Determine whether the action should terminate.
   bool shouldTerminate () const;
   
-  //	Handles a Name Tag.
-  virtual void handleNameTag (const GeoNameTag *);
-  
-  //	Handles a Serial Denominator.
-  virtual void handleSerialDenominator (const GeoSerialDenominator *);
-  
+ 
   //	Sets a depth limit.
   void setDepthLimit (unsigned int limit);
   
   //	Clears a depth limit, if any.
   void clearDepthLimit ();
   
-  //	Handles a Serial Transformer
-  virtual void handleSerialTransformer (const GeoSerialTransformer  *);
-  
-  //	Handles an Identifier Tag.
-  virtual void handleIdentifierTag (const GeoIdentifierTag *);
-  
-  virtual void handleSerialIdentifier(const GeoSerialIdentifier *);
-
  protected:
   //	Termination flag; causes an abortion of action execution.
   bool m_terminate;

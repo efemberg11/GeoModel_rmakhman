@@ -3,7 +3,7 @@
 */
 
 #include <cstdlib>
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <vector>
 #include <string>
 #include "ExpressionEvaluator/Evaluator.h"
@@ -98,7 +98,6 @@ void PositionIndex::indices(map<string, int> &index, Evaluator &eval) {
         string name = *n;
         index[name] = (int) eval.evaluate(m_formula[name].c_str());
         if (eval.status() != Evaluator::OK) {
-            OUTPUT_STREAM;
             msglog << MSG::FATAL <<
                    "GeoModelXml Error processing Evaluator expression for PositionIndex. Error name " <<
                     eval.error_name() << endl << "Message: ";

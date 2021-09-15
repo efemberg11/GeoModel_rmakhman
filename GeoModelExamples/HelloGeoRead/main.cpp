@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
   // GET GEOMETRY FROM LOCAL DB
   // Set valid db path before first run
-  const std::string path = "../geometry.db";
+  const std::string path = "geometry.db";
   std::cout << "Using this DB file:" << path << std::endl;
 
   // check if DB file exists. If not, return.
@@ -102,13 +102,18 @@ int main(int argc, char *argv[])
 //  db->printAllElements();
 
   /* setup the GeoModel reader */
-  GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
+  GeoModelIO::ReadGeoModel geoReader = GeoModelIO::ReadGeoModel(db);
   std::cout << "OK! ReadGeoModel is set." << std::endl;
 
 
   /* build the GeoModel geometry */
-  GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+  GeoPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
   std::cout << "ReadGeoModel::buildGeoModel() done." << std::endl;
+
+  std::cout << "Reading records from the imported geometry DB file..." << std::endl;
+  geoReader.printDBTable("SerialIdentifiers");
+  geoReader.printDBTable("IdentifierTags");
+
 
   // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
@@ -159,6 +164,7 @@ int main(int argc, char *argv[])
 		  std::cout << "\t\t GeoMaterial's number of elements: " << childVol->getNumElements() << std::endl;
 	  }
   }
+
 
   std::cout << "Everything done." << std::endl;
 

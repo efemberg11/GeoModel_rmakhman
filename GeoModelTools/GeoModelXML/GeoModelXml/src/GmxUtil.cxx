@@ -4,7 +4,7 @@
 
 #include "GeoModelXml/GmxUtil.h"
 
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 
 #ifndef STANDALONE_GMX
 #include "StoreGate/StoreGateSvc.h"
@@ -50,6 +50,7 @@ GmxUtil::GmxUtil(GmxInterface &gmxInterface) {
     processorRegistry.enregister("replicaY", &tagHandler.replicaY);
     processorRegistry.enregister("replicaZ", &tagHandler.replicaZ);
     processorRegistry.enregister("replicaRPhi", &tagHandler.replicaRPhi);
+    processorRegistry.enregister("replicaXYarrays", &tagHandler.replicaXYArrays);
     processorRegistry.enregister("index", &tagHandler.index);
 //
 //   Register tag handlers that produce GeoNodes. Only useful for those tags which
@@ -97,7 +98,6 @@ double GmxUtil::evaluate(char const *expression) {
     }
     if (isWhiteSpace) { // Catch a common error early and give best message possible
 #ifndef STANDALONE_GMX
-	OUTPUT_STREAM;
         msglog << MSG::FATAL << "GeoModelXml Error processing Evaluator expression: empty expression. Exiting program.\n" << 
                endmsg;
 #endif
@@ -120,7 +120,6 @@ double GmxUtil::evaluate(char const *expression) {
     if (eval.status() != Evaluator::OK) {
 #endif
 #ifndef STANDALONE_GMX
-	OUTPUT_STREAM;
         msglog << MSG::FATAL << "GeoModelXml Error processing Evaluator expression. Error name <" <<
          eval.error_name() << ">" << endl << "Message: <";
         eval.print_error();
@@ -146,7 +145,6 @@ std::string GmxUtil::debracket(std::string expression) {
     size_t nextClose = expression.find_first_of(']', lastOpen);
     if (nextClose == string::npos) {
 #ifndef STANDALONE_GMX
-	OUTPUT_STREAM;
         msglog << MSG::ERROR << "debracket: unpaired opening [; expression was:\n    " << expression << endmsg; 
 #endif
         return expression;

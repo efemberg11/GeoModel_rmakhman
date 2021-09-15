@@ -146,6 +146,16 @@ void GMDBManager::printAllSerialDenominators() const
 	printAllRecords("SerialDenominators");
 }
 
+void GMDBManager::printAllSerialIdentifiers() const
+{
+	printAllRecords("SerialIdentifiers");
+}
+
+void GMDBManager::printAllIdentifierTags() const
+{
+	printAllRecords("IdentifierTags");
+}
+
 void GMDBManager::printAllLogVols() const
 {
 	printAllRecords("LogVols");
@@ -445,7 +455,7 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
   return true;
 }
 
-
+//TODO: use this with std::variant to replace the version with std::string only, here above, for all tables; so we can store nativel values (int, double, etc...) -- R.M.B.
 bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> records)
 {
   // get table columns and format them for query
@@ -1355,6 +1365,32 @@ bool GMDBManager::createTables()
     storeNodeType(geoNode, tableName); }
   tab.clear();
 
+  // SerialIdentifiers table
+  geoNode = "GeoSerialIdentifier";
+  tableName = "SerialIdentifiers";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("baseId");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer)", tab[0], tab[1], tab[2]);
+  if ( 0==(rc = execQuery(queryStr))) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+
+  // IdentifierTags table
+  geoNode = "GeoIdentifierTag";
+  tableName = "IdentifierTags";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("identifier");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer)", tab[0], tab[1], tab[2]);
+  if ( 0==(rc = execQuery(queryStr))) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+
   // Functions table
   geoNode = "Function";
   tableName = "Functions";
@@ -1368,7 +1404,7 @@ bool GMDBManager::createTables()
     storeNodeType(geoNode, tableName); }
   tab.clear();
 
-  // SerialDenominators table
+  // SerialTransformers table
   geoNode = "GeoSerialTransformer";
   tableName = "SerialTransformers";
   m_childType_tableName[geoNode] = tableName;

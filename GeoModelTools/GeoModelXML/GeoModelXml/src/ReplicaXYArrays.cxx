@@ -3,23 +3,10 @@
 */
 
 //
-//   multicopy element processor.
+//   replicaX element processor.
 //
-//   First time round, a loop creates all the Geo-transforms needed and stores them. First and subsequent calls, 
-//   a second loop adds these to the toAdd list, along with copies of the object. The object-handler stores and 
-//   deals with the object. This si needed to make sure sensitive volumes and alignable volumes are always added 
-//   correctly. 
-//
-//   The copy number of the copied object can be zeroed each time the multicopy-element is processed if the 
-//   zeroid attribute is set true. This has to be done here - if the attribute is given on a logvol or assembly ref, 
-//   it would alwasy be zero.
-//
-//   There are two ways of making the n transformations:
-//        loopvar attribute not set:    The transformation is raised to the power i-1
-//        loopvar set to a vector name: In the loop, before each transformation is created, the vector generic name is set
-//                                      equal to the next element of the vector.
-//
-#include "GeoModelXml/MulticopyProcessor.h"
+
+#include "GeoModelXml/ReplicaXYArraysProcessor.h"
 
 #include "OutputDirector.h"
 #include <sstream>
@@ -41,7 +28,7 @@
 using namespace xercesc;
 using namespace std;
 
-void MulticopyProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
+void ReplicaXYarraysProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
 char *toRelease;
 XMLCh *ref = XMLString::transcode("ref");
 XMLCh * alignable_tmp = XMLString::transcode("alignable");
@@ -49,6 +36,12 @@ const XMLCh *idref;
 DOMDocument *doc = element->getOwnerDocument();
 
     bool alignable = element->hasAttribute(alignable_tmp);
+    
+    XMLCh * name_tmp = XMLString::transcode("name");
+    toRelease = XMLString::transcode(element->getAttribute(name_tmp));
+    string name(toRelease);
+    XMLString::release(&toRelease);
+    XMLString::release(&name_tmp);
 //
 //    How many copies?
 //
@@ -58,14 +51,89 @@ DOMDocument *doc = element->getOwnerDocument();
     nCopies = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
     XMLString::release(&n_tmp);
+    
+//
+//    Xcoordinates/Ycoordinates arrays
+//
+        string x_varname,y_varname, firstElement;
+	vector<double> xPos,yPos;
+        XMLCh * loopvar_tmp = XMLString::transcode("xCoordinates");
+        bool hasVarname = (element->getAttributeNode(loopvar_tmp) != 0);
+        if (hasVarname) {
+            toRelease = XMLString::transcode(element->getAttribute(loopvar_tmp));
+            x_varname = toRelease;
+            XMLString::release(&toRelease);
+            XMLString::release(&loopvar_tmp);
+            // Check it is a vector
+            firstElement = x_varname + "_0";
+            if (!gmxUtil.eval.findVariable(firstElement.c_str())) {
+                msglog << MSG::FATAL << "Error in .gmx file. Processing multicopy element with name " << name << 
+                ". Found xCoordinates set to " << x_varname << ", but no vector with that name has been defined." << endmsg;
+                exit(999); // Should do better
+            }
+	    else
+	    {
+	    	for (int i=0;i<nCopies;i++)
+		{
+		  ostringstream tempstr;
+		  tempstr<<x_varname + "_"<<i;
+		  if (!gmxUtil.eval.findVariable((tempstr.str()).c_str()))
+		  {
+		  	msglog << MSG::FATAL << "Error whem evaluating xPos, "<<tempstr.str()<<" not found!!"<<endmsg;
+			exit(999); // Should do better
+		  }
+		  else 
+		  	xPos.push_back(gmxUtil.evaluate(tempstr.str().c_str()));
+		}
+	    }
+        }
+	loopvar_tmp = XMLString::transcode("yCoordinates");
+        hasVarname = (element->getAttributeNode(loopvar_tmp) != 0);
+        if (hasVarname) {
+            toRelease = XMLString::transcode(element->getAttribute(loopvar_tmp));
+            y_varname = toRelease;
+            XMLString::release(&toRelease);
+            XMLString::release(&loopvar_tmp);
+            // Check it is a vector
+            firstElement = y_varname + "_0";
+            if (!gmxUtil.eval.findVariable(firstElement.c_str())) {
+                msglog << MSG::FATAL << "Error in .gmx file. Processing multicopy element with name " << name << 
+                ". Found yCoordinates set to " << y_varname << ", but no vector with that name has been defined." << endmsg;
+                exit(999); // Should do better
+            }
+	    else
+	    {
+	    	for (int i=0;i<nCopies;i++)
+		{
+		  ostringstream tempstr;
+		  tempstr<<y_varname + "_"<<i;
+		  if (!gmxUtil.eval.findVariable(tempstr.str().c_str()))
+		  {
+		  	msglog << MSG::FATAL << "Error whem evaluating xPos, "<<tempstr.str()<<" not found!!"<<endmsg;
+			exit(999); // Should do better
+		  }
+		  else 
+		  	yPos.push_back(gmxUtil.evaluate(tempstr.str().c_str()));
+		}
+	    }
+        }
+
+
+    
+//
+//  z value
+// 
+    double zVal=0;
+    XMLCh * z_tmp = XMLString::transcode("zValue");
+    toRelease = XMLString::transcode(element->getAttribute(z_tmp));
+    zVal = gmxUtil.evaluate(toRelease);
+    XMLString::release(&toRelease);
+    XMLString::release(&z_tmp);
+
 //
 //    See if it is in the map; if so, xfList is already done. If not, fill xfList.
 //
-    XMLCh * name_tmp = XMLString::transcode("name");
-    toRelease = XMLString::transcode(element->getAttribute(name_tmp));
-    string name(toRelease);
-    XMLString::release(&toRelease);
-    XMLString::release(&name_tmp);
+
     map<string, GeoNodeList>::iterator entry;
     GeoNodeList *xfList;
     if ((entry = m_map.find(name)) == m_map.end()) { // Not in registry; make a new item
@@ -74,87 +142,32 @@ DOMDocument *doc = element->getOwnerDocument();
 //
         m_map[name] = GeoNodeList();
         xfList = &m_map[name];
-//
-//    Loopvar Variable name
-//
-        string varname, firstElement;
-	XMLCh * loopvar_tmp = XMLString::transcode("loopvar");
-        bool hasVarname = (element->getAttributeNode(loopvar_tmp) != 0);
-        if (hasVarname) {
-            toRelease = XMLString::transcode(element->getAttribute(loopvar_tmp));
-            varname = toRelease;
-            XMLString::release(&toRelease);
-	    XMLString::release(&loopvar_tmp);
-            // Check it is a vector
-            firstElement = varname + "_0";
-            if (!gmxUtil.eval.findVariable(firstElement.c_str())) {
-                msglog << MSG::FATAL << "Error in .gmx file. Processing multicopy element with name " << name << 
-                ". Found loopvar set to " << varname << ", but no vector with that name has been defined." << endmsg;
-                exit(999); // Should do better
-            }
-        }
-//
-//    Get the transformation-element
-//
-        DOMElement *elXf = element->getFirstElementChild();
-        toRelease = XMLString::transcode(elXf->getNodeName());
-        string nodeName(toRelease);
-        XMLString::release(&toRelease);
-        Element2GeoItem *xFormProcessor;
-        if (hasVarname) {
-            if (nodeName == "transformation") { // OK
-                xFormProcessor = (Element2GeoItem *) &(gmxUtil.tagHandler.transformation);
-            }
-            else { // Not OK
-                msglog << MSG::FATAL << "Error in .gmx file. Processing multicopy element with name " << name <<
-                ". \nIt gives loopvar therefore should have a <transformation> and not a <transformationref> (despite the DTD)\n";
-                exit(999); // Should do better
-            }
-        }
-        else {
-            xFormProcessor = nodeName == "transformation"?
-                             (Element2GeoItem *) &(gmxUtil.tagHandler.transformation):
-                             (Element2GeoItem *) &(gmxUtil.tagHandler.transformationref);
-        }
+
+
 //
 //    Produce all the transformations
 //
         GeoAlignableTransform *geoAXf;
         GeoTransform *geoXf;
-        if (hasVarname) {
-            for (int i = 0; i < nCopies; ++i) {
-                gmxUtil.eval.setVariable(varname.c_str(), (varname + "_" + to_string(i)).c_str());
-                if (alignable) {
-                    geoAXf = (GeoAlignableTransform *) xFormProcessor->make(elXf, gmxUtil);
-                    xfList->push_back((GeoGraphNode *) geoAXf);
-                }
-                else {
-                    geoXf = (GeoTransform *) xFormProcessor->make(elXf, gmxUtil);
-                    xfList->push_back((GeoGraphNode *) geoXf);
-                }
-                gmxUtil.eval.removeVariable(varname.c_str()); // Avoids a warning status in evaluator
-            }
-        }
-        else {
+
 //
 //    If varname not given, we get the CLHEP xForm and raise it to the power i, so NOT applied to first object.
 //    No transform (i.e. identity) for the first; so one less transform than objects
 //
 	  GeoTrf::Transform3D hepXf0=GeoTrf::Transform3D::Identity();
             if (alignable) {
-                geoAXf = (GeoAlignableTransform *) xFormProcessor->make(elXf, gmxUtil);
+                geoAXf = new GeoAlignableTransform (hepXf0) ;
                 hepXf0 = geoAXf->getTransform();
             }
             else {
-                geoXf = (GeoTransform *) xFormProcessor->make(elXf, gmxUtil);
+                geoXf = new GeoTransform (hepXf0);
                 hepXf0 = geoXf->getTransform();
             }
-            GeoTrf::Transform3D hepXf=GeoTrf::Transform3D::Identity(); // Identity initially
+            GeoTrf::Transform3D hepXf=hepXf0; 
             for (int i = 0; i < nCopies; ++i) {
+	     	hepXf = GeoTrf::TranslateZ3D(zVal)*GeoTrf::TranslateX3D(xPos[i]) * GeoTrf::TranslateY3D(yPos[i]);
                 xfList->push_back((GeoGraphNode *) new GeoTransform(hepXf));
-                hepXf = hepXf0 * hepXf;
             }
-        }
     }
     else {
         xfList = &entry->second;
@@ -202,8 +215,8 @@ DOMDocument *doc = element->getOwnerDocument();
 	}
 	else {
 	  msglog << MSG::FATAL << 
-	    "multicopyprocessor: error in " << name << ". <transform> object was neither assemblyref nor logvolref\n"
-                    << "Exiting Athena" << endmsg;
+	    "ReplicaXProcessor: error in " << name << ". <transform> object was neither assemblyref nor logvolref\n"
+                    << "Exiting " << endmsg;
 	  exit(999); // Should do better
 	}
       }
@@ -234,11 +247,11 @@ DOMDocument *doc = element->getOwnerDocument();
         objectProcessor->process(object, gmxUtil, toAdd);
         if (alignable) {
 
-            msglog << "copy = " << copy << "; level = " << level << endmsg;
-            msglog << "Add Alignable named ";
-            msglog << ((GeoNameTag *) (toAdd[lastTransform + 1]))->getName();
-            msglog << " with id ";
-            msglog << ((GeoIdentifierTag *) (toAdd[lastTransform + 2]))->getIdentifier() << endmsg;
+            cout << "copy = " << copy << "; level = " << level << endl;
+            cout << "\nAdd Alignable named " << endl;
+            cout << ((GeoNameTag *) (toAdd[lastTransform + 1]))->getName() << endl;
+            cout << " with id " << endl;
+            cout << ((GeoIdentifierTag *) (toAdd[lastTransform + 2]))->getIdentifier() << endl;
 
             gmxUtil.positionIndex.incrementLevel(); // Logvol has unfortunately already decremented this; temp. restore it
             gmxUtil.positionIndex.indices(index, gmxUtil.eval);

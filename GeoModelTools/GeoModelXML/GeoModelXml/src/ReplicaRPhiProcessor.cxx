@@ -8,7 +8,7 @@
 
 #include "GeoModelXml/ReplicaRPhiProcessor.h"
 
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <sstream>
 #include <string>
 #include <cstdlib>
@@ -28,15 +28,27 @@
 using namespace xercesc;
 using namespace std;
 
+
+void tokenize(string &str, char delim, vector<string> &out)
+{
+	size_t start;
+	size_t end = 0;
+
+	while ((start = str.find_first_not_of(delim, end)) != string::npos)
+	{
+		end = str.find(delim, start);
+		out.push_back(str.substr(start, end - start));
+	}
+}
+
 void ReplicaRPhiProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
 char *toRelease;
 XMLCh *ref = XMLString::transcode("ref");
 XMLCh * alignable_tmp = XMLString::transcode("alignable");
+XMLCh * skip_tmp = XMLString::transcode("skip");
 const XMLCh *idref;
 DOMDocument *doc = element->getOwnerDocument();
 
-    OUTPUT_STREAM;
-    
     bool alignable = element->hasAttribute(alignable_tmp);
 //
 //    How many copies?
@@ -84,6 +96,38 @@ DOMDocument *doc = element->getOwnerDocument();
     radius = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
     XMLString::release(&rad_tmp);
+    
+//    
+//  skip
+//
+
+    std::vector<int> elementsToSkip;
+    if (element->hasAttribute(skip_tmp))
+    {
+    	toRelease = XMLString::transcode(element->getAttribute(skip_tmp));
+	std::string skip_str(toRelease);
+	//std::cout << "skip string "<<skip_str<<std::endl;
+	std::vector<std::string> parsed;
+	tokenize(skip_str,' ',parsed);
+	for (auto k : parsed) 
+	{
+		std::vector<std::string> tmp_parsed;
+		//std::cout<<" parsed "<<k<<std::endl;
+		tokenize(k,'-',tmp_parsed);
+		if (tmp_parsed.size()==1) elementsToSkip.push_back(std::stoi(tmp_parsed[0]));
+		else if (tmp_parsed.size()==2)
+		{
+			int i1=std::stoi(tmp_parsed[0]);
+			int i2=std::stoi(tmp_parsed[1]);
+			//std::cout<<" indices "<<i1<<" "<<i2<<std::endl;
+			assert(i1<i2);
+			for (int l=i1;l<i2+1;l++) elementsToSkip.push_back(l);
+		}
+		
+	}
+		
+    }
+    
 //
 //    See if it is in the map; if so, xfList is already done. If not, fill xfList.
 //
@@ -200,6 +244,7 @@ DOMDocument *doc = element->getOwnerDocument();
 //
     map<string, int> index;
     for (int copy = 0; copy < nCopies; ++copy) {
+    	if (elementsToSkip.size()>0 && std::find(elementsToSkip.begin(),elementsToSkip.end(),copy)!=elementsToSkip.end()) continue;
         toAdd.push_back((*xfList)[copy]);
         int lastTransform = toAdd.size() - 1;
         objectProcessor->process(object, gmxUtil, toAdd);
@@ -222,5 +267,6 @@ DOMDocument *doc = element->getOwnerDocument();
 
     XMLString::release(&ref);
     XMLString::release(&alignable_tmp);
+    XMLString::release(&skip_tmp);
 
 }

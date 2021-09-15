@@ -6,7 +6,7 @@
 //    Process logvolref items: basically, just find the referenced logvol and call its processor.
 //
 #include "GeoModelXml/LogvolrefProcessor.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelXml/GeoNodeList.h"
@@ -33,7 +33,6 @@ char *toRelease;
     string nodeName(toRelease);
     XMLString::release(&toRelease);
     if (nodeName != string("logvol")) {
-	OUTPUT_STREAM;
         msglog << MSG::FATAL << "Error in xml/gmx file: logvolref " << XMLString::transcode(idref) << " referenced a " << nodeName << 
                 " instead of a logvol." << endmsg;
         exit(999); // Should do better...

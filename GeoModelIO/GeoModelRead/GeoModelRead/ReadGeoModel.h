@@ -8,6 +8,7 @@
  * - 2019 Feb, R.M.Bianchi
  * - 2020 May, R.M.Bianchi - Added parallel read
  * - 2020 Aug, R.M.Bianchi - Added support for reading back published nodes
+ * - 2021 Aug, R.M.Bianchi <riccardo.maria.bianchi@cern.ch> - Added support GeoIdentifierTag and GeoSerialIdentifier nodes
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
@@ -60,6 +61,8 @@ class GeoMaterial;
 class GeoElement;
 class GeoNameTag;
 class GeoSerialDenominator;
+class GeoSerialIdentifier;
+class GeoIdentifierTag;
 class GeoAlignableTransform;
 class GeoTransform;
 class GeoSerialTransformer;
@@ -107,6 +110,8 @@ private:
   void buildAllTransforms();
   void buildAllAlignableTransforms();
   void buildAllSerialDenominators();
+  void buildAllSerialIdentifiers();
+  void buildAllIdentifierTags();
   void buildAllSerialTransformers();
   void buildAllNameTags();
 
@@ -152,6 +157,7 @@ private:
 
 
   // caching methods
+  // TODO: perhaps we could merge all those 'isBuiltYYY' methods in a single one, with the GeoModel class as a second argument ? (RMB)
   bool isBuiltShape(const unsigned int id);
   void storeBuiltShape(const unsigned int, GeoShape* node);
   GeoShape* getBuiltShape(const unsigned int id);
@@ -195,6 +201,14 @@ private:
   void storeBuiltSerialDenominator(GeoSerialDenominator* nodePtr);
   GeoSerialDenominator* getBuiltSerialDenominator(const unsigned int id);
 
+  bool isBuiltSerialIdentifier(const unsigned int id);
+  void storeBuiltSerialIdentifier(GeoSerialIdentifier* nodePtr);
+  GeoSerialIdentifier* getBuiltSerialIdentifier(const unsigned int id);
+  
+  bool isBuiltIdentifierTag(const unsigned int id);
+  void storeBuiltIdentifierTag(GeoIdentifierTag* nodePtr);
+  GeoIdentifierTag* getBuiltIdentifierTag(const unsigned int id);
+  
   bool isBuiltNameTag(const unsigned int id);
   void storeBuiltNameTag(GeoNameTag* nodePtr);
   GeoNameTag* getBuiltNameTag(const unsigned int id);
@@ -234,6 +248,8 @@ private:
   std::vector<std::vector<std::string>> m_transforms;
   std::vector<std::vector<std::string>> m_alignableTransforms;
   std::vector<std::vector<std::string>> m_serialDenominators;
+  std::vector<std::vector<std::string>> m_serialIdentifiers;
+  std::vector<std::vector<std::string>> m_identifierTags;
   std::vector<std::vector<std::string>> m_serialTransformers;
   std::vector<std::vector<std::string>> m_nameTags;
   std::vector<std::vector<std::string>> m_logVols;
@@ -254,6 +270,8 @@ private:
   std::vector<GeoTransform*> m_memMapTransforms;
   std::vector<GeoAlignableTransform*> m_memMapAlignableTransforms;
   std::vector<GeoSerialDenominator*> m_memMapSerialDenominators;
+  std::vector<GeoSerialIdentifier*> m_memMapSerialIdentifiers;
+  std::vector<GeoIdentifierTag*> m_memMapIdentifierTags;
   std::vector<GeoSerialTransformer*> m_memMapSerialTransformers;
   std::vector<GeoNameTag*> m_memMapNameTags;
   std::vector<GeoLogVol*> m_memMapLogVols;

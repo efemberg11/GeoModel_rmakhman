@@ -65,6 +65,7 @@ void physvolHandler::ElementHandle() {
                     			{
                         			pVTranslation=pH->getPosition().v3d;
                     			}
+					std::cout<<" translation "<<pVTranslation.x()<<" "<<pVTranslation.y()<<" "<<pVTranslation.z()<<std::endl;
                 		}
                 		else if (nH=="rotationref" || nH=="rotation" )
 				{
@@ -74,6 +75,7 @@ void physvolHandler::ElementHandle() {
 					{
                         				rotation r=rH->getRotation();
                         				pVRotation=GeoTrf::RotateX3D(-r.rotx)*GeoTrf::RotateY3D(-r.roty)*GeoTrf::RotateZ3D(-r.rotz);
+							std::cout<<" rotation "<<r.rotx<<" "<<r.roty<<" "<<r.rotz<<std::endl;
                     			}
                 		}
                 		else if (nH=="scale") 

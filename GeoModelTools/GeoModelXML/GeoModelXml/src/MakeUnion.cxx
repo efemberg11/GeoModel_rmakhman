@@ -4,7 +4,7 @@
 
 #include "GeoModelXml/shape/MakeUnion.h"
 #include <string>
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <xercesc/dom/DOM.hpp>
 //   #include <CLHEP/Geometry/Transform3D.h>
 #include "GeoModelKernel/RCBase.h"
@@ -50,7 +50,6 @@ const RCBase * MakeUnion::make(const xercesc::DOMElement *element, GmxUtil &gmxU
                     break;
                 }
                 default: // More than 3 elements?
-                    OUTPUT_STREAM;
                     msglog << MSG::FATAL << "MakeUnion: Incompatible DTD? got more than 3 child elements" << endmsg;
             }
             elementIndex++;

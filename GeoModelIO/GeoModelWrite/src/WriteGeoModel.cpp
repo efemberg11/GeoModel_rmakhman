@@ -10,6 +10,7 @@
 // - Aug 2020 - Riccardo Maria Bianchi - Added support to publish lists of FPV and AXF nodes
 // - Aug 2020 - Marilena Bandieramonte (e-mail: marilena.bandieramonte@cern.ch)
 // - Jan 2021 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch> - Added support for custom tables, to store auxiliary data
+// - Aug 2021 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch> - Added support for GeoSerialTransformer nodes
 
 
 // local includes
@@ -352,15 +353,79 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 }
 
 
+void WriteGeoModel::handleIdentifierTag(const GeoIdentifierTag *node)
+{
+    std::string address = getAddressStringFromPointer( node );
+    int identifier = node->getIdentifier();
+    
+    // debug msgs
+    //std::cout << "WriteGeoModel::handleIdentifierTag()..." << std::endl;
+    //std::cout << "id: " << identifier << std::endl;
+    
+    // variables used to persistify the object
+    unsigned int itId;
+
+    // get the parent volume
+    const std::vector<std::string> parentList = getParentNode();
+    const unsigned int parentId = std::stoi(parentList[0]);
+    const std::string parentType = parentList[1];
+    const unsigned int parentCopyN = getLatestParentCopyNumber(parentId, parentType);
+
+    // check if this object has been stored already
+    if (! isAddressStored(address)) {
+        /* STORE THE OBJECT IN THE DB */
+        itId = storeObj(node, identifier);
+    } else {
+        /* GET THE OBJECT FROM THE DB */
+        itId = getStoredIdFromAddress(address);
+    }
+
+    storeChildPosition(parentId, parentType, itId, parentCopyN, getChildPosition( parentId, parentType, parentCopyN ), "GeoIdentifierTag", 0); // TODO: Check if the copyN=0 at the end is OK for nodes as Transforms, which cannot be used as parents, only as children!
+
+
+}
+
+void WriteGeoModel::handleSerialIdentifier(const GeoSerialIdentifier *node)
+{
+    std::string address = getAddressStringFromPointer( node );
+    int baseId = node->getBaseId();
+    
+    // debug msgs
+    //std::cout << "WriteGeoModel::handleSerialIdentifier()..." << std::endl;
+    //std::cout << "baseId: " << baseId << std::endl;
+    
+    // variables used to persistify the object
+    unsigned int siId;
+
+    // get the parent volume
+    const std::vector<std::string> parentList = getParentNode();
+    const unsigned int parentId = std::stoi(parentList[0]);
+    const std::string parentType = parentList[1];
+    const unsigned int parentCopyN = getLatestParentCopyNumber(parentId, parentType);
+
+    // check if this object has been stored already
+    if (! isAddressStored(address)) {
+        /* STORE THE OBJECT IN THE DB */
+        siId = storeObj(node, baseId);
+    } else {
+        /* GET THE OBJECT FROM THE DB */
+        siId = getStoredIdFromAddress(address);
+    }
+
+    storeChildPosition(parentId, parentType, siId, parentCopyN, getChildPosition( parentId, parentType, parentCopyN ), "GeoSerialIdentifier", 0); // TODO: Check if the copyN=0 at the end is OK for nodes as Transforms, which cannot be used as parents, only as children!
+
+}
+
+
 void WriteGeoModel::handleSerialDenominator (const GeoSerialDenominator *node)
 {
   std::string address = getAddressStringFromPointer( node );
   std::string baseName = node->getBaseName();
 
-	// variables used to persistify the object
-	unsigned int sdId;
+  // variables used to persistify the object
+  unsigned int sdId;
 
-	// get the parent volume
+  // get the parent volume
   const std::vector<std::string> parentList = getParentNode();
   const unsigned int parentId = std::stoi(parentList[0]);
   const std::string parentType = parentList[1];
@@ -521,7 +586,7 @@ void WriteGeoModel::handleNameTag(const GeoNameTag* node)
 {
   std::string name = node->getName();
   const std::string address = getAddressStringFromPointer( node );
-	// get the parent volume
+  // get the parent volume
   const std::vector<std::string> parentList = getParentNode();
   const unsigned int parentId = std::stoi(parentList[0]);
   const std::string parentType = parentList[1];
@@ -759,6 +824,7 @@ unsigned int WriteGeoModel::storeTranform(const GeoTransform* node)
 }
 
 
+//_______________________________________________________________________
 void WriteGeoModel::handleReferencedVPhysVol (const GeoVPhysVol *vol)
 {
 	// qDebug() << "PhysVol's LogVol name:" << QString::fromStdString(vol->getLogVol()->getName());
@@ -1221,7 +1287,7 @@ unsigned int WriteGeoModel::storeObj(const GeoPhysVol* pointer, const unsigned i
 
 unsigned int WriteGeoModel::storeObj(const GeoFullPhysVol* pointer, const unsigned int &logvolId, const unsigned int parentId, const bool isRootVolume)
 {
-  std::string address = getAddressStringFromPointer( pointer );
+    std::string address = getAddressStringFromPointer( pointer );
 
 	unsigned int physvolId;
 	if (! isAddressStored(address)) {
@@ -1235,9 +1301,40 @@ unsigned int WriteGeoModel::storeObj(const GeoFullPhysVol* pointer, const unsign
 	return physvolId;
 }
 
-  unsigned int WriteGeoModel::storeObj(const GeoSerialDenominator* pointer, const std::string &baseName)
+unsigned int WriteGeoModel::storeObj(const GeoSerialIdentifier* pointer, const int &baseId)
 {
-  const std::string address = getAddressStringFromPointer( pointer );
+    const std::string address = getAddressStringFromPointer( pointer );
+	unsigned int id;
+
+	if (! isAddressStored(address)) {
+		id = addSerialIdentifier(baseId);
+		storeAddress( address, id );
+	}
+	else {
+		id = getStoredIdFromAddress(address);
+	}
+	return id;
+}
+
+unsigned int WriteGeoModel::storeObj(const GeoIdentifierTag* pointer, const int &identifier)
+{
+    const std::string address = getAddressStringFromPointer( pointer );
+	unsigned int id;
+
+	if (! isAddressStored(address)) {
+		id = addIdentifierTag(identifier);
+		storeAddress( address, id );
+	}
+	else {
+		id = getStoredIdFromAddress(address);
+	}
+	return id;
+}
+
+
+unsigned int WriteGeoModel::storeObj(const GeoSerialDenominator* pointer, const std::string &baseName)
+{
+    const std::string address = getAddressStringFromPointer( pointer );
 	unsigned int id;
 
 	if (! isAddressStored(address)) {
@@ -1251,7 +1348,7 @@ unsigned int WriteGeoModel::storeObj(const GeoFullPhysVol* pointer, const unsign
 }
 
 
-  unsigned int WriteGeoModel::storeObj(const GeoSerialTransformer* pointer, const unsigned int &functionId, const unsigned int &volId, const std::string &volType, const unsigned int &copies)
+unsigned int WriteGeoModel::storeObj(const GeoSerialTransformer* pointer, const unsigned int &functionId, const unsigned int &volId, const std::string &volType, const unsigned int &copies)
 {
   const std::string address = getAddressStringFromPointer( pointer );
 	unsigned int id = 0;
@@ -1272,7 +1369,7 @@ unsigned int WriteGeoModel::storeObj(const GeoFullPhysVol* pointer, const unsign
 	return id;
 }
 
-  unsigned int WriteGeoModel::storeObj(const GeoXF::Function* pointer, const std::string &expression)
+unsigned int WriteGeoModel::storeObj(const GeoXF::Function* pointer, const std::string &expression)
 {
   const std::string address = getAddressStringFromPointer( pointer );
 	unsigned int id = 0;
@@ -1406,6 +1503,21 @@ unsigned int WriteGeoModel::addSerialDenominator(const std::string &baseName)
 	return addRecord(container, values);
 }
 
+unsigned int WriteGeoModel::addSerialIdentifier(const int &baseId)
+{
+	std::vector<std::vector<std::string>>* container = &m_serialIdentifiers;
+	std::vector<std::string> values;
+	values.push_back( std::to_string(baseId) );
+	return addRecord(container, values);
+}
+
+unsigned int WriteGeoModel::addIdentifierTag(const int &identifier)
+{
+	std::vector<std::vector<std::string>>* container = &m_identifierTags;
+	std::vector<std::string> values;
+	values.push_back( std::to_string(identifier) );
+	return addRecord(container, values);
+}
 
 unsigned int WriteGeoModel::addFunction(const std::string &expression)
 {
@@ -1547,6 +1659,8 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
 	m_dbManager->addListOfRecords("GeoSerialTransformer", m_serialTransformers);
 	m_dbManager->addListOfRecords("GeoShape", m_shapes);
 	m_dbManager->addListOfRecords("GeoSerialDenominator", m_serialDenominators);
+	m_dbManager->addListOfRecords("GeoSerialIdentifier", m_serialIdentifiers);
+	m_dbManager->addListOfRecords("GeoIdentifierTag", m_identifierTags);
 	m_dbManager->addListOfRecords("GeoPhysVol", m_physVols);
 	m_dbManager->addListOfRecords("GeoFullPhysVol", m_fullPhysVols);
 	m_dbManager->addListOfRecords("GeoLogVol", m_logVols);
@@ -1780,6 +1894,21 @@ std::string WriteGeoModel::getAddressStringFromPointer(const GeoSerialDenominato
 	oss << pointer;
 	return getQStringFromOss(oss);
 }
+
+std::string WriteGeoModel::getAddressStringFromPointer(const GeoSerialIdentifier* pointer)
+{
+	std::ostringstream oss;
+	oss << pointer;
+	return getQStringFromOss(oss);
+}
+
+std::string WriteGeoModel::getAddressStringFromPointer(const GeoIdentifierTag* pointer)
+{
+	std::ostringstream oss;
+	oss << pointer;
+	return getQStringFromOss(oss);
+}
+
 std::string WriteGeoModel::getAddressStringFromPointer(const GeoSerialTransformer* pointer)
 {
 	std::ostringstream oss;

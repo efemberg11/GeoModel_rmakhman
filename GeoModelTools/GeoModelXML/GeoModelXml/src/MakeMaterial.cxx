@@ -3,7 +3,7 @@
 */
 
 #include "GeoModelXml/MakeMaterial.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelKernel/RCBase.h"
@@ -41,7 +41,6 @@ const XMLCh *idref;
 DOMDocument *doc = element->getOwnerDocument();
 char *toRelease;
 
-    OUTPUT_STREAM;
 //
 //    Get material density scale-factor for the block of materials this one is in
 //

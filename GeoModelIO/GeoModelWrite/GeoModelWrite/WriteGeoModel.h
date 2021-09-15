@@ -10,6 +10,7 @@
  * - Feb 2019 - R.M.Bianchi
  * - May 2020 - R.M.Bianchi
  * - Aug 2020 - R.M.Bianchi // added support for GeoPublisher
+ * - Aug 2021 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch> - Added support for GeoSerialTransformer nodes
  */
 
 #ifndef GeoModelWrite_WriteGeoModel_H
@@ -66,11 +67,14 @@ public:
 	~WriteGeoModel();
 
 	virtual void handlePhysVol (const GeoPhysVol *vol); //	Handles a physical volume.
-	virtual void handleFullPhysVol (const GeoFullPhysVol *vol);
+	virtual void handleFullPhysVol (const GeoFullPhysVol *vol); //	Handles a full physical volume.
 	virtual void handleSerialDenominator (const GeoSerialDenominator *sD); //	Handles a Serial Denominator.
-	virtual void handleSerialTransformer (const GeoSerialTransformer *obj);
-	virtual void handleTransform (const GeoTransform *);
-	virtual void handleNameTag (const GeoNameTag *);
+	virtual void handleSerialTransformer (const GeoSerialTransformer *obj); //	Handles a Serial Transformer
+	virtual void handleTransform (const GeoTransform *); //	Handles a Transform.
+	virtual void handleNameTag (const GeoNameTag *); //	Handles a Name Tag.
+    virtual void handleIdentifierTag (const GeoIdentifierTag *); //	Handles an Identifier Tag.
+    virtual void handleSerialIdentifier(const GeoSerialIdentifier *); //	Handles a SerialIdentifier.
+
 
     //void storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::string>> tableData );
     void storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData );
@@ -93,22 +97,24 @@ private:
 
   std::vector<std::string> getParentNode();
 
-	unsigned int storeShape(const GeoShape* shape);
-	unsigned int storeMaterial(const GeoMaterial* mat);
-	unsigned int storeElement(const GeoElement* el);
-	unsigned int storeTranform(const GeoTransform* node);
+  unsigned int storeShape(const GeoShape* shape);
+  unsigned int storeMaterial(const GeoMaterial* mat);
+  unsigned int storeElement(const GeoElement* el);
+  unsigned int storeTranform(const GeoTransform* node);
 
-	unsigned int storeObj(const GeoMaterial* pointer, const std::string &name, const double &density, const std::string &elements);
+  unsigned int storeObj(const GeoMaterial* pointer, const std::string &name, const double &density, const std::string &elements);
   unsigned int storeObj(const GeoElement* pointer, const std::string &name, const std::string &symbol, const double &elZ, const double &elA);
   unsigned int storeObj(const GeoShape* pointer, const std::string &type, const std::string &parameters);
   unsigned int storeObj(const GeoLogVol* pointer, const std::string &name, const unsigned int &shapeId, const unsigned int &materialId);
-	unsigned int storeObj(const GeoPhysVol* pointer, const unsigned int &logvolId, const unsigned int parentId = 0, const bool isRootVolume = false );
-	unsigned int storeObj(const GeoFullPhysVol* pointer, const unsigned int &logvolId, const unsigned int parentId = 0, const bool isRootVolume = false );
+  unsigned int storeObj(const GeoPhysVol* pointer, const unsigned int &logvolId, const unsigned int parentId = 0, const bool isRootVolume = false );
+  unsigned int storeObj(const GeoFullPhysVol* pointer, const unsigned int &logvolId, const unsigned int parentId = 0, const bool isRootVolume = false );
   unsigned int storeObj(const GeoSerialDenominator* pointer, const std::string &baseName);
+  unsigned int storeObj(const GeoSerialIdentifier* pointer, const int &baseId);
+  unsigned int storeObj(const GeoIdentifierTag* pointer, const int &identifier);
   unsigned int storeObj(const GeoSerialTransformer* pointer, const unsigned int &functionId, const unsigned int &volId, const std::string &volType, const unsigned int &copies);
   unsigned int storeObj(const GeoXF::Function* pointer, const std::string &expression);
-	unsigned int storeObj(const GeoTransform* pointer, const std::vector<double> &parameters);
-	unsigned int storeObj(const GeoAlignableTransform* pointer, const std::vector<double> &parameters);
+  unsigned int storeObj(const GeoTransform* pointer, const std::vector<double> &parameters);
+  unsigned int storeObj(const GeoAlignableTransform* pointer, const std::vector<double> &parameters);
   unsigned int storeObj(const GeoNameTag* pointer, const std::string &name);
 
   unsigned int addRecord(std::vector<std::vector<std::string>>* container, const std::vector<std::string> values) const;
@@ -122,6 +128,8 @@ private:
   unsigned int addSerialTransformer(const unsigned int &funcId, const unsigned int &physvolId, const std::string volType, const unsigned int &copies);
   unsigned int addShape(const std::string &type, const std::string &parameters);
   unsigned int addSerialDenominator(const std::string &baseName);
+  unsigned int addSerialIdentifier(const int &baseId);
+  unsigned int addIdentifierTag(const int &identifier);
 	unsigned int addPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume);
 	unsigned int addFullPhysVol(const unsigned int &logVolId, const unsigned int &parentPhysVolId, const bool &isRootVolume);
   unsigned int addLogVol(const std::string &name, const unsigned int &shapeId, const unsigned int &materialId);
@@ -146,6 +154,8 @@ private:
 	std::string getAddressStringFromPointer(const GeoPhysVol* pointer);
 	std::string getAddressStringFromPointer(const GeoVPhysVol* pointer);
 	std::string getAddressStringFromPointer(const GeoSerialDenominator* pointer);
+	std::string getAddressStringFromPointer(const GeoSerialIdentifier* pointer);
+	std::string getAddressStringFromPointer(const GeoIdentifierTag* pointer);
 	std::string getAddressStringFromPointer(const GeoSerialTransformer* pointer);
 	std::string getAddressStringFromPointer(const GeoXF::Function* pointer);
 	std::string getAddressStringFromPointer(const GeoTransform* pointer);
@@ -194,6 +204,8 @@ private:
 	std::vector<std::vector<std::string>> m_transforms;
 	std::vector<std::vector<std::string>> m_alignableTransforms;
 	std::vector<std::vector<std::string>> m_serialDenominators;
+	std::vector<std::vector<std::string>> m_serialIdentifiers;
+	std::vector<std::vector<std::string>> m_identifierTags;
 	std::vector<std::vector<std::string>> m_serialTransformers;
 	std::vector<std::vector<std::string>> m_functions;
 	std::vector<std::vector<std::string>> m_nameTags;

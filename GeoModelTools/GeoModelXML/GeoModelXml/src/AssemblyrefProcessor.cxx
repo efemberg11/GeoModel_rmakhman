@@ -5,7 +5,7 @@
 //
 //    Process assemblyref items: basically, just find the referenced assembly and call its processor.
 //
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include "GeoModelXml/AssemblyrefProcessor.h"
 #include <string>
 
@@ -36,7 +36,6 @@ char *toRelease;
     string nodeName(toRelease);
     XMLString::release(&toRelease);
     if (nodeName != string("assembly")) {
-        OUTPUT_STREAM;
         msglog << MSG::FATAL << "Error in xml/gmx file: assemblyref " << XMLString::transcode(idref) << " referenced a " << 
                               nodeName << " instead of an assembly.\n";
         exit(999); // Should do better...

@@ -10,6 +10,7 @@
  *  - Mar 2020, boudreau
  *  - May 2020, R.M.Bianchi
  *  - Aug 2020, R.M.Bianchi - Added support to read published FullPhysVols and AlignableTransforms back in
+ *  - Aug 2021, R.M.Bianchi <riccardo.maria.bianchi@cern.ch> - Added support for GeoSerialIdentifier and GeoIdentifierTag
  */
 
 
@@ -25,6 +26,8 @@
 #include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoSerialDenominator.h"
+#include "GeoModelKernel/GeoSerialIdentifier.h"
+#include "GeoModelKernel/GeoIdentifierTag.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoNameTag.h"
@@ -208,6 +211,8 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
   m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
   m_alignableTransforms = m_dbManager->getTableFromNodeType("GeoAlignableTransform");
   m_serialDenominators = m_dbManager->getTableFromNodeType("GeoSerialDenominator");
+  m_serialIdentifiers = m_dbManager->getTableFromNodeType("GeoSerialIdentifier");
+  m_identifierTags = m_dbManager->getTableFromNodeType("GeoIdentifierTag");
   m_serialTransformers = m_dbManager->getTableFromNodeType("GeoSerialTransformer");
   m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
   // get the children table from DB
@@ -235,6 +240,8 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
   std::thread t8(&ReadGeoModel::buildAllTransforms, this);
   std::thread t9(&ReadGeoModel::buildAllAlignableTransforms, this);
   std::thread t10(&ReadGeoModel::buildAllSerialDenominators, this);
+  std::thread t13(&ReadGeoModel::buildAllSerialIdentifiers, this);
+  std::thread t14(&ReadGeoModel::buildAllIdentifierTags, this);
   std::thread t11(&ReadGeoModel::buildAllNameTags, this);
 
   t8.join(); // ok, all Transforms have been built
@@ -265,6 +272,8 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
   t10.join(); // ok, all SerialDenominators have been built
   t11.join(); // ok, all NameTags have been built
   t12.join(); // ok, all SerialTransformers have been built
+  t13.join(); // ok, all SerialIdentifiers have been built
+  t14.join(); // ok, all IdentifierTags have been built
   }
   // serial mode:
   else {
@@ -274,6 +283,8 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
     buildAllTransforms();
     buildAllAlignableTransforms();
     buildAllSerialDenominators();
+    buildAllSerialIdentifiers();
+    buildAllIdentifierTags();
     buildAllNameTags();
     buildAllShapes();
     buildAllMaterials();
@@ -355,7 +366,7 @@ void ReadGeoModel::buildAllSerialDenominators()
   size_t nSize = m_serialDenominators.size();
   m_memMapSerialDenominators.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
   for (unsigned int ii=0; ii<nSize; ++ii) {
-    //const unsigned int nodeID = std::stoi(m_serialDenominators[ii][0]); // RMB: not used at teh moment, commented to avoid warnings
+    //const unsigned int nodeID = std::stoi(m_serialDenominators[ii][0]); // RMB: not used at the moment, commented to avoid warnings
     const std::string baseName = m_serialDenominators[ii][1];
     GeoSerialDenominator* nodePtr = new GeoSerialDenominator(baseName);
     storeBuiltSerialDenominator(nodePtr);
@@ -363,7 +374,40 @@ void ReadGeoModel::buildAllSerialDenominators()
   if (nSize>0) std::cout << "All " << nSize << " SerialDenominators have been built!\n";
 }
 
-//! Iterate over the list of GeoSerialDenominator nodes, build them all, and store their pointers
+//! Iterate over the list of GeoSerialIdentifier nodes, build them all, and store their pointers
+void ReadGeoModel::buildAllSerialIdentifiers()
+{
+  std::cout<<"buildAllSerialIdentifiers" << std::endl;
+  if (m_debug) std::cout << "Building all SerialIdentifier nodes...\n";
+  size_t nSize = m_serialIdentifiers.size();
+  m_memMapSerialIdentifiers.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
+  for (unsigned int ii=0; ii<nSize; ++ii) {
+    //const unsigned int nodeID = std::stoi(m_seriaIdentifiers[ii][0]); // RMB: not used at the moment, commented to avoid warnings
+    const int baseId = std::stoi(m_serialIdentifiers[ii][1]);
+    GeoSerialIdentifier* nodePtr = new GeoSerialIdentifier(baseId);
+    storeBuiltSerialIdentifier(nodePtr);
+  }
+  if (nSize>0) std::cout << "All " << nSize << " SerialIdentifiers have been built!\n";
+}
+
+//! Iterate over the list of GeoIdentifierTag nodes, build them all, and store their pointers
+void ReadGeoModel::buildAllIdentifierTags()
+{
+  std::cout<<"buildAllIdentifierTags" << std::endl;
+  if (m_debug) std::cout << "Building all IdentifierTag nodes...\n";
+  size_t nSize = m_identifierTags.size(); 
+  m_memMapIdentifierTags.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
+  for (unsigned int ii=0; ii<nSize; ++ii) {
+    //const unsigned int nodeID = std::stoi(m_identifierTags[ii][0]); // RMB: not used at the moment, commented to avoid warnings
+    const int identifier = std::stoi(m_identifierTags[ii][1]);
+    GeoIdentifierTag* nodePtr = new GeoIdentifierTag(identifier);
+    storeBuiltIdentifierTag(nodePtr);
+  }
+  if (nSize>0) std::cout << "All " << nSize << " SerialIdentifiers have been built!\n";
+}
+
+
+//! Iterate over the list of NameTag nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllNameTags()
 {
   if (m_debug) std::cout << "Building all NameTag nodes...\n";
@@ -662,6 +706,14 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 	}
 	else if (childNodeType == "GeoSerialDenominator") {
     GeoSerialDenominator* childNode = getBuiltSerialDenominator(childId);
+		volAddHelper(parentVol, childNode);
+	}
+	else if (childNodeType == "GeoSerialIdentifier") {
+    GeoSerialIdentifier* childNode = getBuiltSerialIdentifier(childId);
+		volAddHelper(parentVol, childNode);
+	}
+	else if (childNodeType == "GeoIdentifierTag") {
+    GeoIdentifierTag* childNode = getBuiltIdentifierTag(childId);
 		volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoAlignableTransform") {
@@ -2836,7 +2888,7 @@ GeoAlignableTransform* ReadGeoModel::getBuiltAlignableTransform(const unsigned i
 }
 
 // --- methods for caching GeoSerialDenominator nodes ---
-bool ReadGeoModel::isBuiltSerialDenominator(const unsigned int id)
+bool ReadGeoModel::isBuiltSerialDenominator(const unsigned int id) // TODO: not used at the moment, implemnt the use of this method!! and check all the others too...!!
 {
   return (id <= m_memMapSerialDenominators.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
 }
@@ -2847,6 +2899,38 @@ void ReadGeoModel::storeBuiltSerialDenominator(GeoSerialDenominator* nodePtr)
 GeoSerialDenominator* ReadGeoModel::getBuiltSerialDenominator(const unsigned int id)
 {
   return m_memMapSerialDenominators[id-1]; // nodes' IDs start from 1
+
+}
+
+// --- methods for caching GeoSerialIdentifier nodes ---
+bool ReadGeoModel::isBuiltSerialIdentifier(const unsigned int id)
+{
+  return (id <= m_memMapSerialIdentifiers.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
+}
+void ReadGeoModel::storeBuiltSerialIdentifier(GeoSerialIdentifier* nodePtr)
+{
+  m_memMapSerialIdentifiers.push_back(nodePtr); // vector, we store them in the order of IDs
+}
+GeoSerialIdentifier* ReadGeoModel::getBuiltSerialIdentifier(const unsigned int id)
+{
+  return m_memMapSerialIdentifiers[id-1]; // nodes' IDs start from 1
+
+}
+
+// --- methods for caching GeoIdentifierTag nodes ---
+bool ReadGeoModel::isBuiltIdentifierTag(const unsigned int id)
+{
+  return (id <= m_memMapIdentifierTags.size()); // vector: we exploit the fact that we built the vols ordered by their IDs
+}
+void ReadGeoModel::storeBuiltIdentifierTag(GeoIdentifierTag* nodePtr)
+{
+  m_memMapIdentifierTags.push_back(nodePtr); // vector, we store them in the order of IDs
+}
+GeoIdentifierTag* ReadGeoModel::getBuiltIdentifierTag(const unsigned int id)
+{
+  if (0 == m_memMapIdentifierTags.size())
+      std::cout << "WARNING!!! vector is empty! A crash is on its way..." << std::endl; // TODO: make this check for all get methods, to catch the situation when a new GeoModel class is added but no buildAllXXX method is called.
+  return m_memMapIdentifierTags[id-1]; // nodes' IDs start from 1
 
 }
 
@@ -2866,7 +2950,7 @@ GeoNameTag* ReadGeoModel::getBuiltNameTag(const unsigned int id)
 
 }
 
-// --- methods for caching GeoSerialDenominator nodes ---
+// --- methods for caching GeoSerialTransformer nodes ---
 bool ReadGeoModel::isBuiltSerialTransformer(const unsigned int id)
 {
   return (id <= m_memMapSerialTransformers.size()); // vector: we exploit the fact that we built the vols ordered by their IDs

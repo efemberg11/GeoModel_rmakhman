@@ -189,6 +189,15 @@ else()
     message(STATUS "WARNING - 'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
 endif()
 
+#----------------------------------------------------------------------------
+# Add profiling test targets
+if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
+  if(NOT Pythia_FOUND)
+    message(FATAL_ERROR "FullSimLight needs to be built with Pythia support for profiling with perf")
+  endif()
+  add_subdirectory(perf)
+endif()
+
 #ROOT_GENERATE_DICTIONARY(G__geantinoMaps ${headers} LINKDEF geantinoMapsLinkDef.h)
 
 #----------------------------------------------------------------------------

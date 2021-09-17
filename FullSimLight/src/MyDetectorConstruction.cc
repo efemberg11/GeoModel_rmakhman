@@ -1146,7 +1146,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
         
         fWorld = physWorld;
-        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::GetInvisible());
         
         if (fWorld == 0) {
             G4ExceptionDescription ed;
@@ -1200,7 +1200,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
         
         fWorld = physWorld;
-        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::GetInvisible());
         
         if (fWorld == 0) {
             G4ExceptionDescription ed;
@@ -1216,7 +1216,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         //fParser.SetOverlapCheck(true);
         fParser.Read(fGeometryFileName, false); // turn off schema checker
         fWorld = (G4VPhysicalVolume *)fParser.GetWorldVolume();
-        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::Invisible);
+        fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::GetInvisible());
         
         //RecursivelyCheckOverlap(fWorld->GetLogicalVolume());
         envelope = fWorld->GetLogicalVolume();

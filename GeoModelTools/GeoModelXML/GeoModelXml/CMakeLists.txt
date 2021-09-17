@@ -4,6 +4,7 @@
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS GeoModelXml/*.h )
 file( GLOB SHAPEHEADERS GeoModelXml/shape/*.h )
+file( GLOB DATA data/*.dtd )
 
 # External dependencies
 find_package( ZLIB REQUIRED )
@@ -47,5 +48,4 @@ install( FILES ${HEADERS}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXml
     COMPONENT Development )
 install( FILES ${SHAPEHEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXml/shape)
-
-
+install( FILES ${DATA} DESTINATION ${CMAKE_INSTALL_DATADIR}/GeoModelXml)

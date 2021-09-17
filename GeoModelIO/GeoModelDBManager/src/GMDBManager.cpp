@@ -25,7 +25,7 @@
 #include <sstream>
 
 
-static std::string dbversion = "0.5.0"; // Added new tables to store lists of published FullPhysVols and AlignableTransforms
+static std::string dbversion = "0.6.0"; // Added new tables to store lists of published FullPhysVols and AlignableTransforms
 
 
 //// FIXME: move this to utility class/file
@@ -315,9 +315,17 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(std::string t
 
 std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType(std::string nodeType)
 {
-
+  std::vector<std::vector<std::string>> out;
   std::string tableName = getTableNameFromNodeType(nodeType);
-  return getTableRecords(tableName);
+  if ( tableName.empty() ) {
+      std::mutex coutMutex;
+      coutMutex.lock();
+      printf ("\t ===> WARNING! The geometry input file does not contain a table for the %s nodes. That means that you are probably using an old geometry file. Unless you know exactly what you are doing, please expect to see incomplete geometries or crashes.\n", nodeType.c_str() );
+      coutMutex.unlock();
+  } else {
+      out = getTableRecords(tableName);
+  }
+  return out;
 }
 
 // TODO: simplify error reporting for SQLite
@@ -837,8 +845,17 @@ unsigned int GMDBManager::getTableIdFromNodeType(const std::string &nodeType)
 
 
 std::string GMDBManager::getTableNameFromNodeType(const std::string &nodeType)
-{
-  return m_cache_nodeType_tableName.at(nodeType);
+{ 
+  std::string st{""};
+  if (m_cache_nodeType_tableName.count(nodeType)) {
+      st = m_cache_nodeType_tableName.at(nodeType);
+  } else {
+      std::mutex coutMutex;
+      coutMutex.lock();
+      std::cout << "\t ===> WARNING! A table for nodeType '" << nodeType << "' has not been found in the input geometry file." << std::endl;
+      coutMutex.unlock();
+  }
+  return st;
 }
 
 

@@ -96,32 +96,34 @@ char *toRelease;
 	if (gmxUtil.matManager)
 	{
 		name=XMLString::transcode(idref);
-    if (!gmxUtil.matManager->isElementDefined(name))
-    {
-      //std::cout<<"adding element "<<name<<" to the material manager"<<std::endl;
-      GeoElement *temp=(GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
-      //gmxUtil.matManager->addElement(temp);
-    }
+    		if (!gmxUtil.matManager->isElementDefined(name))
+    		{
+      			GeoElement *temp=(GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
+      			//gmxUtil.matManager->addElement(temp);
+    		}
 		geoElem=const_cast<GeoElement*>(gmxUtil.matManager->getElement(name));
 		XMLString::release(&name);
 	}
 	else
 	{
+		
 		geoElem=(const GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
-  }
+		if (!geoElem) std::cout<<"could not retrieve element!!!!!"<<std::endl;
+  	}
 
 
   fracString = XMLString::transcode(elRef->getAttribute(fraction_tmp));
   fraction = gmxUtil.evaluate(fracString);
   XMLString::release(&fracString);
-	//std::cout << "\t adding element "<<geoElem<<" fraction "<<fraction<<std::endl;
   material->add(geoElem, fraction);
+  
 }
 //
 //   Add my chemical contents
 //
     DOMNodeList *chemRefs = element->getElementsByTagName(chemicalref_tmp);
     int nChemRefs = chemRefs->getLength();
+    
     for (int i = 0; i < nChemRefs; ++i) {
         DOMElement *chemRef = dynamic_cast<DOMElement *>(chemRefs->item(i));
         idref = chemRef->getAttribute(ref);
@@ -190,6 +192,8 @@ char *toRelease;
 //
     elRefs = element->getElementsByTagName(materialref_tmp);
     nElRefs = elRefs->getLength();
+    
+    
     for (int i = 0; i < nElRefs; ++i) {
         DOMElement *elRef = dynamic_cast<DOMElement *>(elRefs->item(i));
         idref = elRef->getAttribute(ref);
@@ -197,6 +201,8 @@ char *toRelease;
 
         toRelease = XMLString::transcode(elem->getNodeName());
         string nodeName(toRelease);
+	
+	
         XMLString::release(&toRelease);
         if (nodeName != string("material")) {
             msglog << MSG::FATAL <<
@@ -213,8 +219,10 @@ char *toRelease;
 	}
 	else
 	{
-		geoMaterial=(const GeoMaterial *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
-  }
+		
+		geoMaterial=(const GeoMaterial *) gmxUtil.tagHandler.material.process(elem, gmxUtil);
+		if (!geoMaterial) std::cout<<"something is wrong!!!!"<<std::endl;
+  	}
 
         fracString = XMLString::transcode(elRef->getAttribute(fraction_tmp));
         fraction = gmxUtil.evaluate(fracString);

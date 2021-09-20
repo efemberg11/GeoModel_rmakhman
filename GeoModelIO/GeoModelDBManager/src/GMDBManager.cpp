@@ -23,6 +23,7 @@
 // C++ includes
 #include <stdlib.h> /* exit, EXIT_FAILURE */
 #include <sstream>
+#include <mutex>
 
 
 static std::string dbversion = "0.6.0"; // Added new tables to store lists of published FullPhysVols and AlignableTransforms

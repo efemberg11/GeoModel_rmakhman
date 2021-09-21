@@ -65,7 +65,7 @@
     <!ELEMENT addindex EMPTY>
         <!ATTLIST addindex name ID #REQUIRED>
 
-  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union)+)>
+  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep)+)>
     <!-- All shapes allowed in GeoModel manual. Same name, parameters, parameter order, but always lower case -->
 
     <!ELEMENT box EMPTY>
@@ -118,7 +118,7 @@
         <!ATTLIST addplane zplane    CDATA #REQUIRED
                            rminplane CDATA #REQUIRED
                            rmaxplane CDATA #REQUIRED>
- 
+
       <!ATTLIST pcon name ID    #REQUIRED
                      sphi CDATA #REQUIRED
                      dphi CDATA #REQUIRED>
@@ -174,6 +174,12 @@
     <!ELEMENT union (shaperef, (transformation|transformationref), shaperef)>
       <!ATTLIST union name ID #REQUIRED>
 
+    <!ELEMENT simplepolygonbrep EMPTY>
+      <!ATTLIST simplepolygonbrep name        ID    #REQUIRED
+                        xpoints     CDATA #REQUIRED
+                        ypoints     CDATA #REQUIRED
+                        zhalflength CDATA #REQUIRED>
+
   <!ELEMENT shaperef EMPTY>
     <!ATTLIST shaperef ref IDREF #REQUIRED>
 
@@ -200,7 +206,7 @@
                               z CDATA "0.0">
 
       <!ATTLIST transformation name ID #REQUIRED>
-      <!ATTLIST transformation alignable (true|false) "false"> 
+      <!ATTLIST transformation alignable (true|false) "false">
 
     <!ELEMENT transformationref EMPTY>
       <!ATTLIST transformationref ref IDREF #REQUIRED>
@@ -211,7 +217,8 @@
                      shape IDREF #REQUIRED
                      material IDREF #REQUIRED
                      sensitive IDREF #IMPLIED 
-                     alignable (true|false) "false"> 
+                     alignable (true|false) "false"
+                     splitLevel CDATA #IMPLIED>
 
   <!ELEMENT index EMPTY>
     <!ATTLIST index ref   IDREF #REQUIRED
@@ -223,15 +230,15 @@
 
   <!ELEMENT assembly (transform|logvol|logvolref|assembly|assemblyref|multicopy|replicaX|replicaY|replicaZ|replicaRPhi|replicaXYarrays|index)+>
     <!ATTLIST assembly name      ID           #REQUIRED
-                       alignable (true|false) "false"> 
+                       alignable (true|false) "false">
 
   <!ELEMENT assemblyref EMPTY>
     <!ATTLIST assemblyref ref    IDREF        #REQUIRED
                           zeroid (true|false) "false">
 
   <!ELEMENT multicopy (transformation, (transform|logvolref|assemblyref))>
-    <!-- Removed logvol and assembly from multicopy content. There is no particular reason 
-         why they shouldn't be allowed there. But in practice one uses refs, and forbidding them simplifies coding 
+    <!-- Removed logvol and assembly from multicopy content. There is no particular reason
+         why they shouldn't be allowed there. But in practice one uses refs, and forbidding them simplifies coding
          the index stuff. If you need them, put them back. Got rid of transformref; never used. -->
     <!-- loopvar: Set to a vector variable name or omit; see manual -->
     <!-- alignable: Value is the alignment level-number -->

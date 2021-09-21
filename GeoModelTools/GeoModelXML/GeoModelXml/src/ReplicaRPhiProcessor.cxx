@@ -158,7 +158,7 @@ DOMDocument *doc = element->getOwnerDocument();
 //    If varname not given, we get the CLHEP xForm and raise it to the power i, so NOT applied to first object.
 //    No transform (i.e. identity) for the first; so one less transform than objects
 //
-	  GeoTrf::Transform3D hepXf0=GeoTrf::TranslateX3D(radius)*GeoTrf::TranslateZ3D(zVal)*GeoTrf::RotateZ3D(offsetPhi);
+	  GeoTrf::Transform3D hepXf0=GeoTrf::TranslateZ3D(zVal);
             if (alignable) {
                 geoAXf = new GeoAlignableTransform (hepXf0) ;
                 hepXf0 = geoAXf->getTransform();
@@ -167,10 +167,13 @@ DOMDocument *doc = element->getOwnerDocument();
                 geoXf = new GeoTransform (hepXf0);
                 hepXf0 = geoXf->getTransform();
             }
+	    double angle=offsetPhi;
             GeoTrf::Transform3D hepXf=hepXf0; 
             for (int i = 0; i < nCopies; ++i) {
+	    	hepXf=hepXf0*GeoTrf::TranslateX3D(radius*cos(angle))*GeoTrf::TranslateY3D(radius*sin(angle))*GeoTrf::RotateZ3D(angle);
                 xfList->push_back((GeoGraphNode *) new GeoTransform(hepXf));
-                hepXf = hepXf * GeoTrf::RotateZ3D(stepPhi) ;
+                // hepXf = hepXf * GeoTrf::RotateZ3D(stepPhi) ;
+		angle+=stepPhi;
             }
     }
     else {

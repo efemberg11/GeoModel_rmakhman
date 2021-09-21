@@ -8,9 +8,6 @@
 #include <xercesc/dom/DOMLSParser.hpp>
 #include <iostream>
 
-using namespace std;
-using namespace xercesc;
-
-DOMDocument *createDOMDocument(string xmlFile, DOMLSParser *parser, unsigned int flags = 0);
+xercesc::DOMDocument *createDOMDocument(std::string xmlFile, xercesc::DOMLSParser *parser, unsigned int flags = 0);
 
 #endif // CREATEDOMDOCUMENT_H

@@ -16,6 +16,7 @@ using namespace GeoModelKernelUnits;
 MakeElement::MakeElement() {}
 
 const RCBase * MakeElement::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+  //std::cout<<"this is MakeElement: make()"<<std::endl;
   char *name, *shortname, *z,*a;
   XMLCh *name_tmp,*shortname_tmp,*z_tmp,*a_tmp;
   double zVal, aVal;
@@ -45,12 +46,24 @@ const RCBase * MakeElement::make(const xercesc::DOMElement *element, GmxUtil &gm
   //
   //    Create it
   //
-  aVal *= gram/mole;
-  GeoElement *el = new GeoElement(name, shortname, zVal, aVal);
+  //aVal *= gram/mole;
+
+  GeoElement *el=0;
+  if (gmxUtil.matManager)
+  {
+  	gmxUtil.matManager->addElement(name, shortname, zVal, aVal);
+	  el=const_cast<GeoElement *>(gmxUtil.matManager->getElement(name));
+    //std::cout<<"MaterialManager: element added "<<el->getName()<<std::endl;
+  }
+  else
+  {
+  	//std::cout<<" making new element "<<name<<" "<<shortname<<" "<<zVal<<" "<<aVal<<std::endl;
+  	el = new GeoElement(name, shortname, zVal, aVal*gram/mole);
+  }
   XMLString::release(&name);
   XMLString::release(&shortname);
   XMLString::release(&name_tmp);
   XMLString::release(&shortname_tmp);
-  
+
   return (const RCBase *) el;
 }

@@ -341,21 +341,24 @@ void IVP1System::message(const QString& str) const
     sysmessage(str);
   }
   else{
-    std::cout<<VP1Msg::prefix_msg()<<" ["<<m_d->name.toStdString()<<"]: "<<str.toStdString()<<std::endl;
+    //std::cout<<VP1Msg::prefix_msg()<<" ["<<m_d->name.toStdString()<<"]: "<<str.toStdString()<<std::endl;
+    VP1Msg::message( QString(VP1Msg::prefix_msg()) + " [" + QString(m_d->name) + "]: " + QString(str) );
   }
 }
 
 //_______________________________________________________
 void IVP1System::messageDebug(const QString& str) const
 {
-  std::cout<<VP1Msg::prefix_debug()<<" ["<<m_d->name.toStdString()<<"]: "<<str.toStdString()<<std::endl;
+  //std::cout<<VP1Msg::prefix_debug()<<" ["<<m_d->name.toStdString()<<"]: "<<str.toStdString()<<std::endl;
+    VP1Msg::messageDebug( QString(VP1Msg::prefix_debug()) + " [" + QString(m_d->name) + "]: " + QString(str) );
 }
 
 //_______________________________________________________
 void IVP1System::messageVerbose(const QString& str) const
 {
-  if (VP1Msg::verbose())
-    std::cout<<VP1Msg::prefix_verbose()<<" ["<<m_d->name.toStdString()<<"]: "<<str.toStdString()<<std::endl;
+  //if (VP1Msg::verbose())
+    //std::cout<<VP1Msg::prefix_verbose()<<" ["<<m_d->name.toStdString()<<"]: "<<str.toStdString()<<std::endl;
+    VP1Msg::messageVerbose( QString(VP1Msg::prefix_verbose()) + " [" + QString(m_d->name) + "]: " + QString(str) );
 }
 
 

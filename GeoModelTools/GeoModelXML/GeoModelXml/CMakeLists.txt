@@ -4,6 +4,7 @@
 file( GLOB SOURCES src/*.cxx )
 file( GLOB HEADERS GeoModelXml/*.h )
 file( GLOB SHAPEHEADERS GeoModelXml/shape/*.h )
+file( GLOB DATA data/*.dtd )
 
 # External dependencies
 find_package( ZLIB REQUIRED )
@@ -11,8 +12,6 @@ find_package( ZLIB REQUIRED )
 
 # Create the library.
 add_library( GeoModelXml SHARED ${HEADERS} ${SOURCES} )
-# Add custom definitions
-target_compile_definitions( GeoModelXml PUBLIC -DSTANDALONE_GMX )
 # link libraries
 target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel GeoModelTools::ExpressionEvaluator XercesC::XercesC PRIVATE ZLIB::ZLIB  )
 target_include_directories( GeoModelXml PUBLIC 
@@ -47,5 +46,4 @@ install( FILES ${HEADERS}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXml
     COMPONENT Development )
 install( FILES ${SHAPEHEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelXml/shape)
-
-
+install( FILES ${DATA} DESTINATION ${CMAKE_INSTALL_DATADIR}/GeoModelXml)

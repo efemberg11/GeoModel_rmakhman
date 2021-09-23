@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOVFULLPHYSVOL_H
@@ -19,17 +19,28 @@ class GeoVFullPhysVol : public GeoVPhysVol
   GeoVFullPhysVol(const GeoVFullPhysVol &right) = delete;
   GeoVFullPhysVol & operator=(const GeoVFullPhysVol &right) = delete;
 
-  /// Returns the absolute transform of the volume.
+  /// Returns the (default) absolute transform of the volume.
+  /// 1. When store=nullptr. This is considered a "serial case" when
+  /// the cached (default) absolute transform is kept as a data member of the
+  /// GeoVFullPhysVol class. If the local cache is empty, then it gets computed and stored.
+  ///
+  /// 2. When store!=nullptr. This is considered a "multithreaded case" when
+  /// the cached (default) absolute trnasforms of Full Physical Volumes are kept in
+  /// an external object pointed by store. If the cache for given full physical
+  /// volume is missing, it gets computed and saved in the store.
   const GeoTrf::Transform3D& getAbsoluteTransform(GeoVAlignmentStore* store=nullptr) const;
+  const GeoTrf::Transform3D& getDefAbsoluteTransform(GeoVAlignmentStore* store=nullptr) const;
+
+  /// Returns the previously computed and cached (default) absolute transform of the volume.
+  /// If the cache has not yet been computed, and exception gets thrown
+  const GeoTrf::Transform3D& getCachedAbsoluteTransform(const GeoVAlignmentStore* store=nullptr) const;
+  const GeoTrf::Transform3D& getCachedDefAbsoluteTransform(const GeoVAlignmentStore* store=nullptr) const;
 
   /// Clears the position information.  This can be used if
   /// the cache is determined to be invalid.  The usual client
   /// is one of the parents, upon changing its own position.
   /// There is little need for casual users to call this.
   void clearPositionInfo() const;
-
-  /// Returns the default absolute transform of the volume.
-  const GeoTrf::Transform3D& getDefAbsoluteTransform(GeoVAlignmentStore* store=nullptr) const;
 
   /// Returns the absolute name of this node.
   const std::string& getAbsoluteName();

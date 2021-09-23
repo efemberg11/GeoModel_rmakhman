@@ -5,7 +5,7 @@
 // Automatically generated code from /home/hessey/prog/gmx2geo/makeshape
 // Then heavily modified
 #include "GeoModelXml/shape/MakeSubtraction.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 //   #include <CLHEP/Geometry/Transform3D.h>
@@ -52,7 +52,6 @@ const RCBase * MakeSubtraction::make(const xercesc::DOMElement *element, GmxUtil
                     break;
                 }
                 default: // More than 3 elements?
-                    OUTPUT_STREAM;
                     msglog << MSG::FATAL  << "MakeSubtraction: Incompatible DTD? got more than 3 child elements" << endmsg;
             }
             elementIndex++;

@@ -34,7 +34,7 @@ void VP1Msg::message( const QString& str, IVP1System*sys )
   if (sys)
     sys->message(str);
   else
-    std::cout << prefix_msg() << ": "<< str.toStdString()<<std::endl;
+    std::cout << "MEX!!!" <<  prefix_msg() << ": "<< str.toStdString()<<std::endl;
 }
 
 //____________________________________________________________________
@@ -43,7 +43,7 @@ void VP1Msg::messageDebug( const QString& str )
   if ( ! (debug() or debug2() or debug3()) ){
     return;
   }
-  std::cout << prefix_debug() << ": "<< str.toStdString()<<std::endl;
+  std::cout << "DBG!!!" << prefix_debug() << ": "<< str.toStdString()<<std::endl;
 }
 
 //____________________________________________________________________

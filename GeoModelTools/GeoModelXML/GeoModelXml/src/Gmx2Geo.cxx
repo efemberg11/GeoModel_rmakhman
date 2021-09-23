@@ -3,7 +3,7 @@
 */
 
 #include "GeoModelXml/Gmx2Geo.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 
 #include <string>
 #include <iomanip>
@@ -25,17 +25,18 @@
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GmxInterface.h"
 #include "GeoModelXml/createdomdocument.h"
+#include "GeoModelXml/MaterialManager.h"
 
 using namespace std;
+using namespace xercesc;
 
-Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags) {
+Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager) {
 //
 //    Create the xml tree (DOMDocument)
 //
 
 // Logging: ref https://wiki.bnl.gov/dayabay/index.php?title=Logging
 // Turn on logging in job-options with: MessageSvc.setDebug += {"GeoModelXml"}
-    OUTPUT_STREAM;
 
     DOMLSParser *parser = 0;
     DOMDocument *doc = createDOMDocument(xmlFile, parser, flags);
@@ -48,6 +49,7 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
 //    Set up the CLHEP evaluator and the xml-tag processors, and store the GmxInterface:
 //
     GmxUtil gmxUtil(gmxInterface); 
+    if (useMatManager) gmxUtil.matManager=MaterialManager::getManager();
 //
 //    Process the xml tree, creating all the GeoModel items and adding to the GeoModel tree.
 //
@@ -65,6 +67,13 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
     XMLCh * name_tmp = XMLString::transcode("name");
     const XMLCh *attribute = element->getAttribute(name_tmp);
     msglog << XMLString::transcode(attribute) << endmsg;
+    
+// 
+// if the material manager is set, create a namespace
+// 
+
+    if (gmxUtil.matManager) gmxUtil.matManager->addNamespace(XMLString::transcode(attribute));
+
 //
 //    Add all constant definitions to the evaluator, so they are ready if needed.
 //
@@ -115,7 +124,6 @@ const DOMElement *element;
 //-------------------------------------------------------------------------------------------
 //
 // Turn var printout on and off with message level
-    OUTPUT_STREAM;
     msglog << MSG::DEBUG << "\n\nGmx2Geo GmxUtil matrix, vector and var values:\n";
     msglog << MSG::DEBUG <<     "==============================================\n\n";
 

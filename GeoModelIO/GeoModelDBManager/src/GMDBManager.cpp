@@ -23,9 +23,10 @@
 // C++ includes
 #include <stdlib.h> /* exit, EXIT_FAILURE */
 #include <sstream>
+#include <mutex>
 
 
-static std::string dbversion = "0.5.0"; // Added new tables to store lists of published FullPhysVols and AlignableTransforms
+static std::string dbversion = "0.6.0"; // Added new tables to store lists of published FullPhysVols and AlignableTransforms
 
 
 //// FIXME: move this to utility class/file
@@ -144,6 +145,16 @@ void GMDBManager::printAllShapes() const
 void GMDBManager::printAllSerialDenominators() const
 {
 	printAllRecords("SerialDenominators");
+}
+
+void GMDBManager::printAllSerialIdentifiers() const
+{
+	printAllRecords("SerialIdentifiers");
+}
+
+void GMDBManager::printAllIdentifierTags() const
+{
+	printAllRecords("IdentifierTags");
 }
 
 void GMDBManager::printAllLogVols() const
@@ -305,9 +316,17 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(std::string t
 
 std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType(std::string nodeType)
 {
-
+  std::vector<std::vector<std::string>> out;
   std::string tableName = getTableNameFromNodeType(nodeType);
-  return getTableRecords(tableName);
+  if ( tableName.empty() ) {
+      std::mutex coutMutex;
+      coutMutex.lock();
+      printf ("\t ===> WARNING! The geometry input file does not contain a table for the %s nodes. That means that you are probably using an old geometry file. Unless you know exactly what you are doing, please expect to see incomplete geometries or crashes.\n", nodeType.c_str() );
+      coutMutex.unlock();
+  } else {
+      out = getTableRecords(tableName);
+  }
+  return out;
 }
 
 // TODO: simplify error reporting for SQLite
@@ -445,7 +464,7 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
   return true;
 }
 
-
+//TODO: use this with std::variant to replace the version with std::string only, here above, for all tables; so we can store nativel values (int, double, etc...) -- R.M.B.
 bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std::vector<std::vector<std::variant<int,long,float,double,std::string>>> records)
 {
   // get table columns and format them for query
@@ -827,8 +846,17 @@ unsigned int GMDBManager::getTableIdFromNodeType(const std::string &nodeType)
 
 
 std::string GMDBManager::getTableNameFromNodeType(const std::string &nodeType)
-{
-  return m_cache_nodeType_tableName.at(nodeType);
+{ 
+  std::string st{""};
+  if (m_cache_nodeType_tableName.count(nodeType)) {
+      st = m_cache_nodeType_tableName.at(nodeType);
+  } else {
+      std::mutex coutMutex;
+      coutMutex.lock();
+      std::cout << "\t ===> WARNING! A table for nodeType '" << nodeType << "' has not been found in the input geometry file." << std::endl;
+      coutMutex.unlock();
+  }
+  return st;
 }
 
 
@@ -1355,6 +1383,32 @@ bool GMDBManager::createTables()
     storeNodeType(geoNode, tableName); }
   tab.clear();
 
+  // SerialIdentifiers table
+  geoNode = "GeoSerialIdentifier";
+  tableName = "SerialIdentifiers";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("baseId");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer)", tab[0], tab[1], tab[2]);
+  if ( 0==(rc = execQuery(queryStr))) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+
+  // IdentifierTags table
+  geoNode = "GeoIdentifierTag";
+  tableName = "IdentifierTags";
+  m_childType_tableName[geoNode] = tableName;
+  tab.push_back(tableName);
+  tab.push_back("id");
+  tab.push_back("identifier");
+  storeTableColumnNames(tab);
+  queryStr = fmt::format("create table {0}({1} integer primary key, {2} integer)", tab[0], tab[1], tab[2]);
+  if ( 0==(rc = execQuery(queryStr))) {
+    storeNodeType(geoNode, tableName); }
+  tab.clear();
+
   // Functions table
   geoNode = "Function";
   tableName = "Functions";
@@ -1368,7 +1422,7 @@ bool GMDBManager::createTables()
     storeNodeType(geoNode, tableName); }
   tab.clear();
 
-  // SerialDenominators table
+  // SerialTransformers table
   geoNode = "GeoSerialTransformer";
   tableName = "SerialTransformers";
   m_childType_tableName[geoNode] = tableName;

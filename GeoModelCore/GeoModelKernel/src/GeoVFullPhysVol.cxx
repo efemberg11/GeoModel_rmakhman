@@ -75,6 +75,19 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
   }
 }
 
+const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedAbsoluteTransform(const GeoVAlignmentStore* store) const
+{
+  if(store==nullptr) {
+    if(m_absPosInfo->getAbsTransform()) return *m_absPosInfo->getAbsTransform();
+  }
+  else {
+    const GeoTrf::Transform3D* storedPos = store->getAbsPosition(this);
+    if(storedPos) return *storedPos;
+  }
+  throw std::runtime_error("Failed to find the cached absolute transform for " + getLogVol()->getName());
+}
+
+
 void GeoVFullPhysVol::clearPositionInfo() const
 {
   delete m_absPosInfo;
@@ -135,6 +148,18 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
     const GeoTrf::Transform3D* storedPosition = store->getDefAbsPosition(this);
     return *storedPosition;
   }
+}
+
+const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedDefAbsoluteTransform(const GeoVAlignmentStore* store) const
+{
+  if(store==nullptr) {
+    if(m_absPosInfo->getDefAbsTransform()) return *m_absPosInfo->getDefAbsTransform();
+  }
+  else {
+    const GeoTrf::Transform3D* storedPos = store->getDefAbsPosition(this);
+    if(storedPos) return *storedPos;
+  }
+  throw std::runtime_error("Failed to find the cached default absolute transform for " + getLogVol()->getName());
 }
 
 const std::string &  GeoVFullPhysVol::getAbsoluteName ()

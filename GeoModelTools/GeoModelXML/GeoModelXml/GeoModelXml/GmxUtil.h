@@ -9,11 +9,8 @@
 //    to element handlers instead of a (changing??) list.
 //
 #include <string>
-#ifndef STANDALONE_GMX
-#include "CLHEP/Evaluator/Evaluator.h"
-#else
 #include "ExpressionEvaluator/Evaluator.h"
-#endif
+#include "GeoModelXml/MaterialManager.h"
 #include "GeoModelXml/ProcessorRegistry.h"
 #include "GeoModelXml/Element2GeoItemRegistry.h"
 
@@ -24,6 +21,11 @@
 #include "GeoModelXml/AssemblyrefProcessor.h"
 #include "GeoModelXml/TransformProcessor.h"
 #include "GeoModelXml/MulticopyProcessor.h"
+#include "GeoModelXml/ReplicaXProcessor.h"
+#include "GeoModelXml/ReplicaYProcessor.h"
+#include "GeoModelXml/ReplicaZProcessor.h"
+#include "GeoModelXml/ReplicaRPhiProcessor.h"
+#include "GeoModelXml/ReplicaXYArraysProcessor.h"
 #include "GeoModelXml/IndexProcessor.h"
 
 #include "GeoModelXml/MakeElement.h"
@@ -32,13 +34,11 @@
 #include "GeoModelXml/MakeTransformationref.h"
 #include "GeoModelXml/MakeTranslation.h"
 #include "GeoModelXml/MakeRotation.h"
-#ifndef STANDALONE_GMX
-#include "GeoModelXml/MakeScaling.h"
-#endif
 
 #include "GeoModelXml/shape/MakeSimplePolygonBrep.h"
 #include "GeoModelXml/shape/MakeEllipticalTube.h"
 #include "GeoModelXml/shape/MakeTwistedTrap.h"
+#include "GeoModelXml/shape/MakeTorus.h"
 #include "GeoModelXml/shape/MakeBox.h"
 #include "GeoModelXml/shape/MakeCons.h"
 #include "GeoModelXml/shape/MakeGenericTrap.h"
@@ -66,12 +66,9 @@ public:
     GmxInterface *gmxInterface();
     double evaluate(char const *expression);
     std::string debracket(std::string expression);
-#ifndef STANDALONE_GMX
-    HepTool::Evaluator eval;
-#else
     Evaluator eval;
-#endif
     PositionIndex positionIndex;
+    MaterialManager* matManager=0;
     ProcessorRegistry processorRegistry;
     Element2GeoItemRegistry geoItemRegistry;
     GeoLogVol * getAssemblyLV() {return m_assemblyLV;};
@@ -86,6 +83,11 @@ public:
         AssemblyrefProcessor assemblyref;
         TransformProcessor transform;
         MulticopyProcessor multicopy;
+	ReplicaXProcessor replicaX;
+	ReplicaYProcessor replicaY;
+	ReplicaZProcessor replicaZ;
+	ReplicaRPhiProcessor replicaRPhi;
+	ReplicaXYarraysProcessor replicaXYArrays;
         IndexProcessor index;
 //
 //    Things creating an RCBase *
@@ -93,8 +95,9 @@ public:
         MakeElement element;
         MakeMaterial material;
         MakeSimplePolygonBrep simplepolygonbrep;
-	MakeEllipticalTube ellipticaltube;
-	MakeTwistedTrap twistedtrap;
+        MakeEllipticalTube ellipticaltube;
+        MakeTwistedTrap twistedtrap;
+        MakeTorus torus;
         MakeBox box;
         MakeCons cons;
         MakeGenericTrap generictrap;
@@ -116,9 +119,6 @@ public:
 //
         MakeTranslation translation;
         MakeRotation rotation;
-#ifndef STANDALONE_GMX
-        MakeScaling scaling;
-#endif
 //
 //    Other things
 //

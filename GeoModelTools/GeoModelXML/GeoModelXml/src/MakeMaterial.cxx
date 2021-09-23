@@ -3,7 +3,7 @@
 */
 
 #include "GeoModelXml/MakeMaterial.h"
-#include "GeoModelXml/OutputDirector.h"
+#include "OutputDirector.h"
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelKernel/RCBase.h"
@@ -28,7 +28,7 @@ double fraction;
 char *qString;
 XMLCh *ref = XMLString::transcode("ref");
 XMLCh *materials_tmp = XMLString::transcode("materials");
-XMLCh *density_tmp = XMLString::transcode("density");  
+XMLCh *density_tmp = XMLString::transcode("density");
 XMLCh *densitysf_tmp = XMLString::transcode("densitysf");
 XMLCh *name_tmp = XMLString::transcode("name");
 XMLCh* elementref_tmp = XMLString::transcode("elementref");
@@ -36,18 +36,17 @@ XMLCh *fraction_tmp = XMLString::transcode("fraction");
 XMLCh *chemicalref_tmp = XMLString::transcode("chemicalref");
 XMLCh *elemcontent_tmp = XMLString::transcode("elemcontent");
 XMLCh *quantity_tmp = XMLString::transcode("quantity");
-XMLCh *materialref_tmp = XMLString::transcode("materialref"); 
+XMLCh *materialref_tmp = XMLString::transcode("materialref");
 const XMLCh *idref;
 DOMDocument *doc = element->getOwnerDocument();
 char *toRelease;
 
-    OUTPUT_STREAM;
 //
-//    Get material density scale-factor for the block of materials this one is in 
+//    Get material density scale-factor for the block of materials this one is in
 //
     DOMNode *parent = element->getParentNode();
     if (XMLString::compareIString(parent->getNodeName(), materials_tmp) != 0) {
-        msglog << MSG::FATAL << "Asked to make a material for non-material element. Parent element was " << 
+        msglog << MSG::FATAL << "Asked to make a material for non-material element. Parent element was " <<
                              XMLString::transcode(parent->getNodeName()) << "; error in gmx file; exiting" << endmsg;
         exit(1);
     }
@@ -70,7 +69,9 @@ char *toRelease;
 //
 //    Create it
 //
-    GeoMaterial *material = new GeoMaterial(name, rho * g/cm3);
+    //std::cout<<" MakeMaterial: creating material "<<name<<" "<<rho<<std::endl;
+    GeoMaterial *material=new GeoMaterial(name, rho * g/cm3);
+
     XMLString::release(&name);
 //
 //   Add my element contents
@@ -86,23 +87,43 @@ char *toRelease;
         string nodeName(toRelease);
         XMLString::release(&toRelease);
         if (nodeName != string("element")) {
-            msglog << MSG::FATAL << "Error in xml/gmx file: An elementref referenced a " << nodeName << " instead of an element." 
+            msglog << MSG::FATAL << "Error in xml/gmx file: An elementref referenced a " << nodeName << " instead of an element."
                               << endmsg;
             exit(999); // Should do better...
-        }
+	}
 
-        GeoElement *geoElem = (GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
+	const GeoElement *geoElem = 0;
+	if (gmxUtil.matManager)
+	{
+		name=XMLString::transcode(idref);
+    		if (!gmxUtil.matManager->isElementDefined(name))
+    		{
+      			GeoElement *temp=(GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
+      			//gmxUtil.matManager->addElement(temp);
+    		}
+		geoElem=const_cast<GeoElement*>(gmxUtil.matManager->getElement(name));
+		XMLString::release(&name);
+	}
+	else
+	{
+		
+		geoElem=(const GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
+		if (!geoElem) std::cout<<"could not retrieve element!!!!!"<<std::endl;
+  	}
 
-        fracString = XMLString::transcode(elRef->getAttribute(fraction_tmp));
-        fraction = gmxUtil.evaluate(fracString);
-        XMLString::release(&fracString);
-        material->add(geoElem, fraction);
-    }
+
+  fracString = XMLString::transcode(elRef->getAttribute(fraction_tmp));
+  fraction = gmxUtil.evaluate(fracString);
+  XMLString::release(&fracString);
+  material->add(geoElem, fraction);
+  
+}
 //
 //   Add my chemical contents
 //
     DOMNodeList *chemRefs = element->getElementsByTagName(chemicalref_tmp);
     int nChemRefs = chemRefs->getLength();
+    
     for (int i = 0; i < nChemRefs; ++i) {
         DOMElement *chemRef = dynamic_cast<DOMElement *>(chemRefs->item(i));
         idref = chemRef->getAttribute(ref);
@@ -112,7 +133,7 @@ char *toRelease;
         string nodeName(toRelease);
         XMLString::release(&toRelease);
         if (nodeName != string("chemical")) {
-            msglog << MSG::FATAL << "Error in xml/gmx file: A chemref referenced a " << nodeName << " instead of a chemical." << 
+            msglog << MSG::FATAL << "Error in xml/gmx file: A chemref referenced a " << nodeName << " instead of a chemical." <<
                                   endmsg;
             exit(999); // Should do better...
         }
@@ -137,12 +158,22 @@ char *toRelease;
             string nodeName(toRelease);
             XMLString::release(&toRelease);
             if (nodeName != string("element")) {
-                msglog << MSG::FATAL << 
+                msglog << MSG::FATAL <<
                        "Error in xml/gmx file: An elementref referenced a " << nodeName << " instead of an element." << endmsg;
                 exit(999); // Should do better...
             }
 
-            geoElem.push_back((GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil));
+	    if (gmxUtil.matManager)
+	    {
+		name=XMLString::transcode(idref);
+		geoElem.push_back((GeoElement *)gmxUtil.matManager->getElement(name));
+		XMLString::release(&name);
+	    }
+	    else
+	    {
+		geoElem.push_back((GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil));
+            }
+
             atomicWeight.push_back(geoElem.back()->getA());
 
             qString = XMLString::transcode(chemEl->getAttribute(quantity_tmp));
@@ -161,6 +192,8 @@ char *toRelease;
 //
     elRefs = element->getElementsByTagName(materialref_tmp);
     nElRefs = elRefs->getLength();
+    
+    
     for (int i = 0; i < nElRefs; ++i) {
         DOMElement *elRef = dynamic_cast<DOMElement *>(elRefs->item(i));
         idref = elRef->getAttribute(ref);
@@ -168,14 +201,28 @@ char *toRelease;
 
         toRelease = XMLString::transcode(elem->getNodeName());
         string nodeName(toRelease);
+	
+	
         XMLString::release(&toRelease);
         if (nodeName != string("material")) {
-            msglog << MSG::FATAL << 
+            msglog << MSG::FATAL <<
                    "Error in xml/gmx file: A materialref referenced a " << nodeName << " instead of a material." << endmsg;
             exit(999); // Should do better...
         }
 
-        GeoMaterial *geoMaterial = (GeoMaterial *) gmxUtil.tagHandler.material.process(elem, gmxUtil);
+        const GeoMaterial *geoMaterial=0;
+	if (gmxUtil.matManager)
+	{
+		name=XMLString::transcode(idref);
+		geoMaterial=gmxUtil.matManager->getMaterial(name);
+		XMLString::release(&name);
+	}
+	else
+	{
+		
+		geoMaterial=(const GeoMaterial *) gmxUtil.tagHandler.material.process(elem, gmxUtil);
+		if (!geoMaterial) std::cout<<"something is wrong!!!!"<<std::endl;
+  	}
 
         fracString = XMLString::transcode(elRef->getAttribute(fraction_tmp));
         fraction = gmxUtil.evaluate(fracString);
@@ -187,7 +234,7 @@ char *toRelease;
 
   XMLString::release(&ref);
   XMLString::release(&materials_tmp);
-  XMLString::release(&density_tmp);  
+  XMLString::release(&density_tmp);
   XMLString::release(&densitysf_tmp);
   XMLString::release(&name_tmp);
   XMLString::release(&elementref_tmp);

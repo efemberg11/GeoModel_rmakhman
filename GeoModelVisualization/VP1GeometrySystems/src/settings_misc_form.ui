@@ -214,7 +214,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>[-1: All (slower)]</string>
+           <string>[0: top volumes; -1: All (slower)]</string>
           </property>
          </widget>
         </item>

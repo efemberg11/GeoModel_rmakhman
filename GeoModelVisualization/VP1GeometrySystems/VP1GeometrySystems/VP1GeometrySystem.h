@@ -6,25 +6,34 @@
 #define VP1GEOMETRYSYSTEM_H
 
 /////////////////////////////////////////////////////////////////////////
-//                                                                     //
-//  Header file for class VP1GeometrySystem                            //
-//                                                                     //
-//  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>              //
-//                                                                     //
-//  Derived from V-atlas geometry system by Joe Boudreau.              //
-//  Origins of initial version dates back to ~1996, initial VP1        //
-//  version by TK (May 2007) and almost entirely rewritten Oct 2007    //
-//                                                                     //
+//                                                                     
+//  Header file for class VP1GeometrySystem                            
+//                                                                     
+//  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>              
+//                                                                     
+//  Derived from V-atlas geometry system by Joe Boudreau.              
+//  Origins of initial version dates back to ~1996, initial VP1        
+//  version by TK (May 2007) and almost entirely rewritten Oct 2007
+//
+//  - Jul 2021, Riccardo Maria Bianchi <riccardo.maria.bianchi@cern.ch>
+//              * Added the 'filter volumes' tool
+//              * Added signal/slot to update transparency type in the 3D window
+//                                                                     
 /////////////////////////////////////////////////////////////////////////
 
 #include "VP1Base/IVP13DSystemSimple.h"
 #include "VP1GeometrySystems/VP1GeoFlags.h"
 #include "VP1GeometrySystems/VolumeHandle.h"//fixme
+
 #include "GeoModelKernel/GeoPhysVol.h"
+
 #include <set>
 #include <map>
 #include <QStack>
 #include <QString>
+
+
+
 
 class VP1GeometrySystem : public IVP13DSystemSimple {
 
@@ -52,6 +61,9 @@ public:
   QByteArray saveState();
   void restoreFromState(QByteArray);
 
+signals:
+  void updateTransparencyType(unsigned type);
+
 public slots:
 
   void setCurvedSurfaceRealism(int);//Accepts values in the range 0..100.
@@ -60,10 +72,14 @@ protected slots:
   void updateTransparency();
 
   void resetSubSystems(VP1GeoFlags::SubSystemFlags);
-  void autoExpandByVolumeOrMaterialName(bool,QString);//volname: (false,namestr), matname: (true,namestr)
+  void autoExpandByVolumeOrMaterialName(bool, QString);//volname: (false,namestr), matname: (true,namestr)
 
-  // void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE); // not used anymore?
-  // void volumeResetRequested(VolumeHandle*); // not used anymore?
+  void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);
+  void volumeResetRequested(VolumeHandle*);
+
+  void actionOnAllNonStandardVolumes(bool);//true: zap, false: expand.
+  void actionOnAllVolumes(bool zap, bool standardVolumes = true);//true: zap, false: expand; true: standardVolumes
+  void filterVolumes(QString targetname, bool bymatname, int maxDepth, bool stopAtFirst, bool visitChildren, bool reset);
 
   void setShowVolumeOutLines(bool);
 

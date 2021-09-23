@@ -1,17 +1,22 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 
 ////////////////////////////////////////////////////////////////
-//                                                            //
-//  Header file for class GeoSysController                    //
-//                                                            //
-//  Description: Controller for the geometry system.          //
-//                                                            //
-//  Author: Thomas H. Kittelmann (Thomas.Kittelmann@cern.ch)  //
-//  Initial version: October 2008                             //
-//                                                            //
+//                                                            
+//  Header file for class GeoSysController                    
+//                                                            
+//  Description: Controller for the geometry system.          
+//                                                            
+//  Author: Thomas H. Kittelmann (Thomas.Kittelmann@cern.ch)  
+//  Initial version: October 2008                             
+//
+//  Major updates:
+//   
+//  - Riccardo Maria BIANCHI (riccardo.maria.bianchi@cern.ch)  
+//    Jul 2021: Added support to filter volumes based on names
+//
 ////////////////////////////////////////////////////////////////
 
 #ifndef GEOSYSCONTROLLER_H
@@ -75,6 +80,9 @@ public:
   //Settings with change signals:
 
   float transparency() const;
+  void setTransparency(float value) const;
+  bool isTranspLocked() const;
+
   bool showVolumeOutLines() const;
   int labels() const;
   QList<int> labelPosOffset() ; //!< Offset in x,y,z
@@ -90,10 +98,10 @@ signals:
 
   //Signals without state:
   void resetSubSystems(VP1GeoFlags::SubSystemFlag);
-  void autoExpandByVolumeOrMaterialName(bool,QString);//volname: (false,namestr), matname: (true,namestr)
+  void autoExpandByVolumeOrMaterialName(bool, QString); //volname: (false,namestr), matname: (true,namestr)
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);//Might not be used atm.
   void volumeResetRequested(VolumeHandle*);
-
+  void signalFilterVolumes(QString, bool, int, bool, bool, bool);
   void saveMaterialsToFile(QString,bool);//(filename,onlyChangedMaterials)
   void loadMaterialsFromFile(QString);//filename
   void displayLocalAxesChanged(int);
@@ -112,7 +120,6 @@ private slots:
   void saveMaterialsRequested();
   void loadMaterialsRequested();
   void emit_autoExpandByVolumeOrMaterialName();
-  // void emit_actionOnAllNonStandardVolumes(); // not used anymore?
 };
 
 #endif

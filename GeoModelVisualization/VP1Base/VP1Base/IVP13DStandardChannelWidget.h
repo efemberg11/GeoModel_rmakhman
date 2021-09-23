@@ -16,6 +16,9 @@
 #define IVP13DSTANDARDCHANNELWIDGET_H
 
 #include "VP1Base/IVP13DChannelWidget.h"
+
+
+// FWD declarations
 class IVP13DSystem;
 class IVP13DSystemSimple;
 class QResizeEvent;
@@ -74,6 +77,7 @@ private slots:
   void toggleSystemActive();
   void updateSnapshotDim();
   void setImageFromPresets();
+  void updateTransparencyType(unsigned type);
 
 protected slots:
   void showControlsForSystem();

@@ -76,6 +76,7 @@ public:
   bool isEther() const;
   void expandMothersRecursivelyToNonEther();//expands the tree down to volumes that are either not ether or without children
 
+  bool isInitialisedAndHasNonStandardShape() const;//True if the 3D shape of this volume can not be represented by standard VRML nodes.
 
   SoSeparator * nodeSoSeparator() const;//Returns pointer to 3D representation of volume (null if not built yet).
   void ensureBuildNodeSep();

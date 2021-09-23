@@ -1,22 +1,25 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 /////////////////////////////////////////////////////////////////////////
-//                                                                     //
-//  Implementation of class VP1GeometrySystem                          //
-//                                                                     //
-//  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>              //
-//                                                                     //
-//  Derived from V-atlas geometry system by Joe Boudreau.              //
-//  Origins of initial version dates back to ~1996, initial VP1        //
-//  version by TK (May 2007) and almost entirely rewritten Oct 2007.   //
-//  Major refactoring october 2008.                                    //
-//                                                                     //
-//  Updates:                                                           //
-//  - Aug 2019, Riccardo Maria Bianchi @ CERN                          //
-//  - Aug 2020, Riccardo Maria Bianchi @ CERN                          //
-//                                                                     //
+//                                                                     
+//  Implementation of class VP1GeometrySystem                          
+//                                                                     
+//  Author: Thomas Kittelmann <Thomas.Kittelmann@cern.ch>              
+//                                                                     
+//  Derived from V-atlas geometry system by Joe Boudreau.              
+//  Origins of initial version dates back to ~1996, initial VP1        
+//  version by TK (May 2007) and almost entirely rewritten Oct 2007.   
+//  Major refactoring october 2008.                                    
+//                                                                     
+//  Updates:                                                           
+//  - Aug 2019, Riccardo Maria Bianchi @ CERN                          
+//  - Aug 2020, Riccardo Maria Bianchi @ CERN                          
+//  - Jul 2021, Riccardo Maria Bianchi <riccardo.maria.bianchi@cern.ch> 
+//              * Added the 'filter volumes' tool
+//              * Added signal/slot to update transparency type in the 3D window
+//                                                                     
 /////////////////////////////////////////////////////////////////////////
 
 // local includes
@@ -198,7 +201,10 @@ public:
   static void catchKbdState(void *userData, SoEventCallback *CB);
   const SoKeyboardEvent *kbEvent;
 
+  void changeStateOfVisibleNonStandardVolumesRecursively(VolumeHandle*,VP1GeoFlags::VOLSTATE);
+  void changeStateOfAllVolumesRecursively(VolumeHandle*,VP1GeoFlags::VOLSTATE);
   void expandVisibleVolumesRecursively(VolumeHandle*,const QRegExp&,bool bymatname);
+  bool filterVolumesRec(VolumeHandle* vol, QRegExp selregexp, bool bymatname, bool stopAtFirst, bool visitChildren, bool resetView, bool &zapAll, bool &matchFound, unsigned &nFound, int maxIter = 1, unsigned int iter = 0);
 
   SoSeparator* m_textSep;//!< Separator used to hold all visible labels.
 
@@ -295,7 +301,15 @@ QWidget * VP1GeometrySystem::buildController()
   connect(m_d->controller,SIGNAL(loadMaterialsFromFile(QString)),this,SLOT(loadMaterialsFromFile(QString)));
 
   connect(m_d->controller,SIGNAL(transparencyChanged(float)),this,SLOT(updateTransparency()));
+
+  connect (m_d->controller,SIGNAL(volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE)), this,SLOT(volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE)));
+  connect (m_d->controller,SIGNAL(volumeResetRequested(VolumeHandle*)), this,SLOT(volumeResetRequested(VolumeHandle*)));
+ 
+ 
+  connect(m_d->controller,SIGNAL(actionOnAllNonStandardVolumes(bool)),this,SLOT(actionOnAllNonStandardVolumes(bool)));
   connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
+  connect(m_d->controller,SIGNAL(signalFilterVolumes(QString, bool, int, bool, bool, bool)),this,SLOT(filterVolumes(QString, bool, int, bool, bool, bool)));
+  
   connect(m_d->controller->requestOutputButton(), SIGNAL(clicked()), this, SLOT(saveTrees()));
   connect(m_d->controller,SIGNAL(displayLocalAxesChanged(int)), this, SLOT(toggleLocalAxes(int)));
   connect(m_d->controller,SIGNAL(axesScaleChanged(int)), this, SLOT(setAxesScale(int)));
@@ -418,7 +432,6 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
       subsys->soswitch->whichChild = SO_SWITCH_ALL;
     //Enable in tree browser:
     m_d->volumetreemodel->enableSubSystem(subsys->flag);
-    //     new ModelTest(m_d->volumetreemodel, m_d->treeView_volumebrowser);
   }
   if (!m_d->restoredTopvolstates.isEmpty()) {
     m_d->applyTopVolStates(m_d->restoredTopvolstates,false);
@@ -498,7 +511,6 @@ GeoPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoPhysVol* world)
     const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
     const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2500*SYSTEM_OF_UNITS::cm);
     const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
-    // GeoPhysVol* worldPhys = new GeoPhysVol(worldLog);
     world = new GeoPhysVol(worldLog);
   }
   return world;
@@ -612,17 +624,16 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
     }
   }
 
-// } // end if m_existingGeoInput
-
   return world;
-
 }
 
+//_____________________________________________________________________________________
 void VP1GeometrySystem::toggleLocalAxes(int i) {
   if (i==0) m_d->axesSwitch->whichChild=SO_SWITCH_NONE;
   else m_d->axesSwitch->whichChild=SO_SWITCH_ALL;
 }
 
+//_____________________________________________________________________________________
 void VP1GeometrySystem::setAxesScale(int i) {
   double x=(i-50)/25.0;
   double scale = pow(10,x);
@@ -657,7 +668,6 @@ void VP1GeometrySystem::checkboxChanged()
     sw->enableNotify(save);
     //Enable in tree browser:
     m_d->volumetreemodel->enableSubSystem(subsys->flag);
-    //     new ModelTest(m_d->volumetreemodel, m_d->treeView_volumebrowser);
     if (save)
       sw->touch();
   } else {
@@ -1031,7 +1041,7 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 	VP1Msg::messageDebug("-- toptree vol: " + QString(it->volname.c_str()) );
 
 	// Get the material name from the top volume and search for it
-	// in the lsit of "default" materials for the sub-detectors:
+	// in the list of "default" materials for the sub-detectors:
 	QString topMaterialName = QString::fromStdString(it->pV->getLogVol()->getMaterial()->getName());
 	VP1Msg::messageDebug("topMaterial: " + topMaterialName);
 	SoMaterial* topMaterial = detVisAttributes->get(it->volname);
@@ -1043,8 +1053,13 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 	}
 
 	VolumeHandleSharedData* volhandle_subsysdata = new VolumeHandleSharedData(controller,
-										  si->flag, &sonodesep2volhandle, it->pV, phisectormanager,
-										  topMaterial, matVisAttributes, volVisAttributes,
+										  si->flag, 
+                                          &sonodesep2volhandle, 
+                                          it->pV, 
+                                          phisectormanager,
+										  topMaterial, 
+                                          matVisAttributes, 
+                                          volVisAttributes,
 										  controller->zappedVolumeListModel(),
 										  controller->volumeTreeBrowser(),
 										  m_textSep);
@@ -1069,7 +1084,6 @@ void VP1GeometrySystem::Imp::buildSystem(SubSystemInfo* si)
 
   //Perform auto expansion of all ether volumes (needed for muon dead material):
   VolumeHandle::VolumeHandleListItr it, itE(si->vollist.end());
-  // int idx=0; // for debug
   for (it = si->vollist.begin(); it!=itE; ++it){
     (*it)->expandMothersRecursivelyToNonEther();
   }
@@ -1282,10 +1296,12 @@ void VP1GeometrySystem::autoExpandByVolumeOrMaterialName(bool bymatname,QString 
     return;
   }
 
-  messageVerbose("Auto expansions of visible volumes requested. Target all volumes with "
+    messageVerbose("Auto expansions of **visible** volumes requested. Target all volumes with "
 		 +str(bymatname?"material name":"name")+" matching "+targetname);
 
-  QRegExp selregexp(targetname,Qt::CaseSensitive,QRegExp::Wildcard);
+  //QRegExp selregexp(targetname,Qt::CaseSensitive,QRegExp::Wildcard);
+  QRegExp selregexp(targetname, Qt::CaseSensitive, QRegExp::RegExp);
+  VP1Msg::messageDebug("RegExp pattern: " + selregexp.pattern() );
 
   std::vector<std::pair<VolumeHandle::VolumeHandleListItr,VolumeHandle::VolumeHandleListItr> > roothandles;
   m_d->volumetreemodel->getRootHandles(roothandles);
@@ -1294,49 +1310,95 @@ void VP1GeometrySystem::autoExpandByVolumeOrMaterialName(bool bymatname,QString 
   bool save = m_d->sceneroot->enableNotify(false);
   m_d->phisectormanager->largeChangesBegin();
 
-  deselectAll();
+  if (roothandles.size() == 0) {
+    VP1Msg::messageWarningRed("No root nodes selected! Please select at least a root node before trying to apply filters. Ideally, you should turn on only the root node containing the volumes you are interested in; e.g., turn on the 'Endcap MDT' root node, if you are looking for an EIL chamber.");
+  } else {
+    bool save = m_d->sceneroot->enableNotify(false);
+    m_d->phisectormanager->largeChangesBegin();
 
-  for (unsigned i = 0; i<roothandles.size();++i) {
-    it = roothandles.at(i).first;
-    itE = roothandles.at(i).second;
-    for(;it!=itE;++it)
-      m_d->expandVisibleVolumesRecursively(*it,selregexp,bymatname);
-  }
+    deselectAll();
 
-  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
-  m_d->phisectormanager->largeChangesEnd();
-  if (save) {
-    m_d->sceneroot->enableNotify(true);
-    m_d->sceneroot->touch();
+    for (unsigned i = 0; i<roothandles.size();++i) {
+      it = roothandles.at(i).first;
+      itE = roothandles.at(i).second;
+      bool matchFound = false;
+
+      for(;it!=itE;++it) {
+        VolumeHandle* vol = *it;
+        VP1Msg::messageDebug("Looking inside the root node [name: " + vol->getName() + ", material: " + QString::fromStdString(vol->geoMaterial()->getName()) + "]" );
+      	  m_d->expandVisibleVolumesRecursively(vol, selregexp, bymatname);
+      }
+    }
+
+    m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
+    m_d->phisectormanager->largeChangesEnd();
+    if (save) {
+      m_d->sceneroot->enableNotify(true);
+      m_d->sceneroot->touch();
+    }
   }
 }
 
 //_____________________________________________________________________________________
 void VP1GeometrySystem::Imp::expandVisibleVolumesRecursively(VolumeHandle* handle,const QRegExp& selregexp,bool bymatname)
 {
-  if (handle->state()==VP1GeoFlags::ZAPPED)
-    return;
-  if (handle->state()==VP1GeoFlags::CONTRACTED) {
-    //See if we match (and have children) - if so, update state.
-    if (handle->nChildren()>0
-	&& selregexp.exactMatch(bymatname?QString(handle->geoMaterial()->getName().c_str()):handle->getName())) {
-      handle->setState(VP1GeoFlags::EXPANDED);
-    }
+  //if (handle->state()==VP1GeoFlags::ZAPPED)
+  //  return;
+  VP1Msg::messageDebug("VP1GeometrySystem::Imp::expandVisibleVolumesRecursively()");
+  if (handle->state()==VP1GeoFlags::ZAPPED) {
+	VP1Msg::messageDebug(handle->getName() +" is ZAPPED. Returning...");
     return;
   }
-  //Must be expanded: Let us call on any (initialised) children instead.
-  if (handle->nChildren()==0||!handle->childrenAreInitialised())
+
+  if (handle->state()==VP1GeoFlags::CONTRACTED) {
+    VP1Msg::messageDebug(handle->getName() +" is CONTRACTED. Going on...");
+    //See if we match (and have children) - if so, update state.
+    if (handle->nChildren()>0
+	&& selregexp.exactMatch(bymatname?QString(handle->geoMaterial()->getName().c_str()):handle->getName())) 
+    {
+      VP1Msg::messageDebug(handle->getName() +" has >0 children: OK! Setting it to 'EXPANDED'.");
+      handle->setState(VP1GeoFlags::EXPANDED);
+    }
+    VP1Msg::messageDebug(handle->getName() +" - Now returning...");
     return;
+  }
+  
+  //Must be expanded: Let us call on any (initialised) children instead.
+  if (handle->nChildren()==0||!handle->childrenAreInitialised()) {
+    VP1Msg::messageDebug(handle->getName() +" has NO children or they are not initialized. Returning...");
+    return;
+  }
+
+  //TODO: does the code comes here ever??? Check!
+  VP1Msg::messageDebug(handle->getName() +" - Now looping over children...");
   VolumeHandle::VolumeHandleListItr it(handle->childrenBegin()), itE(handle->childrenEnd());
-  for(;it!=itE;++it)
+  for(;it!=itE;++it) {
     expandVisibleVolumesRecursively(*it,selregexp,bymatname);
+  }
 }
 
 
+//_____________________________________________________________________________________
+void VP1GeometrySystem::volumeStateChangeRequested(VolumeHandle*vh,VP1GeoFlags::VOLSTATE state)
+{
+  //might not use this slot presently...
+  if (!vh)
+    return;
+  deselectAll();
+  vh->setState(state);
+  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
+}
 
 
-
-
+//_____________________________________________________________________________________
+void VP1GeometrySystem::volumeResetRequested(VolumeHandle*vh)
+{
+  if (!vh)
+    return;
+  deselectAll();
+  vh->reset();
+  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
+}
 
 
 //_____________________________________________________________________________________
@@ -1447,7 +1509,7 @@ void VP1GeometrySystem::loadMaterialsFromFile(QString filename)
 
 
 
-
+//_____________________________________________________________________________________
 void VP1GeometrySystem::saveTrees() {
 #ifdef __APPLE__
   char buffer[1024];
@@ -1496,6 +1558,7 @@ void VP1GeometrySystem::saveTrees() {
   world->unref();
 }
 
+//_____________________________________________________________________________________
 GeoPhysVol *VP1GeometrySystem::newWorld()  const {
   const double  gr =   SYSTEM_OF_UNITS::gram;
   const double  mole = SYSTEM_OF_UNITS::mole;
@@ -1520,3 +1583,277 @@ GeoPhysVol *VP1GeometrySystem::newWorld()  const {
   GeoPhysVol* world = new GeoPhysVol(worldLog);
   return world;
 }
+
+
+//_____________________________________________________________________________________
+void VP1GeometrySystem::filterVolumes(QString targetname, bool bymatname, int maxDepth = 1, bool stopAtFirst = true, bool visitChildren = false, bool resetView = false)
+{
+
+  // initialize the regular expression
+  QRegExp selregexp(targetname, Qt::CaseSensitive, QRegExp::RegExp);
+  // VP1Msg::messageDebug("RegExp pattern: " + selregexp.pattern()  );
+  
+  QStringList ll;
+  ll << "VP1GeometrySystem::filterVolumes" << "RegExp pattern:" << selregexp.pattern() 
+     << "- maxDepth:" << QString::number(maxDepth)
+     << "- stopAtFirst:" << QString::number(stopAtFirst) 
+     << "- visitChildren:" << QString::number(visitChildren) 
+     << "- resetView:" << QString::number(resetView);
+  VP1Msg::messageDebug(ll.join(" "));
+
+   
+   // get root handles list
+  std::vector<std::pair<VolumeHandle::VolumeHandleListItr,VolumeHandle::VolumeHandleListItr> > roothandles;
+  m_d->volumetreemodel->getRootHandles(roothandles);
+  VolumeHandle::VolumeHandleListItr it, itE;
+  
+  bool save = m_d->sceneroot->enableNotify(false);
+  m_d->phisectormanager->largeChangesBegin();
+  deselectAll();
+
+  bool zapAll = false; // TODO: do we need that?
+  bool matchFound = false;
+  unsigned nFound = 0;
+  
+  // loop over root handles
+  for (unsigned i = 0; i<roothandles.size();++i) {
+    it = roothandles.at(i).first;
+    itE = roothandles.at(i).second;
+
+    // loop over root volumes
+    for(;it!=itE;++it) {
+
+        VolumeHandle* handle = (*it);
+
+        VP1Msg::messageDebug("Looking at the root node [name: " + handle->getName() + ", mat: " + QString::fromStdString(handle->geoMaterial()->getName()) + "]" );
+        m_d->filterVolumesRec(handle, selregexp, bymatname, stopAtFirst, visitChildren, resetView, zapAll, matchFound, nFound, maxDepth);
+        VP1Msg::messageDebug("matchFound: " + QString::number(matchFound));
+        
+        if (resetView) {
+            VP1Msg::messageDebug("'expanding' and 'contracting' the root volume...");
+            // in the call to 'filterVolumesRec' above, when resetting the view, 
+            // we have 'contracted' the root volume and all the children we had 'zapped' before.
+            // So, now we need to open ('expand'), and then close ('contract') the root volume again,
+            // in order to get rid of the manually-contracted volumes.
+            handle->setState(VP1GeoFlags::EXPANDED); 
+            handle->setState(VP1GeoFlags::CONTRACTED); 
+        }
+
+    } // end loop over root volumes
+  } // loop over root handles
+
+  // give feedback to the user
+  message("[filter volumes] # of matching volumes: " + QString::number(nFound));
+  
+  //if user chose to visit children of matching volumes,
+  //then we change transparency type to 'Sorted Object Blend', usually better to visualize nested volumes
+  if (visitChildren && (nFound>0) ) {
+      message(  QString("[filter volumes] NOTE: to show both matching mother and matching daughter volumes, ") 
+              + QString("transparency has been set to 50% and transparency type has been changed to 'Sorted Object Blend', ")
+              + QString("which is usually better to visualize nested geometry volumes. ")
+              + QString("You can disable this auto-setting by checking the 'lock'.") );
+      if ( ! m_d->controller->isTranspLocked()) {
+          m_d->controller->setTransparency(50);
+          emit updateTransparencyType( VP1QtInventorUtils::transparencyTypeToInt(SoGLRenderAction::SORTED_OBJECT_BLEND) );
+      }
+  }
+
+
+  VP1Msg::messageDebug("largeChangesEnding...");
+  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
+  m_d->phisectormanager->largeChangesEnd();
+  if (save) {
+    m_d->sceneroot->enableNotify(true);
+    m_d->sceneroot->touch();
+  }
+
+}
+//_____________________________________________________________________________________
+bool VP1GeometrySystem::Imp::filterVolumesRec(VolumeHandle* handle, QRegExp selregexp, bool bymatname, bool stopAtFirst, bool visitChildren, bool resetView, bool &zapAll, bool &matchFound, unsigned &nFound, int maxIter, unsigned int iter)
+{
+      if (!zapAll) {
+        VP1Msg::messageDebug2("iteration: " + QString::number(iter) + ", maxIter: " + QString::number(maxIter));
+        VP1Msg::messageDebug2("looking into volume: " + handle->getName());
+      }
+      
+      // zap the current volume by default...
+      handle->setState(VP1GeoFlags::ZAPPED);
+
+      VP1Msg::messageDebug2("filtering: " + handle->getName() );
+
+      if ( !zapAll ) {
+        if ( !resetView ) {
+          //... then unzap the volume if it matches the filter regex
+          if (selregexp.exactMatch( bymatname ? QString(handle->geoMaterial()->getName().c_str()) : handle->getName()) ) 
+          {
+            matchFound = true;
+            ++nFound;
+            VP1Msg::messageDebug(handle->getName() +" - **MATCH!** - 'Contracting' it (-->make it visible)...");
+            handle->setState(VP1GeoFlags::CONTRACTED); // match, make the matching volume visible
+            // if a matching volume was found and 'stop at first' option was choosen, then stop here
+            //VP1Msg::messageDebug2("matchFound: " + QString::number(matchFound) + " - stopAtFirst: " + QString::number(stopAtFirst));
+            
+            if (stopAtFirst && matchFound) {
+              VP1Msg::messageDebug("\tYou chose to show only the first matching volume, so we stop here - exiting from the inner children loop...");
+              //return matchFound;
+              zapAll = true;
+            } 
+          } else {
+            VP1Msg::messageDebug2("not matching --> zapping it");
+            handle->setState(VP1GeoFlags::ZAPPED); // no match, open the volume to show its children
+          }
+        }
+        if (resetView) {
+          if(handle->state()!=VP1GeoFlags::CONTRACTED) {
+              VP1Msg::messageDebug2("resetView --> contracting it");
+              handle->setState(VP1GeoFlags::CONTRACTED); // open the volume to show its children
+          }
+        }
+      } // end if !zapAll
+
+
+      // check iterations, a.k.a., the 'maxDepth', i.e., the number of layers of daughter volumes visited 
+      if( maxIter != -1 && iter == maxIter) {
+          VP1Msg::messageDebug("maxIter [" + QString::number(iter) + "] reached, returning from the recursive method and go to the next upper volume...");
+          return matchFound;
+      }
+       // increment the iteration number
+      iter++;
+      
+      // if no match yet, 
+      // or if user asked to visit children of matching volumes too, 
+      // then loop over children
+      if ( !matchFound || (matchFound && visitChildren) ) {
+          if (!zapAll) {
+              VP1Msg::messageDebug2("No match, or you chose to inspect all child volumes, so we look into the children...");
+          }
+          if (handle->nChildren()>0) {
+              // get children list
+              handle->initialiseChildren();
+              VolumeHandle::VolumeHandleListItr itChl(handle->childrenBegin()),itChlE(handle->childrenEnd());
+              for (;itChl!=itChlE;++itChl) {
+
+                  VolumeHandle* child = (*itChl);
+
+                  // filter children volumes recursively
+                  filterVolumesRec(child, selregexp, bymatname, stopAtFirst, visitChildren, resetView, zapAll, matchFound, nFound, maxIter, iter);
+                  if (stopAtFirst && matchFound) {
+                      //return matchFound;
+                      zapAll = true;
+                  }
+              } // end loop over children
+          
+              if (resetView) {
+                 // in the call to 'filterVolumesRec' above, when resetting the view, 
+                 // we have 'contracted' the root volume and all the children we had 'zapped' before.
+                 // So, now we need to open ('expand'), and then close ('contract') the root volume again,
+                 // in order to get rid of the manually-contracted volumes.
+                 handle->setState(VP1GeoFlags::EXPANDED); 
+                 handle->setState(VP1GeoFlags::CONTRACTED); 
+              }
+          }
+      }
+
+      return matchFound;
+}
+
+
+
+
+
+
+
+
+
+
+
+// =========================
+
+////////
+// Methods which come from VP1 and have been rplaced by other methods, 
+// but they are useful for later use,
+// when we try to act on all volumes
+////////
+
+// Not used at the moment, but useful
+//_____________________________________________________________________________________
+void VP1GeometrySystem::Imp::changeStateOfAllVolumesRecursively(VolumeHandle*handle,VP1GeoFlags::VOLSTATE target)
+{
+    handle->initialiseChildren();
+    handle->setState(target);
+    VolumeHandle::VolumeHandleListItr itChl(handle->childrenBegin()),itChlE(handle->childrenEnd());
+
+    // loop over second level children 
+    for (;itChl!=itChlE;++itChl) {
+        changeStateOfAllVolumesRecursively(*itChl, target);
+    }
+}
+
+
+// Not used at the moment, but useful
+//_____________________________________________________________________________________
+void VP1GeometrySystem::Imp::changeStateOfVisibleNonStandardVolumesRecursively(VolumeHandle*handle,VP1GeoFlags::VOLSTATE target)
+{
+  assert(target!=VP1GeoFlags::CONTRACTED);
+  if (handle->isAttached()) {
+    //The volume is visible, so ignore daughters
+    if (handle->isInitialisedAndHasNonStandardShape()) {
+      if (target!=VP1GeoFlags::EXPANDED||handle->nChildren()>0)
+	handle->setState(target);
+    }
+    return;
+  } else if (handle->state()==VP1GeoFlags::ZAPPED)
+    return;
+  //Must be expanded: Let us call on any (initialised) children instead.
+  if (handle->nChildren()==0||!handle->childrenAreInitialised())
+    return;
+  VolumeHandle::VolumeHandleListItr it(handle->childrenBegin()), itE(handle->childrenEnd());
+  for(;it!=itE;++it)
+    changeStateOfVisibleNonStandardVolumesRecursively(*it, target);
+}
+
+// Not used at the moment, but useful
+//_____________________________________________________________________________________
+void VP1GeometrySystem::actionOnAllNonStandardVolumes(bool zap)
+{
+  actionOnAllVolumes(zap, false);
+}
+
+// Not used at the moment, but useful
+//_____________________________________________________________________________________
+void VP1GeometrySystem::actionOnAllVolumes(bool zap, bool standardVolumes /* default: true*/)
+{
+  //VP1GeoFlags::VOLSTATE target = zap ? VP1GeoFlags::ZAPPED : VP1GeoFlags::EXPANDED;
+  VP1GeoFlags::VOLSTATE target = zap ? VP1GeoFlags::ZAPPED : VP1GeoFlags::CONTRACTED;
+  messageVerbose("Action on volumes with non-standard VRML representations. Target state is "+VP1GeoFlags::toString(target));
+
+  std::vector<std::pair<VolumeHandle::VolumeHandleListItr,VolumeHandle::VolumeHandleListItr> > roothandles;
+  m_d->volumetreemodel->getRootHandles(roothandles);
+  VolumeHandle::VolumeHandleListItr it, itE;
+
+  bool save = m_d->sceneroot->enableNotify(false);
+  m_d->phisectormanager->largeChangesBegin();
+
+  deselectAll();
+
+  for (unsigned i = 0; i<roothandles.size();++i) {
+    it = roothandles.at(i).first;
+    itE = roothandles.at(i).second;
+    for(;it!=itE;++it) {
+      if (standardVolumes) {
+        m_d->changeStateOfAllVolumesRecursively(*it, target);
+      } else {
+        m_d->changeStateOfVisibleNonStandardVolumesRecursively(*it, target);
+      }
+    }
+  }
+
+  m_d->phisectormanager->updateRepresentationsOfVolsAroundZAxis();
+  m_d->phisectormanager->largeChangesEnd();
+  if (save) {
+    m_d->sceneroot->enableNotify(true);
+    m_d->sceneroot->touch();
+  }
+}
+
+

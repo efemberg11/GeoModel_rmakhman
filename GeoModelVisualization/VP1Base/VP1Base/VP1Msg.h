@@ -30,6 +30,8 @@ class VP1Msg : public VP1String {
 public:
   static bool verbose() { return m_verbose; } // Returns true if env var VP1_VERBOSE_OUTPUT=1
   static bool debug() { return m_debug; } // Returns true if env var VP1_DEBUG_OUTPUT=1
+  static bool debug2() { return m_debug_2; } // Returns true if env var VP1_DEBUG_2_OUTPUT=1
+  static bool debug3() { return m_debug_3; } // Returns true if env var VP1_DEBUG_3_OUTPUT=1
 
   #if defined BUILDVP1LIGHT
     static void enableMsg(const QString&, const QString&);  
@@ -39,6 +41,8 @@ public:
 
   static void message(const QString&, IVP1System*sys = 0);//Non-zero sys pointer to get message in GUI
   static void messageDebug(const QString&);
+  static void messageDebug2(const QString&);
+  static void messageDebug3(const QString&); 
   static void messageWarning(const QString&);
   static void messageVerbose(const QString&);//This outputs only if verbose() is true.
   static void messageWarningRed( const QString& str );
@@ -54,6 +58,8 @@ public:
 
   static const char* prefix_msg() { return "VP1MESSAGE";}
   static const char* prefix_debug() { return "VP1MSG_DEBUG";}
+  static const char* prefix_debug2() { return "VP1MSG_DEBUG_2";}
+  static const char* prefix_debug3() { return "VP1MSG_DEBUG_3";}
   static const char* prefix_warning() { return "VP1MSG_WARNING";}
   static const char* prefix_verbose() { return "VP1MSG_VERBOSE";}
 
@@ -62,6 +68,8 @@ private:
   ~VP1Msg(){}
   static bool m_verbose;
   static bool m_debug;
+  static bool m_debug_2;
+  static bool m_debug_3;
 };
 
 #endif

@@ -276,7 +276,7 @@
                         offsetPhi CDATA #REQUIRED
 			stepPhi   CDATA #REQUIRED
                         alignable CDATA #IMPLIED
-			skip      CDATA #IMPLIED
+			skip      CDATA #IMPLIED>
   <!ELEMENT replicaXYarrays (transform|logvolref|assemblyref)>
     <!ATTLIST replicaXYarrays  name      ID    #REQUIRED
                         n         CDATA #REQUIRED

@@ -61,11 +61,19 @@ sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip buil
 
 ### Linux/Fedora
 
+**On Fedora < 34**:
 On Fedora, you can install all the needed third-party dependencies by using the built-in `dnf` package manager:
 
 ```bash
 dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial xerces-c-devel unzip freeglut-devel wget eigen3-devel
 ```
+
+**On Fedora >= 34**:
+
+```
+dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5-qtbase-devel boost mercurial xerces-c-devel unzip freeglut-devel wget eigen3-devel giflib-devel libjpeg-devel sqlite-devel
+```
+
 
 ### Centos7
 

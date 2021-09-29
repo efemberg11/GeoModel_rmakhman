@@ -1160,7 +1160,7 @@
             },
             "name": [
                 "Scintillator",
-                "tile::Scontillator"
+                "tile::Scintillator"
             ],
             "shininess": 0.9818180203437805,
             "specular": {

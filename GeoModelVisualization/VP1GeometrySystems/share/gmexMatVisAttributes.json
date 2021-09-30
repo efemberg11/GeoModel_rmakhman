@@ -1160,7 +1160,9 @@
             },
             "name": [
                 "Scintillator",
-                "tile::Scintillator"
+                "Polyvinyltoluene",
+                "tile::Scintillator",
+                "tile::Polyvinyltoluene"
             ],
             "shininess": 0.9818180203437805,
             "specular": {

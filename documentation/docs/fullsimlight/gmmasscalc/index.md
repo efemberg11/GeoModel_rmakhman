@@ -14,6 +14,7 @@ Run the executable with the `--help` option to see the available options:
 By default (if the optional flag are not used) *gmmasscalc*, takes the main *World Volume*, and calculates the inclusive and exclusive masses of the respective daughters, saving the calculated quantities in the output json file. At the end of the report, the total masses are reported for the whole *World Volume*. The output JSON file format is the following:
 
 ``` json
+{
 "exclusiveMass[kg]": 1.3358800280858636,
 "inclusiveMass[kg]": 133.81273262584054,
 "logicalVolumeName": "SCT_ForwardC",
@@ -21,6 +22,7 @@ By default (if the optional flag are not used) *gmmasscalc*, takes the main *Wor
 "physicalVolumeName": "SCT",
 "volumeCopyNo": 16969,
 "volumeEntityType": "G4Tubs"
+}
 ``` 
 
 where:
@@ -31,6 +33,7 @@ where:
 At the end of the report, additional information about the whole geometry is reported. The last item of the JSON file will look like the following:
 
 ``` json
+{
 "apparentWeightInAir[kg]": 2405.2018407511378,
 "densityThreshold[g/cm3]": 0.02,
 "excludedFilteredMass[kg]": 14.649883998898723,
@@ -40,6 +43,7 @@ At the end of the report, additional information about the whole geometry is rep
 "logicalVolumeName": "newWorldLog",
 "material": "Air",
 "volumeEntityType": "World Volume"
+}
 ``` 
 
 where:

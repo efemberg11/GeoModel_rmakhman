@@ -22,7 +22,9 @@ By default (if the optional flag are not used) *gmmasscalc*, takes the main *Wor
 "volumeCopyNo": 16969,
 "volumeEntityType": "G4Tubs"
 ``` 
+
 where:
+
 - *exclusiveMass* is the mass of the considered volume only (from which the volumes occupied by the daughters volumes have been subtracted)
 - *inclusiveMass* is the mass of the considered volume, comprehensive of the masses of the respective daughters (propagated in an iterative way to their daughter volumes).
 
@@ -40,9 +42,10 @@ At the end of the report, additional information about the whole geometry is rep
 "volumeEntityType": "World Volume"
 ``` 
 where:
+
 - *apparent weight in Air* by definition, the weight of a body as affected by the buoyancy of a fluid (such as air) in which it is immersed. It is calculated only on the total geometry, assuming that the World Volume is made of Air
 - *exclusiveFilteredMass* is the sum of the exclusive masses of all the volumes with density>densityThreshold (0.02 g/cm3)
--*excludedFilteredMass*  is the sum of the exclusive masses of all the volumes with density<densityThreshold (0.02 g/cm3)
+- *excludedFilteredMass*  is the sum of the exclusive masses of all the volumes with density<densityThreshold (0.02 g/cm3)
 
 In addition to the default behaviour, *gmmasscalc* offers the possibility to apply 2 filters to the geometry, described in what follows. 
 

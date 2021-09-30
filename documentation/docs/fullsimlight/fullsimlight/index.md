@@ -11,7 +11,7 @@ FullSimLight package consists of different tools based on [Geant4](https://geant
 
 ### Geometry:
 
-The supported geometry formats are SQLite (.db), GDML (.gdml) and plugins that build from scratch a GeoModel geometry (.dylib/.so). Examples of geometry plugins can be found in the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins). 
+The supported geometry formats are SQLite (.db), GDML (.gdml) and plugins that build from scratch a GeoModel geometry (.dylib/.so). An example of geometry plugins can be found in the [GeoModelExamples folder](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/GeoModelExamples/KitchenSinkPlugin). 
 Use the -g flag to specify the name of the input geometry file. 
 
 ### ATLAS Geometry Files:

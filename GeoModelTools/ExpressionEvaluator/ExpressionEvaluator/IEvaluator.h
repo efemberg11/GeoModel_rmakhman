@@ -35,27 +35,27 @@ class IEvaluator {
 
   virtual void setVariable(const char * name, const char * expression) = 0;
 
-  virtual void setFunction(const char * name, double (*fun)()) {;}
+  virtual void setFunction(const char * /*name*/, double (*/*fun*/)()) {;}
 
-  virtual void setFunction(const char * name, double (*fun)(double)) {;}
+  virtual void setFunction(const char * /*name*/, double (*/*fun*/)(double)) {;}
 
-  virtual void setFunction(const char * name, double (*fun)(double,double)) {;}
+  virtual void setFunction(const char * /*name*/, double (*/*fun*/)(double,double)) {;}
 
-  virtual void setFunction(const char * name, double (*fun)(double,double,double)) {;}
+  virtual void setFunction(const char * /*name*/, double (*/*fun*/)(double,double,double)) {;}
 
-  virtual void setFunction(const char * name,
-		   double (*fun)(double,double,double,double)) {;}
+  virtual void setFunction(const char * /*name*/,
+                           double (*/*fun*/)(double,double,double,double)) {;}
 
-  virtual void setFunction(const char * name,
-                   double (*fun)(double,double,double,double,double)) {;}
+  virtual void setFunction(const char * /*name*/,
+                           double (*/*fun*/)(double,double,double,double,double)) {;}
 
   virtual bool findVariable(const char * name) const =0;
 
   virtual bool findFunction(const char * name, int npar) const =0;
 
-  virtual void removeVariable(const char * name) {;}
+  virtual void removeVariable(const char * /*name*/) {;}
 
-  virtual void removeFunction(const char * name, int npar) {;}
+  virtual void removeFunction(const char * /*name*/, int /*npar*/) {;}
   
   virtual void clear() {;}
 

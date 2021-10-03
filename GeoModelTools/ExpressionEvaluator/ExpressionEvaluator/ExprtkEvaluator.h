@@ -57,21 +57,21 @@ public:
 
   void setVariable(const char * name, const char * expression);
 
-  void setFunction(const char * name, double (*fun)()) {;}
+  void setFunction(const char * /*name*/, double (*/*fun*/)()) {;}
 
   void setArray(const char * name, std::vector<double> array);
 
-  void setFunction(const char * name, double (*fun)(double)) {;}
+  void setFunction(const char * /*name*/, double (*/*fun*/)(double)) {;}
 
-  void setFunction(const char * name, double (*fun)(double,double)) {;}
+  void setFunction(const char * /*name*/, double (*/*fun*/)(double,double)) {;}
 
-  void setFunction(const char * name, double (*fun)(double,double,double)) {;}
+  void setFunction(const char * /*name*/, double (*/*fun*/)(double,double,double)) {;}
 
-  void setFunction(const char * name,
-		   double (*fun)(double,double,double,double)) {;}
+  void setFunction(const char * /*name*/,
+		   double (*/*fun*/)(double,double,double,double)) {;}
 
-  void setFunction(const char * name,
-                   double (*fun)(double,double,double,double,double)) {;}
+  void setFunction(const char * /*name*/,
+                   double (*/*fun*/)(double,double,double,double,double)) {;}
 
   bool findVariable(const char * name) const;
 

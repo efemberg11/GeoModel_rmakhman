@@ -70,10 +70,6 @@ class GeoGraphNode;
 class GeoShapeSubtraction;
 class GeoBox;
 
-// namespaces
-using namespace GeoGenfun;
-//using namespace GeoXF;
-
 
 // type definitions
 typedef const GeoXF::Function & TRANSFUNCTION;

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/RCBase.h"
@@ -21,10 +21,7 @@ void RCBase::ref () const
 
 void RCBase::unref () const
 {
-  if (m_count.load()>0) {
-    m_count--;
-    if (m_count.load()==0) delete this;
-  }
+  if (--m_count == 0) delete this;
 }
 
 unsigned int RCBase::refCount () const

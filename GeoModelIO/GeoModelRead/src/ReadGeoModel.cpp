@@ -1851,7 +1851,6 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId, type_shapes_boole
 	}
     else if (type == "TwistedTrap") {
         // shape constructor parameters
-        const GeoTwistedTrap* shapeIn = dynamic_cast<const GeoTwistedTrap*>(shape);
         double PhiTwist = 0;
         double ZHalfLength = 0.;
         double Theta = 0.;

@@ -106,8 +106,9 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
       	" does not exist. quitting and returning nicely! "<<std::endl;
    	return;
     }
+    processorList proc;
     GmxInterface gmxInterface;
-    Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , matman);
+    Gmx2Geo gmx2Geo(f, world, gmxInterface,proc, 0 , matman);
   }
 
   if (matman) MaterialManager::getManager()->printAll();

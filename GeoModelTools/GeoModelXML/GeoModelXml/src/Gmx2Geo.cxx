@@ -30,7 +30,7 @@
 using namespace std;
 using namespace xercesc;
 
-Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager) {
+Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, processorList& procs, unsigned int flags, bool useMatManager) {
 //
 //    Create the xml tree (DOMDocument)
 //
@@ -45,11 +45,17 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
         msglog << MSG::FATAL << "Error in xml file " << xmlFile << ". Exiting athena." << endmsg;
         exit(0);
     }
+
 //
 //    Set up the CLHEP evaluator and the xml-tag processors, and store the GmxInterface:
 //
     GmxUtil gmxUtil(gmxInterface); 
     if (useMatManager) gmxUtil.matManager=MaterialManager::getManager();
+
+// add any additional ElementProcessor
+    for (auto pr: procs)
+        gmxUtil.processorRegistry.enregister(pr.first,pr.second);
+
 //
 //    Process the xml tree, creating all the GeoModel items and adding to the GeoModel tree.
 //

@@ -116,17 +116,17 @@ bool ExprtkEvaluator::findVariable(const char * name) const
   return (varMap.find(name)!=varMap.end());
 }
 
-bool ExprtkEvaluator::findFunction(const char * name, int npar) const
+bool ExprtkEvaluator::findFunction(const char * /*name*/, int /*npar*/) const
 {
   return true;
 }
 
-void ExprtkEvaluator::removeVariable(const char * name)
+void ExprtkEvaluator::removeVariable(const char * /*name*/)
 {
 
 }
 
-void ExprtkEvaluator::removeFunction(const char * name, int npar)
+void ExprtkEvaluator::removeFunction(const char * /*name*/, int /*npar*/)
 {
 
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -1173,7 +1173,6 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
     if( tableColNames.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' names is empty!!");
     if( tableColTypes.size() == 0 ) throw std::runtime_error("GMDBManager::createCustomTable -- The list of columns' types is empty!!");
 
-  int rc = -1; // sqlite's return code
   std::string queryStr;
 
   std::vector<std::string> tab;
@@ -1187,7 +1186,7 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
 
   // prepare the dynamic query to create the custom table
   queryStr = fmt::format( "create table {0} ( id integer primary key ", tab[0] );
-  for( int ii=0; ii<tableColNames.size(); ++ii) {
+  for( size_t ii=0; ii<tableColNames.size(); ++ii) {
       std::string colType = "";
     
     // -- Here we check the datum's type, which is more universal than using string-encoded types
@@ -1216,7 +1215,7 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
   queryStr += ")";
   std::cout << "- table definition: " << queryStr << std::endl;
 
-  rc = execQuery(queryStr);
+  (void)execQuery(queryStr);
   tab.clear();
   return addListOfRecordsToTable( tableName, records ); // needs SQLite >= 3.7.11
 }
@@ -1650,8 +1649,8 @@ std::vector<std::string> GMDBManager::getRootPhysVol()
   // get the ID of the ROOT vol from the table "RootVolume"
   sqlite3_stmt* stmt = m_d->selectAllFromTable("RootVolume");
   // declare the data we want to fetch
-  unsigned int id;
-  unsigned int typeId;
+  unsigned int id = 0;
+  unsigned int typeId = 0;
   // execute the statement on all rows
   int rc = -1;
   while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {

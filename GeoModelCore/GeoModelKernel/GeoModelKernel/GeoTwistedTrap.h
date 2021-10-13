@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOTWISTEDTRAP_H
@@ -113,12 +113,7 @@ class GeoTwistedTrap : public GeoShape
   double m_dx3;
   double m_dx4;
   double m_dz;        // Half-length along the z axis
-  double m_dx ;       // maximum side in x
-  double m_dy ;       // maximum side in y
   double m_alph ;
-  double m_tAlph ;    // std::tan(fAlph)
-  double m_deltaX ;
-  double m_deltaY ;
   double m_phiTwist;  // twist angle ( dphi in surface equation)
     
   const double m_CarTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;

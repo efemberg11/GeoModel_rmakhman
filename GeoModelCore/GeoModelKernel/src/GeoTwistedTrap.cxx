@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoTwistedTrap.h"
@@ -15,9 +15,7 @@ GeoTwistedTrap::GeoTwistedTrap(double  pPhiTwist,
                                double  pDx2,
                                double  pDy,
                                double  pDz )
-: m_phiTwist(pPhiTwist),
-m_dz(pDz),
-m_theta(0.),
+: m_theta(0.),
 m_phi(0.),
 m_dy1(pDy),
 m_dx1(pDx1),
@@ -25,7 +23,9 @@ m_dx2(pDx2),
 m_dy2(pDy),
 m_dx3(pDx1),
 m_dx4(pDx2),
-m_alph(0.)
+m_dz(pDz),
+m_alph(0.),
+m_phiTwist(pPhiTwist)
 {
 }
 
@@ -41,9 +41,7 @@ GeoTwistedTrap(double  pPhiTwist,  // twist angle
                double  pDx3,    // half x length at +pDz,-pDy
                double  pDx4,    // half x length at +pDz,+pDy
                double  pAlph )  // tilt angle
-: m_phiTwist(pPhiTwist),
-m_dz(pDz),
-m_theta(pTheta),
+: m_theta(pTheta),
 m_phi(pPhi),
 m_dy1(pDy1),
 m_dx1(pDx1),
@@ -51,7 +49,9 @@ m_dx2(pDx2),
 m_dy2(pDy2),
 m_dx3(pDx3),
 m_dx4(pDx4),
-m_alph(pAlph)
+m_dz(pDz),
+m_alph(pAlph),
+m_phiTwist(pPhiTwist)
 {
      if  ( ! ( ( m_dx1  > 2*m_CarTolerance)
             && ( m_dx2  > 2*m_CarTolerance)

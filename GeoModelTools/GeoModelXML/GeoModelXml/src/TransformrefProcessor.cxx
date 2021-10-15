@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -35,7 +35,7 @@ char *toRelease;
     if (nodeName != "transform") {
         msglog << MSG::FATAL<< "Error in xml/gmx file: transformref " << XMLString::transcode(idref) << " referenced a " << nodeName << 
                 " instead of a logvol." << endmsg;
-        exit(999); // Should do better...
+	std::abort();
     }
 //
 //    Process it

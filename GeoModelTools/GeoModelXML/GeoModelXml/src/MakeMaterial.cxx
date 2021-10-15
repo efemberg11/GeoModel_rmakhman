@@ -18,7 +18,7 @@ using namespace GeoModelKernelUnits;
 
 MakeMaterial::MakeMaterial() {}
 
-const RCBase * MakeMaterial::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+RCBase * MakeMaterial::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
 char *name;
 char *density;
 char *densitySF;
@@ -48,7 +48,7 @@ char *toRelease;
     if (XMLString::compareIString(parent->getNodeName(), materials_tmp) != 0) {
         msglog << MSG::FATAL << "Asked to make a material for non-material element. Parent element was " <<
                              XMLString::transcode(parent->getNodeName()) << "; error in gmx file; exiting" << endmsg;
-        exit(1);
+	std::abort();
     }
     double scaleFactor(1.0);
     DOMElement *el = dynamic_cast<DOMElement *> (parent);
@@ -89,26 +89,25 @@ char *toRelease;
         if (nodeName != string("element")) {
             msglog << MSG::FATAL << "Error in xml/gmx file: An elementref referenced a " << nodeName << " instead of an element."
                               << endmsg;
-            exit(999); // Should do better...
+	    std::abort();
 	}
 
-	const GeoElement *geoElem = 0;
+	const GeoElement *geoElem = nullptr;
 	if (gmxUtil.matManager)
 	{
 		name=XMLString::transcode(idref);
     		if (!gmxUtil.matManager->isElementDefined(name))
     		{
-      			GeoElement *temp=(GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
-      			//gmxUtil.matManager->addElement(temp);
+		  const GeoElement *temp=static_cast<const GeoElement *>( gmxUtil.tagHandler.element.process(elem, gmxUtil));
+		  //gmxUtil.matManager->addElement(temp);
     		}
-		geoElem=const_cast<GeoElement*>(gmxUtil.matManager->getElement(name));
+		geoElem=gmxUtil.matManager->getElement(name);
 		XMLString::release(&name);
 	}
 	else
 	{
-		
-		geoElem=(const GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil);
-		if (!geoElem) std::cout<<"could not retrieve element!!!!!"<<std::endl;
+	  geoElem=static_cast<const GeoElement *>( gmxUtil.tagHandler.element.process(elem, gmxUtil));
+	  if (!geoElem) std::cout<<"could not retrieve element!!!!!"<<std::endl;
   	}
 
 
@@ -135,7 +134,7 @@ char *toRelease;
         if (nodeName != string("chemical")) {
             msglog << MSG::FATAL << "Error in xml/gmx file: A chemref referenced a " << nodeName << " instead of a chemical." <<
                                   endmsg;
-            exit(999); // Should do better...
+	    std::abort();
         }
 
         fracString = XMLString::transcode(chemRef->getAttribute(fraction_tmp));
@@ -145,7 +144,7 @@ char *toRelease;
         // Loop over chemical contents, adding each element to this material
         DOMNodeList *chemEls = chem->getElementsByTagName(elemcontent_tmp);
         int nChemEls = chemEls->getLength();
-        vector<GeoElement *> geoElem;
+        vector<const GeoElement *> geoElem;
         vector<double> atomicWeight;
         double molWeight = 0.0;
         vector<double> formula;
@@ -160,18 +159,18 @@ char *toRelease;
             if (nodeName != string("element")) {
                 msglog << MSG::FATAL <<
                        "Error in xml/gmx file: An elementref referenced a " << nodeName << " instead of an element." << endmsg;
-                exit(999); // Should do better...
+		std::abort();
             }
 
 	    if (gmxUtil.matManager)
 	    {
 		name=XMLString::transcode(idref);
-		geoElem.push_back((GeoElement *)gmxUtil.matManager->getElement(name));
+		geoElem.push_back(gmxUtil.matManager->getElement(name));
 		XMLString::release(&name);
 	    }
 	    else
 	    {
-		geoElem.push_back((GeoElement *) gmxUtil.tagHandler.element.process(elem, gmxUtil));
+	      geoElem.push_back(static_cast<const GeoElement *>(gmxUtil.tagHandler.element.process(elem, gmxUtil)));
             }
 
             atomicWeight.push_back(geoElem.back()->getA());
@@ -245,5 +244,5 @@ char *toRelease;
   XMLString::release(&materialref_tmp);
 
 
-    return (const RCBase *) material;
+    return (RCBase *) material;
 }

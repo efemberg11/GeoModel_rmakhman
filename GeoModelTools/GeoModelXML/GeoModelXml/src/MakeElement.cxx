@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelXml/MakeElement.h"
@@ -15,7 +15,7 @@ using namespace GeoModelKernelUnits;
 
 MakeElement::MakeElement() {}
 
-const RCBase * MakeElement::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+RCBase * MakeElement::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
   //std::cout<<"this is MakeElement: make()"<<std::endl;
   char *name, *shortname, *z,*a;
   XMLCh *name_tmp,*shortname_tmp,*z_tmp,*a_tmp;
@@ -65,5 +65,5 @@ const RCBase * MakeElement::make(const xercesc::DOMElement *element, GmxUtil &gm
   XMLString::release(&name_tmp);
   XMLString::release(&shortname_tmp);
 
-  return (const RCBase *) el;
+  return (RCBase *) el;
 }

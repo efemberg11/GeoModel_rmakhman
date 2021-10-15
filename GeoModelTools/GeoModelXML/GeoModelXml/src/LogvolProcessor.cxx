@@ -47,7 +47,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
 //
   map<string, LogVolStore>::iterator entry;
   if ((entry = m_map.find(name)) == m_map.end()) { // Not in registry; make a new item
-//
+    //
 //    Name
 //
     m_map[name] = LogVolStore();
@@ -65,11 +65,12 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     // Check it is a shape... its parent should be a <shapes>. DTD cannot do this for us.
     DOMNode *parent = refShape->getParentNode();
     if (XMLString::compareIString(parent->getNodeName(), XMLString::transcode("shapes")) != 0) {
-
+      char* shape_s = XMLString::transcode (shape);
       msglog << MSG::FATAL << "Processing logvol " << name <<
-                    ". Error in gmx file. An IDREF for a logvol shape did not refer to a shape.\n" <<
-                    "Shape ref was " << shape << "; exiting" << endmsg;
-      exit (1); // Need to improve...
+	". Error in gmx file. An IDREF for a logvol shape did not refer to a shape.\n" <<
+	"Shape ref was " << shape_s << "; exiting" << endmsg;
+      XMLString::release (&shape_s);
+      std::abort();
     }
 //
 //    What sort of shape?
@@ -79,7 +80,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     XMLString::release(&name2release);
     XMLString::release(&shape_tmp);
 
-    GeoShape *s = (GeoShape *) gmxUtil.geoItemRegistry.find(shapeType)->process(refShape, gmxUtil);
+    const GeoShape *s = static_cast<const GeoShape *>(gmxUtil.geoItemRegistry.find(shapeType)->process(refShape, gmxUtil));
 //
 //    Get the material
 //
@@ -90,28 +91,30 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     parent = refMaterial->getParentNode();
     XMLCh * materials_tmp = XMLString::transcode("materials");
     if (XMLString::compareIString(parent->getNodeName(), materials_tmp) != 0) {
+      char* material_s = XMLString::transcode (material);
       msglog << MSG::FATAL << "Processing logvol " << name <<
-                    ". Error in gmx file. An IDREF for a logvol material did not refer to a material.\n" <<
-                    "Material ref was " << material << "; exiting" << endmsg;
-      exit (1); // Need to improve...
+	". Error in gmx file. An IDREF for a logvol material did not refer to a material.\n" <<
+	"Material ref was " << material_s << "; exiting" << endmsg;
+      XMLString::release (&material_s);
+      std::abort();
     }
-	  std::string nam_mat=XMLString::transcode(material);
+    std::string nam_mat=XMLString::transcode(material);
 
-	  GeoMaterial* m=0;
+    const GeoMaterial* m=nullptr;
 
     if (gmxUtil.matManager)
     {
       if (!gmxUtil.matManager->isMaterialDefined(nam_mat))
       {
-        GeoMaterial* tempMat=(GeoMaterial *) gmxUtil.tagHandler.material.process(refMaterial, gmxUtil);
+        GeoMaterial* tempMat=static_cast<GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
         // we let GMX create the material and store it in the MM
 
         gmxUtil.matManager->addMaterial(tempMat);
       }
-      m=const_cast<GeoMaterial*>(gmxUtil.matManager->getMaterial(nam_mat));
+      m=gmxUtil.matManager->getMaterial(nam_mat);
     }
     else
-      m=(GeoMaterial *) gmxUtil.tagHandler.material.process(refMaterial, gmxUtil);
+      m=static_cast<const GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
 
 //
 //    Make the LogVol and add it to the map ready for next time

@@ -33,7 +33,7 @@ using namespace xercesc;
 
 MakeTwistedTrap::MakeTwistedTrap() {}
 
-const RCBase * MakeTwistedTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+RCBase * MakeTwistedTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
 const int nParams = 11; 
 char const *parName[nParams] = {"twist", "dz", "theta","phi","dy1","dx1","dx2","dy2","dx3","dx4","alpha"};
 double p[nParams];

@@ -35,7 +35,7 @@ char *toRelease;
     if (nodeName != string("logvol")) {
         msglog << MSG::FATAL << "Error in xml/gmx file: logvolref " << XMLString::transcode(idref) << " referenced a " << nodeName << 
                 " instead of a logvol." << endmsg;
-        exit(999); // Should do better...
+	std::abort();
     }
 //
 //    Process it

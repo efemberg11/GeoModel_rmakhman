@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelXml/GmxUtil.h"
@@ -82,7 +82,7 @@ GmxInterface * GmxUtil::gmxInterface() {
 
 double GmxUtil::evaluate(char const *expression) {
     static string lastGoodExpression("none"); // It is helpful for debugging to get some idea of where we had got to...
-    string strExpression(expression);
+    string thread_local strExpression(expression);
 
     bool isWhiteSpace = true;
     for(unsigned int i = 0; i < strExpression.length(); ++i){

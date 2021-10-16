@@ -13,16 +13,17 @@
 #include "GeoModelKernel/Query.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoVFullPhysVol.h"
+#include <atomic>
 using namespace std;
 
 int GmxInterface::sensorId(map<string, int> &/*index*/) const {
-    static int sequentialId;
-    return sequentialId++;
+  static std::atomic<int> sequentialId;
+  return sequentialId++;
 }
 
 int GmxInterface::splitSensorId(map<string, int> &/*index*/, std::pair<std::string, int> &/*extraIndex*/, map<string, int> &/*updatedIndex*/) const {
-    static int sequentialId;
-    return sequentialId++;
+  static std::atomic<int> sequentialId;
+  return sequentialId++;
 }
 
 void GmxInterface::addSensorType(string clas, string type, map<string, string> params) {

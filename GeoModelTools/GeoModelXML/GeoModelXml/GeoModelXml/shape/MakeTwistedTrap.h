@@ -11,7 +11,7 @@
 class MakeTwistedTrap: public Element2GeoItem {
 public:
     MakeTwistedTrap();
-    const RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const;
+    virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 };
 
 #endif // GEO_MODEL_XML_MAKE_TWISTED_TRAP_H

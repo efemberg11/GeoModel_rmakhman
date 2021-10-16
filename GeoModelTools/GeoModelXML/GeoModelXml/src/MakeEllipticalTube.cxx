@@ -13,7 +13,7 @@ using namespace xercesc;
 
 MakeEllipticalTube::MakeEllipticalTube() {}
 
-const RCBase * MakeEllipticalTube::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+RCBase * MakeEllipticalTube::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
 const int nParams = 3; 
 char const *parName[nParams] = {"xhalflength", "yhalflength", "zhalflength"};
 double p[nParams];

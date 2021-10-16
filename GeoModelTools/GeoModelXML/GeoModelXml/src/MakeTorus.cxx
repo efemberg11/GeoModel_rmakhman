@@ -15,7 +15,7 @@ using namespace xercesc;
 
 MakeTorus::MakeTorus() {}
 
-const RCBase * MakeTorus::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+RCBase * MakeTorus::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
 const int nParams = 5; 
 char const *parName[nParams] = {"rmin", "rmax", "rtor", "sphi", "dphi"};
 double p[nParams];

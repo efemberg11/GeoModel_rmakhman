@@ -76,6 +76,7 @@ public:
 //
 //    Things creating a vector of nodes to be added to the tree
 //
+	std::map<std::string, ElementProcessor&, std::less<std::string> > processor;
         AddbranchProcessor addbranch;
         LogvolProcessor logvol;
         LogvolrefProcessor logvolref;

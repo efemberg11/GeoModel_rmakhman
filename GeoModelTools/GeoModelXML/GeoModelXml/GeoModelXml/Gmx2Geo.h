@@ -42,6 +42,7 @@
 #include <string>
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GmxInterface.h"
+#include <map>
 
 class GeoPhysVol;
 XERCES_CPP_NAMESPACE_BEGIN
@@ -53,9 +54,11 @@ XERCES_CPP_NAMESPACE_END
 
 class Evaluator;
 
+#define processorList std::map<std::string,ElementProcessor*> 
+
 class Gmx2Geo {
 public:
-    Gmx2Geo(const std::string gmxFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0);
+    Gmx2Geo(const std::string gmxFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0,const processorList& procs=processorList());
 private:
 // Disallow copying
     Gmx2Geo(const Gmx2Geo &right);

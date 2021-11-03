@@ -30,7 +30,7 @@
 using namespace std;
 using namespace xercesc;
 
-Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, processorList& procs, unsigned int flags, bool useMatManager) {
+Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager, const processorList& procs) {
 //
 //    Create the xml tree (DOMDocument)
 //

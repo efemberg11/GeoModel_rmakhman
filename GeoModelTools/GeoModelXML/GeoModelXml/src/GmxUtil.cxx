@@ -81,8 +81,8 @@ GmxInterface * GmxUtil::gmxInterface() {
 }
 
 double GmxUtil::evaluate(char const *expression) {
-    static string lastGoodExpression("none"); // It is helpful for debugging to get some idea of where we had got to...
-    string thread_local strExpression(expression);
+    static thread_local string lastGoodExpression("none"); // It is helpful for debugging to get some idea of where we had got to...
+    string strExpression(expression);
 
     bool isWhiteSpace = true;
     for(unsigned int i = 0; i < strExpression.length(); ++i){

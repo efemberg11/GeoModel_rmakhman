@@ -206,7 +206,7 @@ char *toRelease;
         if (nodeName != string("material")) {
             msglog << MSG::FATAL <<
                    "Error in xml/gmx file: A materialref referenced a " << nodeName << " instead of a material." << endmsg;
-            exit(999); // Should do better...
+            std::abort();
         }
 
         const GeoMaterial *geoMaterial=0;
@@ -219,7 +219,7 @@ char *toRelease;
 	else
 	{
 		
-		geoMaterial=(const GeoMaterial *) gmxUtil.tagHandler.material.process(elem, gmxUtil);
+	        geoMaterial=static_cast<const GeoMaterial *>( gmxUtil.tagHandler.material.process(elem, gmxUtil));
 		if (!geoMaterial) std::cout<<"something is wrong!!!!"<<std::endl;
   	}
 

@@ -203,7 +203,7 @@ DOMDocument *doc = element->getOwnerDocument();
 	else {
 	  msglog << MSG::FATAL << 
 	    "multicopyprocessor: error in " << name << ". <transform> object was neither assemblyref nor logvolref\n"
-                    << "Exiting Athena" << endmsg;
+                    << "Exiting program" << endmsg;
 	  std::abort();
 	}
       }

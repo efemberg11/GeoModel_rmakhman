@@ -58,7 +58,7 @@ class Evaluator;
 
 class Gmx2Geo {
 public:
-    Gmx2Geo(const std::string gmxFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0,const processorList& procs=processorList());
+    Gmx2Geo(const std::string& gmxFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0,const processorList& procs=processorList());
 private:
 // Disallow copying
     Gmx2Geo(const Gmx2Geo &right);

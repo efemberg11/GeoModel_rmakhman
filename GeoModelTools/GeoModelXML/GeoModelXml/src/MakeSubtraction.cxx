@@ -57,6 +57,9 @@ RCBase * MakeSubtraction::make(const xercesc::DOMElement *element, GmxUtil &gmxU
 	  elementIndex++;
         }
     }
+
+    if (!first || !second) std::abort();
+
     // FIXME: subtract() returns a new'd object --- should really be
     // returning a `unique_ptr<GeoShapeSubtraction>' not a
     // `const GeoShapeSubtraction'

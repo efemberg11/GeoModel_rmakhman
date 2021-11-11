@@ -56,6 +56,9 @@ RCBase * MakeIntersection::make(const xercesc::DOMElement *element, GmxUtil &gmx
 	  elementIndex++;
         }
     }
+
+    if (!first || !second) std::abort();
+
     // FIXME: intersect() returns a new'd object --- should really be
     // returning a `unique_ptr<GeoShapeIntersection>' not a
     // `const GeoShapeIntersection'

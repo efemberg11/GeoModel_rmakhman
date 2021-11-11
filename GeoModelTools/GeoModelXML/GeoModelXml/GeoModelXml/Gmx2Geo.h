@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEO_MODEL_XML_GMX2GEO_H
@@ -30,9 +30,9 @@
 //    Use:
 //        #include "GeoModelXml/Gmx2Geo.h"
 //        #include "GeoModelXml/GmxInterface.h"
-//            ...create your world volume and do all the Athena setup...
+//            ...create your world volume ...
 //            ... get the filename with the xml in:
-//              std::string xmlfilename; some athena stuff to get filename from the job options...
+//              std::string xmlfilename; ...
 //            ...create your envelope GeoPhysVol...
 //            GeoPhysVol *sct(...);
 //            GmxInterface gmxInterface;
@@ -58,7 +58,7 @@ class Evaluator;
 
 class Gmx2Geo {
 public:
-    Gmx2Geo(const std::string gmxFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0,const processorList& procs=processorList());
+    Gmx2Geo(const std::string& gmxFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0,const processorList& procs=processorList());
 private:
 // Disallow copying
     Gmx2Geo(const Gmx2Geo &right);

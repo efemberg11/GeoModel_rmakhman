@@ -30,7 +30,7 @@
 using namespace std;
 using namespace xercesc;
 
-Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager, const processorList& procs) {
+Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager, const processorList& procs) {
 //
 //    Create the xml tree (DOMDocument)
 //
@@ -42,7 +42,7 @@ Gmx2Geo::Gmx2Geo(const string xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInt
     DOMDocument *doc = createDOMDocument(xmlFile, parser, flags);
     if (!doc) {// Parsed badly
         XMLPlatformUtils::Terminate();
-        msglog << MSG::FATAL << "Error in xml file " << xmlFile << ". Exiting athena." << endmsg;
+        msglog << MSG::FATAL << "Error in xml file " << xmlFile << ". Exiting program." << endmsg;
 	std::abort();
     }
 

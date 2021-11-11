@@ -1,10 +1,6 @@
 /*
-    Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+    Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
-
-//
-//    Use gaudi messaging service when in Athena; use cout when "stand-alone".
-//
 
 #ifndef OUTPUTDIRECTOR_H
 #define OUTPUTDIRECTOR_H

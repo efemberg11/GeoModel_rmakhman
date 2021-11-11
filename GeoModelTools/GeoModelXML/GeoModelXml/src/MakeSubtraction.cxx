@@ -48,7 +48,7 @@ RCBase * MakeSubtraction::make(const xercesc::DOMElement *element, GmxUtil &gmxU
 	    break;
 	  }
 	  case 2: { // Third element is second shaperef
-	    second = (GeoShape *) gmxUtil.tagHandler.shaperef.process(dynamic_cast<DOMElement *> (child), gmxUtil);
+	    second = static_cast<const GeoShape *>( gmxUtil.tagHandler.shaperef.process(dynamic_cast<DOMElement *> (child), gmxUtil));
 	    break;
 	  }
 	  default: // More than 3 elements?
@@ -57,6 +57,9 @@ RCBase * MakeSubtraction::make(const xercesc::DOMElement *element, GmxUtil &gmxU
 	  elementIndex++;
         }
     }
+
+    if (!first || !second) std::abort();
+
     // FIXME: subtract() returns a new'd object --- should really be
     // returning a `unique_ptr<GeoShapeSubtraction>' not a
     // `const GeoShapeSubtraction'

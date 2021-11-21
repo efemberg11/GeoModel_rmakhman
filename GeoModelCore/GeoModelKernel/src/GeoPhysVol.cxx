@@ -19,13 +19,13 @@ GeoPhysVol::GeoPhysVol(const GeoLogVol* LogVol)
 
 GeoPhysVol::~GeoPhysVol()
 {
-  std::lock_guard<std::mutex> lk(m_muxVec);
+  std::scoped_lock<std::mutex> lk(m_muxVec);
   for(const GeoGraphNode* daughter : m_daughters) daughter->unref();
 }
 
 void GeoPhysVol::add(GeoGraphNode* graphNode)
 {
-  std::lock_guard<std::mutex> lk(m_muxVec);
+  std::scoped_lock<std::mutex> lk(m_muxVec);
   m_daughters.push_back(graphNode);
   graphNode->ref();
   graphNode->dockTo(this);
@@ -88,7 +88,7 @@ void GeoPhysVol::exec(GeoNodeAction *action) const
   }
   else {
     // FIXME: m_daughters access is now protected in other methods, but having the lock here makes a deadlock
-    // std::lock_guard<std::mutex> lk(m_muxVec);
+    // std::scoped_lock<std::mutex> lk(m_muxVec);
     // TODO: Think more thouroughly about thread-safe of this class...!!
     for(size_t c = 0; c < m_daughters.size (); c++) {
       m_daughters[c]->exec(action);
@@ -195,19 +195,19 @@ GeoTrf::Transform3D GeoPhysVol::getDefX(const GeoVAlignmentStore* store) const {
 
 unsigned int GeoPhysVol::getNChildNodes() const 
 {
-  std::lock_guard<std::mutex> lk(m_muxVec);
+  std::scoped_lock<std::mutex> lk(m_muxVec);
   return m_daughters.size();
 }
 
 const GeoGraphNode * const * GeoPhysVol::getChildNode(unsigned int i) const 
 {
-  std::lock_guard<std::mutex> lk(m_muxVec);
+  std::scoped_lock<std::mutex> lk(m_muxVec);
   return &(m_daughters[i]);
 }
 
 const GeoGraphNode * const * GeoPhysVol::findChildNode(const GeoGraphNode * n) const 
 {
-  std::lock_guard<std::mutex> lk(m_muxVec);
+  std::scoped_lock<std::mutex> lk(m_muxVec);
   std::vector<const GeoGraphNode *>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
   if (i==m_daughters.end()) {
     return nullptr;

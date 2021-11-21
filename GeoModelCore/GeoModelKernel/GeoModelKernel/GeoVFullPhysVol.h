@@ -7,6 +7,7 @@
 
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoAbsPositionInfo.h"
+#include <mutex>
 
 class GeoVAlignmentStore;
 
@@ -61,6 +62,8 @@ class GeoVFullPhysVol : public GeoVPhysVol
   /// Information on the where this volume is, by default and after alignment corrections.      
   mutable GeoAbsPositionInfo *m_absPosInfo;
 
+  /// The absolute position info needs to be protected by mutex
+  mutable std::mutex m_absPosMutex;
 };
 
 #endif

@@ -30,7 +30,7 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
   //------------------------------------------------------------------------------------------------//     
   if(isShared()) throw std::runtime_error(errorMessage);
 
-  std::scoped_lock<std::mutex> guard(m_absPosMutex);
+  std::scoped_lock<std::mutex> guard(m_mutex);
   
   if(store==nullptr && !m_absPosInfo) m_absPosInfo = new GeoAbsPositionInfo();
 
@@ -80,7 +80,7 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
 const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedAbsoluteTransform(const GeoVAlignmentStore* store) const
 {
   if(store==nullptr) {
-    std::scoped_lock<std::mutex> guard(m_absPosMutex);
+    std::scoped_lock<std::mutex> guard(m_mutex);
     if(m_absPosInfo->getAbsTransform()) return *m_absPosInfo->getAbsTransform();
   }
   else {
@@ -93,7 +93,7 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedAbsoluteTransform(const Geo
 
 void GeoVFullPhysVol::clearPositionInfo() const
 {
-  std::scoped_lock<std::mutex> guard(m_absPosMutex);
+  std::scoped_lock<std::mutex> guard(m_mutex);
   delete m_absPosInfo;
   m_absPosInfo = nullptr;
 }
@@ -109,7 +109,7 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
   //------------------------------------------------------------------------------------------------//     
   if(isShared()) throw std::runtime_error(errorMessage);
 
-  std::scoped_lock<std::mutex> guard(m_absPosMutex);
+  std::scoped_lock<std::mutex> guard(m_mutex);
   
   if(store==nullptr && !m_absPosInfo) m_absPosInfo = new GeoAbsPositionInfo();
 
@@ -159,7 +159,7 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
 const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedDefAbsoluteTransform(const GeoVAlignmentStore* store) const
 {
   if(store==nullptr) {
-    std::scoped_lock<std::mutex> guard(m_absPosMutex);
+    std::scoped_lock<std::mutex> guard(m_mutex);
     if(m_absPosInfo->getDefAbsTransform()) return *m_absPosInfo->getDefAbsTransform();
   }
   else {

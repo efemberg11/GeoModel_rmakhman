@@ -26,7 +26,7 @@ GeoFullPhysVol::~GeoFullPhysVol()
 void GeoFullPhysVol::add(GeoGraphNode* graphNode)
 {
   if(m_cloneOrigin) throw std::runtime_error("Attempt to modify contents of a cloned FPV");
-
+  std::scoped_lock<std::mutex> guard(m_mutex);
   m_daughters.push_back(graphNode);
   graphNode->ref();
   graphNode->dockTo(this);
@@ -235,15 +235,18 @@ GeoTrf::Transform3D GeoFullPhysVol::getDefX(const GeoVAlignmentStore* store) con
 
 unsigned int GeoFullPhysVol::getNChildNodes() const 
 {
+  std::scoped_lock<std::mutex> guard(m_mutex);
   return m_daughters.size();
 }
 
 const GeoGraphNode * const * GeoFullPhysVol::getChildNode(unsigned int i) const 
 {
+  std::scoped_lock<std::mutex> guard(m_mutex);
   return &(m_daughters[i]);
 }
 const GeoGraphNode * const * GeoFullPhysVol::findChildNode(const GeoGraphNode * n) const 
 {
+  std::scoped_lock<std::mutex> guard(m_mutex);
   std::vector<const GeoGraphNode *>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
   if (i==m_daughters.end()) {
     return nullptr;

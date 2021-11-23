@@ -52,6 +52,11 @@ class GeoVFullPhysVol : public GeoVPhysVol
  protected:
   virtual ~GeoVFullPhysVol() override;
 
+  /// Mutex serving dual purpose:
+  ///  1. To protect the absolute position info
+  ///  2. To protect m_daughters container in the derived GeoFullPhysVol
+  mutable std::mutex m_mutex;
+
  private:
   /// The absolute name of this volume.
   std::string m_absName;
@@ -62,8 +67,6 @@ class GeoVFullPhysVol : public GeoVPhysVol
   /// Information on the where this volume is, by default and after alignment corrections.      
   mutable GeoAbsPositionInfo *m_absPosInfo;
 
-  /// The absolute position info needs to be protected by mutex
-  mutable std::mutex m_absPosMutex;
 };
 
 #endif

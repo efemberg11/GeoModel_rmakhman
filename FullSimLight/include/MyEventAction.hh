@@ -4,30 +4,28 @@
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
-#include "MyEventDataPerPrimary.hh"
-
-#include <vector>
+#include "MyEventData.hh"
 
 class G4Event;
 class G4Track;
-
 
 class MyEventAction: public G4UserEventAction {
 
 public:
 
-  MyEventAction();
-  virtual ~MyEventAction();
+   MyEventAction();
+  ~MyEventAction() override;
 
-  virtual void BeginOfEventAction(const G4Event* evt);
-  virtual void EndOfEventAction(const G4Event* evt);
+  void BeginOfEventAction(const G4Event* evt) override;
+  void EndOfEventAction(const G4Event* evt) override;
 
-  void  AddData(G4double edep, G4double length, G4bool ischarged, G4int primid);
-  void  AddSecondaryTrack(const G4Track* track, G4int primid);
+  void AddData(G4double edep, G4double length, G4bool ischarged);
+  void AddSecondaryTrack(const G4Track* track);
 
 private:
-  G4int  fNumberOfPrimariesPerEvent;
-  std::vector<MyEventDataPerPrimary>  fEventDataPerPrimary;
+
+  MyEventData fEventData;
+
 };
 
 #endif

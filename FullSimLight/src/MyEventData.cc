@@ -1,9 +1,17 @@
 
-#include "MyEventDataPerPrimary.hh"
+#include "MyEventData.hh"
 
 #include "G4SystemOfUnits.hh"
 
-MyEventDataPerPrimary::MyEventDataPerPrimary() {
+MyEventData::MyEventData() {
+  Clear();
+}
+
+
+MyEventData::~MyEventData() {}
+
+
+void MyEventData::Clear() {
   fEdep         = 0.;
   fTrackLCh     = 0.;
   fTrackLNe     = 0.;
@@ -15,22 +23,7 @@ MyEventDataPerPrimary::MyEventDataPerPrimary() {
 }
 
 
-MyEventDataPerPrimary::~MyEventDataPerPrimary() {}
-
-
-void MyEventDataPerPrimary::Clear() {
-  fEdep         = 0.;
-  fTrackLCh     = 0.;
-  fTrackLNe     = 0.;
-  fChargedStep  = 0.;
-  fNeutralStep  = 0.;
-  fNGamma       = 0.;
-  fNElec        = 0.;
-  fNPosit       = 0.;
-}
-
-
-std::ostream& operator<<(std::ostream& flux, const MyEventDataPerPrimary& evtdata) {
+std::ostream& operator<<(std::ostream& flux, const MyEventData& evtdata) {
   std::ios::fmtflags mode = flux.flags();
   flux.setf(std::ios::fixed,std::ios::floatfield);
   long prec = flux.precision(3);

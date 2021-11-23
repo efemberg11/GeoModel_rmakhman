@@ -9,16 +9,16 @@ class G4Track;
 class MyEventAction;
 
 class MyTrackingAction : public G4UserTrackingAction {
+
 public:
 
-  MyTrackingAction(MyEventAction*);
-  virtual ~MyTrackingAction();
+   MyTrackingAction(MyEventAction*);
+  ~MyTrackingAction() override;
 
-  virtual void PreUserTrackingAction(const G4Track*);
-  virtual void PostUserTrackingAction(const G4Track*);
+   void PreUserTrackingAction(const G4Track*) override;
 
 private:
-  
+
   MyEventAction *fEventAction;
 
 };

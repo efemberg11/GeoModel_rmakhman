@@ -31,6 +31,12 @@ MyActionInitialization::~MyActionInitialization() {}
 void MyActionInitialization::BuildForMaster() const {
     MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps,fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
+#if USE_PYTHIA
+    if (use_pythia()) {
+      G4String str(get_pythia_config());
+      masterRunAct->SetPythiaConfig(str);
+    }
+#endif
     SetUserAction(masterRunAct);
 }
 
@@ -44,7 +50,6 @@ void MyActionInitialization::Build() const {
     // seed each generator/thread by 1234 if perfomance mode run and use the event
     // ID+1 as seed otherwise (guaranted reproducibility wile having different events)
     G4int pythiaSeed = fIsPerformance ? -1 : 0;
-//    pythiaSeed = 0;
     SetUserAction(new PythiaPrimaryGeneratorAction(pythiaSeed));
   } else {
     SetUserAction(new MyPrimaryGeneratorAction());
@@ -57,6 +62,12 @@ void MyActionInitialization::Build() const {
   if (fIsPerformance) {
     MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
+#if USE_PYTHIA
+    if (use_pythia()) {
+      G4String str(get_pythia_config());
+      masterRunAct->SetPythiaConfig(str);
+    }
+#endif
     SetUserAction(masterRunAct);
   }
 #endif

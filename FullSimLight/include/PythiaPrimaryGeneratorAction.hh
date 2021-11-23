@@ -10,6 +10,7 @@ class G4Event;
 
 bool use_pythia();
 void set_pythia_config(const char*);
+const char* get_pythia_config();
 
 class PythiaPrimaryGeneratorAction final : public G4VUserPrimaryGeneratorAction {
 
@@ -21,8 +22,10 @@ public:
   void GeneratePrimaries(G4Event*) override;
 
 private:
-  Pythia8::Pythia pythia;
+
   int             fSeeding;
+  Pythia8::Pythia fPythia;
+
 };
 
 #endif

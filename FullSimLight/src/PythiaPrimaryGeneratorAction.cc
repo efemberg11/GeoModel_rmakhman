@@ -53,13 +53,18 @@ void set_pythia_config(const char *cfg)
 	config = cfg;
 }
 
-PythiaPrimaryGeneratorAction::PythiaPrimaryGeneratorAction() {
+PythiaPrimaryGeneratorAction::PythiaPrimaryGeneratorAction(int seeding) : fSeeding(seeding) {
         if (access(config, R_OK) == 0) {
                 pythia.readFile(config);
         } else {
                 /*
                 flag name="Pythia:setSeed" default="off"
-                Indicates whether a user-set seed should be used every time the Pythia::init routine is called. If off, the random number generator is initialized with its default seed at the beginning of the run, and never again. If on, each new Pythia::init call (should several be made in the same run) results in the random number being re-initialized, thereby possibly starting over with the same sequence, if you do not watch out.
+                Indicates whether a user-set seed should be used every time the Pythia::init
+                routine is called. If off, the random number generator is initialized with its
+                default seed at the beginning of the run, and never again. If on, each new
+                Pythia::init call (should several be made in the same run) results in the
+                random number being re-initialized, thereby possibly starting over with the
+                same sequence, if you do not watch out.
 
                 mode name="Pythia:seed" default="-1" max="900000000"
                 The seed to be used, if setSeed is on.
@@ -96,7 +101,13 @@ void PythiaPrimaryGeneratorAction::GeneratePrimaries(G4Event *event)
         static const G4ThreeVector position(0.0, 0.0, 0.0);
 
         G4PrimaryVertex* vertex = new G4PrimaryVertex(position, time);
-
+        //
+        // re-seed pythia with the event ID + 1 in order to ensure that the
+        // events are the same for a given event ID independently the from other
+        // run conditions
+        if (fSeeding == 0) {
+          pythia.rndm.init(event->GetEventID()+1);
+        }
         pythia.next();
 
         for (auto i = 1, n = pythia.event.size(); i < n; ++i) {

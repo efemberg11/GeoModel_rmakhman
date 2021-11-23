@@ -14,12 +14,15 @@ void set_pythia_config(const char*);
 class PythiaPrimaryGeneratorAction final : public G4VUserPrimaryGeneratorAction {
 
 public:
-  PythiaPrimaryGeneratorAction();
+  // seeding < 0 : fixed 1234 for all thraeds (used for performance measurements)
+  // seeding = 0 : re-seeding by the event ID in order to guarantee reproducibilty
+  PythiaPrimaryGeneratorAction(int seeding = -1);
 
   void GeneratePrimaries(G4Event*) override;
 
 private:
   Pythia8::Pythia pythia;
+  int             fSeeding;
 };
 
 #endif

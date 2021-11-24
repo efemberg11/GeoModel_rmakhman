@@ -13,8 +13,10 @@
 #include "G4TransportationManager.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4RunManager.hh"
-#include "MyDetectorMessenger.hh"
 #include "G4PVPlacement.hh"
+
+#include "MyDetectorMessenger.hh"
+#include "RegionConfigurator.hh"
 
 // Geant4 steppers
 
@@ -90,11 +92,11 @@ namespace clashdet {
         double x,y,z;
         G4double distance;
     };
-    
+
     void to_json(json& j, const clash& p) {
         j = json{{"typeOfClash", p.clashType}, {"volume1Name", p.volume1Name}, {"volume1CopyNo", p.volume1CopyNo}, {"volume1EntityType", p.volume1EntityType},{"volume2Name", p.volume2Name},{"volume2CopyNo", p.volume2CopyNo}, {"volume2EntityType", p.volume2EntityType},{"x", p.x},{"y", p.y},{"z", p.z},{"distance[mm]", p.distance} };
     }
-    
+
     void from_json(const json& j, clash& p) {
       p.clashType=j.at("clashType").get<typeOfClash>();
       p.volume1Name=j.at("volume1Name").get<std::string>();
@@ -138,11 +140,11 @@ namespace masscalc {
         double exclusiveMassFiltered;  //total mass of the volumes with density > threshold
         double excludedMass;  //total mass of the volumes with density < threshold
 };
-    
+
     void to_json(json& j, const massReport& p) {
         j = json{{"logicalVolumeName", p.logicalVolumeName}, json{"physicalVolumeName", p.physicalVolumeName}, {"volumeCopyNo", p.volumeCopyNo}, {"material", p.material},{"density[g/cm3]", p.density}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass} };
     }
-    
+
     void from_json(const json& j, massReport& p) {
       p.logicalVolumeName=j.at("logicalVolumeName").get<std::string>();
       p.physicalVolumeName=j.at("physicalVolumeName").get<std::string>();
@@ -152,13 +154,13 @@ namespace masscalc {
       p.volumeEntityType=j.at("volumeEntityType").get<std::string>();
       p.inclusiveMass=j.at("inclusiveMass[kg]").get<double>();
       p.exclusiveMass=j.at("exclusiveMass[kg]").get<double>();
-      
+
      }
 
     void to_json(json& j, const finalMassReport& p) {
        j = json{{"logicalVolumeName", p.logicalVolumeName}, {"material", p.material},  {"densityThreshold[g/cm3]", p.densityThreshold}, {"volumeEntityType", p.volumeEntityType}, {"inclusiveMass[kg]", p.inclusiveMass}, {"exclusiveMass[kg]", p.exclusiveMass}, {"apparentWeightInAir[kg]", p.apparentWeight}, {"exclusiveFilteredMass[kg]", p.exclusiveMassFiltered}, {"excludedFilteredMass[kg]", p.excludedMass}   };
    }
-   
+
    void from_json(const json& j, finalMassReport& p) {
      p.logicalVolumeName=j.at("logicalVolumeName").get<std::string>();
      p.material=j.at("material").get<std::string>();
@@ -169,7 +171,7 @@ namespace masscalc {
      p.apparentWeight=j.at("apparentWeightInAir[kg]").get<double>();
      p.exclusiveMassFiltered=j.at("exclusiveFilteredMass[kg]").get<double>();
      p.excludedMass=j.at("excludedFilteredMass[kg]").get<double>();
-     
+
     }
 } // namespace masscalc
 
@@ -191,7 +193,7 @@ double exclusiveMass(const PVConstLink& pv) {
 }
 
 double inclusiveMass(const PVConstLink& pv) {
-    
+
     const GeoLogVol*        lv       = pv->getLogVol();
     const GeoMaterial      *material = lv->getMaterial();
     // Exclude from the calculation the EMEC special shape
@@ -217,14 +219,14 @@ double inclusiveMass(const PVConstLink& pv) {
     }
     double density = material->getDensity();
     double mass = exclusiveMass(pv);
-    
+
     GeoVolumeCursor av(pv);
     while (!av.atEnd()) {
         mass += inclusiveMass(av.getVolume());
         mass -= volume(av.getVolume())*density;
         av.next();
     }
-    
+
     return mass;
 }
 
@@ -240,6 +242,7 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
   fRunMassCalculator   = false;
+  fAddRegions          = false;
   fDumpGDML            = false;
   fReportFileName      = "gmclash_report.json";
   fMinStep             = 1.0e-2;
@@ -254,21 +257,21 @@ MyDetectorConstruction::~MyDetectorConstruction()
 }
 
 void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep){
-    
+
     double tmpInclusive,tmpExclusive;
-    
+
     //By setting the 'propagate' boolean flag - the second one -  to 'false' the
     //       method returns the mass of the present logical volume only
     //       (subtracted for the volume occupied by the daughter volumes).
-    
+
     tmpInclusive = logVol->GetMass(true, true);  //real mass of the LV, inclusive of the masses of the daughters
     tmpExclusive = logVol->GetMass(true, false); //mass of the LV substracted for the volume occupied by the daughters
-    
+
     //if the method is called iteratively, the only mass cumulative mass that makes sense
     //to retrieve is the sum of the exclusive masses of all the volumes
     //satisfying the filters criteria
     exclusiveMass+= tmpExclusive;
-    
+
     if(writeRep){
         masscalc::massReport singleMassReport;
         json jSingleMassReport;
@@ -281,40 +284,40 @@ void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalV
         singleMassReport.volumeEntityType=logVol->GetSolid()->GetEntityType();
         singleMassReport.inclusiveMass = tmpInclusive/(CLHEP::kg);
         singleMassReport.exclusiveMass = tmpExclusive/(CLHEP::kg);
-    
+
         //write the singleMassReport in the json file
         to_json(jSingleMassReport, singleMassReport);
         // write prettified JSON to another file
         jlist.push_back(jSingleMassReport);
     }
-    
+
 }
 
 void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix, G4String material){
-    
+
     int nDaughters = logVolume->GetNoDaughters();
     //std::cout<<"Total n. of Daughters of "<<logVolume->GetName()<<" is : "<<nDaughters<<std::endl;
     G4VPhysicalVolume *daughterPV = nullptr;
     G4LogicalVolume *daughterLV   = nullptr;
     G4double density;
-    
+
     for (int n=0; n<nDaughters; n++)
     {
         daughterPV=logVolume->GetDaughter(n);
         daughterLV = daughterPV->GetLogicalVolume();
         density=daughterLV->GetMaterial()->GetDensity();
         //fAnalysisManager->FillH1(fHistoID, density/(SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3), 1);
-        
+
         //1. look only for the logVol
         if(prefix!="" && material==""){
             if (daughterLV->GetName().contains(prefix) || daughterPV->GetName().contains(prefix)){
 //                std::cout<<"Found the LV "<<prefix<<" and its full name is "<<daughterLV->GetName()<<std::endl;
 //                std::cout<<"Found the Daughter "<<prefix<<" and its full name is "<<daughterPV->GetName()<<std::endl;
                 std::cout<<"Cubic Volume of "<<daughterLV->GetName()<<" is "<<daughterLV->GetSolid()->GetCubicVolume()/SYSTEM_OF_UNITS::cm3<<" [cm3]"<<std::endl;
-                
+
                 calculateMass(daughterLV, daughterPV, jlist, exclusiveMass, true );
             }
-            
+
         }
         //2. look only for the material
         else if(prefix=="" && material!=""){
@@ -323,14 +326,14 @@ void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, st
             if (daughterLV->GetMaterial()->GetName().contains(material)){
                 calculateMass(daughterLV, daughterPV, jlist, exclusiveMass, true );
             }
-            
+
         }
         //3. look for both
         else if(prefix!="" && material!=""){
             if ((daughterLV->GetName().contains(prefix) || daughterPV->GetName().contains(prefix)) && daughterLV->GetMaterial()->GetName().contains(material)){
                 calculateMass(daughterLV, daughterPV, jlist, exclusiveMass, true );
             }
-            
+
         }
         //4. loop on the whole geometry tree, filtering w.r.t density of the material
         else
@@ -340,21 +343,21 @@ void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, st
             {
                 //sum of the exclusive masses of all the volumes that have density > threshold
                 inclusiveMass+=daughterLV->GetMass(true, false);
-               
+
             }
             else
             {
                 //Sum of the ignored mass
                 exclusiveMass+=daughterLV->GetMass(true, false);
             }
-            
+
         }
         if (daughterLV->GetNoDaughters()>0){
                 iterateFromWorldMass(daughterLV, jlist, inclusiveMass, exclusiveMass,  prefix, material);
         }
-            
+
     }
-    
+
 }
 
 bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume* volume, G4ThreeVector& local){
@@ -364,10 +367,10 @@ bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhys
     G4VPhysicalVolume *daughter;
     G4LogicalVolume *daughterLV;
     bool isFound;
- 
+
     for (int n=0; n<localNoDaughters; n++)
     {
-        
+
         daughter=envelope->GetDaughter(n);
         daughterLV = daughter->GetLogicalVolume();
 //        std::cout<<"Checking daughter "<<n<<" out of "<<localNoDaughters<<std::endl;
@@ -380,14 +383,14 @@ bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhys
             {
                 fTree.push_back(daughter);
                 //std::cout<<"--------------> Found the ancestor! Daughter: "<< daughter->GetName() <<", the logical volume connected is: "<< daughterLV->GetName()<< std::endl;
-                
+
                 if(daughterLV->GetNoDaughters()>1){
 //                    std::cout<<"---------------> MORE than 1 daughters"<<std::endl;
 //                    std::cout<<"---------------> Iterating to the next level. Passing Volume: "<<daughterLV->GetName()<<". Elements in the tree: "<<fTree.size()<<std::endl;
                     isFound = iterateFromWorld(daughterLV, volume, local);
                     if(isFound) return true;
                     break;
-                    
+
                 }else
                 {
 //                    std::cout<<"---------------> ONLY 1 daughter"<<std::endl;
@@ -404,7 +407,7 @@ bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhys
                 std::cout<<daughterLV->GetName()<< " should be equal to == " <<volume->GetLogicalVolume()->GetName()<<std::endl;
                 fTree.push_back(volume);//TO CHECK
                 return true;
-                
+
             }
 //            else std::cout<<"------------> Names are different  "<<daughterLV->GetName()<< "  and  " <<volume->GetLogicalVolume()->GetName()<<std::endl;
         } else //the volume has zero daughters
@@ -417,7 +420,7 @@ bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhys
                 fTree.push_back(daughter);
 //                std::cout<<"Found the volume! Daughter: "<< daughter->GetName() <<", the logical volume connected is: "<< daughterLV->GetName()<< std::endl;
                 return true;
-                
+
             }
 //            else {
 //                std::cout<<"------------> Too bad, it is not the right one!!!"<<std::endl;
@@ -430,7 +433,7 @@ bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhys
 }
 
 G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool skipFirstIt){
-    
+
     std::cout<<"Converting coordinates from Local to Global: "<<std::endl;
     std::cout<<"G4VPhysicalVolumes chain is: \n"<<fWorld->GetName();
     for (auto & element : fTree) {
@@ -448,7 +451,7 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool s
 
             std::cout<<"IS mother, skipping the first iteration"<<std::endl;
             skipFirstIt=false;
-            
+
 
         }
         else{
@@ -457,7 +460,7 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool s
             G4AffineTransform Tm((*element)->GetRotation(), (*element)->GetTranslation());
             globalPoint = Tm.TransformPoint(localPoint);
             std::cout<<"Local point: "<<localPoint<<" transformed in global: "<<globalPoint<<std::endl;
-            
+
         }
 
 
@@ -466,7 +469,7 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool s
 }
 
 void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoPhysVol* /*worldgeoModel*/, std::vector<json>& jlist){
-    
+
     masscalc::massReport singleMassReport;
     json jSingleMassReport;
     int localNoDaughters = worldg4->GetLogicalVolume()->GetNoDaughters();
@@ -474,7 +477,7 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     G4VPhysicalVolume *daughter;
     G4LogicalVolume *daughterLV;
     G4double cubicVolumeWorld, globalDensityWorld, globalMassWorld;
-    
+
     //Instance of the G4AnalysisManager used to fill the density_histogram
 //    fAnalysisManager = G4AnalysisManager::Instance();
 //    if (!fAnalysisManager->OpenFile("density_histogram")){
@@ -482,18 +485,18 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
 //        exit(-1);
 //    } else
 //        G4cout<<"\n...output File density_histogram opened!"<<G4endl;
-    
+
     if (fVerbosityFlag>0) {
         std::cout<<"\n========== Printing geometry info ============\n "<<std::endl;
         printGeometryInfo (worldg4->GetLogicalVolume(), fVerbosityFlag);
         std::cout<<"\n========== Printing geometry info: DONE! ============ \n"<<std::endl;
-        
+
     }
-    
+
 //    fHistoID = fAnalysisManager->CreateH1("density", "density", 300, 10e-3, 30, "none", "none", "log");
 //    fAnalysisManager->SetH1Ascii(fHistoID,true);  // misi: always ascii
 //    fAnalysisManager->SetH1XAxisTitle(fHistoID, "density [g/cm3]]");
-    
+
     //Debug information about World volume, Name, Material, Solid name of the LV, density and cubic volume
     std::cout<<"Checking World volume "<<std::endl;
     std::cout<<"-----> World Name is: "<<worldg4->GetName()<<std::endl;
@@ -511,12 +514,12 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     globalMassWorld = globalDensityWorld * cubicVolumeWorld;
     std::cout<<"-----> World mass is: "<< globalMassWorld / (CLHEP::kg) <<" [Kg]"<<std::endl;
     std::cout<<"\n *** --------------- ***\n"<<std::endl;
-    
+
     double inclusiveMassG4 = 0., exclusiveMassG4=0., apparentWeightG4=0.;
     double totalInclusiveMassG4 = 0., totalExclusiveMassG4 =0.;
     //double inclusiveMassGeoModel = 0., exclusiveMassGeoModel = 0.;
-    
-    
+
+
     //CASE 1: DEFAULT BEHAVIOUR
     //No filter is applied -- calculate the inclusiveMass, exclusiveMass and apparentWeigth of the whole geometry
     //For the inclusive and exclusive mass calculation uses a filter on the density of the material
@@ -537,7 +540,7 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
             std::cout<<"---> DaughterLV Solid entity type: "<<daughterLV->GetSolid()->GetEntityType()<<std::endl;
             G4double globalDensity = daughterLV->GetMaterial()->GetDensity();
             std::cout<<"---> DaughterLV Solid density is: "<<globalDensity/ (CLHEP::g / CLHEP::cm3)<<" [gr/cm3]"<<std::endl;
-            
+
 //            //GeoModel mass calculation invoked only if the geometry is not in GDML format
 //            //NB exclusive mass concept in GeoModel is different than the Geant4 one
 //            //So do not expect that the exclusive masses of the 2 calculations are the same
@@ -547,18 +550,18 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
 //                //exclusiveMassGeoModel+= exclusiveMass(mypv); //mass of the whole volume, as it would not have daughters
 //
 //            }
-            
+
             //Here is already excluding the world volume from the calculation,
             //Being it made by AIR by default
             //calculateMass of each daughter and since the last flag is true, write out results in the json file
             //I call this only once -- no iteration
             //calculateMass(daughterLV, daughter, jlist, inclusiveMassG4, exclusiveMassG4, true);
-            
+
             inclusiveMassG4 = daughterLV->GetMass(true, true);  //real mass of the LV, inclusive of the masses of the daughters
             exclusiveMassG4 = daughterLV->GetMass(true, false); //mass of the LV substracted for the volume occupied by the daughters
             totalInclusiveMassG4+=inclusiveMassG4;
             totalExclusiveMassG4+=exclusiveMassG4;
-            
+
             //fill the singleMassReport struct
             singleMassReport.logicalVolumeName=daughterLV->GetName();
             singleMassReport.physicalVolumeName=daughter->GetName();
@@ -569,19 +572,19 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
             singleMassReport.inclusiveMass = inclusiveMassG4/(CLHEP::kg);
             singleMassReport.exclusiveMass = exclusiveMassG4/(CLHEP::kg);
             //std::cout<<"-----> DaughterLV inclusive mass is: "<<singleMassReport.inclusiveMass<<" [kg]"<<std::endl;
-            
+
             //write the singleMassReport in the json file
             to_json(jSingleMassReport, singleMassReport);
             // write prettified JSON to another file
             jlist.push_back(jSingleMassReport);
-        
+
         }
-        
+
         //Calculate the apparentWeight for the whole geometry
         //mass of the LV substracted for the volume occupied by the daughters
         double exclusiveWorld = worldg4->GetLogicalVolume()->GetMass(true, false);
         apparentWeightG4 = exclusiveWorld + totalInclusiveMassG4 - globalMassWorld;
-        
+
         masscalc::finalMassReport finalMassReport;
         json jsonFinalMassReport;
         //fill the finalMassReport struct
@@ -592,24 +595,24 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         finalMassReport.inclusiveMass = totalInclusiveMassG4/(CLHEP::kg);
         finalMassReport.exclusiveMass = totalExclusiveMassG4/(CLHEP::kg);
         finalMassReport.apparentWeight = apparentWeightG4/(CLHEP::kg);
-        
+
         std::cout<<"\n=== Calculated total masses ==="<<std::endl;
         std::cout<<"Total inclusive mass of the detector is ... "<<totalInclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
         std::cout<<"Total exclusive mass of the detector is ... "<<totalExclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
         std::cout<<"Total apparent weight in Air of the detector is ... "<<apparentWeightG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
-        
+
         //Do the same calculation but with a filter on the density
         double exclusiveFilteredMass=0.;
         double excludedFilteredMass=0.;
         iterateFromWorldMass(worldg4->GetLogicalVolume(),jlist, exclusiveFilteredMass, excludedFilteredMass, fPrefixLogicalVolume, fMaterial);
-        
+
         finalMassReport.exclusiveMassFiltered = exclusiveFilteredMass/(CLHEP::kg);
         finalMassReport.excludedMass = excludedFilteredMass/(CLHEP::kg);
-        
+
         std::cout<<"\n==== Filters by density ===="<<std::endl;
         std::cout<<"Total exclusive mass for Geometry filtered by density ... "<<exclusiveFilteredMass / (CLHEP::kg) <<" [kg]."<<std::endl;
         std::cout<<"Total ignored mass cause below density threshold ... "<<excludedFilteredMass / (CLHEP::kg) <<" [kg]."<<std::endl;
-        
+
 //        //This might be misleading, better to comment it out
 //        if (!fGeometryFileName.contains(".gdml")){
 //            std::cout<<"\nGeoModel: Total inclusive mass of the detector is ... "<<inclusiveMassGeoModel / (SYSTEM_OF_UNITS::kg) <<" [kg]."<<std::endl;
@@ -620,8 +623,8 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         to_json(jsonFinalMassReport, finalMassReport);
         // write prettified JSON to another file
         jlist.push_back(jsonFinalMassReport);
-        
-        
+
+
     }
     //CASE 2: One of the 2 filters or both are used
     // Iterate on the whole geometry tree, looking for the logical volumes that correspond to the
@@ -630,7 +633,7 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
     else
     {
         iterateFromWorldMass(worldg4->GetLogicalVolume(),jlist, inclusiveMassG4, exclusiveMassG4, fPrefixLogicalVolume, fMaterial);
-        
+
         //fill the finalMassReport struct
         singleMassReport.logicalVolumeName = fPrefixLogicalVolume;
         //singleMassReport.physicalVolumeName = fPrefixLogicalVolume;
@@ -640,29 +643,29 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
         singleMassReport.inclusiveMass = -999; //inclusiveMassG4/(CLHEP::kg);
         singleMassReport.exclusiveMass = exclusiveMassG4/(CLHEP::kg);
 
-        
+
         //std::cout<<"\nTotal inclusive mass for the requested Geometry is ... "<<inclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
         std::cout<<"Total exclusive mass for the filtered Geometry is ... "<<exclusiveMassG4 / (CLHEP::kg) <<" [kg]."<<std::endl;
-        
-        
+
+
         //write the finalMassReport in the json file
         to_json(jSingleMassReport, singleMassReport);
         // write prettified JSON to another file
         jlist.push_back(jSingleMassReport);
     }
-    
+
 
 //    fAnalysisManager->Write();
 //    fAnalysisManager->CloseFile();
-    
+
 }
 
 void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope,std::vector<json>& jlist){
-    
+
     int localNoDaughters = envelope->GetNoDaughters();
     //std::cout<<"Total n. of Daughters of "<<envelope->GetName()<<" is : "<<localNoDaughters<<std::endl;
     for (int sampleNo=0; sampleNo<localNoDaughters; sampleNo++){
-        
+
         G4VPhysicalVolume *daughter=envelope->GetDaughter(sampleNo);
         if(daughter->GetLogicalVolume()->GetNoDaughters()>0)
                 RecursivelyCheckOverlap(daughter->GetLogicalVolume(), jlist);
@@ -685,10 +688,10 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
             std::cout<<"solid->getName(): "<<solid->GetName()<<std::endl;
             exit(-1);
             return false; }
-        
+
         G4int trials = 0;
         G4bool retval = false;
-        
+
         if (verbose)
         {
             G4cout << "*************  Checking overlaps for volume " << volume->GetName()
@@ -704,14 +707,14 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
             G4VSolid* motherSolid = motherLog->GetSolid();
             std::cout<<"**** GMClash cannot generate a point on the surface of the volume!" <<std::endl;
             iterateFromWorld(fWorld->GetLogicalVolume(), volume, solidCenter);
-            
+
             // Convert from local to global coordinate system.
             // NB: we put the flag to false cause we are not in the mother volume
             // coordinate system, so we don't need to skip the first iteration
             G4ThreeVector globalPoint = localToGlobal (solidCenter, false);
             std::cout<<"**** Center of the solid in Global Coordinates: " <<globalPoint<<" \n"<<std::endl;
             fTree.clear();
-            
+
             //fill the singleClash struct
             singleClash.clashType = clashdet::invalidSolid;
             singleClash.volume1Name=volume->GetName();
@@ -724,13 +727,13 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
             singleClash.y = globalPoint[1];
             singleClash.z = globalPoint[2];
             singleClash.distance = -999;
-            
+
             //write the singleClash in the json file
             to_json(jSingleClash, singleClash);
             // write prettified JSON to another file
             jlist.push_back(jSingleClash);
-            
-            
+
+
             G4String position[3] = { "outside", "surface", "inside" };
             std::ostringstream message;
             message << "Sample point is not on the surface !" << G4endl
@@ -743,7 +746,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                         "GeomVol1002", JustWarning, message);
             return false;
         }
-    
+
         // Generate random points on the surface of the solid,
         // transform them into the mother volume coordinate system
         // and find the bonding box
@@ -762,7 +765,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
             ymax = std::max(ymax, points[i].y());
             zmax = std::max(zmax, points[i].z());
         }
-        
+
         // Check overlap with the mother volume
         //
         G4VSolid* motherSolid = motherLog->GetSolid();
@@ -785,7 +788,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 << "          at mother local point " << mp << ", "
                 << "overlapping by at least: "
                 << G4BestUnit(distin, "Length");
-                
+
                 if (trials >= maxErr)
                 {
                     message << G4endl
@@ -794,13 +797,13 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 }
                 G4Exception("G4PVPlacement::CheckOverlaps()",
                             "GeomVol1002", JustWarning, message);
-                
+
                 std::cout<<"**** GMClash detected a clash ::withMother - at local point: " <<mp<<std::endl;
                 iterateFromWorld(fWorld->GetLogicalVolume(), volume, mp);
                 G4ThreeVector globalPoint = localToGlobal (mp, true);
                 std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
                 fTree.clear();
-                
+
                 //fill the singleClash struct
                 singleClash.clashType = clashdet::withMother;
                 singleClash.volume1Name=volume->GetName();
@@ -813,20 +816,20 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 singleClash.y = globalPoint[1];
                 singleClash.z = globalPoint[2];
                 singleClash.distance = distin;
-                
+
                 //write the singleClash in the json file
                 to_json(jSingleClash, singleClash);
                 // write prettified JSON to another file
                 jlist.push_back(jSingleClash);
-                
-                
-                
-                
+
+
+
+
                 if (trials >= maxErr)  { return true; }
                 break;
             }
         }
-        
+
         // Checking overlaps with each 'sister' volume
         //
         for (size_t k = 0; k < motherLog->GetNoDaughters(); ++k)
@@ -835,7 +838,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
             if (daughter == volume) continue;
             G4VSolid* daughterSolid = daughter->GetLogicalVolume()->GetSolid();
             G4AffineTransform Td(daughter->GetRotation(), daughter->GetTranslation());
-            
+
             G4double distout = -kInfinity;
             G4ThreeVector plocal;
             if (!Td.IsRotated()) {
@@ -936,13 +939,13 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                     }
                 }
             }
-            
+
             if (distout > tol)
             {
                 ++trials;
                 retval = true;
                 std::ostringstream message;
-                
+
                 message << "Overlap with volume already placed !" << G4endl
                 << "          Overlap is detected for volume "
                 << volume->GetName() << ':' << volume->GetCopyNo()
@@ -954,7 +957,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 << "          local point " << plocal << ", "
                 << "overlapping by at least: "
                 << G4BestUnit(distout, "Length")<<std::endl;
-                
+
                 if (trials >= maxErr)
                 {
                     message << G4endl
@@ -963,7 +966,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 }
                 G4Exception("G4PVPlacement::CheckOverlaps()",
                             "GeomVol1002", JustWarning, message);
-                
+
                 std::cout<<"**** GMClash detected a clash ::withSister - at sister local point: " <<plocal<<std::endl;
 
                 // Transform the generated point to the mother's coordinate system
@@ -980,12 +983,12 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
 #endif
 
                 iterateFromWorld(fWorld->GetLogicalVolume(), volume, msi);
-                
+
 
                 G4ThreeVector globalPoint = localToGlobal (msi, false);
                 std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
                 fTree.clear();
-                
+
                 //fill the singleClash struct
                 singleClash.clashType         = clashdet::withSister;
                 singleClash.volume1Name       = volume->GetName();
@@ -998,11 +1001,11 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 singleClash.y = globalPoint[1];
                 singleClash.z = globalPoint[2];
                 singleClash.distance = distout;
-                
+
                 //write the singleClash in the json file
                 to_json(jSingleClash, singleClash);
                 jlist.push_back(jSingleClash);
-                
+
                 if (trials >= maxErr)  { return true; }
             }
             else if (distout == kInfinity)
@@ -1013,7 +1016,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 // the current volume
                 //
                 G4ThreeVector dPoint = daughterSolid->GetPointOnSurface();
-                
+
                 // Transform the generated point to the mother's coordinate system
                 // and then to current volume's coordinate system
                 //
@@ -1039,7 +1042,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                     << daughter->GetName() << ':' << daughter->GetCopyNo()
                     << " (" << daughterSolid->GetEntityType() << ")"
                     << " at the same level !";
-            
+
                     if (trials >= maxErr)
                     {
                         message << G4endl
@@ -1048,14 +1051,14 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                     }
                     G4Exception("G4PVPlacement::CheckOverlaps()",
                                 "GeomVol1002", JustWarning, message);
-                    
+
                     std::cout<<"**** GMClash detected a clash ::fullyEncapsSister - at volume1 local point: " <<msi<<std::endl;
                     iterateFromWorld(fWorld->GetLogicalVolume(), volume, msi);
                     G4ThreeVector globalPoint = localToGlobal (msi, false);
 
                     std::cout<<"**** Global Point: " <<globalPoint<<" \n"<<std::endl;
                     fTree.clear();
-                    
+
                     //fill the singleClash struct
                     singleClash.clashType         = clashdet::fullyEncapsSister;
                     singleClash.volume1Name       = volume->GetName();
@@ -1068,16 +1071,16 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                     singleClash.y = globalPoint[1];
                     singleClash.z = globalPoint[2];
                     //                    singleClash.distance = distout;
-                    
+
                     //write the singleClash in the json file
                     to_json(jSingleClash, singleClash);
                     jlist.push_back(jSingleClash);
-                    
+
                     if (trials >= maxErr)  { return true; }
                 }
             }
         }
-        
+
         if (verbose && trials == 0) { G4cout << "OK, done! " << G4endl; }
         return retval;
 }
@@ -1092,12 +1095,12 @@ GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
         GeoMaterial* Air=new GeoMaterial("Air", 1.290*SYSTEM_OF_UNITS::mg/SYSTEM_OF_UNITS::cm3);
         GeoElement* Oxigen = new GeoElement("Oxygen",  "O", 8.0, 16.0*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
         GeoElement* Nitrogen = new GeoElement("Nitrogen", "N", 7., 14.0067*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
-        
+
 //        GeoMaterial* Ether=new GeoMaterial("Ether", 1e-25*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3);
 //        GeoElement* vacuum = new GeoElement("vacuum", "Mt", 1, 1);
 //        Ether->add(vacuum, 1.0);
 //        Ether->lock();
-        
+
         Air->add(Nitrogen, .8);
         Air->add(Oxigen, .2);
         Air->lock();
@@ -1123,7 +1126,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         if (!factory) {
             std::cout<<"Error!Cannot load geometry from factory. Exiting!"<<std::endl;
             exit(0);
-            
+
         }
 
         world = CreateTheWorld(nullptr);
@@ -1135,19 +1138,19 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout << "*** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
         G4cout << "*** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
         G4cout << "*** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
-        
+
         fTimer.Start();
         // build the Geant4 geometry and get an hanlde to the world' volume
         ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
-        
+
         std::cout << "Building G4 geometry."<<std::endl;
         envelope = builder->Build(world);
-        
+
         G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
-        
+
         fWorld = physWorld;
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::GetInvisible());
-        
+
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly check your setup selection criteria or input files!" << G4endl;
@@ -1159,7 +1162,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     }
     else if (fGeometryFileName.contains(".db")){
         G4cout << "Building the detector from the SQLite file: "<<fGeometryFileName<<G4endl;
-        
+
         // open the DB
         GMDBManager* db = new GMDBManager(fGeometryFileName.data());
         /* Open database */
@@ -1170,17 +1173,17 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
             G4cout << "ERROR! Database is not open." << G4endl;
             // return;
             throw;
-            
+
         }
-    
+
         // -- testing the input database
         //std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
         //db->printAllMaterials();
         /* setup the GeoModel reader */
         GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
         G4cout << "ReadGeoModel set.";
-        
-        
+
+
         /* build the GeoModel geometry */
         //GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
         world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
@@ -1190,18 +1193,18 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout << "*** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
         G4cout << "*** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
         G4cout << "*** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
-        
+
         fTimer.Start();
         // build the Geant4 geometry and get an hanlde to the world' volume
         ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
-        
+
         std::cout << "Building G4 geometry."<<std::endl;
         envelope = builder->Build(world);
         G4VPhysicalVolume* physWorld= new G4PVPlacement(0,G4ThreeVector(),envelope,envelope->GetName(),0,false,0,false);
-        
+
         fWorld = physWorld;
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::GetInvisible());
-        
+
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly check your setup selection criteria or GDML input!" << G4endl;
@@ -1210,36 +1213,36 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
         G4cout << "Detector Construction from the SQLite file " << fGeometryFileName.data() <<", done!"<<G4endl;
     }
-    
+
     else if (fGeometryFileName.contains(".gdml")){
         G4cout << "Building the detector from the GDML file: "<<fGeometryFileName<<G4endl;
         //fParser.SetOverlapCheck(true);
         fParser.Read(fGeometryFileName, false); // turn off schema checker
         fWorld = (G4VPhysicalVolume *)fParser.GetWorldVolume();
         fWorld->GetLogicalVolume()->SetVisAttributes(G4VisAttributes::GetInvisible());
-        
+
         //RecursivelyCheckOverlap(fWorld->GetLogicalVolume());
         envelope = fWorld->GetLogicalVolume();
-        
+
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly! Check your setup selection criteria or the GDML input!" << G4endl;
             G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0001", FatalException, ed);
         }
         G4cout << "Detector Construction from the GDML file " << fGeometryFileName.data() <<", done!"<<G4endl;
-        
-        
+
+
     }
     else{
         std::cout<< "Error! Geometry format file not supported! Please use one of the following format: .db/.gdml/.so/.dylib. Exiting. "<<std::endl;
         exit(-1);
     }
-    
+
     fTimer.Stop();
     G4cout << "**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
     G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
     G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
-    
+
     if (fRunOverlapCheck){
         G4cout << "\n ===================  Starting Clashes Detection  =================== \n" << G4endl;
         fTimer.Start();
@@ -1249,32 +1252,32 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout << "\n**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
         G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
         G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
-        
+
         json jReport={{"ClashesReport",jlist}};
         std::cout<<"\n**** Writing out the clashes report file: "<<fReportFileName<<std::endl;
         std::ofstream outJsonFile(fReportFileName);
         outJsonFile << std::setw(4) << jReport << std::endl;
         outJsonFile.close();
-        
+
         G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
         exit(0);
     }
-    
+
     if(fRunMassCalculator)
     {
         G4cout<<"\n=================== Starting mass calculation...   =================== "<<G4endl;
-        
+
         std::cout<<"Calculating the mass of the total detector... "<<fGeometryFileName<<std::endl;
         fTimer.Start();
         std::vector<json> jlist;
         RecursiveMassCalculation(fWorld,world, jlist);
-        
-    
+
+
         fTimer.Stop();
         G4cout << "\n**** Real time elapsed for mass calculation  : "<<fTimer.GetRealElapsed()/60   << " min. "<< G4endl;
         G4cout << "**** User time elapsed for mass calculation   : " <<fTimer.GetUserElapsed()/60   << " min. "<<G4endl;
         G4cout << "**** System time elapsed for mass calculation : " <<fTimer.GetSystemElapsed()/60 << " min. "<<G4endl;
-        
+
         json jReport={{"MassReport",jlist}};
         std::cout<<"\n**** Writing out the mass report file: "<<fReportFileName<<std::endl;
         std::ofstream outJsonFile(fReportFileName);
@@ -1283,8 +1286,15 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout<<"\n=================== Mass calculation...DONE!   =================== "<<G4endl;
     }
 
+    // trying to add detector regions with the configurations given in the RegionConfigurator
+    if (fAddRegions)  {
+        G4cout << "\n ===================  Trying to add detector regions ... ================== \n" << G4endl;
+        RegionConfigurator::Instance().CreateRegions(1);
+        G4cout << "\n ===================  Adding detector regions is DONE!  ================== \n" << G4endl;
+    }
+
     if (fDumpGDML){
-        
+
         G4cout << "\n ===================  Dump geometry in GDML format  =================== \n" << G4endl;
         //G4GDMLParser parser;
         //fParser.SetRegionExport(true);
@@ -1295,13 +1305,14 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         G4cout << "\n =================== Geometry exported in GDML, DONE!  =================== \n" << G4endl;
         exit(0);
     }
+
     return fWorld;
 }
 
 void MyDetectorConstruction::ConstructSDandField()
 {
  // if (std::abs(fFieldValue) > 0.0) {
-    
+
     if (fFieldConstant && std::abs(fFieldValue) > 0.0){
     // Apply a global uniform magnetic field along the Z axis.
     // Notice that only if the magnetic field is not zero, the Geant4
@@ -1326,13 +1337,13 @@ void MyDetectorConstruction::ConstructSDandField()
           G4MagneticField* g4Field =  myMagField->getField();
           if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
           fField.Put(g4Field);
-        
+
           //This is thread-local
           G4FieldManager* fieldMgr =
           G4TransportationManager::GetTransportationManager()->GetFieldManager();
           G4cout<< "DeltaStep "<<fieldMgr->GetDeltaOneStep()/mm <<"mm" <<G4endl;
           //G4ChordFinder *pChordFinder = new G4ChordFinder(mymagField);
-        
+
 //#if G4VERSION_NUMBER < 1040
 //
 //        auto stepper = getStepper(m_integratorStepper, field);
@@ -1343,14 +1354,14 @@ void MyDetectorConstruction::ConstructSDandField()
 //        auto chordFinder = fieldMgr->GetChordFinder();
 //        auto driver = createDriverAndStepper(m_integratorStepper, field);
 //        chordFinder->SetIntegrationDriver(driver);
-        
+
           fieldMgr->SetDetectorField(fField.Get());
           fieldMgr->CreateChordFinder(fField.Get());
 //#endif
-          
+
       }
-      
-    
+
+
   }
 }
 #if G4VERSION_NUMBER>=1040
@@ -1404,16 +1415,16 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
             G4DoLoMcPriRK34* stepper = new G4DoLoMcPriRK34(eqRhs);
         driver = new G4IntegrationDriver<G4DoLoMcPriRK34>(
                                                           fMinStep, stepper, stepper->GetNumberOfVariables());
-            
+
         } else if (stepperType=="BogackiShampine23") {
             G4BogackiShampine23* stepper = new G4BogackiShampine23(eqRhs);
             driver = new G4IntegrationDriver<G4BogackiShampine23>(fMinStep, stepper, stepper->GetNumberOfVariables());
-            
+
         } else if (stepperType=="BogackiShampine45") {
             G4BogackiShampine45* stepper = new G4BogackiShampine45(eqRhs);
             driver = new G4IntegrationDriver<G4BogackiShampine45>(
                                                               fMinStep, stepper, stepper->GetNumberOfVariables());
-            
+
         } else if (stepperType=="DormandPrince745") {
             G4DormandPrince745* stepper = new G4DormandPrince745(eqRhs);
             driver = new G4IntegrationDriver<G4DormandPrince745>(
@@ -1443,7 +1454,7 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
             G4TsitourasRK45* stepper = new G4TsitourasRK45(eqRhs);
             driver = new G4IntegrationDriver<G4TsitourasRK45>(
                                                           fMinStep, stepper, stepper->GetNumberOfVariables());
-            
+
         }
         else if (stepperType=="RKG3_Stepper") {
             G4RKG3_Stepper* stepper = new G4RKG3_Stepper(eqRhs);
@@ -1503,7 +1514,7 @@ MyDetectorConstruction::CreateStepper(std::string name, G4MagneticField* field) 
     else if (name=="AtlasRK4") {
         std::string g4tag = G4VERSION_TAG;
         if (g4tag.find("atlas") != std::string::npos){
-            
+
             std::cout<<"Setting AtlasRK4 stepper, in the OLD style"<<std::endl;
             std::cout<<"CAVEAT: only available with atlas patches of Geant4!"<<std::endl;
 #ifdef G4ATLAS
@@ -1537,13 +1548,13 @@ MyDetectorConstruction::CreateStepper(std::string name, G4MagneticField* field) 
 
 
 void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
-    
+
     if (v==0) return;
     std::vector<G4VPhysicalVolume*> pv_to_remove;
     for (size_t i=0;i<v->GetNoDaughters();++i){
-        
+
         G4VPhysicalVolume * n_v = v->GetDaughter(i);
-        
+
         if (n_v->GetName() == "LAr::EMEC::Pos::InnerWheel" ||
             n_v->GetName() == "LAr::EMEC::Neg::InnerWheel" ||
             n_v->GetName() == "LAr::EMEC::Pos::OuterWheel" ||
@@ -1570,12 +1581,12 @@ void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
     for (unsigned int j=0;j<pv_to_remove.size();++j){
         v->RemoveDaughter( pv_to_remove[j] );
     }
-    
-    
+
+
 }
 
 void MyDetectorConstruction::printGeometryInfo(G4LogicalVolume* lv, G4int verbosity){
-    
+
     int localNoDaughters = lv->GetNoDaughters();
     G4VPhysicalVolume *daughter;
     G4LogicalVolume *daughterLV;
@@ -1583,15 +1594,15 @@ void MyDetectorConstruction::printGeometryInfo(G4LogicalVolume* lv, G4int verbos
     {
         daughter=lv->GetDaughter(n);
         daughterLV = daughter->GetLogicalVolume();
-        
+
         std::cout<< "LV_name: ";
         std::cout.width(40); std::cout << std::left <<daughter->GetLogicalVolume()->GetName();
         std::cout << std::left << "\tMaterial:  "<<daughter->GetLogicalVolume()->GetMaterial()->GetName()<<std::endl;
         if (verbosity>1)
             std::cout <<daughter->GetLogicalVolume()->GetMaterial()<<std::endl;
-       
+
         if(daughterLV->GetNoDaughters()>0)
             printGeometryInfo(daughterLV, verbosity);
     }
-        
+
 }

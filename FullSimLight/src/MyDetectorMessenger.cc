@@ -5,6 +5,7 @@
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithoutParameter.hh"
 #include "globals.hh"
 
 
@@ -28,12 +29,17 @@ MyDetectorMessenger( MyDetectorConstruction* myDet )
   theGDMLCommand->SetDefaultValue( "atlas2018.gdml" );
   theGDMLCommand->AvailableForStates( G4State_PreInit, G4State_Idle );
 
+  theRegionCommand = new G4UIcmdWithoutParameter( "/mydet/addRegions", this );
+  theRegionCommand->SetGuidance( "Try to add detector regions." );
+  theRegionCommand->AvailableForStates( G4State_PreInit, G4State_Idle );
+
 }
 
 
 MyDetectorMessenger::~MyDetectorMessenger() {
   delete theFieldCommand;
   delete theDetectorDir;
+  delete theRegionCommand;
 }
 
 
@@ -43,6 +49,9 @@ void MyDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
   }
   if ( command == theGDMLCommand ) {
     theDetector->SetGDMLFileName( newValue );
+  }
+  if ( command == theRegionCommand ) {
+    theDetector->SetAddRegions( true );
   }
 
 }

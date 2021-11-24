@@ -107,27 +107,34 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
         //G4cout<<"\nBeginOfRunAction isMaster, and fMasterAnalysisManager: "<<fMasterAnalysisManager<<G4endl;
 
-        std::vector<G4Region*>* regionVect =  G4RegionStore::GetInstance();
-        int numRegions = regionVect->size();
-        int sumNumMC = 0;
-        G4ProductionCutsTable* pTable = G4ProductionCutsTable::GetProductionCutsTable();
-        size_t numMC = pTable->GetTableSize();
-        std::vector<int> mcRVect(23,0);
-        for (size_t imc=0; imc<numMC; ++imc) {
-            const G4MaterialCutsCouple* mc =pTable->GetMaterialCutsCouple(imc);
-            if (!mc->IsUsed()) continue;
-            G4Material* mat = const_cast<G4Material*>(mc->GetMaterial());
-            int k=0;
-            for (; k<numRegions && (!(*regionVect)[k]->FindCouple(mat)); ++k){}
-            if (k<numRegions) {
-                ++mcRVect[k];
+        G4cout << "\n ========================  Material-cuts couples ========================== \n" << G4endl;
+        const std::map<G4String, std::vector<G4Region*> >& theRegionMap  =  G4RegionStore::GetInstance()->GetMap();
+        std::map<G4String, std::vector<G4Region*> >::const_iterator rItr =  theRegionMap.begin();
+        std::size_t numTotalUsedCouples = 0;
+        while ( rItr != theRegionMap.end() ) {
+          const std::vector<G4Region*>& aRegionVect = rItr->second;
+          const std::size_t nRegion = aRegionVect.size();
+          G4cout << " ---> Region name: = " << rItr->first << " (NR = " << nRegion << " regions with this name.) " << G4endl;
+          for (std::size_t ir=0; ir<nRegion; ++ir) {
+            G4Region* reg = aRegionVect[ir];
+            const std::size_t numMats = reg->GetNumberOfMaterials();
+            std::vector<G4Material*>::const_iterator mItr = reg->GetMaterialIterator();
+            std::size_t numUsedCouples = 0;
+            for (std::size_t im=0; im<numMats; ++im) {
+              const G4Material*              mat = (*mItr);
+              const G4MaterialCutsCouple* couple = reg->FindCouple(const_cast<G4Material*>(mat));
+              if (couple && couple->IsUsed()) {
+                ++numUsedCouples;
+              }
+              ++mItr;
             }
+            numTotalUsedCouples += numUsedCouples;
+            G4cout << "     -- " << numUsedCouples << " mat-cuts couples used inside " << G4endl;
+          }
+          ++rItr;
         }
-        for (int ir=0; ir<numRegions; ++ir) {
-            G4cout<< " ir = " << ir << "  region Name = " << (*regionVect)[ir]->GetName() <<" #mc = " << mcRVect[ir] << G4endl;
-            sumNumMC += mcRVect[ir];
-        }
-        G4cout<< " === Total number of MC = " << sumNumMC << " vs " << numMC << " #regions = " << numRegions << G4endl;
+        G4cout << "     = Total number of mat-cuts couple used: " << numTotalUsedCouples << G4endl;
+        G4cout << "\n ==================================  DONE!  =============================== \n" << G4endl;
 
 
         G4String  msg0 = (fPythiaConfig == "") ? "a Particle-Gun" : "PYTHIA (" + fPythiaConfig +")";

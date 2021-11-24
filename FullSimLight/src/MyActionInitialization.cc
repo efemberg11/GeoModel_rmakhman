@@ -31,6 +31,12 @@ MyActionInitialization::~MyActionInitialization() {}
 void MyActionInitialization::BuildForMaster() const {
     MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps,fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
+#if USE_PYTHIA
+    if (use_pythia()) {
+      G4String str(get_pythia_config());
+      masterRunAct->SetPythiaConfig(str);
+    }
+#endif
     SetUserAction(masterRunAct);
 }
 
@@ -40,10 +46,14 @@ void MyActionInitialization::Build() const {
 #if !USE_PYTHIA
   SetUserAction(new MyPrimaryGeneratorAction());
 #else
-  if (use_pythia())
-    SetUserAction(new PythiaPrimaryGeneratorAction());
-  else
+  if (use_pythia()) {
+    // seed each generator/thread by 1234 if perfomance mode run and use the event
+    // ID+1 as seed otherwise (guaranted reproducibility while having different events)
+    G4int pythiaSeed = fIsPerformance ? -1 : 0;
+    SetUserAction(new PythiaPrimaryGeneratorAction(pythiaSeed));
+  } else {
     SetUserAction(new MyPrimaryGeneratorAction());
+  }
 #endif
 
 #ifndef G4MULTITHREADED
@@ -52,6 +62,12 @@ void MyActionInitialization::Build() const {
   if (fIsPerformance) {
     MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
+#if USE_PYTHIA
+    if (use_pythia()) {
+      G4String str(get_pythia_config());
+      masterRunAct->SetPythiaConfig(str);
+    }
+#endif
     SetUserAction(masterRunAct);
   }
 #endif
@@ -59,14 +75,14 @@ void MyActionInitialization::Build() const {
   if (!fIsPerformance) {
       MyRunAction* runact = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
       SetUserAction(runact);
-      
+
       if(!fCreateGeantinoMaps){
           MyEventAction* evtact = new MyEventAction();
           SetUserAction(evtact);
           SetUserAction(new MyTrackingAction(evtact));
           SetUserAction(new MySteppingAction(evtact));
-          
       }
+
 #if G4VERSION_NUMBER>=1040
       else
       {
@@ -85,7 +101,7 @@ void MyActionInitialization::Build() const {
           myLenghtIntEventAct->SetCreateEtaPhiMaps(fCreateEtaPhiMaps);
           SetUserAction(myLenghtIntEventAct);
           SetUserAction(myLenghtIntSteppingAct);
-          
+
       }
 #endif
       //MultiEventActions?? TO DO?

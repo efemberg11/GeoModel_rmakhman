@@ -41,10 +41,10 @@ void Help();
 
 
 int main(int argc, char** argv) {
-    
+
     // Get input arguments
     GetInputArguments(argc, argv);
-    
+
     G4cout
     << " =============== Running FullSimLight ================ "      << G4endl
     << "   Physics list name  =  " << parPhysListName                 << G4endl
@@ -53,10 +53,10 @@ int main(int argc, char** argv) {
     << "   Geometry file      =  " << geometryFileName                << G4endl
     << "   Run Overlap Check  =  " << parRunOverlapCheck              << G4endl
     << " ===================================================== "      << G4endl;
-    
+
     G4Timer myTotalCPUTimer;
     myTotalCPUTimer.Start();
-    
+
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
     G4Random::setTheEngine(new CLHEP::MixMaxRng);
     // set seed and print info
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     << "   Initial seed       = " << G4Random::getTheSeed()           << G4endl
     << " ===================================================== "      << G4endl
     << G4endl;
-    
+
     // Construct the default run manager
 #ifdef G4MULTITHREADED
     G4MTRunManager* runManager = new G4MTRunManager;
@@ -77,16 +77,16 @@ int main(int argc, char** argv) {
 #else
     G4RunManager* runManager = new G4RunManager;
 #endif
-    
+
     // set mandatory initialization classes
     // 1. Detector construction
     MyDetectorConstruction* detector = new MyDetectorConstruction;
-    
+
     if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
-        
+
     detector->SetGeometryFileName (geometryFileName);
     runManager->SetUserInitialization(detector);
-  
+
     // 2. Physics list
     G4PhysListFactory factory;
     if (factory.IsReferencePhysList(parPhysListName)) {
@@ -99,15 +99,15 @@ int main(int argc, char** argv) {
         G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
         return -1;
     }
-  
+
     // 3. User action
     runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance));
-  
+
     // 4. Run the simulation in batch mode
     G4UImanager* UI = G4UImanager::GetUIpointer();
     G4String command = "/control/execute ";
     UI->ApplyCommand(command+parMacroFileName);
-  
+
     // Print out the final random number
     G4cout << G4endl
            << " ================================================================= " << G4endl
@@ -150,7 +150,7 @@ void Help() {
             <<"      -P :   use Pythia primary generator [config. available: ttbar/higgs/minbias or use a Pythia command input file]\n"
             <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
             <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"<< std::endl;
-    
+
   std::cout <<"\nUsage: ./fullSimLight [OPTIONS] -m <MACRO_FILE>\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
     //printf("\t-%c  --%s\t%s\n", options[i].val, options[i].name, options[i].has_arg ? options[i].name : "");
@@ -178,8 +178,6 @@ void GetInputArguments(int argc, char** argv) {
    case 'P':
 #if USE_PYTHIA
      set_pythia_config(optarg);
-     // Need to enable performance mode, as user actions require particle gun setup
-     parIsPerformance = true;
 #else
      std::cerr << "Support for Pythia is not available. \nPlease visit the website http://home.thep.lu.se/Pythia/ to install it in your system." << std::endl;
      exit(1);

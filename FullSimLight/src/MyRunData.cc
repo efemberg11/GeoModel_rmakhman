@@ -1,17 +1,16 @@
 
-#include "MyRunDataPerPrimary.hh"
+#include "MyRunData.hh"
 
 
-MyRunDataPerPrimary::MyRunDataPerPrimary() {
+MyRunData::MyRunData() {
   Clear();
 }
 
 
-MyRunDataPerPrimary::~MyRunDataPerPrimary() {}
+MyRunData::~MyRunData() {}
 
 
-void MyRunDataPerPrimary::Clear() {
-  fNumPrimaries = 0.;
+void MyRunData::Clear() {
   fEdep         = 0.;
   fEdep2        = 0.;
   fTrackLCh     = 0.;
@@ -33,8 +32,7 @@ void MyRunDataPerPrimary::Clear() {
 }
 
 
-MyRunDataPerPrimary& MyRunDataPerPrimary::operator+=(const MyRunDataPerPrimary& right) {
-  fNumPrimaries += right.fNumPrimaries;
+MyRunData& MyRunData::operator+=(const MyRunData& right) {
   fEdep         += right.fEdep;
   fEdep2        += right.fEdep2;
   fTrackLCh     += right.fTrackLCh;

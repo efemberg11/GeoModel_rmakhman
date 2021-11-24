@@ -1,19 +1,20 @@
 
-#ifndef MyEventDataPerPrimary_h
-#define MyEventDataPerPrimary_h 1
+#ifndef MyEventData_h
+#define MyEventData_h 1
 
 #include "globals.hh"
 #include <iostream>
 
-class MyEventDataPerPrimary {
+class MyEventData {
 
 public:
-  MyEventDataPerPrimary();
-  ~MyEventDataPerPrimary();
+
+   MyEventData();
+  ~MyEventData();
 
   void Clear();
 
-  friend std::ostream& operator<<(std::ostream&, const MyEventDataPerPrimary&);
+  friend std::ostream& operator<<(std::ostream&, const MyEventData&);
 
   G4double fEdep;           // sum of energy deposit
   G4double fTrackLCh;       // sum of charged step length

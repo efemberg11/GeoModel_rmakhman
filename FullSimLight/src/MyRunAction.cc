@@ -11,7 +11,7 @@
 #include "globals.hh"
 
 #include "MyRun.hh"
-#include "MyPrimaryGeneratorAction.hh"
+
 
 #include "G4ProductionCutsTable.hh"
 #include "G4Region.hh"
@@ -19,9 +19,10 @@
 
 G4AnalysisManager* MyRunAction::fMasterAnalysisManager = nullptr;
 
-MyRunAction::MyRunAction(bool isGeantino, G4String geantinoMapFilename) : G4UserRunAction(), fIsPerformance(false), fIsGeantino(isGeantino), fRun(nullptr), fTimer(nullptr), fGeantinoMapsFilename(geantinoMapFilename){
-    
-}
+MyRunAction::MyRunAction(bool isGeantino, G4String geantinoMapFilename)
+: G4UserRunAction(), fIsPerformance(false), fIsGeantino(isGeantino),
+  fRun(nullptr), fTimer(nullptr), fGeantinoMapsFilename(geantinoMapFilename),
+  fPythiaConfig("") { }
 
 MyRunAction::~MyRunAction() {
     if(fIsGeantino)
@@ -42,7 +43,7 @@ G4Run* MyRunAction::GenerateRun() {
 void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
 #if G4VERSION_NUMBER>=1040
-    
+
     if(fIsGeantino)
     {
         // Create analysis manager
@@ -50,14 +51,14 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         if (isMaster) {
             fMasterAnalysisManager = analysisManager;
             //G4cout<<"MyRunAction::BeginOfRunAction, created MASTER istance of the G4AnalysisManager: "<<fMasterAnalysisManager<<G4endl;
-            
+
         }
         //else
         //    G4cout<<"MyRunAction::BeginOfRunAction, created WORKER istance of the G4AnalysisManager: "<<analysisManager<<G4endl;
-        
+
         G4cout << "Using G4AnalysisManager type: " << analysisManager->GetType() << G4endl;
         analysisManager->SetVerboseLevel(1);
-        
+
         // Open output root file
         G4cout<<"\n\nBeginOfRunAction: \n...create a root file using the G4AnalysisManager" << G4endl;
         if (!analysisManager->OpenFile(fGeantinoMapsFilename)){
@@ -65,7 +66,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
             exit(-1);
         } else
             G4cout<<"\n...output File "<<fGeantinoMapsFilename<<" opened!"<<G4endl;
-        
+
         const char* radName = "RZRadLen";
         if(analysisManager->GetP2Id(radName, false) < 0){
             fRadName_id = analysisManager->CreateP2(radName,radName,1000,-25000.,25000.,2000,0.,15000.);
@@ -73,7 +74,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
             analysisManager->SetP2XAxisTitle(fRadName_id,"Z[mm]");
             analysisManager->SetP2YAxisTitle(fRadName_id,"R[mm]");
             analysisManager->SetP2ZAxisTitle(fRadName_id,"thickstepRL");
-            
+
         }
         const char* intName = "RZIntLen";
         if(analysisManager->GetP2Id(intName, false)< 0)
@@ -90,7 +91,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
             fEtaRad_id = analysisManager->CreateP1(etaRadName,etaRadName,500,-6,6);
             analysisManager->SetP1XAxisTitle(fEtaRad_id,"#eta");
             analysisManager->SetP1YAxisTitle(fEtaRad_id,"Radiation Length %X0");
-           
+
         }
         const char* etaIntName = "etaIntLen";
         if(analysisManager->GetP1Id(etaIntName, false)< 0)
@@ -99,13 +100,13 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
             analysisManager->SetP1XAxisTitle(fEtaInt_id,"#eta");
             analysisManager->SetP1YAxisTitle(fEtaInt_id,"Interaction Length #lambda");
         }
-        
+
     }
 #endif
     if (isMaster) {
-        
+
         //G4cout<<"\nBeginOfRunAction isMaster, and fMasterAnalysisManager: "<<fMasterAnalysisManager<<G4endl;
-        
+
         std::vector<G4Region*>* regionVect =  G4RegionStore::GetInstance();
         int numRegions = regionVect->size();
         int sumNumMC = 0;
@@ -127,17 +128,20 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
             sumNumMC += mcRVect[ir];
         }
         G4cout<< " === Total number of MC = " << sumNumMC << " vs " << numMC << " #regions = " << numRegions << G4endl;
-        
-        
+
+
+        G4String  msg0 = (fPythiaConfig == "") ? "a Particle-Gun" : "PYTHIA (" + fPythiaConfig +")";
 #ifdef G4MULTITHREADED
         G4int nThreads = G4MTRunManager::GetMasterRunManager()->GetNumberOfThreads();
+        G4int nEvent   = G4MTRunManager::GetMasterRunManager()->GetNumberOfEventsToBeProcessed();
         G4cout << "\n  =======================================================================================\n"
-        << "   Run started in MT mode with " << nThreads << "  threads    \n"
+        << "   Run started in MT mode with " << nThreads << "  threads, simulating " << nEvent << " events using " << msg0 << " \n"
         << "  =======================================================================================  \n"
         << G4endl;
 #else
+        G4int nEvent   = G4RunManager::GetRunManager()->GetNumberOfEventsToBeProcessed();
         G4cout << "\n  =======================================================================================\n"
-        << "   Run started in sequential mode (i.e. with 1 thread)        \n"
+        << "   Run started in sequential mode (i.e. with 1 thread), simulating " << nEvent << " events using " << msg0 << " \n"
         << "  =======================================================================================  \n"
         << G4endl;
 #endif
@@ -153,7 +157,7 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
 #if G4VERSION_NUMBER>=1040
 
     if(fIsGeantino){
-        
+
         auto analysisManager= G4AnalysisManager::Instance();
         //Finalize analysisManager and Write out file
         if (analysisManager->IsOpenFile()){
@@ -163,10 +167,10 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
             analysisManager->CloseFile();
             G4cout<<"Output File successfully saved and closed! " << G4endl;
         }
-        
+
     }
 #endif
-    
+
     if (isMaster) {
         fTimer->Stop();
         // get number of events: even in case of perfomance mode when MyRun-s are not generated in GenerateRun()
@@ -183,8 +187,7 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
         G4cout << "     Time:  "  << *fTimer                                                                   << G4endl;
         G4cout << "  =======================================================================================  "<< G4endl;
         delete fTimer;
-        // print primary gun properties (not available at the begining of the run)
-        MyPrimaryGeneratorAction::Print();
+
         if (!fIsPerformance) { // otherwise we do not even create any MyRun objects so fRun is nullptr
             fRun->EndOfRun();
         }

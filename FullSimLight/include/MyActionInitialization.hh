@@ -6,12 +6,14 @@
 #include "G4String.hh"
 
 class MyActionInitialization : public G4VUserActionInitialization {
-public:
-  MyActionInitialization(bool isperformance=false, bool createGeantinoMaps=false, G4String geantinoMapsFilename="geantinoMaps.root");
-  virtual ~MyActionInitialization();
 
-  virtual void BuildForMaster() const;
-  virtual void Build() const;
+public:
+
+  MyActionInitialization(bool isperformance=false, bool createGeantinoMaps=false, G4String geantinoMapsFilename="geantinoMaps.root");
+ ~MyActionInitialization() override;
+
+  void BuildForMaster() const override;
+  void Build() const override;
 
   void SetPerformanceModeFlag(bool val) { fIsPerformance = val; }
   void SetCreateGeantinoMaps (bool val) { fCreateGeantinoMaps = val; }
@@ -25,12 +27,13 @@ public:
   void SetYlimit(G4double y) { fYlimit = y; }
 
 private:
-  bool fIsPerformance;
-  bool fCreateGeantinoMaps;
-  bool fCreateEtaPhiMaps;
-  bool fCreateDetectorsMaps;
-  bool fCreateMaterialsMaps;
-  bool fCreateElementsMaps;
+  
+  bool     fIsPerformance;
+  bool     fCreateGeantinoMaps;
+  bool     fCreateEtaPhiMaps;
+  bool     fCreateDetectorsMaps;
+  bool     fCreateMaterialsMaps;
+  bool     fCreateElementsMaps;
   G4String fGeantinoMapsFilename;
   G4double fRlimit;
   G4double fZlimit;

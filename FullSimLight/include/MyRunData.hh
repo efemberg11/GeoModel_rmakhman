@@ -1,19 +1,20 @@
 
-#ifndef MyRunDataPerPrimary_h
-#define MyRunDataPerPrimary_h 1
+#ifndef MyRunData_h
+#define MyRunData_h 1
 
 #include "globals.hh"
 
-class MyRunDataPerPrimary {
+class MyRunData {
+
 public:
-  MyRunDataPerPrimary();
-  ~MyRunDataPerPrimary();
+
+   MyRunData();
+  ~MyRunData();
 
   void Clear();
 
-  MyRunDataPerPrimary& operator+=(const MyRunDataPerPrimary& other);
+  MyRunData& operator+=(const MyRunData& other);
 
-  G4double fNumPrimaries;   // total number of primary particles
   G4double fEdep;           // sum of energy deposit (per event)
   G4double fEdep2;          // sum of energy deposit square
   G4double fTrackLCh;       // sum of charged step length (per event)

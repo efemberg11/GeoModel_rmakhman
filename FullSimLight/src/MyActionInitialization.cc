@@ -48,7 +48,7 @@ void MyActionInitialization::Build() const {
 #else
   if (use_pythia()) {
     // seed each generator/thread by 1234 if perfomance mode run and use the event
-    // ID+1 as seed otherwise (guaranted reproducibility wile having different events)
+    // ID+1 as seed otherwise (guaranted reproducibility while having different events)
     G4int pythiaSeed = fIsPerformance ? -1 : 0;
     SetUserAction(new PythiaPrimaryGeneratorAction(pythiaSeed));
   } else {

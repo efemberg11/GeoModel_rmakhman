@@ -97,7 +97,7 @@ void PythiaPrimaryGeneratorAction::GeneratePrimaries(G4Event *event) {
   G4PrimaryVertex* vertex = new G4PrimaryVertex(position, time);
   //
   // re-seed pythia with the event ID + 1 in order to ensure that the
-  // events are the same for a given event ID independently the from other
+  // events are the same for a given event ID independently from any other
   // run conditions
   if (fSeeding == 0) {
     fPythia.rndm.init(event->GetEventID()+1);

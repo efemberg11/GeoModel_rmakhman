@@ -15,7 +15,7 @@ const char* get_pythia_config();
 class PythiaPrimaryGeneratorAction final : public G4VUserPrimaryGeneratorAction {
 
 public:
-  // seeding < 0 : fixed 1234 for all thraeds (used for performance measurements)
+  // seeding < 0 : fixed 1234 for all threads (used for performance measurements)
   // seeding = 0 : re-seeding by the event ID in order to guarantee reproducibilty
   PythiaPrimaryGeneratorAction(int seeding = -1);
 

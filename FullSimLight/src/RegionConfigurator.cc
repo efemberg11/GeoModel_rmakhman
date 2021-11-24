@@ -14,17 +14,22 @@ RegionConfigurator& RegionConfigurator::Instance() {
 // loop over all RegionData and create a region for each if any of the listed
 // root logical volumes can be found
 void RegionConfigurator::CreateRegions(int verbose) {
-  G4LogicalVolumeStore* lvStore =  G4LogicalVolumeStore::GetInstance();
-  const std::map<G4String, std::vector<G4LogicalVolume*> >& lvStoreMap   = lvStore->GetMap();
-  //
+  std::vector<G4LogicalVolume*>* lvStore =  G4LogicalVolumeStore::GetInstance();
+  std::vector<G4LogicalVolume*> lvList;
   for(const RegionData& aRegionData: fRegionData) {
     G4Region*          reg = nullptr;
     const G4String regName = aRegionData.fRegionName;
     for (const G4String& rootLVName: aRegionData.fRootLVNames) {
-      std::map<G4String, std::vector<G4LogicalVolume*> >::const_iterator itr = lvStoreMap.find(rootLVName);
-      if (itr != lvStoreMap.end()) {
-        // the list of logical volumes with the given `rootLVName` name in the detector
-        const std::vector<G4LogicalVolume*>& lvList = itr->second;
+      // collect logical volume ptrs with the given name (if any)
+      lvList.clear();
+      for (std::size_t ilv=0, nlv=lvStore->size(); ilv<nlv; ++ilv) {
+        G4LogicalVolume* lv = (*lvStore)[ilv];
+        if (lv->GetName()==rootLVName) {
+          lvList.push_back(lv);
+        }
+      }
+      std::size_t nlv = lvList.size();
+      if (nlv>0) {
         // create the region if not yet
         if (reg==nullptr) {
           if (verbose>0) {
@@ -39,11 +44,11 @@ void RegionConfigurator::CreateRegions(int verbose) {
           reg->SetProductionCuts(pcut);
         }
         if (verbose>0) {
-           G4cout << "      = adding N = " << lvList.size()
+           G4cout << "      = adding N = " << nlv
                   << " root logical volumes to it with the name of " << rootLVName
                   << G4endl;
         }
-        for (std::size_t ilv=0; ilv<lvList.size(); ++ilv) {
+        for (std::size_t ilv=0; ilv<nlv; ++ilv) {
            reg->AddRootLogicalVolume(lvList[ilv]);
         }
       }
@@ -59,7 +64,6 @@ void RegionConfigurator::CreateRegions(int verbose) {
       G4cout << G4endl;
     }
   }
-
 }
 
 

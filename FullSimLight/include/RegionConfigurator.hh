@@ -42,6 +42,7 @@ private:
     G4double                 fGammaCut;
     G4double                 fElectronCut;
     G4double                 fPositronCut;
+    G4double                 fProtonCut;
   };
 
   void InitRegionData();

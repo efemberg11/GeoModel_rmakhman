@@ -41,6 +41,7 @@ void RegionConfigurator::CreateRegions(int verbose) {
           pcut->SetProductionCut(aRegionData.fGammaCut   , 0);
           pcut->SetProductionCut(aRegionData.fElectronCut, 1);
           pcut->SetProductionCut(aRegionData.fPositronCut, 2);
+          pcut->SetProductionCut(aRegionData.fProtonCut  , 3);
           reg->SetProductionCuts(pcut);
         }
         if (verbose>0) {
@@ -83,6 +84,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[0].fGammaCut    = 0.05;
   fRegionData[0].fElectronCut = 0.05;
   fRegionData[0].fPositronCut = 0.05;
+  fRegionData[0].fProtonCut   = 1.0;
   fRegionData[0].fRootLVNames = {"siLog", "siBLayLog", "dbmDiamondLog"};
   //
   //  Region: SCT
@@ -90,6 +92,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[1].fGammaCut    = 0.05;
   fRegionData[1].fElectronCut = 0.05;
   fRegionData[1].fPositronCut = 0.05;
+  fRegionData[1].fProtonCut   = 1.0;
   fRegionData[1].fRootLVNames = {"BRLSensor", "ECSensor0", "ECSensor1", "ECSensor2", "ECSensor3"};
   //
   //  Region: TRT
@@ -97,6 +100,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[2].fGammaCut    = 0.05;
   fRegionData[2].fElectronCut = 30.0;
   fRegionData[2].fPositronCut = 30.0;
+  fRegionData[2].fProtonCut   = 1.0;
   fRegionData[2].fRootLVNames = {"Gas", "GasMA"};
   //
   //  Region: TRT_Ar
@@ -104,6 +108,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[3].fGammaCut    = 0.05;
   fRegionData[3].fElectronCut = 30.0;
   fRegionData[3].fPositronCut = 30.0;
+  fRegionData[3].fProtonCut   = 1.0;
   fRegionData[3].fRootLVNames = {"Gas_Ar", "GasMA_Ar"};
   //
   //  Region: EMB
@@ -111,6 +116,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[4].fGammaCut    = 0.1;
   fRegionData[4].fElectronCut = 0.1;
   fRegionData[4].fPositronCut = 0.1;
+  fRegionData[4].fProtonCut   = 1.0;
   fRegionData[4].fRootLVNames = {"LAr::EMB::STAC"};
   //
   //  Region: EMEC
@@ -118,6 +124,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[5].fGammaCut    = 0.1;
   fRegionData[5].fElectronCut = 0.1;
   fRegionData[5].fPositronCut = 0.1;
+  fRegionData[5].fProtonCut   = 1.0;
   fRegionData[5].fRootLVNames = {"LAr::EMEC::Mother"};
   //
   //  Region: HEC
@@ -125,6 +132,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[6].fGammaCut    = 1.0;
   fRegionData[6].fElectronCut = 1.0;
   fRegionData[6].fPositronCut = 1.0;
+  fRegionData[6].fProtonCut   = 1.0;
   fRegionData[6].fRootLVNames = {"LAr::HEC::LiquidArgon"};
   //
   //  Region: FCAL
@@ -132,6 +140,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[7].fGammaCut    = 0.03;
   fRegionData[7].fElectronCut = 0.03;
   fRegionData[7].fPositronCut = 0.03;
+  fRegionData[7].fProtonCut   = 1.0;
   fRegionData[7].fRootLVNames = {"LAr::FCAL::LiquidArgonC"};
   //
   //  Region: DriftWall
@@ -139,6 +148,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[8].fGammaCut    = 1.0;
   fRegionData[8].fElectronCut = 0.05;
   fRegionData[8].fPositronCut = 0.05;
+  fRegionData[8].fProtonCut   = 1.0;
   fRegionData[8].fRootLVNames = {"MDTDriftWall"};
   //
   //  Region: DriftWall1
@@ -146,6 +156,7 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[9].fGammaCut    = 1.0;
   fRegionData[9].fElectronCut = 1.0;
   fRegionData[9].fPositronCut = 1.0;
+  fRegionData[9].fProtonCut   = 1.0;
   fRegionData[9].fRootLVNames = {"Endplug"};
   //
   //  Region: DriftWall2
@@ -153,5 +164,6 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[10].fGammaCut    = 1.0;
   fRegionData[10].fElectronCut = 1.0;
   fRegionData[10].fPositronCut = 1.0;
+  fRegionData[10].fProtonCut   = 1.0;
   fRegionData[10].fRootLVNames = {"SensitiveGas"};
 }

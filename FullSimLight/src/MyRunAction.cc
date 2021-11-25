@@ -128,6 +128,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
           G4cout << "     -- " << numUsedCouples << " mat-cuts couples used inside " << G4endl;
         }
         G4cout << "     = Total number of mat-cuts couple used: " << numTotalUsedCouples << G4endl;
+        // G4ProductionCutsTable::GetProductionCutsTable()->DumpCouples();
         G4cout << "\n ==================================  DONE!  =============================== \n" << G4endl;
 
 

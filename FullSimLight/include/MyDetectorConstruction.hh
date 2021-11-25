@@ -43,6 +43,7 @@ public:
 
   void SetGDMLFileName  (const G4String &gdmlfile)   { fGeometryFileName = gdmlfile;}
   void SetRunOverlapCheck(const bool runOvCheck)     { fRunOverlapCheck = runOvCheck; }
+  void SetAddRegions(const bool addRegions)          { fAddRegions = addRegions; }     
   void SetRunMassCalculator(const bool runMassCalc)  { fRunMassCalculator = runMassCalc; }
   void SetVerbosity(const int verbosity)            { fVerbosityFlag = verbosity; }
   void SetGeometryFileName(const G4String &geometryFileName) { fGeometryFileName = geometryFileName; }
@@ -64,11 +65,11 @@ public:
   }
 
   static G4double GetFieldValue() { return gFieldValue; }
-    
+
   void RecursiveMassCalculation (G4VPhysicalVolume* worldg4,GeoPhysVol* worldgeoModel, std::vector<json>& jlist);
-    
+
   void RecursivelyCheckOverlap(G4LogicalVolume* envelope, std::vector<json>& jlist);
-  
+
   // Verifies if the placed volume is overlapping with existing
   // daughters or with the mother volume. Provides default resolution
   // for the number of points to be generated and verified.
@@ -77,31 +78,31 @@ public:
   // Reports a maximum of overlaps errors according to parameter in input.
   // Returns true if the volume is overlapping.
   bool myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res = 1000, G4double tol = 0., G4bool verbose = true, G4int maxErr = 1 );
-    
+
   //Retrieves the corresponding point in global coordinates,
   //using the chain of G4VPhysicalVolumes stored in the fTree vector
   G4ThreeVector localToGlobal(G4ThreeVector& mp, bool skipFirstIt);
-  
+
   // Iterate from the volume envelope through all the daughter volumes, and look for the ancestors of
   // 'volume', populating the fTree vector of G4VPhysicalVolumes
   bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
-    
+
   void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep);
-    
+
   void iterateFromWorldMass(G4LogicalVolume* envelope, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix="", G4String material="");
-    
+
   GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
 
   /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
   void PullUnidentifiedVolumes( G4LogicalVolume* v );
-    
+
   void printGeometryInfo(G4LogicalVolume* lv, G4int verbosity);
 
   static G4AnalysisManager* fAnalysisManager;
 
 protected:
   G4Timer fTimer;
-    
+
 private:
   // this static member is for the print out
   static G4double gFieldValue;
@@ -109,6 +110,7 @@ private:
   //G4int    fHistoID; //density histogram ID
   G4bool   fRunOverlapCheck;
   G4bool   fRunMassCalculator;
+  G4bool   fAddRegions;
   G4int    fVerbosityFlag;
   G4bool   fDumpGDML;
   G4double fMinStep;

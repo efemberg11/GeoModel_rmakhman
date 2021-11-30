@@ -7,6 +7,7 @@
 
 #include "GeoModelKernel/GeoTransform.h"
 #include <vector>
+#include <mutex>
 
 class GeoVAlignmentStore;
 
@@ -45,6 +46,10 @@ class GeoAlignableTransform final : public GeoTransform
   // the memory is unallocated.
   GeoTrf::Transform3D* m_delta;
 
+  // We need to protext m_delta with a mutex in order to avoid
+  // memory corruption in multithreaded applications
+  mutable std::mutex m_deltaMutex;
+  
   // A list of parents who use this alignable target.  They
   // must all be notified when the alignment changes!
   std::vector<GeoGraphNode*>  m_parentList;

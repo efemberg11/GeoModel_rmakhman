@@ -7,6 +7,7 @@
 
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoAbsPositionInfo.h"
+#include <mutex>
 
 class GeoVAlignmentStore;
 
@@ -50,6 +51,11 @@ class GeoVFullPhysVol : public GeoVPhysVol
 
  protected:
   virtual ~GeoVFullPhysVol() override;
+
+  /// Mutex serving dual purpose:
+  ///  1. To protect the absolute position info
+  ///  2. To protect m_daughters container in the derived GeoFullPhysVol
+  mutable std::mutex m_mutex;
 
  private:
   /// The absolute name of this volume.

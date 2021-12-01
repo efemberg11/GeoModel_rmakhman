@@ -20,7 +20,9 @@
 
 #include "Randomize.hh"
 #include "MyDetectorConstruction.hh"
-#include "MyGVPhysicsList.hh"
+#include "StandardEmWithWoodcock.hh"
+#include "EmExtraPhysics.hh"
+#include "G4NeutronTrackingCut.hh"
 
 #include "MyActionInitialization.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
@@ -78,27 +80,46 @@ int main(int argc, char** argv) {
     G4RunManager* runManager = new G4RunManager;
 #endif
 
-    // set mandatory initialization classes
-    // 1. Detector construction
-    MyDetectorConstruction* detector = new MyDetectorConstruction;
-
-    if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
-
-    detector->SetGeometryFileName (geometryFileName);
-    runManager->SetUserInitialization(detector);
-
-    // 2. Physics list
+    // 1. Physics list
+    G4bool activateRegions = false;
     G4PhysListFactory factory;
     if (factory.IsReferencePhysList(parPhysListName)) {
-        G4VModularPhysicsList* physList = factory.GetReferencePhysList(parPhysListName);
+        G4VModularPhysicsList*  physList = factory.GetReferencePhysList(parPhysListName);
+        // set the neutron tracking cut (to be 150 [ns]) for a more realistic simulation
+        G4NeutronTrackingCut* neutronCut = new G4NeutronTrackingCut("neutronCutphysics", 1);
+        neutronCut->SetTimeLimit(150.0*CLHEP::ns);
+        physList->ReplacePhysics(neutronCut);
         runManager->SetUserInitialization(physList);
-    } else if (parPhysListName==G4String("GV")) {
-        G4VUserPhysicsList* physList = new MyGVPhysicsList();
+    } else if (parPhysListName==G4String("FTFP_BERT_ATL_WDCK")) {
+        G4VModularPhysicsList*   physList = factory.GetReferencePhysList("FTFP_BERT_ATL");
+        // the local em-standard physics with Woodcock tracking for gamma
+        G4VPhysicsConstructor* em0AndWDCK = new StandardEmWithWoodcock;
+        physList->ReplacePhysics(em0AndWDCK);
+        // the local version of the `G4EmExtraPhysics` that will use the local `GammaGeneralProcess`
+        G4VPhysicsConstructor* emExtra = new EmExtraPhysics;
+        physList->ReplacePhysics(emExtra);
+        //physList->RemovePhysics("G4GammaLeptoNuclearPhys");
+        // set the neutron tracking cut (to be 150 [ns]) for a more realistic simulation
+        G4NeutronTrackingCut*  neutronCut = new G4NeutronTrackingCut("neutronCutphysics", 1);
+        neutronCut->SetTimeLimit(150.0*CLHEP::ns);
+        physList->ReplacePhysics(neutronCut);
+        //
         runManager->SetUserInitialization(physList);
+        // make sure that regions will also be added to the detector
+        activateRegions = true;
     } else {
         G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
         return -1;
     }
+
+    // 2. Detector construction
+    MyDetectorConstruction* detector = new MyDetectorConstruction;
+
+    if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
+    if (activateRegions)    detector->SetAddRegions(true);
+
+    detector->SetGeometryFileName (geometryFileName);
+    runManager->SetUserInitialization(detector);
 
     // 3. User action
     runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance));

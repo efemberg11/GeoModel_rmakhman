@@ -20,7 +20,6 @@
 
 #include "Randomize.hh"
 #include "MyDetectorConstruction.hh"
-#include "MyGVPhysicsList.hh"
 
 #include "MyActionInitialization.hh"
 
@@ -51,10 +50,10 @@ void Help();
 
 
 int main(int argc, char** argv) {
-    
+
     // Get input arguments
     GetInputArguments(argc, argv);
-    
+
     G4cout
     << " =============== Running geantinoMaps ================ "      << G4endl
     << "   Geant4 macro               =  " << parMacroFileName        << G4endl
@@ -65,7 +64,7 @@ int main(int argc, char** argv) {
     << "   Create Materials maps      =  " << parCreateMaterialsMaps  << G4endl
     << "   Create Elements maps       =  " << parCreateElementsMaps   << G4endl
     << " ===================================================== "      << G4endl;
-    
+
     // JFB: Check that the macro file exists and is readable:
     if (access(parMacroFileName,R_OK)) {
       G4cout << G4endl;
@@ -96,7 +95,7 @@ int main(int argc, char** argv) {
     G4cout << "INFO: Exiting" <<G4endl;
     return 1;
 #endif
-    
+
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
     G4Random::setTheEngine(new CLHEP::MixMaxRng);
     // set seed and print info
@@ -107,7 +106,7 @@ int main(int argc, char** argv) {
     << "   Initial seed       = " << G4Random::getTheSeed()           << G4endl
     << " ===================================================== "      << G4endl
     << G4endl;
-    
+
     // Construct the default run manager
 #ifdef G4MULTITHREADED
     G4MTRunManager* runManager = new G4MTRunManager;
@@ -117,29 +116,26 @@ int main(int argc, char** argv) {
 #else
     G4RunManager* runManager = new G4RunManager;
 #endif
-    
+
     // set mandatory initialization classes
     // 1. Detector construction
     MyDetectorConstruction* detector = new MyDetectorConstruction;
-    
+
     if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
-        
+
     detector->SetGeometryFileName (parGeometryFileName);
     runManager->SetUserInitialization(detector);
-  
+
     // 2. Physics list
     G4PhysListFactory factory;
     if (factory.IsReferencePhysList(parPhysListName)) {
         G4VModularPhysicsList* physList = factory.GetReferencePhysList(parPhysListName);
         runManager->SetUserInitialization(physList);
-    } else if (parPhysListName==G4String("GV")) {
-        G4VUserPhysicsList* physList = new MyGVPhysicsList();
-        runManager->SetUserInitialization(physList);
     } else {
         G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
         return -1;
     }
-  
+
     // 3. User action
     MyActionInitialization* myAct = new MyActionInitialization(parIsPerformance, parCreateGeantinoMaps,parOutputFileName);
     myAct->SetRlimit(parRlimit);
@@ -153,12 +149,12 @@ int main(int argc, char** argv) {
     runManager->SetUserInitialization(myAct);
 
 
-  
+
     // 4. Run the simulation in batch mode
     G4UImanager* UI = G4UImanager::GetUIpointer();
     G4String command = "/control/execute ";
     UI->ApplyCommand(command+parMacroFileName);
-  
+
     // Print out the final random number
     G4cout << G4endl
            << " ================================================================= " << G4endl

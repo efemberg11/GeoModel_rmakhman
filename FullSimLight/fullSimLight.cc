@@ -119,6 +119,15 @@ int main(int argc, char** argv) {
     detector->SetGeometryFileName (geometryFileName);
     runManager->SetUserInitialization(detector);
 
+    // 2. Detector construction
+    MyDetectorConstruction* detector = new MyDetectorConstruction;
+
+    if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
+    if (activateRegions)    detector->SetAddRegions(true);
+
+    detector->SetGeometryFileName (geometryFileName);
+    runManager->SetUserInitialization(detector);
+
     // 3. User action
     runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance));
 

@@ -95,6 +95,8 @@
 #include "G4NuMuNucleusCcModel.hh"
 #include "G4NuMuNucleusNcModel.hh"
 #include "G4LossTableManager.hh"
+
+//#include "G4GammaGeneralProcess.hh"
 #include "GammaGeneralProcess.hh"
 
 #include "G4HadronicParameters.hh"

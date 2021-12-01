@@ -37,90 +37,256 @@
 // 31.01.2018 V. Grichine: add neutrino-electron process and xsc
 //
 // NOTE: M. Novak 30.11.2021.
-//       This is local version of the `EmExtraPhysics` constructor that taken
-//       from Geant4.10.6.p03 and renamed to `EmExtraPhysics` while alll
-//       `G4GammaGeneralProcess` casts has been chaned to `GammaGeneralProcess`
-//       in order ot be able to use with the local `GammaGeneralProcess` when
-//       Woodcock tracking is utilised. This should be removed (together with
-//       the `GammaGeneralProcess`) when moving to Geant4.11.0 version of the
-//       `G4GammaGeneralProcess` as base class for `WoodcockProcess`.
+//       This is local version of the `G4EmExtraPhysics` constructor renamed to
+//       `EmExtraPhysics` and all `G4GammaGeneralProcess` casts has been chaned
+//       to `GammaGeneralProcess` in order ot be able to use with the local
+//       `GammaGeneralProcess` when Woodcock tracking is utilised. This should
+//       be removed (together with the `GammaGeneralProcess`) when moving to
+//       Geant4.11.0 version of the `G4GammaGeneralProcess` as base class for
+//       `WoodcockProcess`.
 //----------------------------------------------------------------------------
 //
 
 #ifndef EmExtraPhysics_h
 #define EmExtraPhysics_h 1
 
+#include "G4Version.hh"
 #include "G4VPhysicsConstructor.hh"
 #include "globals.hh"
 
-#include "G4EmMessenger.hh"
 
-class G4CascadeInterface;
-class G4PhotoNuclearProcess;
+#if G4VERSION_NUMBER<1070
 
-class EmExtraPhysics : public G4VPhysicsConstructor
-{
-public:
+  class G4PhotoNuclearProcess;
+  class G4CascadeInterface;
 
-  EmExtraPhysics(G4int ver = 1);
+  class EmExtraPhysics : public G4VPhysicsConstructor
+  {
+  public:
 
-  // obsolete
-  EmExtraPhysics(const G4String& name);
+    EmExtraPhysics(G4int ver = 1);
 
-  virtual ~EmExtraPhysics();
+    // obsolete
+    EmExtraPhysics(const G4String& name);
 
-  void ConstructParticle();
-  void ConstructProcess();
+    virtual ~EmExtraPhysics();
 
-  void Synch(G4bool val);
-  void SynchAll(G4bool val);
-  void GammaNuclear(G4bool val);
-  void LENDGammaNuclear(G4bool val);
-  void ElectroNuclear(G4bool val);
-  void MuonNuclear(G4bool val);
-  void GammaToMuMu(G4bool val);
-  void PositronToMuMu(G4bool val);
-  void PositronToHadrons(G4bool val);
-  void GammaToMuMuFactor(G4double val);
-  void PositronToMuMuFactor(G4double val);
-  void PositronToHadronsFactor(G4double val);
+    void ConstructParticle();
+    void ConstructProcess();
 
-  void NeutrinoActivated(G4bool val);
-  void NuETotXscActivated(G4bool val);
-  void SetNuEleCcBias(G4double bf);
-  void SetNuEleNcBias(G4double bf);
-  void SetNuNucleusBias(G4double bf);
-  void SetNuDetectorName(const G4String& dn);
+    void Synch(G4bool val);
+    void SynchAll(G4bool val);
+    void GammaNuclear(G4bool val);
+    void LENDGammaNuclear(G4bool val);
+    void ElectroNuclear(G4bool val);
+    void MuonNuclear(G4bool val);
+    void GammaToMuMu(G4bool val);
+    void PositronToMuMu(G4bool val);
+    void PositronToHadrons(G4bool val);
+    void GammaToMuMuFactor(G4double val);
+    void PositronToMuMuFactor(G4double val);
+    void PositronToHadronsFactor(G4double val);
 
-private:
+    void NeutrinoActivated(G4bool val);
+    void NuETotXscActivated(G4bool val);
+    void SetNuEleCcBias(G4double bf);
+    void SetNuEleNcBias(G4double bf);
+    void SetNuNucleusBias(G4double bf);
+    void SetNuDetectorName(const G4String& dn);
 
-  void ConstructGammaElectroNuclear();
+  private:
 
-  void ConstructLENDGammaNuclear(G4CascadeInterface* cascade,
-                                 G4PhotoNuclearProcess* gnuc);
+    void ConstructGammaElectroNuclear();
 
-  G4bool gnActivated;
-  G4bool eActivated;
-  G4bool gLENDActivated;
-  G4bool munActivated;
-  G4bool synActivated;
-  G4bool synActivatedForAll;
-  G4bool gmumuActivated;
-  G4bool pmumuActivated;
-  G4bool phadActivated;
-  G4bool fNuActivated;
-  G4bool fNuETotXscActivated;
+    void ConstructLENDGammaNuclear(G4CascadeInterface* cascade,
+                                   G4PhotoNuclearProcess* gnuc);
 
-  G4double gmumuFactor;
-  G4double pmumuFactor;
-  G4double phadFactor;
-  G4double fNuEleCcBias;
-  G4double fNuEleNcBias;
-  G4double fNuNucleusBias;
+    G4bool gnActivated;
+    G4bool eActivated;
+    G4bool gLENDActivated;
+    G4bool munActivated;
+    G4bool synActivated;
+    G4bool synActivatedForAll;
+    G4bool gmumuActivated;
+    G4bool pmumuActivated;
+    G4bool phadActivated;
+    G4bool fNuActivated;
+    G4bool fNuETotXscActivated;
 
-  G4String fNuDetectorName;
+    G4double gmumuFactor;
+    G4double pmumuFactor;
+    G4double phadFactor;
+    G4double fNuEleCcBias;
+    G4double fNuEleNcBias;
+    G4double fNuNucleusBias;
 
-  G4int verbose;
-};
+    G4String fNuDetectorName;
+
+    G4int verbose;
+  };
+
+#elif G4VERSION_NUMBER<1100
+
+  #include "G4VPhysicsConstructor.hh"
+  #include "globals.hh"
+
+  #include "G4EmMessenger.hh"
+
+  class G4CascadeInterface;
+  class G4PhotoNuclearProcess;
+
+  class EmExtraPhysics : public G4VPhysicsConstructor
+  {
+  public:
+
+    EmExtraPhysics(G4int ver = 1);
+
+    // obsolete
+    EmExtraPhysics(const G4String& name);
+
+    virtual ~EmExtraPhysics();
+
+    void ConstructParticle();
+    void ConstructProcess();
+
+    void Synch(G4bool val);
+    void SynchAll(G4bool val);
+    void GammaNuclear(G4bool val);
+    void LENDGammaNuclear(G4bool val);
+    void ElectroNuclear(G4bool val);
+    void MuonNuclear(G4bool val);
+    void GammaToMuMu(G4bool val);
+    void PositronToMuMu(G4bool val);
+    void PositronToHadrons(G4bool val);
+    void GammaToMuMuFactor(G4double val);
+    void PositronToMuMuFactor(G4double val);
+    void PositronToHadronsFactor(G4double val);
+    void GammaNuclearLEModelLimit(G4double val);
+
+    void NeutrinoActivated(G4bool val);
+    void NuETotXscActivated(G4bool val);
+    void SetUseGammaNuclearXS(G4bool val);
+    void SetNuEleCcBias(G4double bf);
+    void SetNuEleNcBias(G4double bf);
+    void SetNuNucleusBias(G4double bf);
+    void SetNuDetectorName(const G4String& dn);
+
+  private:
+
+    void ConstructGammaElectroNuclear();
+
+    void ConstructLENDGammaNuclear(G4CascadeInterface* cascade,
+                                   G4PhotoNuclearProcess* gnuc);
+
+    G4bool gnActivated;
+    G4bool eActivated;
+    G4bool gLENDActivated;
+    G4bool munActivated;
+    G4bool synActivated;
+    G4bool synActivatedForAll;
+    G4bool gmumuActivated;
+    G4bool pmumuActivated;
+    G4bool phadActivated;
+    G4bool fNuActivated;
+    G4bool fNuETotXscActivated;
+    G4bool fUseGammaNuclearXS;
+
+    G4double gmumuFactor;
+    G4double pmumuFactor;
+    G4double phadFactor;
+    G4double fNuEleCcBias;
+    G4double fNuEleNcBias;
+    G4double fNuNucleusBias;
+    G4double fGNLowEnergyLimit;
+
+    G4String fNuDetectorName;
+
+    G4EmMessenger* theMessenger;
+    G4int verbose;
+  };
+
+#else
+
+  #include "G4VPhysicsConstructor.hh"
+  #include "globals.hh"
+
+  #include "G4EmMessenger.hh"
+
+  class G4CascadeInterface;
+  class G4HadronInelasticProcess;
+
+  class EmExtraPhysics : public G4VPhysicsConstructor
+  {
+  public:
+
+    EmExtraPhysics(G4int ver = 1);
+
+    // obsolete
+    EmExtraPhysics(const G4String& name);
+
+    virtual ~EmExtraPhysics();
+
+    void ConstructParticle();
+    void ConstructProcess();
+
+    void Synch(G4bool val);
+    void SynchAll(G4bool val);
+    void GammaNuclear(G4bool val);
+    void LENDGammaNuclear(G4bool val);
+    void ElectroNuclear(G4bool val);
+    void MuonNuclear(G4bool val);
+    void GammaToMuMu(G4bool val);
+    void PositronToMuMu(G4bool val);
+    void PositronToHadrons(G4bool val);
+    void GammaToMuMuFactor(G4double val);
+    void PositronToMuMuFactor(G4double val);
+    void PositronToHadronsFactor(G4double val);
+    void GammaNuclearLEModelLimit(G4double val);
+
+    void NeutrinoActivated(G4bool val);
+    void NuETotXscActivated(G4bool val);
+    void SetUseGammaNuclearXS(G4bool val);
+    void SetNuEleCcBias(G4double bf);
+    void SetNuEleNcBias(G4double bf);
+    void SetNuNucleusBias(G4double bf);
+    void SetNuDetectorName(const G4String& dn);
+
+  private:
+
+    void ConstructGammaElectroNuclear();
+
+    void ConstructLENDGammaNuclear(G4CascadeInterface* cascade,
+                                   G4HadronInelasticProcess* gnuc);
+
+    G4bool gnActivated;
+    G4bool eActivated;
+    G4bool gLENDActivated;
+    G4bool munActivated;
+    G4bool synActivated;
+    G4bool synActivatedForAll;
+    G4bool gmumuActivated;
+    G4bool pmumuActivated;
+    G4bool phadActivated;
+    G4bool fNuActivated;
+    G4bool fNuETotXscActivated;
+    G4bool fUseGammaNuclearXS;
+
+    G4double gmumuFactor;
+    G4double pmumuFactor;
+    G4double phadFactor;
+    G4double fNuEleCcBias;
+    G4double fNuEleNcBias;
+    G4double fNuNucleusBias;
+    G4double fGNLowEnergyLimit;
+
+    G4String fNuDetectorName;
+
+    G4EmMessenger* theMessenger;
+    G4int verbose;
+  };
+
+
+#endif // G4VERSION_NUMBER
+
 
 #endif

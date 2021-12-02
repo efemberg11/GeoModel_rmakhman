@@ -60,6 +60,7 @@ public:
   double last_lettersVerticalPos;
   bool last_showAxes;
   double last_axesLength;
+  unsigned int last_axesLength_UnitsFactor;
   SbVec3f last_axesPosition;
   double last_relAxesThickness;
   bool last_showCartesianGrid;
@@ -146,7 +147,9 @@ GuideSysController::GuideSysController(IVP1System * sys)
 
   addUpdateSlot(SLOT(possibleChange_axesLength()));
   connectToLastUpdateSlot(m_d->ui_axes.checkBox_axes_shownegativeparts);
-  connectToLastUpdateSlot(m_d->ui_axes.doubleSpinBox_axes_lengths_m);
+  connectToLastUpdateSlot(m_d->ui_axes.doubleSpinBox_axes_lengths);
+  connectToLastUpdateSlot(m_d->ui_axes.comboBox_axes_lengths_units);
+  m_d->ui_axes.comboBox_axes_lengths_units->setCurrentIndex(2); // we set 'm' (meters) as default units
 
   addUpdateSlot(SLOT(possibleChange_axesPosition()));
   connectToLastUpdateSlot(m_d->ui_axes.doubleSpinBox_axes_xpos_m);
@@ -295,8 +298,22 @@ bool GuideSysController::showAxes() const
 //____________________________________________________________________
 double GuideSysController::axesLength() const
 {
-  return m_d->ui_axes.doubleSpinBox_axes_lengths_m->value()*SYSTEM_OF_UNITS::m *
-    (m_d->ui_axes.checkBox_axes_shownegativeparts->isChecked()?-1.0:1.0);
+    unsigned int unitsFactor;
+    QString units = m_d->ui_axes.comboBox_axes_lengths_units->currentText();
+    if (units == "mm") {
+        unitsFactor = SYSTEM_OF_UNITS::mm;
+    } else if (units == "cm") {
+        unitsFactor = SYSTEM_OF_UNITS::cm;
+    } else if (units == "m") {
+        unitsFactor = SYSTEM_OF_UNITS::m;
+    } else if (units == "km") {
+        unitsFactor = SYSTEM_OF_UNITS::km;
+    } else {
+        std::cout << "\nWARNING! So far, only 'mm', 'cm', 'm', and 'km' units are supported. If you need other units, please contact 'geomodel-developers@cern.ch'.\n\n" << std::endl;
+    }
+
+    return m_d->ui_axes.doubleSpinBox_axes_lengths->value()*unitsFactor *
+        (m_d->ui_axes.checkBox_axes_shownegativeparts->isChecked()?-1.0:1.0);
 }
 
 //____________________________________________________________________
@@ -449,7 +466,7 @@ void GuideSysController::actualSaveSettings(VP1Serialise&s) const
   s.save(m_d->ui_floorandletters.checkBox_acdesignations);
   //Version 0 output bool here
   s.save(m_d->ui_axes.checkBox_axes_shownegativeparts);
-  s.save(m_d->ui_axes.doubleSpinBox_axes_lengths_m);
+  s.save(m_d->ui_axes.doubleSpinBox_axes_lengths);
   s.save(m_d->ui_axes.doubleSpinBox_axes_relthickness);
   s.save(m_d->ui_axes.doubleSpinBox_axes_xpos_m);
   s.save(m_d->ui_axes.doubleSpinBox_axes_ypos_m);
@@ -480,6 +497,9 @@ void GuideSysController::actualSaveSettings(VP1Serialise&s) const
   s.save(m_d->ui_lines.doubleSpinBox_phi);
   s.save(m_d->ui_lines.doubleSpinBox_eta);
   s.save(m_d->ui_lines.doubleSpinBox_length);
+  
+  // new, length units
+  s.save(m_d->ui_axes.comboBox_axes_lengths_units);
 }
 
 //____________________________________________________________________
@@ -515,7 +535,7 @@ void GuideSysController::actualRestoreSettings(VP1Deserialise& s)
   if (s.version()==0)
     s.ignoreBool();
   s.restore(m_d->ui_axes.checkBox_axes_shownegativeparts);
-  s.restore(m_d->ui_axes.doubleSpinBox_axes_lengths_m);
+  s.restore(m_d->ui_axes.doubleSpinBox_axes_lengths);
   s.restore(m_d->ui_axes.doubleSpinBox_axes_relthickness);
   s.restore(m_d->ui_axes.doubleSpinBox_axes_xpos_m);
   s.restore(m_d->ui_axes.doubleSpinBox_axes_ypos_m);
@@ -537,6 +557,9 @@ void GuideSysController::actualRestoreSettings(VP1Deserialise& s)
   s.restore(m_d->ui_lines.doubleSpinBox_phi);
   s.restore(m_d->ui_lines.doubleSpinBox_eta);
   s.restore(m_d->ui_lines.doubleSpinBox_length);
+  
+  // new, length units
+  s.restore(m_d->ui_axes.comboBox_axes_lengths_units);
 }
 
 void GuideSysController::possibleChange_lineDirection() {	

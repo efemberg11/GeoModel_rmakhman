@@ -82,16 +82,13 @@ int main(int argc, char** argv) {
 
     // 1. Physics list
     G4bool activateRegions = false;
+    G4VModularPhysicsList* physList = nullptr;
     G4PhysListFactory factory;
     if (factory.IsReferencePhysList(parPhysListName)) {
-        G4VModularPhysicsList*  physList = factory.GetReferencePhysList(parPhysListName);
-        // set the neutron tracking cut (to be 150 [ns]) for a more realistic simulation
-        G4NeutronTrackingCut* neutronCut = new G4NeutronTrackingCut("neutronCutphysics", 1);
-        neutronCut->SetTimeLimit(150.0*CLHEP::ns);
-        physList->ReplacePhysics(neutronCut);
-        runManager->SetUserInitialization(physList);
+        physList = factory.GetReferencePhysList(parPhysListName);
     } else if (parPhysListName==G4String("FTFP_BERT_ATL_WDCK")) {
-        G4VModularPhysicsList*   physList = factory.GetReferencePhysList("FTFP_BERT_ATL");
+        G4cout << "<<< Geant4 FTFP_BERT_ATL physics list with the local Woodcock settings " << G4endl;
+        physList = factory.GetReferencePhysList("FTFP_BERT_ATL");
         // the local em-standard physics with Woodcock tracking for gamma
         G4VPhysicsConstructor* em0AndWDCK = new StandardEmWithWoodcock;
         physList->ReplacePhysics(em0AndWDCK);
@@ -99,18 +96,19 @@ int main(int argc, char** argv) {
         G4VPhysicsConstructor* emExtra = new EmExtraPhysics;
         physList->ReplacePhysics(emExtra);
         //physList->RemovePhysics("G4GammaLeptoNuclearPhys");
-        // set the neutron tracking cut (to be 150 [ns]) for a more realistic simulation
-        G4NeutronTrackingCut*  neutronCut = new G4NeutronTrackingCut("neutronCutphysics", 1);
-        neutronCut->SetTimeLimit(150.0*CLHEP::ns);
-        physList->ReplacePhysics(neutronCut);
-        //
-        runManager->SetUserInitialization(physList);
         // make sure that regions will also be added to the detector
         activateRegions = true;
     } else {
         G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
         return -1;
     }
+    // In all cases of physics lists, set the neutron tracking cut to be 150 [ns] as in Athena
+    G4NeutronTrackingCut* neutronCut = new G4NeutronTrackingCut("neutronCutphysics", 1);
+    neutronCut->SetTimeLimit(150.0*CLHEP::ns);
+    physList->ReplacePhysics(neutronCut);
+    // register the final version of the physics list in the run manager
+    runManager->SetUserInitialization(physList);
+
 
     // 2. Detector construction
     MyDetectorConstruction* detector = new MyDetectorConstruction;

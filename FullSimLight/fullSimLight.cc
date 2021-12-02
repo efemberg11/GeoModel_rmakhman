@@ -109,16 +109,6 @@ int main(int argc, char** argv) {
     // register the final version of the physics list in the run manager
     runManager->SetUserInitialization(physList);
 
-
-    // 2. Detector construction
-    MyDetectorConstruction* detector = new MyDetectorConstruction;
-
-    if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
-    if (activateRegions)    detector->SetAddRegions(true);
-
-    detector->SetGeometryFileName (geometryFileName);
-    runManager->SetUserInitialization(detector);
-
     // 2. Detector construction
     MyDetectorConstruction* detector = new MyDetectorConstruction;
 

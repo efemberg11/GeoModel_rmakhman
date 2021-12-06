@@ -223,7 +223,7 @@ void StandardEmWithWoodcock::ConstructProcess()
       // and only above `theWDCKLowEnergyThreshold` gamma energies.
       // NOTE: the `WoodcockProcess` is equivalent to the `G4GammaGeneralProcess`
       //       when no detector region can be found with the given name.
-      const G4String theWDCKRegionName          = "EMEC";
+      const G4String theWDCKRegionName          = "EMEC-xxx";
       const G4double theWDCKLowEnergyThreshold  = 200.0*CLHEP::keV;
       WoodcockProcess* theWDCKProcess = new WoodcockProcess(theWDCKRegionName, theWDCKLowEnergyThreshold);
       //

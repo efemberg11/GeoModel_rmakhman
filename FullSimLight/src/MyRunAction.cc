@@ -107,11 +107,14 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 #endif
 
     // set the special scoring region in the stepping and tracking actions
-    if (!fIsPerformance && fSpecialScoringRegionName!="") {
+    if (fRun && fSpecialScoringRegionName!="") {
       std::vector<G4Region*>* theRegionVector = G4RegionStore::GetInstance();
       for (std::size_t ir=0, nr=theRegionVector->size(); ir<nr; ++ir) {
         G4Region* reg = (*theRegionVector)[ir];
         if (reg->GetName() == fSpecialScoringRegionName) {
+          if (isMaster) {
+            G4cout << " --- Special scoring will be done in Region = " << fSpecialScoringRegionName << G4endl;
+          }
           if (fSteppingAction) { fSteppingAction->SetScoringRegion(reg); }
           if (fTrackingAction) { fTrackingAction->SetScoringRegion(reg); }
           fRun->SetSpecialScoringRegion(reg);

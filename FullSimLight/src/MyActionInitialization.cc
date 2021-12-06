@@ -78,6 +78,7 @@ void MyActionInitialization::Build() const {
   if (!fIsPerformance) {
       MyRunAction* runact = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
       SetUserAction(runact);
+      runact->SetSpecialScoringRegionName(fSpecialScoringRegionName);
 
       if(!fCreateGeantinoMaps){
           MyEventAction*    evtAct = new MyEventAction();

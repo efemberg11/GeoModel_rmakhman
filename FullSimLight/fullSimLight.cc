@@ -123,7 +123,8 @@ int main(int argc, char** argv) {
     // set the name of a region in which we are interested to see a very basic simulation
     // stat e.g. "EMEC" (NOTE: only if the given region can be found and executed in
     // non-perfomance mode)
-    actInit->SetSpecialScoringRegionName("");
+    const G4String nameSpecialScoringRegion = ""; //"EMEC"
+    actInit->SetSpecialScoringRegionName(nameSpecialScoringRegion);
     runManager->SetUserInitialization(actInit);
 
     // 4. Run the simulation in batch mode

@@ -66,7 +66,7 @@ void MyRun::EndOfRun() {
   //
   PrintEndOfRunStat(fRunData, norm);
   if (fScoringRegion != nullptr) {
-    G4cout<< "\n ------------- In the Special Detector Region: " << fScoringRegion->GetName() << " \n" << G4endl;
+    G4cout<< "\n --- In the Special Detector Region: " << fScoringRegion->GetName() << " \n" << G4endl;
     PrintEndOfRunStat(fRunDataSpecialRegion, norm);
   }
   G4cout<< " ......................................................................................... \n" << G4endl;

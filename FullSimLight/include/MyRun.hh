@@ -7,6 +7,7 @@
 #include "MyRunData.hh"
 
 class G4Track;
+class G4Region;
 class MyEventData;
 
 class MyRun : public G4Run {
@@ -18,15 +19,25 @@ public:
 
   void Merge(const G4Run*) override;
 
-  void FillPerEvent(const MyEventData&);
+  void SetSpecialScoringRegion(G4Region* reg) { fScoringRegion = reg; }
+
+  void FillPerEvent(const MyEventData&, G4bool);
   void EndOfRun();
 
-  const MyRunData&  GetRunData() const { return fRunData; }
+  const MyRunData&  GetRunData(G4bool isspecial) const { return isspecial ? fRunDataSpecialRegion : fRunData; }
 
 
 private:
 
+  void AddData(const MyEventData& data, MyRunData& runData);
+  void PrintEndOfRunStat(MyRunData& runData, G4double norm);
+
+private:
+
+  G4Region*  fScoringRegion;
+
   MyRunData  fRunData;
+  MyRunData  fRunDataSpecialRegion;
 
 };
 

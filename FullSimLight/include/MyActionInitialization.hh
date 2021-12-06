@@ -26,8 +26,11 @@ public:
   void SetXlimit(G4double x) { fXlimit = x; }
   void SetYlimit(G4double y) { fYlimit = y; }
 
+  void  SetSpecialScoringRegionName(const G4String& rname) { fSpecialScoringRegionName = rname; }
+
+
 private:
-  
+
   bool     fIsPerformance;
   bool     fCreateGeantinoMaps;
   bool     fCreateEtaPhiMaps;
@@ -35,6 +38,7 @@ private:
   bool     fCreateMaterialsMaps;
   bool     fCreateElementsMaps;
   G4String fGeantinoMapsFilename;
+  G4String fSpecialScoringRegionName;
   G4double fRlimit;
   G4double fZlimit;
   G4double fXlimit;

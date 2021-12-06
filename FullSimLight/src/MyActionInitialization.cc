@@ -22,7 +22,8 @@
 //const G4AnalysisManager* MyActionInitialization::fMasterAnalysisManager = nullptr;
 
 MyActionInitialization::MyActionInitialization(bool isperformance, bool createGeantinoMaps, G4String geantinoMapsFilename)
-: G4VUserActionInitialization(), fIsPerformance(isperformance), fCreateGeantinoMaps(createGeantinoMaps),fGeantinoMapsFilename(geantinoMapsFilename){}
+: G4VUserActionInitialization(), fIsPerformance(isperformance), fCreateGeantinoMaps(createGeantinoMaps),fGeantinoMapsFilename(geantinoMapsFilename),
+  fSpecialScoringRegionName("") {}
 
 
 MyActionInitialization::~MyActionInitialization() {}
@@ -31,6 +32,7 @@ MyActionInitialization::~MyActionInitialization() {}
 void MyActionInitialization::BuildForMaster() const {
     MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps,fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
+    masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
 #if USE_PYTHIA
     if (use_pythia()) {
       G4String str(get_pythia_config());
@@ -62,6 +64,7 @@ void MyActionInitialization::Build() const {
   if (fIsPerformance) {
     MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
+    masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
 #if USE_PYTHIA
     if (use_pythia()) {
       G4String str(get_pythia_config());
@@ -77,10 +80,14 @@ void MyActionInitialization::Build() const {
       SetUserAction(runact);
 
       if(!fCreateGeantinoMaps){
-          MyEventAction* evtact = new MyEventAction();
-          SetUserAction(evtact);
-          SetUserAction(new MyTrackingAction(evtact));
-          SetUserAction(new MySteppingAction(evtact));
+          MyEventAction*    evtAct = new MyEventAction();
+          MyTrackingAction*  trAct = new MyTrackingAction(evtAct);
+          MySteppingAction* stpAct = new MySteppingAction(evtAct);
+          SetUserAction(evtAct);
+          SetUserAction(trAct);
+          SetUserAction(stpAct);
+          runact->SetTrackingAction(trAct);
+          runact->SetSteppingAction(stpAct);
       }
 
 #if G4VERSION_NUMBER>=1040

@@ -22,8 +22,11 @@
 #include "MyPrimaryGeneratorAction.hh"
 
 
-MyEventAction::MyEventAction() : G4UserEventAction() {
+MyEventAction::MyEventAction() : G4UserEventAction(), fIsSpecialScoring(false) {
   fEventData.Clear();
+  if (fIsSpecialScoring) {
+    fEventDataSpecialRegion.Clear();
+  }
 }
 
 
@@ -32,18 +35,24 @@ MyEventAction::~MyEventAction() { }
 
 void MyEventAction::BeginOfEventAction(const G4Event*) {
   fEventData.Clear();
+  if (fIsSpecialScoring) {
+    fEventDataSpecialRegion.Clear();
+  }
 }
 
 
 void MyEventAction::EndOfEventAction(const G4Event*) {
   //get the Run and add the data collected during the simulation of the event that has been completed
   MyRun* run = static_cast<MyRun*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
-  run->FillPerEvent(fEventData);
+  run->FillPerEvent(fEventData, false);
+  if (fIsSpecialScoring) {
+    run->FillPerEvent(fEventDataSpecialRegion, true);
+  }
 }
 
 
 // called from the SteppingAction
-void MyEventAction::AddData(G4double edep, G4double length, G4bool ischarged) {
+void MyEventAction::AddData(G4double edep, G4double length, G4bool ischarged, G4bool isspecial) {
   fEventData.fEdep += edep;
   if (ischarged) {
     fEventData.fTrackLCh    += length;
@@ -52,17 +61,40 @@ void MyEventAction::AddData(G4double edep, G4double length, G4bool ischarged) {
     fEventData.fTrackLNe    += length;
     fEventData.fNeutralStep += 1.;
   }
+  // return if this step was not done in the special region
+  if (!isspecial) {
+    return;
+  }
+  fEventDataSpecialRegion.fEdep += edep;
+  if (ischarged) {
+    fEventDataSpecialRegion.fTrackLCh    += length;
+    fEventDataSpecialRegion.fChargedStep += 1.;
+  } else {
+    fEventDataSpecialRegion.fTrackLNe    += length;
+    fEventDataSpecialRegion.fNeutralStep += 1.;
+  }
 }
 
 
 // called from the TrackingAction
-void MyEventAction::AddSecondaryTrack(const G4Track* track) {
-    const G4ParticleDefinition* pdf = track->GetDefinition();
-    if (pdf==G4Gamma::Gamma()) {
-        fEventData.fNGamma += 1.;
-    } else if (pdf==G4Electron::Electron()) {
-        fEventData.fNElec += 1.;
-    } else if (pdf==G4Positron::Positron()) {
-        fEventData.fNPosit += 1.;
-    }
+void MyEventAction::AddSecondaryTrack(const G4Track* track, G4bool isspecial) {
+  const G4ParticleDefinition* pdf = track->GetDefinition();
+  if (pdf==G4Gamma::Gamma()) {
+    fEventData.fNGamma += 1.;
+  } else if (pdf==G4Electron::Electron()) {
+    fEventData.fNElec += 1.;
+  } else if (pdf==G4Positron::Positron()) {
+    fEventData.fNPosit += 1.;
+  }
+  // return if this step was not done in the special region
+  if (!isspecial) {
+    return;
+  }
+  if (pdf==G4Gamma::Gamma()) {
+    fEventDataSpecialRegion.fNGamma += 1.;
+  } else if (pdf==G4Electron::Electron()) {
+    fEventDataSpecialRegion.fNElec += 1.;
+  } else if (pdf==G4Positron::Positron()) {
+    fEventDataSpecialRegion.fNPosit += 1.;
+  }
 }

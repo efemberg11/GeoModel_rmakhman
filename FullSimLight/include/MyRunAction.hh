@@ -10,6 +10,8 @@
 
 class MyRun;
 class G4Timer;
+class MySteppingAction;
+class MyTrackingAction;
 
 
 class MyRunAction: public G4UserRunAction {
@@ -25,14 +27,23 @@ public:
 
   void   SetPerformanceFlag(G4bool val)    { fIsPerformance = val; }
   void   SetPythiaConfig(G4String config)  { fPythiaConfig  = config; }
+
+  void  SetSteppingAction(MySteppingAction* stpact) { fSteppingAction = stpact; }
+  void  SetTrackingAction(MyTrackingAction* tract)  { fTrackingAction = tract;  }
+
+  void  SetSpecialScoringRegionName(const G4String& rname) { fSpecialScoringRegionName = rname; }
+
 private:
 
-  G4bool       fIsPerformance;
-  G4bool       fIsGeantino;
-  MyRun*       fRun;
-  G4Timer*     fTimer;
-  G4String     fGeantinoMapsFilename;
-  G4String     fPythiaConfig;
+  G4bool            fIsPerformance;
+  G4bool            fIsGeantino;
+  MyRun*            fRun;
+  G4Timer*          fTimer;
+  MySteppingAction* fSteppingAction;
+  MyTrackingAction* fTrackingAction;
+  G4String          fGeantinoMapsFilename;
+  G4String          fPythiaConfig;
+  G4String          fSpecialScoringRegionName;
 
 
     //TO DO: make private and add Get methods

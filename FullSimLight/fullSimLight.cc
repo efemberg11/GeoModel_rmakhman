@@ -119,7 +119,12 @@ int main(int argc, char** argv) {
     runManager->SetUserInitialization(detector);
 
     // 3. User action
-    runManager->SetUserInitialization(new MyActionInitialization(parIsPerformance));
+    MyActionInitialization* actInit = new MyActionInitialization(parIsPerformance);
+    // set the name of a region in which we are interested to see a very basic simulation
+    // stat e.g. "EMEC" (NOTE: only if the given region can be found and executed in
+    // non-perfomance mode)
+    actInit->SetSpecialScoringRegionName("");
+    runManager->SetUserInitialization(actInit);
 
     // 4. Run the simulation in batch mode
     G4UImanager* UI = G4UImanager::GetUIpointer();

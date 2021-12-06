@@ -120,7 +120,7 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 StandardEmWithWoodcock::StandardEmWithWoodcock(G4int ver, const G4String& name)
-  : G4VPhysicsConstructor(name), verbose(ver)
+  : G4VPhysicsConstructor(name), verbose(ver), fWDCKRegionName(""), fWDCKLowEnergyThreshold(0.0)
 {
   SetVerboseLevel(ver);
   G4EmParameters* param = G4EmParameters::Instance();
@@ -223,9 +223,7 @@ void StandardEmWithWoodcock::ConstructProcess()
       // and only above `theWDCKLowEnergyThreshold` gamma energies.
       // NOTE: the `WoodcockProcess` is equivalent to the `G4GammaGeneralProcess`
       //       when no detector region can be found with the given name.
-      const G4String theWDCKRegionName          = "EMEC-xxx";
-      const G4double theWDCKLowEnergyThreshold  = 200.0*CLHEP::keV;
-      WoodcockProcess* theWDCKProcess = new WoodcockProcess(theWDCKRegionName, theWDCKLowEnergyThreshold);
+      WoodcockProcess* theWDCKProcess = new WoodcockProcess(fWDCKRegionName, fWDCKLowEnergyThreshold);
       //
       G4PhotoElectricEffect* pee = new G4PhotoElectricEffect();
       pee->SetEmModel(new G4LivermorePhotoElectricModel());

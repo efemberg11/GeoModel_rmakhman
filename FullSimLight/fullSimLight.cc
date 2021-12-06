@@ -90,7 +90,10 @@ int main(int argc, char** argv) {
         G4cout << "<<< Geant4 FTFP_BERT_ATL physics list with the local Woodcock settings " << G4endl;
         physList = factory.GetReferencePhysList("FTFP_BERT_ATL");
         // the local em-standard physics with Woodcock tracking for gamma
-        G4VPhysicsConstructor* em0AndWDCK = new StandardEmWithWoodcock;
+        StandardEmWithWoodcock* em0AndWDCK = new StandardEmWithWoodcock;
+        // set the region name and low energy limit for Woodcock tracking
+        em0AndWDCK->SetRegionNameForWoodcockTracking("EMEC");
+        em0AndWDCK->SetLowEnergyLimitForWoodcockTracking(200.0*CLHEP::keV);
         physList->ReplacePhysics(em0AndWDCK);
         // the local version of the `G4EmExtraPhysics` that will use the local `GammaGeneralProcess`
         G4VPhysicsConstructor* emExtra = new EmExtraPhysics;

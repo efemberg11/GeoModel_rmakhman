@@ -76,10 +76,17 @@ public:
   void ConstructParticle() override;
   void ConstructProcess() override;
 
+
+  void SetRegionNameForWoodcockTracking(const G4String& rname) { fWDCKRegionName = rname; }
+  void SetLowEnergyLimitForWoodcockTracking(G4double val)      { fWDCKLowEnergyThreshold = val; }
+
 private:
 
   G4int verbose;
   G4EmParticleList partList;
+
+  G4String         fWDCKRegionName;
+  G4double         fWDCKLowEnergyThreshold;
 
 };
 

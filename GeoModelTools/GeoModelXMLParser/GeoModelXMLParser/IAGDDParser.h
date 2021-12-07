@@ -8,6 +8,8 @@
 
 #include <string>
 
+namespace GeoModelTools { 
+
 class IAGDDParser {
 public:
 	IAGDDParser():m_fileName("") {}
@@ -22,5 +24,7 @@ public:
 protected:
 	std::string m_fileName;
 };
+
+} // end namespace
 
 #endif

@@ -28,23 +28,23 @@ void volumeHandler::ElementHandle()
 	
 	GeoLogVol* tempLV=0;
 
-	for (child=XercesParser::GetCurrentElement()->getFirstChild();child!=0;child=child->getNextSibling())
+	for (child=GeoModelTools::XercesParser::GetCurrentElement()->getFirstChild();child!=0;child=child->getNextSibling())
 	{
 		if (child->getNodeType()==xercesc::DOMNode::ELEMENT_NODE) {
 			// XercesParser::elementLoop(child);
-			XMLHandler *h=theController->XMLStore()->GetHandler(child);
+			GeoModelTools::XMLHandler *h=theController->XMLStore()->GetHandler(child);
             		if (h){
 	              		std::string nH=h->GetName();
                 		//std::cout<<" handler name "<<nH<<std::endl;
 				
                 		if (nH=="materialref") {
-					XercesParser::elementLoop(child);
+					GeoModelTools::XercesParser::elementLoop(child);
                     			materialrefHandler* mH=dynamic_cast<materialrefHandler*>(h);
                     			if (!mH) std::cout<<" something is wrong! can not retrieve materialrefHandler!!!"<<std::endl;
                     			else material=mH->getMaterial();
                 		}
                 		else if (nH=="solidref") {
-					XercesParser::elementLoop(child);
+					GeoModelTools::XercesParser::elementLoop(child);
                     			solidrefHandler* sH=dynamic_cast<solidrefHandler*>(h);
                     			if (!sH) std::cout<<" something is wrong! can not retrieve solidrefHandler!!!"<<std::endl;
                     			else shape=sH->getSolid();
@@ -67,7 +67,7 @@ void volumeHandler::ElementHandle()
 						}
 						pH->setMotherVolume(tempPV);
                     			}
-					XercesParser::elementLoop(child);
+					GeoModelTools::XercesParser::elementLoop(child);
                 		}
 				else if (nH=="replicavol") {
 					replicaHandler* rH=dynamic_cast<replicaHandler*>(h);
@@ -84,7 +84,7 @@ void volumeHandler::ElementHandle()
 						}
 						rH->setMotherVolume(tempPV);
 					}
-					XercesParser::elementLoop(child);
+					GeoModelTools::XercesParser::elementLoop(child);
 				}
             		}
             

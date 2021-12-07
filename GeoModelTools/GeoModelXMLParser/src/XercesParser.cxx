@@ -22,6 +22,7 @@
 #include <xercesc/util/OutOfMemoryException.hpp>
 
 using namespace xercesc;
+using namespace GeoModelTools;
 
 DOMNode* XercesParser::s_currentElement=0;
 

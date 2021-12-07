@@ -5,6 +5,8 @@
 #include <string>
 #include <map>
 
+namespace GeoModelTools {
+
 class JSONHandler;
 
 class handlerStore {
@@ -26,4 +28,5 @@ private:
 	std::map< std::string, JSONHandler*, std::less<std::string> > store;
 };
 
+}  // end namespace
 #endif

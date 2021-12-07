@@ -26,11 +26,11 @@ void materialHandler::ElementHandle()
 
 	xercesc::DOMNode *child;
 
-	for (child=XercesParser::GetCurrentElement()->getFirstChild();child!=0;child=child->getNextSibling())
+	for (child=GeoModelTools::XercesParser::GetCurrentElement()->getFirstChild();child!=0;child=child->getNextSibling())
 	{
 		if (child->getNodeType()==xercesc::DOMNode::ELEMENT_NODE) 
 		{
-			XercesParser::elementLoop(child);
+			GeoModelTools::XercesParser::elementLoop(child);
 			XMLHandler *h=theController->XMLStore()->GetHandler(child);
                 	if(h)
 			{

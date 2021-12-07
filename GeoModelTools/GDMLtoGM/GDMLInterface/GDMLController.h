@@ -35,7 +35,7 @@ class GDMLController {
 public:
 	GDMLController(std::string);
 	ExpressionEvaluator* Evaluator();
-	XMLHandlerStore* XMLStore();
+	GeoModelTools::XMLHandlerStore* XMLStore();
 
 	void saveIsotope(std::string, isotope);
 	isotope& retrieveIsotope(std::string);
@@ -72,7 +72,7 @@ protected:
 
 	std::string controllerName;
 	ExpressionEvaluator* theEvaluator;
-	XMLHandlerStore* theXMLStore;
+	GeoModelTools::XMLHandlerStore* theXMLStore;
 
 	isotopeStore theIsotopes;
 	positionStore thePositions;

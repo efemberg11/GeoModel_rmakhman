@@ -7,11 +7,13 @@
 #ifndef EXPRESSION_EVALUATOR_H
 #define EXPRESSION_EVALUATOR_H 1
 
-#include "ExpressionEvaluator/ExprtkEvaluator.h"
-
 #include <string>
 #include <vector>
 #include <map>
+
+#include "ExpressionEvaluator/ExprtkEvaluator.h"
+
+namespace GeoModelTools {
 
 class ExpressionEvaluator
 {
@@ -38,5 +40,7 @@ private:
   
   void replace_substring(std::string& , const std::string , const std::string );
 };
+
+}
 
 #endif // GDML_EXPRESSION_EVALUATOR_H

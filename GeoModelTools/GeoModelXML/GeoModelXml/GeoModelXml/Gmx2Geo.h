@@ -52,7 +52,7 @@ XERCES_CPP_NAMESPACE_BEGIN
 class DOMNode;
 XERCES_CPP_NAMESPACE_END
 
-class Evaluator;
+class IEvaluator;
 
 #define processorList std::map<std::string,ElementProcessor*> 
 
@@ -64,7 +64,7 @@ private:
     Gmx2Geo(const Gmx2Geo &right);
     Gmx2Geo & operator=(const Gmx2Geo &right);
 
-    int doDefines(xercesc::DOMDocument *doc, Evaluator &eval);
+    int doDefines(xercesc::DOMDocument *doc, GeoModelTools::IEvaluator &eval);
     int doPositionIndex(xercesc::DOMDocument *doc, GmxUtil &gmxUtil);
     int doReadoutGeometry(xercesc::DOMDocument *doc, GmxUtil &gmxUtil);
     void addParam(xercesc::DOMNode *node, std::map<std::string, std::string> &params);

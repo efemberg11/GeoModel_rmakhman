@@ -105,7 +105,7 @@ double GmxUtil::evaluate(char const *expression) {
 //   And evaluate the result
 //
     double result = eval.evaluate(noBrackets.c_str());
-    if (eval.status() != Evaluator::OK) {
+    if (eval.status() != GeoModelTools::Evaluator::OK) {
         throw runtime_error(string("evaluate: invalid expression. Last good expression was <" + lastGoodExpression + ">"));
     }
     lastGoodExpression = strExpression;

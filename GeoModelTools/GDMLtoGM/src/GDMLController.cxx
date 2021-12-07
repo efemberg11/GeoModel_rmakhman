@@ -23,18 +23,18 @@ std::string stripPointer(const std::string str)
 
 
 GDMLController::GDMLController(std::string name): controllerName(name) {
-	theXMLStore=XMLHandlerStore::GetHandlerStore();
-	theEvaluator=ExpressionEvaluator::GetEvaluator();
+	theXMLStore=GeoModelTools::XMLHandlerStore::GetHandlerStore();
+	theEvaluator=GeoModelTools::ExpressionEvaluator::GetEvaluator();
 
 	registerHandlers();
 }
 
-ExpressionEvaluator* GDMLController::Evaluator()
+GeoModelTools::ExpressionEvaluator* GDMLController::Evaluator()
 {
 	return theEvaluator;
 }
 
-XMLHandlerStore* GDMLController::XMLStore()
+GeoModelTools::XMLHandlerStore* GDMLController::XMLStore()
 {
 	return theXMLStore;
 }

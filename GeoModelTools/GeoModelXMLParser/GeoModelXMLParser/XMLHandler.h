@@ -11,6 +11,8 @@
 
 #include "ExpressionEvaluator/ExpressionEvaluator.h"
 
+namespace GeoModelTools {
+
 class XMLHandlerStore;
 
 class XMLHandler {
@@ -70,5 +72,7 @@ protected:
 private:
 	void RegisterToStore();
 };
+
+}  // end namespace
 
 #endif

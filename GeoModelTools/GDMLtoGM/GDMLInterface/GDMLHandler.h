@@ -7,9 +7,9 @@
 #include <string>
 #include <iostream>
 
-class GDMLHandler:public XMLHandler {
+class GDMLHandler:public GeoModelTools::XMLHandler {
 public:
-  GDMLHandler(std::string n, GDMLController* c):XMLHandler(n),theController(c)
+  GDMLHandler(std::string n, GDMLController* c):GeoModelTools::XMLHandler(n),theController(c)
   {;}
   virtual void postLoopHandling() {;}
 protected:

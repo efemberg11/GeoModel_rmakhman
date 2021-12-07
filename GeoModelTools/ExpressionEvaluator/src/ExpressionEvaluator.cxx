@@ -10,6 +10,8 @@
 #include <vector>
 #include <iostream>
 
+using namespace GeoModelTools;
+
 ExpressionEvaluator::ExpressionEvaluator()
 {
   m_calc.clear();

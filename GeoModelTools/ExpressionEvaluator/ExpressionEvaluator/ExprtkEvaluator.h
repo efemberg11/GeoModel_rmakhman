@@ -21,6 +21,9 @@ typedef exprtk::parser<T>             parser_t;
 typedef std::map<std::string,std::vector<double> > vectorMap;
 typedef std::map<std::string,double> variableMap;
 
+
+namespace GeoModelTools { 
+
 /*
  Evaluator based on exprtk (see https://www.partow.net/programming/exprtk/index.html)
 */
@@ -41,7 +44,7 @@ public:
 
   double evaluate(const char * expression);
 
-  int status() const;
+int status() const;
 
   int error_position() const;
 
@@ -100,5 +103,6 @@ private:
 
 };
 
+}
 
 #endif

@@ -20,7 +20,7 @@
 #include <map>
 #include <string>
 
-class Evaluator;
+class IEvaluator;
 
 class PositionIndex {
 public:
@@ -39,7 +39,7 @@ public:
     std::string formula(const std::string& name);
     void setFormula(const std::string& name, const std::string& formula);
 
-    void indices(std::map<std::string, int> &index, Evaluator &eval);
+    void indices(std::map<std::string, int> &index, GeoModelTools::IEvaluator &eval);
 
 private:
     int m_level;

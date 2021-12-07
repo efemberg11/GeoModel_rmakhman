@@ -8,6 +8,7 @@
 #include <iostream>
 
 using namespace xercesc;
+using namespace GeoModelTools;
 
 XMLHandlerStore* XMLHandlerStore::s_theStore=0;
 

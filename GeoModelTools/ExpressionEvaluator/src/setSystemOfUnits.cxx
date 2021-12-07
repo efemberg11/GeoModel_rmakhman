@@ -7,7 +7,7 @@
 
 //  namespace HepTool {
 
-void IEvaluator::setSystemOfUnits(double meter,
+void GeoModelTools::IEvaluator::setSystemOfUnits(double meter,
 				 double kilogram,
 				 double second,
 				 double ampere,

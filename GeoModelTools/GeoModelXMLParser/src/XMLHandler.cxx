@@ -10,6 +10,7 @@
 #include <vector>
 
 using namespace xercesc;
+using namespace GeoModelTools;
 
 DOMNode* XMLHandler::s_currentElement=0;
 bool XMLHandler::s_printFlag=false;

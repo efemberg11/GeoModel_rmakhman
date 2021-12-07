@@ -17,7 +17,7 @@
 
 #include "GeoModelKernel/GeoPhysVol.h"
 
-#include "ExpressionEvaluator/Evaluator.h"
+#include "ExpressionEvaluator/IEvaluator.h"
 
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GeoNodeList.h"
@@ -111,7 +111,7 @@ Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoPhysVol *addHere, GmxInterface &gmxIn
     XMLPlatformUtils::Terminate();
 }
 
-int Gmx2Geo::doDefines(DOMDocument *doc, Evaluator &eval) {
+int Gmx2Geo::doDefines(DOMDocument *doc, GeoModelTools::IEvaluator &eval) {
 //
 //    Add all defines to the CLHEP::Evaluator
 //
@@ -214,7 +214,7 @@ const DOMElement *element;
             char *name = XMLString::transcode(var->getAttribute(name_tmp));
             char *val = XMLString::transcode(var->getAttribute(value_tmp));
             double evaluated = eval.evaluate(val);
-            if (eval.status() != Evaluator::OK) {
+            if (eval.status() != GeoModelTools::IEvaluator::OK) {
                 msglog << MSG::FATAL << "GeoModelXml Error processing CLHEP Evaluator expression. Error name " <<
                 eval.error_name() << endl << "Message: ";
                 eval.print_error();

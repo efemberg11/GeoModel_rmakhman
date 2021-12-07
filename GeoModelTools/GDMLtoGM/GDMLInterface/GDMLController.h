@@ -34,8 +34,8 @@ typedef std::map<std::string, GeoElement*, std::less<std::string> > elementStore
 class GDMLController {
 public:
 	GDMLController(std::string);
-	ExpressionEvaluator* Evaluator();
-	XMLHandlerStore* XMLStore();
+	GeoModelTools::ExpressionEvaluator* Evaluator();
+	GeoModelTools::XMLHandlerStore* XMLStore();
 
 	void saveIsotope(std::string, isotope);
 	isotope& retrieveIsotope(std::string);
@@ -71,8 +71,8 @@ protected:
 	void setConstant(const char*, double);
 
 	std::string controllerName;
-	ExpressionEvaluator* theEvaluator;
-	XMLHandlerStore* theXMLStore;
+	GeoModelTools::ExpressionEvaluator* theEvaluator;
+	GeoModelTools::XMLHandlerStore* theXMLStore;
 
 	isotopeStore theIsotopes;
 	positionStore thePositions;

@@ -16,6 +16,8 @@
 #include <errno.h>
 #include <stdlib.h>	// for strtod()
 
+using namespace GeoModelTools;
+
 //---------------------------------------------------------------------------
 // Fix non ISO C++ compliant cast from pointer to function
 // to void*, which is a pointer to an object

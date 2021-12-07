@@ -8,6 +8,8 @@
 
 using nlohmann::json;
 
+namespace GeoModelTools {
+
 #include "handlerStore.h"
 
 class JSONHandler {
@@ -18,11 +20,13 @@ public:
 	virtual void ElementHandle(const json& j) = 0;
 	std::string name() {return _name;}
 protected:
-	JSONHandler(std::string n):_name(n) {handlerStore::getHandlerStore()->registerHandler(this);}
+	JSONHandler(std::string n):_name(n) {GeoModelTools::handlerStore::getHandlerStore()->registerHandler(this);}
 	virtual ~JSONHandler() {;}
 private:
 	std::string _name;
 	std::map<std::string, JSONHandler*,std::less<std::string> > registeredHandlers;
 };
+
+}  // end namespace
 
 #endif

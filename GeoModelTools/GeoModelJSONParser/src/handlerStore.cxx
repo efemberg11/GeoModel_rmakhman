@@ -1,5 +1,7 @@
 #include "GeoModelJSONParser/handlerStore.h"
 #include "GeoModelJSONParser/JSONHandler.h"
+
+using namespace GeoModelTools;
  
 handlerStore* handlerStore::getHandlerStore()
 {

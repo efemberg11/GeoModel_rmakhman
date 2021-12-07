@@ -6,7 +6,7 @@
 #include "OutputDirector.h"
 #include <vector>
 #include <string>
-#include "ExpressionEvaluator/Evaluator.h"
+#include "ExpressionEvaluator/IEvaluator.h"
 #include "GeoModelXml/PositionIndex.h"
 
 using namespace std;
@@ -68,7 +68,7 @@ void PositionIndex::setFormula(const std::string& name, const std::string& formu
     m_formula[name] = formula;
 }
 
-void PositionIndex::indices(map<string, int> &index, Evaluator &eval) {
+void PositionIndex::indices(map<string, int> &index, GeoModelTools::IEvaluator &eval) {
     index.clear(); // In case caller uses it many times
 //
 //    Set Copy Number of each Level (CNL_i) up to current level
@@ -97,7 +97,7 @@ void PositionIndex::indices(map<string, int> &index, Evaluator &eval) {
     for (vector <string>::iterator n = m_name.begin(); n < m_name.end(); ++n) {
         string name = *n;
         index[name] = (int) eval.evaluate(m_formula[name].c_str());
-        if (eval.status() != Evaluator::OK) {
+        if (eval.status() != GeoModelTools::IEvaluator::OK) {
             msglog << MSG::FATAL <<
                    "GeoModelXml Error processing Evaluator expression for PositionIndex. Error name " <<
                     eval.error_name() << endl << "Message: ";

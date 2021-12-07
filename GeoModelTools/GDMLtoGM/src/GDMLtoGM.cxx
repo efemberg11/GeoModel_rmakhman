@@ -62,7 +62,7 @@ void GDMLtoGM::create(GeoPhysVol *world, bool /* 'publish' is not used here */)
   	std::cout<< "GDMLtoGeo: GDML to GeoModel Interface. Parsing gdml file "<<fileName<<" and setting world volume"<<std::endl;
 	GDMLController controller("GDMLController");
 	std::cout<<"controller created, now parsing "<<std::endl;
-	XercesParser xercesParser;
+	GeoModelTools::XercesParser xercesParser;
   	xercesParser.ParseFileAndNavigate(fileName);
 	std::cout << "done parsing "<<std::endl;
 	GeoPhysVol* w=controller.getWorld();

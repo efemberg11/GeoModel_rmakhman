@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+using namespace GeoModelTools;
+
 ExprtkEvaluator::ExprtkEvaluator()
 {
   //  std::cout<<" ########### new ExprtkEvaluator being created "<<std::endl;

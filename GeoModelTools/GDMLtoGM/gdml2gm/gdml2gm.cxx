@@ -83,7 +83,7 @@ int main(int argc, char ** argv) {
   
   std::cout<< "GDMLtoGeo: GDML to GeoModel Interface. Parsing gdml file "<<inputFile<<" and setting world volume"<<std::endl;
   GDMLController controller("GDMLController");
-  XercesParser xercesParser;
+  GeoModelTools::XercesParser xercesParser;
   xercesParser.ParseFileAndNavigate(inputFile);
   //std::cout << "done parsing "<<std::endl;
   GeoPhysVol* w=controller.getWorld();

@@ -11,6 +11,7 @@
 #include "GeoModelJSONParser/JSONHandler.h"
 
 using json = nlohmann::json;
+namespace GeoModelTools {
 
 class JSONParser {
 public:
@@ -50,4 +51,5 @@ void JSONParser::IterateModel(json& jj)
         }
 }
 
+}  // end namespace
 #endif

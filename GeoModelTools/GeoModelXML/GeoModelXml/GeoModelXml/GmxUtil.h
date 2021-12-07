@@ -66,7 +66,7 @@ public:
     GmxInterface *gmxInterface();
     double evaluate(char const *expression);
     std::string debracket(std::string expression);
-    Evaluator eval;
+    GeoModelTools::Evaluator eval;
     PositionIndex positionIndex;
     MaterialManager* matManager=0;
     ProcessorRegistry processorRegistry;

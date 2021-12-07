@@ -28,7 +28,7 @@ static double eval_log10(double a)           { return std::log10(a); }
 
 //namespace HepTool {
 
-void Evaluator::setStdMath() {
+void GeoModelTools::Evaluator::setStdMath() {
 
   //   S E T   S T A N D A R D   C O N S T A N T S
 

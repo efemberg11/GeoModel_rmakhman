@@ -7,12 +7,18 @@
 
 #include <string>
 
+namespace GeoModelTools {
 
 /**
  * IEvaluator: base class for Evaluator
  */
 class IEvaluator {
  public: 
+
+  enum {
+    OK,                         /**< Everything OK */
+    ERROR
+  };
 
   IEvaluator() {;}
 
@@ -74,5 +80,7 @@ private:
   // IEvaluator(const IEvaluator &);             // copy constructor is not allowed
   // IEvaluator & operator=(const IEvaluator &); // assignment is not allowed
 };
+
+}
 
 #endif /* HEP_EVALUATOR_H */

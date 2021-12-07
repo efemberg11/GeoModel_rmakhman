@@ -22,5 +22,5 @@ void constantHandler::ElementHandle()
 		std::cout<<" Warning, <quantity /> tag requires an unit attribute to be defined!!!!"<<std::endl;
 	std::string type=getAttributeAsString("type","density");
   }
-  ExpressionEvaluator::GetEvaluator()->RegisterConstant(name,value*lunit);
+  GeoModelTools::ExpressionEvaluator::GetEvaluator()->RegisterConstant(name,value*lunit);
 }

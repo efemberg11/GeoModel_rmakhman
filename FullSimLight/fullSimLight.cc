@@ -105,10 +105,13 @@ int main(int argc, char** argv) {
         G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
         return -1;
     }
-    // In all cases of physics lists, set the neutron tracking cut to be 150 [ns] as in Athena
-    G4NeutronTrackingCut* neutronCut = new G4NeutronTrackingCut("neutronCutphysics", 1);
-    neutronCut->SetTimeLimit(150.0*CLHEP::ns);
-    physList->ReplacePhysics(neutronCut);
+    // In cases of ATLAS physics lists, set the neutron tracking cut to be 150 [ns] as in Athena
+    if (parPhysListName.find("ATL") != std::string::npos) {
+      G4NeutronTrackingCut* neutronCut = new G4NeutronTrackingCut("neutronCutphysics", 1);
+      neutronCut->SetTimeLimit(150.0*CLHEP::ns);
+      physList->ReplacePhysics(neutronCut);
+    }
+    
     // register the final version of the physics list in the run manager
     runManager->SetUserInitialization(physList);
 

@@ -337,7 +337,7 @@ By default, i.e. if it is not specified by the above command, the type will be r
    - the standard EM physics constructor is replaced by the local `StandardEmWithWoodcock` that can utilise *Woodcock*-tracking of gamma photons in a specified detector region
    - the EM extra physics constructor is replaced with a local version that is identical to the one delivered by Geant4 with the only difference that its `G4GammaGeneralProcess` parts are replaced with the local `GammaGeneralProcess`
    - the neutron tracking cut module is replaced by one that sets a 150 [ns] tracking cut  
- This latter is applied now in all cases of physics list in order to use a similar setting that is in Athena. 
+ This latter is applied now in all cases of dedicated ATLAS physics lists (i.e. those with the `ATL` sub-string in their name) in order to use a similar setting that is in Athena. 
 
 # GeoModelClash: run and options
 

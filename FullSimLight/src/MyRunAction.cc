@@ -11,6 +11,8 @@
 #include "globals.hh"
 
 #include "MyRun.hh"
+#include "MySteppingAction.hh"
+#include "MyTrackingAction.hh"
 
 
 #include "G4ProductionCutsTable.hh"
@@ -20,9 +22,9 @@
 G4AnalysisManager* MyRunAction::fMasterAnalysisManager = nullptr;
 
 MyRunAction::MyRunAction(bool isGeantino, G4String geantinoMapFilename)
-: G4UserRunAction(), fIsPerformance(false), fIsGeantino(isGeantino),
-  fRun(nullptr), fTimer(nullptr), fGeantinoMapsFilename(geantinoMapFilename),
-  fPythiaConfig("") { }
+: G4UserRunAction(), fIsPerformance(false), fIsGeantino(isGeantino), fRun(nullptr), fTimer(nullptr),
+  fSteppingAction(nullptr), fTrackingAction(nullptr), fGeantinoMapsFilename(geantinoMapFilename),
+  fPythiaConfig(""), fSpecialScoringRegionName("") { }
 
 MyRunAction::~MyRunAction() {
     if(fIsGeantino)
@@ -103,6 +105,23 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
     }
 #endif
+
+    // set the special scoring region in the stepping and tracking actions
+    if (fRun && fSpecialScoringRegionName!="") {
+      std::vector<G4Region*>* theRegionVector = G4RegionStore::GetInstance();
+      for (std::size_t ir=0, nr=theRegionVector->size(); ir<nr; ++ir) {
+        G4Region* reg = (*theRegionVector)[ir];
+        if (reg->GetName() == fSpecialScoringRegionName) {
+          if (isMaster) {
+            G4cout << " --- Special scoring will be done in Region = " << fSpecialScoringRegionName << G4endl;
+          }
+          if (fSteppingAction) { fSteppingAction->SetScoringRegion(reg); }
+          if (fTrackingAction) { fTrackingAction->SetScoringRegion(reg); }
+          fRun->SetSpecialScoringRegion(reg);
+        }
+      }
+    }
+
     if (isMaster) {
 
         //G4cout<<"\nBeginOfRunAction isMaster, and fMasterAnalysisManager: "<<fMasterAnalysisManager<<G4endl;

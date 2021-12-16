@@ -120,7 +120,7 @@ WoodcockProcess::PostStepGetPhysicalInteractionLength(const G4Track& track, G4do
     // we are already reached the WDCK region boundary at the end of the previous
     // step: just give a step length > 1.0E-4 and let the transportation win this
     //       time normaly (this will set everything properly)
-    fWDCKStepLength      = 1.0;
+    fWDCKStepLength      = 10.0;
     fWDCKRootLVolumeIndx = -1;
     return fWDCKStepLength;
   }
@@ -216,13 +216,16 @@ WoodcockProcess::PostStepGetPhysicalInteractionLength(const G4Track& track, G4do
         //       not the track. If the gamma leaves the given WDCK root volume,
         //       we make sure that a normal transportation step will transverse
         //       the volume boundary.
-        fWDCKStepLength = stepLength;
         G4Track& theTrack = const_cast<G4Track&>(track);
         // shorten a bit this step length if we would reach the boundary:
         //  - WoodcockProcess limits the step but we see in the DoIt that actually its boundary
         //  - the next step will be real Transportation since Woodcock will propose a longer step
         //  - this will bring us properly to the next boundary in the next step
-        const double sl = fOnWDCKRegionBoundary ? stepLength - 1.0E-4 : stepLength;
+        double sl = stepLength;
+        if (fOnWDCKRegionBoundary) {
+          sl = sl > 1.0E-4 ? sl-1.0E-4 : sl*0.999;
+        }
+        fWDCKStepLength = sl;
         theTrack.SetPosition(track.GetPosition()+sl*track.GetMomentumDirection());
         // relocate the moved G4Track in order to avoid Navigator warnings
         G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->LocateGlobalPointAndUpdateTouchableHandle(track.GetPosition(), track.GetMomentumDirection(), const_cast<G4TouchableHandle&>(track.GetTouchableHandle()));

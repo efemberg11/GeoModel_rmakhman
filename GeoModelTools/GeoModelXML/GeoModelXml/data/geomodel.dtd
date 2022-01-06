@@ -218,6 +218,7 @@
                      material IDREF #REQUIRED
                      sensitive IDREF #IMPLIED 
                      alignable (true|false) "false"
+                     envelope (true|false) "false"
                      splitLevel CDATA #IMPLIED>
 
   <!ELEMENT index EMPTY>
@@ -286,4 +287,5 @@
                         alignable CDATA #IMPLIED>
 
   <!ELEMENT addbranch (transform|logvol|logvolref|assembly|assemblyref)+>
+    <!ATTLIST addbranch envelope CDATA #IMPLIED>
 

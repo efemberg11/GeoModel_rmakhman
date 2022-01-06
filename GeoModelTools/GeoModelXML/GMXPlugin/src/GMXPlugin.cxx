@@ -42,17 +42,20 @@ class GMXPlugin : public GeoVGeometryPlugin  {
     return f.good();
   }
 
-  std::vector<std::string> parseFiles(const std::string files, const char separator=';')
+  std::vector<std::string> parseFiles(const std::string s, std::string delimiter=";")
   {
-  	 std::string parsed;
-	 std::istringstream iFiles(files);
-	 std::vector<std::string> fileList;
-	 while (iFiles>>parsed)
-	 {
-		std::cout<<" parsed string "<<parsed<<std::endl;
-		fileList.push_back(parsed);
-	 }
-	 return fileList;
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::string token;
+    std::vector<std::string> res;
+
+    while ((pos_end = s.find (delimiter, pos_start)) != std::string::npos) {
+        token = s.substr (pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back (token);
+    }
+
+    res.push_back (s.substr (pos_start));
+    return res;
   }
 
 };
@@ -82,7 +85,7 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
   if (fPath!=NULL) {
     std::cout<<" Environment variable GMX_FILES set to "<<fPath<<std::endl;
     fileName=std::string(fPath);
-    filesToParse=parseFiles(fileName,':');
+    filesToParse=parseFiles(fileName,":");
   }
   else {
   	fileName="gmx.xml";

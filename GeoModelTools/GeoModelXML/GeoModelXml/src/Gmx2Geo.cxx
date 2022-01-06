@@ -16,6 +16,7 @@
 #include <xercesc/util/PlatformUtils.hpp>
 
 #include "GeoModelKernel/GeoPhysVol.h"
+#include "GeoModelKernel/GeoVolumeTagCatalog.h"
 
 #include "ExpressionEvaluator/IEvaluator.h"
 
@@ -100,10 +101,29 @@ Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoPhysVol *addHere, GmxInterface &gmxIn
     XMLCh * addbranch_tmp = XMLString::transcode("addbranch"); 
     xercesc::DOMNodeList *addbranchs = doc->getElementsByTagName(addbranch_tmp);
     const DOMElement *addbranch = dynamic_cast<const DOMElement *> (addbranchs->item(0)); 
+
+//  ADA - check if an envelope is requested, in case we take is and fill it up with the addbranch's contents.
+
+    XMLCh * envelope_tmp=XMLString::transcode("envelope");
+    GeoPhysVol* physVol=addHere;
+    if (addbranch->hasAttribute(envelope_tmp))
+    {
+        char *toRelease=XMLString::transcode(addbranch->getAttribute(envelope_tmp));
+	std::cout<<" envelope requested "<<toRelease<<std::endl;
+        std::string envel=toRelease;
+	XMLString::release(&toRelease);
+	GeoPhysVol* tmpVol=dynamic_cast<GeoPhysVol*>(GeoVolumeTagCatalog::VolumeTagCatalog()->getTaggedVolume("Envelope",envel));
+	if (tmpVol) 
+	{
+		std::cout<< " volume "<<envel<<" found in the envelope catalog"<<std::endl;
+		physVol=tmpVol;
+	}
+    }
+
     GeoNodeList toAdd;
     gmxUtil.processorRegistry.find("addbranch")->process(addbranch, gmxUtil, toAdd);
     for (GeoNodeList::iterator node = toAdd.begin(); node != toAdd.end(); ++node) {
-        addHere->add(*node);
+        physVol->add(*node);
     }
 
     XMLString::release(&name_tmp);

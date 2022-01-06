@@ -22,6 +22,7 @@
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoVFullPhysVol.h"
+#include "GeoModelKernel/GeoVolumeTagCatalog.h"
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GeoNodeList.h"
 #include "xercesc/util/XMLString.hpp"
@@ -42,6 +43,15 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   string name(name2release);
   XMLString::release(&name2release);
   XMLString::release(&name_tmp);
+
+//
+
+  XMLCh * envelope_tmp = XMLString::transcode("envelope");
+  char *env = XMLString::transcode(element->getAttribute(envelope_tmp));
+  string envelope(env);
+  bool is_envelope=(envelope.compare(string("true"))==0);
+  XMLString::release(&env);
+
 //
 //    Look for the logvol in the map; if not yet there, add it
 //
@@ -176,6 +186,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   XMLString::release(&alignable_tmp);
   if (sensitive || (alignable.compare(string("true")) == 0)) {
     GeoFullPhysVol *pv = new GeoFullPhysVol(lv);
+    if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
     for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
 	     pv->add(*node);
     }
@@ -210,6 +221,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   }
   else {
     GeoPhysVol *pv = new GeoPhysVol(lv);
+    if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
     for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
       pv->add(*node);
     }

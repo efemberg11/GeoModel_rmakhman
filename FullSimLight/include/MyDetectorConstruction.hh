@@ -50,6 +50,7 @@ public:
   void SetPrefixLogicalVolume(const G4String &prefixLV) { fPrefixLogicalVolume = prefixLV; }
   void SetMaterial(const G4String &material) { fMaterial = material; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
+  void SetGMClashVerbosity(const G4bool flag)     { fGmclashVerbosity = flag; }
   void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
   void SetDumpGDML(const bool dumpGDML)              {fDumpGDML=dumpGDML;}
   /// Common method to construct a driver with a stepper of requested type.
@@ -121,6 +122,7 @@ private:
   G4String fOutputGDMLFileName;
   G4double fFieldValue;
   G4bool   fFieldConstant;
+  G4bool   fGmclashVerbosity;
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;
   MyDetectorMessenger *fDetectorMessenger;

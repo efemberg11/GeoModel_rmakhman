@@ -238,6 +238,7 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
 {
   fFieldValue          = 0.0;
   fVerbosityFlag       = -1;
+  fGmclashVerbosity    = false;
   fFieldConstant       = false;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
@@ -671,12 +672,13 @@ void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope,s
                 RecursivelyCheckOverlap(daughter->GetLogicalVolume(), jlist);
         //std::cout<<"Starting Overlaps check on daughter: "<<daughter->GetName()<<std::endl;
         //std::cout<<"... "<<sampleNo<<std::endl;
-        myCheckOverlaps(daughter, jlist);
+        myCheckOverlaps(daughter, jlist, 1000, 0., fGmclashVerbosity, 1);
     }
 }
 
 bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res, G4double tol,G4bool verbose, G4int maxErr)
 {
+    
         std::cout.precision(8);
         clashdet::clash singleClash;
         json jSingleClash;
@@ -821,9 +823,6 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
                 to_json(jSingleClash, singleClash);
                 // write prettified JSON to another file
                 jlist.push_back(jSingleClash);
-
-
-
 
                 if (trials >= maxErr)  { return true; }
                 break;

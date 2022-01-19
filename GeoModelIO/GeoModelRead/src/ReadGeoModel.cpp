@@ -1,8 +1,12 @@
 /*
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+*/
+
+/*
  * ReadGeoModel.cpp
  *
  *  Created on: May 20, 2016
- *      Author: riccardo.maria.bianchi@cern.ch
+ *  Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
  *
  * major updates:
  *  - Feb 2019, R.M.Bianchi
@@ -377,7 +381,6 @@ void ReadGeoModel::buildAllSerialDenominators()
 //! Iterate over the list of GeoSerialIdentifier nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllSerialIdentifiers()
 {
-  std::cout<<"buildAllSerialIdentifiers" << std::endl;
   if (m_debug) std::cout << "Building all SerialIdentifier nodes...\n";
   size_t nSize = m_serialIdentifiers.size();
   m_memMapSerialIdentifiers.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...
@@ -393,7 +396,6 @@ void ReadGeoModel::buildAllSerialIdentifiers()
 //! Iterate over the list of GeoIdentifierTag nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllIdentifierTags()
 {
-  std::cout<<"buildAllIdentifierTags" << std::endl;
   if (m_debug) std::cout << "Building all IdentifierTag nodes...\n";
   size_t nSize = m_identifierTags.size(); 
   m_memMapIdentifierTags.reserve( nSize*2 ); // TODO: check if *2 is good or redundant...

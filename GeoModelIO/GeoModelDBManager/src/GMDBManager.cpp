@@ -1,10 +1,10 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 
 /*
-* author: Riccardo Maria Bianchi @ CERN - 2017
+* author: 2017, Riccardo Maria Bianchi @ CERN - <riccardo.maria.bianchi@cern.ch>
 * major updates:
 *  - Aug 2018, R.M.Bianchi
 *  - Jun 2020, R.M.Bianchi
@@ -435,7 +435,7 @@ bool GMDBManager::addListOfRecordsToTable(const std::string tableName, const std
   if(m_debug) std::cout << "tableColString:" << tableColString << std::endl;
 
   unsigned int nRecords = records.size();
-  std::cout << "Info: number of " << tableName << " records to dump into the DB:" << nRecords << std::endl;
+  std::cout << "Info: number of " << tableName << " records to dump into the DB: " << nRecords << std::endl;
 
   // preparing the SQL query
   std::string sql = fmt::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);

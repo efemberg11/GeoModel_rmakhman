@@ -237,65 +237,65 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
   start = std::chrono::system_clock::now(); // timing: get start time
   // parallel mode:
   if (m_runMultithreaded) {
-  std::cout << "Building nodes concurrently..." << std::endl;
-  std::thread t2(&ReadGeoModel::buildAllElements, this);
-    //  std::thread t7(&ReadGeoModel::buildAllFunctions, this); // FIXME: implement cache for Functions
+      if (m_debug) std::cout << "Building nodes concurrently..." << std::endl;
+      std::thread t2(&ReadGeoModel::buildAllElements, this);
+      //  std::thread t7(&ReadGeoModel::buildAllFunctions, this); // FIXME: implement cache for Functions
 
-  std::thread t8(&ReadGeoModel::buildAllTransforms, this);
-  std::thread t9(&ReadGeoModel::buildAllAlignableTransforms, this);
-  std::thread t10(&ReadGeoModel::buildAllSerialDenominators, this);
-  std::thread t13(&ReadGeoModel::buildAllSerialIdentifiers, this);
-  std::thread t14(&ReadGeoModel::buildAllIdentifierTags, this);
-  std::thread t11(&ReadGeoModel::buildAllNameTags, this);
+      std::thread t8(&ReadGeoModel::buildAllTransforms, this);
+      std::thread t9(&ReadGeoModel::buildAllAlignableTransforms, this);
+      std::thread t10(&ReadGeoModel::buildAllSerialDenominators, this);
+      std::thread t13(&ReadGeoModel::buildAllSerialIdentifiers, this);
+      std::thread t14(&ReadGeoModel::buildAllIdentifierTags, this);
+      std::thread t11(&ReadGeoModel::buildAllNameTags, this);
 
-  t8.join(); // ok, all Transforms have been built
-  t9.join(); // ok, all AlignableTransforms have been built
-  // needs Transforms and AlignableTransforms for Shift boolean shapes
-  std::thread t1(&ReadGeoModel::buildAllShapes, this);
+      t8.join(); // ok, all Transforms have been built
+      t9.join(); // ok, all AlignableTransforms have been built
+      // needs Transforms and AlignableTransforms for Shift boolean shapes
+      std::thread t1(&ReadGeoModel::buildAllShapes, this);
 
-  t2.join(); // ok, all Elements have been built
-  // needs Elements
-  std::thread t3(&ReadGeoModel::buildAllMaterials, this);
+      t2.join(); // ok, all Elements have been built
+      // needs Elements
+      std::thread t3(&ReadGeoModel::buildAllMaterials, this);
 
-  t1.join(); // ok, all Shapes have been built
-  t3.join(); // ok, all Materials have been built
-  // needs Shapes and Materials
-  std::thread t4(&ReadGeoModel::buildAllLogVols, this);
+      t1.join(); // ok, all Shapes have been built
+      t3.join(); // ok, all Materials have been built
+      // needs Shapes and Materials
+      std::thread t4(&ReadGeoModel::buildAllLogVols, this);
 
-  t4.join(); // ok, all LogVols have been built
-  // needs LogVols
-  std::thread t5(&ReadGeoModel::buildAllPhysVols, this);
-  std::thread t6(&ReadGeoModel::buildAllFullPhysVols, this);
+      t4.join(); // ok, all LogVols have been built
+      // needs LogVols
+      std::thread t5(&ReadGeoModel::buildAllPhysVols, this);
+      std::thread t6(&ReadGeoModel::buildAllFullPhysVols, this);
 
-  t5.join(); // ok, all PhysVols have been built
-  t6.join(); // ok, all FullPhysVols have been built
-//  t7.join(); // ok, all Functions have been built
-  // needs Functions, PhysVols, FullPhysVols
-  std::thread t12(&ReadGeoModel::buildAllSerialTransformers, this);
+      t5.join(); // ok, all PhysVols have been built
+      t6.join(); // ok, all FullPhysVols have been built
+      //  t7.join(); // ok, all Functions have been built
+      // needs Functions, PhysVols, FullPhysVols
+      std::thread t12(&ReadGeoModel::buildAllSerialTransformers, this);
 
-  t10.join(); // ok, all SerialDenominators have been built
-  t11.join(); // ok, all NameTags have been built
-  t12.join(); // ok, all SerialTransformers have been built
-  t13.join(); // ok, all SerialIdentifiers have been built
-  t14.join(); // ok, all IdentifierTags have been built
+      t10.join(); // ok, all SerialDenominators have been built
+      t11.join(); // ok, all NameTags have been built
+      t12.join(); // ok, all SerialTransformers have been built
+      t13.join(); // ok, all SerialIdentifiers have been built
+      t14.join(); // ok, all IdentifierTags have been built
   }
   // serial mode:
   else {
-    std::cout << "Building nodes serially..." << std::endl;
-    buildAllElements();
-    // buildAllFunctions();
-    buildAllTransforms();
-    buildAllAlignableTransforms();
-    buildAllSerialDenominators();
-    buildAllSerialIdentifiers();
-    buildAllIdentifierTags();
-    buildAllNameTags();
-    buildAllShapes();
-    buildAllMaterials();
-    buildAllLogVols();
-    buildAllPhysVols();
-    buildAllFullPhysVols();
-    buildAllSerialTransformers();
+      if (m_debug) std::cout << "Building nodes serially..." << std::endl;
+      buildAllElements();
+      // buildAllFunctions();
+      buildAllTransforms();
+      buildAllAlignableTransforms();
+      buildAllSerialDenominators();
+      buildAllSerialIdentifiers();
+      buildAllIdentifierTags();
+      buildAllNameTags();
+      buildAllShapes();
+      buildAllMaterials();
+      buildAllLogVols();
+      buildAllPhysVols();
+      buildAllFullPhysVols();
+      buildAllSerialTransformers();
   }
   end = std::chrono::system_clock::now(); // timing: get end time
   diff = std::chrono::duration_cast < std::chrono::seconds > (end - start).count();

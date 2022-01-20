@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iomanip>
 
+G4bool   gmclash_verbose    =false;
 static G4String geometryFileName   ;
 static G4String reportFileName     = "gmclash_report.json";
 
@@ -24,10 +25,11 @@ int main(int argc, char** argv) {
     GetInputArguments(argc, argv);
     
     G4cout
-    << " ===================  Running GeoModelClash =================== "      << G4endl
+    << " ===================  Running GeoModelClash =================== "    << G4endl
     << "   Geometry file name               =  " << geometryFileName         << G4endl
     << "   Output clashes report file name  =  " << reportFileName           << G4endl
-    << " ============================================================== "      << G4endl;
+    << "   Verbose output                   =  " << gmclash_verbose          << G4endl
+    << " ============================================================== "    << G4endl;
     
     // version banner
     G4String vs = G4Version;
@@ -64,6 +66,7 @@ int main(int argc, char** argv) {
     detector->SetRunOverlapCheck(true);
     detector->SetGeometryFileName (geometryFileName);
     detector->SetReportFileName (reportFileName);
+    detector->SetGMClashVerbosity(gmclash_verbose);
     detector->Construct();
     
     delete detector;
@@ -73,6 +76,7 @@ int main(int argc, char** argv) {
 static struct option options[] = {
     {"geometry file name              "  , required_argument, 0, 'g'},
     {"output clashes report file name "  , required_argument, 0, 'o'},
+    {"verbose output "                   , no_argument      , 0, 'v'},
     {"help"                              , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
@@ -85,6 +89,7 @@ void Help() {
             <<"  **** Parameters: \n\n"
             <<"      -g :   [MANDATORY] the Geometry file name [.db/.gdml/.dylib/.so] \n"
             <<"      -o :   [OPTIONAL] clashes report file name (default: gmclash_report)\n"
+            <<"      -v :   [OPTIONAL] verbose output (default: off)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmclash [OPTIONS]\n" <<std::endl;
   for (int i=0; options[i].name!=NULL; i++) {
@@ -104,7 +109,7 @@ void GetInputArguments(int argc, char** argv) {
  }
  while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:o:h", options, &optidx);
+   c = getopt_long(argc, argv, "g:o:vh", options, &optidx);
    if (c == -1)
      break;
    //
@@ -117,6 +122,9 @@ void GetInputArguments(int argc, char** argv) {
      break;
    case 'o':
      reportFileName = optarg;
+     break;
+   case 'v':
+     gmclash_verbose = true;
      break;
    case 'h':
      Help();

@@ -78,7 +78,7 @@ public:
   // by default it is set to maximum precision.
   // Reports a maximum of overlaps errors according to parameter in input.
   // Returns true if the volume is overlapping.
-  bool myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res = 1000, G4double tol = 0., G4bool verbose = true, G4int maxErr = 1 );
+  bool myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res = 1000, G4double tol = 0., G4int maxErr = 1 );
 
   //Retrieves the corresponding point in global coordinates,
   //using the chain of G4VPhysicalVolumes stored in the fTree vector

@@ -32,7 +32,7 @@ variables:
     - export LDFLAGS="-L/usr/local/opt/expat/lib"
     - export CPPFLAGS="-I/usr/local/opt/expat/include"
     - export PATH="/usr/local/opt/qt5/bin:$PATH" # to make Qt5 discoverable by CMake
-  
+
 
 # general Ubuntu job template
 .ubuntu-template-job-base: &ubuntu-job-base
@@ -194,8 +194,8 @@ debug-job:
 ### MACOS BUILD JOBS
 
 # *** NOTE ***
-# gitlab-runner on needs to be run in user's space "shell executor" on macOS, 
-# thus, it's not possibke to containerize the jobs. 
+# gitlab-runner on needs to be run in user's space "shell executor" on macOS,
+# thus, it's not possibke to containerize the jobs.
 # Also, `brew` cannot be run in parallel jobs, as it throw error, making the job fail.
 # Thus, for our macOS pipeline, we use 'brew bundle' to check and install all needed
 # dependencies, which are listed in a custom Brewfile under the CI folder.
@@ -253,7 +253,7 @@ mac-gm-gmg4:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
-  
+
 
 mac-gm-examples-gmg4:
   <<: *macos-job
@@ -389,10 +389,10 @@ ubu-gm-fullsimlight-builtinxercesc-builtinjson:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE 
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-#TODO: this does not work properly. Needs some work... 
+#TODO: this does not work properly. Needs some work...
 # ubu-gm-fullsimlight-customxercesc-builtinjson:
 #   <<: *ubuntu-job
 #   <<: *geomodel-job
@@ -402,7 +402,7 @@ ubu-gm-fullsimlight-builtinxercesc-builtinjson:
 #     XERCESC_VERSION: 3.2.3
 #     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 #     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
+#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib
 #   rules:
 #     - when: manual
 
@@ -482,7 +482,7 @@ build_system_docker:
 
 ##  Construct one Docker image containing
 ##  also Geant4
-##  Note:  
+##  Note:
 ##  - we build the docker image only from 'master' and tags
 ##  - image's final name is, e.g., "geomodel:master-base"
 ##
@@ -505,18 +505,19 @@ build_full_docker:
   script:
     - ignore
   needs:
-    - build_system_docker  
+    - build_system_docker
+  timeout: 2h 0m 
 
 ##  Construct one Docker image only for
 ##  viewer puposes
-##  Note:  
+##  Note:
 ##  - we build the docker image only from 'master' and tags
 ##  - image's final name is, e.g., "geomodel:master-light"
 ##
 build_light_docker:
   stage: step-B
   only:
-    refs: 
+    refs:
       - master
       - tags
   variables:

@@ -32,6 +32,11 @@ public:
   void  SetTrackingAction(MyTrackingAction* tract)  { fTrackingAction = tract;  }
 
   void  SetSpecialScoringRegionName(const G4String& rname) { fSpecialScoringRegionName = rname; }
+    
+  void SetRlimit(G4double r){fRlimit = r;}
+  void SetZlimit(G4double z){fZlimit = z;}
+  void SetXlimit(G4double x){fXlimit = x;}
+  void SetYlimit(G4double y){fYlimit = y;}
 
 private:
 
@@ -44,7 +49,11 @@ private:
   G4String          fGeantinoMapsFilename;
   G4String          fPythiaConfig;
   G4String          fSpecialScoringRegionName;
-
+  G4double fRlimit;
+  G4double fZlimit;
+  G4double fXlimit;
+  G4double fYlimit;
+    
 
     //TO DO: make private and add Get methods
 public:

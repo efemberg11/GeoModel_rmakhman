@@ -71,7 +71,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
         const char* radName = "RZRadLen";
         if(analysisManager->GetP2Id(radName, false) < 0){
-            fRadName_id = analysisManager->CreateP2(radName,radName,1000,-25000.,25000.,2000,0.,15000.);
+            fRadName_id = analysisManager->CreateP2(radName,radName,3000,-fZlimit,fZlimit,2000,0.,fRlimit);
             //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZRadLen 2DProfile with name: "<<radName<< " and  with id: "<<fRadName_id<<G4endl;
             analysisManager->SetP2XAxisTitle(fRadName_id,"Z[mm]");
             analysisManager->SetP2YAxisTitle(fRadName_id,"R[mm]");
@@ -81,7 +81,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         const char* intName = "RZIntLen";
         if(analysisManager->GetP2Id(intName, false)< 0)
         {
-            fIntName_id = analysisManager->CreateP2(intName,intName,1000,-25000.,25000.,2000,0.,15000.);
+            fIntName_id = analysisManager->CreateP2(intName,intName,3000,-fZlimit,fZlimit,2000,0.,fRlimit);
             //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZIntLen 2DProfile with name: "<<intName<< " and with id: "<<fIntName_id<<G4endl;
             analysisManager->SetP2XAxisTitle(fIntName_id,"Z[mm]");
             analysisManager->SetP2YAxisTitle(fIntName_id,"R[mm]");

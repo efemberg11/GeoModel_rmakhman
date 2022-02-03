@@ -33,6 +33,10 @@ void MyActionInitialization::BuildForMaster() const {
     MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps,fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
+    masterRunAct->SetRlimit(fRlimit);
+    masterRunAct->SetZlimit(fZlimit);
+    masterRunAct->SetXlimit(fXlimit);
+    masterRunAct->SetYlimit(fYlimit);
 #if USE_PYTHIA
     if (use_pythia()) {
       G4String str(get_pythia_config());
@@ -65,6 +69,10 @@ void MyActionInitialization::Build() const {
     MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
+    masterRunAct->SetRlimit(fRlimit);
+    masterRunAct->SetZlimit(fZlimit);
+    masterRunAct->SetXlimit(fXlimit);
+    masterRunAct->SetYlimit(fYlimit);
 #if USE_PYTHIA
     if (use_pythia()) {
       G4String str(get_pythia_config());
@@ -79,6 +87,10 @@ void MyActionInitialization::Build() const {
       MyRunAction* runact = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
       SetUserAction(runact);
       runact->SetSpecialScoringRegionName(fSpecialScoringRegionName);
+      runact->SetRlimit(fRlimit);
+      runact->SetZlimit(fZlimit);
+      runact->SetXlimit(fXlimit);
+      runact->SetYlimit(fYlimit);
 
       if(!fCreateGeantinoMaps){
           MyEventAction*    evtAct = new MyEventAction();

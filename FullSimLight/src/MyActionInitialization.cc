@@ -19,24 +19,26 @@
 #endif
 
 
+
 //const G4AnalysisManager* MyActionInitialization::fMasterAnalysisManager = nullptr;
 
-MyActionInitialization::MyActionInitialization(bool isperformance, bool createGeantinoMaps, G4String geantinoMapsFilename)
-: G4VUserActionInitialization(), fIsPerformance(isperformance), fCreateGeantinoMaps(createGeantinoMaps),fGeantinoMapsFilename(geantinoMapsFilename),
-  fSpecialScoringRegionName("") {}
+MyActionInitialization::MyActionInitialization(bool isperformance)
+: G4VUserActionInitialization(), fIsPerformance(isperformance),
+  fSpecialScoringRegionName("") {
+      
+      fGeantinoMapsConfig = GeantinoMapsConfigurator::getGeantinoMapsConf();
+  }
 
 
 MyActionInitialization::~MyActionInitialization() {}
 
 // called in case of MT
 void MyActionInitialization::BuildForMaster() const {
-    MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps,fGeantinoMapsFilename);
+    
+    MyRunAction* masterRunAct = new MyRunAction();
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
-    masterRunAct->SetRlimit(fRlimit);
-    masterRunAct->SetZlimit(fZlimit);
-    masterRunAct->SetXlimit(fXlimit);
-    masterRunAct->SetYlimit(fYlimit);
+
 #if USE_PYTHIA
     if (use_pythia()) {
       G4String str(get_pythia_config());
@@ -66,13 +68,9 @@ void MyActionInitialization::Build() const {
 // in sequential mode the BuildForMaster method is not called:
 // - create the only one run action with perfomance flag true i.e. only time is measured
   if (fIsPerformance) {
-    MyRunAction* masterRunAct = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
+    MyRunAction* masterRunAct = new MyRunAction();
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
-    masterRunAct->SetRlimit(fRlimit);
-    masterRunAct->SetZlimit(fZlimit);
-    masterRunAct->SetXlimit(fXlimit);
-    masterRunAct->SetYlimit(fYlimit);
 #if USE_PYTHIA
     if (use_pythia()) {
       G4String str(get_pythia_config());
@@ -84,15 +82,12 @@ void MyActionInitialization::Build() const {
 #endif
   // do not create Run,Event,Stepping and Tracking actions in case of perfomance mode
   if (!fIsPerformance) {
-      MyRunAction* runact = new MyRunAction(fCreateGeantinoMaps, fGeantinoMapsFilename);
+      MyRunAction* runact = new MyRunAction();
       SetUserAction(runact);
       runact->SetSpecialScoringRegionName(fSpecialScoringRegionName);
-      runact->SetRlimit(fRlimit);
-      runact->SetZlimit(fZlimit);
-      runact->SetXlimit(fXlimit);
-      runact->SetYlimit(fYlimit);
 
-      if(!fCreateGeantinoMaps){
+
+      if(!fGeantinoMapsConfig->GetCreateGeantinoMaps()){
           MyEventAction*    evtAct = new MyEventAction();
           MyTrackingAction*  trAct = new MyTrackingAction(evtAct);
           MySteppingAction* stpAct = new MySteppingAction(evtAct);
@@ -109,16 +104,9 @@ void MyActionInitialization::Build() const {
 
           //Stepping action
           G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction(runact);
-          myLenghtIntSteppingAct->SetRlimit(fRlimit);
-          myLenghtIntSteppingAct->SetZlimit(fZlimit);
-          myLenghtIntSteppingAct->SetXlimit(fXlimit);
-          myLenghtIntSteppingAct->SetYlimit(fYlimit);
-          myLenghtIntSteppingAct->SetCreateDetectorsMaps(fCreateDetectorsMaps);
-          myLenghtIntSteppingAct->SetCreateMaterialsMaps(fCreateMaterialsMaps);
-          myLenghtIntSteppingAct->SetCreateElementsMaps(fCreateElementsMaps);
           //Event action
           G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct, runact);
-          myLenghtIntEventAct->SetCreateEtaPhiMaps(fCreateEtaPhiMaps);
+          //myLenghtIntEventAct->SetCreateEtaPhiMaps(fCreateEtaPhiMaps);
           SetUserAction(myLenghtIntEventAct);
           SetUserAction(myLenghtIntSteppingAct);
 

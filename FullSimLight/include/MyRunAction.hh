@@ -8,6 +8,8 @@
 //G4AnalysisMananager
 #include "MyAnalysis.hh"
 
+#include "GeantinoMapsConfigurator.hh"
+
 class MyRun;
 class G4Timer;
 class MySteppingAction;
@@ -18,7 +20,7 @@ class MyRunAction: public G4UserRunAction {
 
 public:
 
-  MyRunAction(bool isGeantino, G4String geantinoMapsFileName="geantinoMaps.root");
+  MyRunAction();
  ~MyRunAction();
 
   G4Run* GenerateRun() override;
@@ -32,28 +34,18 @@ public:
   void  SetTrackingAction(MyTrackingAction* tract)  { fTrackingAction = tract;  }
 
   void  SetSpecialScoringRegionName(const G4String& rname) { fSpecialScoringRegionName = rname; }
-    
-  void SetRlimit(G4double r){fRlimit = r;}
-  void SetZlimit(G4double z){fZlimit = z;}
-  void SetXlimit(G4double x){fXlimit = x;}
-  void SetYlimit(G4double y){fYlimit = y;}
 
 private:
-
+  GeantinoMapsConfigurator* fGeantinoMapsConf;
   G4bool            fIsPerformance;
-  G4bool            fIsGeantino;
+  //G4bool            fIsGeantino;
   MyRun*            fRun;
   G4Timer*          fTimer;
   MySteppingAction* fSteppingAction;
   MyTrackingAction* fTrackingAction;
-  G4String          fGeantinoMapsFilename;
+  //G4String          fGeantinoMapsFilename;
   G4String          fPythiaConfig;
   G4String          fSpecialScoringRegionName;
-  G4double fRlimit;
-  G4double fZlimit;
-  G4double fXlimit;
-  G4double fYlimit;
-    
 
     //TO DO: make private and add Get methods
 public:

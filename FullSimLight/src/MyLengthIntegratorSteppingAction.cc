@@ -39,19 +39,13 @@ namespace G4UA
   //---------------------------------------------------------------------------
   // Constructor
   //---------------------------------------------------------------------------
-  MyLengthIntegratorSteppingAction::MyLengthIntegratorSteppingAction(MyRunAction* run, G4double rlimit,G4double zlimit,G4double xlimit,G4double ylimit, bool createDetectorsMaps, bool createMaterialsMaps, bool createElementsMaps)
+  MyLengthIntegratorSteppingAction::MyLengthIntegratorSteppingAction(MyRunAction* run)
     : m_g4pow(0),
-      m_run(run),
-      fRlimit(rlimit),
-      fZlimit(zlimit),
-      fXlimit(xlimit),
-      fYlimit(ylimit),
-      fCreateDetectorsMaps(createDetectorsMaps),
-      fCreateMaterialsMaps(createMaterialsMaps),
-      fCreateElementsMaps(createElementsMaps)
+      m_run(run)
   
   {
 
+      fGeantinoMapsConfig= GeantinoMapsConfigurator::getGeantinoMapsConf();
       m_g4pow = G4Pow::GetInstance();
       
 //    //ROOT
@@ -157,7 +151,7 @@ namespace G4UA
         double zHit = aStep->GetPreStepPoint()->GetPosition().z();
         double rHit = aStep->GetPreStepPoint()->GetPosition().perp();
         
-        if(fabs(zHit) < fZlimit && rHit < fRlimit){
+        if(zHit > fGeantinoMapsConfig->GetZmin() && zHit < fGeantinoMapsConfig->GetZmax() && rHit > fGeantinoMapsConfig->GetRmin() && rHit < fGeantinoMapsConfig->GetRmax()){
             
             MyLengthIntegratorSteppingAction::addToDetThickMap(detName_d,            thickstepRL, thickstepIL);
             MyLengthIntegratorSteppingAction::addToDetThickMap(matName,              thickstepRL, thickstepIL);
@@ -241,7 +235,7 @@ namespace G4UA
         }
         
         std::string plotstring = "";
-      if(fCreateDetectorsMaps || fCreateMaterialsMaps){
+      if(fGeantinoMapsConfig->GetCreateDetectorsMaps()|| fGeantinoMapsConfig->GetCreateMaterialsMaps()){
           // 1. UPDATE m_rzMapRL and m_xyMapRL per Detector and Materials
           for (auto it : L) {
               
@@ -280,8 +274,8 @@ namespace G4UA
                   G4String xyname_g4 = "XYRadLen_"+plotstring;
                   //          m_rzMapRL_g4[plotstring]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"%X0");
                   //          m_xyMapRL_g4[plotstring]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"%X0");
-                  m_rzMapRL_g4[plotstring]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-fZlimit,fZlimit,"R [mm]",1000,0.,fRlimit,"%X0");
-                  m_xyMapRL_g4[plotstring]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-fXlimit,fXlimit,"Y [mm]",1000,-fYlimit,fYlimit,"%X0");
+                  m_rzMapRL_g4[plotstring]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,fGeantinoMapsConfig->GetZmin(),fGeantinoMapsConfig->GetZmax(), "R [mm]",1000,fGeantinoMapsConfig->GetRmin(),fGeantinoMapsConfig->GetRmax(),"%X0");
+                  m_xyMapRL_g4[plotstring]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,fGeantinoMapsConfig->GetXmin(),fGeantinoMapsConfig->GetXmax(),"Y [mm]",1000,fGeantinoMapsConfig->GetYmin(),fGeantinoMapsConfig->GetYmax(),"%X0");
                   
               }
               //else G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<plotstring<<" EXIST!"<<G4endl;
@@ -328,8 +322,8 @@ namespace G4UA
                   G4String xyname_g4 = "XYIntLen_"+plotstring;
                   //m_rzMapIL_g4[plotstring]= getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"#lambda");
                   //m_xyMapIL_g4[plotstring]= getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"#lambda");
-                  m_rzMapIL_g4[plotstring]= getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-fZlimit,fZlimit,"R [mm]",1000,0.,fRlimit,"#lambda");
-                  m_xyMapIL_g4[plotstring]= getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-fXlimit,fXlimit,"Y [mm]",1000,-fYlimit,fYlimit,"#lambda");
+                  m_rzMapIL_g4[plotstring]= getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,fGeantinoMapsConfig->GetZmin(),fGeantinoMapsConfig->GetZmax(),"R [mm]",1000,fGeantinoMapsConfig->GetRmin(),fGeantinoMapsConfig->GetRmax(),"#lambda");
+                  m_xyMapIL_g4[plotstring]= getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,fGeantinoMapsConfig->GetXmin(),fGeantinoMapsConfig->GetXmax(),"Y [mm]",1000,fGeantinoMapsConfig->GetYmin(),fGeantinoMapsConfig->GetYmax(),"#lambda");
               }
               //else G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<plotstring<<" EXIST!"<<G4endl;
               //   G4cout<<"Geant4: Filling m_rzMapIL_g4 histogram for plotstring: "<<plotstring<<"!"<<G4endl;
@@ -341,7 +335,7 @@ namespace G4UA
           }
           
       }
-      if(fCreateElementsMaps){
+      if(fGeantinoMapsConfig->GetCreateElementsMaps()){
           // 3. UPDATE m_rzMapRL and m_xyMapRL per ELEMENTS
           const G4ElementVector* eVec = mat->GetElementVector();
           for (size_t i=0 ; i < mat->GetNumberOfElements() ; ++i) {
@@ -380,8 +374,8 @@ namespace G4UA
                   G4String xyname_g4 = "XYRadLen_"+elementName;
                   //         m_rzMapRL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"%X0");
                   //         m_xyMapRL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"%X0");
-                  m_rzMapRL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-fZlimit,fZlimit,"R [mm]",1000,0.,fRlimit,"%X0");
-                  m_xyMapRL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-fXlimit,fXlimit,"Y [mm]",1000,-fYlimit,fYlimit,"%X0");
+                  m_rzMapRL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,fGeantinoMapsConfig->GetZmin(),fGeantinoMapsConfig->GetZmax(),"R [mm]",1000,fGeantinoMapsConfig->GetRmin(),fGeantinoMapsConfig->GetRmax(),"%X0");
+                  m_xyMapRL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,fGeantinoMapsConfig->GetXmin(),fGeantinoMapsConfig->GetXmax(),"Y [mm]",1000,fGeantinoMapsConfig->GetYmin(),fGeantinoMapsConfig->GetYmax(),"%X0");
               }
               //else G4cout<<"Geant4: m_rzMapRL_g4 2DProfile for "<<elementName<<" EXIST!"<<G4endl;
               //   G4cout<<"Geant4: Filling m_rzMapRL_g4 histogram for elementName: "<<elementName<<"!"<<G4endl;
@@ -429,8 +423,8 @@ namespace G4UA
                   G4String xyname_g4 = "XYIntLen_"+elementName;
                   //         m_rzMapIL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-3512.,3512.,"R [mm]",1000,0.,1200.,"#lambda");
                   //         m_xyMapIL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-1200.,1200.,"Y [mm]",1000,-1200.,1200.,"#lambda");
-                  m_rzMapIL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,-fZlimit,fZlimit,"R [mm]",1000,0.,fRlimit,"#lambda");
-                  m_xyMapIL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,-fXlimit, fXlimit,"Y [mm]",1000,-fYlimit,fYlimit,"#lambda");
+                  m_rzMapIL_g4[elementName]=getOrCreateProfile_g4(rznameReg, rzname_g4, "Z [mm]", 1000,fGeantinoMapsConfig->GetZmin(),fGeantinoMapsConfig->GetZmax(),"R [mm]",1000,fGeantinoMapsConfig->GetRmin(),fGeantinoMapsConfig->GetRmax(),"#lambda");
+                  m_xyMapIL_g4[elementName]=getOrCreateProfile_g4(xynameReg, xyname_g4, "X [mm]", 1000,fGeantinoMapsConfig->GetXmin(),fGeantinoMapsConfig->GetXmax(),"Y [mm]",1000,fGeantinoMapsConfig->GetYmin(),fGeantinoMapsConfig->GetYmax(),"#lambda");
                   
               }
               //else G4cout<<"Geant4: m_rzMapIL_g4 2DProfile for "<<elementName<<" EXIST!"<<G4endl;

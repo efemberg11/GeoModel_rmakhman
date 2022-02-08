@@ -71,6 +71,8 @@ GmxUtil::GmxUtil(GmxInterface &gmxInterface) {
     geoItemRegistry.enregister("shaperef", (Element2GeoItem *) &tagHandler.shaperef);
     geoItemRegistry.enregister("transformation", (Element2GeoItem *) &tagHandler.transformation);
     geoItemRegistry.enregister("transformationref", (Element2GeoItem *) &tagHandler.transformationref);
+
+    tagHandler.addplane.gmxUtil=this;
 }
 
 GmxUtil::~GmxUtil() {

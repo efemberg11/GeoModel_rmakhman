@@ -31,7 +31,6 @@ char *toRelease;
 //
 //    Add planes
 //
-    if (!gmxUtil.tagHandler.addplane.gmxUtil) gmxUtil.tagHandler.addplane.gmxUtil=&gmxUtil;
     double zPlane = 0.;
     double rMinPlane = 0.;
     double rMaxPlane = 0.;

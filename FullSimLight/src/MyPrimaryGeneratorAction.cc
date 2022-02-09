@@ -1,6 +1,5 @@
 
 #include "MyPrimaryGeneratorAction.hh"
-
 #include "MyPrimaryGeneratorMessenger.hh"
 
 #include "globals.hh"
@@ -25,6 +24,7 @@ G4int            MyPrimaryGeneratorAction::gNumPrimaryPerEvt(-1);
 G4double         MyPrimaryGeneratorAction::gPrimaryEnergy(-1.);
 std::string      MyPrimaryGeneratorAction::gPrimaryType("");
 G4ThreeVector    MyPrimaryGeneratorAction::gPrimaryDir(0.,0.,0.);
+G4ThreeVector    MyPrimaryGeneratorAction::gPrimaryPos(0.,0.,0.);
 
 
 // These are the particle types that can be used as primary beam particle, on a event-by-event based.
@@ -47,65 +47,85 @@ const std::map<G4String,G4int> MyPrimaryGeneratorAction::gPrimaryNameToIndexMap 
 
 
 MyPrimaryGeneratorAction::MyPrimaryGeneratorAction() {
+
+  fGeantinoMapsConfig = GeantinoMapsConfigurator::getGeantinoMapsConf();
   fIsUserNumPrimaryPerEvt     = false;
   fIsUserPrimaryType          = false;
   fIsUserPrimaryDir           = false;
+  fIsUserPrimaryPos           = false;
   fIsUserPrimaryEnergy        = false;
   fNumPrimaryPerEvt           = 1;
   fPrimaryParticleName        = "e-";
-  fParticleGun                = new G4ParticleGun(1);
+  if (fGeantinoMapsConfig->GetCreateGeantinoMaps())
+         fGeantinoParticleGun = new G4GeneralParticleSource;
+     else
+         fParticleGun         = new G4ParticleGun(1);
   fParticleTable              = G4ParticleTable::GetParticleTable();
   fPrimaryParticleEnergy      = 10.*GeV;
   fPrimaryParticlePosition    = G4ThreeVector(0.0,0.0,0.0);
   //
   fGunMessenger  = new MyPrimaryGeneratorMessenger(this);
+  
 }
 
 
 MyPrimaryGeneratorAction::~MyPrimaryGeneratorAction() {
-  delete fParticleGun;
+    if (fGeantinoMapsConfig->GetCreateGeantinoMaps())
+        delete fGeantinoParticleGun;
+    else
+        delete fParticleGun;
   delete fGunMessenger;
 }
 
 
 void MyPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
-  if (!fIsUserNumPrimaryPerEvt) {
-    G4int idum        = static_cast<G4int>(G4UniformRand()*(gSupNumPrimaryPerEvt-gInfNumPrimaryPerEvt+1));
-    fNumPrimaryPerEvt = std::max(gInfNumPrimaryPerEvt + idum,1);
-  }
-  for (G4int i=0; i<fNumPrimaryPerEvt; ++i) {
-    // Select randomly the primary particle if it was not set by the user
-    if (!fIsUserPrimaryType) {
-      G4int caseBeamParticle = static_cast<G4int>(G4UniformRand()*MyPrimaryGeneratorAction::gNumberCandidateParticles);
-      fPrimaryParticleName = gNameParticlesVector[caseBeamParticle];
+    
+    if (fGeantinoMapsConfig->GetCreateGeantinoMaps()){
+        fGeantinoParticleGun->GeneratePrimaryVertex(anEvent);
     }
-    // Select randomly the beam energy if it was not set by the user.
-    if (!fIsUserPrimaryEnergy) {
-      fPrimaryParticleEnergy = gInfBeamEnergy+G4UniformRand()*(gSupBeamEnergy-gInfBeamEnergy);
+    else {
+        if (!fIsUserNumPrimaryPerEvt) {
+            G4int idum        = static_cast<G4int>(G4UniformRand()*(gSupNumPrimaryPerEvt-gInfNumPrimaryPerEvt+1));
+            fNumPrimaryPerEvt = std::max(gInfNumPrimaryPerEvt + idum,1);
+        }
+        for (G4int i=0; i<fNumPrimaryPerEvt; ++i) {
+            // Select randomly the primary particle if it was not set by the user
+            if (!fIsUserPrimaryType) {
+                G4int caseBeamParticle = static_cast<G4int>(G4UniformRand()*MyPrimaryGeneratorAction::gNumberCandidateParticles);
+                fPrimaryParticleName = gNameParticlesVector[caseBeamParticle];
+            }
+            // Select randomly the beam energy if it was not set by the user.
+            if (!fIsUserPrimaryEnergy) {
+                fPrimaryParticleEnergy = gInfBeamEnergy+G4UniformRand()*(gSupBeamEnergy-gInfBeamEnergy);
+            }
+            // Select random direction if it was not set by the user
+            if (!fIsUserPrimaryDir) {
+                fPrimaryParticleDirection = G4RandomDirection();
+            }
+            
+            //
+            // Set the particle gun
+            G4ParticleDefinition* pDef = fParticleTable->FindParticle(fPrimaryParticleName);
+            if (!pDef) {
+                G4cerr<< " *** ERROR in MyPrimaryGeneratorAction::GeneratePrimaries() " << G4endl
+                << "       UNKNOWN PRIMARY PARTICLE WITH NAME = "
+                << fPrimaryParticleName << G4endl
+                << G4endl;
+                exit(-1);
+            }
+            //std::cout<<"Setting the particle gun"<<std::endl;
+            
+            
+            fParticleGun->SetParticleDefinition       (pDef                     );
+            fParticleGun->SetParticleEnergy           (fPrimaryParticleEnergy   );
+            fParticleGun->SetParticlePosition         (fPrimaryParticlePosition );
+            fParticleGun->SetParticleMomentumDirection(fPrimaryParticleDirection);
+            //
+            fParticleGun->GeneratePrimaryVertex(anEvent);
+            
+        }
+        
     }
-    // Select random direction if it was not set by the user
-    if (!fIsUserPrimaryDir) {
-      fPrimaryParticleDirection = G4RandomDirection();
-    }
-    // Beam position: always the origin i.e. [0,0,0].
-    //
-    // Set the particle gun
-    G4ParticleDefinition* pDef = fParticleTable->FindParticle(fPrimaryParticleName);
-    if (!pDef) {
-      G4cerr<< " *** ERROR in MyPrimaryGeneratorAction::GeneratePrimaries() " << G4endl
-            << "       UNKNOWN PRIMARY PARTICLE WITH NAME = "
-            << fPrimaryParticleName << G4endl
-            << G4endl;
-      exit(-1);
-    }
-    //std::cout<<"Setting the particle gun"<<std::endl;
-    fParticleGun->SetParticleDefinition       (pDef                     );
-    fParticleGun->SetParticleEnergy           (fPrimaryParticleEnergy   );
-    fParticleGun->SetParticlePosition         (fPrimaryParticlePosition );
-    fParticleGun->SetParticleMomentumDirection(fPrimaryParticleDirection);
-    //
-    fParticleGun->GeneratePrimaryVertex(anEvent);
- }
 }
 
 void  MyPrimaryGeneratorAction::SetNumPrimaryPerEvt(G4int pperevt) {
@@ -132,6 +152,12 @@ void  MyPrimaryGeneratorAction::SetPrimaryDirection(const G4ThreeVector &pdir) {
   fPrimaryParticleDirection.setMag(1.);
   gPrimaryDir = fPrimaryParticleDirection;
   fIsUserPrimaryDir         = true;
+}
+
+void  MyPrimaryGeneratorAction::SetPrimaryPosition(const G4ThreeVector &ppos) {
+  fPrimaryParticlePosition = ppos;
+  gPrimaryPos = fPrimaryParticlePosition;
+  fIsUserPrimaryPos         = true;
 }
 
 G4int MyPrimaryGeneratorAction::GetPrimaryTypeIndex(const G4String& pname) {
@@ -169,6 +195,15 @@ void  MyPrimaryGeneratorAction::Print() {
           + std::to_string(gPrimaryDir.y()) + ", "
           + std::to_string(gPrimaryDir.x()) + "]\n";
     str += "     Primary direction     : " + sdir;
+  }
+  if (gPrimaryPos.mag()==0.) {
+    str += "     Primary position     : [0,0,0] \n";
+  } else {
+    G4String spos= "[";
+    spos += std::to_string(gPrimaryPos.x()) + ", "
+          + std::to_string(gPrimaryPos.y()) + ", "
+          + std::to_string(gPrimaryPos.x()) + "]\n";
+    str += "     Primary position     : " + spos;
   }
   if (gPrimaryType=="") {
     str += "     Primary type          : randomly selected for each primary from \n";

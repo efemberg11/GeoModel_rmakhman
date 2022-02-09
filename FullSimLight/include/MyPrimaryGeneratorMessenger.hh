@@ -27,6 +27,7 @@ private:
  G4UIcmdWithAString*        fPrimaryTypeCmd;
  G4UIcmdWithADoubleAndUnit* fPrimaryEnergyCmd;
  G4UIcmdWith3Vector*        fPrimaryDirCmd;
+ G4UIcmdWith3Vector*        fPrimaryPosCmd;
 
 };
 

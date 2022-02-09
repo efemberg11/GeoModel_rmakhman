@@ -10,7 +10,7 @@
 
 
 MyPrimaryGeneratorMessenger::MyPrimaryGeneratorMessenger(MyPrimaryGeneratorAction *gun) : G4UImessenger(),
- fTheGun(gun), fGunDirectory(nullptr), fPrimaryTypeCmd(nullptr), fPrimaryEnergyCmd(nullptr), fPrimaryDirCmd(nullptr) {
+ fTheGun(gun), fGunDirectory(nullptr), fPrimaryTypeCmd(nullptr), fPrimaryEnergyCmd(nullptr), fPrimaryDirCmd(nullptr),  fPrimaryPosCmd(nullptr) {
  fGunDirectory     = new G4UIdirectory("/mygun/");
  fGunDirectory->SetGuidance("gun control");
 
@@ -31,6 +31,10 @@ MyPrimaryGeneratorMessenger::MyPrimaryGeneratorMessenger(MyPrimaryGeneratorActio
  fPrimaryDirCmd       = new G4UIcmdWith3Vector("/mygun/direction",this);
  fPrimaryDirCmd->SetGuidance("set primary particle direction");
  fPrimaryDirCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+ fPrimaryPosCmd       = new G4UIcmdWith3Vector("/mygun/position",this);
+ fPrimaryPosCmd->SetGuidance("set primary particle position");
+ fPrimaryPosCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 }
 
 
@@ -40,6 +44,7 @@ MyPrimaryGeneratorMessenger::~MyPrimaryGeneratorMessenger() {
   delete fPrimaryTypeCmd;
   delete fPrimaryEnergyCmd;
   delete fPrimaryDirCmd;
+  delete fPrimaryPosCmd;
 }
 
 void MyPrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newValue) {
@@ -54,5 +59,8 @@ void MyPrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String new
   }
   if (command==fPrimaryDirCmd) {
     fTheGun->SetPrimaryDirection(fPrimaryDirCmd->GetNew3VectorValue(newValue));
+  }
+  if (command==fPrimaryPosCmd) {
+    fTheGun->SetPrimaryPosition(fPrimaryPosCmd->GetNew3VectorValue(newValue));
   }
 }

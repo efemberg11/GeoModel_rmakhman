@@ -145,6 +145,9 @@ int main(int argc, char** argv) {
     
     // 3. Geantino Maps Configurator
     GeantinoMapsConfigurator* gm_config = GeantinoMapsConfigurator::getGeantinoMapsConf();
+    
+    
+    //Set default GeantinoMaps configuration values
     gm_config->SetRmin(parRmin);
     gm_config->SetRmax(parRmax);
     gm_config->SetZmin(parZmin);
@@ -162,16 +165,13 @@ int main(int argc, char** argv) {
     gm_config->SetCreateGeantinoMaps(parCreateGeantinoMaps);
     gm_config->SetMapsFilename(parOutputFileName);
     
-    
-    
-    
     // 3. User action
     MyActionInitialization* myAct = new MyActionInitialization(parIsPerformance);
     runManager->SetUserInitialization(myAct);
     
     
     
-    // 4. Run the simulation in batch mode
+    // 4. Run the simulation in batch mode - read configuration file
     G4UImanager* UI = G4UImanager::GetUIpointer();
     G4String command = "/control/execute ";
     UI->ApplyCommand(command+parMacroFileName);
@@ -193,16 +193,6 @@ int main(int argc, char** argv) {
 static struct option options[] = {
     {"geometry file name    "  , required_argument, 0, 'g'},
     {"macro file            "  , required_argument, 0, 'm'},
-    {"rmin                  "  , required_argument, 0, 'r'},
-    {"rmax                  "  , required_argument, 0, 'R'},
-    {"zmin                  "  , required_argument, 0, 'z'},
-    {"zmax                  "  , required_argument, 0, 'Z'},
-    {"xmin                  "  , required_argument, 0, 'x'},
-    {"xmax                  "  , required_argument, 0, 'X'},
-    {"ymin                  "  , required_argument, 0, 'y'},
-    {"ymax                  "  , required_argument, 0, 'Y'},
-    {"etamin                "  , required_argument, 0, 'b'},
-    {"etamax                "  , required_argument, 0, 'B'},
     {"output ROOT file name "  , required_argument, 0, 'o'},
     {"etaphiMap             "  , no_argument      , 0, 'e'},
     {"detectorsMap          "  , no_argument      , 0, 'd'},
@@ -220,16 +210,6 @@ void Help() {
     <<"  **** Parameters: \n\n"
     <<"      -g :   [REQUIRED] the Geometry file name (supported extensions: .db/.gdml/.dylib/.so) \n"
     <<"      -m :   [OPTIONAL] the standard Geant4 macro file name (default: 'geantino.g4') \n"
-    <<"      -r :   [OPTIONAL] r min for geantino maps in mm (default: '-12500') \n"
-    <<"      -R :   [OPTIONAL] r max for geantino maps in mm (default: '12500') \n"
-    <<"      -z :   [OPTIONAL] z min for geantino maps in mm (default: '-23000') \n"
-    <<"      -Z :   [OPTIONAL] z min for geantino maps in mm (default: '23000') \n"
-    <<"      -x :   [OPTIONAL] x min for geantino maps in mm (default: '-12500') \n"
-    <<"      -X :   [OPTIONAL] x max for geantino maps in mm (default: '12500') \n"
-    <<"      -y :   [OPTIONAL] y min for geantino maps in mm (default: '-12500') \n"
-    <<"      -Y :   [OPTIONAL] y max for geantino maps in mm (default: '12500') \n"
-    <<"      -b :   [OPTIONAL] eta min for geantino maps (default: '-6') \n"
-    <<"      -B :   [OPTIONAL] eta max for geantino maps (default: '6') \n"
     <<"      -o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') \n"
     <<"      -e :   [FLAG]     use this flag to create eta-phi radiation-interaction length 1D profile histograms (caveat: the process might run out of memory!)\n"
     <<"      -d :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'detectors' (caveat: the process might run out of memory!)\n"
@@ -252,7 +232,7 @@ void GetInputArguments(int argc, char** argv) {
     }
     while (true) {
         int c, optidx = 0;
-        c = getopt_long(argc, argv, "g:m:o:r:R:z:Z:x:X:y:Y:b:B:edalh", options, &optidx);
+        c = getopt_long(argc, argv, "g:m:o:edalh", options, &optidx);
         if (c == -1)
             break;
         //
@@ -268,30 +248,6 @@ void GetInputArguments(int argc, char** argv) {
                 break;
             case 'o':
                 parOutputFileName = optarg;
-                break;
-            case 'r':
-                parRmin = atof(optarg);
-                break;
-            case 'R':
-                parRmax = atof(optarg);
-                break;
-            case 'z':
-                parZmin = atof(optarg);
-                break;
-            case 'Z':
-                parZmax = atof(optarg);
-                break;
-            case 'x':
-                parXmin = atof(optarg);
-                break;
-            case 'X':
-                parXmax = atof(optarg);
-                break;
-            case 'y':
-                parYmin = atof(optarg);
-                break;
-            case 'Y':
-                parYmax = atof(optarg);
                 break;
             case 'e':
                 parCreateEtaPhiMaps = true;

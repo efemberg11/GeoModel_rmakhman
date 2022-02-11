@@ -4,6 +4,7 @@
 
 #include "G4Types.hh"
 #include "G4String.hh"
+#include "GeantinoMapsMessenger.hh"
 
 #include <vector>
 
@@ -41,6 +42,7 @@ public:
   void SetCreateElementsMaps(G4bool flag) {fCreateElementsMaps  =flag;}
   void SetCreateGeantinoMaps(G4bool flag) {fCreateGeantinoMaps  =flag;}
   void SetMapsFilename(G4String filename) {fMapsFilename        =filename;}
+  void SetVolumesList(G4String volumeslist);
     
   G4double GetRmin()const {return fRmin;}
   G4double GetRmax()const{return fRmax;}
@@ -60,7 +62,7 @@ public:
   G4String GetMapsFilename()const {return fMapsFilename;}
     
 private:
-
+    GeantinoMapsMessenger* fGMapsMessenger;
     static GeantinoMapsConfigurator* s_instance;
     GeantinoMapsConfigurator();
     ~GeantinoMapsConfigurator();
@@ -81,6 +83,10 @@ private:
     G4bool    fCreateMaterialsMaps;
     G4bool    fCreateElementsMaps;
     G4bool    fCreateGeantinoMaps=false;
+    
+    std::vector<std::string> fVolumesList;
+    G4String fMaterial;
+    G4String fElement;
 
 }; // GeantinoMapsConfigurator
 

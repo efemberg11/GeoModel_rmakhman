@@ -16,4 +16,30 @@ GeantinoMapsConfigurator* GeantinoMapsConfigurator::getGeantinoMapsConf()
   return s_instance;
 }
 
-GeantinoMapsConfigurator::GeantinoMapsConfigurator() {}
+GeantinoMapsConfigurator::GeantinoMapsConfigurator() :
+fGMapsMessenger(nullptr)
+{
+    fGMapsMessenger   = new GeantinoMapsMessenger(this);
+}
+
+GeantinoMapsConfigurator::~ GeantinoMapsConfigurator()
+{
+    delete fGMapsMessenger;
+}
+
+void GeantinoMapsConfigurator::SetVolumesList(G4String volumeslist){
+    
+    using namespace std;
+    
+    string parsed;
+    stringstream input_stringstream(volumeslist);
+    
+    while (getline(input_stringstream,parsed,' '))
+    {
+        fVolumesList.push_back(parsed);
+        std::cout<<"Volume found: "<<parsed<<std::endl;
+        
+    }
+    
+}
+

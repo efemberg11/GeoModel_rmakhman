@@ -39,12 +39,14 @@ namespace G4UA
     //---------------------------------------------------------------------------
     // Constructor
     //---------------------------------------------------------------------------
-    MyLengthIntegratorEventAction::MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction* stepAct, MyRunAction* run, bool createEtaPhiMaps)
+    MyLengthIntegratorEventAction::MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction* stepAct, MyRunAction* run)
     :m_run(run),
     m_stepAct(stepAct),
     m_etaPrimary(0),
-    m_phiPrimary(0),
-    m_createEtaPhiMaps(createEtaPhiMaps){}
+    m_phiPrimary(0){
+        
+         fGeantinoMapsConfig = GeantinoMapsConfigurator::getGeantinoMapsConf();
+    }
     
     MyLengthIntegratorEventAction::~MyLengthIntegratorEventAction(){
         
@@ -141,8 +143,7 @@ namespace G4UA
             }
         }
         
-        
-        if(m_createEtaPhiMaps){
+        if(fGeantinoMapsConfig->GetCreateEtaPhiMaps()){
             
             // Loop over volumes
             for (auto& it : m_stepAct->m_detThickMap) {
@@ -441,7 +442,7 @@ namespace G4UA
             
             //G4cout<<"Geant4: Eta rad profile of "<<pathEtaRL<<" didn't exist, creating P1 now on MASTER:  "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"_RL");
-            id_EtaRL = m_run->fMasterAnalysisManager->CreateP1(pathEtaRL, name.c_str(), 500, -6., 6.);
+            id_EtaRL = m_run->fMasterAnalysisManager->CreateP1(pathEtaRL, name.c_str(), 500, fGeantinoMapsConfig->GetEtamin(), fGeantinoMapsConfig->GetEtamax());
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_EtaRL, "#eta");
             m_run->fMasterAnalysisManager->SetP1YAxisTitle(id_EtaRL, "%X0");
             
@@ -451,7 +452,7 @@ namespace G4UA
         {
             //G4cout<<"Geant4: Eta rad profile of "<<pathEtaRL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"_RL");
-            id_EtaRL = analysisManager->CreateP1(pathEtaRL, name.c_str(), 500, -6., 6.);
+            id_EtaRL = analysisManager->CreateP1(pathEtaRL, name.c_str(), 500,  fGeantinoMapsConfig->GetEtamin(), fGeantinoMapsConfig->GetEtamax());
             analysisManager->SetP1XAxisTitle(id_EtaRL, "#eta");
             analysisManager->SetP1YAxisTitle(id_EtaRL, "%X0");
             
@@ -463,7 +464,7 @@ namespace G4UA
         {
             //G4cout<<"Geant4: Eta int profile of "<<pathEtaIL<<" didn't exist, creating P1 now on MASTER:  "<<m_run->fMasterAnalysisManager<<G4endl;
             const std::string name(detName+"_IL");
-            id_EtaIL = m_run->fMasterAnalysisManager->CreateP1(pathEtaIL, name.c_str(), 500, -6., 6.);
+            id_EtaIL = m_run->fMasterAnalysisManager->CreateP1(pathEtaIL, name.c_str(), 500,  fGeantinoMapsConfig->GetEtamin(), fGeantinoMapsConfig->GetEtamax());
             m_run->fMasterAnalysisManager->SetP1XAxisTitle(id_EtaIL, "#eta");
             m_run->fMasterAnalysisManager->SetP1YAxisTitle(id_EtaIL, "#lambda");
             
@@ -473,7 +474,7 @@ namespace G4UA
         {
             //G4cout<<"Geant4: Eta int profile of "<<pathEtaIL<<" didn't exist, creating P1 now on WORKER: "<<analysisManager<<G4endl;
             const std::string name(detName+"_IL");
-            id_EtaIL = analysisManager->CreateP1(pathEtaIL, name.c_str(), 500, -6., 6.);
+            id_EtaIL = analysisManager->CreateP1(pathEtaIL, name.c_str(), 500, fGeantinoMapsConfig->GetEtamin(), fGeantinoMapsConfig->GetEtamax());
             analysisManager->SetP1XAxisTitle(id_EtaIL, "#eta");
             analysisManager->SetP1YAxisTitle(id_EtaIL, "#lambda");
             

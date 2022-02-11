@@ -16,6 +16,7 @@
 
 #include "MyLengthIntegratorSteppingAction.hh"
 #include "MyRunAction.hh"
+#include "GeantinoMapsConfigurator.hh"
 
 #include <string>
 #include <map>
@@ -47,7 +48,7 @@ namespace G4UA
     public:
 
       /// Constructor takes the name of the histogram service as argument.
-      MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction*, MyRunAction* run, bool createEtaPhiMaps = false);
+      MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction*, MyRunAction* run);
       /// Destructor
       ~MyLengthIntegratorEventAction();
 
@@ -60,12 +61,11 @@ namespace G4UA
       
       /// Pointer to the RunAction
       MyRunAction*  m_run;
-      void SetCreateEtaPhiMaps   (bool val) { m_createEtaPhiMaps = val; }
-      
 
     private:
       /// Pointer to MyLengthIntegratorSteppingAction
       MyLengthIntegratorSteppingAction* m_stepAct;
+      GeantinoMapsConfigurator* fGeantinoMapsConfig;
       
 //      /// Setup one set of measurement hists for a detector name - ROOT
 //      void regAndFillHist(const std::string&, const std::pair<double, double>&);
@@ -77,8 +77,6 @@ namespace G4UA
       double m_etaPrimary;
       /// Cached phi of the current primary
       double m_phiPrimary;
-      /// Flag to create eta-phi geantino maps
-      bool m_createEtaPhiMaps;
       
 
 //      /// Rad-length profile hist in eta - ROOT

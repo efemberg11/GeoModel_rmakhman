@@ -151,8 +151,8 @@ namespace G4UA
         double zHit = aStep->GetPreStepPoint()->GetPosition().z();
         double rHit = aStep->GetPreStepPoint()->GetPosition().perp();
         
-        std::cout<<"zHit: "<<zHit<<" ::["<<fGeantinoMapsConfig->GetZmin()<<","<<fGeantinoMapsConfig->GetZmax()<<"]"<<std::endl;
-        std::cout<<"rHit: "<<rHit<<" ::["<<fGeantinoMapsConfig->GetRmin()<<","<<fGeantinoMapsConfig->GetRmax()<<"]"<<std::endl;
+//        std::cout<<"zHit: "<<zHit<<" ::["<<fGeantinoMapsConfig->GetZmin()<<","<<fGeantinoMapsConfig->GetZmax()<<"]"<<std::endl;
+//        std::cout<<"rHit: "<<rHit<<" ::["<<fGeantinoMapsConfig->GetRmin()<<","<<fGeantinoMapsConfig->GetRmax()<<"]"<<std::endl;
         
         if(zHit >= fGeantinoMapsConfig->GetZmin() && zHit <= fGeantinoMapsConfig->GetZmax() && rHit >= fGeantinoMapsConfig->GetRmin() && rHit <= fGeantinoMapsConfig->GetRmax()){
             MyLengthIntegratorSteppingAction::addToDetThickMap(detName_d,            thickstepRL, thickstepIL);

@@ -15,19 +15,19 @@
 ## ---------------------------------------------------------------------
 /mydet/setField 0 tesla
 ########################################################################
-##  Geantino Maps Configuration
+##  Geantino Maps Configuration : ATLAS Pixel
 ## ---------------------------------------------------------------------
 /gmaps/rmin 0 mm
-/gmaps/rmax 200 mm
-/gmaps/zmin -3000 mm
-/gmaps/zmax 3000 mm
-/gmaps/xmin -200 mm
-/gmaps/xmax 200 mm
-/gmaps/ymin -200 mm
-/gmaps/ymax 200 mm
+/gmaps/rmax 250 mm
+/gmaps/zmin -3100 mm
+/gmaps/zmax 3100 mm
+/gmaps/xmin -250 mm
+/gmaps/xmax 250 mm
+/gmaps/ymin -250 mm
+/gmaps/ymax 250 mm
 /gmaps/etamin -6
 /gmaps/etamax 6
-/gmaps/volumeslist Pixel SCT TRT
+/gmaps/volumeslist Pixel
 ########################################################################
 ##  INIT
 ## ---------------------------------------------------------------------

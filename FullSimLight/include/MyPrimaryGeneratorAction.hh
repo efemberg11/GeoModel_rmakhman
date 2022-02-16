@@ -6,10 +6,12 @@
 #include "G4String.hh"
 #include "G4ThreeVector.hh"
 #include "G4String.hh"
-
+#include "GeantinoMapsConfigurator.hh"
+#include "G4GeneralParticleSource.hh"
 #include <map>
 
 class G4ParticleGun;
+class G4GeneralParticleSource;
 class G4Event;
 class G4ParticleTable;
 class MyPrimaryGeneratorMessenger;
@@ -26,6 +28,7 @@ public:
   void SetPrimaryEnergy(G4double ekin);
   void SetPrimaryName(const G4String& pname);
   void SetPrimaryDirection(const G4ThreeVector &pdir);
+  void SetPrimaryPosition(const G4ThreeVector &ppos);
 
   static void   Print();
   static G4int  GetNumberOfPrimaryTypes()  {  return gNumberCandidateParticles; }
@@ -49,11 +52,13 @@ private:
   static G4double          gPrimaryEnergy;
   static std::string       gPrimaryType;
   static G4ThreeVector     gPrimaryDir;
+  static G4ThreeVector     gPrimaryPos;
 
 
   G4bool                   fIsUserNumPrimaryPerEvt;
   G4bool                   fIsUserPrimaryType;
   G4bool                   fIsUserPrimaryDir;
+  G4bool                   fIsUserPrimaryPos;
   G4bool                   fIsUserPrimaryEnergy;
 
   G4int                    fNumPrimaryPerEvt;
@@ -61,6 +66,7 @@ private:
   G4String                 fPrimaryParticleName;
 
   G4ParticleGun*           fParticleGun;
+  G4GeneralParticleSource* fGeantinoParticleGun;
   G4ParticleTable*         fParticleTable;
 
   G4double                 fPrimaryParticleEnergy;
@@ -69,6 +75,7 @@ private:
   G4ThreeVector            fPrimaryParticlePosition;
 
   MyPrimaryGeneratorMessenger *fGunMessenger;
+  GeantinoMapsConfigurator* fGeantinoMapsConfig;
 };
 
 #endif

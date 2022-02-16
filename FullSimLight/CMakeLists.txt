@@ -207,9 +207,12 @@ endif()
 #
 set(FULLSIMLIGHT_SCRIPTS
   geantino.g4
+  geantino_Pixel.g4
+  geantino_SCT.g4
   macro.g4
   pythia.g4
   drawMagField.C
+  drawGeantinoMaps.C
   )
 
 foreach(_script ${FULLSIMLIGHT_SCRIPTS})

@@ -21,13 +21,16 @@
 
 G4AnalysisManager* MyRunAction::fMasterAnalysisManager = nullptr;
 
-MyRunAction::MyRunAction(bool isGeantino, G4String geantinoMapFilename)
-: G4UserRunAction(), fIsPerformance(false), fIsGeantino(isGeantino), fRun(nullptr), fTimer(nullptr),
-  fSteppingAction(nullptr), fTrackingAction(nullptr), fGeantinoMapsFilename(geantinoMapFilename),
-  fPythiaConfig(""), fSpecialScoringRegionName("") { }
+MyRunAction::MyRunAction()
+: G4UserRunAction(), fIsPerformance(false), fRun(nullptr), fTimer(nullptr),
+  fSteppingAction(nullptr), fTrackingAction(nullptr),
+  fPythiaConfig(""), fSpecialScoringRegionName("") {
+      
+      fGeantinoMapsConf=GeantinoMapsConfigurator::getGeantinoMapsConf();
+  }
 
 MyRunAction::~MyRunAction() {
-    if(fIsGeantino)
+    if(fGeantinoMapsConf->GetCreateGeantinoMaps())
         delete G4AnalysisManager::Instance();
 }
 
@@ -46,7 +49,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
 #if G4VERSION_NUMBER>=1040
 
-    if(fIsGeantino)
+    if(fGeantinoMapsConf->GetCreateGeantinoMaps())
     {
         // Create analysis manager
         G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
@@ -63,15 +66,16 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
         // Open output root file
         G4cout<<"\n\nBeginOfRunAction: \n...create a root file using the G4AnalysisManager" << G4endl;
-        if (!analysisManager->OpenFile(fGeantinoMapsFilename)){
+        if (!analysisManager->OpenFile(fGeantinoMapsConf->GetMapsFilename())){
             G4cout<<"\nBeginOfRunAction ERROR: File cannot be opened!"<<G4endl;
             exit(-1);
         } else
-            G4cout<<"\n...output File "<<fGeantinoMapsFilename<<" opened!"<<G4endl;
+            G4cout<<"\n...output File "<<fGeantinoMapsConf->GetMapsFilename()<<" opened!"<<G4endl;
 
         const char* radName = "RZRadLen";
         if(analysisManager->GetP2Id(radName, false) < 0){
-            fRadName_id = analysisManager->CreateP2(radName,radName,1000,-25000.,25000.,2000,0.,15000.);
+
+            fRadName_id = analysisManager->CreateP2(radName,radName,3000,fGeantinoMapsConf->GetZmin(),fGeantinoMapsConf->GetZmax(),2000,fGeantinoMapsConf->GetRmin(),fGeantinoMapsConf->GetRmax());
             //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZRadLen 2DProfile with name: "<<radName<< " and  with id: "<<fRadName_id<<G4endl;
             analysisManager->SetP2XAxisTitle(fRadName_id,"Z[mm]");
             analysisManager->SetP2YAxisTitle(fRadName_id,"R[mm]");
@@ -81,7 +85,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         const char* intName = "RZIntLen";
         if(analysisManager->GetP2Id(intName, false)< 0)
         {
-            fIntName_id = analysisManager->CreateP2(intName,intName,1000,-25000.,25000.,2000,0.,15000.);
+            fIntName_id = analysisManager->CreateP2(intName,intName,3000,fGeantinoMapsConf->GetZmin(),fGeantinoMapsConf->GetZmax(),2000,fGeantinoMapsConf->GetRmin(),fGeantinoMapsConf->GetRmax());
             //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZIntLen 2DProfile with name: "<<intName<< " and with id: "<<fIntName_id<<G4endl;
             analysisManager->SetP2XAxisTitle(fIntName_id,"Z[mm]");
             analysisManager->SetP2YAxisTitle(fIntName_id,"R[mm]");
@@ -90,7 +94,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         const char* etaRadName = "etaRadLen";
         if(analysisManager->GetP1Id(etaRadName, false)< 0)
         {
-            fEtaRad_id = analysisManager->CreateP1(etaRadName,etaRadName,500,-6,6);
+            fEtaRad_id = analysisManager->CreateP1(etaRadName,etaRadName,500,fGeantinoMapsConf->GetEtamin(),fGeantinoMapsConf->GetEtamax());
             analysisManager->SetP1XAxisTitle(fEtaRad_id,"#eta");
             analysisManager->SetP1YAxisTitle(fEtaRad_id,"Radiation Length %X0");
 
@@ -98,7 +102,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         const char* etaIntName = "etaIntLen";
         if(analysisManager->GetP1Id(etaIntName, false)< 0)
         {
-            fEtaInt_id = analysisManager->CreateP1(etaIntName,etaIntName,500,-6,6);
+            fEtaInt_id = analysisManager->CreateP1(etaIntName,etaIntName,500,fGeantinoMapsConf->GetEtamin(),fGeantinoMapsConf->GetEtamax());
             analysisManager->SetP1XAxisTitle(fEtaInt_id,"#eta");
             analysisManager->SetP1YAxisTitle(fEtaInt_id,"Interaction Length #lambda");
         }
@@ -177,7 +181,7 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
 
 #if G4VERSION_NUMBER>=1040
 
-    if(fIsGeantino){
+    if(fGeantinoMapsConf->GetCreateGeantinoMaps() ){
 
         auto analysisManager= G4AnalysisManager::Instance();
         //Finalize analysisManager and Write out file

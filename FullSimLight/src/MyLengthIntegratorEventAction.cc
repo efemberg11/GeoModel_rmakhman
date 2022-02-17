@@ -103,20 +103,28 @@ namespace G4UA
     //---------------------------------------------------------------------------
     void MyLengthIntegratorEventAction::BeginOfEventAction(const G4Event* event)
     {
-        std::cout << "\n ========================================================= "      <<std::endl;
-        G4cout  << " ****** BeginOfEventAction  ****** " <<G4endl;
+        bool verbose = false;
+        if (verbose){
+            G4cout << "\n ========================================================= "      <<G4endl;
+            G4cout  << " ****** BeginOfEventAction  ****** " <<G4endl;
+            
+        }
         //clear the detThickMap for the event that begins
         m_stepAct->m_detThickMap.clear();
         G4PrimaryVertex* vert = event->GetPrimaryVertex(0);
         G4PrimaryParticle* part = vert->GetPrimary();
         G4ThreeVector mom = part->GetMomentum();
-        G4cout<<" ****** Primary Particle: "<< part->GetParticleDefinition()->GetParticleName()<<" ****** " <<G4endl;
-        G4cout<<" ****** Momentum: "<< mom <<" ****** " <<G4endl;
+        
         m_etaPrimary = mom.eta();
         m_phiPrimary = mom.phi();
-        G4cout.precision(6);
-        G4cout<<" ****** Eta: "<< m_etaPrimary<<" ****** " <<G4endl;
-        G4cout<<" ****** Phi: "<< m_phiPrimary<<" ****** " <<G4endl;
+        
+        if(verbose){
+            G4cout.precision(6);
+            G4cout<<" ****** Primary Particle: "<< part->GetParticleDefinition()->GetParticleName()<<" ****** " <<G4endl;
+            G4cout<<" ****** Momentum: "<< mom <<" ****** " <<G4endl;
+            G4cout<<" ****** Eta: "<< m_etaPrimary<<" ****** " <<G4endl;
+            G4cout<<" ****** Phi: "<< m_phiPrimary<<" ****** " <<G4endl;
+        }
         
     }
     
@@ -125,14 +133,15 @@ namespace G4UA
     //---------------------------------------------------------------------------
     void MyLengthIntegratorEventAction::EndOfEventAction(const G4Event*)
     {
-        G4cout    <<" ****** EndOfEventAction  ****** "  << G4endl;
+        bool verbose = false;
+        if (verbose) G4cout <<" ****** EndOfEventAction  ****** "  << G4endl;
         auto analysisManager = G4AnalysisManager::Instance();
         // Lazily protect this whole code from concurrent access
         std::lock_guard<std::mutex> lock(gHistSvcMutex);
         
         //m_stepAct
         if (m_stepAct->m_detThickMap.size()==0){
-            G4cout<<" m_detThickMap size is zero! "<<G4endl;
+            G4cout<<"ERROR! m_detThickMap size is zero! Exiting"<<G4endl;
             exit(-1);
         }
         // Loop over volumes
@@ -357,7 +366,7 @@ namespace G4UA
                 }
             }//~Geant4
         }
-        std::cout << "\n ========================================================= "  << std::endl;
+        if (verbose) std::cout << "\n ========================================================= "  << std::endl;
     }
     
     //---------------------------------------------------------------------------

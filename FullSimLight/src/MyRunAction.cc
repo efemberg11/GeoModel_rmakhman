@@ -186,11 +186,11 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
         auto analysisManager= G4AnalysisManager::Instance();
         //Finalize analysisManager and Write out file
         if (analysisManager->IsOpenFile()){
-            G4cout<<"\n\n EndOfRunAction, writing output file: "<<analysisManager->GetFileName() << G4endl;
+            //G4cout<<"\n\n EndOfRunAction, writing output file: "<<analysisManager->GetFileName() << G4endl;
             analysisManager->Write();
-            G4cout<<"... closing output file: "<<analysisManager->GetFileName() << G4endl;
+            //G4cout<<"... closing output file: "<<analysisManager->GetFileName() << G4endl;
             analysisManager->CloseFile();
-            G4cout<<"Output File successfully saved and closed! " << G4endl;
+            //G4cout<<"Output File successfully saved and closed! " << G4endl;
         }
 
     }

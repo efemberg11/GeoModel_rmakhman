@@ -35,7 +35,7 @@
 ########################################################################
 ##  PRIMARY GENERATOR
 ## ---------------------------------------------------------------------
-/gps/verbose 2
+/gps/verbose 0
 /gps/particle geantino
 #/gps/pos/type Plane
 #/gps/pos/shape Square

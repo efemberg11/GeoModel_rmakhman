@@ -209,6 +209,10 @@ set(FULLSIMLIGHT_SCRIPTS
   geantino.g4
   geantino_Pixel.g4
   geantino_SCT.g4
+  geantino_TRT.g4
+  geantino_LAr.g4
+  geantino_Tile.g4
+  geantino_Muon.g4
   macro.g4
   pythia.g4
   drawMagField.C

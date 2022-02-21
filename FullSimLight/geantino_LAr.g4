@@ -19,8 +19,8 @@
 ## ---------------------------------------------------------------------
 /gmaps/rmin 0 mm
 /gmaps/rmax 4000 mm
-/gmaps/zmin -75000 mm
-/gmaps/zmax 75000 mm
+/gmaps/zmin -7500 mm
+/gmaps/zmax 7500 mm
 /gmaps/xmin -4000 mm
 /gmaps/xmax 4000 mm
 /gmaps/ymin -4000 mm

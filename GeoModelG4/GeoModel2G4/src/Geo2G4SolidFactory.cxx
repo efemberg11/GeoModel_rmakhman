@@ -55,6 +55,9 @@
 
 #include "GeoModel2G4/CLHEPtoEigenConverter.h"
 
+#define STR_VALUE(arg) #arg
+#define STR_NAME(name) STR_VALUE(name)
+
 typedef std::map<const GeoShape*, G4VSolid*, std::less<const GeoShape*> > shapesMap;
 
 
@@ -487,21 +490,24 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
     }
     else {                   // make and store the new plugin.
       static GeoG4SolidPluginLoader loader;
-      const std::string g4SolidPluginDir=getenv("G4SOLID_PLUGIN_DIR");
-      if (!g4SolidPluginDir.empty()) {
-	std::string pName=g4SolidPluginDir+"/lib"+customShape->name()+"Plugin"+extension;
-	plugin=loader.load(pName);
-	if (plugin) {
-	  pluginMap[customShape->name()]=plugin;
-	}
-	else {
-	  std::string error = std::string("Can't load") + customShape->name() + " in Geo2G4SolidFactory::Build\n";
-	  throw std::runtime_error(error);
-	}
+      std::string pName;
+      char * qName=getenv("G4SOLID_PLUGIN_DIR");
+      if (qName) {
+	std::string g4SolidPluginDir=qName;
+	pName=g4SolidPluginDir+"/lib"+customShape->name()+"Plugin"+extension;
       }
       else {
-	std::string error="Error loading G4Solid plugins: Did you set the environment variable G4SOLID_PLUGIN_DIR ?" ;
-	throw std::runtime_error(error);
+	std::string vName = STR_NAME(G4SOLID_PLUGIN_DIR);
+	pName = std::string(vName)+"/lib"+customShape->name()+"Plugin"+extension;
+      }
+      plugin=loader.load(pName);
+      if (plugin) {
+	pluginMap[customShape->name()]=plugin;
+      }
+      else {
+	std::cerr << "ERROR in Geo2G4SolidFactory. Cannot load G4VSolidPlugin " << pName << std::endl;
+	std::cerr << "Did you set the G4SOLID_PLUGIN_DIR variable?" << std::endl;
+	throw std::runtime_error("Cannot load plugin");
       }
     }
     if (plugin) {

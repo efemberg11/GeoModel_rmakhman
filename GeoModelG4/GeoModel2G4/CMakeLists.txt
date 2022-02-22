@@ -30,6 +30,7 @@ file( GLOB HEADERS GeoModel2G4/*.h )
 
 # include Geant4 headers
 include(${Geant4_USE_FILE})
+add_definitions (-DG4SOLID_PLUGIN_DIR=${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} )
 
 # Set target and properties
 add_library( GeoModel2G4 SHARED ${HEADERS} ${SOURCES} )

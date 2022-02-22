@@ -3,11 +3,6 @@
 */
 
 #include "GeoModel2G4/Geo2G4SolidFactory.h"
-#include "GeoModel2G4/LArWheelSolid.h"
-#include "GeoModel2G4/LArWheelSliceSolid.h"
-#include "GeoModel2G4/LArWheelSolidDDProxy.h"
-#include "GeoSpecialShapes/LArCustomShape.h"
-
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoTube.h"
@@ -29,6 +24,8 @@
 #include "GeoModelKernel/GeoShapeIntersection.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
+#include "GeoModelKernel/GeoG4SolidPluginLoader.h"
+#include "GeoModelKernel/GeoVG4SolidPlugin.h"
 
 #include "G4VSolid.hh"
 #include "G4Box.hh"
@@ -59,76 +56,7 @@
 #include "GeoModel2G4/CLHEPtoEigenConverter.h"
 
 typedef std::map<const GeoShape*, G4VSolid*, std::less<const GeoShape*> > shapesMap;
-typedef std::map<std::string, G4VSolid*,std::less<std::string> > customSolidMap;
 
-const Geo2G4SolidFactory::LArWheelSolid_typemap Geo2G4SolidFactory::s_lwsTypes = {
-       /* entries w/o explicit Pos/Neg kept for backward compatibility */
-       { "LAr::EMEC::InnerWheel::Absorber",           {InnerAbsorberWheel, 1} },
-       { "LAr::EMEC::InnerWheel::Electrode",          {InnerElectrodWheel, 1} },
-       { "LAr::EMEC::InnerWheel::Glue",               {InnerGlueWheel, 1} },
-       { "LAr::EMEC::InnerWheel::Lead",               {InnerLeadWheel, 1} },
-
-       { "LAr::EMEC::OuterWheel::Absorber",           {OuterAbsorberWheel, 1} },
-       { "LAr::EMEC::OuterWheel::Electrode",          {OuterElectrodWheel, 1} },
-       { "LAr::EMEC::OuterWheel::Glue",               {OuterGlueWheel, 1} },
-       { "LAr::EMEC::OuterWheel::Lead",               {OuterLeadWheel, 1} },
-
-       { "LAr::EMEC::Pos::InnerWheel::Absorber",      {InnerAbsorberWheel, 1} },
-       { "LAr::EMEC::Pos::InnerWheel::Electrode",     {InnerElectrodWheel, 1} },
-       { "LAr::EMEC::Pos::InnerWheel::Glue",          {InnerGlueWheel, 1} },
-       { "LAr::EMEC::Pos::InnerWheel::Lead",          {InnerLeadWheel, 1} },
-
-       { "LAr::EMEC::Pos::OuterWheel::Absorber",      {OuterAbsorberWheel, 1} },
-       { "LAr::EMEC::Pos::OuterWheel::Electrode",     {OuterElectrodWheel, 1} },
-       { "LAr::EMEC::Pos::OuterWheel::Glue",          {OuterGlueWheel, 1} },
-       { "LAr::EMEC::Pos::OuterWheel::Lead",          {OuterLeadWheel, 1} },
-
-       { "LAr::EMEC::Neg::InnerWheel::Absorber",      {InnerAbsorberWheel, -1} },
-       { "LAr::EMEC::Neg::InnerWheel::Electrode",     {InnerElectrodWheel, -1} },
-       { "LAr::EMEC::Neg::InnerWheel::Glue",          {InnerGlueWheel, -1} },
-       { "LAr::EMEC::Neg::InnerWheel::Lead",          {InnerLeadWheel, -1} },
-
-       { "LAr::EMEC::Neg::OuterWheel::Absorber",      {OuterAbsorberWheel, -1} },
-       { "LAr::EMEC::Neg::OuterWheel::Electrode",     {OuterElectrodWheel, -1} },
-       { "LAr::EMEC::Neg::OuterWheel::Glue",          {OuterGlueWheel, -1} },
-       { "LAr::EMEC::Neg::OuterWheel::Lead",          {OuterLeadWheel, -1} },
-
-       { "LAr::EMEC::InnerModule::Absorber",          {InnerAbsorberModule, 1} },
-       { "LAr::EMEC::InnerModule::Electrode",         {InnerElectrodModule, 1} },
-       { "LAr::EMEC::OuterModule::Absorber",          {OuterAbsorberModule, 1} },
-       { "LAr::EMEC::OuterModule::Electrode",         {OuterElectrodModule, 1} },
-
-       { "LAr::EMEC::Pos::InnerCone::Absorber",       {InnerAbsorberCone, 1} },
-       { "LAr::EMEC::Pos::InnerCone::Electrode",      {InnerElectrodCone, 1} },
-       { "LAr::EMEC::Pos::InnerCone::Glue",           {InnerGlueCone, 1} },
-       { "LAr::EMEC::Pos::InnerCone::Lead",           {InnerLeadCone, 1} },
-
-       { "LAr::EMEC::Neg::InnerCone::Absorber",       {InnerAbsorberCone, -1} },
-       { "LAr::EMEC::Neg::InnerCone::Electrode",      {InnerElectrodCone, -1} },
-       { "LAr::EMEC::Neg::InnerCone::Glue",           {InnerGlueCone, -1} },
-       { "LAr::EMEC::Neg::InnerCone::Lead",           {InnerLeadCone, -1} },
-
-       { "LAr::EMEC::Pos::OuterFrontCone::Absorber",  {OuterAbsorberFrontCone, 1} },
-       { "LAr::EMEC::Pos::OuterFrontCone::Electrode", {OuterElectrodFrontCone, 1} },
-       { "LAr::EMEC::Pos::OuterFrontCone::Glue",      {OuterGlueFrontCone, 1} },
-       { "LAr::EMEC::Pos::OuterFrontCone::Lead",      {OuterLeadFrontCone, 1} },
-
-       { "LAr::EMEC::Neg::OuterFrontCone::Absorber",  {OuterAbsorberFrontCone, -1} },
-       { "LAr::EMEC::Neg::OuterFrontCone::Electrode", {OuterElectrodFrontCone, -1} },
-       { "LAr::EMEC::Neg::OuterFrontCone::Glue",      {OuterGlueFrontCone, -1} },
-       { "LAr::EMEC::Neg::OuterFrontCone::Lead",      {OuterLeadFrontCone, -1} },
-
-       { "LAr::EMEC::Pos::OuterBackCone::Absorber",   {OuterAbsorberBackCone, 1} },
-       { "LAr::EMEC::Pos::OuterBackCone::Electrode",  {OuterElectrodBackCone, 1} },
-       { "LAr::EMEC::Pos::OuterBackCone::Glue",       {OuterGlueBackCone, 1} },
-       { "LAr::EMEC::Pos::OuterBackCone::Lead",       {OuterLeadBackCone, 1} },
-
-       { "LAr::EMEC::Neg::OuterBackCone::Absorber",   {OuterAbsorberBackCone, -1} },
-       { "LAr::EMEC::Neg::OuterBackCone::Electrode",  {OuterElectrodBackCone, -1} },
-       { "LAr::EMEC::Neg::OuterBackCone::Glue",       {OuterGlueBackCone, -1} },
-       { "LAr::EMEC::Neg::OuterBackCone::Lead",       {OuterLeadBackCone, -1} }
-
-};
 
 Geo2G4SolidFactory::Geo2G4SolidFactory()
 {
@@ -136,9 +64,14 @@ Geo2G4SolidFactory::Geo2G4SolidFactory()
 
 G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) const
 {
+#ifdef __APPLE__
+    const std::string extension=".dylib";
+#else
+    const std::string extension=".so";
+#endif
+
   G4VSolid* theSolid(nullptr);
 
-  static customSolidMap customSolids;
   static shapesMap sharedShapes;
   if(sharedShapes.find(geoShape)!=sharedShapes.end())
     return sharedShapes[geoShape];
@@ -543,79 +476,39 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
   // Custom Shapes (presently LAr shapes only)
   //
   // GeoUnidentifiedShape - LAr custom shape
-  else if(geoShape->typeID() == GeoUnidentifiedShape::getClassTypeID())
-  {
-      const GeoUnidentifiedShape* customShape = dynamic_cast<const GeoUnidentifiedShape*> (geoShape);
-      //std::cout<<" GeoModelG4, I found a GeoUnidentifiedShape with customShape->name()== " <<customShape->name()<<std::endl;
-      //const LArCustomShape* customShape = dynamic_cast<const LArCustomShape*> (geoShape);
-      if (nullptr==customShape) throw std::runtime_error("TypeID did not match cast for custom shape");
-      if (customShape->name()=="LArCustomShape")
-      {
-          std::string customName = customShape->asciiData();
-          customSolidMap::const_iterator it = customSolids.find(customName);
-          if(it!=customSolids.end())
-              theSolid = it->second;
-          else
-          {
-              theSolid = nullptr;
-  
-              if(customName.find("Slice") != std::string::npos){
-                  //const LArCustomShape* larShape = dynamic_cast<const LArCustomShape*> (customShape);
-                  theSolid = createLArWheelSliceSolid(customShape);
-              } else {
-                  theSolid = createLArWheelSolid(customName, s_lwsTypes.at(customName) ); // map.at throws std::out_of_range exception on unknown shape name
-              }
-              if ( nullptr == theSolid ) {
-                  std::string error = std::string("Can't create LArWheelSolid for name ") + customName + " in Geo2G4SolidFactory::Build";
-                  throw std::runtime_error(error);
-              }
-              if(theSolid != nullptr) customSolids[customName] = theSolid;
-              
-          }
-          
+  else if(geoShape->typeID() == GeoUnidentifiedShape::getClassTypeID()) {
+    static std::map<std::string, GeoVG4SolidPlugin *> pluginMap;
+    const GeoUnidentifiedShape* customShape = dynamic_cast<const GeoUnidentifiedShape*> (geoShape);
+    GeoVG4SolidPlugin *plugin=nullptr;
+    
+    auto p=pluginMap.find(customShape->name());
+    if (p!=pluginMap.end()) { // obtain previously created plugin.
+      plugin=(*p).second;
+    }
+    else {                   // make and store the new plugin.
+      static GeoG4SolidPluginLoader loader;
+      const std::string g4SolidPluginDir=getenv("G4SOLID_PLUGIN_DIR");
+      if (!g4SolidPluginDir.empty()) {
+	std::string pName=g4SolidPluginDir+"/lib"+customShape->name()+"Plugin"+extension;
+	plugin=loader.load(pName);
+	if (plugin) {
+	  pluginMap[customShape->name()]=plugin;
+	}
+	else {
+	  std::string error = std::string("Can't load") + customShape->name() + " in Geo2G4SolidFactory::Build\n";
+	  throw std::runtime_error(error);
+	}
       }
-      
+      else {
+	std::string error="Error loading G4Solid plugins: Did you set the environment variable G4SOLID_PLUGIN_DIR ?" ;
+	throw std::runtime_error(error);
+      }
     }
-  
-  //
-  // Catch All
-  //
-  else
-    {
-      std::cout << "Sorry this solid is not yet implemented... "<<std::endl;
-      std::cout << geoShape->type()<<std::endl;
-      std::cout << "You will have a core dump..."<<std::endl;
-      return nullptr;
+    if (plugin) {
+      // The so-created solid may be new or cached, this is at the discretion of the plugin
+      // implementer. A good implementer will share instances of shapes when possible. 
+      theSolid=plugin->newG4Solid(customShape);
     }
-
-  sharedShapes[geoShape] = theSolid;
+  }
   return theSolid;
-}
-//createLArWheelSolid
-G4VSolid* Geo2G4SolidFactory::createLArWheelSolid(const std::string& name, const LArWheelSolidDef_t & lwsdef) const { // LArWheelSolid_t wheelType, int zside
-        LArWheelSolid_t wheelType = lwsdef.first;
-        int zside = lwsdef.second;
-
-        LArWheelSolid * theLWS = new LArWheelSolid(name, wheelType, zside);
-
-        //LArWheelSolidDDProxy * theLWS_p = new LArWheelSolidDDProxy(theLWS);
-        // ownership is passed to detStore
-        //if ( detStore()->record(theLWS_p,  name).isFailure() ) {
-        //  std::cout<<"Can't store proxy for LArWheelSolid to the DetectorStore"<<std::endl;
-       //         delete theLWS_p;
-       //}
-        return theLWS;
-}
-
-G4VSolid* Geo2G4SolidFactory::createLArWheelSliceSolid(const GeoUnidentifiedShape* customShape) const
-{
-    LArWheelSliceSolid *theLWS = new LArWheelSliceSolid(customShape->asciiData() );
-
-    //LArWheelSolidDDProxy *theLWS_p = new LArWheelSolidDDProxy(theLWS);
-    // ownership is passed to detStore
-//    if(detStore()->record(theLWS_p, theLWS->GetName()).isFailure()){
-//        ATH_MSG_WARNING("Can't store proxy for LArWheelSolid to the DetectorStore");
-//        delete theLWS_p;
-//    }
-    return theLWS;
 }

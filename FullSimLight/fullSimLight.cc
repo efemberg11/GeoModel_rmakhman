@@ -44,6 +44,21 @@ void Help();
 
 int main(int argc, char** argv) {
 
+  // JFB if the G4 environment does not already set path to these variables, look for
+  // them in standard places. 
+  const std::string g4ShareDir=G4SHAREDIR;
+  setenv("G4NEUTRONHPDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4NDL4.6").c_str(),                0);
+  setenv("G4LEDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4EMLOW7.9.1").c_str(),                   0);
+  setenv("G4LEVELGAMMADATA",(g4ShareDir+"/Geant4-10.6.1/data/PhotonEvaporation5.5").c_str(),   0);
+  setenv("G4RADIOACTIVEDATA",(g4ShareDir+"/Geant4-10.6.1/data/RadioactiveDecay5.4").c_str(),   0);
+  setenv("G4PARTICLEXSDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4PARTICLEXS2.1").c_str(),        0);
+  setenv("G4PIIDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4PII1.3").c_str(),                      0);
+  setenv("G4REALSURFACEDATA",(g4ShareDir+"/Geant4-10.6.1/data/RealSurface2.1.1").c_str() ,     0);
+  setenv("G4SAIDXSDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4SAIDDATA2.0").c_str(),              0);
+  setenv("G4ABLADATA",(g4ShareDir+"/Geant4-10.6.1/data/G4ABLA3.1").c_str(),                    0);
+  setenv("G4INCLDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4INCL1.0").c_str(),                    0);
+  setenv("G4ENSDFSTATEDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4ENSDFSTATE2.2").c_str(),        0);
+  
     // Get input arguments
     GetInputArguments(argc, argv);
 

@@ -99,6 +99,8 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
 set(OUTPUT bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 
+add_definitions (-DG4SHAREDIR="${CMAKE_INSTALL_PREFIX}/share" )
+
 add_executable(fullSimLight fullSimLight.cc ${sources} ${headers})
 add_executable(gmclash geoModelClash.cc ${sources} ${headers})
 add_executable(gmmasscalc geoModelMassCalculator.cc ${sources} ${headers})

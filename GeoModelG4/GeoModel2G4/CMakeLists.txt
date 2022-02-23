@@ -36,7 +36,7 @@ add_definitions (-DG4SOLID_PLUGIN_DIR=${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LI
 add_library( GeoModel2G4 SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModel2G4
   PUBLIC  ${GEANT4_LIBRARIES}
-  PRIVATE GeoMaterial2G4 GeoSpecialShapes)
+  PRIVATE GeoMaterial2G4 )
 # Check if we are building FullSimLight individually,
 # or as a part of the main GeoModel.
 # In the first case, we link against the imported targets, which are taken

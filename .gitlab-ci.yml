@@ -539,7 +539,7 @@ build_light_docker:
 ## TAGS ##
 ##########
 after-tag-creation:
-  stage: step-pre
+  stage: step-A
   # only run on tags
   #only:
   #  - tags

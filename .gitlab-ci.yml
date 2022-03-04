@@ -540,8 +540,8 @@ build_light_docker:
 after-tag-creation:
   stage: step-A
   # only run on tags
-  only:
-    - tags
+  #only:
+  #  - tags
   # manual mode, for testing the script
   when: manual
   script:

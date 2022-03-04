@@ -533,3 +533,19 @@ build_light_docker:
     - ignore
   needs:
     - build_system_docker
+
+##########
+## TAGS ##
+##########
+after-tag-creation:
+  # only run on tags
+  only:
+    - tags
+  # manual mode, for testing the script
+  when: manual
+  script:
+    - TAG=$(curl -Ss --request GET "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags" | jq -r '.[0] | .name')
+    - test -z "$TAG" && echo "no tag found" && exit 1
+    - 'VERSION=$(sed -n -E "s#(^.*VERSION.*[\"])(.*)([\"].*)\$#\2#p" cmake/GeoModel-version.cmake)' # -E for extended regex on macOS, as -r on linux
+    - test -z "$VERSION" && echo "no version tag found" && exit 1
+

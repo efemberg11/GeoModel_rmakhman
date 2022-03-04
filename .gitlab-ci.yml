@@ -553,4 +553,6 @@ after-tag-creation:
     - 'echo "Latest GeoModel VERSION: ${VERSION}"'
     - test -z "$VERSION" && echo "no version found" && exit 1
     - 'echo "Latest TAG: ${TAG} -- Latest GeoModel VERSION: ${VERSION}"'
+    - test "$TAG" != "$VERSION" && echo "ERROR --> There is a TAG/VERSION mismatch" && exit 1
+    - echo "OK."
 

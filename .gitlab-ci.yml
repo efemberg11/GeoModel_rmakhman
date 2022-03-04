@@ -549,6 +549,6 @@ after-tag-creation:
     - 'echo "Latest TAG: ${TAG}"'
     - test -z "$TAG" && echo "no tag found" && exit 1
     - 'VERSION=$(sed -n -E "s#(^.*VERSION.*[\"])(.*)([\"].*)\$#\2#p" cmake/GeoModel-version.cmake)' # -E for extended regex on macOS, as -r on linux
-    - echo "Latest GeoModel VERSION: ${VERSION}"
+    - 'echo "Latest GeoModel VERSION: ${VERSION}"'
     - test -z "$VERSION" && echo "no version tag found" && exit 1
 

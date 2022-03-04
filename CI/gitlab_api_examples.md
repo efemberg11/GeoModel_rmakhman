@@ -1,5 +1,24 @@
 # GitLab API examples for GeoModel
 
+**NOTE:** Here below, `95156` is the ID of the GeoModel project on the CERN GitLab installation. You can find the ID of your project by looking at the main page of your GitLab repository, you'll find the ID under the name of the repository.
+
+**NOTE:** Being the GeoModel respoitory public, we don't need authorization. If your project is not public, you need to pass a variable in the header. Please [see this post](https://stackoverflow.com/a/59949488/320369) for an example.
+
+
+## Tags 
+
+### Get the list of tags 
+
+```
+curl "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags/"
+```
+
+### Get the name of the latest tag 
+
+```
+curl -Ss --request GET "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags" | jq -r '.[0] | .name'
+```
+
 ## Pipelines
 
 Given the GeoModel project ID: 95156, get all the latest pipelines:

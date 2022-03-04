@@ -1,5 +1,6 @@
 # List of the CI build stages.
 stages:
+  - step-pre
   - step-A
   - step-B
   - step-C
@@ -538,7 +539,7 @@ build_light_docker:
 ## TAGS ##
 ##########
 after-tag-creation:
-  stage: step-A
+  stage: step-pre
   # only run on tags
   #only:
   #  - tags
@@ -550,6 +551,6 @@ after-tag-creation:
     - test -z "$TAG" && echo "no tag found" && exit 1
     - 'VERSION=$(sed -n -E "s#(^.*GeoModel_VERSION.*[\"])(.*)([\"].*)\$#\2#p" cmake/GeoModel-version.cmake)' # -E for extended regex on macOS, as -r on linux
     - 'echo "Latest GeoModel VERSION: ${VERSION}"'
-    - echo "$VERSION" "--" "${VERSION}"
     - test -z "$VERSION" && echo "no version found" && exit 1
+    - 'echo "Latest TAG: ${TAG} -- Latest GeoModel VERSION: ${VERSION}"'
 

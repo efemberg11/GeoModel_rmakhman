@@ -547,8 +547,8 @@ after-tag-creation:
   script:
     - 'TAG=$(curl -Ss --request GET "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags" | jq -r ".[0] | .name")'
     - 'echo "Latest TAG: ${TAG}"'
-    - test -z "$TAG" && echo "no tag found" && exit 1
-    - 'VERSION=$(sed -n -E "s#(^.*VERSION.*[\"])(.*)([\"].*)\$#\2#p" cmake/GeoModel-version.cmake)' # -E for extended regex on macOS, as -r on linux
+    - test -z "$TAG" && echo "no tag found" && exit 21
+    - 'VERSION=$(sed -n -E "s#(^.*GeoModel_VERSION.*[\"])(.*)([\"].*)\$#\2#p" cmake/GeoModel-version.cmake)' # -E for extended regex on macOS, as -r on linux
     - 'echo "Latest GeoModel VERSION: ${VERSION}"'
-    - test -z "$VERSION" && echo "no version tag found" && exit 1
+    - test -z "$VERSION" && echo "no version tag found" && exit 22
 

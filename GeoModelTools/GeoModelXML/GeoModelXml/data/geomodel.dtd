@@ -65,7 +65,7 @@
     <!ELEMENT addindex EMPTY>
         <!ATTLIST addindex name ID #REQUIRED>
 
-  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep)+)>
+  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep|ellipticaltube|twistedtrap|torus)+)>
     <!-- All shapes allowed in GeoModel manual. Same name, parameters, parameter order, but always lower case -->
 
     <!ELEMENT box EMPTY>
@@ -179,6 +179,35 @@
                         xpoints     CDATA #REQUIRED
                         ypoints     CDATA #REQUIRED
                         zhalflength CDATA #REQUIRED>
+
+    <!ELEMENT ellipticaltube EMPTY>
+      <!ATTLIST ellipticaltube name        ID    #REQUIRED
+                               xhalflength CDATA #REQUIRED
+                               yhalflength CDATA #REQUIRED
+                               zhalflength CDATA #REQUIRED>
+  
+    <!ELEMENT twistedtrap EMPTY>
+      <!ATTLIST twistedtrap name        ID    #REQUIRED
+                            twist       CDATA #REQUIRED
+                            dz          CDATA #REQUIRED
+                            theta       CDATA #REQUIRED
+			    phi         CDATA #REQUIRED
+                            dy1         CDATA #REQUIRED
+                            dx1         CDATA #REQUIRED
+                            dx2         CDATA #REQUIRED
+                            dy2         CDATA #REQUIRED
+                            dx3         CDATA #REQUIRED
+                            dx4         CDATA #REQUIRED
+                            alpha       CDATA #REQUIRED>
+
+    <!ELEMENT torus EMPTY>
+      <!ATTLIST torus name ID    #REQUIRED
+                      rmin CDATA #REQUIRED
+                      rmax CDATA #REQUIRED
+                      rtor CDATA #REQUIRED
+                      sphi CDATA #REQUIRED
+                      dphi CDATA #REQUIRED>
+
 
   <!ELEMENT shaperef EMPTY>
     <!ATTLIST shaperef ref IDREF #REQUIRED>

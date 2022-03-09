@@ -213,10 +213,10 @@ mac-soqt:
   stage: step-B
 
 
-mac-gm-base:
+mac-gm:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-B
+  stage: step-A
 
 
 mac-gm-tools:

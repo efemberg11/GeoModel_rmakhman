@@ -40,10 +40,11 @@ sudo apt install geomodel-visualization-dev
 
 On macOS, we use the Homebrew package manager to handle and install the GeoModel packages. If you don't have Homebrew installed on your machine, you should install it by following the instructions on the Homebrew website: <http://brew.sh>.
 
+### First installation 
+
 At first, you add the dedicated Homebrew repository:
 
-
-```
+```shell
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
 brew update 
 ```
@@ -52,7 +53,7 @@ The first command will set the Homebrew repository (a *Tap*, in Homebrew jargon)
 
 Then, you install the pre-compiled GeoModel applications:
 
-```
+```shell
 brew install geomodel-visualization # to get gmex (the geometry explorer)
 brew install geomodel-fullsimlight  # to get fullsimlight, gm2gdml, gmclash, gmgeantino
 brew install geomodel-tools         # to get gmcat, gdml2gm
@@ -75,6 +76,49 @@ For older macOS releases, Homebrew will try to compile the packages from source.
 !!! tip
     
     If you experience problems in installing GeoModel packages with brew or using them, please try to clean your system from old packages or repositories. For that, please refer to the [Troubleshooting page](../dev/troubleshooting.md).
+
+
+### Update
+
+#### Quick instructions 
+
+As soon as you have followed the initial installation instructions above, you can update the GeoModel libraries and tools to the latest version simply by running the commands here below:
+
+```shell
+brew update
+brew upgrade geomodel geomodel-geomodeltools geomodel-visualization geomodel-geomodelg4 geomodel-fullsimlight
+```
+
+#### Some more details 
+
+After the first command, `brew update`, you get a summary of the updated repositories and recipes. If there are new versions of the GeoModel tools and libraries, you should see something like the output messages here below:
+
+```
+➜  ~ brew update
+Updated Homebrew from e13d04c1d to 784be839b.
+Updated 5 taps (homebrew/core, homebrew/cask, homebrew/bundle, homebrew/services and atlas/geomodel).
+...
+==> Updated Formulae
+...
+atlas/geomodel/geomodel                     fbthrift                                    libvdpau                                    sdcc
+atlas/geomodel/geomodel-fullsimlight        feroxbuster                                 lilv                                        serverless
+atlas/geomodel/geomodel-geomodelg4          fheroes2                                    localstack                                  snakemake
+atlas/geomodel/geomodel-tools               fizz                                        lua-language-server                         snort
+atlas/geomodel/geomodel-visualization
+...
+```
+
+You can now update the GeoModel recipes with `brew upgrade ...`. 
+
+Please notice that, if you get an error like the one below:
+
+```shell
+➜  ~ brew upgrade geomodel
+Error: atlas/geomodel/geomodel not installed
+```
+
+that means that, even if the GeoModel repository (`tap`) has been installed, at a certain point the `geomodel` Homebrew package has been removed (for example, to test other versions). Therefore, the `upgrade` command cannot work. You should re-install the package with `brew install geomodel`. The same with all the other GeoModel Homebrew packages.
+
 
 
 

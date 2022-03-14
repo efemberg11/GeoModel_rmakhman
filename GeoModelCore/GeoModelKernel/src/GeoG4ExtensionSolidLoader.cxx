@@ -1,18 +1,18 @@
-#include "GeoModelKernel/GeoG4SolidPluginLoader.h"
-#include "GeoModelKernel/GeoVG4SolidPlugin.h"
+#include "GeoModelKernel/GeoG4ExtensionSolidLoader.h"
+#include "GeoModelKernel/GeoVG4ExtensionSolid.h"
 #include <string>
 #include <iostream>
 #include <dlfcn.h>
 #include <libgen.h>
 
-GeoG4SolidPluginLoader::GeoG4SolidPluginLoader () {
+GeoG4ExtensionSolidLoader::GeoG4ExtensionSolidLoader () {
 }
 
-GeoG4SolidPluginLoader::~GeoG4SolidPluginLoader () {
+GeoG4ExtensionSolidLoader::~GeoG4ExtensionSolidLoader () {
 }
 
 
-GeoVG4SolidPlugin *GeoG4SolidPluginLoader::load(const std::string & pString) const {
+GeoVG4ExtensionSolid *GeoG4ExtensionSolidLoader::load(const std::string & pString) const {
   std::string bNameString=basename ((char *) pString.c_str());       // Strip off the directory
   bNameString=bNameString.substr(3);                        // Strip off leading "lib"
   bNameString=bNameString.substr(0,bNameString.find("."));  // Strip off extensions
@@ -43,7 +43,7 @@ GeoVG4SolidPlugin *GeoG4SolidPluginLoader::load(const std::string & pString) con
   //
   // 
   //
-  GeoVG4SolidPlugin * factory = (GeoVG4SolidPlugin *) F();
+  GeoVG4ExtensionSolid * factory = (GeoVG4ExtensionSolid *) F();
   return factory;
 
 }

@@ -38,23 +38,10 @@ int main(int argc, char** argv)
 		   setenv(variable, plus, true);
 		 }
 	       };
-  // Preprocessor:  we are passing the install directory to this
-  // class, from the CMake configuration.
-  // Drivers will be loaded from this install directory.
-  // However in some cases "linux" is part of the install directory
-  // name and that may be defined in a macro to be 1. So if that is
-  // the case we temporarily undef it.
-#ifdef linux
-#define waslinux linux
-#undef linux
-  const char * standardPlaces = GEOMODEL_INSTALL_PREFIX;
-#define linux waslinux
-#else
-  const char * standardPlaces = GEOMODEL_INSTALL_PREFIX;
-#endif
-  std::cout << "standardPlaces: " << standardPlaces << std::endl;
-  std::string gxpluginpath= std::string(standardPlaces)+"/lib/gxplugins";
+  
+  std::string gxpluginpath= GXPLUGINDIR;
   pManip("GXPLUGINPATH",gxpluginpath.c_str());
+  std::cout << "Plugins resolved in path: " << getenv("GXPLUGINPATH") << std::endl;
   QStringList arguments;
   for (int i = 0; i<=argc; i++){
     arguments << argv[i];

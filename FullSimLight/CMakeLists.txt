@@ -62,6 +62,7 @@ find_package(Pythia QUIET) # optional
 #
 #message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
 include(${Geant4_USE_FILE})
+add_definitions (-DG4VERSION="${Geant4_VERSION}" )
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -98,6 +99,8 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
 #
 set(OUTPUT bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
+
+add_definitions (-DG4SHAREDIR="${Geant4_INCLUDE_DIR}/../../share" )
 
 add_executable(fullSimLight fullSimLight.cc ${sources} ${headers})
 add_executable(gmclash geoModelClash.cc ${sources} ${headers})
@@ -226,6 +229,7 @@ foreach(_script ${FULLSIMLIGHT_SCRIPTS})
     COPYONLY
     )
 endforeach()
+
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin/' directory under the

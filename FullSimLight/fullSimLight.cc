@@ -32,6 +32,9 @@
 #include <iostream>
 #include <iomanip>
 
+#include <sys/types.h>
+#include <dirent.h>
+
 static bool         parIsPerformance   = false;
 static G4String     geometryFileName   ;
 static std::string  parMacroFileName   = "";
@@ -45,19 +48,41 @@ void Help();
 int main(int argc, char** argv) {
 
   // JFB if the G4 environment does not already set path to these variables, look for
-  // them in standard places. 
+  // them in standard places.
+  
+  auto dataSetEnv=[] (const std::string &dir, const std::string & dataSetEnvName, const std::string & dataset) {
+    DIR *directory = opendir(dir.c_str());
+    if (directory) {
+      dirent * entry = readdir(directory);
+      while (entry) {
+	std::string entryName=entry->d_name;
+	if (entryName.find(dataset)!=std::string::npos) {
+	  std::cout << dataSetEnvName << "=" << (dir+"/"+entryName) << std::endl; 
+	  setenv(dataSetEnvName.c_str(),(dir+"/"+entryName).c_str(),0);
+	}
+	entry=readdir(directory);
+      }
+      closedir(directory);
+    }
+    
+  };
+    
+  
   const std::string g4ShareDir=G4SHAREDIR;
-  setenv("G4NEUTRONHPDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4NDL4.6").c_str(),                0);
-  setenv("G4LEDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4EMLOW7.9.1").c_str(),                   0);
-  setenv("G4LEVELGAMMADATA",(g4ShareDir+"/Geant4-10.6.1/data/PhotonEvaporation5.5").c_str(),   0);
-  setenv("G4RADIOACTIVEDATA",(g4ShareDir+"/Geant4-10.6.1/data/RadioactiveDecay5.4").c_str(),   0);
-  setenv("G4PARTICLEXSDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4PARTICLEXS2.1").c_str(),        0);
-  setenv("G4PIIDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4PII1.3").c_str(),                      0);
-  setenv("G4REALSURFACEDATA",(g4ShareDir+"/Geant4-10.6.1/data/RealSurface2.1.1").c_str() ,     0);
-  setenv("G4SAIDXSDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4SAIDDATA2.0").c_str(),              0);
-  setenv("G4ABLADATA",(g4ShareDir+"/Geant4-10.6.1/data/G4ABLA3.1").c_str(),                    0);
-  setenv("G4INCLDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4INCL1.0").c_str(),                    0);
-  setenv("G4ENSDFSTATEDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4ENSDFSTATE2.2").c_str(),        0);
+  const std::string g4Version=G4VERSION;
+  const std::string searchDir=g4ShareDir+"/Geant4-"+g4Version+"/data";
+
+  dataSetEnv(searchDir,"G4NEUTRONHPDATA", "G4NDL");
+  dataSetEnv(searchDir,"G4LEDATA","G4EMLOW7");
+  dataSetEnv(searchDir,"G4LEVELGAMMADATA","PhotonEvaporation");
+  dataSetEnv(searchDir,"G4RADIOACTIVEDATA","RadioactiveDecay");
+  dataSetEnv(searchDir,"G4PARTICLEXSDATA","G4PARTICLEXS");
+  dataSetEnv(searchDir,"G4PIIDATA","G4PII");
+  dataSetEnv(searchDir,"G4REALSURFACEDATA","RealSurface");
+  dataSetEnv(searchDir,"G4SAIDXSDATA","G4SAIDDATA");
+  dataSetEnv(searchDir,"G4ABLADATA","G4ABLA");
+  dataSetEnv(searchDir,"G4INCLDATA","G4INCL");
+  dataSetEnv(searchDir,"G4ENSDFSTATEDATA","G4ENSDFSTATE");
   
     // Get input arguments
     GetInputArguments(argc, argv);

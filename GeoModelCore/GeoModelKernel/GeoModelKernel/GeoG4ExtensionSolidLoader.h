@@ -2,27 +2,27 @@
   Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef GEOG4SOLIDPLUGINLOADER_H_
-#define GEOG4SOLIDPLUGINLOADER_H_
+#ifndef GEOG4EXTENSIONSOLIDLOADER_H_
+#define GEOG4EXTENSIONSOLIDLOADER_H_
 #include <string> 
-class GeoVG4SolidPlugin;
-class GeoG4SolidPluginLoader 
+class GeoVG4ExtensionSolid;
+class GeoG4ExtensionSolidLoader 
 {
  public:
 
   // Constructor:
-  GeoG4SolidPluginLoader();
+  GeoG4ExtensionSolidLoader();
 
   // Destructor:
-  ~GeoG4SolidPluginLoader();
+  ~GeoG4ExtensionSolidLoader();
 
   // load G4Solid plugin
-  GeoVG4SolidPlugin *load(const std::string & path) const;
+  GeoVG4ExtensionSolid *load(const std::string & path) const;
   
  private:
   
-  GeoG4SolidPluginLoader(const GeoG4SolidPluginLoader &)=delete;
-  GeoG4SolidPluginLoader & operator=(const GeoG4SolidPluginLoader &)=delete;
+  GeoG4ExtensionSolidLoader(const GeoG4ExtensionSolidLoader &)=delete;
+  GeoG4ExtensionSolidLoader & operator=(const GeoG4ExtensionSolidLoader &)=delete;
 
 };
 

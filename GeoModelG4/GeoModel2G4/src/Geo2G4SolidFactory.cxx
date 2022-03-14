@@ -24,8 +24,8 @@
 #include "GeoModelKernel/GeoShapeIntersection.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
-#include "GeoModelKernel/GeoG4SolidPluginLoader.h"
-#include "GeoModelKernel/GeoVG4SolidPlugin.h"
+#include "GeoModelKernel/GeoG4ExtensionSolidLoader.h"
+#include "GeoModelKernel/GeoVG4ExtensionSolid.h"
 
 #include "G4VSolid.hh"
 #include "G4Box.hh"
@@ -480,32 +480,32 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
   //
   // GeoUnidentifiedShape - LAr custom shape
   else if(geoShape->typeID() == GeoUnidentifiedShape::getClassTypeID()) {
-    static std::map<std::string, GeoVG4SolidPlugin *> pluginMap;
+    static std::map<std::string, GeoVG4ExtensionSolid *> pluginMap;
     const GeoUnidentifiedShape* customShape = dynamic_cast<const GeoUnidentifiedShape*> (geoShape);
-    GeoVG4SolidPlugin *plugin=nullptr;
+    GeoVG4ExtensionSolid *plugin=nullptr;
     
     auto p=pluginMap.find(customShape->name());
     if (p!=pluginMap.end()) { // obtain previously created plugin.
       plugin=(*p).second;
     }
     else {                   // make and store the new plugin.
-      static GeoG4SolidPluginLoader loader;
+      static GeoG4ExtensionSolidLoader loader;
       std::string pName;
-      char * qName=getenv("G4SOLID_PLUGIN_DIR");
+      char * qName=getenv("G4EXTENSION_SOLID_DIR");
       if (qName) {
-	std::string g4SolidPluginDir=qName;
-	pName=g4SolidPluginDir+"/lib"+customShape->name()+"Plugin"+extension;
+	std::string g4ExtensionSolidDir=qName;
+	pName=g4ExtensionSolidDir+"/lib"+customShape->name()+"ExtensionSolid"+extension;
       }
       else {
-	std::string vName = STR_NAME(G4SOLID_PLUGIN_DIR);
-	pName = std::string(vName)+"/lib"+customShape->name()+"Plugin"+extension;
+	std::string vName = STR_NAME(G4EXTENSION_SOLID_DIR);
+	pName = std::string(vName)+"/lib"+customShape->name()+"ExtensionSolid"+extension;
       }
       plugin=loader.load(pName);
       if (plugin) {
 	pluginMap[customShape->name()]=plugin;
       }
       else {
-	std::cerr << "ERROR in Geo2G4SolidFactory. Cannot load G4VSolidPlugin " << pName << std::endl;
+	std::cerr << "ERROR in Geo2G4SolidFactory. Cannot load G4VExtensionSolid " << pName << std::endl;
 	std::cerr << "Did you set the G4SOLID_PLUGIN_DIR variable?" << std::endl;
 	throw std::runtime_error("Cannot load plugin");
       }

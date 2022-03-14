@@ -211,6 +211,8 @@ mac-soqt:
   <<: *macos-job
   <<: *soqt-job
   stage: step-B
+  needs: ["mac-coin"]
+
 
 
 mac-gm:

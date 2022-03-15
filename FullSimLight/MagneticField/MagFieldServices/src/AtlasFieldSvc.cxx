@@ -36,7 +36,7 @@
 //#include "TFile.h"
 //#include "TTree.h"
 
-#include "g4root.hh"
+#include "G4RootAnalysisReader.hh"
 
 /** Constructor **/
 MagField::AtlasFieldSvc::AtlasFieldSvc(bool isAscii) :
@@ -1262,7 +1262,7 @@ bool MagField::AtlasFieldSvc::readMapRoot (std::string filename)
 {
     
     // Create (or get) analysis reader
-    G4AnalysisReader* analysisReader = G4AnalysisReader::Instance();
+    G4RootAnalysisReader* analysisReader = G4RootAnalysisReader::Instance();
     analysisReader->SetVerboseLevel(-1);
     
     // Define a base file name

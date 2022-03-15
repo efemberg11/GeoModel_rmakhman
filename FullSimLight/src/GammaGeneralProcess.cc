@@ -325,7 +325,7 @@ void GammaGeneralProcess::BuildPhysicsTable(const G4ParticleDefinition& part)
       if (bld->GetFlag(i)) {
 
 //        G4int idx = (!baseMat) ? i : DensityIndex(i);
-       G4int idx = (*theDensityIdx)[i];
+	G4int idx = DensityIndex(i);
  	     const G4MaterialCutsCouple* couple =
 	     theCoupleTable->GetMaterialCutsCouple(i);
 	     const G4Material* material = couple->GetMaterial();
@@ -502,8 +502,8 @@ G4double GammaGeneralProcess::PostStepGetPhysicalInteractionLength(
   if(couple != currentCouple) {
     currentCouple = couple;
     currentCoupleIndex = couple->GetIndex();
-    basedCoupleIndex = (*theDensityIdx)[currentCoupleIndex];
-    factor = (*theDensityFactor)[currentCoupleIndex];
+    basedCoupleIndex = DensityIndex(currentCoupleIndex);
+    factor = DensityFactor(currentCoupleIndex);
     currentMaterial = couple->GetMaterial();
     recompute = true;
   }

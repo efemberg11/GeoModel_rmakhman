@@ -88,7 +88,7 @@
 
 #include "G4hIonisation.hh"
 #include "G4ionIonisation.hh"
-#include "G4alphaIonisation.hh"
+// JFB #include "G4alphaIonisation.hh"
 
 #include "G4ParticleTable.hh"
 #include "G4Gamma.hh"

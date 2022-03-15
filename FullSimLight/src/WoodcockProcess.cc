@@ -335,8 +335,8 @@ void WoodcockProcess::ComputeTotalMacrCrossSection(const G4MaterialCutsCouple* c
     currentCouple      = couple;
     currentCoupleIndex = couple->GetIndex();
     currentMaterial    = couple->GetMaterial();
-    basedCoupleIndex   = (*theDensityIdx)[currentCoupleIndex];
-    factor             =  (*theDensityFactor)[currentCoupleIndex];
+    basedCoupleIndex   = DensityIndex(currentCoupleIndex);
+    factor             = DensityFactor(currentCoupleIndex);
     isRecompute = true;
   }
   if (energy != preStepKinEnergy) {

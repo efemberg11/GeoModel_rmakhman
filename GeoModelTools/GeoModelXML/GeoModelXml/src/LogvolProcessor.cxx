@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -10,6 +10,14 @@
 //   Process children and get list of things to be added to the physvol.
 //   Add them to the physvol.
 //
+//
+// Updates:
+// - 2022/02, Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+//            * Removed the automatic cration of a GeoNameTag for each volume, to save memory
+//            * Added support for the GeoNameTag node
+//
+
+
 #include "GeoModelXml/LogvolProcessor.h"
 #include "OutputDirector.h"
 
@@ -32,19 +40,69 @@
 using namespace std;
 using namespace xercesc;
 
+//class GeoSerialDenominator;
+//class GeoSerialTransformer;
+//class GeoSerialIdentifier;
+
+std::string getNodeType(const GeoGraphNode* node) {
+    if ( dynamic_cast<const GeoPhysVol*>(node) )
+        return "GeoPhysVol";
+    if ( dynamic_cast<const GeoFullPhysVol*>(node) )
+        return "GeoFullPhysVol";
+    if ( dynamic_cast<const GeoIdentifierTag*>(node) )
+        return "GeoIdentifierTag";
+    if ( dynamic_cast<const GeoNameTag*>(node) )
+        return "GeoNameTag";
+    if ( dynamic_cast<const GeoLogVol*>(node) )
+        return "GeoLogVol";
+    if ( dynamic_cast<const GeoShape*>(node) )
+        return "GeoShape";
+    if ( dynamic_cast<const GeoMaterial*>(node) )
+        return "GeoMaterial";
+    //if ( dynamic_cast<const GeoSerialDenominator*>(node) )
+        //return "GeoSerialDenominator";
+    //if ( dynamic_cast<const GeoSerialIdentifier*>(node) )
+        //return "GeoSerialIdentifier";
+    //if ( dynamic_cast<const GeoSerialTransformer*>(node) )
+        //return "GeoSerialTransformer";
+    if ( dynamic_cast<const GeoTransform*>(node) )
+        return "GeoTransform";
+    return "UnidentifiedNode";
+}
+
 void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
   GeoLogVol *lv;
-  GeoNameTag *physVolName;
+  GeoNameTag *nameTag_physVolName;
 
   gmxUtil.positionIndex.incrementLevel();
 
+  // get the name of the LogVol
   XMLCh * name_tmp = XMLString::transcode("name");
   char *name2release = XMLString::transcode(element->getAttribute(name_tmp));
   string name(name2release);
   XMLString::release(&name2release);
   XMLString::release(&name_tmp);
+  std::cout << "LogVol name: " << name << std::endl; 
 
-//
+  // get the value for the "named" option,
+  // to add a GeoNameTag to the tree if "true"
+  XMLCh * named_tmp = XMLString::transcode("named");
+  char *toRelease2 = XMLString::transcode(element->getAttribute(named_tmp));
+  string named(toRelease2);
+  XMLString::release(&toRelease2);
+  XMLString::release(&named_tmp);
+  bool isNamed = bool(named.compare(string("true")) == 0);
+  
+  // get the value for the "identifier" option,
+  // to add a GeoIdentifierTag to the tree if "true"
+  XMLCh * id_tmp = XMLString::transcode("identifier");
+  char *toRelease3 = XMLString::transcode(element->getAttribute(id_tmp));
+  string idStr(toRelease3);
+  XMLString::release(&toRelease3);
+  XMLString::release(&id_tmp);
+  bool hasIdentifier = bool(idStr.compare(string("true")) == 0);
+
+  //
 
   XMLCh * envelope_tmp = XMLString::transcode("envelope");
   char *env = XMLString::transcode(element->getAttribute(envelope_tmp));
@@ -57,13 +115,15 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
 //
   map<string, LogVolStore>::iterator entry;
   if ((entry = m_map.find(name)) == m_map.end()) { // Not in registry; make a new item
-    //
+//
 //    Name
 //
     m_map[name] = LogVolStore();
     LogVolStore *store = &m_map[name];
-    physVolName = new GeoNameTag(name);
-    store->name = physVolName;
+    if(isNamed) {
+        nameTag_physVolName = new GeoNameTag(name);
+        store->name = nameTag_physVolName;
+    }
     store->id = 0;
 //
 //    Get the shape.
@@ -75,12 +135,12 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     // Check it is a shape... its parent should be a <shapes>. DTD cannot do this for us.
     DOMNode *parent = refShape->getParentNode();
     if (XMLString::compareIString(parent->getNodeName(), XMLString::transcode("shapes")) != 0) {
-      char* shape_s = XMLString::transcode (shape);
-      msglog << MSG::FATAL << "Processing logvol " << name <<
-	". Error in gmx file. An IDREF for a logvol shape did not refer to a shape.\n" <<
-	"Shape ref was " << shape_s << "; exiting" << endmsg;
-      XMLString::release (&shape_s);
-      std::abort();
+        char* shape_s = XMLString::transcode (shape);
+        msglog << MSG::FATAL << "Processing logvol " << name <<
+            ". Error in gmx file. An IDREF for a logvol shape did not refer to a shape.\n" <<
+            "Shape ref was " << shape_s << "; exiting" << endmsg;
+        XMLString::release (&shape_s);
+        std::abort();
     }
 //
 //    What sort of shape?
@@ -90,7 +150,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     XMLString::release(&name2release);
     XMLString::release(&shape_tmp);
 
-    const GeoShape *s = static_cast<const GeoShape *>(gmxUtil.geoItemRegistry.find(shapeType)->process(refShape, gmxUtil));
+    const GeoShape *shGeo = static_cast<const GeoShape *>(gmxUtil.geoItemRegistry.find(shapeType)->process(refShape, gmxUtil));
 //
 //    Get the material
 //
@@ -101,42 +161,45 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     parent = refMaterial->getParentNode();
     XMLCh * materials_tmp = XMLString::transcode("materials");
     if (XMLString::compareIString(parent->getNodeName(), materials_tmp) != 0) {
-      char* material_s = XMLString::transcode (material);
-      msglog << MSG::FATAL << "Processing logvol " << name <<
-	". Error in gmx file. An IDREF for a logvol material did not refer to a material.\n" <<
-	"Material ref was " << material_s << "; exiting" << endmsg;
-      XMLString::release (&material_s);
-      std::abort();
+        char* material_s = XMLString::transcode (material);
+        msglog << MSG::FATAL << "Processing logvol " << name <<
+            ". Error in gmx file. An IDREF for a logvol material did not refer to a material.\n" <<
+            "Material ref was " << material_s << "; exiting" << endmsg;
+        XMLString::release (&material_s);
+        std::abort();
     }
     std::string nam_mat=XMLString::transcode(material);
 
-    const GeoMaterial* m=nullptr;
+    const GeoMaterial* matGeo = nullptr;
 
     if (gmxUtil.matManager)
     {
-      if (!gmxUtil.matManager->isMaterialDefined(nam_mat))
-      {
-        GeoMaterial* tempMat=static_cast<GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
-        // we let GMX create the material and store it in the MM
+        if (!gmxUtil.matManager->isMaterialDefined(nam_mat))
+        {
+            GeoMaterial* tempMat=static_cast<GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
+            // we let GMX create the material and store it in the MM
 
-        gmxUtil.matManager->addMaterial(tempMat);
-      }
-      m=gmxUtil.matManager->getMaterial(nam_mat);
+            gmxUtil.matManager->addMaterial(tempMat);
+        }
+        matGeo = gmxUtil.matManager->getMaterial(nam_mat);
     }
-    else
-      m=static_cast<const GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
-
+    else {
+        matGeo = static_cast<const GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
+    }
 //
 //    Make the LogVol and add it to the map ready for next time
 //
-    lv = new GeoLogVol(name, s, m);
+    lv = new GeoLogVol(name, shGeo, matGeo);
     store->logVol = lv;
 
-	  XMLString::release(&material_tmp);
-	  XMLString::release(&materials_tmp);
+    XMLString::release(&material_tmp);
+    XMLString::release(&materials_tmp);
   }
   else { // Already in the registry; use it.
-    physVolName = entry->second.name;
+    msglog << MSG::DEBUG << "LogVol w/ name '" << name << "' already present, picking it from cache..." << endmsg;
+    if(isNamed) {
+        nameTag_physVolName = entry->second.name;
+    }
     lv = entry->second.logVol;
   }
 
@@ -144,6 +207,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
 //
 //    Process the logvol children (side effect: sets formulae for indexes before calculating them)
 //
+// RMB: Note -- here the code looks for "children of the LogVol" but this is not true: they are PhysVol children. In fact, they are later added to the newly created PhysVol... needs to be clearified/updated
   GeoNodeList childrenAdd;
   for (DOMNode *child = element->getFirstChild(); child != 0; child = child->getNextSibling()) {
     if (child->getNodeType() == DOMNode::ELEMENT_NODE) {
@@ -157,7 +221,10 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
 //
 //   Make a list of things to be added
 //
-  toAdd.push_back(physVolName);
+  if(isNamed) {
+      toAdd.push_back(nameTag_physVolName);
+  }
+
   XMLCh * sensitive_tmp = XMLString::transcode("sensitive");
   bool sensitive = element->hasAttribute(sensitive_tmp);
   int sensId = 0;
@@ -168,23 +235,32 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
     gmxUtil.positionIndex.indices(index, gmxUtil.eval);
     sensId = gmxUtil.gmxInterface()->sensorId(index);
-    //        toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
-    toAdd.push_back(new GeoIdentifierTag(sensId));
+    if(hasIdentifier) { //TODO: check if all "sensitive" volumes must have an identifier. If that's the case, then we can remove this "if" here
+        //        toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
+        toAdd.push_back(new GeoIdentifierTag(sensId));
+    }
   }
   else {
-    toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
-    gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
+      if(hasIdentifier) {
+          toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
+          gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
+      }
   }
   XMLString::release(&sensitive_tmp);
   //
-  //    Make a new PhysVol and add everything to it, then add it to the list of things for my caller to add
+  //    Make a new PhysVol/FullPhysVol and add everything to it, then add it to the list of things for my caller to add
   //
+  
+  // get the value for the "alignable" option
   XMLCh * alignable_tmp = XMLString::transcode("alignable");
   char *toRelease = XMLString::transcode(element->getAttribute(alignable_tmp));
   string alignable(toRelease);
   XMLString::release(&toRelease);
   XMLString::release(&alignable_tmp);
+  
+
   if (sensitive || (alignable.compare(string("true")) == 0)) {
+    msglog << MSG::DEBUG << "Handling a FullPhysVol (alignable or sensitive) ..." << endmsg;
     GeoFullPhysVol *pv = new GeoFullPhysVol(lv);
     if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
     for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
@@ -220,11 +296,15 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     }
   }
   else {
+    msglog << MSG::DEBUG << "Handling a standard PhysVol..." << endmsg;
     GeoPhysVol *pv = new GeoPhysVol(lv);
     if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
+    msglog << MSG::DEBUG << "Now, looping over all the children of the LogVol (in the GMX meaning)..." << endmsg; 
     for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
       pv->add(*node);
+      msglog << MSG::DEBUG << "LVProc, PV child: " << *node << " -- " << getNodeType(*node) << endmsg;
     }
+    msglog << MSG::DEBUG << "End of loop over children." << endmsg;
     toAdd.push_back(pv);
   }
 
@@ -248,3 +328,5 @@ void LogvolProcessor::zeroId(const xercesc::DOMElement *element) {
   }
   /* else: Not an error: it is usually just about to be made with id = 0; no action needed. */
 }
+
+

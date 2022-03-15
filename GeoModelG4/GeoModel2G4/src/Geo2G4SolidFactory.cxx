@@ -506,7 +506,7 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
       }
       else {
 	std::cerr << "ERROR in Geo2G4SolidFactory. Cannot load G4VExtensionSolid " << pName << std::endl;
-	std::cerr << "Did you set the G4SOLID_PLUGIN_DIR variable?" << std::endl;
+	std::cerr << "Did you set the G4EXTENSION_SOLID_DIR variable?" << std::endl;
 	throw std::runtime_error("Cannot load plugin");
       }
     }

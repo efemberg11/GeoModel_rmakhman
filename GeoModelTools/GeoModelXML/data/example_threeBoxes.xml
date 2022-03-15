@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE geomodel SYSTEM "geomodel.dtd" [
+
+<!-- include the file where the materials are defined -->
+<!ENTITY materials SYSTEM "materials.gmx" >
+
+]>
+
+<geomodel name="ITk_Example" version="1.0"
+  xmlns="http://www.nikhef.nl/%7Er29/gmx">
+
+  <!-- Definition of materials -->
+  <!-- Load materials -->
+  &materials;
+
+  <!-- Definition of shapes -->
+<shapes>
+    <box name="BoxShape" xhalflength="50" yhalflength="50"
+        zhalflength="50"/>
+    <box name="BigBox" xhalflength="1000" yhalflength="1000"
+        zhalflength="1000"/>
+</shapes>
+
+<!--We define the child logvol-->
+<logvol name="SingleBox" shape="BoxShape" material="Air" alignable="false" named="false" identifier="true"/>
+
+
+<logvol name="MotherVolume" shape="BigBox" material="Air" alignable="false" named="true" identifier="false">
+    <transform>
+        <transformation name="negTransf">
+            <translation z="-500"/>
+        </transformation>
+        <logvolref ref="SingleBox"/>
+    </transform>
+    <logvolref ref="SingleBox"/>
+    <transform>
+        <transformation name="posTransf">
+            <translation z="+500"/>
+        </transformation>
+        <logvolref ref="SingleBox"/>
+    </transform>
+</logvol>
+
+<!-- Adding volume branches -->
+  <addbranch>
+      <logvolref ref="MotherVolume" />
+  </addbranch>
+
+
+</geomodel>

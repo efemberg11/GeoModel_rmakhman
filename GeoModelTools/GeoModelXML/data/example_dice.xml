@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE geomodel SYSTEM "geomodel.dtd" [
+
+<!-- include the file where the materials are defined -->
+<!ENTITY materials SYSTEM "materials.gmx" >
+
+]>
+
+<geomodel name="ITk_Example" version="1.0"
+  xmlns="http://www.nikhef.nl/%7Er29/gmx">
+
+  <!-- Definition of materials -->
+  <!-- Load materials -->
+  &materials;
+
+  <!-- Definition of variables -->
+  <defines>
+    <var name="TubeInnerRadius" value="0" />
+    <var name="TubeOuterRadius" value="600." />
+    <var name="TubeHalfLength"  value="1200." />
+  </defines>
+
+  <!-- Definition of shapes -->
+<shapes>
+    <box name="BoxShape" xhalflength="50."
+        yhalflength="70." zhalflength="90."/>
+    <box name="Cube" xhalflength="5." yhalflength="5." zhalflength="5."/>
+    <tube name="Tube" rmin="0" rmax="1." zhalflength="10."/>
+    <subtraction name="DiceForANecklace">
+        <shaperef ref="Cube"/>
+        <transformation name="Rotate45Deg">
+            <rotation xcos="sqrt(2) / 2" ycos="sqrt(2) / 2" angle="PI/4"/>
+        </transformation>
+        <shaperef ref="Tube"/>
+    </subtraction>
+</shapes>
+
+  <!-- Defining logical volumes -->
+    <!--TODO: this gives errors from the Evaluator, apparently...-->
+    <logvol name="MyTube" shape="DiceForANecklace" material="N2" /> 
+
+  <assembly name="DisplacedTube" >
+    <transform>
+      <transformation name="negativeShift">
+        <translation z="-3000."/>
+      </transformation>
+      <logvolref ref="MyTube"/>
+    </transform>
+  </assembly>
+
+
+
+  <!-- Adding volume branches -->
+  <addbranch>
+      <assemblyref ref="DisplacedTube" />
+  </addbranch>
+
+</geomodel>

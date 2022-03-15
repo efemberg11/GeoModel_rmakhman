@@ -281,7 +281,6 @@
 
     G4String fNuDetectorName;
 
-    G4EmMessenger* theMessenger;
     G4int verbose;
   };
 

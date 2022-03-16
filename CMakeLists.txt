@@ -55,6 +55,7 @@ option(GEOMODEL_BUILD_VISUALIZATION "Enable the build of GeoModelVisualization" 
 option(GEOMODEL_BUILD_GEOMODELG4 "Enable the build of GeoModelG4" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT "Enable the build of FullSimLight" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING "Enable FullSimLight profiling targets" OFF)
+option(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION "Build the LArCustomSolidExtension" OFF)
 
 if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
   set(GEOMODEL_BUILD_FULLSIMLIGHT ON CACHE BOOL "Enable the build of FullSimLight" FORCE)
@@ -73,7 +74,7 @@ list( APPEND BUILT_PACKAGES "GeoModelIO")
 if(GEOMODEL_BUILD_ALL)
     set(GEOMODEL_BUILD_TOOLS         TRUE)
     set(GEOMODEL_BUILD_VISUALIZATION TRUE)
-    set(GEOMODEL_BUILD_FULLSIMLIGHT  TRUE) 
+    set(GEOMODEL_BUILD_FULLSIMLIGHT  TRUE)
 endif()
 
 if(GEOMODEL_BUILD_TOOLS)
@@ -95,6 +96,11 @@ if(GEOMODEL_BUILD_FULLSIMLIGHT)
   set(GEOMODEL_BUILD_GEOMODELG4 TRUE) # FullSimLight needs GeoModelG4
   add_subdirectory(FullSimLight)
   list( APPEND BUILT_PACKAGES "FullSimLight")
+endif()
+
+if(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION)
+  add_subdirectory(LarCustomSolidExtension)
+  list( APPEND BUILT_PACKAGES "LarCustomSolidExtension")
 endif()
 
 if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)

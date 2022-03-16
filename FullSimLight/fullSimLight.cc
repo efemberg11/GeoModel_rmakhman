@@ -1,4 +1,3 @@
-
 //--------------------------------------------------------
 // fullSimLight application: 17 September 2019 (README)
 //--------------------------------------------------------
@@ -73,7 +72,7 @@ int main(int argc, char** argv) {
   const std::string searchDir=g4ShareDir+"/Geant4-"+g4Version+"/data";
 
   dataSetEnv(searchDir,"G4NEUTRONHPDATA", "G4NDL");
-  dataSetEnv(searchDir,"G4LEDATA","G4EMLOW7");
+  dataSetEnv(searchDir,"G4LEDATA","G4EMLOW");
   dataSetEnv(searchDir,"G4LEVELGAMMADATA","PhotonEvaporation");
   dataSetEnv(searchDir,"G4RADIOACTIVEDATA","RadioactiveDecay");
   dataSetEnv(searchDir,"G4PARTICLEXSDATA","G4PARTICLEXS");

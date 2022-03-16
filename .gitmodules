@@ -1,0 +1,3 @@
+[submodule "FullSimLight/LArCustomSolidExtension"]
+	path = FullSimLight/LArCustomSolidExtension
+	url = https://gitlab.cern.ch/SolidExtensions/LArCustomSolidExtension

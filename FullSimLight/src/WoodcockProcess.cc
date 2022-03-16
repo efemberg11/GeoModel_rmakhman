@@ -1,5 +1,6 @@
 #include "WoodcockProcess.hh"
 
+#include "G4Version.hh"
 #include "G4Region.hh"
 #include "G4VSolid.hh"
 #include "G4RegionStore.hh"

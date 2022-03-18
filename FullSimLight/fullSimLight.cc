@@ -34,9 +34,10 @@
 #include <sys/types.h>
 #include <dirent.h>
 
+static const std::string fullSimLightShareDir=FULLSIMLIGHTSHAREDIR;
+static std::string  parMacroFileName   = fullSimLightShareDir+"/macro.g4";
 static bool         parIsPerformance   = false;
 static G4String     geometryFileName   ;
-static std::string  parMacroFileName   = "";
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
 
@@ -50,20 +51,24 @@ int main(int argc, char** argv) {
   // them in standard places.
   
   auto dataSetEnv=[] (const std::string &dir, const std::string & dataSetEnvName, const std::string & dataset) {
-    DIR *directory = opendir(dir.c_str());
-    if (directory) {
-      dirent * entry = readdir(directory);
-      while (entry) {
-	std::string entryName=entry->d_name;
-	if (entryName.find(dataset)!=std::string::npos) {
-	  std::cout << dataSetEnvName << "=" << (dir+"/"+entryName) << std::endl; 
-	  setenv(dataSetEnvName.c_str(),(dir+"/"+entryName).c_str(),0);
-	}
-	entry=readdir(directory);
-      }
-      closedir(directory);
+    if (getenv(dataSetEnvName.c_str())) {
+      std::cout << dataSetEnvName << "=" << getenv(dataSetEnvName.c_str()) << std::endl; 
     }
-    
+    else {
+      DIR *directory = opendir(dir.c_str());
+      if (directory) {
+	dirent * entry = readdir(directory);
+	while (entry) {
+	  std::string entryName=entry->d_name;
+	  if (entryName.find(dataset)!=std::string::npos) {
+	    std::cout << dataSetEnvName << "=" << (dir+"/"+entryName) << std::endl; 
+	    setenv(dataSetEnvName.c_str(),(dir+"/"+entryName).c_str(),0);
+	  }
+	  entry=readdir(directory);
+	}
+	closedir(directory);
+      }
+    }
   };
     
   
@@ -177,6 +182,7 @@ int main(int argc, char** argv) {
     G4String command = "/control/execute ";
     UI->ApplyCommand(command+parMacroFileName);
 
+    //
     // Print out the final random number
     G4cout << G4endl
            << " ================================================================= " << G4endl
@@ -196,8 +202,8 @@ int main(int argc, char** argv) {
 }
 
 static struct option options[] = {
-    {"macro file               "  , required_argument, 0, 'm'},
     {"physics list name        "  , required_argument, 0, 'f'},
+    {"macro file               "  , required_argument, 0, 'm'},
     {"performance flag         "  , no_argument      , 0, 'p'},
     {"geometry file name       "  , required_argument, 0, 'g'},
     {"pythia primary generator "  , required_argument, 0, 'P'},
@@ -212,8 +218,8 @@ void Help() {
   G4cout <<"  FullSimLight Geant4 application.    \n"
             << std::endl
             <<"  **** Parameters: \n\n"
-            <<"      -m :   REQUIRED : the standard Geant4 macro file name \n"
             <<"      -g :   REQUIRED : the Geometry file name \n"
+            <<"      -m :   the standard Geant4 macro file name \n"
             <<"      -o :   flag  ==> run the geometry overlap check (default: FALSE)\n"
             <<"      -f :   physics list name (default: FTFP_BERT) \n"
             <<"      -P :   use Pythia primary generator [config. available: ttbar/higgs/minbias or use a Pythia command input file]\n"

@@ -101,6 +101,7 @@ set(OUTPUT bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 
 add_definitions (-DG4SHAREDIR="${Geant4_INCLUDE_DIR}/../../share" )
+add_definitions (-DFULLSIMLIGHTSHAREDIR="${CMAKE_INSTALL_PREFIX}/share/FullSimLight" )
 
 add_executable(fullSimLight fullSimLight.cc ${sources} ${headers})
 add_executable(gmclash geoModelClash.cc ${sources} ${headers})

@@ -31,7 +31,7 @@
 using namespace std;
 using namespace xercesc;
 
-Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager, const processorList& procs) {
+Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager, std::string levelMapName, const processorList& procs) {
 //
 //    Create the xml tree (DOMDocument)
 //
@@ -92,7 +92,7 @@ Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoPhysVol *addHere, GmxInterface &gmxIn
 //
 //    Add all index names
 //
-    doPositionIndex(doc, gmxUtil);
+    doPositionIndex(doc, gmxUtil, levelMapName);
 //
 //   The xml file ends with an addbranch element. We start there, process it, 
 //   and it fills in the list of things to be added to the GeoModel graph. 
@@ -262,7 +262,7 @@ const DOMElement *element;
     return 1;
 }
 
-int Gmx2Geo::doPositionIndex(xercesc::DOMDocument *doc, GmxUtil &gmxUtil) {
+int Gmx2Geo::doPositionIndex(xercesc::DOMDocument *doc, GmxUtil &gmxUtil, std::string levelMapName) {
     XMLCh * positionindex_tmp = XMLString::transcode("positionindex");
     XMLCh * addindex_tmp = XMLString::transcode("addindex");
     XMLCh * name_tmp = XMLString::transcode("name");
@@ -277,6 +277,7 @@ int Gmx2Geo::doPositionIndex(xercesc::DOMDocument *doc, GmxUtil &gmxUtil) {
             DOMElement *addindex = dynamic_cast<DOMElement*>(addindexs->item(j));
             string name = string(XMLString::transcode(addindex->getAttribute(name_tmp)));
             gmxUtil.positionIndex.addIndex(name);
+            if(levelMapName!="") gmxUtil.positionIndex.setLevelMapName(levelMapName);
         }
     }
     XMLString::release(&positionindex_tmp);

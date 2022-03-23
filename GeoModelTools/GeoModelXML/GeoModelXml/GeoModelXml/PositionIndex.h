@@ -41,6 +41,11 @@ public:
 
     void indices(std::map<std::string, int> &index, GeoModelTools::IEvaluator &eval);
 
+    void addToLevelMap(std::string name, int level);
+    void printLevelMap();
+    void setLevelMapName(std::string filename);
+    std::string getLevelMapName();
+
 private:
     int m_level;
     std::vector <int> m_copyNo; // Size is always m_level+1
@@ -48,5 +53,7 @@ private:
  */
     std::vector <std::string> m_name;
     std::map <std::string, std::string> m_formula;
+    std::map <std::string, int> m_levelMap;
+    std::string m_mapName;
 };
 #endif // POSITIONINDEX_H

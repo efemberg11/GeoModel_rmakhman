@@ -4,6 +4,8 @@
 //--------------------------------------------------------
 
 #include "G4Version.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 #include "Randomize.hh"
 #include "MyDetectorConstruction.hh"
 
@@ -15,6 +17,7 @@
 G4bool   gmclash_verbose    =false;
 static G4String geometryFileName   ;
 static G4String reportFileName     = "gmclash_report.json";
+G4double tolerance=0.0;
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -28,6 +31,7 @@ int main(int argc, char** argv) {
     << " ===================  Running GeoModelClash =================== "    << G4endl
     << "   Geometry file name               =  " << geometryFileName         << G4endl
     << "   Output clashes report file name  =  " << reportFileName           << G4endl
+    << "   Tolerance threshold value        =  " << G4BestUnit(tolerance, "Length")<< G4endl
     << "   Verbose output                   =  " << gmclash_verbose          << G4endl
     << " ============================================================== "    << G4endl;
     
@@ -67,6 +71,7 @@ int main(int argc, char** argv) {
     detector->SetGeometryFileName (geometryFileName);
     detector->SetReportFileName (reportFileName);
     detector->SetGMClashVerbosity(gmclash_verbose);
+    detector->SetTolerance(tolerance);
     detector->Construct();
     
     delete detector;
@@ -77,6 +82,7 @@ static struct option options[] = {
     {"geometry file name              "  , required_argument, 0, 'g'},
     {"output clashes report file name "  , required_argument, 0, 'o'},
     {"verbose output "                   , no_argument      , 0, 'v'},
+    {"tolerance threshold value "        , required_argument, 0, 't'},
     {"help"                              , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
 };
@@ -89,6 +95,7 @@ void Help() {
             <<"  **** Parameters: \n\n"
             <<"      -g :   [MANDATORY] the Geometry file name [.db/.gdml/.dylib/.so] \n"
             <<"      -o :   [OPTIONAL] clashes report file name (default: gmclash_report)\n"
+            <<"      -t :   [OPTIONAL] tolerance threshold value in mm (default: 0)\n"
             <<"      -v :   [OPTIONAL] verbose output (default: off)\n"
             << std::endl;
   std::cout <<"\nUsage: ./gmclash [OPTIONS]\n" <<std::endl;
@@ -109,7 +116,7 @@ void GetInputArguments(int argc, char** argv) {
  }
  while (true) {
    int c, optidx = 0;
-   c = getopt_long(argc, argv, "g:o:vh", options, &optidx);
+   c = getopt_long(argc, argv, "g:o:t:vh", options, &optidx);
    if (c == -1)
      break;
    //
@@ -126,6 +133,9 @@ void GetInputArguments(int argc, char** argv) {
    case 'v':
      gmclash_verbose = true;
      break;
+  case 't':
+  tolerance = atof(optarg)*mm;
+  break;
    case 'h':
      Help();
      exit(0);

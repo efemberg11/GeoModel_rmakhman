@@ -239,6 +239,7 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
   fFieldValue          = 0.0;
   fVerbosityFlag       = -1;
   fGmclashVerbosity    = false;
+  fTolerance           = 0.0;
   fFieldConstant       = false;
   fDetectorMessenger   = new MyDetectorMessenger(this);
   fRunOverlapCheck     = false;
@@ -683,7 +684,7 @@ void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope,s
                 RecursivelyCheckOverlap(daughter->GetLogicalVolume(), jlist);
         //std::cout<<"Starting Overlaps check on daughter: "<<daughter->GetName()<<std::endl;
         //std::cout<<"... "<<sampleNo<<std::endl;
-        myCheckOverlaps(daughter, jlist);
+        myCheckOverlaps(daughter, jlist, 1000, fTolerance, 1);
     }
 }
 

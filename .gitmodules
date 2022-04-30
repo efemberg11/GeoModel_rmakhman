@@ -1,0 +1,3 @@
+[submodule "LArCustomSolidExtension"]
+	path = LArCustomSolidExtension
+	url = https://gitlab.cern.ch/SolidExtensions/LArCustomSolidExtension

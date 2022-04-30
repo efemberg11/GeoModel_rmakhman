@@ -48,6 +48,7 @@ public slots:
   void showClashPoint2(bool);
   void showClashPoint3(bool);
   void showClashPoint4(bool);
+  void setPointSize(int);
   
 private:
   class Imp;

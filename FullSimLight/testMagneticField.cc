@@ -17,7 +17,9 @@
 #include "Randomize.hh"
 #include "G4Version.hh"
 
-#if G4VERSION_NUMBER>=1060
+#if G4VERSION_NUMBER>=1101
+#include "G4AnalysisManager.hh"
+#elif G4VERSION_NUMBER>=1060
 #include "g4analysis.hh"
 #else
 #include "g4analysis_defs.hh"
@@ -160,7 +162,7 @@ int main(int argc, char** argv) {
     }
     
     G4String root_fileName = baseName + ".root";
-#if G4VERSION_NUMBER>=1060
+#if G4VERSION_NUMBER>=1060 && G4VERSION_NUMBER<1101
     G4AnalysisManager *analysisManager = G4Analysis::ManagerInstance("root");
 #else
     auto *analysisManager = G4AnalysisManager::Instance();

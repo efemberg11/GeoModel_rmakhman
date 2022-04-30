@@ -58,14 +58,14 @@ class IEvaluator;
 
 class Gmx2Geo {
 public:
-    Gmx2Geo(const std::string& gmxFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0,const processorList& procs=processorList());
+    Gmx2Geo(const std::string& gmxFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0, std::string levelMapName = "", const processorList& procs=processorList());
 private:
 // Disallow copying
     Gmx2Geo(const Gmx2Geo &right);
     Gmx2Geo & operator=(const Gmx2Geo &right);
 
     int doDefines(xercesc::DOMDocument *doc, GeoModelTools::IEvaluator &eval);
-    int doPositionIndex(xercesc::DOMDocument *doc, GmxUtil &gmxUtil);
+    int doPositionIndex(xercesc::DOMDocument *doc, GmxUtil &gmxUtil, std::string levelMapName = "");
     int doReadoutGeometry(xercesc::DOMDocument *doc, GmxUtil &gmxUtil);
     void addParam(xercesc::DOMNode *node, std::map<std::string, std::string> &params);
 };

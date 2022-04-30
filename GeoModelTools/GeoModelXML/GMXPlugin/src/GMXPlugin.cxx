@@ -102,6 +102,8 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
 	std::cout<<"matman set to "<<matman<<std::endl;
   }
 
+  char* levelmaps=getenv("GMX_DUMP_LEVEL_MAPS");
+
   for (auto f: filesToParse)
   {
     if (!exists(f)) {
@@ -110,7 +112,13 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
    	return;
     }
     GmxInterface gmxInterface;
-    Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , matman);
+    if (levelmaps!=nullptr){
+        std::string mapname = f.substr(0, f.length() - 4);
+        mapname+="_levelMap.txt";
+        std::cout<<"Dumping Copy Number Level Map to "<<mapname<<std::endl;
+        Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , matman, mapname);
+    }
+    else Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , matman);
   }
 
   if (matman) MaterialManager::getManager()->printAll();

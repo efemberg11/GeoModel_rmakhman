@@ -32,7 +32,17 @@ brew install cmake eigen doxygen wget boost xerces-c nlohmann-json sqlite
 
 # if you want to build the visualization tools as well, please install and configure Qt5
 brew install qt5
+```
+Then, add the path to your shell, by running the command below, depending on your macOS machine:
+
+* Intel chip:
+```
 echo 'export PATH="/usr/local/opt/qt@5/bin:$PATH"' >> ~/.zshrc
+```
+
+* Apple M1 (ARM64) chip:
+```
+echo 'export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"' >> ~/.zshrc
 ```
 
 !!! note 

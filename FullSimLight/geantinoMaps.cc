@@ -82,15 +82,23 @@ int main(int argc, char** argv) {
         return 1;
     }
     
-    // JFB: Check that the macro file exists and is readable:
-    if (!getenv("G4ENSDFSTATEDATA")) {
-        G4cout << G4endl;
-        G4cout << "INFO: It appears that your Geant4 environment is not set up" << G4endl;
-        G4cout << "INFO: Please source the script geant4.sh" << G4endl;
-        G4cout << "INFO: Possible locations: /usr/bin or /usr/local/bin" << G4endl;
-        G4cout << "INFO: Exiting" <<G4endl;
-        return 1;
-    }
+    // JFB. In case the user has not set up the pointers to G4 data files, look for them
+    // in standard directories.
+
+    const std::string g4ShareDir=G4SHAREDIR;
+  setenv("G4NEUTRONHPDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4NDL4.6").c_str(),                0);
+  setenv("G4LEDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4EMLOW7.9.1").c_str(),                   0);
+  setenv("G4LEVELGAMMADATA",(g4ShareDir+"/Geant4-10.6.1/data/PhotonEvaporation5.5").c_str(),   0);
+  setenv("G4RADIOACTIVEDATA",(g4ShareDir+"/Geant4-10.6.1/data/RadioactiveDecay5.4").c_str(),   0);
+  setenv("G4PARTICLEXSDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4PARTICLEXS2.1").c_str(),        0);
+  setenv("G4PIIDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4PII1.3").c_str(),                      0);
+  setenv("G4REALSURFACEDATA",(g4ShareDir+"/Geant4-10.6.1/data/RealSurface2.1.1").c_str() ,     0);
+  setenv("G4SAIDXSDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4SAIDDATA2.0").c_str(),              0);
+  setenv("G4ABLADATA",(g4ShareDir+"/Geant4-10.6.1/data/G4ABLA3.1").c_str(),                    0);
+  setenv("G4INCLDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4INCL1.0").c_str(),                    0);
+  setenv("G4ENSDFSTATEDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4ENSDFSTATE2.2").c_str(),        0);
+  
+    
     //#if G4VERSION_NUMBER>=1040
     //    std::cout<<"G4VERSION_NUMBER:::: "<<G4VERSION_NUMBER<<std::endl;
     //    exit(1);

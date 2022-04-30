@@ -39,6 +39,7 @@ GeoNameTag *physVolName;
     XMLCh * name_tmp = XMLString::transcode("name");
     char *name2release = XMLString::transcode(element->getAttribute(name_tmp));
     string name(name2release);
+    gmxUtil.positionIndex.addToLevelMap(name,gmxUtil.positionIndex.level());
     XMLString::release(&name2release);
     XMLString::release(&name_tmp);
 //

@@ -6,6 +6,7 @@
 #include "OutputDirector.h"
 #include <vector>
 #include <string>
+#include <fstream>
 #include "ExpressionEvaluator/IEvaluator.h"
 #include "GeoModelXml/PositionIndex.h"
 
@@ -13,6 +14,8 @@ using namespace std;
 
 PositionIndex::PositionIndex() {
     m_level = -1; // Level -1 represents the "world" with no Copy Number
+    m_levelMap.clear();
+    m_mapName = "";
 }
 
 PositionIndex::~PositionIndex() {}
@@ -112,3 +115,31 @@ void PositionIndex::indices(map<string, int> &index, GeoModelTools::IEvaluator &
         eval.setVariable(name.c_str(), (double) index[name]);
     }
 }
+
+ void PositionIndex::addToLevelMap(std::string name,int level){
+     m_levelMap[name]=level;
+ }
+
+void PositionIndex::setLevelMapName(std::string name){
+    m_mapName = name;
+}
+
+std::string PositionIndex::getLevelMapName(){
+    return m_mapName;
+}
+
+void PositionIndex::printLevelMap(){
+if(m_mapName!=""){
+    std::ofstream outfile(m_mapName);
+    outfile<<"----------CNL Map----------\n\n";
+    for (auto const& entry: m_levelMap){
+        outfile<<"Item: "<<entry.first<<"   Level: CNL_"<<entry.second<<"   last copyNumber at Level:"<<m_copyNo[entry.second]<<"\n";
+    }
+    outfile<<"\n\n";
+    outfile.close();
+}
+//otherwise, do nothing
+}
+
+
+

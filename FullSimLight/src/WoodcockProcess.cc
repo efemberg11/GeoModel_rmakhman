@@ -1,5 +1,6 @@
 #include "WoodcockProcess.hh"
 
+#include "G4Version.hh"
 #include "G4Region.hh"
 #include "G4VSolid.hh"
 #include "G4RegionStore.hh"
@@ -335,8 +336,13 @@ void WoodcockProcess::ComputeTotalMacrCrossSection(const G4MaterialCutsCouple* c
     currentCouple      = couple;
     currentCoupleIndex = couple->GetIndex();
     currentMaterial    = couple->GetMaterial();
+#if G4VERSION_NUMBER>=1100
+    basedCoupleIndex   = DensityIndex(currentCoupleIndex);
+    factor             = DensityFactor(currentCoupleIndex);
+#else
     basedCoupleIndex   = (*theDensityIdx)[currentCoupleIndex];
-    factor             =  (*theDensityFactor)[currentCoupleIndex];
+    factor             = (*theDensityFactor)[currentCoupleIndex];
+#endif
     isRecompute = true;
   }
   if (energy != preStepKinEnergy) {

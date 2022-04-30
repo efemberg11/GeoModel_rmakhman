@@ -51,6 +51,7 @@ public:
   void SetMaterial(const G4String &material) { fMaterial = material; }
   void SetReportFileName(const G4String &reportFileName)     { fReportFileName = reportFileName; }
   void SetGMClashVerbosity(const G4bool flag)     { fGmclashVerbosity = flag; }
+  void SetTolerance (const G4double tolerance){fTolerance=tolerance;}
   void SetOutputGDMLFileName(const G4String &outputGDMLFileName)     { fOutputGDMLFileName = outputGDMLFileName; }
   void SetDumpGDML(const bool dumpGDML)              {fDumpGDML=dumpGDML;}
   /// Common method to construct a driver with a stepper of requested type.
@@ -66,6 +67,7 @@ public:
   }
 
   static G4double GetFieldValue() { return gFieldValue; }
+  G4double GetTolerance (){return fTolerance;}
 
   void RecursiveMassCalculation (G4VPhysicalVolume* worldg4,GeoPhysVol* worldgeoModel, std::vector<json>& jlist);
 
@@ -123,6 +125,7 @@ private:
   G4double fFieldValue;
   G4bool   fFieldConstant;
   G4bool   fGmclashVerbosity;
+  G4double fTolerance; //tolerance value for gmclash
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;
   MyDetectorMessenger *fDetectorMessenger;

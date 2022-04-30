@@ -2,11 +2,11 @@
   Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef GEOMODELKERNEL_GEOVG4SOLIDPLUGIN_H
-#define GEOMODELKERNEL_GEOVG4SOLIDPLUGIN_H
+#ifndef GEOMODELKERNEL_GEOVG4EXTENSIONSOLID_H
+#define GEOMODELKERNEL_GEOVG4EXTENSIONSOLID_H
 
 /**
- * @class: GeoVG4SolidPlugin
+ * @class: GeoVG4ExtensionSolid
  *
  * @brief Abstact Base Class for a G4Solid plugin.
  *	  The G4Solid plugin builds the raw G4Solid
@@ -14,14 +14,14 @@
 
 class G4VSolid;
 class GeoUnidentifiedShape;
-class GeoVG4SolidPlugin 
+class GeoVG4ExtensionSolid 
 {
  public:
 
    //! Default constructor.
-   GeoVG4SolidPlugin() {}
+   GeoVG4ExtensionSolid() {}
      
-   virtual ~GeoVG4SolidPlugin() {}
+   virtual ~GeoVG4ExtensionSolid() {}
 
    //! Create the specified solid. .
    virtual G4VSolid *newG4Solid(const GeoUnidentifiedShape *shape) const=0;
@@ -29,8 +29,8 @@ class GeoVG4SolidPlugin
  private:
 
   // Illegal operations
-  GeoVG4SolidPlugin(const GeoVG4SolidPlugin &right)=delete;
-  GeoVG4SolidPlugin & operator=(const GeoVG4SolidPlugin &right)=delete;
+  GeoVG4ExtensionSolid(const GeoVG4ExtensionSolid &right)=delete;
+  GeoVG4ExtensionSolid & operator=(const GeoVG4ExtensionSolid &right)=delete;
 
 };
 

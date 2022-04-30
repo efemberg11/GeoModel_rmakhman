@@ -57,7 +57,7 @@ public:
   SoSwitch                * switch1;
   SoSwitch                * switch2;
   SoSwitch                * switch3;
-
+  SoDrawStyle             * drawStyle;
 
     static SbColor4f color4f(const QColor& col) {
     return SbColor4f(std::max<float>(0.0f,std::min<float>(1.0f,col.redF())),
@@ -148,9 +148,10 @@ void GXClashPointSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   pickStyle->style=SoPickStyle::UNPICKABLE;
   root->addChild(pickStyle);
 
-  SoDrawStyle *drawStyle=new SoDrawStyle;
-  drawStyle->pointSize.setValue(3);
-  root->addChild(drawStyle);
+  m_d->drawStyle=new SoDrawStyle;
+
+  m_d->drawStyle->pointSize.setValue(3);
+  root->addChild(m_d->drawStyle);
 
   SoSeparator *s0=new SoSeparator;
   SoSeparator *s1=new SoSeparator;
@@ -198,9 +199,11 @@ void GXClashPointSystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
   connect(m_d->controller,SIGNAL(showClashPoints2Changed(bool)),this,SLOT(showClashPoint2(bool)));
   connect(m_d->controller,SIGNAL(showClashPoints3Changed(bool)),this,SLOT(showClashPoint3(bool)));
   connect(m_d->controller,SIGNAL(showClashPoints4Changed(bool)),this,SLOT(showClashPoint4(bool)));
-
+  connect(m_d->controller,SIGNAL(setPointSizeChanged(int)), this, SLOT(setPointSize(int)));
 }
 
+
+    
 //_____________________________________________________________________________________
 void GXClashPointSystem::systemuncreate()
 {
@@ -274,7 +277,11 @@ void GXClashPointSystem::selectInputFile() {
 
 }
 
+void GXClashPointSystem::setPointSize(int size) {
+  m_d->drawStyle->pointSize.setValue(size);
+}
 
+ 
 void GXClashPointSystem::showClashPoint1(bool flag) {
   m_d->switch0->whichChild=flag ? SO_SWITCH_ALL:SO_SWITCH_NONE;
 }

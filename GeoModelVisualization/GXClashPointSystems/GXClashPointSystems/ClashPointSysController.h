@@ -39,13 +39,15 @@ public:
   bool showClashPoints2() const;
   bool showClashPoints3() const;
   bool showClashPoints4() const;
-
+  int  setPointSize() const;
+  
 signals:
   
   void showClashPoints1Changed(bool);
   void showClashPoints2Changed(bool);
   void showClashPoints3Changed(bool);
   void showClashPoints4Changed(bool);
+  void setPointSizeChanged(int);
   void inputFileChanged();
 
 private:
@@ -58,7 +60,7 @@ private slots:
   void possibleChange_showClashPoints2();
   void possibleChange_showClashPoints3();
   void possibleChange_showClashPoints4();
-
+  void possibleChange_setPointSize();
   
 };
 

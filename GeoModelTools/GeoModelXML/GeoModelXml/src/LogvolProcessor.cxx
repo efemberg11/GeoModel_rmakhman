@@ -84,8 +84,8 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   XMLString::release(&name_tmp);
   std::cout << "LogVol name: " << name << std::endl; 
 
-  // get the value for the "named" option,
-  // to add a GeoNameTag to the tree if "true"
+  // get the value for the "named" option;
+  // if "true", add a GeoNameTag to the GeoModel tree
   XMLCh * named_tmp = XMLString::transcode("named");
   char *toRelease2 = XMLString::transcode(element->getAttribute(named_tmp));
   string named(toRelease2);
@@ -93,8 +93,8 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   XMLString::release(&named_tmp);
   bool isNamed = bool(named.compare(string("true")) == 0);
   
-  // get the value for the "identifier" option,
-  // to add a GeoIdentifierTag to the tree if "true"
+  // get the value for the "identifier" option;
+  // if "true", add a GeoIdentifierTag to the GeoModel tree
   XMLCh * id_tmp = XMLString::transcode("identifier");
   char *toRelease3 = XMLString::transcode(element->getAttribute(id_tmp));
   string idStr(toRelease3);
@@ -215,6 +215,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
       name2release = XMLString::transcode(el->getNodeName());
       string name(name2release);
       XMLString::release(&name2release);
+      msglog << MSG::DEBUG << "Processing child: '" << name << "'..." << endmsg;
       gmxUtil.processorRegistry.find(name)->process(el, gmxUtil, childrenAdd);
     }
   }
@@ -260,7 +261,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   
 
   if (sensitive || (alignable.compare(string("true")) == 0)) {
-    msglog << MSG::DEBUG << "Handling a FullPhysVol (alignable or sensitive) ..." << endmsg;
+    msglog << MSG::DEBUG << "Handling a FullPhysVol (i.e., an 'alignable' or 'sensitive' volume) ..." << endmsg;
     GeoFullPhysVol *pv = new GeoFullPhysVol(lv);
     if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
     for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {

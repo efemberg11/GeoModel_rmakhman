@@ -1,20 +1,20 @@
 
-#ifndef MySteppingAction_h
-#define MySteppingAction_h 1
+#ifndef FSLSteppingAction_h
+#define FSLSteppingAction_h 1
 
 #include "globals.hh"
 #include "G4UserSteppingAction.hh"
 
-class MyEventAction;
+class FSLEventAction;
 class G4Step;
 class G4Region;
 
-class MySteppingAction : public G4UserSteppingAction {
+class FSLSteppingAction : public G4UserSteppingAction {
 
 public:
 
-  MySteppingAction(MyEventAction*);
- ~MySteppingAction() override;
+  FSLSteppingAction(FSLEventAction*);
+ ~FSLSteppingAction() override;
 
   void UserSteppingAction(const G4Step*) override;
 
@@ -22,7 +22,7 @@ public:
 
 private:
 
-  MyEventAction*   fEventAction;
+  FSLEventAction*   fEventAction;
   G4Region*        fScoringRegion;
 
 };

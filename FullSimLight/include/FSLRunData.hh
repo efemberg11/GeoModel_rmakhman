@@ -1,19 +1,19 @@
 
-#ifndef MyRunData_h
-#define MyRunData_h 1
+#ifndef FSLRunData_h
+#define FSLRunData_h 1
 
 #include "globals.hh"
 
-class MyRunData {
+class FSLRunData {
 
 public:
 
-   MyRunData();
-  ~MyRunData();
+   FSLRunData();
+  ~FSLRunData();
 
   void Clear();
 
-  MyRunData& operator+=(const MyRunData& other);
+  FSLRunData& operator+=(const FSLRunData& other);
 
   G4double fEdep;           // sum of energy deposit (per event)
   G4double fEdep2;          // sum of energy deposit square

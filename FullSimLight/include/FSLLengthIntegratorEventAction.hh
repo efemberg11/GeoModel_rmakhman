@@ -2,8 +2,8 @@
   Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef G4UserActions_MyLengthIntegratorEventAction_H
-#define G4UserActions_MyLengthIntegratorEventAction_H
+#ifndef G4UserActions_FSLLengthIntegratorEventAction_H
+#define G4UserActions_FSLLengthIntegratorEventAction_H
 
 //#include "GaudiKernel/ITHistSvc.h"
 //#include "GaudiKernel/ServiceHandle.h"
@@ -14,8 +14,8 @@
 #include "G4UserEventAction.hh"
 #include "G4UserSteppingAction.hh"
 
-#include "MyLengthIntegratorSteppingAction.hh"
-#include "MyRunAction.hh"
+#include "FSLLengthIntegratorSteppingAction.hh"
+#include "FSLRunAction.hh"
 #include "GeantinoMapsConfigurator.hh"
 
 #include <string>
@@ -29,7 +29,7 @@
 namespace G4UA
 {
 
-  /// @class MyLengthIntegratorEventAction
+  /// @class FSLLengthIntegratorEventAction
   /// @brief A user action used to evaluate thickness of all detectors
   ///        traversed by outgoing particles.
   ///
@@ -42,15 +42,15 @@ namespace G4UA
   /// that each instance has its own copy of the histograms which get merged in
   /// finalization of the LengthIntegratorTool.
   ///
-  class MyLengthIntegratorEventAction final : public G4UserEventAction
+  class FSLLengthIntegratorEventAction final : public G4UserEventAction
   {
 
     public:
 
       /// Constructor takes the name of the histogram service as argument.
-      MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction*, MyRunAction* run);
+      FSLLengthIntegratorEventAction(FSLLengthIntegratorSteppingAction*, FSLRunAction* run);
       /// Destructor
-      ~MyLengthIntegratorEventAction();
+      ~FSLLengthIntegratorEventAction();
 
       /// Called at beginning of G4 event to cache some details about the
       /// current primary vertex and particle. Also resets some measurements.
@@ -60,11 +60,11 @@ namespace G4UA
       virtual void EndOfEventAction(const G4Event*) override;
       
       /// Pointer to the RunAction
-      MyRunAction*  m_run;
+      FSLRunAction*  m_run;
 
     private:
-      /// Pointer to MyLengthIntegratorSteppingAction
-      MyLengthIntegratorSteppingAction* m_stepAct;
+      /// Pointer to FSLLengthIntegratorSteppingAction
+      FSLLengthIntegratorSteppingAction* m_stepAct;
       GeantinoMapsConfigurator* fGeantinoMapsConfig;
       
 //      /// Setup one set of measurement hists for a detector name - ROOT
@@ -100,7 +100,7 @@ namespace G4UA
       std::map<std::string, G4int> m_phiMapIL_g4;
       
 
-  }; // class MyLengthIntegratorEventAction
+  }; // class FSLLengthIntegratorEventAction
 
 } // namespace G4UA
 

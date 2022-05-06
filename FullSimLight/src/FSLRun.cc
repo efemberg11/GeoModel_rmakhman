@@ -1,22 +1,22 @@
 
-#include "MyRun.hh"
+#include "FSLRun.hh"
 
-#include "MyEventData.hh"
+#include "FSLEventData.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4Region.hh"
 
 #include <iomanip>
 
 
-MyRun::MyRun() : G4Run(), fScoringRegion(nullptr) {
+FSLRun::FSLRun() : G4Run(), fScoringRegion(nullptr) {
   fRunData.Clear();
   fRunDataSpecialRegion.Clear();
 }
 
 
-MyRun::~MyRun() {}
+FSLRun::~FSLRun() {}
 
-void MyRun::FillPerEvent(const MyEventData& data, G4bool isspecial) {
+void FSLRun::FillPerEvent(const FSLEventData& data, G4bool isspecial) {
   if (!isspecial) {
     AddData(data, fRunData);
   } else {
@@ -25,7 +25,7 @@ void MyRun::FillPerEvent(const MyEventData& data, G4bool isspecial) {
 }
 
 
-void MyRun::AddData(const MyEventData& data, MyRunData& runData) {
+void FSLRun::AddData(const FSLEventData& data, FSLRunData& runData) {
   runData.fEdep        += data.fEdep;         runData.fEdep2        += data.fEdep*data.fEdep;
   runData.fTrackLCh    += data.fTrackLCh;     runData.fTrackLCh2    += data.fTrackLCh*data.fTrackLCh;
   runData.fTrackLNe    += data.fTrackLNe;     runData.fTrackLNe2    += data.fTrackLNe*data.fTrackLNe;
@@ -36,8 +36,8 @@ void MyRun::AddData(const MyEventData& data, MyRunData& runData) {
   runData.fNPosit      += data.fNPosit;       runData.fNPosit2      += data.fNPosit*data.fNPosit;
 }
 
-void MyRun::Merge(const G4Run* run) {
-  const MyRun* localRun = static_cast<const MyRun*>(run);
+void FSLRun::Merge(const G4Run* run) {
+  const FSLRun* localRun = static_cast<const FSLRun*>(run);
   if (localRun) {
     fRunData += localRun->GetRunData(false);
     fRunDataSpecialRegion += localRun->GetRunData(true);
@@ -46,7 +46,7 @@ void MyRun::Merge(const G4Run* run) {
 }
 
 
-void MyRun::EndOfRun() {
+void FSLRun::EndOfRun() {
   const G4int  numEvents  = GetNumberOfEvent();
   //
   std::ios::fmtflags mode = G4cout.flags();
@@ -77,7 +77,7 @@ void MyRun::EndOfRun() {
   G4cout.precision(prec);
 }
 
-void MyRun::PrintEndOfRunStat(MyRunData& runData, G4double norm) {
+void FSLRun::PrintEndOfRunStat(FSLRunData& runData, G4double norm) {
   //compute and print statistic
   const G4double meanEdep   = runData.fEdep*norm;
   const G4double rmsEdep    = std::sqrt(std::abs(runData.fEdep2*norm-meanEdep*meanEdep));

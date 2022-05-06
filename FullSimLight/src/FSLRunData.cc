@@ -1,16 +1,16 @@
 
-#include "MyRunData.hh"
+#include "FSLRunData.hh"
 
 
-MyRunData::MyRunData() {
+FSLRunData::FSLRunData() {
   Clear();
 }
 
 
-MyRunData::~MyRunData() {}
+FSLRunData::~FSLRunData() {}
 
 
-void MyRunData::Clear() {
+void FSLRunData::Clear() {
   fEdep         = 0.;
   fEdep2        = 0.;
   fTrackLCh     = 0.;
@@ -32,7 +32,7 @@ void MyRunData::Clear() {
 }
 
 
-MyRunData& MyRunData::operator+=(const MyRunData& right) {
+FSLRunData& FSLRunData::operator+=(const FSLRunData& right) {
   fEdep         += right.fEdep;
   fEdep2        += right.fEdep2;
   fTrackLCh     += right.fTrackLCh;

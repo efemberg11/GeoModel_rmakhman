@@ -1,26 +1,26 @@
 
-#ifndef MyPrimaryGeneratorMessenger_h
-#define MyPrimaryGeneratorMessenger_h 1
+#ifndef FSLPrimaryGeneratorMessenger_h
+#define FSLPrimaryGeneratorMessenger_h 1
 
 #include "G4UImessenger.hh"
 #include "globals.hh"
 
-class MyPrimaryGeneratorAction;
+class FSLPrimaryGeneratorAction;
 class G4UIdirectory;
 class G4UIcmdWithAnInteger;
 class G4UIcmdWithAString;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWith3Vector;
 
-class MyPrimaryGeneratorMessenger : public G4UImessenger {
+class FSLPrimaryGeneratorMessenger : public G4UImessenger {
 public:
-  MyPrimaryGeneratorMessenger(MyPrimaryGeneratorAction* gun);
- ~MyPrimaryGeneratorMessenger();
+  FSLPrimaryGeneratorMessenger(FSLPrimaryGeneratorAction* gun);
+ ~FSLPrimaryGeneratorMessenger();
 
   virtual void SetNewValue(G4UIcommand*, G4String);
 
 private:
- MyPrimaryGeneratorAction*  fTheGun;
+ FSLPrimaryGeneratorAction*  fTheGun;
 
  G4UIdirectory*             fGunDirectory;
  G4UIcmdWithAnInteger*      fNumPrimaryPerEvtCmd;

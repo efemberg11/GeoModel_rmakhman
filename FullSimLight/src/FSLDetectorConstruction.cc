@@ -1,4 +1,4 @@
-#include "MyDetectorConstruction.hh"
+#include FSLDetectorConstruction.hh"
 
 #include <iomanip>
 
@@ -15,7 +15,7 @@
 #include "G4RunManager.hh"
 #include "G4PVPlacement.hh"
 
-#include "MyDetectorMessenger.hh"
+#include "FSLDetectorMessenger.hh"
 #include "RegionConfigurator.hh"
 
 // Geant4 steppers
@@ -76,7 +76,7 @@
 
 #include "GeoModelKernel/GeoVolumeCursor.h"
 
-G4AnalysisManager* MyDetectorConstruction::fAnalysisManager = nullptr;
+G4AnalysisManager* FSLDetectorConstruction::fAnalysisManager = nullptr;
 
 namespace clashdet {
     enum typeOfClash{ withMother=0, withSister, fullyEncapsSister, invalidSolid};
@@ -232,16 +232,16 @@ double inclusiveMass(const PVConstLink& pv) {
 
 
 
-G4double MyDetectorConstruction::gFieldValue = 0.0;
+G4double FSLDetectorConstruction::gFieldValue = 0.0;
 
-MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
+FSLDetectorConstruction::FSLDetectorConstruction() : fWorld(nullptr), fDetectorMessenger(nullptr)
 {
   fFieldValue          = 0.0;
   fVerbosityFlag       = -1;
   fGmclashVerbosity    = false;
   fTolerance           = 0.0;
   fFieldConstant       = false;
-  fDetectorMessenger   = new MyDetectorMessenger(this);
+  fDetectorMessenger   = new FSLDetectorMessenger(this);
   fRunOverlapCheck     = false;
   fRunMassCalculator   = false;
   fAddRegions          = false;
@@ -253,12 +253,12 @@ MyDetectorConstruction::MyDetectorConstruction() : fWorld(nullptr), fDetectorMes
 
 }
 
-MyDetectorConstruction::~MyDetectorConstruction()
+FSLDetectorConstruction::~FSLDetectorConstruction()
 {
   delete fDetectorMessenger;
 }
 
-void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep){
+void FSLDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep){
 
     double tmpInclusive,tmpExclusive;
 
@@ -295,7 +295,7 @@ void MyDetectorConstruction::calculateMass(G4LogicalVolume* logVol, G4VPhysicalV
 
 }
 
-void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix, G4String material){
+void FSLDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix, G4String material){
 
     int nDaughters = logVolume->GetNoDaughters();
     //std::cout<<"Total n. of Daughters of "<<logVolume->GetName()<<" is : "<<nDaughters<<std::endl;
@@ -362,7 +362,7 @@ void MyDetectorConstruction::iterateFromWorldMass(G4LogicalVolume* logVolume, st
 
 }
 
-bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume* volume, G4ThreeVector& local){
+bool FSLDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume* volume, G4ThreeVector& local){
 
     int localNoDaughters = envelope->GetNoDaughters();
     //std::cout<<"Total n. of Daughters of "<<envelope->GetName()<<" is : "<<localNoDaughters<<std::endl;
@@ -440,7 +440,7 @@ bool MyDetectorConstruction::iterateFromWorld(G4LogicalVolume* envelope, G4VPhys
     return true;
 }
 
-G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool skipFirstIt){
+G4ThreeVector FSLDetectorConstruction::localToGlobal(G4ThreeVector& local, bool skipFirstIt){
 
     if (fGmclashVerbosity){
         std::cout<<"Converting coordinates from Local to Global: "<<std::endl;
@@ -481,7 +481,7 @@ G4ThreeVector MyDetectorConstruction::localToGlobal(G4ThreeVector& local, bool s
     return globalPoint;
 }
 
-void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoPhysVol* /*worldgeoModel*/, std::vector<json>& jlist){
+void FSLDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoPhysVol* /*worldgeoModel*/, std::vector<json>& jlist){
 
     masscalc::massReport singleMassReport;
     json jSingleMassReport;
@@ -558,9 +558,9 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
 //            //NB exclusive mass concept in GeoModel is different than the Geant4 one
 //            //So do not expect that the exclusive masses of the 2 calculations are the same
 //            if (!fGeometryFileName.contains(".gdml")){
-//                const PVConstLink mypv = worldgeoModel->getChildVol(n);
-//                inclusiveMassGeoModel+= inclusiveMass(mypv); //real mass of the whole volume, including the real masses of the daughters
-//                //exclusiveMassGeoModel+= exclusiveMass(mypv); //mass of the whole volume, as it would not have daughters
+//                const PVConstLink FSLpv = worldgeoModel->getChildVol(n);
+//                inclusiveMassGeoModel+= inclusiveMass(FSLpv); //real mass of the whole volume, including the real masses of the daughters
+//                //exclusiveMassGeoModel+= exclusiveMass(FSLpv); //mass of the whole volume, as it would not have daughters
 //
 //            }
 
@@ -673,7 +673,7 @@ void MyDetectorConstruction::RecursiveMassCalculation (G4VPhysicalVolume* worldg
 
 }
 
-void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope,std::vector<json>& jlist){
+void FSLDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope,std::vector<json>& jlist){
 
     int localNoDaughters = envelope->GetNoDaughters();
     //std::cout<<"Total n. of Daughters of "<<envelope->GetName()<<" is : "<<localNoDaughters<<std::endl;
@@ -684,11 +684,11 @@ void MyDetectorConstruction::RecursivelyCheckOverlap(G4LogicalVolume* envelope,s
                 RecursivelyCheckOverlap(daughter->GetLogicalVolume(), jlist);
         //std::cout<<"Starting Overlaps check on daughter: "<<daughter->GetName()<<std::endl;
         //std::cout<<"... "<<sampleNo<<std::endl;
-        myCheckOverlaps(daughter, jlist, 1000, fTolerance, 1);
+        FSLCheckOverlaps(daughter, jlist, 1000, fTolerance, 1);
     }
 }
 
-bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res, G4double tol, G4int maxErr)
+bool FSLDetectorConstruction::FSLCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res, G4double tol, G4int maxErr)
 {
     
         std::cout.precision(8);
@@ -1094,7 +1094,7 @@ bool MyDetectorConstruction::myCheckOverlaps(G4VPhysicalVolume* volume, std::vec
         return retval;
 }
 
-GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
+GeoPhysVol*  FSLDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
 {
     if (world == nullptr)
     {
@@ -1121,7 +1121,7 @@ GeoPhysVol*  MyDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
     return world;
 }
 
-G4VPhysicalVolume *MyDetectorConstruction::Construct()
+G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 {
     fTimer.Start();
 
@@ -1163,7 +1163,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly check your setup selection criteria or input files!" << G4endl;
-            G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
+            G4Exception("FSLDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
         }
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
         G4cout << "Detector Construction from the plugin file " << fGeometryFileName.data() <<", done!"<<G4endl;
@@ -1217,7 +1217,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly check your setup selection criteria or GDML input!" << G4endl;
-            G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
+            G4Exception("FSLDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
         }
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
         G4cout << "Detector Construction from the SQLite file " << fGeometryFileName.data() <<", done!"<<G4endl;
@@ -1236,7 +1236,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         if (fWorld == 0) {
             G4ExceptionDescription ed;
             ed << "World volume not set properly! Check your setup selection criteria or the GDML input!" << G4endl;
-            G4Exception("MyDetectorConstruction::Construct()", "FULLSIMLIGHT_0001", FatalException, ed);
+            G4Exception("FSLDetectorConstruction::Construct()", "FULLSIMLIGHT_0001", FatalException, ed);
         }
         G4cout << "Detector Construction from the GDML file " << fGeometryFileName.data() <<", done!"<<G4endl;
 
@@ -1318,7 +1318,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     return fWorld;
 }
 
-void MyDetectorConstruction::ConstructSDandField()
+void FSLDetectorConstruction::ConstructSDandField()
 {
  // if (std::abs(fFieldValue) > 0.0) {
 
@@ -1342,8 +1342,8 @@ void MyDetectorConstruction::ConstructSDandField()
       G4cout << G4endl << " *** MAGNETIC FIELD SET FROM FILE  *** " << G4endl << G4endl;
       if (fField.Get() == 0)
       {
-          StandardFieldSvc* myMagField = new StandardFieldSvc("StandardFieldSvc");
-          G4MagneticField* g4Field =  myMagField->getField();
+          StandardFieldSvc* FSLMagField = new StandardFieldSvc("StandardFieldSvc");
+          G4MagneticField* g4Field =  FSLMagField->getField();
           if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
           fField.Put(g4Field);
 
@@ -1351,7 +1351,7 @@ void MyDetectorConstruction::ConstructSDandField()
           G4FieldManager* fieldMgr =
           G4TransportationManager::GetTransportationManager()->GetFieldManager();
           G4cout<< "DeltaStep "<<fieldMgr->GetDeltaOneStep()/mm <<"mm" <<G4endl;
-          //G4ChordFinder *pChordFinder = new G4ChordFinder(mymagField);
+          //G4ChordFinder *pChordFinder = new G4ChordFinder(FSLmagField);
 
 //#if G4VERSION_NUMBER < 1040
 //
@@ -1378,7 +1378,7 @@ void MyDetectorConstruction::ConstructSDandField()
 // Create the driver with a stepper
 //=============================================================================
 G4VIntegrationDriver*
-MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
+FSLDetectorConstruction::createDriverAndStepper(std::string stepperType) const
 {
 
 
@@ -1492,7 +1492,7 @@ MyDetectorConstruction::createDriverAndStepper(std::string stepperType) const
 // Create the stepper (Geant4 < 10.4)
 //=============================================================================
 G4MagIntegratorStepper*
-MyDetectorConstruction::CreateStepper(std::string name, G4MagneticField* field) const
+FSLDetectorConstruction::CreateStepper(std::string name, G4MagneticField* field) const
 {
     std::cout<<"Stepper type is : "<<name<<std::endl;
     //ATH_MSG_DEBUG("getStepper");
@@ -1556,7 +1556,7 @@ MyDetectorConstruction::CreateStepper(std::string name, G4MagneticField* field) 
 }
 
 
-void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
+void FSLDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
 
     if (v==0) return;
     std::vector<G4VPhysicalVolume*> pv_to_remove;
@@ -1594,7 +1594,7 @@ void MyDetectorConstruction::PullUnidentifiedVolumes( G4LogicalVolume* v ){
 
 }
 
-void MyDetectorConstruction::printGeometryInfo(G4LogicalVolume* lv, G4int verbosity){
+void FSLDetectorConstruction::printGeometryInfo(G4LogicalVolume* lv, G4int verbosity){
 
     int localNoDaughters = lv->GetNoDaughters();
     G4VPhysicalVolume *daughter;

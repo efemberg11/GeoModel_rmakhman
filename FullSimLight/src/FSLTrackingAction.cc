@@ -1,24 +1,24 @@
 
-#include "MyTrackingAction.hh"
+#include "FSLTrackingAction.hh"
 
 #include "G4Track.hh"
 #include "G4Region.hh"
-#include "MyEventAction.hh"
+#include "FSLEventAction.hh"
 
 
-MyTrackingAction::MyTrackingAction(MyEventAction* evtact)
+FSLTrackingAction::FSLTrackingAction(FSLEventAction* evtact)
 : G4UserTrackingAction(), fEventAction(evtact), fScoringRegion(nullptr) {}
 
 
-MyTrackingAction::~MyTrackingAction() {}
+FSLTrackingAction::~FSLTrackingAction() {}
 
-void MyTrackingAction::SetScoringRegion(G4Region* reg) {
+void FSLTrackingAction::SetScoringRegion(G4Region* reg) {
   fScoringRegion = reg;
   fEventAction->SetIsSpecialScoringRegion(reg!=nullptr);
 }
 
 
-void MyTrackingAction::PreUserTrackingAction(const G4Track* theTrack) {
+void FSLTrackingAction::PreUserTrackingAction(const G4Track* theTrack) {
   // count secondaries
   const G4bool isSpecialScoring = (fScoringRegion!=nullptr && fScoringRegion==theTrack->GetVolume()->GetLogicalVolume()->GetRegion());
   if (theTrack->GetParentID()!=0) {

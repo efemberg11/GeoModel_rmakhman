@@ -5,7 +5,7 @@
 #include "G4Version.hh"
 #if G4VERSION_NUMBER>=1040
 
-#include "MyLengthIntegratorEventAction.hh"
+#include "FSLLengthIntegratorEventAction.hh"
 #include "G4PrimaryVertex.hh"
 #include "G4PrimaryParticle.hh"
 #include "G4Event.hh"
@@ -23,7 +23,7 @@
 #include <mutex>
 
 //G4AnalysisManager
-#include "MyAnalysis.hh"
+#include "FSLAnalysis.hh"
 
 
 // Anonymous namespace for file-global mutexes and helper functions
@@ -39,7 +39,7 @@ namespace G4UA
     //---------------------------------------------------------------------------
     // Constructor
     //---------------------------------------------------------------------------
-    MyLengthIntegratorEventAction::MyLengthIntegratorEventAction(MyLengthIntegratorSteppingAction* stepAct, MyRunAction* run)
+    FSLLengthIntegratorEventAction::FSLLengthIntegratorEventAction(FSLLengthIntegratorSteppingAction* stepAct, FSLRunAction* run)
     :m_run(run),
     m_stepAct(stepAct),
     m_etaPrimary(0),
@@ -48,7 +48,7 @@ namespace G4UA
          fGeantinoMapsConfig = GeantinoMapsConfigurator::getGeantinoMapsConf();
     }
     
-    MyLengthIntegratorEventAction::~MyLengthIntegratorEventAction(){
+    FSLLengthIntegratorEventAction::~FSLLengthIntegratorEventAction(){
         
         m_etaMapRL_g4.clear();
         m_phiMapRL_g4.clear();
@@ -58,7 +58,7 @@ namespace G4UA
         //      //ROOT
         //      static std::mutex mutex_instance;
         //      std::lock_guard<std::mutex> lock(mutex_instance);
-        //      G4cout<<"Finalizing MyLengthIntegratorEventAction" << G4endl;
+        //      G4cout<<"Finalizing FSLLengthIntegratorEventAction" << G4endl;
         //      // Open output root file
         //      std::string fileName = "EtaPhi_RadLen.root";
         //      TFile* fOut = new TFile(fileName.c_str(), "RECREATE");
@@ -101,7 +101,7 @@ namespace G4UA
     //---------------------------------------------------------------------------
     // Cache primary info at beginning of event
     //---------------------------------------------------------------------------
-    void MyLengthIntegratorEventAction::BeginOfEventAction(const G4Event* event)
+    void FSLLengthIntegratorEventAction::BeginOfEventAction(const G4Event* event)
     {
         bool verbose = false;
         if (verbose){
@@ -131,7 +131,7 @@ namespace G4UA
     //---------------------------------------------------------------------------
     // Finalize event measurements
     //---------------------------------------------------------------------------
-    void MyLengthIntegratorEventAction::EndOfEventAction(const G4Event*)
+    void FSLLengthIntegratorEventAction::EndOfEventAction(const G4Event*)
     {
         bool verbose = false;
         if (verbose) G4cout <<" ****** EndOfEventAction  ****** "  << G4endl;
@@ -373,7 +373,7 @@ namespace G4UA
     // Setup hists for one detector
     //---------------------------------------------------------------------------
     //  //ROOT Version
-    //  void MyLengthIntegratorEventAction::regAndFillHist(const std::string& detName,
+    //  void FSLLengthIntegratorEventAction::regAndFillHist(const std::string& detName,
     //                                        const std::pair<double, double>& thicks)
     //  {
     //    TProfile* profEtaRL = nullptr;
@@ -434,7 +434,7 @@ namespace G4UA
     //    profPhiIL->Fill(m_phiPrimary, thicks.second, 1.);
     //  }
 
-    void MyLengthIntegratorEventAction::regAndFillHist_g4(const std::string& detName,
+    void FSLLengthIntegratorEventAction::regAndFillHist_g4(const std::string& detName,
                                                           const std::pair<double, double>& thicks)
     {
         auto pathEtaRL = detName + "_RL";

@@ -1,20 +1,20 @@
 
-#ifndef MyEventAction_h
-#define MyEventAction_h 1
+#ifndef FSLEventAction_h
+#define FSLEventAction_h 1
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
-#include "MyEventData.hh"
+#include "FSLEventData.hh"
 
 class G4Event;
 class G4Track;
 
-class MyEventAction: public G4UserEventAction {
+class FSLEventAction: public G4UserEventAction {
 
 public:
 
-   MyEventAction();
-  ~MyEventAction() override;
+   FSLEventAction();
+  ~FSLEventAction() override;
 
   void BeginOfEventAction(const G4Event* evt) override;
   void EndOfEventAction(const G4Event* evt) override;
@@ -28,8 +28,8 @@ private:
 
   G4bool      fIsSpecialScoring;  
 
-  MyEventData fEventData;
-  MyEventData fEventDataSpecialRegion;
+  FSLEventData fEventData;
+  FSLEventData fEventDataSpecialRegion;
 
 };
 

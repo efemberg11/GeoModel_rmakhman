@@ -1,6 +1,6 @@
 
-#ifndef MyDetectorConstruction_h
-#define MyDetectorConstruction_h 1
+#ifndef FSLDetectorConstruction_h
+#define FSLDetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 
@@ -13,7 +13,7 @@
 #include "G4MagneticField.hh"
 
 //G4AnalysisMananager
-#include "MyAnalysis.hh"
+#include "FSLAnalysis.hh"
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -29,14 +29,14 @@ class G4UniformMagField;
 class G4MagneticField;
 class G4VIntegrationDriver;
 class G4MagIntegratorStepper;
-class MyDetectorMessenger;
+class FSLDetectorMessenger;
 class GeoPhysVol;
 
-class MyDetectorConstruction : public G4VUserDetectorConstruction {
+class FSLDetectorConstruction : public G4VUserDetectorConstruction {
 
 public:
-  MyDetectorConstruction();
-  ~MyDetectorConstruction();
+  FSLDetectorConstruction();
+  ~FSLDetectorConstruction();
 
   G4VPhysicalVolume *Construct();
   void ConstructSDandField();
@@ -80,7 +80,7 @@ public:
   // by default it is set to maximum precision.
   // Reports a maximum of overlaps errors according to parameter in input.
   // Returns true if the volume is overlapping.
-  bool myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res = 1000, G4double tol = 0., G4int maxErr = 1 );
+  bool FSLCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res = 1000, G4double tol = 0., G4int maxErr = 1 );
 
   //Retrieves the corresponding point in global coordinates,
   //using the chain of G4VPhysicalVolumes stored in the fTree vector
@@ -128,7 +128,7 @@ private:
   G4double fTolerance; //tolerance value for gmclash
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;
-  MyDetectorMessenger *fDetectorMessenger;
+  FSLDetectorMessenger *fDetectorMessenger;
   std::vector<G4VPhysicalVolume*> fTree;
   G4Cache<G4MagneticField*> fField; //pointer to the thread-local fields
 };

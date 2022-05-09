@@ -121,7 +121,7 @@ FullSimLight and in general Geant4 based simulations, need a Geant4 macro to rea
  A constant magnetic field can be set through the macro command:
  
 ``` bash
-/mydet/setField <field-value> <unit>
+/FSLdet/setField <field-value> <unit>
 ```
 
 The default value is a uniform magnetic field of 4 Tesla.
@@ -176,7 +176,7 @@ The number of primary particles per event can be set through the macro
 command:
 
 ``` bash
-/mygun/primaryPerEvt <number>
+/FSLgun/primaryPerEvt <number>
 ```
 
 By default, i.e. if it is not specified by the above command, the number of primary particles will be randomly selected for each individual event from the [1, 10] interval uniformly.
@@ -185,7 +185,7 @@ By default, i.e. if it is not specified by the above command, the number of prim
 The primary particle energy can be set through the macro command:
 
 ``` bash
-/mygun/energy  <energy-value> <unit>
+/FSLgun/energy  <energy-value> <unit>
 ```
 By default, i.e. if it is not specified by the above command, the kinetic energy will be randomly selected for each individual primary particle from the [1 GeV, 100 GeV] uniformly.
 
@@ -193,7 +193,7 @@ By default, i.e. if it is not specified by the above command, the kinetic energy
 The primary particle momentum direction can be set through the macro command: 
 
 ``` bash
-/mygun/direction  <xdir-value> <ydir-value> <zdir-value>
+/FSLgun/direction  <xdir-value> <ydir-value> <zdir-value>
 ```
 By default, i.e. if it is not specified by the above command, the momentum direction will be randomly selected for each individual primary particle from isotropic distribution.
 
@@ -201,9 +201,9 @@ By default, i.e. if it is not specified by the above command, the momentum direc
 The primary particle type can be set through the macro command:
 
 ``` bash
-/mygun/particle <particle-name>
+/FSLgun/particle <particle-name>
 ``` 
-By default, i.e. if it is not specified by the above command, the type will be randomly selected from a pre-defined list for each individual primary particle uniformly. The current list of particles includes e-, e+ and gamma particles. It can be extended by adding more particles to the list in the MyPrimaryGeneratorAction class.
+By default, i.e. if it is not specified by the above command, the type will be randomly selected from a pre-defined list for each individual primary particle uniformly. The current list of particles includes e-, e+ and gamma particles. It can be extended by adding more particles to the list in the FSLPrimaryGeneratorAction class.
 
 
 ## Pythia generator
@@ -229,8 +229,4 @@ By default, i.e. if it is not specified by the above command, the type will be r
  (e.g. -f FTFP_BERT). Notice that the name of the Geant4 built in Physics List
  must be in upper case, exactly as the corresponding header file. By default,
  i.e. if the Physics List name is not provided as an input argument, the FTFP_BERT
- Physics List will be used. FullSimLight has also the possibility to use a
- special custom Physics List MyGVPhysicsList (a Geant4 Physics
- List including only those particles, processes and models that are available
- and used in the corresponding GeantV application with exactly the same
- settings). In order to use it one need to specify -f GV as input parameter. 
+ Physics List will be used.  

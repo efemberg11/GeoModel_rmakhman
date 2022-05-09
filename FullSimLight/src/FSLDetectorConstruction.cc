@@ -1,4 +1,4 @@
-#include FSLDetectorConstruction.hh"
+#include "FSLDetectorConstruction.hh"
 
 #include <iomanip>
 
@@ -14,6 +14,7 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4RunManager.hh"
 #include "G4PVPlacement.hh"
+//#include "G4LogicalVolumeStore.hh"
 
 #include "FSLDetectorMessenger.hh"
 #include "RegionConfigurator.hh"
@@ -1165,6 +1166,16 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
             ed << "World volume not set properly check your setup selection criteria or input files!" << G4endl;
             G4Exception("FSLDetectorConstruction::Construct()", "FULLSIMLIGHT_0000", FatalException, ed);
         }
+        
+//        std::vector<G4LogicalVolume*>* lvStore =  G4LogicalVolumeStore::GetInstance();
+//        std::size_t nlv=lvStore->size();
+//        std::cout<<"G4LogicalVolume store size: "<<nlv<<std::endl;
+//        for (std::size_t i=0;  i<nlv; ++i) {
+//            G4LogicalVolume* lv = (*lvStore)[i];
+//            std::cout<<"G4LogicalVolume store:: "<<lv->GetName()<<std::endl;
+//
+//        }
+        
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
         G4cout << "Detector Construction from the plugin file " << fGeometryFileName.data() <<", done!"<<G4endl;
 
@@ -1221,6 +1232,15 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
         }
         G4cout << "Second step done. Geant4 geometry created from GeoModeltree "<<G4endl;
         G4cout << "Detector Construction from the SQLite file " << fGeometryFileName.data() <<", done!"<<G4endl;
+        
+//        std::vector<G4LogicalVolume*>* lvStore =  G4LogicalVolumeStore::GetInstance();
+//        std::size_t nlv=lvStore->size();
+//        std::cout<<"G4LogicalVolume store size: "<<nlv<<std::endl;
+//        for (std::size_t i=0;  i<nlv; ++i) {
+//            G4LogicalVolume* lv = (*lvStore)[i];
+//            std::cout<<"G4LogicalVolume store:: "<<lv->GetName()<<std::endl;
+//
+//        }
     }
 
     else if (fGeometryFileName.contains(".gdml")){

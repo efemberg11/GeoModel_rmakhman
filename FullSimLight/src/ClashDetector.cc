@@ -4,6 +4,7 @@
 #include "G4AffineTransform.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
+#include "G4Version.hh"
 
 
 namespace clashdet {
@@ -40,7 +41,8 @@ namespace clashdet {
     }
 } // namespace clashdet
 
-ClashDetector::ClashDetector(G4VPhysicalVolume *world):
+ClashDetector::ClashDetector(G4VPhysicalVolume *world)
+:
 fWorld(world)
 {}
 bool ClashDetector::iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume* volume, G4ThreeVector& local){

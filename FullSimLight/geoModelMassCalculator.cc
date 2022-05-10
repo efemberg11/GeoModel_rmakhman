@@ -5,7 +5,7 @@
 
 #include "G4Version.hh"
 #include "Randomize.hh"
-#include "MyDetectorConstruction.hh"
+#include "FSLDetectorConstruction.hh"
 
 #include <getopt.h>
 #include <err.h>
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
     << G4endl;
     
     // Detector construction
-    MyDetectorConstruction* detector = new MyDetectorConstruction;
+    FSLDetectorConstruction* detector = new FSLDetectorConstruction;
     detector->SetRunMassCalculator(true);
     detector->SetPrefixLogicalVolume(prefixLogicalVolume);
     detector->SetMaterial(material);

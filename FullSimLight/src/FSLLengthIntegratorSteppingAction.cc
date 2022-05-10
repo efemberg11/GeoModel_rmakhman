@@ -4,7 +4,7 @@
 #include "G4Version.hh"
 #if G4VERSION_NUMBER>=1040
 
-#include "MyLengthIntegratorSteppingAction.hh"
+#include "FSLLengthIntegratorSteppingAction.hh"
 
 #include "G4PrimaryVertex.hh"
 #include "G4PrimaryParticle.hh"
@@ -23,7 +23,7 @@
 #include <mutex>
 
 
-#include "MyRunAction.hh"
+#include "FSLRunAction.hh"
 
 
 // Anonymous namespace for file-global mutexes and helper functions
@@ -39,7 +39,7 @@ namespace G4UA
   //---------------------------------------------------------------------------
   // Constructor
   //---------------------------------------------------------------------------
-  MyLengthIntegratorSteppingAction::MyLengthIntegratorSteppingAction(MyRunAction* run)
+  FSLLengthIntegratorSteppingAction::FSLLengthIntegratorSteppingAction(FSLRunAction* run)
     : m_g4pow(0),
       m_run(run)
   
@@ -69,14 +69,14 @@ namespace G4UA
     
 
   }
-  MyLengthIntegratorSteppingAction::~MyLengthIntegratorSteppingAction()
+  FSLLengthIntegratorSteppingAction::~FSLLengthIntegratorSteppingAction()
   {
       m_detThickMap.clear();
       
 //    //ROOT
 //    static std::mutex mutex_instance;
 //    std::lock_guard<std::mutex> lock(mutex_instance);
-//    G4cout<<"Finalizing MyLengthIntegratorSteppingAction" << G4endl;
+//    G4cout<<"Finalizing FSLLengthIntegratorSteppingAction" << G4endl;
 //    // Open output root file
 //    std::string fileName = "RZRadLen.root";
 //    TFile* fOut = new TFile(fileName.c_str(), "RECREATE");
@@ -120,9 +120,9 @@ namespace G4UA
     //---------------------------------------------------------------------------
     // Accumulate results from one step
     //---------------------------------------------------------------------------
-    void MyLengthIntegratorSteppingAction::UserSteppingAction(const G4Step* aStep)
+    void FSLLengthIntegratorSteppingAction::UserSteppingAction(const G4Step* aStep)
     {
-        //G4cout<<" ****** MyLengthIntegratorSteppingAction::UserSteppingAction Accumulate results from one step  ****** " <<G4endl;
+        //G4cout<<" ****** FSLLengthIntegratorSteppingAction::UserSteppingAction Accumulate results from one step  ****** " <<G4endl;
         G4TouchableHistory* touchHist =
         (G4TouchableHistory*) aStep->GetPreStepPoint()->GetTouchable();
         G4LogicalVolume* lv = touchHist->GetVolume()->GetLogicalVolume();
@@ -155,10 +155,10 @@ namespace G4UA
 //        std::cout<<"rHit: "<<rHit<<" ::["<<fGeantinoMapsConfig->GetRmin()<<","<<fGeantinoMapsConfig->GetRmax()<<"]"<<std::endl;
         
         if(zHit >= fGeantinoMapsConfig->GetZmin() && zHit <= fGeantinoMapsConfig->GetZmax() && rHit >= fGeantinoMapsConfig->GetRmin() && rHit <= fGeantinoMapsConfig->GetRmax()){
-            MyLengthIntegratorSteppingAction::addToDetThickMap(detName_d,            thickstepRL, thickstepIL);
-            MyLengthIntegratorSteppingAction::addToDetThickMap(matName,              thickstepRL, thickstepIL);
-            MyLengthIntegratorSteppingAction::addToDetThickMap(detName_plus_matName, thickstepRL, thickstepIL);
-            MyLengthIntegratorSteppingAction::addToDetThickMap("Total_X0",           thickstepRL, thickstepIL);
+            FSLLengthIntegratorSteppingAction::addToDetThickMap(detName_d,            thickstepRL, thickstepIL);
+            FSLLengthIntegratorSteppingAction::addToDetThickMap(matName,              thickstepRL, thickstepIL);
+            FSLLengthIntegratorSteppingAction::addToDetThickMap(detName_plus_matName, thickstepRL, thickstepIL);
+            FSLLengthIntegratorSteppingAction::addToDetThickMap("Total_X0",           thickstepRL, thickstepIL);
             
             const G4ElementVector* eVec = mat->GetElementVector();
             for (size_t i=0 ; i < mat->GetNumberOfElements() ; ++i)
@@ -169,9 +169,9 @@ namespace G4UA
                 double el_thickstepRL = stepl * (mat->GetVecNbOfAtomsPerVolume())[i] * (*eVec)[i]->GetfRadTsai() * 100.0;
                 G4double lambda0 = 35*g/cm2;
                 double el_thickstepIL = stepl * amu/lambda0 * (mat->GetVecNbOfAtomsPerVolume())[i] * m_g4pow->Z23( G4int( (*eVec)[i]->GetN() + 0.5 ) );
-                MyLengthIntegratorSteppingAction::addToDetThickMap(elementName,              el_thickstepRL, el_thickstepIL);
-                MyLengthIntegratorSteppingAction::addToDetThickMap(matName_plus_elementName, el_thickstepRL, el_thickstepIL);
-                MyLengthIntegratorSteppingAction::addToDetThickMap(detName_plus_elementName, el_thickstepRL, el_thickstepIL);
+                FSLLengthIntegratorSteppingAction::addToDetThickMap(elementName,              el_thickstepRL, el_thickstepIL);
+                FSLLengthIntegratorSteppingAction::addToDetThickMap(matName_plus_elementName, el_thickstepRL, el_thickstepIL);
+                FSLLengthIntegratorSteppingAction::addToDetThickMap(detName_plus_elementName, el_thickstepRL, el_thickstepIL);
             }
             
         }
@@ -443,7 +443,7 @@ namespace G4UA
 
   /// note that this should be called from a section protected by a mutex, since it talks to the THitSvc
 //  //ROOT version
-//  TProfile2D* MyLengthIntegratorSteppingAction::getOrCreateProfile(std::string regName, TString histoname, TString xtitle, int nbinsx, float xmin, float xmax, TString ytitle, int nbinsy,float ymin, float ymax,TString ztitle){
+//  TProfile2D* FSLLengthIntegratorSteppingAction::getOrCreateProfile(std::string regName, TString histoname, TString xtitle, int nbinsx, float xmin, float xmax, TString ytitle, int nbinsy,float ymin, float ymax,TString ztitle){
 //
 //    //G4cout<<"histo "<<histoname<<" not found. checking for  "<<regName<<G4endl;
 //
@@ -473,7 +473,7 @@ namespace G4UA
 //  }
     
 
-G4int MyLengthIntegratorSteppingAction::getOrCreateProfile_g4(G4String regName,G4String histoname, G4String xtitle, int nbinsx, float xmin, float xmax,G4String ytitle, int nbinsy,float ymin, float ymax,G4String ztitle)
+G4int FSLLengthIntegratorSteppingAction::getOrCreateProfile_g4(G4String regName,G4String histoname, G4String xtitle, int nbinsx, float xmin, float xmax,G4String ytitle, int nbinsy,float ymin, float ymax,G4String ztitle)
     {
 
 
@@ -506,7 +506,7 @@ G4int MyLengthIntegratorSteppingAction::getOrCreateProfile_g4(G4String regName,G
   //---------------------------------------------------------------------------
   // Add elements and values to the map
   //---------------------------------------------------------------------------
-  void MyLengthIntegratorSteppingAction::addToDetThickMap(std::string name, double thickstepRL, double thickstepIL)
+  void FSLLengthIntegratorSteppingAction::addToDetThickMap(std::string name, double thickstepRL, double thickstepIL)
   {
     auto it=m_detThickMap.find(name);
     if(it!=m_detThickMap.end()){

@@ -1,17 +1,17 @@
 
-#include "MyEventData.hh"
+#include "FSLEventData.hh"
 
 #include "G4SystemOfUnits.hh"
 
-MyEventData::MyEventData() {
+FSLEventData::FSLEventData() {
   Clear();
 }
 
 
-MyEventData::~MyEventData() {}
+FSLEventData::~FSLEventData() {}
 
 
-void MyEventData::Clear() {
+void FSLEventData::Clear() {
   fEdep         = 0.;
   fTrackLCh     = 0.;
   fTrackLNe     = 0.;
@@ -23,7 +23,7 @@ void MyEventData::Clear() {
 }
 
 
-std::ostream& operator<<(std::ostream& flux, const MyEventData& evtdata) {
+std::ostream& operator<<(std::ostream& flux, const FSLEventData& evtdata) {
   std::ios::fmtflags mode = flux.flags();
   flux.setf(std::ios::fixed,std::ios::floatfield);
   long prec = flux.precision(3);

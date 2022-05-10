@@ -1,20 +1,20 @@
 
-#ifndef MyEventData_h
-#define MyEventData_h 1
+#ifndef FSLEventData_h
+#define FSLEventData_h 1
 
 #include "globals.hh"
 #include <iostream>
 
-class MyEventData {
+class FSLEventData {
 
 public:
 
-   MyEventData();
-  ~MyEventData();
+   FSLEventData();
+  ~FSLEventData();
 
   void Clear();
 
-  friend std::ostream& operator<<(std::ostream&, const MyEventData&);
+  friend std::ostream& operator<<(std::ostream&, const FSLEventData&);
 
   G4double fEdep;           // sum of energy deposit
   G4double fTrackLCh;       // sum of charged step length

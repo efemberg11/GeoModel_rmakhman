@@ -1,11 +1,11 @@
 
-#include "MyActionInitialization.hh"
+#include "FSLActionInitialization.hh"
 
-#include "MyPrimaryGeneratorAction.hh"
-#include "MyRunAction.hh"
-#include "MyEventAction.hh"
-#include "MySteppingAction.hh"
-#include "MyTrackingAction.hh"
+#include "FSLPrimaryGeneratorAction.hh"
+#include "FSLRunAction.hh"
+#include "FSLEventAction.hh"
+#include "FSLSteppingAction.hh"
+#include "FSLTrackingAction.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
 
 #include "G4Version.hh"
@@ -14,15 +14,15 @@
 #include "G4MultiEventAction.hh"
 #include "G4MultiTrackingAction.hh"
 #include "G4MultiSteppingAction.hh"
-#include "MyLengthIntegratorEventAction.hh"
-#include "MyLengthIntegratorSteppingAction.hh"
+#include "FSLLengthIntegratorEventAction.hh"
+#include "FSLLengthIntegratorSteppingAction.hh"
 #endif
 
 
 
-//const G4AnalysisManager* MyActionInitialization::fMasterAnalysisManager = nullptr;
+//const G4AnalysisManager* FSLActionInitialization::fMasterAnalysisManager = nullptr;
 
-MyActionInitialization::MyActionInitialization(bool isperformance)
+FSLActionInitialization::FSLActionInitialization(bool isperformance)
 : G4VUserActionInitialization(), fIsPerformance(isperformance),
   fSpecialScoringRegionName("") {
       
@@ -30,12 +30,12 @@ MyActionInitialization::MyActionInitialization(bool isperformance)
   }
 
 
-MyActionInitialization::~MyActionInitialization() {}
+FSLActionInitialization::~FSLActionInitialization() {}
 
 // called in case of MT
-void MyActionInitialization::BuildForMaster() const {
+void FSLActionInitialization::BuildForMaster() const {
     
-    MyRunAction* masterRunAct = new MyRunAction();
+    FSLRunAction* masterRunAct = new FSLRunAction();
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
 
@@ -49,10 +49,10 @@ void MyActionInitialization::BuildForMaster() const {
 }
 
 
-void MyActionInitialization::Build() const {
+void FSLActionInitialization::Build() const {
 
 #if !USE_PYTHIA
-  SetUserAction(new MyPrimaryGeneratorAction());
+  SetUserAction(new FSLPrimaryGeneratorAction());
 #else
   if (use_pythia()) {
     // seed each generator/thread by 1234 if perfomance mode run and use the event
@@ -60,7 +60,7 @@ void MyActionInitialization::Build() const {
     G4int pythiaSeed = fIsPerformance ? -1 : 0;
     SetUserAction(new PythiaPrimaryGeneratorAction(pythiaSeed));
   } else {
-    SetUserAction(new MyPrimaryGeneratorAction());
+    SetUserAction(new FSLPrimaryGeneratorAction());
   }
 #endif
 
@@ -68,7 +68,7 @@ void MyActionInitialization::Build() const {
 // in sequential mode the BuildForMaster method is not called:
 // - create the only one run action with perfomance flag true i.e. only time is measured
   if (fIsPerformance) {
-    MyRunAction* masterRunAct = new MyRunAction();
+    FSLRunAction* masterRunAct = new FSLRunAction();
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
 #if USE_PYTHIA
@@ -82,15 +82,15 @@ void MyActionInitialization::Build() const {
 #endif
   // do not create Run,Event,Stepping and Tracking actions in case of perfomance mode
   if (!fIsPerformance) {
-      MyRunAction* runact = new MyRunAction();
+      FSLRunAction* runact = new FSLRunAction();
       SetUserAction(runact);
       runact->SetSpecialScoringRegionName(fSpecialScoringRegionName);
 
 
       if(!fGeantinoMapsConfig->GetCreateGeantinoMaps()){
-          MyEventAction*    evtAct = new MyEventAction();
-          MyTrackingAction*  trAct = new MyTrackingAction(evtAct);
-          MySteppingAction* stpAct = new MySteppingAction(evtAct);
+          FSLEventAction*    evtAct = new FSLEventAction();
+          FSLTrackingAction*  trAct = new FSLTrackingAction(evtAct);
+          FSLSteppingAction* stpAct = new FSLSteppingAction(evtAct);
           SetUserAction(evtAct);
           SetUserAction(trAct);
           SetUserAction(stpAct);
@@ -103,11 +103,11 @@ void MyActionInitialization::Build() const {
       {
 
           //Stepping action
-          G4UA::MyLengthIntegratorSteppingAction* myLenghtIntSteppingAct = new G4UA::MyLengthIntegratorSteppingAction(runact);
+          G4UA::FSLLengthIntegratorSteppingAction* FSLLenghtIntSteppingAct = new G4UA::FSLLengthIntegratorSteppingAction(runact);
           //Event action
-          G4UA::MyLengthIntegratorEventAction* myLenghtIntEventAct = new G4UA::MyLengthIntegratorEventAction(myLenghtIntSteppingAct, runact);
-          SetUserAction(myLenghtIntEventAct);
-          SetUserAction(myLenghtIntSteppingAct);
+          G4UA::FSLLengthIntegratorEventAction* FSLLenghtIntEventAct = new G4UA::FSLLengthIntegratorEventAction(FSLLenghtIntSteppingAct, runact);
+          SetUserAction(FSLLenghtIntEventAct);
+          SetUserAction(FSLLenghtIntSteppingAct);
 
       }
 #endif

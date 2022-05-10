@@ -1,5 +1,5 @@
 
-#include "MyEventAction.hh"
+#include "FSLEventAction.hh"
 
 #include "G4ios.hh"
 #include "G4SystemOfUnits.hh"
@@ -16,13 +16,13 @@
 #include "G4ThreeVector.hh"
 #include "G4PrimaryVertex.hh"
 
-#include "MyRunAction.hh"
-#include "MySteppingAction.hh"
-#include "MyRun.hh"
-#include "MyPrimaryGeneratorAction.hh"
+#include "FSLRunAction.hh"
+#include "FSLSteppingAction.hh"
+#include "FSLRun.hh"
+#include "FSLPrimaryGeneratorAction.hh"
 
 
-MyEventAction::MyEventAction() : G4UserEventAction(), fIsSpecialScoring(false) {
+FSLEventAction::FSLEventAction() : G4UserEventAction(), fIsSpecialScoring(false) {
   fEventData.Clear();
   if (fIsSpecialScoring) {
     fEventDataSpecialRegion.Clear();
@@ -30,10 +30,10 @@ MyEventAction::MyEventAction() : G4UserEventAction(), fIsSpecialScoring(false) {
 }
 
 
-MyEventAction::~MyEventAction() { }
+FSLEventAction::~FSLEventAction() { }
 
 
-void MyEventAction::BeginOfEventAction(const G4Event*) {
+void FSLEventAction::BeginOfEventAction(const G4Event*) {
   fEventData.Clear();
   if (fIsSpecialScoring) {
     fEventDataSpecialRegion.Clear();
@@ -41,9 +41,9 @@ void MyEventAction::BeginOfEventAction(const G4Event*) {
 }
 
 
-void MyEventAction::EndOfEventAction(const G4Event*) {
+void FSLEventAction::EndOfEventAction(const G4Event*) {
   //get the Run and add the data collected during the simulation of the event that has been completed
-  MyRun* run = static_cast<MyRun*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  FSLRun* run = static_cast<FSLRun*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
   run->FillPerEvent(fEventData, false);
   if (fIsSpecialScoring) {
     run->FillPerEvent(fEventDataSpecialRegion, true);
@@ -52,7 +52,7 @@ void MyEventAction::EndOfEventAction(const G4Event*) {
 
 
 // called from the SteppingAction
-void MyEventAction::AddData(G4double edep, G4double length, G4bool ischarged, G4bool isspecial) {
+void FSLEventAction::AddData(G4double edep, G4double length, G4bool ischarged, G4bool isspecial) {
   fEventData.fEdep += edep;
   if (ischarged) {
     fEventData.fTrackLCh    += length;
@@ -77,7 +77,7 @@ void MyEventAction::AddData(G4double edep, G4double length, G4bool ischarged, G4
 
 
 // called from the TrackingAction
-void MyEventAction::AddSecondaryTrack(const G4Track* track, G4bool isspecial) {
+void FSLEventAction::AddSecondaryTrack(const G4Track* track, G4bool isspecial) {
   const G4ParticleDefinition* pdf = track->GetDefinition();
   if (pdf==G4Gamma::Gamma()) {
     fEventData.fNGamma += 1.;

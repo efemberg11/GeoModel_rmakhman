@@ -1,27 +1,27 @@
 
-#ifndef MyRunAction_h
-#define MyRunAction_h 1
+#ifndef FSLRunAction_h
+#define FSLRunAction_h 1
 
 #include "G4UserRunAction.hh"
 #include "G4String.hh"
 
 //G4AnalysisMananager
-#include "MyAnalysis.hh"
+#include "FSLAnalysis.hh"
 
 #include "GeantinoMapsConfigurator.hh"
 
-class MyRun;
+class FSLRun;
 class G4Timer;
-class MySteppingAction;
-class MyTrackingAction;
+class FSLSteppingAction;
+class FSLTrackingAction;
 
 
-class MyRunAction: public G4UserRunAction {
+class FSLRunAction: public G4UserRunAction {
 
 public:
 
-  MyRunAction();
- ~MyRunAction();
+  FSLRunAction();
+ ~FSLRunAction();
 
   G4Run* GenerateRun() override;
   void   BeginOfRunAction(const G4Run*) override;
@@ -30,8 +30,8 @@ public:
   void   SetPerformanceFlag(G4bool val)    { fIsPerformance = val; }
   void   SetPythiaConfig(G4String config)  { fPythiaConfig  = config; }
 
-  void  SetSteppingAction(MySteppingAction* stpact) { fSteppingAction = stpact; }
-  void  SetTrackingAction(MyTrackingAction* tract)  { fTrackingAction = tract;  }
+  void  SetSteppingAction(FSLSteppingAction* stpact) { fSteppingAction = stpact; }
+  void  SetTrackingAction(FSLTrackingAction* tract)  { fTrackingAction = tract;  }
 
   void  SetSpecialScoringRegionName(const G4String& rname) { fSpecialScoringRegionName = rname; }
 
@@ -39,10 +39,10 @@ private:
   GeantinoMapsConfigurator* fGeantinoMapsConf;
   G4bool            fIsPerformance;
   //G4bool            fIsGeantino;
-  MyRun*            fRun;
+  FSLRun*            fRun;
   G4Timer*          fTimer;
-  MySteppingAction* fSteppingAction;
-  MyTrackingAction* fTrackingAction;
+  FSLSteppingAction* fSteppingAction;
+  FSLTrackingAction* fTrackingAction;
   //G4String          fGeantinoMapsFilename;
   G4String          fPythiaConfig;
   G4String          fSpecialScoringRegionName;

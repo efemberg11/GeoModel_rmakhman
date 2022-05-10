@@ -1,6 +1,6 @@
 
-#ifndef MyPrimaryGeneratorAction_h
-#define MyPrimaryGeneratorAction_h 1
+#ifndef FSLPrimaryGeneratorAction_h
+#define FSLPrimaryGeneratorAction_h 1
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4String.hh"
@@ -14,13 +14,13 @@ class G4ParticleGun;
 class G4GeneralParticleSource;
 class G4Event;
 class G4ParticleTable;
-class MyPrimaryGeneratorMessenger;
+class FSLPrimaryGeneratorMessenger;
 
-class MyPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
+class FSLPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
 
 public:
-  MyPrimaryGeneratorAction();
- ~MyPrimaryGeneratorAction();
+  FSLPrimaryGeneratorAction();
+ ~FSLPrimaryGeneratorAction();
 
   virtual void GeneratePrimaries(G4Event* anEvent);
 
@@ -74,7 +74,7 @@ private:
   G4ThreeVector            fPrimaryParticleDirection;
   G4ThreeVector            fPrimaryParticlePosition;
 
-  MyPrimaryGeneratorMessenger *fGunMessenger;
+  FSLPrimaryGeneratorMessenger *fGunMessenger;
   GeantinoMapsConfigurator* fGeantinoMapsConfig;
 };
 

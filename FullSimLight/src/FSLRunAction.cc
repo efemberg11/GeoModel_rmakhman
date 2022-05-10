@@ -1,4 +1,4 @@
-#include "MyRunAction.hh"
+#include "FSLRunAction.hh"
 
 #include "G4Version.hh"
 #ifdef G4MULTITHREADED
@@ -10,18 +10,18 @@
 #include "G4SystemOfUnits.hh"
 #include "globals.hh"
 
-#include "MyRun.hh"
-#include "MySteppingAction.hh"
-#include "MyTrackingAction.hh"
+#include "FSLRun.hh"
+#include "FSLSteppingAction.hh"
+#include "FSLTrackingAction.hh"
 
 
 #include "G4ProductionCutsTable.hh"
 #include "G4Region.hh"
 #include "G4RegionStore.hh"
 
-G4AnalysisManager* MyRunAction::fMasterAnalysisManager = nullptr;
+G4AnalysisManager* FSLRunAction::fMasterAnalysisManager = nullptr;
 
-MyRunAction::MyRunAction()
+FSLRunAction::FSLRunAction()
 : G4UserRunAction(), fIsPerformance(false), fRun(nullptr), fTimer(nullptr),
   fSteppingAction(nullptr), fTrackingAction(nullptr),
   fPythiaConfig(""), fSpecialScoringRegionName("") {
@@ -29,23 +29,23 @@ MyRunAction::MyRunAction()
       fGeantinoMapsConf=GeantinoMapsConfigurator::getGeantinoMapsConf();
   }
 
-MyRunAction::~MyRunAction() {
+FSLRunAction::~FSLRunAction() {
     if(fGeantinoMapsConf->GetCreateGeantinoMaps())
         delete G4AnalysisManager::Instance();
 }
 
-G4Run* MyRunAction::GenerateRun() {
+G4Run* FSLRunAction::GenerateRun() {
     // don't Generate our Run in perfomance mode but return with nullptr:
     //   the RunManager::RunInitialization will create a base G4Run object if this method gives back nullptr
     if (!fIsPerformance) {
-        fRun = new MyRun();
+        fRun = new FSLRun();
         return fRun;
     }
     return nullptr;
 }
 
 
-void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
+void FSLRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 
 #if G4VERSION_NUMBER>=1040
 
@@ -55,11 +55,11 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
         if (isMaster) {
             fMasterAnalysisManager = analysisManager;
-            //G4cout<<"MyRunAction::BeginOfRunAction, created MASTER istance of the G4AnalysisManager: "<<fMasterAnalysisManager<<G4endl;
+            //G4cout<<"FSLRunAction::BeginOfRunAction, created MASTER istance of the G4AnalysisManager: "<<fMasterAnalysisManager<<G4endl;
 
         }
         //else
-        //    G4cout<<"MyRunAction::BeginOfRunAction, created WORKER istance of the G4AnalysisManager: "<<analysisManager<<G4endl;
+        //    G4cout<<"FSLRunAction::BeginOfRunAction, created WORKER istance of the G4AnalysisManager: "<<analysisManager<<G4endl;
 
         G4cout << "Using G4AnalysisManager type: " << analysisManager->GetType() << G4endl;
         analysisManager->SetVerboseLevel(1);
@@ -76,7 +76,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         if(analysisManager->GetP2Id(radName, false) < 0){
 
             fRadName_id = analysisManager->CreateP2(radName,radName,3000,fGeantinoMapsConf->GetZmin(),fGeantinoMapsConf->GetZmax(),2000,fGeantinoMapsConf->GetRmin(),fGeantinoMapsConf->GetRmax());
-            //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZRadLen 2DProfile with name: "<<radName<< " and  with id: "<<fRadName_id<<G4endl;
+            //G4cout<<"FSLRunAction::BeginOfRunAction: G4AnalysisManager Created RZRadLen 2DProfile with name: "<<radName<< " and  with id: "<<fRadName_id<<G4endl;
             analysisManager->SetP2XAxisTitle(fRadName_id,"Z[mm]");
             analysisManager->SetP2YAxisTitle(fRadName_id,"R[mm]");
             analysisManager->SetP2ZAxisTitle(fRadName_id,"thickstepRL");
@@ -86,7 +86,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
         if(analysisManager->GetP2Id(intName, false)< 0)
         {
             fIntName_id = analysisManager->CreateP2(intName,intName,3000,fGeantinoMapsConf->GetZmin(),fGeantinoMapsConf->GetZmax(),2000,fGeantinoMapsConf->GetRmin(),fGeantinoMapsConf->GetRmax());
-            //G4cout<<"MyRunAction::BeginOfRunAction: G4AnalysisManager Created RZIntLen 2DProfile with name: "<<intName<< " and with id: "<<fIntName_id<<G4endl;
+            //G4cout<<"FSLRunAction::BeginOfRunAction: G4AnalysisManager Created RZIntLen 2DProfile with name: "<<intName<< " and with id: "<<fIntName_id<<G4endl;
             analysisManager->SetP2XAxisTitle(fIntName_id,"Z[mm]");
             analysisManager->SetP2YAxisTitle(fIntName_id,"R[mm]");
             analysisManager->SetP2ZAxisTitle(fIntName_id,"thickstepIL");
@@ -177,7 +177,7 @@ void MyRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
 }
 
 
-void MyRunAction::EndOfRunAction(const G4Run*) {
+void FSLRunAction::EndOfRunAction(const G4Run*) {
 
 #if G4VERSION_NUMBER>=1040
 
@@ -198,7 +198,7 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
 
     if (isMaster) {
         fTimer->Stop();
-        // get number of events: even in case of perfomance mode when MyRun-s are not generated in GenerateRun()
+        // get number of events: even in case of perfomance mode when FSLRun-s are not generated in GenerateRun()
 #ifdef G4MULTITHREADED
         const G4Run* run = G4MTRunManager::GetMasterRunManager()->GetCurrentRun();
 #else
@@ -213,7 +213,7 @@ void MyRunAction::EndOfRunAction(const G4Run*) {
         G4cout << "  =======================================================================================  "<< G4endl;
         delete fTimer;
 
-        if (!fIsPerformance) { // otherwise we do not even create any MyRun objects so fRun is nullptr
+        if (!fIsPerformance) { // otherwise we do not even create any FSLRun objects so fRun is nullptr
             fRun->EndOfRun();
         }
     }

@@ -2,8 +2,8 @@
   Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef G4UserActions_MyLengthIntegratorSteppingAction_H
-#define G4UserActions_MyLengthIntegratorSteppingAction_H
+#ifndef G4UserActions_FSLLengthIntegratorSteppingAction_H
+#define G4UserActions_FSLLengthIntegratorSteppingAction_H
 
 //#include "GaudiKernel/ITHistSvc.h"
 //#include "GaudiKernel/ServiceHandle.h"
@@ -19,18 +19,18 @@
 #include <map>
 
 //G4AnalysisManager
-#include "MyAnalysis.hh"
+#include "FSLAnalysis.hh"
 
 // Forward declarations
 //class TProfile;
 //class TProfile2D;
-class MyRunAction;
+class FSLRunAction;
 
 
 namespace G4UA
 {
 
-  /// @class MyLengthIntegratorSteppingAction
+  /// @class FSLLengthIntegratorSteppingAction
   /// @brief A user action used to evaluate thickness of all detectors
   ///        traversed by outgoing particles.
   ///
@@ -43,15 +43,15 @@ namespace G4UA
   /// that each instance has its own copy of the histograms which get merged in
   /// finalization of the LengthIntegratorTool.
   ///
-  class MyLengthIntegratorSteppingAction final : public G4UserSteppingAction
+  class FSLLengthIntegratorSteppingAction final : public G4UserSteppingAction
   {
 
     public:
 
       /// Constructor takes the name of the histogram service as argument.
-      MyLengthIntegratorSteppingAction(MyRunAction* myrun);
+      FSLLengthIntegratorSteppingAction(FSLRunAction* FSLrun);
       /// Destructor
-      ~MyLengthIntegratorSteppingAction();
+      ~FSLLengthIntegratorSteppingAction();
 
       /// Called at every particle step to accumulate thickness.
       virtual void UserSteppingAction(const G4Step*) override;
@@ -73,8 +73,8 @@ namespace G4UA
       /// Map of detector thickness measurements for current event
       std::map<std::string, std::pair<double, double> > m_detThickMap;
   private:
-      /// Pointer to the MyRunAction, needed to create new Profiles
-      MyRunAction* m_run;
+      /// Pointer to the FSLRunAction, needed to create new Profiles
+      FSLRunAction* m_run;
       GeantinoMapsConfigurator* fGeantinoMapsConfig;
 
       
@@ -103,7 +103,7 @@ namespace G4UA
       std::map<std::string,G4int,std::less<std::string> > m_rzMapIL_g4;
       std::map<std::string,G4int,std::less<std::string> > m_xyMapIL_g4;
 
-  }; // class MyLengthIntegratorSteppingAction
+  }; // class FSLLengthIntegratorSteppingAction
 
 } // namespace G4UA
 

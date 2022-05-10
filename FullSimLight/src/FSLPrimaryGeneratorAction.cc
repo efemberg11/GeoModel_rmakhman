@@ -1,6 +1,6 @@
 
-#include "MyPrimaryGeneratorAction.hh"
-#include "MyPrimaryGeneratorMessenger.hh"
+#include "FSLPrimaryGeneratorAction.hh"
+#include "FSLPrimaryGeneratorMessenger.hh"
 
 #include "globals.hh"
 #include "G4SystemOfUnits.hh"
@@ -11,33 +11,33 @@
 #include "Randomize.hh"
 #include "G4RandomDirection.hh"
 // just for the final printout
-#include "MyDetectorConstruction.hh"
+#include "FSLDetectorConstruction.hh"
 
-const G4int      MyPrimaryGeneratorAction::gInfNumPrimaryPerEvt =  1;
-const G4int      MyPrimaryGeneratorAction::gSupNumPrimaryPerEvt = 10;
+const G4int      FSLPrimaryGeneratorAction::gInfNumPrimaryPerEvt =  1;
+const G4int      FSLPrimaryGeneratorAction::gSupNumPrimaryPerEvt = 10;
 
-const G4double   MyPrimaryGeneratorAction::gInfBeamEnergy       =   1.*GeV;
-const G4double   MyPrimaryGeneratorAction::gSupBeamEnergy       = 100.*GeV;
+const G4double   FSLPrimaryGeneratorAction::gInfBeamEnergy       =   1.*GeV;
+const G4double   FSLPrimaryGeneratorAction::gSupBeamEnergy       = 100.*GeV;
 
 // these static variables stores the gun configuration just for the Print()
-G4int            MyPrimaryGeneratorAction::gNumPrimaryPerEvt(-1);
-G4double         MyPrimaryGeneratorAction::gPrimaryEnergy(-1.);
-std::string      MyPrimaryGeneratorAction::gPrimaryType("");
-G4ThreeVector    MyPrimaryGeneratorAction::gPrimaryDir(0.,0.,0.);
-G4ThreeVector    MyPrimaryGeneratorAction::gPrimaryPos(0.,0.,0.);
+G4int            FSLPrimaryGeneratorAction::gNumPrimaryPerEvt(-1);
+G4double         FSLPrimaryGeneratorAction::gPrimaryEnergy(-1.);
+std::string      FSLPrimaryGeneratorAction::gPrimaryType("");
+G4ThreeVector    FSLPrimaryGeneratorAction::gPrimaryDir(0.,0.,0.);
+G4ThreeVector    FSLPrimaryGeneratorAction::gPrimaryPos(0.,0.,0.);
 
 
 // These are the particle types that can be used as primary beam particle, on a event-by-event based.
-const G4int MyPrimaryGeneratorAction::gNumberCandidateParticles = 3; //only e-/e+ and gammas can be chosen randomly
-const G4int MyPrimaryGeneratorAction::gTotalNumberParticles = 5;
-const G4String MyPrimaryGeneratorAction::gNameParticlesVector[MyPrimaryGeneratorAction::gTotalNumberParticles] = {
+const G4int FSLPrimaryGeneratorAction::gNumberCandidateParticles = 3; //only e-/e+ and gammas can be chosen randomly
+const G4int FSLPrimaryGeneratorAction::gTotalNumberParticles = 5;
+const G4String FSLPrimaryGeneratorAction::gNameParticlesVector[FSLPrimaryGeneratorAction::gTotalNumberParticles] = {
   "e-",
   "e+",
   "gamma",
   "geantino",
   "chargedgeantino",
 };
-const std::map<G4String,G4int> MyPrimaryGeneratorAction::gPrimaryNameToIndexMap = {
+const std::map<G4String,G4int> FSLPrimaryGeneratorAction::gPrimaryNameToIndexMap = {
   {"e-",0},
   {"e+",1},
   {"gamma",2},
@@ -46,7 +46,7 @@ const std::map<G4String,G4int> MyPrimaryGeneratorAction::gPrimaryNameToIndexMap 
 };
 
 
-MyPrimaryGeneratorAction::MyPrimaryGeneratorAction() {
+FSLPrimaryGeneratorAction::FSLPrimaryGeneratorAction() {
 
   fGeantinoMapsConfig = GeantinoMapsConfigurator::getGeantinoMapsConf();
   fIsUserNumPrimaryPerEvt     = false;
@@ -64,12 +64,12 @@ MyPrimaryGeneratorAction::MyPrimaryGeneratorAction() {
   fPrimaryParticleEnergy      = 10.*GeV;
   fPrimaryParticlePosition    = G4ThreeVector(0.0,0.0,0.0);
   //
-  fGunMessenger  = new MyPrimaryGeneratorMessenger(this);
+  fGunMessenger  = new FSLPrimaryGeneratorMessenger(this);
   
 }
 
 
-MyPrimaryGeneratorAction::~MyPrimaryGeneratorAction() {
+FSLPrimaryGeneratorAction::~FSLPrimaryGeneratorAction() {
     if (fGeantinoMapsConfig->GetCreateGeantinoMaps())
         delete fGeantinoParticleGun;
     else
@@ -78,7 +78,7 @@ MyPrimaryGeneratorAction::~MyPrimaryGeneratorAction() {
 }
 
 
-void MyPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
+void FSLPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     
     if (fGeantinoMapsConfig->GetCreateGeantinoMaps()){
         fGeantinoParticleGun->GeneratePrimaryVertex(anEvent);
@@ -91,7 +91,7 @@ void MyPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
         for (G4int i=0; i<fNumPrimaryPerEvt; ++i) {
             // Select randomly the primary particle if it was not set by the user
             if (!fIsUserPrimaryType) {
-                G4int caseBeamParticle = static_cast<G4int>(G4UniformRand()*MyPrimaryGeneratorAction::gNumberCandidateParticles);
+                G4int caseBeamParticle = static_cast<G4int>(G4UniformRand()*FSLPrimaryGeneratorAction::gNumberCandidateParticles);
                 fPrimaryParticleName = gNameParticlesVector[caseBeamParticle];
             }
             // Select randomly the beam energy if it was not set by the user.
@@ -107,7 +107,7 @@ void MyPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
             // Set the particle gun
             G4ParticleDefinition* pDef = fParticleTable->FindParticle(fPrimaryParticleName);
             if (!pDef) {
-                G4cerr<< " *** ERROR in MyPrimaryGeneratorAction::GeneratePrimaries() " << G4endl
+                G4cerr<< " *** ERROR in FSLPrimaryGeneratorAction::GeneratePrimaries() " << G4endl
                 << "       UNKNOWN PRIMARY PARTICLE WITH NAME = "
                 << fPrimaryParticleName << G4endl
                 << G4endl;
@@ -128,47 +128,47 @@ void MyPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
     }
 }
 
-void  MyPrimaryGeneratorAction::SetNumPrimaryPerEvt(G4int pperevt) {
+void  FSLPrimaryGeneratorAction::SetNumPrimaryPerEvt(G4int pperevt) {
   fNumPrimaryPerEvt         = pperevt;
   gNumPrimaryPerEvt         = fNumPrimaryPerEvt;
   fIsUserNumPrimaryPerEvt   = true;
 }
 
-void  MyPrimaryGeneratorAction::SetPrimaryEnergy(G4double ekin) {
+void  FSLPrimaryGeneratorAction::SetPrimaryEnergy(G4double ekin) {
   fPrimaryParticleEnergy    = ekin;
   gPrimaryEnergy            = fPrimaryParticleEnergy;
   fIsUserPrimaryEnergy      = true;
 }
 
-void  MyPrimaryGeneratorAction::SetPrimaryName(const G4String& pname) {
+void  FSLPrimaryGeneratorAction::SetPrimaryName(const G4String& pname) {
   fPrimaryParticleName      = pname;
   gPrimaryType              = fPrimaryParticleName;
   fIsUserPrimaryType        = true;
   std::cout<<"Primary name: "<<pname<<std::endl;
 }
 
-void  MyPrimaryGeneratorAction::SetPrimaryDirection(const G4ThreeVector &pdir) {
+void  FSLPrimaryGeneratorAction::SetPrimaryDirection(const G4ThreeVector &pdir) {
   fPrimaryParticleDirection = pdir;
   fPrimaryParticleDirection.setMag(1.);
   gPrimaryDir = fPrimaryParticleDirection;
   fIsUserPrimaryDir         = true;
 }
 
-void  MyPrimaryGeneratorAction::SetPrimaryPosition(const G4ThreeVector &ppos) {
+void  FSLPrimaryGeneratorAction::SetPrimaryPosition(const G4ThreeVector &ppos) {
   fPrimaryParticlePosition = ppos;
   gPrimaryPos = fPrimaryParticlePosition;
   fIsUserPrimaryPos         = true;
 }
 
-G4int MyPrimaryGeneratorAction::GetPrimaryTypeIndex(const G4String& pname) {
+G4int FSLPrimaryGeneratorAction::GetPrimaryTypeIndex(const G4String& pname) {
   G4int indx = gPrimaryNameToIndexMap.find(pname)->second;
   return indx;
 }
 
 // will give proper results only at the end of the run
-void  MyPrimaryGeneratorAction::Print() {
+void  FSLPrimaryGeneratorAction::Print() {
   G4String str = "";
-  G4double magFValue = MyDetectorConstruction::GetFieldValue();
+  G4double magFValue = FSLDetectorConstruction::GetFieldValue();
   if (magFValue>0.) {
     str += "  Magnetic field           : constant " + std::to_string(magFValue/tesla) + " [ Tesla] field \n";
   } else {

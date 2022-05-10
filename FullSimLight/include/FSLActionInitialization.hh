@@ -1,17 +1,17 @@
 
-#ifndef MyActionInitialization_h
-#define MyActionInitialization_h 1
+#ifndef FSLActionInitialization_h
+#define FSLActionInitialization_h 1
 
 #include "G4VUserActionInitialization.hh"
 #include "G4String.hh"
 #include "GeantinoMapsConfigurator.hh"
 
-class MyActionInitialization : public G4VUserActionInitialization {
+class FSLActionInitialization : public G4VUserActionInitialization {
 
 public:
 
-  MyActionInitialization(bool isperformance=false);
- ~MyActionInitialization() override;
+  FSLActionInitialization(bool isperformance=false);
+ ~FSLActionInitialization() override;
 
   void BuildForMaster() const override;
   void Build() const override;

@@ -1,6 +1,6 @@
 
-#ifndef MyDetectorConstruction_h
-#define MyDetectorConstruction_h 1
+#ifndef FSLDetectorConstruction_h
+#define FSLDetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 
@@ -13,13 +13,11 @@
 #include "G4MagneticField.hh"
 
 //G4AnalysisMananager
-#include "MyAnalysis.hh"
+#include "FSLAnalysis.hh"
 
 // Units
 #include "GeoModelKernel/Units.h"
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
-// ****
-
+#define SYSTEM_OF_UNITS GeoModelKernelUnits
 
 using json = nlohmann::json;
 
@@ -29,14 +27,14 @@ class G4UniformMagField;
 class G4MagneticField;
 class G4VIntegrationDriver;
 class G4MagIntegratorStepper;
-class MyDetectorMessenger;
+class FSLDetectorMessenger;
 class GeoPhysVol;
 
-class MyDetectorConstruction : public G4VUserDetectorConstruction {
+class FSLDetectorConstruction : public G4VUserDetectorConstruction {
 
 public:
-  MyDetectorConstruction();
-  ~MyDetectorConstruction();
+  FSLDetectorConstruction();
+  ~FSLDetectorConstruction();
 
   G4VPhysicalVolume *Construct();
   void ConstructSDandField();
@@ -69,38 +67,10 @@ public:
   static G4double GetFieldValue() { return gFieldValue; }
   G4double GetTolerance (){return fTolerance;}
 
-  void RecursiveMassCalculation (G4VPhysicalVolume* worldg4,GeoPhysVol* worldgeoModel, std::vector<json>& jlist);
-
-  void RecursivelyCheckOverlap(G4LogicalVolume* envelope, std::vector<json>& jlist);
-
-  // Verifies if the placed volume is overlapping with existing
-  // daughters or with the mother volume. Provides default resolution
-  // for the number of points to be generated and verified.
-  // A tolerance for the precision of the overlap check can be specified,
-  // by default it is set to maximum precision.
-  // Reports a maximum of overlaps errors according to parameter in input.
-  // Returns true if the volume is overlapping.
-  bool myCheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res = 1000, G4double tol = 0., G4int maxErr = 1 );
-
-  //Retrieves the corresponding point in global coordinates,
-  //using the chain of G4VPhysicalVolumes stored in the fTree vector
-  G4ThreeVector localToGlobal(G4ThreeVector& mp, bool skipFirstIt);
-
-  // Iterate from the volume envelope through all the daughter volumes, and look for the ancestors of
-  // 'volume', populating the fTree vector of G4VPhysicalVolumes
-  bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume*volume, G4ThreeVector& local);
-
-  void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep);
-
-  void iterateFromWorldMass(G4LogicalVolume* envelope, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix="", G4String material="");
-
   GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
 
   /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
   void PullUnidentifiedVolumes( G4LogicalVolume* v );
-
-  void printGeometryInfo(G4LogicalVolume* lv, G4int verbosity);
-
   static G4AnalysisManager* fAnalysisManager;
 
 protected:
@@ -109,8 +79,6 @@ protected:
 private:
   // this static member is for the print out
   static G4double gFieldValue;
-  const G4double fDensityThreshold = 0.02 * SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3;
-  //G4int    fHistoID; //density histogram ID
   G4bool   fRunOverlapCheck;
   G4bool   fRunMassCalculator;
   G4bool   fAddRegions;
@@ -128,8 +96,7 @@ private:
   G4double fTolerance; //tolerance value for gmclash
   G4GDMLParser fParser;
   G4VPhysicalVolume *fWorld;
-  MyDetectorMessenger *fDetectorMessenger;
-  std::vector<G4VPhysicalVolume*> fTree;
+  FSLDetectorMessenger *fDetectorMessenger;
   G4Cache<G4MagneticField*> fField; //pointer to the thread-local fields
 };
 

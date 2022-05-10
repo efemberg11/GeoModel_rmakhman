@@ -1,20 +1,20 @@
 
-#ifndef MyTrackingAction_h
-#define MyTrackingAction_h 1
+#ifndef FSLTrackingAction_h
+#define FSLTrackingAction_h 1
 
 #include "G4UserTrackingAction.hh"
 #include "globals.hh"
 
 class G4Track;
-class MyEventAction;
+class FSLEventAction;
 class G4Region;
 
-class MyTrackingAction : public G4UserTrackingAction {
+class FSLTrackingAction : public G4UserTrackingAction {
 
 public:
 
-   MyTrackingAction(MyEventAction*);
-  ~MyTrackingAction() override;
+   FSLTrackingAction(FSLEventAction*);
+  ~FSLTrackingAction() override;
 
    void SetScoringRegion(G4Region* reg);
 
@@ -22,7 +22,7 @@ public:
 
 private:
 
-  MyEventAction* fEventAction;
+  FSLEventAction* fEventAction;
   G4Region*      fScoringRegion;
 
 };

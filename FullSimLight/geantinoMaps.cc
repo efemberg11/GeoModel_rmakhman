@@ -19,8 +19,8 @@
 #include "G4VModularPhysicsList.hh"
 
 #include "Randomize.hh"
-#include "MyDetectorConstruction.hh"
-#include "MyActionInitialization.hh"
+#include "FSLDetectorConstruction.hh"
+#include "FSLActionInitialization.hh"
 #include "GeantinoMapsConfigurator.hh"
 
 #include <getopt.h>
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
     
     // set mandatory initialization classes
     // 1. Detector construction
-    MyDetectorConstruction* detector = new MyDetectorConstruction;
+    FSLDetectorConstruction* detector = new FSLDetectorConstruction;
     
     if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
     
@@ -174,8 +174,8 @@ int main(int argc, char** argv) {
     gm_config->SetMapsFilename(parOutputFileName);
     
     // 3. User action
-    MyActionInitialization* myAct = new MyActionInitialization(parIsPerformance);
-    runManager->SetUserInitialization(myAct);
+    FSLActionInitialization* FSLAct = new FSLActionInitialization(parIsPerformance);
+    runManager->SetUserInitialization(FSLAct);
     
     
     

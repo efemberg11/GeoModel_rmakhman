@@ -24,6 +24,7 @@
 #include "G4NeutronTrackingCut.hh"
 
 #include "FSLActionInitialization.hh"
+#include "FSLConfigurator.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
 
 #include <getopt.h>
@@ -40,6 +41,7 @@ static bool         parIsPerformance   = false;
 static G4String     geometryFileName   ;
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
+bool isBatch = true;
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -179,8 +181,33 @@ int main(int argc, char** argv) {
 
     // 4. Run the simulation in batch mode
     G4UImanager* UI = G4UImanager::GetUIpointer();
-    G4String command = "/control/execute ";
-    UI->ApplyCommand(command+parMacroFileName);
+    
+    if(isBatch){
+        G4String command = "/control/execute ";
+        UI->ApplyCommand(command+parMacroFileName);
+        
+    } else
+    {
+        //It should instantiate the configurator that reads and parse the json configuration file
+        FSLConfigurator fsl_conf=FSLConfigurator();
+        // Hard coded string commands that will be taken and fed from the config files  
+        UI->ApplyCommand("/control/verbose 0");
+        UI->ApplyCommand("/run/verbose 0");
+        UI->ApplyCommand("/event/verbose 0");
+        UI->ApplyCommand("/tracking/verbose 0");
+        UI->ApplyCommand("/run/numberOfThreads 1");
+        UI->ApplyCommand("/control/cout/prefixString G4Worker_");
+        UI->ApplyCommand("/FSLdet/setField 4.0 tesla");
+        UI->ApplyCommand("/FSLgun/primaryPerEvt 2");
+        UI->ApplyCommand("/FSLgun/energy  10 GeV");
+        //UI->ApplyCommand("/FSLgun/direction  0 1 0");
+        UI->ApplyCommand("/process/list");
+
+        // Initialize G4 kernel
+        runManager->Initialize();
+        int numberOfEvent = 10;
+        runManager->BeamOn(numberOfEvent);
+    }
 
     //
     // Print out the final random number

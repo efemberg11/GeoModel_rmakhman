@@ -99,8 +99,8 @@ if(GEOMODEL_BUILD_FULLSIMLIGHT)
 endif()
 
 if(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION)
-  add_subdirectory(LarCustomSolidExtension)
-  list( APPEND BUILT_PACKAGES "LarCustomSolidExtension")
+  add_subdirectory(LArCustomSolidExtension)
+  list( APPEND BUILT_PACKAGES "LArCustomSolidExtension")
 endif()
 
 if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)

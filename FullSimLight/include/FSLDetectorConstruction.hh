@@ -56,7 +56,7 @@ public:
   G4VIntegrationDriver*
   createDriverAndStepper(std::string stepperType) const;
   G4MagIntegratorStepper* CreateStepper(std::string name, G4MagneticField* field) const;
-
+  
   void SetMagFieldValue(const G4double fieldValue)
   {
     fFieldValue = fieldValue;
@@ -64,6 +64,8 @@ public:
     fFieldConstant = true;
   }
 
+  void AddSensitiveDetectorPlugin(const std::string & SDPluginName) { sensitiveDetectorPluginName.push_back(SDPluginName);}
+  
   static G4double GetFieldValue() { return gFieldValue; }
   G4double GetTolerance (){return fTolerance;}
 
@@ -98,6 +100,12 @@ private:
   G4VPhysicalVolume *fWorld;
   FSLDetectorMessenger *fDetectorMessenger;
   G4Cache<G4MagneticField*> fField; //pointer to the thread-local fields
+
+
+  std::vector<std::string> sensitiveDetectorPluginName;
+
+  
+
 };
 
 #endif

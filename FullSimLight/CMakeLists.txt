@@ -236,6 +236,8 @@ endforeach()
 # Install the executable to 'bin/' directory under the
 # CMAKE_INSTALL_PREFIX
 #
+
+
 install(TARGETS fullSimLight DESTINATION ${OUTPUT})
 install(TARGETS gmclash DESTINATION ${OUTPUT})
 install(TARGETS gmmasscalc DESTINATION ${OUTPUT})
@@ -244,3 +246,54 @@ install(TARGETS gmgeantino DESTINATION ${OUTPUT})
 install(TARGETS testMagneticField DESTINATION ${OUTPUT})
 install(TARGETS gm2gdml DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION share/FullSimLight)
+
+
+
+add_library ( FullSimLight INTERFACE )
+
+# Set up the packaging of the project using CPack.
+list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
+
+include ( GNUInstallDirs )
+include( WriteBasicConfigVersionFile )
+
+write_basic_config_version_file(
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}ConfigVersion.cmake
+   VERSION ${PROJECT_VERSION}
+   COMPATIBILITY SameMajorVersion )
+
+install(
+   FILES
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}ConfigVersion.cmake
+   COMPONENT Development
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
+
+#Create and install the description of the libraries.
+install( EXPORT ${PROJECT_NAME}-export
+   FILE ${PROJECT_NAME}Targets.cmake
+   COMPONENT Development
+#   NAMESPACE "${PROJECT_NAME}::"
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
+
+# Install the hand-written project configuration.
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FullSimLightConfig.cmake.in
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+   @ONLY )
+install(
+   FILES
+   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
+   COMPONENT Development
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
+
+
+install( TARGETS FullSimLight
+   EXPORT ${PROJECT_NAME}-export
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
+
+   
+install(FILES include/FSLSensitiveDetectorPlugin.h 
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/FullSimLight
+   COMPONENT Development )
+
+

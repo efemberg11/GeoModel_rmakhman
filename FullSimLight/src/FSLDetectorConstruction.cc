@@ -70,6 +70,15 @@
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 #include "GeoModelKernel/GeoVolumeCursor.h"
 
+// For Sensitive Detector plugins:
+#include "FSLSensitiveDetectorPlugin.h"
+#include "FSLSDPluginLoader.h"
+#include "G4VSensitiveDetector.hh"
+#include "G4LogicalVolumeStore.hh"
+#include "G4LogicalVolume.hh"
+#include "G4SDManager.hh"
+
+
 #include <iomanip>
 
 G4AnalysisManager* FSLDetectorConstruction::fAnalysisManager = nullptr;
@@ -272,7 +281,10 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
         exit(-1);
     }
 
+
     fTimer.Stop();
+
+
     G4cout << "**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
     G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
     G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
@@ -354,6 +366,28 @@ void FSLDetectorConstruction::ConstructSDandField()
 {
  // if (std::abs(fFieldValue) > 0.0) {
 
+    for (unsigned int i=0;i<sensitiveDetectorPluginName.size();i++) {
+      FSLSDPluginLoader loader;
+      FSLSensitiveDetectorPlugin *plugin=loader.load(sensitiveDetectorPluginName[i]);
+      G4VSensitiveDetector *sensitiveDetector=plugin->getSensitiveDetector();
+      sensitiveDetector->Activate(true);
+      G4SDManager *sdm=G4SDManager::GetSDMpointer();
+      sdm->AddNewDetector(sensitiveDetector);
+      G4LogicalVolumeStore *logVolStore=G4LogicalVolumeStore::GetInstance();
+      for (auto lv: *logVolStore) {
+	for (auto v=plugin->beginLogVolumeNames();v!=plugin->endLogVolumeNames();v++) {
+	  if (*v==lv->GetName()) {
+	    std::cout << "Sensitive Detector " << sensitiveDetector->GetName() << " attached to log vol " << lv->GetName() << " active = " << sensitiveDetector->isActive() << std::endl;
+	    lv->SetSensitiveDetector(sensitiveDetector);
+	  }
+	}
+      }
+    }
+
+
+
+
+  
     if (fFieldConstant && std::abs(fFieldValue) > 0.0){
     // Apply a global uniform magnetic field along the Z axis.
     // Notice that only if the magnetic field is not zero, the Geant4

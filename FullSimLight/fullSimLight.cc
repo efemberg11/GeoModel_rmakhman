@@ -18,12 +18,12 @@
 #include "G4VModularPhysicsList.hh"
 
 #include "Randomize.hh"
-#include "MyDetectorConstruction.hh"
+#include "FSLDetectorConstruction.hh"
 #include "StandardEmWithWoodcock.hh"
 #include "EmExtraPhysics.hh"
 #include "G4NeutronTrackingCut.hh"
 
-#include "MyActionInitialization.hh"
+#include "FSLActionInitialization.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
 
 #include <getopt.h>
@@ -100,8 +100,8 @@ int main(int argc, char** argv) {
     << "   Run Overlap Check  =  " << parRunOverlapCheck              << G4endl
     << " ===================================================== "      << G4endl;
 
-    G4Timer myTotalCPUTimer;
-    myTotalCPUTimer.Start();
+    G4Timer FSLTotalCPUTimer;
+    FSLTotalCPUTimer.Start();
 
     //choose the Random engine: set to MixMax explicitely (default form 10.4)
     G4Random::setTheEngine(new CLHEP::MixMaxRng);
@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
     runManager->SetUserInitialization(physList);
 
     // 2. Detector construction
-    MyDetectorConstruction* detector = new MyDetectorConstruction;
+    FSLDetectorConstruction* detector = new FSLDetectorConstruction;
 
     if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
     if (activateRegions)    detector->SetAddRegions(true);
@@ -169,7 +169,7 @@ int main(int argc, char** argv) {
     runManager->SetUserInitialization(detector);
 
     // 3. User action
-    MyActionInitialization* actInit = new MyActionInitialization(parIsPerformance);
+    FSLActionInitialization* actInit = new FSLActionInitialization(parIsPerformance);
     // set the name of a region in which we are interested to see a very basic simulation
     // stat e.g. "EMEC" (NOTE: only if the given region can be found and executed in
     // non-perfomance mode)
@@ -192,11 +192,11 @@ int main(int argc, char** argv) {
     //
     // Delete the RunManager
     delete runManager;
-    myTotalCPUTimer.Stop();
+    FSLTotalCPUTimer.Stop();
     G4cout << "FullSimLight done! Total execution time info: " << G4endl;
-    G4cout << "*** User time elapsed   : " <<myTotalCPUTimer.GetUserElapsed()   << G4endl;
-    G4cout << "*** Real time elapsed   : " <<myTotalCPUTimer.GetRealElapsed()   << G4endl;
-    G4cout << "*** System time elapsed : " <<myTotalCPUTimer.GetSystemElapsed() << G4endl
+    G4cout << "*** User time elapsed   : " <<FSLTotalCPUTimer.GetUserElapsed()   << G4endl;
+    G4cout << "*** Real time elapsed   : " <<FSLTotalCPUTimer.GetRealElapsed()   << G4endl;
+    G4cout << "*** System time elapsed : " <<FSLTotalCPUTimer.GetSystemElapsed() << G4endl
     << " ================================================================= "    << G4endl;
     return 0;
 }

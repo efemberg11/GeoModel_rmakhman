@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE geomodel SYSTEM "geomodel.dtd" [
+
+<!-- include the file where the materials are defined -->
+<!ENTITY materials SYSTEM "materials.gmx" >
+
+]>
+
+<geomodel name="ITk_Example" version="1.0"
+  xmlns="http://www.nikhef.nl/%7Er29/gmx">
+
+  <!-- Definition of materials -->
+  <!-- Load materials -->
+  &materials;
+
+  <!-- Definition of shapes -->
+<shapes>
+    <box name="BoxShape" xhalflength="50" yhalflength="50"
+        zhalflength="50"/>
+    <box name="BigBox" xhalflength="1000" yhalflength="1000"
+        zhalflength="1000"/>
+</shapes>
+
+<!--We define the child logvol-->
+<logvol name="SingleBox" shape="BoxShape" material="Air" alignable="true" named="false" sensitive="RD53_20x19_Quad" identifier="true"/>
+
+
+<!-- The readout geometry -->
+<readoutgeometry>
+  <sensorclass name="QuadChip_RD53">
+    <param name="circuitsPerEta" value="2"/>
+    <param name="circuitsPerPhi" value="2"/>
+    <param name="thickness" value="0.150"/>
+    <param name="is3D" value="0"/>
+
+    <!-- main Quad type -->
+    <sensortype name="RD53_20x19_Quad">
+      <param name="rows" value="384"/>
+      <param name="columns" value="400"/>
+      <param name="pitchEta" value="0.050"/>
+      <param name="pitchPhi" value="0.050"/>
+      <param name="pitchEtaLong" value="0.100"/>
+      <param name="pitchPhiLong" value="0.100"/>
+      <param name="pitchEtaEnd" value="0.0"/>
+      <param name="pitchPhiEnd" value="0.0"/>
+      <param name="nPhiLongPerSide" value="2"/>
+      <param name="nEtaLongPerSide" value="2"/>
+      <param name="nPhiEndPerSide" value="0"/>
+      <param name="nEtaEndPerSide" value="0"/>
+    </sensortype>
+  </sensorclass>
+</readoutgeometry>
+
+
+<logvol name="MotherVolume" shape="BigBox" material="Air" alignable="false" named="true" identifier="false">
+    <!--<logvol name="MotherVolume" shape="BigBox" material="Air" alignable="true" sensitive="RD53_20x19_Quad" named="true" identifier="true">-->
+    <transform>
+        <transformation name="negTransf">
+            <translation z="-500"/>
+        </transformation>
+        <logvolref ref="SingleBox"/>
+    </transform>
+    <logvolref ref="SingleBox"/>
+    <transform>
+        <transformation name="posTransf">
+            <translation z="+500"/>
+        </transformation>
+        <logvolref ref="SingleBox"/>
+    </transform>
+</logvol>
+
+<!-- Adding volume branches -->
+  <addbranch>
+      <logvolref ref="MotherVolume" />
+  </addbranch>
+
+
+</geomodel>

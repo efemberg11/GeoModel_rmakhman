@@ -238,6 +238,11 @@ int main(int argc, char** argv) {
 //            std::cout<<"------------------------------------------------"<<std::endl;
         }
         
+        for (const auto& element : jf["Sensitive Detector Extensions"]){
+            
+            detector->AddSensitiveDetectorPlugin(element);
+        }
+        
         //parse and apply G4Commands
         for (const auto& element : jf["g4ui_commands"]){
             //std::cout<<"G4Commands: "<<element<<std::endl;

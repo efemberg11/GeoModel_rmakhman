@@ -148,20 +148,6 @@ int main(int argc, char** argv) {
     if(!isBatch){
         
         simConfig::parse_json_file(parConfigFileName);
-        
-        if(simConfig::fsl.eventGeneratorName=="Pythia")
-        {
-        set_pythia_config((simConfig::fsl.typeOfEvent).c_str());
-        }
-        
-        else
-        {
-        std::cerr << "Support for Pythia is not available. \nPlease visit the website http://home.thep.lu.se/Pythia/ to install it in your system." << std::endl;
-        exit(1);
-        }
-        
-        
-        
         parPhysListName = simConfig::fsl.physicsList;
     }
     G4bool activateRegions = false;
@@ -265,6 +251,18 @@ int main(int argc, char** argv) {
         for (const auto& element : simConfig::jf["Sensitive Detector Extensions"]){
             
             detector->AddSensitiveDetectorPlugin(element);
+        }
+        
+        if(simConfig::fsl.eventGeneratorName=="Pythia")
+        {
+#if USE_PYTHIA
+        set_pythia_config((simConfig::fsl.typeOfEvent).c_str());
+
+#else
+        std::cerr << "Support for Pythia is not available. \nPlease visit the website http://home.thep.lu.se/Pythia/ to install it in your system." << std::endl;
+        exit(1);
+            
+#endif
         }
         
         //parse and apply G4Commands

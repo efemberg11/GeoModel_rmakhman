@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(FullSimLightConfig VERSION 0.1 LANGUAGES CXX)
+project(fsl VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -24,9 +24,9 @@ file(GLOB uis ${PROJECT_SOURCE_DIR}/src/*.ui)
 set(PROJECT_SOURCES ${sources} ${headers}  ${uis} )
 
 
-add_executable(FullSimLightConfig ${PROJECT_SOURCES} )
+add_executable(fsl ${PROJECT_SOURCES} )
 
-target_link_libraries(FullSimLightConfig PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(FullSimLightConfig PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(fsl PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(fsl PRIVATE nlohmann_json::nlohmann_json)
 
 

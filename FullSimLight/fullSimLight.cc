@@ -38,6 +38,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
+                               
 static const std::string fullSimLightShareDir=FULLSIMLIGHTSHAREDIR;
 static std::string  parMacroFileName   = fullSimLightShareDir+"/macro.g4";
 static bool         parIsPerformance   = false;
@@ -46,6 +47,8 @@ static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
 bool isBatch = true;
 static std::string  parConfigFileName  = "config.json";
+
+
 
 void GetInputArguments(int argc, char** argv);
 void Help();
@@ -142,6 +145,25 @@ int main(int argc, char** argv) {
 #endif
     
     // 1. Physics list
+    if(!isBatch){
+        
+        simConfig::parse_json_file(parConfigFileName);
+        
+        if(simConfig::fsl.eventGeneratorName=="Pythia")
+        {
+        set_pythia_config((simConfig::fsl.typeOfEvent).c_str());
+        }
+        
+        else
+        {
+        std::cerr << "Support for Pythia is not available. \nPlease visit the website http://home.thep.lu.se/Pythia/ to install it in your system." << std::endl;
+        exit(1);
+        }
+        
+        
+        
+        parPhysListName = simConfig::fsl.physicsList;
+    }
     G4bool activateRegions = false;
     G4VModularPhysicsList* physList = nullptr;
     G4PhysListFactory factory;
@@ -205,20 +227,22 @@ int main(int argc, char** argv) {
     } else
     {
         
-        std::ifstream ifs(parConfigFileName);
-        auto jf=json::parse(ifs);
+      //  std::ifstream ifs(parConfigFileName);
+       // auto jf=json::parse(ifs);
         
-        simConfig::fslConfig fsl;
-        simConfig::regionConfig rc;
+      //  simConfig::fslConfig fsl;
+      //  simConfig::regionConfig rc;
         
         //read and store the configuration into the fslConfig struct
-        simConfig::from_json(jf, fsl);
+      //  simConfig::from_json(jf, fsl);
         
-        detector->SetGeometryFileName (fsl.geometry);
+        
+        
+        detector->SetGeometryFileName (simConfig::fsl.geometry);
         runManager->SetUserInitialization(detector);
         
         //parse RegionsData
-        for (const auto& element : jf["Regions data"]){
+        for (const auto& element : simConfig::jf["Regions data"]){
             
 //            std::cout<<"RegionName: "<<element["RegionName"]<<std::endl;
 //            std::cout<<"RootLVNames: "<<element["RootLVNames"]<<std::endl;
@@ -228,7 +252,7 @@ int main(int argc, char** argv) {
 //            std::cout<<"ProtonCut: "<<element["ProtonCut"]<<std::endl;
             
             //actually read the data and save them in a simConfig::regionConfig object (might be useful for the configuration later on)
-            simConfig::from_json(element, rc);
+            simConfig::from_json(element, simConfig::rc);
 //            std::cout<<"RegionName: "<<rc.regionName<<std::endl;
 //            std::cout<<"RootLVNames size: "<<rc.rootLVNames.size()<<std::endl;
 //            std::cout<<"GammaCut: "<<rc.gammaCut<<std::endl;
@@ -238,13 +262,13 @@ int main(int argc, char** argv) {
 //            std::cout<<"------------------------------------------------"<<std::endl;
         }
         
-        for (const auto& element : jf["Sensitive Detector Extensions"]){
+        for (const auto& element : simConfig::jf["Sensitive Detector Extensions"]){
             
             detector->AddSensitiveDetectorPlugin(element);
         }
         
         //parse and apply G4Commands
-        for (const auto& element : jf["g4ui_commands"]){
+        for (const auto& element : simConfig::jf["g4ui_commands"]){
             //std::cout<<"G4Commands: "<<element<<std::endl;
             UI->ApplyCommand(element);
         }
@@ -252,17 +276,17 @@ int main(int argc, char** argv) {
         G4cout
         << " ===================================================== "      << G4endl
         << "   Configuration parameters"                                  << G4endl
-        << "   Geometry file      =  " << fsl.geometry                    << G4endl
-        << "   Physics list name  =  " << fsl.physicsList                 << G4endl
-        << "   Generator          =  " << fsl.eventGeneratorName          << G4endl
-        << "   Magnetic Field     =  " << fsl.magFieldIntensity           << G4endl
+        << "   Geometry file      =  " << simConfig::fsl.geometry                    << G4endl
+        << "   Physics list name  =  " << simConfig::fsl.physicsList                 << G4endl
+        << "   Generator          =  " << simConfig::fsl.eventGeneratorName          << G4endl
+        << "   Magnetic Field     =  " << simConfig::fsl.magFieldIntensity           << G4endl
         << "   Run Overlap Check  =  " << parRunOverlapCheck              << G4endl
         << " ===================================================== "      << G4endl;
         
         
         // Initialize G4 kernel
         runManager->Initialize();
-        runManager->BeamOn(fsl.nEvents);
+        runManager->BeamOn(simConfig::fsl.nEvents);
     }
     
     //
@@ -337,6 +361,7 @@ void GetInputArguments(int argc, char** argv) {
                 break;
             case 'P':
 #if USE_PYTHIA
+                parMacroFileName   = fullSimLightShareDir+"/pythia.g4";
                 set_pythia_config(optarg);
 #else
                 std::cerr << "Support for Pythia is not available. \nPlease visit the website http://home.thep.lu.se/Pythia/ to install it in your system." << std::endl;

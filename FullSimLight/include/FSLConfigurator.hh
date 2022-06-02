@@ -15,6 +15,8 @@
 
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <fstream>
+
 
 using json = nlohmann::json;
 
@@ -26,6 +28,8 @@ using json = nlohmann::json;
  */
 
 namespace simConfig {
+
+
 
 struct regionConfig {
     std::string   regionName;
@@ -52,16 +56,26 @@ struct fslConfig{
     
     std::vector<regionConfig> regionsData;
     
+    std::string magFieldType;
     std::string magFieldIntensity;
     std::string magFieldMap;
     std::string magFieldPlugin;
     
-    std::vector<std::string> userActionExtensions;
+    std::vector<std::string> runActions;
+    std::vector<std::string> eventActions;
+    std::vector<std::string> steppingActions;
+    std::vector<std::string> stackingActions;
+    std::vector<std::string> trackingActions;
+
     std::vector<std::string> g4UiCommands;
 };
 
+fslConfig fsl;
+regionConfig rc;
+json jf;
+
 inline void to_json(json& j, const fslConfig& p) {
-    j = json{{"Geometry", p.geometry},{"Physics list name", p.physicsList},{"Number of events", p.nEvents},{"Magnetic field intensity", p.magFieldIntensity},{"Generator", p.eventGeneratorName},{"Event input file", p.eventInputFile},{"Type of event", p.typeOfEvent},{"Sensitive Detector Extensions", p.sensitiveDetectors},{"Output Hits file", p.outputHitsFile},{"Output Histo file", p.outputHistoFile},{"Magnetic Field Map", p.magFieldMap},{"Magnetic Field Plugin", p.magFieldPlugin},{"User Action Extensions", p.userActionExtensions},{"g4ui_commands", p.g4UiCommands}};
+    j = json{{"Geometry", p.geometry},{"Physics list name", p.physicsList},{"Number of events", p.nEvents},{"Magnetic Field Intensity", p.magFieldIntensity},{"Generator", p.eventGeneratorName},{"Event input file", p.eventInputFile},{"Type of event", p.typeOfEvent},{"Sensitive Detector Extensions", p.sensitiveDetectors},{"Output Hits file", p.outputHitsFile},{"Output Histo file", p.outputHistoFile},{"Magnetic Field Type", p.magFieldType},{"Magnetic Field Map", p.magFieldMap},{"Magnetic Field Plugin", p.magFieldPlugin},{"Run Actions", p.runActions},{"Event Actions", p.eventActions},{"Stepping Actions", p.steppingActions},{"Stacking Actions", p.stackingActions},{"Tracking Actions", p.trackingActions},{"g4ui_commands", p.g4UiCommands}};
     
 }
 inline void to_json(json& j, const regionConfig& r) {
@@ -71,7 +85,8 @@ inline void from_json(const json& j, fslConfig& p) {
     p.geometry=j.at("Geometry").get<std::string>();
     p.physicsList=j.at("Physics list name").get<std::string>();
     p.nEvents=j.at("Number of events").get<int>();
-    p.magFieldIntensity=j.at("Magnetic field intensity").get<std::string>();
+    p.magFieldType=j.at("Magnetic Field Type").get<std::string>();
+    p.magFieldIntensity=j.at("Magnetic Field Intensity").get<std::string>();
     p.eventGeneratorName=j.at("Generator").get<std::string>();
     p.eventInputFile=j.at("Event input file").get<std::string>();
     p.typeOfEvent=j.at("Type of event").get<std::string>();
@@ -80,7 +95,11 @@ inline void from_json(const json& j, fslConfig& p) {
     p.outputHistoFile=j.at("Output Histo file").get<std::string>();
     p.magFieldMap=j.at("Magnetic Field Map").get<std::string>();
     p.magFieldPlugin=j.at("Magnetic Field Plugin").get<std::string>();
-    p.userActionExtensions=j.at("User Action Extensions").get<std::vector<std::string>>();
+    p.runActions=j.at("Run Actions").get<std::vector<std::string>>();
+    p.eventActions=j.at("Event Actions").get<std::vector<std::string>>();
+    p.steppingActions=j.at("Stepping Actions").get<std::vector<std::string>>();
+    p.stackingActions=j.at("Stacking Actions").get<std::vector<std::string>>();
+    p.trackingActions=j.at("Tracking Actions").get<std::vector<std::string>>();
     p.g4UiCommands=j.at("g4ui_commands").get<std::vector<std::string>>();
     
 }
@@ -94,6 +113,20 @@ inline void from_json(const json& j, regionConfig& r) {
     r.protonCut=j.at("ProtonCut").get<double>();
 
 }
+
+auto parse_json_file(std::string config_file_name)
+{
+    std::ifstream ifs(config_file_name);
+    jf=json::parse(ifs);
+    
+    //read and store the configuration into the fslConfig struct
+    simConfig::from_json(jf, fsl);
+    
+    
+
+}
+
+
 
 } // namespace fslconf
 

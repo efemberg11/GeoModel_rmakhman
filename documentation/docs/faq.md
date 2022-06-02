@@ -1,6 +1,6 @@
 # Frequent Asked Questions (FAQ)
 
-
+  
 ## Visualization
 
 ### How can I move objects to the center of the 3D view? How can I move/pan the 3D view?

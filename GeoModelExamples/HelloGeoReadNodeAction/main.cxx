@@ -4,9 +4,12 @@
  * HelloGeo.cpp
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
- *  Created on: Nov, 2018
+ *  Created on: May, 2022
  *
  */
+
+// local includes
+#include "GeoInventoryGraphAction.h"
 
 // GeoModel includes
 #include "GeoModelDBManager/GMDBManager.h"
@@ -174,6 +177,11 @@ int main(int argc, char *argv[])
 		  std::cout << "\t\t GeoMaterial's number of elements: " << childVol->getNumElements() << std::endl;
 	  }
   }
+
+
+  GeoInventoryGraphAction action(std::cout);
+  world->exec(&action);
+
 
 
   std::cout << "Everything done." << std::endl;

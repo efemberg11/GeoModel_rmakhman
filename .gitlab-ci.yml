@@ -418,6 +418,8 @@ docs-build:
     #rules:
     #  - changes:
     #    - documentation/**/*
+    allow_failure: true
+    timeout: 30 minutes
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
     before_script:
         - apt-get update -qq && apt-get install -y -qq git wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev

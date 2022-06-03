@@ -43,7 +43,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     region_horizontalHeader.append("Gamma Cut");
     region_model->setHorizontalHeaderLabels(region_horizontalHeader);
     ui->regions_table->setModel(region_model);
-    ui->regions_table->horizontalHeader()->setStretchLastSection(true);
+  //  ui->regions_table->horizontalHeader()->setStretchLastSection(true);
+    ui->regions_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->regions_table->resizeRowsToContents();
     ui->regions_table->resizeColumnsToContents();
 
@@ -298,7 +299,7 @@ void FSLMainWindow::configure_g4ui_command()
     g4ui_commands.push_back("/control/cout/prefixString G4Worker_");
     g4ui_commands.push_back("/run/numberOfThreads " + ui->sB_NOT->text().toStdString());
 
-    if(magnetic_field_type=="Fixed")
+    if(magnetic_field_type=="Fixed Axial")
     {
     g4ui_commands.push_back("/FSLdet/setField " + ui->lE_fixed_MF->text().toStdString() +" tesla");
     }
@@ -637,7 +638,7 @@ void FSLMainWindow::configure_magnetic_field()
 {
     magnetic_field_type = (ui->cB_magnetic_field->currentText()).toStdString();
 
-    if(magnetic_field_type == "Fixed")
+    if(magnetic_field_type == "Fixed Axial")
     {
         magnetic_field = (ui->lE_fixed_MF->text()).toStdString();
         magnetic_field_plugin_file = "";
@@ -872,7 +873,7 @@ void FSLMainWindow::load_configuration()
 
     magnetic_field_type = j_load["Magnetic Field Type"];
 
-    if(magnetic_field_type == "Fixed")
+    if(magnetic_field_type == "Fixed Axial")
     {
         ui->lE_fixed_MF->setEnabled(true);
         ui->cB_magnetic_field->setCurrentIndex(0);

@@ -29,7 +29,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="main">
        <attribute name="title">
@@ -353,174 +353,119 @@
           <property name="title">
            <string>G4ParticleGun</string>
           </property>
-          <widget class="QLabel" name="label_15">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>40</y>
-             <width>111</width>
-             <height>18</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>15</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Particle name</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_19">
-           <property name="geometry">
-            <rect>
-             <x>310</x>
-             <y>80</y>
-             <width>28</width>
-             <height>18</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>15</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>GeV</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_17">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>120</y>
-             <width>121</width>
-             <height>18</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>15</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Particle Direction</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_16">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>80</y>
-             <width>111</width>
-             <height>18</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>15</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Particle Energy</string>
-           </property>
-          </widget>
-          <widget class="QLineEdit" name="lE_part_dir">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>120</y>
-             <width>101</width>
-             <height>21</height>
-            </rect>
-           </property>
-          </widget>
-          <widget class="QLineEdit" name="lE_part_energy">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>80</y>
-             <width>101</width>
-             <height>21</height>
-            </rect>
-           </property>
-          </widget>
-          <widget class="QComboBox" name="cB_particle">
-           <property name="geometry">
-            <rect>
-             <x>190</x>
-             <y>40</y>
-             <width>111</width>
-             <height>32</height>
-            </rect>
-           </property>
-           <item>
-            <property name="text">
-             <string>e-</string>
-            </property>
+          <layout class="QGridLayout" name="gridLayout_13">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Particle name</string>
+             </property>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>e+</string>
-            </property>
+           <item row="0" column="1" colspan="2">
+            <widget class="QComboBox" name="cB_particle">
+             <item>
+              <property name="text">
+               <string>e-</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>e+</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>pi-</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>pi+</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>mu-</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>mu+</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>geantino</string>
+              </property>
+             </item>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>pi-</string>
-            </property>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Particle Energy</string>
+             </property>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>pi+</string>
-            </property>
+           <item row="1" column="1" colspan="2">
+            <widget class="QLineEdit" name="lE_part_energy"/>
            </item>
-           <item>
-            <property name="text">
-             <string>mu-</string>
-            </property>
+           <item row="1" column="3">
+            <widget class="QLabel" name="label_19">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>GeV</string>
+             </property>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>mu+</string>
-            </property>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_17">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Particle Direction</string>
+             </property>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>geantino</string>
-            </property>
+           <item row="2" column="1" colspan="2">
+            <widget class="QLineEdit" name="lE_part_dir"/>
            </item>
-          </widget>
-          <widget class="QSpinBox" name="sB_NOPE">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>160</y>
-             <width>38</width>
-             <height>21</height>
-            </rect>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_18">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>160</y>
-             <width>81</width>
-             <height>51</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>15</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Number of primaries per event </string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
+           <item row="3" column="0" colspan="2">
+            <widget class="QLabel" name="label_18">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Number of primaries per event </string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QSpinBox" name="sB_NOPE"/>
+           </item>
+          </layout>
          </widget>
         </item>
         <item row="0" column="2">

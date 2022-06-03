@@ -96,7 +96,7 @@ int main(int argc, char ** argv) {
 
 
   //
-  // Create elements and materials:
+  // Create elements and materials for the "World" volume, which is the container:
   //
 
   const double  gr =   SYSTEM_OF_UNITS::gram;
@@ -172,9 +172,11 @@ int main(int argc, char ** argv) {
       GeoTransform *transform= new GeoTransform(aV.getTransform());
       world->add(nameTag);
       world->add(transform);
+      std::cout << "visiting: " << aV.getVolume()->getLogVol()->getName() << " [" << &*aV.getVolume() <<  "]" << std::endl;
       world->add((GeoVPhysVol *) &*aV.getVolume());
       aV.next();
     }
+
     delete db;
   }
   //
@@ -191,7 +193,11 @@ int main(int argc, char ** argv) {
 
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
-  dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
+  if (vecPluginsPublishers.size() > 0) {
+      dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
+  } else {
+      dumpGeoModelGraph.saveToDB();
+  }
 
   world->unref();
 

@@ -37,7 +37,7 @@ variables:
 
 # general Ubuntu job template
 .ubuntu-template-job-base: &ubuntu-job-base
-  image: ubuntu:18.04
+  image: ubuntu:22.04
   tags:
     - docker
   rules:

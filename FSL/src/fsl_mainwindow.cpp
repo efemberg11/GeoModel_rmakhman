@@ -118,6 +118,27 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->tB_view_config->setCurrentFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     ui->tB_view_config->setFontPointSize(13);
 
+    p_x_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    p_y_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    p_z_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    mag_field_validator = new QDoubleValidator(-100000.0,100000.0,8);
+
+
+    ui->lE_px->setValidator(p_x_validator);
+    ui->lE_py->setValidator(p_y_validator);
+    ui->lE_pz->setValidator(p_z_validator);
+    ui->lE_fixed_MF->setValidator(mag_field_validator);
+
+    ui->lE_hits->setEnabled(false);
+    ui->lE_histo->setEnabled(false);
+
+
+    ui->tab->setEnabled(false);//Shape tab (Change name on UI)
+    ui->Region->setEnabled(false);
+    ui->User_Actions->setEnabled(false);
+
+
+
     //Setting up Signals
     connect(ui->cB_gen_options, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_generator);
     connect(ui->cB_magnetic_field, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_magnetic_field);
@@ -144,6 +165,11 @@ FSLMainWindow::~FSLMainWindow()
     delete region_model;
     delete user_action_model;
     delete shape_model;
+    delete p_x_validator;
+    delete p_y_validator;
+    delete p_z_validator;
+    delete mag_field_validator;
+
 }
 
 
@@ -308,7 +334,6 @@ void FSLMainWindow::configure_g4ui_command()
     if(generator=="Pythia")
     {
     g4ui_commands.push_back("/run/initialize");
-    g4ui_commands.push_back("/run/beamOn " + ui->sB_NOE->text().toStdString());
     }
 
     if(generator=="G4ParticleGun")
@@ -317,6 +342,7 @@ void FSLMainWindow::configure_g4ui_command()
     g4ui_commands.push_back("/FSLgun/energy  " + particle_energy);
     g4ui_commands.push_back("/FSLgun/particle  " + particle);
     g4ui_commands.push_back("/FSLgun/direction  " + particle_direction);
+
     }
 
     g4ui_commands.push_back("/process/list");

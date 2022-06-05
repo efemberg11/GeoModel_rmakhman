@@ -6,6 +6,7 @@
 #include <QStringListModel>
 #include <QProcess>
 #include <QStandardItemModel>
+#include <QDoubleValidator>
 #include "configregions.h"
 
 QT_BEGIN_NAMESPACE
@@ -197,6 +198,10 @@ private:
     QStandardItemModel *user_action_model;
     QStringList region_horizontalHeader;
     QStringList user_action_horizontalHeader;
+    QDoubleValidator *p_x_validator;
+    QDoubleValidator *p_y_validator;
+    QDoubleValidator *p_z_validator;
+    QDoubleValidator *mag_field_validator;
 
 
 

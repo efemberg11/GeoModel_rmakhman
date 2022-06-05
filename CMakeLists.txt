@@ -95,7 +95,9 @@ endif()
 if(GEOMODEL_BUILD_FULLSIMLIGHT)
   set(GEOMODEL_BUILD_GEOMODELG4 TRUE) # FullSimLight needs GeoModelG4
   add_subdirectory(FullSimLight)
+  add_subdirectory(FSL)
   list( APPEND BUILT_PACKAGES "FullSimLight")
+  list( APPEND BUILT_PACKAGES "FSL")
 endif()
 
 if(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION)

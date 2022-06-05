@@ -65,6 +65,12 @@ public:
     std::string particle = "";
     std::string particle_energy = "";
     std::string particle_direction = "";
+    double p_x;
+    double p_y;
+    double p_z;
+    std::string x_dir;
+    std::string y_dir;
+    std::string z_dir;
     int number_of_primaries_per_event;
     std::string pythia_input_file = "";
     std::string pythia_type_of_event = "";
@@ -118,6 +124,7 @@ public:
 
     void clear_main_status();
     void configure_generator();
+    void configure_energy_direction();
 
 
     void add_sens_det();

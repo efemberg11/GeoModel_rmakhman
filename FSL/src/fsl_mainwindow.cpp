@@ -13,13 +13,14 @@
 #include <sstream>
 #include <nlohmann/json.hpp>
 #include <cmath>
-
+#include <unistd.h>
+#include <libgen.h>
 FSLMainWindow::FSLMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::FSLMainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("Configuration Utility (beta version)");
+    this->setWindowTitle("FullSimLight-GUI (beta version)");
 
     //Setting up Models
     sens_det_model = new QStringListModel(this);
@@ -62,9 +63,10 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
     //Setting up Connections
     connect(ui->pB_geom, &QPushButton::released, this, &FSLMainWindow::assign_geom_file);
-    connect(ui->pB_Save, &QPushButton::released, this, &FSLMainWindow::save_configuration);
+    connect(ui->actionSave, &QAction::triggered, this, &FSLMainWindow::save_configuration);
+    connect(ui->actionSave_as, &QAction::triggered, this, &FSLMainWindow::save_configuration_as);
+    connect(ui->actionOpen, &QAction::triggered, this, &FSLMainWindow::load_configuration);
     connect(ui->pB_view, &QPushButton::released, this, &FSLMainWindow::view_configuration);
-    connect(ui->pB_Load, &QPushButton::released, this, &FSLMainWindow::load_configuration);
     connect(ui->pB_Run, &QPushButton::released, this, &FSLMainWindow::run_configuration);
     connect(ui->pB_main_clear, &QPushButton::released, this, &FSLMainWindow::clear_main_status);
     connect(ui->pB_pythia_browse, &QPushButton::released, this, &FSLMainWindow::assign_pythia_file);
@@ -87,6 +89,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_tracking_actions, &QPushButton::released, this, &FSLMainWindow::assign_tracking_actions_file);
     connect(ui->pB_del_user_action, &QPushButton::released, this, &FSLMainWindow::del_user_action);
 
+    connect(ui->actionQuit, &QAction::triggered, qApp, &QApplication::quit);
+    
 
     //Setting widget properties
     ui->sB_NOE->setMaximum(10000);
@@ -101,7 +105,6 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->cB_pythia_type_of_eve->setEnabled(false);
     ui->lE_magnetic_field_map->setEnabled(false);
     ui->pB_magnetic_field_plugin->setEnabled(false);
-    ui->lE_CFN->setText("config");
     ui->cB_particle->setCurrentIndex(0);
     ui->lE_px->setText("0");
     ui->lE_py->setText("10");
@@ -740,12 +743,40 @@ void FSLMainWindow::view_configuration()
 void FSLMainWindow::save_configuration()
 {
 
-    this->create_configuration();
-    save_directory = this->get_directory();
-    config_file_name = (ui->lE_CFN->text()).toStdString();
-    std::filesystem::path  save_file_path = save_directory + "/" + config_file_name + ".json";
-    std::ofstream o(save_file_path);
+    create_configuration();
+    if (config_file_name.empty()) {
+      save_configuration_as();
+      return;
+    }
+    //    config_file_name = (ui->lE_CFN->text()).toStdString();
+    std::ofstream o(config_file_name);
     o << std::setw(4) << j << std::endl;
+}
+
+//Function to save current configuration
+void FSLMainWindow::save_configuration_as()
+{
+    create_configuration();
+    if (save_directory.empty()) save_directory=std::filesystem::current_path().string()+"/";
+    
+    QString fileName = QFileDialog::getSaveFileName(this,
+						    tr("Save Configuration"), save_directory.c_str(), tr("Configuration Files (*.json)"));
+    if (fileName.isEmpty()) return;
+    std::string   save_file=fileName.toStdString();
+    std::string   save_base=basename(const_cast<char *> (save_file.c_str()));
+    save_directory=dirname(const_cast<char *> (save_file.c_str()));
+
+    std::ofstream o(save_directory+"/"+save_base);
+    o << std::setw(4) << j << std::endl;
+
+    
+    config_file_name=save_directory+"/"+save_base;
+    ui->lE_CFN->setText(("Config file: " + config_file_name).c_str());
+    ui->lE_CFN->adjustSize();
+ 
+    
+
+
 }
 
 //Function to run a selected configuration.
@@ -784,16 +815,31 @@ void FSLMainWindow::readyReadStandardError()
 //Function to load configuration
 void FSLMainWindow::load_configuration()
 {
-    load_file_name = this->get_file_name();
+
+    if (save_directory.empty()) save_directory=std::filesystem::current_path().string()+"/";
+    QString fileName = QFileDialog::getOpenFileName(this,
+						    tr("Open Configuration"), save_directory.c_str(), tr("Configuration Files (*.json)"));
+
+    if (fileName.isEmpty()) return;
+
+    std::string   load_file=fileName.toStdString();
+    std::string   load_base=basename(const_cast<char *> (load_file.c_str()));
+    std::string   load_directory=dirname(const_cast<char *> (load_file.c_str()));
+    load_file_name=load_directory+"/"+load_base;
+
+    // Store these values:
+    save_directory=load_directory;// When browser is reopened, start from here.
+    config_file_name=load_file_name;
 
     if(load_file_name.find(".json") != std::string::npos)
     {
     std::ifstream ifs(load_file_name);
     auto j_load = nlohmann::json::parse(ifs);
 
-    QFileInfo file(QString::fromUtf8(load_file_name.c_str()));
-    ui->lE_CFN->setText(file.baseName());
-
+    //    QFileInfo file(QString::fromUtf8(load_file_name.c_str()));
+    ui->lE_CFN->setText(("Config file: " + config_file_name).c_str());
+    ui->lE_CFN->adjustSize();
+    
     geom_file_address = j_load["Geometry"];
 
     physics_list_name = j_load["Physics list name"];

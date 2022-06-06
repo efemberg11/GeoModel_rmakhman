@@ -117,6 +117,7 @@ public:
 
     //Functions used in Configuration
     void save_configuration();
+    void save_configuration_as();
     void create_configuration();
     void view_configuration();
     void run_configuration();

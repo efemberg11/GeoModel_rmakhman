@@ -12,7 +12,6 @@ stages:
 variables:
   CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
-  XERCESC_VERSION_BASE: 3.2.2
   # also, 'CMAKE_EXTRA_FLAGS' will be specified by specific jobs when needed, and used by job templates like 'geomodel-job'
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -37,7 +36,7 @@ variables:
 
 # general Ubuntu job template
 .ubuntu-template-job-base: &ubuntu-job-base
-  image: ubuntu:18.04
+  image: ubuntu:22.04
   tags:
     - docker
   rules:
@@ -51,10 +50,7 @@ variables:
 .ubuntu-template-job-default: &ubuntu-job
   <<: *ubuntu-job-base
   before_script:
-    - apt-get update -qq && apt-get install -y -qq git wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
-    - wget https://cmake.org/files/v3.14/cmake-3.14.7-Linux-x86_64.tar.gz
-    - tar -C /usr/local --strip-components=1 --no-same-owner -xvf cmake-*-Linux-x86_64.tar.gz
-    - rm cmake-*-Linux-x86_64.tar.gz
+    - apt-get update -qq && apt-get install -y -qq git wget unzip build-essential freeglut3-dev libboost-all-dev qtbase5-dev libqt5opengl5-dev mercurial libeigen3-dev libsqlite3-dev nlohmann-json3-dev libexpat1-dev libxerces-c-dev cmake
 
 
 # .ubuntu-template-job-registry: &ubuntu-job-registry
@@ -105,42 +101,24 @@ variables:
       - install
 
 
-.xercesc-build-template-job: &xercesc-job
-  stage: step-A
-  variables:
-    XERCESC_VERSION: ${XERCESC_VERSION_BASE}
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC_VERSION}.tar.gz
-    - tar -xf xerces-c-${XERCESC_VERSION}.tar.gz
-    - mkdir xerces-c-build-${XERCESC_VERSION}
-    - cd xerces-c-build-${XERCESC_VERSION}
-    - cmake ${CMAKE_ARGS} ../xerces-c-${XERCESC_VERSION}
-    - make -j4
-    - make install
-  artifacts:
-    paths:
-      - install
 
 
 .geant4-build-template-job: &geant4-job
   stage: step-B
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    XERCESC_VERSION: ${XERCESC_VERSION_BASE}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/geant4/geant4.git
     - cd geant4
-    - git checkout tags/v10.6.0
+    - git checkout tags/v11.0.2
     - cd ../
     - mkdir Geant4-build
     - cd Geant4-build
     - ls;
     - ls ../
     - ls ../install
-    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install ../geant4 -DGEANT4_USE_SYSTEM_EXPAT=OFF
+    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON  ../geant4 
     - make -j4
     - make install
   artifacts:
@@ -288,25 +266,23 @@ ubu-soqt:
   stage: step-B
   needs: ["ubu-coin"]
 
-ubu-gm-base-builtin:
+ubu-gm-base:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubu-gm-tools-builtin:
+ubu-gm-tools:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-ubu-gm-visualization-builtin:
+ubu-gm-visualization:
   <<: *ubuntu-job
   <<: *geomodel-job
   needs: ["ubu-coin", "ubu-soqt"]
@@ -314,56 +290,32 @@ ubu-gm-visualization-builtin:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubu-gm-examples-builtin:
+ubu-gm-examples:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
-    CMAKE_EXTRA_FLAGS:  -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-ubu-XercesC:
-  <<: *ubuntu-job
-  <<: *xercesc-job
-
-ubu-XercesC-323:
-  <<: *ubuntu-job
-  <<: *xercesc-job
-  variables:
-    XERCESC_VERSION: 3.2.3
-    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install/xerces-c-${XERCESC_VERSION} # was: ${CMAKE_BASE_ARGS}
 
 ubu-geant4:
   <<: *ubuntu-job
   <<: *geant4-job
-  needs: ["ubu-XercesC"]
 
 
-ubu-gm-examples-gmg4-builtinjson:
+ubu-gm-examples-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC"]
+  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
 
-ubu-gm-gmg4-builtinjson:
-  <<: *ubuntu-job
-  <<: *geomodel-job
-  stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC"]
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
-
-ubu-gm-gmg4-builtinxercesc-builtinjson:
+ubu-gm-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
@@ -371,20 +323,9 @@ ubu-gm-gmg4-builtinxercesc-builtinjson:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-ubu-gm-fullsimlight-builtinjson:
-  <<: *ubuntu-job
-  <<: *geomodel-job
-  stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC"]
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
-
-ubu-gm-fullsimlight-builtinxercesc-builtinjson:
+ubu-gm-fullsimlight:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
@@ -392,7 +333,6 @@ ubu-gm-fullsimlight-builtinxercesc-builtinjson:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
 #TODO: this does not work properly. Needs some work...
@@ -400,7 +340,7 @@ ubu-gm-fullsimlight-builtinxercesc-builtinjson:
 #   <<: *ubuntu-job
 #   <<: *geomodel-job
 #   stage: step-C
-#   needs: ["ubu-geant4", "ubu-XercesC-323"]
+#   needs: ["ubu-geant4"]
 #   variables:
 #     XERCESC_VERSION: 3.2.3
 #     CMAKE_ARGS: ${CMAKE_BASE_ARGS}

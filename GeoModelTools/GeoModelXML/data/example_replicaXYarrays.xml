@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE geomodel SYSTEM "geomodel.dtd" [
+
+<!--Author: Andrea Dell'Acqua, Aug 2021-->
+
+<!-- include the file where the materials are defined -->
+<!ENTITY materials SYSTEM "materials.gmx" >
+
+]>
+
+<geomodel name="ITk_Example" version="1.0"
+  xmlns="http://www.nikhef.nl/%7Er29/gmx">
+
+  <!-- Definition of materials -->
+  <!-- Load materials -->
+  &materials;
+
+  <!-- Definition of variables -->
+  <defines>
+    <vector name="xp" value="-100 100 300 500 100 300 500 100 300 500" />
+    <vector name="yp" value="600 200 200 200 400 400 400 600 600 600" />
+  </defines>
+  
+  <!-- Definition of shapes -->  
+  <shapes>
+    <box name="Box" xhalflength="90" yhalflength="90" zhalflength="10" />   
+  </shapes>
+  
+  <!-- Defining logical volumes -->
+  <logvol name="MyBox" shape="Box" material="N2"/>
+
+  <!-- Adding volume branches -->
+  <addbranch>
+        <assembly name="mytest" >
+                <replicaXYarrays name="boxArray" n="10" zValue="500" xCoordinates="xp" yCoordinates="yp" >
+                  <logvolref ref="MyBox" /> 
+                </replicaXYarrays>
+        </assembly> 
+</addbranch>
+
+</geomodel>

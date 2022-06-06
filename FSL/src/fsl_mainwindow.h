@@ -127,7 +127,6 @@ public:
     void configure_generator();
     void configure_energy_direction();
 
-
     void add_sens_det();
     void del_sens_det();
     void configure_sens_det_actions();
@@ -202,8 +201,6 @@ private:
     QDoubleValidator *p_y_validator;
     QDoubleValidator *p_z_validator;
     QDoubleValidator *mag_field_validator;
-
-
 
 
 };

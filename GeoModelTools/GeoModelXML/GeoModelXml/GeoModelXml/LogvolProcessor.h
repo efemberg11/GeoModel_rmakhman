@@ -15,6 +15,7 @@
 class GmxUtil;
 class GeoNameTag;
 class GeoLogVol;
+class GeoPhysVol;
 
 class LogvolProcessor: public ElementProcessor {
 public:
@@ -28,6 +29,7 @@ public:
     void zeroId(const xercesc::DOMElement *element);
 private:
     std::map<std::string, LogVolStore> m_map; 
+    std::map<std::string, GeoPhysVol*> m_mapPV; 
 };
 
 #endif // LOGVOL_PROCESSOR_H

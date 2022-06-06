@@ -28,6 +28,23 @@
 
 int main(int argc, char** argv)
 {
+
+  // We don't know for sure which one of these causes the trouble..We add them all till we understand why this
+  // is happening and correct the problem where it occurs.
+
+  
+    setenv("LC_ADDRESS","en_US.UTF-8",1);
+    setenv("LC_NAME","en_US.UTF-8",1);
+    setenv("LC_MONETARY","en_US.UTF-8",1);
+    setenv("LC_PAPER","en_US.UTF-8",1);
+    setenv("LC_IDENTIFICATION","en_US.UTF-8",1);
+    setenv("LC_TELEPHONE","en_US.UTF-8",1);
+    setenv("LC_MEASUREMENT","en_US.UTF-8",1);
+    setenv("LC_TIME","en_US.UTF-8",1);
+    setenv("LC_NUMERIC","en_US.UTF-8",1);
+    
+
+  
   auto pManip= [] (const char * variable, const char *plus) {
 		 const char *path=getenv(variable);
 		 if (path) {

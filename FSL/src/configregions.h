@@ -35,9 +35,6 @@ private:
     QDoubleValidator *proton_cut_validator;
     QDoubleValidator *positron_cut_validator;
     QDoubleValidator *gamma_cut_validator;
-
-    
-    
 };
 
 #endif // CONFIGREGIONS_H

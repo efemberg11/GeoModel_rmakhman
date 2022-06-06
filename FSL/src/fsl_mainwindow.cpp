@@ -12,14 +12,14 @@
 #include <fstream>
 #include <sstream>
 #include <nlohmann/json.hpp>
-#include <math.h>
+#include <cmath>
 
 FSLMainWindow::FSLMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::FSLMainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("Configuration Utility Beta");
+    this->setWindowTitle("Configuration Utility (beta version)");
 
     //Setting up Models
     sens_det_model = new QStringListModel(this);
@@ -90,7 +90,12 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
     //Setting widget properties
     ui->sB_NOE->setMaximum(10000);
+<<<<<<< HEAD
     ui->sB_NOT->setMaximum(std::thread::hardware_concurrency());
+=======
+    ui->sB_NOT->setMaximum(10000);
+    ui->sB_NOPE->setMaximum(10000);
+>>>>>>> origin/master
     ui->sB_control->setMaximum(5);
     ui->sB_run->setMaximum(5);
     ui->sB_event->setMaximum(5);
@@ -103,21 +108,31 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->pB_magnetic_field_plugin->setEnabled(false);
     ui->lE_CFN->setText("config");
     ui->cB_particle->setCurrentIndex(0);
+<<<<<<< HEAD
     ui->lE_px->setText("0");
     ui->lE_py->setText("10");
     ui->lE_pz->setText("0");
 
+=======
+    ui->lE_part_energy->setText("10");
+    ui->lE_part_dir->setText("0,1,0");
+>>>>>>> origin/master
 
     ui->lE_PLN->setText("FTFP_BERT");
     ui->lE_fixed_MF->setText("4.0");
     ui->sB_NOT->setValue(std::thread::hardware_concurrency());
     ui->sB_NOE->setValue(10);
+<<<<<<< HEAD
     number_of_primaries_per_event = 1;
+=======
+    ui->sB_NOPE->setValue(2);
+>>>>>>> origin/master
     ui->lE_hits->setText("HITS.root");
     ui->lE_histo->setText("HISTO.root");
     ui->tB_view_config->setCurrentFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     ui->tB_view_config->setFontPointSize(13);
 
+<<<<<<< HEAD
     p_x_validator = new QDoubleValidator(-100000.0,100000.0,8);
     p_y_validator = new QDoubleValidator(-100000.0,100000.0,8);
     p_z_validator = new QDoubleValidator(-100000.0,100000.0,8);
@@ -139,6 +154,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
 
 
+=======
+>>>>>>> origin/master
     //Setting up Signals
     connect(ui->cB_gen_options, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_generator);
     connect(ui->cB_magnetic_field, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_magnetic_field);
@@ -151,7 +168,11 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readyReadStandardError()));
 
 
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> origin/master
 
 
 }
@@ -165,11 +186,14 @@ FSLMainWindow::~FSLMainWindow()
     delete region_model;
     delete user_action_model;
     delete shape_model;
+<<<<<<< HEAD
     delete p_x_validator;
     delete p_y_validator;
     delete p_z_validator;
     delete mag_field_validator;
 
+=======
+>>>>>>> origin/master
 }
 
 
@@ -334,15 +358,26 @@ void FSLMainWindow::configure_g4ui_command()
     if(generator=="Pythia")
     {
     g4ui_commands.push_back("/run/initialize");
+<<<<<<< HEAD
+=======
+    g4ui_commands.push_back("/run/beamOn " + ui->sB_NOE->text().toStdString());
+>>>>>>> origin/master
     }
 
     if(generator=="G4ParticleGun")
     {
+<<<<<<< HEAD
     g4ui_commands.push_back("/FSLgun/primaryPerEvt " + std::to_string(number_of_primaries_per_event));
     g4ui_commands.push_back("/FSLgun/energy  " + particle_energy);
     g4ui_commands.push_back("/FSLgun/particle  " + particle);
     g4ui_commands.push_back("/FSLgun/direction  " + particle_direction);
 
+=======
+    g4ui_commands.push_back("/FSLgun/primaryPerEvt " + ui->sB_NOPE->text().toStdString());
+    g4ui_commands.push_back("/FSLgun/energy  " + particle_energy);
+    g4ui_commands.push_back("/FSLgun/particle  " + particle);
+    g4ui_commands.push_back("/FSLgun/direction  " + particle_direction);
+>>>>>>> origin/master
     }
 
     g4ui_commands.push_back("/process/list");
@@ -615,6 +650,7 @@ void FSLMainWindow::assign_magnetic_field_plugin_file()
     magnetic_field_plugin_file = this->get_file_name();
 }
 
+<<<<<<< HEAD
 //Function to configure particle energy and direction
 void FSLMainWindow::configure_energy_direction()
 {
@@ -635,6 +671,8 @@ void FSLMainWindow::configure_energy_direction()
 
 
 }
+=======
+>>>>>>> origin/master
 
 //Function to select type of generator
 void FSLMainWindow::configure_generator()
@@ -643,6 +681,7 @@ void FSLMainWindow::configure_generator()
 
     if(generator=="G4ParticleGun")
     {
+<<<<<<< HEAD
         this->configure_energy_direction();
         ui->pB_pythia_browse->setEnabled(false);
         ui->cB_pythia_type_of_eve->setEnabled(false);
@@ -653,6 +692,22 @@ void FSLMainWindow::configure_generator()
 
 
         particle = (ui->cB_particle->currentText()).toStdString();
+=======
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->cB_pythia_type_of_eve->setEnabled(false);
+
+        ui->sB_NOPE->setEnabled(true);
+        ui->cB_particle->setEnabled(true);
+        ui->lE_part_energy->setEnabled(true);
+        ui->lE_part_dir->setEnabled(true);
+
+        particle = (ui->cB_particle->currentText()).toStdString();
+        particle_energy = (ui->lE_part_energy->text()).toStdString() + " GeV";
+        particle_direction = (ui->lE_part_dir->text()).toStdString();
+        std::replace(particle_direction.begin(), particle_direction.end(), ',', ' ');
+        number_of_primaries_per_event = ui->sB_NOPE->value();
+
+>>>>>>> origin/master
         pythia_type_of_event = "";
         pythia_input_file = "";
     }
@@ -662,6 +717,7 @@ void FSLMainWindow::configure_generator()
         ui->pB_pythia_browse->setEnabled(true);
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
+<<<<<<< HEAD
         ui->cB_particle->setEnabled(false);
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
@@ -675,6 +731,17 @@ void FSLMainWindow::configure_generator()
         p_y = 0;
         p_z = 0;
 
+=======
+        ui->sB_NOPE->setEnabled(false);
+        ui->cB_particle->setEnabled(false);
+        ui->lE_part_energy->setEnabled(false);
+        ui->lE_part_dir->setEnabled(false);
+
+        number_of_primaries_per_event = 0;
+        particle = "";
+        particle_energy = "";
+        particle_direction = "";
+>>>>>>> origin/master
 
         pythia_type_of_event = (ui->cB_pythia_type_of_eve->currentText()).toStdString();
     }
@@ -817,6 +884,7 @@ void FSLMainWindow::load_configuration()
 
     if(generator=="G4ParticleGun")
     {
+<<<<<<< HEAD
         ui->cB_gen_options->setCurrentIndex(0);
 
         ui->cB_particle->setEnabled(true);
@@ -824,10 +892,19 @@ void FSLMainWindow::load_configuration()
         ui->lE_py->setEnabled(true);
         ui->lE_pz->setEnabled(true);
 
+=======
+        ui->sB_NOPE->setEnabled(true);
+        ui->cB_particle->setEnabled(true);
+        ui->lE_part_energy->setEnabled(true);
+        ui->lE_part_dir->setEnabled(true);
+
+        ui->cB_gen_options->setCurrentIndex(0);
+>>>>>>> origin/master
 
         particle = j_load["Particle"];
         ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
 
+<<<<<<< HEAD
         p_x = j_load["p_x"];
         p_y = j_load["p_y"];
         p_z = j_load["p_z"];
@@ -838,6 +915,21 @@ void FSLMainWindow::load_configuration()
 
 
         ui->cB_pythia_type_of_eve->setCurrentIndex(0);
+=======
+        particle_energy = j_load["Particle energy"];
+        particle_energy.erase(particle_energy.length()-4);
+        ui->lE_part_energy->setText(QString::fromUtf8(particle_energy.c_str()));
+
+        particle_direction = j_load["Particle direction"];
+        std::replace(particle_direction.begin(), particle_direction.end(), ' ', ',');
+        ui->lE_part_dir->setText(QString::fromUtf8(particle_direction.c_str()));
+
+        number_of_primaries_per_event = j_load["Number of primaries per events"];
+        ui->sB_NOPE->setValue(number_of_primaries_per_event);
+
+        ui->cB_pythia_type_of_eve->setCurrentIndex(0);
+
+>>>>>>> origin/master
         ui->pB_pythia_browse->setEnabled(false);
         ui->cB_pythia_type_of_eve->setEnabled(false);
 
@@ -853,10 +945,15 @@ void FSLMainWindow::load_configuration()
 
         pythia_type_of_event = j_load["Type of event"];
         ui->cB_pythia_type_of_eve->setCurrentText(QString::fromUtf8(pythia_type_of_event.c_str()));
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
         pythia_input_file = j_load["Event input file"];
 
 
         ui->cB_particle->setCurrentIndex(0);
+<<<<<<< HEAD
         ui->lE_px->clear();
         ui->lE_py->clear();
         ui->lE_pz->clear();
@@ -866,6 +963,17 @@ void FSLMainWindow::load_configuration()
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
         ui->lE_pz->setEnabled(false);
+=======
+        ui->lE_part_energy->clear();
+        ui->lE_part_dir->clear();
+        ui->sB_NOPE->setValue(0);
+
+
+        ui->sB_NOPE->setEnabled(false);
+        ui->cB_particle->setEnabled(false);
+        ui->lE_part_energy->setEnabled(false);
+        ui->lE_part_dir->setEnabled(false);
+>>>>>>> origin/master
 
 
 
@@ -1108,11 +1216,17 @@ void FSLMainWindow::create_configuration()
     this->configure_generator();
     j["Generator"] = generator;
     j["Particle"] = particle;
+<<<<<<< HEAD
     j["p_x"] = p_x;
     j["p_y"] = p_y;
     j["p_z"] = p_z;
     j["Particle energy"] = particle_energy;
     j["Particle direction"] = particle_direction;
+=======
+    j["Particle energy"] = particle_energy;
+    j["Particle direction"] = particle_direction;
+    j["Number of primaries per events"] = number_of_primaries_per_event;
+>>>>>>> origin/master
     j["Event input file"] = pythia_input_file;
     j["Type of event"] = pythia_type_of_event;
 

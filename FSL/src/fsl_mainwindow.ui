@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1232</width>
+    <width>1261</width>
     <height>726</height>
    </rect>
   </property>
@@ -29,7 +29,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="main">
        <attribute name="title">
@@ -39,7 +39,7 @@
         <item row="1" column="0" colspan="2">
          <widget class="QTextBrowser" name="tB_view_config">
           <property name="textInteractionFlags">
-           <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextEditorInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           <set>Qt::NoTextInteraction</set>
           </property>
          </widget>
         </item>
@@ -545,6 +545,11 @@
                <string>minbias</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>select file</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
@@ -630,7 +635,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>g4Ui Commands</string>
+                <string>G4Ui Commands</string>
                </property>
               </widget>
              </item>
@@ -822,7 +827,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Additional g4Ui Commands</string>
+           <string>Additional G4Ui Commands</string>
           </property>
          </widget>
         </item>
@@ -992,7 +997,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Magnetic FIeld Plugin</string>
+                <string>Magnetic Field Plugin</string>
                </property>
               </widget>
              </item>
@@ -1011,7 +1016,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Magnetic FIeld Map</string>
+                <string>Magnetic Field Map</string>
                </property>
               </widget>
              </item>
@@ -1540,8 +1545,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1232</width>
-     <height>22</height>
+     <width>1261</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

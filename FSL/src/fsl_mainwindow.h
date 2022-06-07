@@ -187,6 +187,8 @@ private slots:
     void add_region(std::string  region_name, std::string frootLV_names
                     ,double electron_cut , double proton_cut
                     ,double positron_cut , double gamma_cut);
+    
+    void check_if_pythia_file();
     void fsmlreadyReadStandardOutput();
     void fsmlreadyReadStandardError();
     void fsml_process_started();

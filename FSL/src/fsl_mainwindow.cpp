@@ -38,7 +38,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     region = new ConfigRegions(this);
     region_model = new QStandardItemModel(this);
     region_horizontalHeader.append("Region Name");
-    region_horizontalHeader.append("fRootLV Names");
+    region_horizontalHeader.append("RootLV Names");
     region_horizontalHeader.append("Electron Cut");
     region_horizontalHeader.append("Proton Cut");
     region_horizontalHeader.append("Positron Cut");
@@ -145,6 +145,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     //Setting up Signals
     connect(ui->cB_gen_options, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_generator);
     connect(ui->cB_magnetic_field, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_magnetic_field);
+    connect(ui->cB_pythia_type_of_eve, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::check_if_pythia_file);
+
     connect(this, &FSLMainWindow::send_error_message, this, &FSLMainWindow::catch_error_message);
     connect(ui->sens_det_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_sens_det_index(QModelIndex)));
     connect(ui->g4ui_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_g4ui_index(QModelIndex)));
@@ -631,7 +633,17 @@ void FSLMainWindow::assign_pythia_file()
     pythia_input_file = this->get_file_name();
 }
 
-
+void FSLMainWindow::check_if_pythia_file()
+{
+    if(ui->cB_pythia_type_of_eve->currentIndex()==3)
+    {
+        ui->pB_pythia_browse->setEnabled(true);
+    }
+    else
+    {
+        ui->pB_pythia_browse->setEnabled(false);
+    }
+}
 
 //Function to select a magnetic field plugin file
 void FSLMainWindow::assign_magnetic_field_plugin_file()
@@ -683,13 +695,26 @@ void FSLMainWindow::configure_generator()
 
     else if(generator=="Pythia")
     {
-        ui->pB_pythia_browse->setEnabled(true);
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
         ui->cB_particle->setEnabled(false);
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
         ui->lE_pz->setEnabled(false);
+
+        if(ui->cB_pythia_type_of_eve->currentIndex()==3)
+        {
+        pythia_type_of_event = "";
+        ui->pB_pythia_browse->setEnabled(true);
+
+        }
+
+        else
+        {
+        pythia_input_file = "";
+        pythia_type_of_event = (ui->cB_pythia_type_of_eve->currentText()).toStdString();
+
+        }
 
 
         particle = "";
@@ -699,7 +724,6 @@ void FSLMainWindow::configure_generator()
         p_y = 0;
         p_z = 0;
 
-        pythia_type_of_event = (ui->cB_pythia_type_of_eve->currentText()).toStdString();
     }
 
 }
@@ -979,13 +1003,28 @@ void FSLMainWindow::load_configuration()
     else
     {
 
-        ui->pB_pythia_browse->setEnabled(true);
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
         ui->cB_gen_options->setCurrentIndex(1);
 
         pythia_type_of_event = j_load["Type of event"];
+
+        if(pythia_type_of_event != "")
+        {
         ui->cB_pythia_type_of_eve->setCurrentText(QString::fromUtf8(pythia_type_of_event.c_str()));
+        ui->pB_pythia_browse->setEnabled(false);
+
+        }
+        else 
+        {
+        pythia_input_file = j_load["Event input file"];
+        ui->cB_pythia_type_of_eve->setCurrentIndex(3);
+        ui->pB_pythia_browse->setEnabled(true);
+
+        }
+
+
+
         ui->lE_px->clear();
         ui->lE_py->clear();
         ui->lE_pz->clear();

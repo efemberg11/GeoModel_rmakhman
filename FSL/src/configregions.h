@@ -2,6 +2,8 @@
 #define CONFIGREGIONS_H
 
 #include <QDialog>
+#include <QDoubleValidator>
+
 
 namespace Ui {
 class ConfigRegions;
@@ -29,6 +31,10 @@ signals:
 
 private:
     Ui::ConfigRegions *ui;
+    QDoubleValidator *electron_cut_validator;
+    QDoubleValidator *proton_cut_validator;
+    QDoubleValidator *positron_cut_validator;
+    QDoubleValidator *gamma_cut_validator;
 };
 
 #endif // CONFIGREGIONS_H

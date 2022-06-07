@@ -6,6 +6,7 @@
 #include <QStringListModel>
 #include <QProcess>
 #include <QStandardItemModel>
+#include <QDoubleValidator>
 #include "configregions.h"
 
 QT_BEGIN_NAMESPACE
@@ -52,8 +53,10 @@ public:
 
     //Parameters associated with the main tab
     nlohmann::json j;
-    QProcess process;
+    QProcess fullSimLight_process;
+    QProcess gmex_process;
     std::string geom_file_address = "";
+    std::string geom_file_directory=""; 
     std::string physics_list_name = "";
     int number_of_threads = 0;
     int number_of_events = 0;
@@ -65,6 +68,12 @@ public:
     std::string particle = "";
     std::string particle_energy = "";
     std::string particle_direction = "";
+    double p_x;
+    double p_y;
+    double p_z;
+    std::string x_dir;
+    std::string y_dir;
+    std::string z_dir;
     int number_of_primaries_per_event;
     std::string pythia_input_file = "";
     std::string pythia_type_of_event = "";
@@ -110,15 +119,18 @@ public:
 
     //Functions used in Configuration
     void save_configuration();
+    void save_configuration_as();
     void create_configuration();
     void view_configuration();
     void run_configuration();
+    void run_gmex();
+    void run_gmclash();
     void load_configuration();
     std::vector<std::string> display_configuration(const std::string &s);
 
     void clear_main_status();
     void configure_generator();
-
+    void configure_energy_direction();
 
     void add_sens_det();
     void del_sens_det();
@@ -176,8 +188,17 @@ private slots:
     void add_region(std::string  region_name, std::string frootLV_names
                     ,double electron_cut , double proton_cut
                     ,double positron_cut , double gamma_cut);
-    void readyReadStandardOutput();
-    void readyReadStandardError();
+    
+    void check_if_pythia_file();
+    void fsmlreadyReadStandardOutput();
+    void fsmlreadyReadStandardError();
+    void fsml_process_started();
+    void fsml_process_finished();
+    
+    void gmexreadyReadStandardOutput();
+    void gmexreadyReadStandardError();
+  //  void gmex_process_started();
+  //  void gmex_process_finished();
 
 
 private:
@@ -190,8 +211,10 @@ private:
     QStandardItemModel *user_action_model;
     QStringList region_horizontalHeader;
     QStringList user_action_horizontalHeader;
-
-
+    QDoubleValidator *p_x_validator;
+    QDoubleValidator *p_y_validator;
+    QDoubleValidator *p_z_validator;
+    QDoubleValidator *mag_field_validator;
 
 
 };

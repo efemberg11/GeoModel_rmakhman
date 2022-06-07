@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 
 project(fsl VERSION 0.1 LANGUAGES CXX)
 
-
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am top-level project.
     # Make the root module directory visible to CMake.
@@ -48,7 +47,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-#find_package(nlohmann_json REQUIRED)
 
 
 
@@ -61,7 +59,6 @@ set(PROJECT_SOURCES ${sources} ${headers}  ${uis} )
 add_executable(fsl ${PROJECT_SOURCES} )
 
 target_link_libraries(fsl PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-
 
 if( GEOMODEL_USE_BUILTIN_JSON )
    add_dependencies(fsl JSONExt )

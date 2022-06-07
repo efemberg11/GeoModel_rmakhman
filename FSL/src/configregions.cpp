@@ -13,16 +13,25 @@ ConfigRegions::ConfigRegions(QWidget *parent) :
     connect(ui->pB_add_region, &QPushButton::released, this, &ConfigRegions::add_region_config);
 
 
-    ui->lE_electron->setValidator(new QDoubleValidator(-100000.0,100000.0,8));
-    ui->lE_proton->setValidator(new QDoubleValidator(-100000.0,100000.0,8));
-    ui->lE_positron->setValidator(new QDoubleValidator(-100000.0,100000.0,8));
-    ui->lE_gamma->setValidator(new QDoubleValidator(-100000.0,100000.0,8));
+    electron_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    proton_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    positron_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    gamma_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
+
+    ui->lE_electron->setValidator(electron_cut_validator);
+    ui->lE_proton->setValidator(proton_cut_validator);
+    ui->lE_positron->setValidator(positron_cut_validator);
+    ui->lE_gamma->setValidator(gamma_cut_validator);
 
 }
 
 ConfigRegions::~ConfigRegions()
 {
     delete ui;
+    delete electron_cut_validator;
+    delete proton_cut_validator;
+    delete positron_cut_validator;
+    delete gamma_cut_validator;
 }
 
 void ConfigRegions::add_region_config()

@@ -27,7 +27,7 @@ namespace clashdet {
     }
     
     void from_json(const json& j, clash& p) {
-        p.clashType=j.at("clashType").get<typeOfClash>();
+        p.clashType=j.at("typeOfClash").get<typeOfClash>();
         p.volume1Name=j.at("volume1Name").get<std::string>();
         p.volume1CopyNo=j.at("volume1CopyNo").get<int>();
         p.volume1EntityType=j.at("volume1EntityType").get<std::string>();

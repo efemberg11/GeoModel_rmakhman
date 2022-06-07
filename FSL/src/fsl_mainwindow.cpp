@@ -3,47 +3,48 @@
 #include "ui_fsl_mainwindow.h"
 #include <QFileDialog>
 #include <QProcess>
+#include <QMessageBox>
 #include <QFontDatabase>
 #include <QFileInfo>
 #include <thread>
 #include <iostream>
 #include <iomanip>
-#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <nlohmann/json.hpp>
-
+#include <cmath>
+#include <unistd.h>
+#include <libgen.h>
 FSLMainWindow::FSLMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::FSLMainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("Configuration Utility");
+    this->setWindowTitle("FullSimLight-GUI (beta version)");
 
     //Setting up Models
     sens_det_model = new QStringListModel(this);
     g4ui_model = new QStringListModel(this);
     shape_model = new QStringListModel(this);
-    ui->sens_det_view->setEditTriggers(QAbstractItemView::DoubleClicked);
-    ui->g4ui_view->setEditTriggers(QAbstractItemView::DoubleClicked);
     ui->shape_view->setEditTriggers(QAbstractItemView::DoubleClicked);
     ui->sens_det_view->setModel(sens_det_model);
     ui->g4ui_view->setModel(g4ui_model);
     ui->shape_view->setModel(shape_model);
+    ui->sens_det_view->setEditTriggers(QAbstractItemView::DoubleClicked);
+    ui->g4ui_view->setEditTriggers(QAbstractItemView::DoubleClicked);
 
 
     //Setting up the Regions Display
     region = new ConfigRegions(this);
     region_model = new QStandardItemModel(this);
     region_horizontalHeader.append("Region Name");
-    region_horizontalHeader.append("fRootLV Names");
+    region_horizontalHeader.append("RootLV Names");
     region_horizontalHeader.append("Electron Cut");
     region_horizontalHeader.append("Proton Cut");
     region_horizontalHeader.append("Positron Cut");
     region_horizontalHeader.append("Gamma Cut");
     region_model->setHorizontalHeaderLabels(region_horizontalHeader);
     ui->regions_table->setModel(region_model);
-  //  ui->regions_table->horizontalHeader()->setStretchLastSection(true);
     ui->regions_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->regions_table->resizeRowsToContents();
     ui->regions_table->resizeColumnsToContents();
@@ -62,10 +63,13 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
     //Setting up Connections
     connect(ui->pB_geom, &QPushButton::released, this, &FSLMainWindow::assign_geom_file);
-    connect(ui->pB_Save, &QPushButton::released, this, &FSLMainWindow::save_configuration);
+    connect(ui->actionSave, &QAction::triggered, this, &FSLMainWindow::save_configuration);
+    connect(ui->actionSave_as, &QAction::triggered, this, &FSLMainWindow::save_configuration_as);
+    connect(ui->actionOpen, &QAction::triggered, this, &FSLMainWindow::load_configuration);
     connect(ui->pB_view, &QPushButton::released, this, &FSLMainWindow::view_configuration);
-    connect(ui->pB_Load, &QPushButton::released, this, &FSLMainWindow::load_configuration);
     connect(ui->pB_Run, &QPushButton::released, this, &FSLMainWindow::run_configuration);
+    connect(ui->pB_gmex, &QPushButton::released, this, &FSLMainWindow::run_gmex);
+    connect(ui->pB_gmclash, &QPushButton::released, this, &FSLMainWindow::run_gmclash);
     connect(ui->pB_main_clear, &QPushButton::released, this, &FSLMainWindow::clear_main_status);
     connect(ui->pB_pythia_browse, &QPushButton::released, this, &FSLMainWindow::assign_pythia_file);
     connect(ui->pB_magnetic_field_plugin, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_plugin_file);
@@ -87,11 +91,12 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_tracking_actions, &QPushButton::released, this, &FSLMainWindow::assign_tracking_actions_file);
     connect(ui->pB_del_user_action, &QPushButton::released, this, &FSLMainWindow::del_user_action);
 
+    connect(ui->actionQuit, &QAction::triggered, qApp, &QApplication::quit);
+    
 
     //Setting widget properties
     ui->sB_NOE->setMaximum(10000);
-    ui->sB_NOT->setMaximum(10000);
-    ui->sB_NOPE->setMaximum(10000);
+    ui->sB_NOT->setMaximum(std::thread::hardware_concurrency());
     ui->sB_control->setMaximum(5);
     ui->sB_run->setMaximum(5);
     ui->sB_event->setMaximum(5);
@@ -102,34 +107,60 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->cB_pythia_type_of_eve->setEnabled(false);
     ui->lE_magnetic_field_map->setEnabled(false);
     ui->pB_magnetic_field_plugin->setEnabled(false);
-    ui->lE_CFN->setText("config");
     ui->cB_particle->setCurrentIndex(0);
-    ui->lE_part_energy->setText("10");
-    ui->lE_part_dir->setText("0,1,0");
+    ui->lE_px->setText("0");
+    ui->lE_py->setText("10");
+    ui->lE_pz->setText("0");
 
     ui->lE_PLN->setText("FTFP_BERT");
     ui->lE_fixed_MF->setText("4.0");
     ui->sB_NOT->setValue(std::thread::hardware_concurrency());
     ui->sB_NOE->setValue(10);
-    ui->sB_NOPE->setValue(2);
+    number_of_primaries_per_event = 1;
     ui->lE_hits->setText("HITS.root");
     ui->lE_histo->setText("HISTO.root");
     ui->tB_view_config->setCurrentFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     ui->tB_view_config->setFontPointSize(13);
 
+    p_x_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    p_y_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    p_z_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    mag_field_validator = new QDoubleValidator(-100000.0,100000.0,8);
+
+
+    ui->lE_px->setValidator(p_x_validator);
+    ui->lE_py->setValidator(p_y_validator);
+    ui->lE_pz->setValidator(p_z_validator);
+    ui->lE_fixed_MF->setValidator(mag_field_validator);
+
+    ui->lE_hits->setEnabled(false);
+    ui->lE_histo->setEnabled(false);
+
+
+    ui->tab->setEnabled(false);//Shape tab (Change name on UI)
+    ui->Region->setEnabled(false);
+    ui->User_Actions->setEnabled(false);
+
+
+
     //Setting up Signals
     connect(ui->cB_gen_options, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_generator);
     connect(ui->cB_magnetic_field, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_magnetic_field);
+    connect(ui->cB_pythia_type_of_eve, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::check_if_pythia_file);
+
     connect(this, &FSLMainWindow::send_error_message, this, &FSLMainWindow::catch_error_message);
     connect(ui->sens_det_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_sens_det_index(QModelIndex)));
     connect(ui->g4ui_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_g4ui_index(QModelIndex)));
     connect(ui->shape_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_shape_index(QModelIndex)));
     connect(region,&ConfigRegions::send_config,this,&FSLMainWindow::add_region);
-    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
-    connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readyReadStandardError()));
+    connect(&fullSimLight_process,SIGNAL(readyReadStandardOutput()),this,SLOT(fsmlreadyReadStandardOutput()));
+    connect(&fullSimLight_process,SIGNAL(readyReadStandardError()),this,SLOT(fsmlreadyReadStandardError()));
 
+    connect(&gmex_process,SIGNAL(readyReadStandardOutput()),this,SLOT(gmexreadyReadStandardOutput()));
+    connect(&gmex_process,SIGNAL(readyReadStandardError()),this,SLOT(gmexreadyReadStandardError()));
 
-
+    connect(&fullSimLight_process,SIGNAL(started()),this,SLOT(fsml_process_started()));
+    connect(&fullSimLight_process,SIGNAL(finished(int , QProcess::ExitStatus )),this,SLOT(fsml_process_finished()));
 
 
 }
@@ -143,6 +174,11 @@ FSLMainWindow::~FSLMainWindow()
     delete region_model;
     delete user_action_model;
     delete shape_model;
+    delete p_x_validator;
+    delete p_y_validator;
+    delete p_z_validator;
+    delete mag_field_validator;
+
 }
 
 
@@ -307,15 +343,15 @@ void FSLMainWindow::configure_g4ui_command()
     if(generator=="Pythia")
     {
     g4ui_commands.push_back("/run/initialize");
-    g4ui_commands.push_back("/run/beamOn " + ui->sB_NOE->text().toStdString());
     }
 
-    if(generator=="G4ParticleGun")
+    if(generator=="Particle Gun")
     {
-    g4ui_commands.push_back("/FSLgun/primaryPerEvt " + ui->sB_NOPE->text().toStdString());
+    g4ui_commands.push_back("/FSLgun/primaryPerEvt " + std::to_string(number_of_primaries_per_event));
     g4ui_commands.push_back("/FSLgun/energy  " + particle_energy);
     g4ui_commands.push_back("/FSLgun/particle  " + particle);
     g4ui_commands.push_back("/FSLgun/direction  " + particle_direction);
+
     }
 
     g4ui_commands.push_back("/process/list");
@@ -560,17 +596,35 @@ std::string FSLMainWindow::get_directory()
 //Function to select geometry file
 void FSLMainWindow::assign_geom_file()
 {
-    std::string geom_file = this->get_file_name();
-    if(geom_file.find(".db") != std::string::npos
-       || geom_file.find(".gdml") != std::string::npos
-       || geom_file.find(".dylib") != std::string::npos
-       || geom_file.find(".so") != std::string::npos)
+
+
+
+  if (geom_file_directory.empty()) geom_file_directory= (QDir::currentPath()).toStdString() +"/";
+  QString fileName = QFileDialog::getOpenFileName(this,
+						  tr("Select Geometry"), geom_file_directory.c_str(), tr("Geometry inputs (*.db *.gdml *.so *.dylib)"));
+  
+  if (fileName.isEmpty()) return;
+  
+  std::string   geometry_file=fileName.toStdString();
+  std::string   geometry_base=basename(const_cast<char *> (geometry_file.c_str()));
+  std::string   geometry_directory=dirname(const_cast<char *> (geometry_file.c_str()));
+  geom_file_address=geometry_directory+"/"+geometry_base;
+  
+  // Store these values:
+  geom_file_directory=geometry_directory;// When browser is reopened, start from here.
+  //    QFileInfo file(QString::fromUtf8(load_file_name.c_str()));
+  ui->le_GI->setText(geom_file_address.c_str());
+  ui->le_GI->adjustSize();
+  
+  if(geometry_base.find(".db") != std::string::npos
+     || geometry_base.find(".gdml") != std::string::npos
+     || geometry_base.find(".dylib") != std::string::npos
+     || geometry_base.find(".so") != std::string::npos)
     {
-    geom_file_address = geom_file;
     }
-    else
+  else
     {
-        ui->tB_view_config->append("Supported Geometry file formats are .db,.gdml,.dylib,.so");
+      ui->tB_view_config->append("Supported Geometry file formats are .db,.gdml,.dylib,.so");
     }
 }
 
@@ -580,7 +634,17 @@ void FSLMainWindow::assign_pythia_file()
     pythia_input_file = this->get_file_name();
 }
 
-
+void FSLMainWindow::check_if_pythia_file()
+{
+    if(ui->cB_pythia_type_of_eve->currentIndex()==3)
+    {
+        ui->pB_pythia_browse->setEnabled(true);
+    }
+    else
+    {
+        ui->pB_pythia_browse->setEnabled(false);
+    }
+}
 
 //Function to select a magnetic field plugin file
 void FSLMainWindow::assign_magnetic_field_plugin_file()
@@ -588,48 +652,79 @@ void FSLMainWindow::assign_magnetic_field_plugin_file()
     magnetic_field_plugin_file = this->get_file_name();
 }
 
+//Function to configure particle energy and direction
+void FSLMainWindow::configure_energy_direction()
+{
+    p_x = ui->lE_px->text().toDouble();
+    p_y = ui->lE_py->text().toDouble();
+    p_z = ui->lE_pz->text().toDouble();
+    double p = sqrt(pow(p_x,2)+pow(p_y,2)+pow(p_z,2));
+
+    x_dir = std::to_string(p_x/p);
+    y_dir = std::to_string(p_y/p);
+    z_dir = std::to_string(p_z/p);
+
+    particle_direction = x_dir + " " + y_dir + " " + z_dir;
+
+    particle_energy = std::to_string(p) + " GeV";
+
+
+
+
+}
 
 //Function to select type of generator
 void FSLMainWindow::configure_generator()
 {
     generator = (ui->cB_gen_options->currentText()).toStdString();
 
-    if(generator=="G4ParticleGun")
+    if(generator=="Particle Gun")
     {
+        this->configure_energy_direction();
         ui->pB_pythia_browse->setEnabled(false);
         ui->cB_pythia_type_of_eve->setEnabled(false);
-
-        ui->sB_NOPE->setEnabled(true);
         ui->cB_particle->setEnabled(true);
-        ui->lE_part_energy->setEnabled(true);
-        ui->lE_part_dir->setEnabled(true);
+        ui->lE_px->setEnabled(true);
+        ui->lE_py->setEnabled(true);
+        ui->lE_pz->setEnabled(true);
+
 
         particle = (ui->cB_particle->currentText()).toStdString();
-        particle_energy = (ui->lE_part_energy->text()).toStdString() + " GeV";
-        particle_direction = (ui->lE_part_dir->text()).toStdString();
-        std::replace(particle_direction.begin(), particle_direction.end(), ',', ' ');
-        number_of_primaries_per_event = ui->sB_NOPE->value();
-
         pythia_type_of_event = "";
         pythia_input_file = "";
     }
 
     else if(generator=="Pythia")
     {
-        ui->pB_pythia_browse->setEnabled(true);
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
-        ui->sB_NOPE->setEnabled(false);
         ui->cB_particle->setEnabled(false);
-        ui->lE_part_energy->setEnabled(false);
-        ui->lE_part_dir->setEnabled(false);
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
 
-        number_of_primaries_per_event = 0;
+        if(ui->cB_pythia_type_of_eve->currentIndex()==3)
+        {
+        pythia_type_of_event = "";
+        ui->pB_pythia_browse->setEnabled(true);
+
+        }
+
+        else
+        {
+        pythia_input_file = "";
+        pythia_type_of_event = (ui->cB_pythia_type_of_eve->currentText()).toStdString();
+
+        }
+
+
         particle = "";
         particle_energy = "";
         particle_direction = "";
+        p_x = 0;
+        p_y = 0;
+        p_z = 0;
 
-        pythia_type_of_event = (ui->cB_pythia_type_of_eve->currentText()).toStdString();
     }
 
 }
@@ -682,6 +777,7 @@ std::vector<std::string> FSLMainWindow::display_configuration(const std::string 
 //Function to view current configuration
 void FSLMainWindow::view_configuration()
 {
+    ui->tB_view_config->clear();
     this->create_configuration();
     const auto s = j.dump();
     std::vector<std::string> display_vector = this->display_configuration(s);
@@ -697,62 +793,197 @@ void FSLMainWindow::view_configuration()
 void FSLMainWindow::save_configuration()
 {
 
-    this->create_configuration();
-    save_directory = this->get_directory();
-    config_file_name = (ui->lE_CFN->text()).toStdString();
-    std::filesystem::path  save_file_path = save_directory + "/" + config_file_name + ".json";
-    std::ofstream o(save_file_path);
+    create_configuration();
+    if (config_file_name.empty()) {
+      save_configuration_as();
+      return;
+    }
+    //    config_file_name = (ui->lE_CFN->text()).toStdString();
+    std::ofstream o(config_file_name);
     o << std::setw(4) << j << std::endl;
+}
+
+//Function to save current configuration
+void FSLMainWindow::save_configuration_as()
+{
+    create_configuration();
+    if (save_directory.empty()) save_directory= (QDir::currentPath()).toStdString() +"/";
+    
+    QString fileName = QFileDialog::getSaveFileName(this,
+						    tr("Save Configuration"), save_directory.c_str(), tr("Configuration Files (*.json)"));
+    if (fileName.isEmpty()) return;
+    std::string   save_file=fileName.toStdString();
+    std::string   save_base=basename(const_cast<char *> (save_file.c_str()));
+    save_directory=dirname(const_cast<char *> (save_file.c_str()));
+
+    std::ofstream o(save_directory+"/"+save_base);
+    o << std::setw(4) << j << std::endl;
+
+    
+    config_file_name=save_directory+"/"+save_base;
+    ui->lE_CFN->setText(("Config file: " + config_file_name).c_str());
+    ui->lE_CFN->adjustSize();
+ 
+    
+
+
 }
 
 //Function to run a selected configuration.
 void FSLMainWindow::run_configuration()
 {
-    std::string config_file = this->get_file_name();
 
-    if(config_file.find(".json") != std::string::npos)
-    {
+  if (geom_file_address.empty()) {
+    QMessageBox::information(this, "Info", "First Select Geometry input");
+     return;
+  }
+  create_configuration();
+  
+  std::string tmpConf="/tmp/fslconfig-"+std::to_string(getuid())+"-"+std::to_string(getpid())+".json";
+  
+  std::ofstream o(tmpConf);
+  o << std::setw(4) << j << std::endl;
+
+  {
     QString Command;    //Contains the command to be executed
     QStringList args;   //Contains arguments of the command
-
+    
     //Needs to be fixed. Should not be a hard coded path.
-    Command = "/usr/local/bin/fullSimLight";
-
-    args<<"-c"<< QString::fromUtf8(config_file.c_str());
-    process.start(Command, args, QIODevice::ReadOnly);
-    }
+    Command = "fullSimLight";
+    
+    args<<"-c"<< QString::fromUtf8(tmpConf.c_str());
+    fullSimLight_process.start(Command, args, QIODevice::ReadOnly);
+  }
 
 }
 
-//Function to get output from run process
-void FSLMainWindow::readyReadStandardOutput()
+//Function to run a selected configuration.
+void FSLMainWindow::run_gmex()
 {
-    QString StdOut = process.readAllStandardOutput(); //Reads standard output
+
+  if (geom_file_address.empty()) {
+    QMessageBox::information(this, "Info", "First Select Geometry input");
+     return;
+  }
+  {
+    QString Command;    //Contains the command to be executed
+    QStringList args;   //Contains arguments of the command
+    
+    //Needs to be fixed. Should not be a hard coded path.
+    Command = "gmex";
+     
+    args << QString::fromUtf8(geom_file_address.c_str());
+    gmex_process.start(Command, args, QIODevice::ReadOnly);
+  }
+
+}
+
+//Function to run a selected configuration.
+void FSLMainWindow::run_gmclash()
+{
+
+  if (geom_file_address.empty()) {
+    QMessageBox::information(this, "Info", "First Select Geometry input");
+     return;
+  }
+  {
+    QString Command;    //Contains the command to be executed
+    QStringList args;   //Contains arguments of the command
+    
+    //Needs to be fixed. Should not be a hard coded path.
+    Command = "gmclash";
+     
+    args << QString("-g") <<  QString::fromUtf8(geom_file_address.c_str());
+    gmex_process.start(Command, args, QIODevice::ReadOnly);
+  }
+
+}
+
+
+//Function to blur out Buttons when fsml QProcess started
+void FSLMainWindow::fsml_process_started()
+{
+    ui->pB_gmex->setEnabled(false);
+    ui->pB_gmclash->setEnabled(false);
+    ui->pB_Run->setEnabled(false);
+
+}
+
+//Function to reactivate Buttons when fsml QProcess stopped
+void FSLMainWindow::fsml_process_finished()
+{
+    ui->pB_gmclash->setEnabled(true);
+    ui->pB_gmex->setEnabled(true);
+    ui->pB_Run->setEnabled(true);
+
+}
+
+
+//Function to get output from fsml run process
+void FSLMainWindow::fsmlreadyReadStandardOutput()
+{
+    QString StdOut = fullSimLight_process.readAllStandardOutput(); //Reads standard output
     ui->tB_view_config->append(StdOut);
 }
 
-//Function to get error output from run process
-void FSLMainWindow::readyReadStandardError()
+//Function to get error output from  fsml run process
+void FSLMainWindow::fsmlreadyReadStandardError()
 {
-    QString StdErr = process.readAllStandardError(); //Reads standard error output
+    QString StdErr = fullSimLight_process.readAllStandardError(); //Reads standard error output
     ui->tB_view_config->append(StdErr);
 }
+
+
+//Function to get output from gmex process
+void FSLMainWindow::gmexreadyReadStandardOutput()
+{
+    QString StdOut = gmex_process.readAllStandardOutput(); //Reads standard output
+    ui->tB_view_config->append(StdOut);
+}
+
+//Function to get error output from gmex process
+void FSLMainWindow::gmexreadyReadStandardError()
+{
+    QString StdErr = gmex_process.readAllStandardError(); //Reads standard error output
+    ui->tB_view_config->append(StdErr);
+}
+
+
 
 //Function to load configuration
 void FSLMainWindow::load_configuration()
 {
-    load_file_name = this->get_file_name();
+
+    if (save_directory.empty()) save_directory= (QDir::currentPath()).toStdString() +"/";
+    QString fileName = QFileDialog::getOpenFileName(this,
+						    tr("Open Configuration"), save_directory.c_str(), tr("Configuration Files (*.json)"));
+
+    if (fileName.isEmpty()) return;
+
+    std::string   load_file=fileName.toStdString();
+    std::string   load_base=basename(const_cast<char *> (load_file.c_str()));
+    std::string   load_directory=dirname(const_cast<char *> (load_file.c_str()));
+    load_file_name=load_directory+"/"+load_base;
+
+    // Store these values:
+    save_directory=load_directory;// When browser is reopened, start from here.
+    config_file_name=load_file_name;
 
     if(load_file_name.find(".json") != std::string::npos)
     {
     std::ifstream ifs(load_file_name);
     auto j_load = nlohmann::json::parse(ifs);
 
-    QFileInfo file(QString::fromUtf8(load_file_name.c_str()));
-    ui->lE_CFN->setText(file.baseName());
-
+    //    QFileInfo file(QString::fromUtf8(load_file_name.c_str()));
+    ui->lE_CFN->setText(("Config file: " + config_file_name).c_str());
+    ui->lE_CFN->adjustSize();
+    
     geom_file_address = j_load["Geometry"];
 
+    ui->le_GI->setText(geom_file_address.c_str());
+    ui->le_GI->adjustSize();
+
+    
     physics_list_name = j_load["Physics list name"];
     ui->lE_PLN->setText(QString::fromUtf8(physics_list_name.c_str()));
 
@@ -768,31 +999,28 @@ void FSLMainWindow::load_configuration()
 
     generator = j_load["Generator"];
 
-    if(generator=="G4ParticleGun")
+    if(generator=="Particle Gun")
     {
-        ui->sB_NOPE->setEnabled(true);
-        ui->cB_particle->setEnabled(true);
-        ui->lE_part_energy->setEnabled(true);
-        ui->lE_part_dir->setEnabled(true);
-
         ui->cB_gen_options->setCurrentIndex(0);
+
+        ui->cB_particle->setEnabled(true);
+        ui->lE_px->setEnabled(true);
+        ui->lE_py->setEnabled(true);
+        ui->lE_pz->setEnabled(true);
 
         particle = j_load["Particle"];
         ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
 
-        particle_energy = j_load["Particle energy"];
-        particle_energy.erase(particle_energy.length()-4);
-        ui->lE_part_energy->setText(QString::fromUtf8(particle_energy.c_str()));
+        p_x = j_load["p_x"];
+        p_y = j_load["p_y"];
+        p_z = j_load["p_z"];
 
-        particle_direction = j_load["Particle direction"];
-        std::replace(particle_direction.begin(), particle_direction.end(), ' ', ',');
-        ui->lE_part_dir->setText(QString::fromUtf8(particle_direction.c_str()));
+        ui->lE_px->setText(QString::number(p_x));
+        ui->lE_py->setText(QString::number(p_y));
+        ui->lE_pz->setText(QString::number(p_z));
 
-        number_of_primaries_per_event = j_load["Number of primaries per events"];
-        ui->sB_NOPE->setValue(number_of_primaries_per_event);
 
         ui->cB_pythia_type_of_eve->setCurrentIndex(0);
-
         ui->pB_pythia_browse->setEnabled(false);
         ui->cB_pythia_type_of_eve->setEnabled(false);
 
@@ -801,29 +1029,37 @@ void FSLMainWindow::load_configuration()
     else
     {
 
-        ui->pB_pythia_browse->setEnabled(true);
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
         ui->cB_gen_options->setCurrentIndex(1);
 
         pythia_type_of_event = j_load["Type of event"];
+
+        if(pythia_type_of_event != "")
+        {
         ui->cB_pythia_type_of_eve->setCurrentText(QString::fromUtf8(pythia_type_of_event.c_str()));
+        ui->pB_pythia_browse->setEnabled(false);
 
+        }
+        else 
+        {
         pythia_input_file = j_load["Event input file"];
+        ui->cB_pythia_type_of_eve->setCurrentIndex(3);
+        ui->pB_pythia_browse->setEnabled(true);
+
+        }
 
 
-        ui->cB_particle->setCurrentIndex(0);
-        ui->lE_part_energy->clear();
-        ui->lE_part_dir->clear();
-        ui->sB_NOPE->setValue(0);
+
+        ui->lE_px->clear();
+        ui->lE_py->clear();
+        ui->lE_pz->clear();
 
 
-        ui->sB_NOPE->setEnabled(false);
         ui->cB_particle->setEnabled(false);
-        ui->lE_part_energy->setEnabled(false);
-        ui->lE_part_dir->setEnabled(false);
-
-
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
 
     }
 
@@ -1064,9 +1300,11 @@ void FSLMainWindow::create_configuration()
     this->configure_generator();
     j["Generator"] = generator;
     j["Particle"] = particle;
+    j["p_x"] = p_x;
+    j["p_y"] = p_y;
+    j["p_z"] = p_z;
     j["Particle energy"] = particle_energy;
     j["Particle direction"] = particle_direction;
-    j["Number of primaries per events"] = number_of_primaries_per_event;
     j["Event input file"] = pythia_input_file;
     j["Type of event"] = pythia_type_of_event;
 

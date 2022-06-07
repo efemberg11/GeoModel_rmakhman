@@ -122,6 +122,7 @@ public:
     void create_configuration();
     void view_configuration();
     void run_configuration();
+    void run_gmex();
     void load_configuration();
     std::vector<std::string> display_configuration(const std::string &s);
 

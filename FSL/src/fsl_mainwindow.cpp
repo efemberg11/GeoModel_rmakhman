@@ -69,6 +69,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->actionOpen, &QAction::triggered, this, &FSLMainWindow::load_configuration);
     connect(ui->pB_view, &QPushButton::released, this, &FSLMainWindow::view_configuration);
     connect(ui->pB_Run, &QPushButton::released, this, &FSLMainWindow::run_configuration);
+    connect(ui->pB_gmex, &QPushButton::released, this, &FSLMainWindow::run_gmex);
     connect(ui->pB_main_clear, &QPushButton::released, this, &FSLMainWindow::clear_main_status);
     connect(ui->pB_pythia_browse, &QPushButton::released, this, &FSLMainWindow::assign_pythia_file);
     connect(ui->pB_magnetic_field_plugin, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_plugin_file);
@@ -821,6 +822,26 @@ void FSLMainWindow::run_configuration()
     Command = "fullSimLight";
     
     args<<"-c"<< QString::fromUtf8(tmpConf.c_str());
+    process.start(Command, args, QIODevice::ReadOnly);
+  }
+
+}
+//Function to run a selected configuration.
+void FSLMainWindow::run_gmex()
+{
+
+  if (geom_file_address.empty()) {
+    QMessageBox::information(this, "Info", "First Select Geometry input");
+     return;
+  }
+  {
+    QString Command;    //Contains the command to be executed
+    QStringList args;   //Contains arguments of the command
+    
+    //Needs to be fixed. Should not be a hard coded path.
+    Command = "gmex";
+     
+    args << QString::fromUtf8(geom_file_address.c_str());
     process.start(Command, args, QIODevice::ReadOnly);
   }
 

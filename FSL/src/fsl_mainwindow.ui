@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1149</width>
+    <width>1232</width>
     <height>726</height>
    </rect>
   </property>
@@ -36,7 +36,93 @@
         <string>Main</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_10">
-        <item row="2" column="0" colspan="2">
+        <item row="1" column="0" colspan="2">
+         <widget class="QTextBrowser" name="tB_view_config"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="font">
+           <font>
+            <pointsize>15</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_9">
+           <item row="2" column="0">
+            <widget class="QPushButton" name="pB_geom">
+             <property name="text">
+              <string>Geometry input</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QLabel" name="lE_CFN">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Number of Events</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QSpinBox" name="sB_NOE"/>
+           </item>
+           <item row="4" column="1">
+            <widget class="QSpinBox" name="sB_NOT"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="le_GI">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Physics List Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="lE_PLN"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Number of Threads</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="2" column="0">
          <widget class="QGroupBox" name="groupBox_11">
           <property name="title">
            <string/>
@@ -76,9 +162,9 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="pB_Run">
+            <widget class="QPushButton" name="pB_main_clear">
              <property name="text">
-              <string>Run</string>
+              <string>Clear</string>
              </property>
             </widget>
            </item>
@@ -89,102 +175,36 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>269</width>
+               <width>58</width>
+               <height>17</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QCommandLinkButton" name="pB_gmex">
+             <property name="text">
+              <string>Gmex</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_27">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>29</width>
                <height>20</height>
               </size>
              </property>
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="pB_main_clear">
+            <widget class="QCommandLinkButton" name="pB_Run">
              <property name="text">
-              <string>Clear</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QTextBrowser" name="tB_view_config"/>
-        </item>
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_3">
-          <property name="font">
-           <font>
-            <pointsize>15</pointsize>
-           </font>
-          </property>
-          <property name="title">
-           <string/>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_9">
-           <item row="4" column="1">
-            <widget class="QSpinBox" name="sB_NOT"/>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="font">
-              <font>
-               <pointsize>15</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Number of Events</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QPushButton" name="pB_geom">
-             <property name="text">
-              <string>Geometry input</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="font">
-              <font>
-               <pointsize>15</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Number of Threads</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QSpinBox" name="sB_NOE"/>
-           </item>
-           <item row="0" column="0" colspan="2">
-            <widget class="QLabel" name="lE_CFN">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="scaledContents">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label">
-             <property name="font">
-              <font>
-               <pointsize>15</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Physics List Name</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="lE_PLN"/>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="le_GI">
-             <property name="text">
-              <string/>
+              <string>FullSimLight</string>
              </property>
             </widget>
            </item>
@@ -1516,7 +1536,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1149</width>
+     <width>1232</width>
      <height>22</height>
     </rect>
    </property>

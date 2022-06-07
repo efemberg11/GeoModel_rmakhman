@@ -752,6 +752,7 @@ std::vector<std::string> FSLMainWindow::display_configuration(const std::string 
 //Function to view current configuration
 void FSLMainWindow::view_configuration()
 {
+    ui->tB_view_config->clear();
     this->create_configuration();
     const auto s = j.dump();
     std::vector<std::string> display_vector = this->display_configuration(s);

@@ -55,6 +55,7 @@ public:
     nlohmann::json j;
     QProcess process;
     std::string geom_file_address = "";
+    std::string geom_file_directory=""; 
     std::string physics_list_name = "";
     int number_of_threads = 0;
     int number_of_events = 0;

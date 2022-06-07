@@ -3,6 +3,7 @@
 #include "ui_fsl_mainwindow.h"
 #include <QFileDialog>
 #include <QProcess>
+#include <QMessageBox>
 #include <QFontDatabase>
 #include <QFileInfo>
 #include <thread>
@@ -587,17 +588,35 @@ std::string FSLMainWindow::get_directory()
 //Function to select geometry file
 void FSLMainWindow::assign_geom_file()
 {
-    std::string geom_file = this->get_file_name();
-    if(geom_file.find(".db") != std::string::npos
-       || geom_file.find(".gdml") != std::string::npos
-       || geom_file.find(".dylib") != std::string::npos
-       || geom_file.find(".so") != std::string::npos)
+
+
+
+  if (geom_file_directory.empty()) geom_file_directory=std::filesystem::current_path().string()+"/";
+  QString fileName = QFileDialog::getOpenFileName(this,
+						  tr("Select Geometry"), geom_file_directory.c_str(), tr("Geometry inputs (*.db *.gdml *.so *.dylib)"));
+  
+  if (fileName.isEmpty()) return;
+  
+  std::string   geometry_file=fileName.toStdString();
+  std::string   geometry_base=basename(const_cast<char *> (geometry_file.c_str()));
+  std::string   geometry_directory=dirname(const_cast<char *> (geometry_file.c_str()));
+  geom_file_address=geometry_directory+"/"+geometry_base;
+  
+  // Store these values:
+  geom_file_directory=geometry_directory;// When browser is reopened, start from here.
+  //    QFileInfo file(QString::fromUtf8(load_file_name.c_str()));
+  ui->le_GI->setText(geom_file_address.c_str());
+  ui->le_GI->adjustSize();
+  
+  if(geometry_base.find(".db") != std::string::npos
+     || geometry_base.find(".gdml") != std::string::npos
+     || geometry_base.find(".dylib") != std::string::npos
+     || geometry_base.find(".so") != std::string::npos)
     {
-    geom_file_address = geom_file;
     }
-    else
+  else
     {
-        ui->tB_view_config->append("Supported Geometry file formats are .db,.gdml,.dylib,.so");
+      ui->tB_view_config->append("Supported Geometry file formats are .db,.gdml,.dylib,.so");
     }
 }
 
@@ -641,7 +660,7 @@ void FSLMainWindow::configure_generator()
 {
     generator = (ui->cB_gen_options->currentText()).toStdString();
 
-    if(generator=="G4ParticleGun")
+    if(generator=="Particle Gun")
     {
         this->configure_energy_direction();
         ui->pB_pythia_browse->setEnabled(false);
@@ -782,19 +801,23 @@ void FSLMainWindow::save_configuration_as()
 //Function to run a selected configuration.
 void FSLMainWindow::run_configuration()
 {
-    std::string config_file = this->get_file_name();
 
-    if(config_file.find(".json") != std::string::npos)
-    {
+  if (geom_file_address.empty()) {
+    QMessageBox::information(this, "Info", "First Select Geometry input");
+     return;
+  }
+
+  std::string tmpConf="/tmp/fslconfig-"+std::to_string(getuid())+std::to_string(getpid())+".json";
+  {
     QString Command;    //Contains the command to be executed
     QStringList args;   //Contains arguments of the command
-
+    
     //Needs to be fixed. Should not be a hard coded path.
-    Command = "/usr/local/bin/fullSimLight";
-
-    args<<"-c"<< QString::fromUtf8(config_file.c_str());
+    Command = "fullSimLight";
+    
+    args<<"-c"<< QString::fromUtf8(tmpConf.c_str());
     process.start(Command, args, QIODevice::ReadOnly);
-    }
+  }
 
 }
 
@@ -842,6 +865,10 @@ void FSLMainWindow::load_configuration()
     
     geom_file_address = j_load["Geometry"];
 
+    ui->le_GI->setText(geom_file_address.c_str());
+    ui->le_GI->adjustSize();
+
+    
     physics_list_name = j_load["Physics list name"];
     ui->lE_PLN->setText(QString::fromUtf8(physics_list_name.c_str()));
 

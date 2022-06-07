@@ -9,7 +9,6 @@
 #include <thread>
 #include <iostream>
 #include <iomanip>
-#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <nlohmann/json.hpp>
@@ -159,7 +158,6 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
     connect(&fullSimLight_process,SIGNAL(started()),this,SLOT(fsml_process_started()));
     connect(&fullSimLight_process,SIGNAL(finished(int , QProcess::ExitStatus )),this,SLOT(fsml_process_finished()));
-
 
 
 }
@@ -598,7 +596,7 @@ void FSLMainWindow::assign_geom_file()
 
 
 
-  if (geom_file_directory.empty()) geom_file_directory=std::filesystem::current_path().string()+"/";
+  if (geom_file_directory.empty()) geom_file_directory= (QDir::currentPath()).toStdString() +"/";
   QString fileName = QFileDialog::getOpenFileName(this,
 						  tr("Select Geometry"), geom_file_directory.c_str(), tr("Geometry inputs (*.db *.gdml *.so *.dylib)"));
   
@@ -783,7 +781,7 @@ void FSLMainWindow::save_configuration()
 void FSLMainWindow::save_configuration_as()
 {
     create_configuration();
-    if (save_directory.empty()) save_directory=std::filesystem::current_path().string()+"/";
+    if (save_directory.empty()) save_directory= (QDir::currentPath()).toStdString() +"/";
     
     QString fileName = QFileDialog::getSaveFileName(this,
 						    tr("Save Configuration"), save_directory.c_str(), tr("Configuration Files (*.json)"));
@@ -905,7 +903,7 @@ void FSLMainWindow::gmexreadyReadStandardError()
 void FSLMainWindow::load_configuration()
 {
 
-    if (save_directory.empty()) save_directory=std::filesystem::current_path().string()+"/";
+    if (save_directory.empty()) save_directory= (QDir::currentPath()).toStdString() +"/";
     QString fileName = QFileDialog::getOpenFileName(this,
 						    tr("Open Configuration"), save_directory.c_str(), tr("Configuration Files (*.json)"));
 

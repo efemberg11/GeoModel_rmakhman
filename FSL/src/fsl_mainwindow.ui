@@ -265,7 +265,7 @@
           <property name="title">
            <string>Select Generator</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8">
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <widget class="QComboBox" name="cB_gen_options">
              <property name="currentText">

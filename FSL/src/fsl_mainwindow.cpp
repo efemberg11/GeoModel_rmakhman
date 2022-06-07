@@ -69,6 +69,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_view, &QPushButton::released, this, &FSLMainWindow::view_configuration);
     connect(ui->pB_Run, &QPushButton::released, this, &FSLMainWindow::run_configuration);
     connect(ui->pB_gmex, &QPushButton::released, this, &FSLMainWindow::run_gmex);
+    connect(ui->pB_gmclash, &QPushButton::released, this, &FSLMainWindow::run_gmclash);
     connect(ui->pB_main_clear, &QPushButton::released, this, &FSLMainWindow::clear_main_status);
     connect(ui->pB_pythia_browse, &QPushButton::released, this, &FSLMainWindow::assign_pythia_file);
     connect(ui->pB_magnetic_field_plugin, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_plugin_file);
@@ -831,6 +832,7 @@ void FSLMainWindow::run_configuration()
   }
 
 }
+
 //Function to run a selected configuration.
 void FSLMainWindow::run_gmex()
 {
@@ -852,10 +854,33 @@ void FSLMainWindow::run_gmex()
 
 }
 
+//Function to run a selected configuration.
+void FSLMainWindow::run_gmclash()
+{
+
+  if (geom_file_address.empty()) {
+    QMessageBox::information(this, "Info", "First Select Geometry input");
+     return;
+  }
+  {
+    QString Command;    //Contains the command to be executed
+    QStringList args;   //Contains arguments of the command
+    
+    //Needs to be fixed. Should not be a hard coded path.
+    Command = "gmclash";
+     
+    args << QString("-g") <<  QString::fromUtf8(geom_file_address.c_str());
+    gmex_process.start(Command, args, QIODevice::ReadOnly);
+  }
+
+}
+
+
 //Function to blur out Buttons when fsml QProcess started
 void FSLMainWindow::fsml_process_started()
 {
     ui->pB_gmex->setEnabled(false);
+    ui->pB_gmclash->setEnabled(false);
     ui->pB_Run->setEnabled(false);
 
 }
@@ -863,6 +888,7 @@ void FSLMainWindow::fsml_process_started()
 //Function to reactivate Buttons when fsml QProcess stopped
 void FSLMainWindow::fsml_process_finished()
 {
+    ui->pB_gmclash->setEnabled(true);
     ui->pB_gmex->setEnabled(true);
     ui->pB_Run->setEnabled(true);
 

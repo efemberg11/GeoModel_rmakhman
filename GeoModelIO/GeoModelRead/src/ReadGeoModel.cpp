@@ -15,6 +15,10 @@
  *  - May 2020, R.M.Bianchi
  *  - Aug 2020, R.M.Bianchi - Added support to read published FullPhysVols and AlignableTransforms back in
  *  - Aug 2021, R.M.Bianchi <riccardo.maria.bianchi@cern.ch> - Added support for GeoSerialIdentifier and GeoIdentifierTag
+ *  - Jun 2022, R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
+ *              Fixed the duplication of VPhysVol instances due to a wrong key used for caching volumes that were built already 
+ *              The copyNumber was wrongly used together with tableID and volID
+ *              For details, see: https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/39
  */
 
 
@@ -325,7 +329,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModelPrivate()
 
   if (m_debug || m_deepDebug) {
     muxCout.lock();
-    std::cout << "Thread " << std::this_thread::get_id() << " - processing " << nChildrenRecords << " keys..." << std::endl;
+    std::cout << "\nReadGeoModel::loopOverAllChildrenRecords -- Thread " << std::this_thread::get_id() << " - processing " << nChildrenRecords << " keys..." << std::endl;
     muxCout.unlock();
   }
 
@@ -664,6 +668,14 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 
   void ReadGeoModel::processParentChild(const std::vector<std::string> &parentchild)
   {
+      if (m_deepDebug) {
+          muxCout.lock();
+          std::cout << "\nReadGeoModel::processParentChild()..." << std::endl; 
+          for (auto& rec : parentchild) std::cout << rec << "-";
+          std::cout << std::endl;
+          muxCout.unlock();
+      }
+
     // safety check
     if (parentchild.size() < 8) {
       std::cout <<  "ERROR!!! Probably you are using an old geometry file. Please, get a new one. Exiting..." << std::endl;
@@ -687,7 +699,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
     std::string childNodeType = m_tableID_toTableName[childTableId];
 
     if ( "" == childNodeType || 0 == childNodeType.size()) {
-      std::cout << "ERROR!!! childNodeType is empty!!! Aborting..." << std::endl;
+      std::cout << "ReadGeoModel -- ERROR!!! childNodeType is empty!!! Aborting..." << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -695,6 +707,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 
     // build or get parent volume.
     // Using the parentCopyNumber here, to get a given instance of the parent volume
+    if (m_deepDebug) { muxCout.lock(); std::cout << "build/get parent volume...\n"; muxCout.unlock(); }
     parentVol = dynamic_cast<GeoVPhysVol*>( buildVPhysVolInstance(parentId, parentTableId, parentCopyN) );
     std::string parentName = parentVol->getLogVol()->getName();
 
@@ -723,6 +736,7 @@ void ReadGeoModel::loopOverAllChildrenInBunches()
 		volAddHelper(parentVol, childNode);
 	}
 	else if (childNodeType == "GeoTransform") {
+    if (m_deepDebug) { muxCout.lock(); std::cout << "get transform child...\n"; muxCout.unlock(); }
     GeoTransform* childNode = getBuiltTransform(childId);
 		volAddHelper(parentVol, childNode);
 	}
@@ -779,20 +793,24 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id, const un
 {
 	if (m_deepDebug) {
     muxCout.lock();
-    std::cout << "ReadGeoModel::buildVPhysVolInstance() - " << id << ", " << tableId << ", " << copyN << std::endl;
+    std::cout << "ReadGeoModel::buildVPhysVolInstance() - id: " << id 
+              << ", tableId: " << tableId 
+              << ", copyN: " << copyN << std::endl;
     muxCout.unlock();
   }
 
-	// A - if the instance has been previously built, return that
-  if ( nullptr != getVPhysVol(id, tableId, copyN)) {
-//  if (isVPhysVolBuilt(id, tableId, copyN)) {
-		if (m_deepDebug) {
-      muxCout.lock();
-      std::cout << "getting the instance volume from memory..." << std::endl;
-      muxCout.unlock();
+    // A - if the instance has been previously built, return that
+    //if ( nullptr != getVPhysVol(id, tableId, copyN)) {
+    if ( nullptr != getVPhysVol(id, tableId)) {
+        if (m_deepDebug) {
+            muxCout.lock();
+            //std::cout << "getting the instance volume from memory... Returning: [" << getVPhysVol(id, tableId, copyN) << "] -- logvol: " << ((GeoVPhysVol*)getVPhysVol(id, tableId, copyN))->getLogVol()->getName() << std::endl;
+            std::cout << "getting the instance volume from memory... Returning: [" << getVPhysVol(id, tableId) << "] -- logvol: " << ((GeoVPhysVol*)getVPhysVol(id, tableId))->getLogVol()->getName() << std::endl;
+            muxCout.unlock();
+        }
+        //return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId, copyN));
+        return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId));
     }
-		return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId, copyN));
-	}
 
   // B - if not built already, then get the actual volume,
   // which should be already built by now,
@@ -802,8 +820,14 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id, const un
   GeoVPhysVol* vol = nullptr;
   bool volFound = true;
   if (1==tableId) {
-    if(isBuiltPhysVol(id))
+    if(isBuiltPhysVol(id)) {
       vol = new GeoPhysVol( getBuiltPhysVol(id)->getLogVol() );
+      if (m_deepDebug) {
+          muxCout.lock();
+          std::cout << "PhysVol not instanced yet, building the instance now [" << vol << "] -- logvol: " << vol->getLogVol()->getName() << std::endl;
+          muxCout.unlock();
+      }
+    }
     else
       volFound = false;
   }
@@ -817,7 +841,8 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id, const un
     std::cout << "ERROR! VPhysVol not found! It should be already built, by now. Exiting...\n";
     exit(EXIT_FAILURE);
   }
-  storeVPhysVol(id, tableId, copyN, vol);
+  //storeVPhysVol(id, tableId, copyN, vol);
+  storeVPhysVol(id, tableId, vol);
 
 	return vol;
 }
@@ -862,6 +887,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(const unsigned int id, const unsigned i
     std::cout << "ERROR!!! LogVol is NULL!" << std::endl;
 //    exit(EXIT_FAILURE);
   }
+    if (m_deepDebug) { muxCout.lock(); std::cout << "using the cached LogVol [" << logVol_ID << "] w/ address: " << logVol << "...\n"; ; muxCout.unlock(); }
 
 	// a pointer to the VPhysVol
 	GeoVPhysVol* vol = nullptr;
@@ -2533,7 +2559,10 @@ GeoBox* ReadGeoModel::buildDummyShape() {
 GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
 {
 
+    if (m_deepDebug) { muxCout.lock(); std::cout << "buildLogVol(), testing LogVol id: " << id << "...\n"; ; muxCout.unlock(); }
+
   if (isBuiltLog(id)) {
+    if (m_deepDebug) { muxCout.lock(); std::cout << "getting the LogVol from cache...\n"; ; muxCout.unlock(); }
     return getBuiltLog(id);
   }
 
@@ -2570,9 +2599,14 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id)
     exit(EXIT_FAILURE);
   }
 
-	GeoLogVol* logPtr = new GeoLogVol(logVolName, shape, mat);
+  GeoLogVol* logPtr = new GeoLogVol(logVolName, shape, mat);
   storeBuiltLog(logPtr);
-	return logPtr;
+  if (m_deepDebug) {
+      muxCout.lock();
+      std::cout << "buildLogVol() - address of the stored LogVol:" << logPtr << std::endl;
+      muxCout.unlock();
+  }	
+  return logPtr;
 }
 
 
@@ -2985,21 +3019,30 @@ GeoSerialTransformer* ReadGeoModel::getBuiltSerialTransformer(const unsigned int
 */
 
 // --- methods for caching GeoPhysVol/GeoFullPhysVol nodes ---
-std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber)
+//std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber)
+//{
+  //std::string key = std::to_string(id) + ":" + std::to_string(tableId) + ":" + std::to_string(copyNumber);
+  //return key;
+//}
+std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId)
 {
-  std::string key = std::to_string(id) + ":" + std::to_string(tableId) + ":" + std::to_string(copyNumber);
+  std::string key = std::to_string(id) + ":" + std::to_string(tableId);
   return key;
 }
-void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN, GeoGraphNode* nodePtr)
+//void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN, GeoGraphNode* nodePtr)
+void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, GeoGraphNode* nodePtr)
 {
   std::lock_guard<std::mutex> lk(muxVPhysVol);
-  std::string key = getVPhysVolKey(id, tableId, copyN);
+  //std::string key = getVPhysVolKey(id, tableId, copyN);
+  std::string key = getVPhysVolKey(id, tableId);
   m_memMap[key] = nodePtr;
 }
-GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN)
+//GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN)
+GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId)
 {
-	std::lock_guard<std::mutex> lk(muxVPhysVol);
-  std::string key = getVPhysVolKey(id, tableId, copyN);
+    std::lock_guard<std::mutex> lk(muxVPhysVol);
+  //std::string key = getVPhysVolKey(id, tableId, copyN);
+  std::string key = getVPhysVolKey(id, tableId);
   if (m_memMap.find(key) == m_memMap.end()) {
     return nullptr; // if volume is not found in cache
   }

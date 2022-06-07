@@ -38,13 +38,9 @@ namespace GeoModelIO {
             std::string volID   = record[2];
             if(0==ii) keyType   = record[3];//this is the same for all records. TODO: it should be stored in a metadata table
             ++ii;
-            
-            //std::cout << "keyStr: " << keyStr << ", volID: " << volID 
-            //          << ", keyType: " << keyType << std::endl; // debug msg
-
             N volPtr = nullptr;
             if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
-                volPtr = dynamic_cast<GeoFullPhysVol*>( getVPhysVol(std::stoul(volID), 2, 1) ); //always table=2, copyN=1 (because FullPhysVols are not sharable 
+                volPtr = dynamic_cast<GeoFullPhysVol*>( getVPhysVol(std::stoul(volID), 2) ); //always table=2, and we should have copyN=1 because FullPhysVols are not sharable 
             } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
                 volPtr = getBuiltAlignableTransform(std::stoul(volID));
             } else {

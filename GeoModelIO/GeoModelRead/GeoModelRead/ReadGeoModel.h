@@ -1,3 +1,8 @@
+
+/*
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+*/
+
 /*
  * ReadGeoModel.h
  *
@@ -9,6 +14,11 @@
  * - 2020 May, R.M.Bianchi - Added parallel read
  * - 2020 Aug, R.M.Bianchi - Added support for reading back published nodes
  * - 2021 Aug, R.M.Bianchi <riccardo.maria.bianchi@cern.ch> - Added support GeoIdentifierTag and GeoSerialIdentifier nodes
+ * - Jun 2022, R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
+ *              Fixed the duplication of VPhysVol instances due to a wrong key used for caching volumes that were built already 
+ *              The copyNumber was wrongly used together with tableID and volID
+ *              For details, see: https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/39
+ *
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
@@ -166,8 +176,10 @@ private:
   void storeBuiltAlignableTransform(GeoAlignableTransform* node);
   GeoAlignableTransform* getBuiltAlignableTransform(const unsigned int id);
 
-  void storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber, GeoGraphNode* node);
-  GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
+  //void storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber, GeoGraphNode* node);
+  //GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
+  void storeVPhysVol(const unsigned int id, const unsigned int tableId, GeoGraphNode* node);
+  GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId);
 
   bool isBuiltLog(const unsigned int id);
   void storeBuiltLog(GeoLogVol* nodePtr);

@@ -11,10 +11,14 @@ project( "GeoModelExamples" VERSION 4.1.0 LANGUAGES CXX )
 
 # Getting-started examples
 add_subdirectory( KitchenSinkPlugin )
+add_subdirectory( MinimalPlugin )
 
 add_subdirectory( HelloGeo )
 add_subdirectory( HelloGeoWrite )
-#add_subdirectory( HelloGeoRead )
+add_subdirectory( HelloGeoWriteReadWrite )
+add_subdirectory( HelloGeoRead )
+add_subdirectory( HelloGeoReadNodeAction )
+
 #add_subdirectory( HelloDummyMaterial )
 #add_subdirectory( HelloToy )
 #add_subdirectory( HelloToyDetectorFactory )

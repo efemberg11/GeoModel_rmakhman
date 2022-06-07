@@ -806,8 +806,13 @@ void FSLMainWindow::run_configuration()
     QMessageBox::information(this, "Info", "First Select Geometry input");
      return;
   }
+  create_configuration();
+  
+  std::string tmpConf="/tmp/fslconfig-"+std::to_string(getuid())+"-"+std::to_string(getpid())+".json";
+  
+  std::ofstream o(tmpConf);
+  o << std::setw(4) << j << std::endl;
 
-  std::string tmpConf="/tmp/fslconfig-"+std::to_string(getuid())+std::to_string(getpid())+".json";
   {
     QString Command;    //Contains the command to be executed
     QStringList args;   //Contains arguments of the command

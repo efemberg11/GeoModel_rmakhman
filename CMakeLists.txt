@@ -3,10 +3,6 @@
 # === Preamble ===
 cmake_minimum_required(VERSION 3.12...3.19.1)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-
 # Make the 'cmake' module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
@@ -23,8 +19,6 @@ project( "GeoModel" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 include( GNUInstallDirs )
 # Set a default build type
 include( BuildType )
-# Print Build Info on screen
-include( PrintBuildInfo )
 # Set default build and C++ options
 include( configure_cpp_options )
 
@@ -113,6 +107,10 @@ if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
   add_subdirectory(GeoModelG4)
   list( APPEND BUILT_PACKAGES "GeoModelG4")
 endif()
+
+
+# Print Build Info on screen
+include( PrintBuildInfo )
 
 
 # A function to get a string with comma-separated package names from a list of packages

@@ -154,7 +154,8 @@ int main(int argc, char** argv) {
         if(simConfig::fsl.eventGeneratorName=="Pythia")
         {
 #if USE_PYTHIA
-        set_pythia_config((simConfig::fsl.typeOfEvent).c_str());
+        if(simConfig::fsl.typeOfEvent != "") set_pythia_config((simConfig::fsl.typeOfEvent).c_str());
+        else set_pythia_config((simConfig::fsl.eventInputFile).c_str());
 
 #else
         std::cerr << "Support for Pythia is not available. \nPlease visit the website http://home.thep.lu.se/Pythia/ to install it in your system." << std::endl;

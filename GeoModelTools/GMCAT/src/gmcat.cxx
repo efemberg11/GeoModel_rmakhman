@@ -1,3 +1,7 @@
+/*
+ *   Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration   
+*/
+
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
@@ -84,12 +88,12 @@ int main(int argc, char ** argv) {
   if (access(outputFile.c_str(),F_OK)==0) {
     if (!access(outputFile.c_str(),W_OK)) {
       if (system(("rm -f "+ outputFile).c_str())) {
-	std::cerr << "Error, cannot overwrite existing file " << outputFile << std::endl;
+	std::cerr << "gmcat -- Error, cannot overwrite existing file " << outputFile << std::endl;
 	return 3;
       }
     }
     else {
-      std::cerr << "Error, cannot overwrite existing file " << outputFile << " (permission denied)" << std::endl;
+      std::cerr << "gmcat -- Error, cannot overwrite existing file " << outputFile << " (permission denied)" << std::endl;
       return 4;
     }
   }
@@ -133,7 +137,7 @@ int main(int argc, char ** argv) {
     GeoGeometryPluginLoader loader;
     GeoVGeometryPlugin *factory=loader.load(plugin);
     if (!factory) {
-      std::cerr << "Could not load plugin " << plugin << std::endl;
+      std::cerr << "gmcat -- Could not load plugin " << plugin << std::endl;
       return 5;
     }
     
@@ -155,7 +159,7 @@ int main(int argc, char ** argv) {
   for (const std::string & file : inputFiles) {
     GMDBManager* db = new GMDBManager(file);
     if (!db->checkIsDBOpen()){
-      std::cerr << "Error opening input file " << file << std::endl;
+      std::cerr << "gmcat -- Error opening the input file: " << file << std::endl;
       return 6;
     }
 
@@ -165,14 +169,15 @@ int main(int argc, char ** argv) {
     /* build the GeoModel geometry */
     GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
+    /* get an handle on a Volume Cursor, to traverse the whole set of Volumes */
     GeoVolumeCursor aV(dbPhys);
 
+    /* loop over the Volumes in the tree */
     while (!aV.atEnd()) {
       GeoNameTag *nameTag=new GeoNameTag(aV.getName());
       GeoTransform *transform= new GeoTransform(aV.getTransform());
       world->add(nameTag);
       world->add(transform);
-      std::cout << "visiting: " << aV.getVolume()->getLogVol()->getName() << " [" << &*aV.getVolume() <<  "]" << std::endl;
       world->add((GeoVPhysVol *) &*aV.getVolume());
       aV.next();
     }
@@ -187,7 +192,7 @@ int main(int argc, char ** argv) {
   // check the DB connection
   //
   if (!db.checkIsDBOpen()) {
-    std::cerr << "Error opening output file " << outputFile << std::endl;
+    std::cerr << "gmcat -- Error opening the output file: " << outputFile << std::endl;
     return 7;
   }
 

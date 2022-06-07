@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 // author: Riccardo.Maria.Bianchi@cern.ch, 2017
@@ -148,6 +148,8 @@ void WriteGeoModel::handleFullPhysVol (const GeoFullPhysVol *vol)
 
 void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 {
+    //std::cout << "WriteGeoModel::handleVPhysVolObjects() -- visiting... " << vol << std::endl; // debug msg
+
 	// get the address string for the current volume
   std::string address = getAddressStringFromPointer( vol );
 
@@ -270,7 +272,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 
 		// LOGVOL
 		const GeoLogVol* logVol = vol->getLogVol();
-    const std::string logName = logVol->getName();
+        const std::string logName = logVol->getName();
 
 		// MATERIAL
 		const GeoMaterial * mat = vol->getLogVol()->getMaterial();
@@ -300,27 +302,29 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 			const GeoPhysVol* physVol = dynamic_cast<const GeoPhysVol*>(vol);
 			// store the PhysVol volume into the DB
 			physId = storeObj(physVol, logvolId, parentId, storeRootVolume); // with parent info
-      volTypeStr = "GeoPhysVol";
+            volTypeStr = "GeoPhysVol";
 		}
 		else if (dynamic_cast<const GeoFullPhysVol*>(vol)) {
 			const GeoFullPhysVol* fullVol = dynamic_cast<const GeoFullPhysVol*>(vol);
 			physId = storeObj(fullVol, logvolId, parentId, storeRootVolume); // with parent info
-      volTypeStr = "GeoFullPhysVol";
+            volTypeStr = "GeoFullPhysVol";
 		} else {
-      std::cout << "WARNING!! Unknown GeoVPhysVol type!! Exiting..." << std::endl;
-      exit(EXIT_FAILURE);
+            std::cout << "GeoModelWrite -- WARNING!! Unknown GeoVPhysVol type!! Exiting..." << std::endl;
+            exit(EXIT_FAILURE);
 		}
 
 	} else {
 		physId = getStoredIdFromAddress(address);
-    volTypeStr = getGeoTypeFromVPhysVol(vol);
+        volTypeStr = getGeoTypeFromVPhysVol(vol);
 	}
 
     // Now we get the 'copy number' for this volume,
     // to distinguish this volume from the other volumes created from the same shared node (if any)
-  if (volTypeStr == "NULL") std::cout << "ERROR!! volTypeStr is 'NULL'!!!\n";
+    if (volTypeStr == "NULL") std::cout << "ERROR!! volTypeStr is 'NULL'!!!\n";
     const unsigned int volCopyN = setVolumeCopyNumber(physId, volTypeStr);
-    //JFB Commented out: qDebug() << "physId: " << physId << "- volume copy number: " << volCopyN;
+
+    // debug msg
+    //std::cout << "WriteGeoModel -- physId: " << physId << "- volume copy number: " << volCopyN << std::endl;
 
     if ( isRootVolume || parentId == 0) {
         //qDebug() << "This is the RootVolume or the volume has 'NULL' parent (unconnected subtree?) - So, we do not store the child position for this volume!";
@@ -347,7 +351,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
 	else if (dynamic_cast<const GeoFullPhysVol*>(vol)) {
 		geoType = "GeoFullPhysVol";
 	} else {
-    std::cout << "WARNING!! Unknown GeoVPhysVol type!!" << std::endl;
+    std::cout << "GeoModelWrite -- WARNING!! Unknown GeoVPhysVol type!!" << std::endl;
 	}
 	return geoType;
 }
@@ -498,7 +502,7 @@ void WriteGeoModel::handleSerialTransformer (const GeoSerialTransformer *node)
         try {
             persistifier.persistify(*func);
         } catch (const std::runtime_error & error) {
-            std::cout << "SEVERE WARNING!! Handling std::runtime_error! -->" << error.what() << std::endl;
+            std::cout << "GeoModelWrite -- SEVERE WARNING!! Handling std::runtime_error! -->" << error.what() << std::endl;
         }
     std::string expression = persistifier.getCodedString();
 
@@ -652,7 +656,7 @@ void WriteGeoModel::handleNameTag(const GeoNameTag* node)
 			}
 		}
 		else{
-      std::cout << "WARNING!! Len == 0, but this cannot be the Root volume!" << std::endl;
+      std::cout << "GeoModelWrite -- WARNING!! Len == 0, but this cannot be the Root volume!" << std::endl;
 		}
 
   std::vector<std::string> parentList;
@@ -1124,7 +1128,7 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape)
   //   shapePars=pars.join(";");
   // }
   else {
-    std::cout << "\n\tWARNING!!! - Shape '" << shapeType << "' needs to be persistified!!\n\n";
+    std::cout << "\n\tGeoModelWrite -- WARNING!!! - Shape '" << shapeType << "' needs to be persistified!!\n\n";
     printStdVectorStrings(m_objectsNotPersistified);
   }
                      
@@ -1702,7 +1706,7 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
 
 
 	if ( !m_objectsNotPersistified.empty() ) {
-        std::cout << "\n\tWARNING!! There are shapes/nodes which need to be persistified! --> ";
+        std::cout << "\n\tGeoModelWrite -- WARNING!! There are shapes/nodes which need to be persistified! --> ";
         printStdVectorStrings(m_objectsNotPersistified);
         std::cout << "\n\n";
 	}
@@ -1741,12 +1745,12 @@ void WriteGeoModel::storePublishedNodes(GeoPublisher* store)
     if (mapAXF.size() > 0) {
         m_dbManager->addListOfPublishedAlignableTransforms(m_publishedAlignableTransforms_String, storeName); 
     } else {
-        std::cout << "\nWARNING! A pointer to a GeoPublisher was provided, but no GeoAlignableTransform nodes have been published. Please, check if that was intended. (If in doubt, please ask to 'geomodel-developers@cern.ch')\n" << std::endl;
+        std::cout << "\nGeoModelWrite -- WARNING! A pointer to a GeoPublisher was provided, but no GeoAlignableTransform nodes have been published. Please, check if that was intended. (If in doubt, please ask to 'geomodel-developers@cern.ch')\n" << std::endl;
     }
     if (mapFPV.size() > 0) {
         m_dbManager->addListOfPublishedFullPhysVols(m_publishedFullPhysVols_String, storeName);
     } else {
-        std::cout << "\nWARNING! A pointer to a GeoPublisher was provided, but no GeoFullPhysVol nodes have been published. Please, check if that was intended. (If in doubt, please ask to 'geomodel-developers@cern.ch')\n" << std::endl;
+        std::cout << "\nGeoModelWrite -- WARNING! A pointer to a GeoPublisher was provided, but no GeoFullPhysVol nodes have been published. Please, check if that was intended. (If in doubt, please ask to 'geomodel-developers@cern.ch')\n" << std::endl;
     }
 
     // clear the caches

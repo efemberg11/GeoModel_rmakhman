@@ -151,8 +151,14 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->g4ui_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_g4ui_index(QModelIndex)));
     connect(ui->shape_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_shape_index(QModelIndex)));
     connect(region,&ConfigRegions::send_config,this,&FSLMainWindow::add_region);
-    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
-    connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readyReadStandardError()));
+    connect(&fullSimLight_process,SIGNAL(readyReadStandardOutput()),this,SLOT(fsmlreadyReadStandardOutput()));
+    connect(&fullSimLight_process,SIGNAL(readyReadStandardError()),this,SLOT(fsmlreadyReadStandardError()));
+
+    connect(&gmex_process,SIGNAL(readyReadStandardOutput()),this,SLOT(gmexreadyReadStandardOutput()));
+    connect(&gmex_process,SIGNAL(readyReadStandardError()),this,SLOT(gmexreadyReadStandardError()));
+
+    connect(&fullSimLight_process,SIGNAL(started()),this,SLOT(fsml_process_started()));
+    connect(&fullSimLight_process,SIGNAL(finished(int , QProcess::ExitStatus )),this,SLOT(fsml_process_finished()));
 
 
 
@@ -338,7 +344,7 @@ void FSLMainWindow::configure_g4ui_command()
     g4ui_commands.push_back("/run/initialize");
     }
 
-    if(generator=="G4ParticleGun")
+    if(generator=="Particle Gun")
     {
     g4ui_commands.push_back("/FSLgun/primaryPerEvt " + std::to_string(number_of_primaries_per_event));
     g4ui_commands.push_back("/FSLgun/energy  " + particle_energy);
@@ -822,7 +828,7 @@ void FSLMainWindow::run_configuration()
     Command = "fullSimLight";
     
     args<<"-c"<< QString::fromUtf8(tmpConf.c_str());
-    process.start(Command, args, QIODevice::ReadOnly);
+    fullSimLight_process.start(Command, args, QIODevice::ReadOnly);
   }
 
 }
@@ -842,24 +848,58 @@ void FSLMainWindow::run_gmex()
     Command = "gmex";
      
     args << QString::fromUtf8(geom_file_address.c_str());
-    process.start(Command, args, QIODevice::ReadOnly);
+    gmex_process.start(Command, args, QIODevice::ReadOnly);
   }
 
 }
 
-//Function to get output from run process
-void FSLMainWindow::readyReadStandardOutput()
+//Function to blur out Buttons when fsml QProcess started
+void FSLMainWindow::fsml_process_started()
 {
-    QString StdOut = process.readAllStandardOutput(); //Reads standard output
+    ui->pB_gmex->setEnabled(false);
+    ui->pB_Run->setEnabled(false);
+
+}
+
+//Function to reactivate Buttons when fsml QProcess stopped
+void FSLMainWindow::fsml_process_finished()
+{
+    ui->pB_gmex->setEnabled(true);
+    ui->pB_Run->setEnabled(true);
+
+}
+
+
+//Function to get output from fsml run process
+void FSLMainWindow::fsmlreadyReadStandardOutput()
+{
+    QString StdOut = fullSimLight_process.readAllStandardOutput(); //Reads standard output
     ui->tB_view_config->append(StdOut);
 }
 
-//Function to get error output from run process
-void FSLMainWindow::readyReadStandardError()
+//Function to get error output from  fsml run process
+void FSLMainWindow::fsmlreadyReadStandardError()
 {
-    QString StdErr = process.readAllStandardError(); //Reads standard error output
+    QString StdErr = fullSimLight_process.readAllStandardError(); //Reads standard error output
     ui->tB_view_config->append(StdErr);
 }
+
+
+//Function to get output from gmex process
+void FSLMainWindow::gmexreadyReadStandardOutput()
+{
+    QString StdOut = gmex_process.readAllStandardOutput(); //Reads standard output
+    ui->tB_view_config->append(StdOut);
+}
+
+//Function to get error output from gmex process
+void FSLMainWindow::gmexreadyReadStandardError()
+{
+    QString StdErr = gmex_process.readAllStandardError(); //Reads standard error output
+    ui->tB_view_config->append(StdErr);
+}
+
+
 
 //Function to load configuration
 void FSLMainWindow::load_configuration()
@@ -910,7 +950,7 @@ void FSLMainWindow::load_configuration()
 
     generator = j_load["Generator"];
 
-    if(generator=="G4ParticleGun")
+    if(generator=="Particle Gun")
     {
         ui->cB_gen_options->setCurrentIndex(0);
 

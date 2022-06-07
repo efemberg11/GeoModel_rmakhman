@@ -53,7 +53,8 @@ public:
 
     //Parameters associated with the main tab
     nlohmann::json j;
-    QProcess process;
+    QProcess fullSimLight_process;
+    QProcess gmex_process;
     std::string geom_file_address = "";
     std::string geom_file_directory=""; 
     std::string physics_list_name = "";
@@ -186,8 +187,15 @@ private slots:
     void add_region(std::string  region_name, std::string frootLV_names
                     ,double electron_cut , double proton_cut
                     ,double positron_cut , double gamma_cut);
-    void readyReadStandardOutput();
-    void readyReadStandardError();
+    void fsmlreadyReadStandardOutput();
+    void fsmlreadyReadStandardError();
+    void fsml_process_started();
+    void fsml_process_finished();
+    
+    void gmexreadyReadStandardOutput();
+    void gmexreadyReadStandardError();
+  //  void gmex_process_started();
+  //  void gmex_process_finished();
 
 
 private:

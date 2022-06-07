@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -8,6 +8,10 @@
 //   Decide if I need alignable transforms from my second child
 //   Add transform from first child to list
 //   Create physvol using my second child; add it to list.
+//
+//   Updates:
+//   - 2022 Apr, Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+//               Commented call to addAlignable
 //
 #include "GeoModelXml/TransformProcessor.h"
 
@@ -50,7 +54,9 @@ char *tagName;
  //
  DOMElement *transformation = element->getFirstElementChild();
  tagName = XMLString::transcode(transformation->getTagName()); // transformation or transformationref
- //  ******* Should check here that an alignable transform is given an alignable transformation and object; to be done
+ 
+ // TODO:  ******* Should check here that an alignable transform is given an alignable transformation and object; to be done
+ 
  toAdd.push_back((GeoGraphNode *)(gmxUtil.geoItemRegistry.find(string(tagName))->process(transformation, gmxUtil)));
  XMLString::release(&tagName);
  //
@@ -58,14 +64,20 @@ char *tagName;
 //
     if (alignable) { 
         int level;
-	alignable_tmp = XMLString::transcode("alignable");
+        alignable_tmp = XMLString::transcode("alignable");
         istringstream(XMLString::transcode(element->getAttribute(alignable_tmp))) >> level;
         map<string, int> index;
         gmxUtil.positionIndex.incrementLevel(); // Logvol has unfortunately already decremented this; temp. restore it
         gmxUtil.positionIndex.indices(index, gmxUtil.eval);
-// ****** Using "[2]" is an ugly way to reach the PV. Define const int in LogvolProcessor?
-        gmxUtil.gmxInterface()->addAlignable(level, index, (GeoVFullPhysVol *) objectsToAdd[2], 
-                                             (GeoAlignableTransform *) toAdd.back());
+
+        // the call to addAlignable below only prints log messages, it is not very useful at the moment.
+        // Since it accesses PV through an hard-coded [2] index, it crashes if the PV is not exactly at [2]
+        // for instance when a NameTag is omitted (which I am pushing, to save memory).
+        // NOTE: So, I comment it out for the moment... RMB
+        //
+        // ****** Using "[2]" is an ugly way to reach the PV. Define const int in LogvolProcessor?
+        //gmxUtil.gmxInterface()->addAlignable(level, index, (GeoVFullPhysVol *) objectsToAdd[2], 
+        //                                     (GeoAlignableTransform *) toAdd.back());
 
         gmxUtil.positionIndex.decrementLevel(); 
 	XMLString::release(&alignable_tmp);

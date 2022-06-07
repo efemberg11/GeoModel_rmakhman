@@ -242,12 +242,14 @@
 
   <!ELEMENT logvol (transform|logvol|logvolref|assembly|assemblyref|multicopy|replicaX|replicaY|replicaZ|replicaRPhi|replicaXYarrays|index)*>
     <!-- If sensitive is not given, it is not sensitive. If given, it points to a digitization scheme -->
-    <!ATTLIST logvol name ID #REQUIRED
-                     shape IDREF #REQUIRED
-                     material IDREF #REQUIRED
-                     sensitive IDREF #IMPLIED 
-                     alignable (true|false) "false"
-                     envelope (true|false) "false"
+    <!ATTLIST logvol name       ID #REQUIRED
+                     shape      IDREF #REQUIRED
+                     material   IDREF #REQUIRED
+                     sensitive  IDREF #IMPLIED 
+                     alignable  (true|false) "false"
+                     named      (true|false) "false"
+                     identifier (true|false) "false"
+                     envelope   (true|false) "false"
                      splitLevel CDATA #IMPLIED>
 
   <!ELEMENT index EMPTY>

@@ -19,8 +19,8 @@
 #include "G4VModularPhysicsList.hh"
 
 #include "Randomize.hh"
-#include "MyDetectorConstruction.hh"
-#include "MyActionInitialization.hh"
+#include "FSLDetectorConstruction.hh"
+#include "FSLActionInitialization.hh"
 #include "GeantinoMapsConfigurator.hh"
 
 #include <getopt.h>
@@ -28,6 +28,9 @@
 #include <iostream>
 #include <iomanip>
 #include <unistd.h>
+
+#include <sys/types.h>
+#include <dirent.h>
 
 static bool         parCreateGeantinoMaps  = true;
 static bool         parIsPerformance       = false;
@@ -37,7 +40,6 @@ static bool         parCreateMaterialsMaps  = false;
 static bool         parCreateElementsMaps   = false;
 static bool         parRunOverlapCheck = false;
 static G4String     parGeometryFileName= "";
-static G4String     parMacroFileName   = "geantino.g4";
 static G4String     parOutputFileName  = "geantinoMaps.root";
 static G4String     parPhysListName    = "FTFP_BERT";
 static G4double     parRmin    = -12500; //r min in mm, for geantino maps
@@ -51,13 +53,56 @@ static G4double     parYmax    =  12500; //y max in mm, for geantino maps
 static G4double     parEtamin  = -6;     //eta min, for geantino maps
 static G4double     parEtamax  =  6;     //eta max, for geantino maps
 
+static const std::string fullSimLightShareDir=FULLSIMLIGHTSHAREDIR;
+static G4String     parMacroFileName   = fullSimLightShareDir+"/geantino.g4";
+
+
 
 void GetInputArguments(int argc, char** argv);
 void Help();
 
 
 int main(int argc, char** argv) {
+
+    auto dataSetEnv=[] (const std::string &dir, const std::string & dataSetEnvName, const std::string & dataset) {
+      if (getenv(dataSetEnvName.c_str())) {
+	std::cout << dataSetEnvName << "=" << getenv(dataSetEnvName.c_str()) << std::endl; 
+      }
+      else {
+	DIR *directory = opendir(dir.c_str());
+	if (directory) {
+	  dirent * entry = readdir(directory);
+	  while (entry) {
+	    std::string entryName=entry->d_name;
+	    if (entryName.find(dataset)!=std::string::npos) {
+	      std::cout << dataSetEnvName << "=" << (dir+"/"+entryName) << std::endl; 
+	      setenv(dataSetEnvName.c_str(),(dir+"/"+entryName).c_str(),0);
+	    }
+	    entry=readdir(directory);
+	  }
+	  closedir(directory);
+	}
+      }
+    };
     
+    
+    const std::string g4ShareDir=G4SHAREDIR;
+    const std::string g4Version=G4VERSION;
+    const std::string searchDir=g4ShareDir+"/Geant4-"+g4Version+"/data";
+    
+    dataSetEnv(searchDir,"G4NEUTRONHPDATA", "G4NDL");
+    dataSetEnv(searchDir,"G4LEDATA","G4EMLOW");
+    dataSetEnv(searchDir,"G4LEVELGAMMADATA","PhotonEvaporation");
+    dataSetEnv(searchDir,"G4RADIOACTIVEDATA","RadioactiveDecay");
+    dataSetEnv(searchDir,"G4PARTICLEXSDATA","G4PARTICLEXS");
+    dataSetEnv(searchDir,"G4PIIDATA","G4PII");
+    dataSetEnv(searchDir,"G4REALSURFACEDATA","RealSurface");
+    dataSetEnv(searchDir,"G4SAIDXSDATA","G4SAIDDATA");
+    dataSetEnv(searchDir,"G4ABLADATA","G4ABLA");
+    dataSetEnv(searchDir,"G4INCLDATA","G4INCL");
+    dataSetEnv(searchDir,"G4ENSDFSTATEDATA","G4ENSDFSTATE");
+  
+  
     // Get input arguments
     GetInputArguments(argc, argv);
     
@@ -81,23 +126,6 @@ int main(int argc, char** argv) {
         G4cout << "INFO: Exiting" <<G4endl;
         return 1;
     }
-    
-    // JFB. In case the user has not set up the pointers to G4 data files, look for them
-    // in standard directories.
-
-    const std::string g4ShareDir=G4SHAREDIR;
-  setenv("G4NEUTRONHPDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4NDL4.6").c_str(),                0);
-  setenv("G4LEDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4EMLOW7.9.1").c_str(),                   0);
-  setenv("G4LEVELGAMMADATA",(g4ShareDir+"/Geant4-10.6.1/data/PhotonEvaporation5.5").c_str(),   0);
-  setenv("G4RADIOACTIVEDATA",(g4ShareDir+"/Geant4-10.6.1/data/RadioactiveDecay5.4").c_str(),   0);
-  setenv("G4PARTICLEXSDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4PARTICLEXS2.1").c_str(),        0);
-  setenv("G4PIIDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4PII1.3").c_str(),                      0);
-  setenv("G4REALSURFACEDATA",(g4ShareDir+"/Geant4-10.6.1/data/RealSurface2.1.1").c_str() ,     0);
-  setenv("G4SAIDXSDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4SAIDDATA2.0").c_str(),              0);
-  setenv("G4ABLADATA",(g4ShareDir+"/Geant4-10.6.1/data/G4ABLA3.1").c_str(),                    0);
-  setenv("G4INCLDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4INCL1.0").c_str(),                    0);
-  setenv("G4ENSDFSTATEDATA",(g4ShareDir+"/Geant4-10.6.1/data/G4ENSDFSTATE2.2").c_str(),        0);
-  
     
     //#if G4VERSION_NUMBER>=1040
     //    std::cout<<"G4VERSION_NUMBER:::: "<<G4VERSION_NUMBER<<std::endl;
@@ -134,7 +162,7 @@ int main(int argc, char** argv) {
     
     // set mandatory initialization classes
     // 1. Detector construction
-    MyDetectorConstruction* detector = new MyDetectorConstruction;
+    FSLDetectorConstruction* detector = new FSLDetectorConstruction;
     
     if (parRunOverlapCheck) detector->SetRunOverlapCheck(true);
     
@@ -174,8 +202,8 @@ int main(int argc, char** argv) {
     gm_config->SetMapsFilename(parOutputFileName);
     
     // 3. User action
-    MyActionInitialization* myAct = new MyActionInitialization(parIsPerformance);
-    runManager->SetUserInitialization(myAct);
+    FSLActionInitialization* FSLAct = new FSLActionInitialization(parIsPerformance);
+    runManager->SetUserInitialization(FSLAct);
     
     
     

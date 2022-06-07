@@ -1,11 +1,15 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 //
 //    Implement default GmxInterface, which just prints debug messages.
 //    User should over-ride all three methods.
 //    Use: create an instance of this, and pass a reference to it in the Gmx2Geo constructor.
+//
+//    Updates:
+//    - 2022 Apr, Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
+//                Fix GMX trying to access non-existent GeoModel nodes
 //
 #include "GeoModelXml/GmxInterface.h"
 #include "OutputDirector.h"
@@ -74,11 +78,17 @@ void GmxInterface::addAlignable(int level, map<std::string, int> &index, GeoVFul
     }
     msglog << MSG::DEBUG << "GmxInterface::addAlignable called for physvol name " << name << ".  Level = " << level << ". Indices:   ";
 */
-
-    msglog << MSG::DEBUG << "GmxInterface::addAlignable called for a physvol. Logvol name " << fpv->getLogVol()->getName() << 
-            ". Level = " << level << ". Indices:   ";
+   
+    // debug message
+    msglog << MSG::DEBUG 
+        << "GmxInterface::addAlignable called for a physvol. Logvol name " 
+        << fpv->getLogVol()->getName() << ". Level = " << level << ". Indices:   ";
     for (map<string, int>::iterator i = index.begin(); i != index.end(); ++i) {
         msglog << i->second << "   ";
     }
     msglog << endmsg;
+    //--------------
+   
+
+
 }

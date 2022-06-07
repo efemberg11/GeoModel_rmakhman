@@ -1,10 +1,11 @@
-// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+// Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 
 /*
- * HelloGeo.cpp
+ * This example writes a sample geometry, reads it back in, then writes it again.
+ * It is meant to test the GeoModel I/O packages and methods.
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
- *  Created on: Apr, 2019
+ *  Created on: May, 2022
  *
  */
 
@@ -222,7 +223,8 @@ int main(int argc, char *argv[])
   // Dump the tree volumes to a local file
 	std::cout << "Dumping the GeoModel geometry to the DB file..." << std::endl;
   GeoModelIO::WriteGeoModel dumpGeoModelGraph3(db3); // init the GeoModel node action
-  world->exec(&dumpGeoModelGraph3); // visit all GeoModel nodes
+  //world->exec(&dumpGeoModelGraph3); // visit all GeoModel nodes
+  dbPhys->exec(&dumpGeoModelGraph3); // visit all GeoModel nodes
   dumpGeoModelGraph3.saveToDB(); // save to the SQlite DB file
   std::cout << "DONE. Geometry saved." <<std::endl;
 

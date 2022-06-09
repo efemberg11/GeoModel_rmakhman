@@ -55,13 +55,19 @@ Then, you install the pre-compiled GeoModel applications:
 
 ```shell
 brew install geomodel-visualization # to get gmex (the geometry explorer)
-brew install geomodel-fullsimlight  # to get fullsimlight, gm2gdml, gmclash, gmgeantino
+brew install geomodel-fsl           # to get fullsimlight, the FSL GUI, gm2gdml, gmclash, gmgeantino, the ATLAS LArCustomSolid extension
 brew install geomodel-tools         # to get gmcat, gdml2gm
 ```
 
+All the above packages also automatically install the base package `geomodel`, which contains the core libraries and the I/O layer. The `geomodel-fsl` package also installs `geomodel-fullsimlight`, `geomodel-geomodelg4`, and the ATLAS extension `geomodel-extension-atlaslar`.
 
 
 The use of **Pre-compiled packages** (*Bottles*, in the Homebrew jargon) **speeds up** the installation on the user's machine a lot. GeoModel bottles are provided at least for the **latest two** macOS releases.
+
+The pre-compiled *bottles* are built for the two latest macOS releases, currently:
+
+* 11 Big_Sur on Intel chip 
+* 12 Monterey on Apple M1 chip
 
 For older macOS releases, Homebrew will try to compile the packages from source. If that fails, you will have to compile from source by yourself by following the instructions provided in the [development](../dev/index.md) section.
 
@@ -86,7 +92,7 @@ As soon as you have followed the initial installation instructions above, you ca
 
 ```shell
 brew update
-brew upgrade geomodel geomodel-geomodeltools geomodel-visualization geomodel-geomodelg4 geomodel-fullsimlight
+brew upgrade geomodel geomodel-geomodeltools geomodel-visualization geomodel-geomodelg4 geomodel-fullsimlight geomodel-fsl geomodel-extension-atlaslar 
 ```
 
 #### Some more details 

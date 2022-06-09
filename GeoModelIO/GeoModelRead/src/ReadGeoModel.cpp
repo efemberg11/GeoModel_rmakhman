@@ -800,16 +800,16 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id, const un
   }
 
     // A - if the instance has been previously built, return that
-    //if ( nullptr != getVPhysVol(id, tableId, copyN)) {
-    if ( nullptr != getVPhysVol(id, tableId)) {
+    if ( nullptr != getVPhysVol(id, tableId, copyN)) {
+      //if ( nullptr != getVPhysVol(id, tableId)) {
         if (m_deepDebug) {
             muxCout.lock();
-            //std::cout << "getting the instance volume from memory... Returning: [" << getVPhysVol(id, tableId, copyN) << "] -- logvol: " << ((GeoVPhysVol*)getVPhysVol(id, tableId, copyN))->getLogVol()->getName() << std::endl;
-            std::cout << "getting the instance volume from memory... Returning: [" << getVPhysVol(id, tableId) << "] -- logvol: " << ((GeoVPhysVol*)getVPhysVol(id, tableId))->getLogVol()->getName() << std::endl;
+            std::cout << "getting the instance volume from memory... Returning: [" << getVPhysVol(id, tableId, copyN) << "] -- logvol: " << ((GeoVPhysVol*)getVPhysVol(id, tableId, copyN))->getLogVol()->getName() << std::endl;
+            //std::cout << "getting the instance volume from memory... Returning: [" << getVPhysVol(id, tableId) << "] -- logvol: " << ((GeoVPhysVol*)getVPhysVol(id, tableId))->getLogVol()->getName() << std::endl;
             muxCout.unlock();
         }
-        //return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId, copyN));
-        return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId));
+        return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId, copyN));
+        //return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId));
     }
 
   // B - if not built already, then get the actual volume,
@@ -841,8 +841,8 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id, const un
     std::cout << "ERROR! VPhysVol not found! It should be already built, by now. Exiting...\n";
     exit(EXIT_FAILURE);
   }
-  //storeVPhysVol(id, tableId, copyN, vol);
-  storeVPhysVol(id, tableId, vol);
+  storeVPhysVol(id, tableId, copyN, vol);
+  //storeVPhysVol(id, tableId, vol);
 
 	return vol;
 }
@@ -3019,30 +3019,30 @@ GeoSerialTransformer* ReadGeoModel::getBuiltSerialTransformer(const unsigned int
 */
 
 // --- methods for caching GeoPhysVol/GeoFullPhysVol nodes ---
-//std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber)
-//{
-  //std::string key = std::to_string(id) + ":" + std::to_string(tableId) + ":" + std::to_string(copyNumber);
-  //return key;
-//}
-std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId)
+std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber)
 {
-  std::string key = std::to_string(id) + ":" + std::to_string(tableId);
+  std::string key = std::to_string(id) + ":" + std::to_string(tableId) + ":" + std::to_string(copyNumber);
   return key;
 }
-//void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN, GeoGraphNode* nodePtr)
-void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, GeoGraphNode* nodePtr)
+//std::string getVPhysVolKey(const unsigned int id, const unsigned int tableId)
+//{
+//  std::string key = std::to_string(id) + ":" + std::to_string(tableId);
+//  return key;
+//}
+void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN, GeoGraphNode* nodePtr)
+//void ReadGeoModel::storeVPhysVol(const unsigned int id, const unsigned int tableId, GeoGraphNode* nodePtr)
 {
   std::lock_guard<std::mutex> lk(muxVPhysVol);
-  //std::string key = getVPhysVolKey(id, tableId, copyN);
-  std::string key = getVPhysVolKey(id, tableId);
+  std::string key = getVPhysVolKey(id, tableId, copyN);
+  //std::string key = getVPhysVolKey(id, tableId);
   m_memMap[key] = nodePtr;
 }
-//GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN)
-GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId)
+GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyN)
+//GeoGraphNode* ReadGeoModel::getVPhysVol(const unsigned int id, const unsigned int tableId)
 {
     std::lock_guard<std::mutex> lk(muxVPhysVol);
-  //std::string key = getVPhysVolKey(id, tableId, copyN);
-  std::string key = getVPhysVolKey(id, tableId);
+  std::string key = getVPhysVolKey(id, tableId, copyN);
+    //  std::string key = getVPhysVolKey(id, tableId);
   if (m_memMap.find(key) == m_memMap.end()) {
     return nullptr; // if volume is not found in cache
   }

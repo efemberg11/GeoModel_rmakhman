@@ -40,7 +40,7 @@ namespace GeoModelIO {
             ++ii;
             N volPtr = nullptr;
             if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
-                volPtr = dynamic_cast<GeoFullPhysVol*>( getVPhysVol(std::stoul(volID), 2) ); //always table=2, and we should have copyN=1 because FullPhysVols are not sharable 
+                volPtr = dynamic_cast<GeoFullPhysVol*>( getVPhysVol(std::stoul(volID), 2,1) ); //always table=2, and we should have copyN=1 because FullPhysVols are not sharable 
             } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
                 volPtr = getBuiltAlignableTransform(std::stoul(volID));
             } else {

@@ -176,10 +176,10 @@ private:
   void storeBuiltAlignableTransform(GeoAlignableTransform* node);
   GeoAlignableTransform* getBuiltAlignableTransform(const unsigned int id);
 
-  //void storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber, GeoGraphNode* node);
-  //GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
-  void storeVPhysVol(const unsigned int id, const unsigned int tableId, GeoGraphNode* node);
-  GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId);
+  void storeVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber, GeoGraphNode* node);
+  GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId, const unsigned int copyNumber);
+  //void storeVPhysVol(const unsigned int id, const unsigned int tableId, GeoGraphNode* node);
+  //GeoGraphNode* getVPhysVol(const unsigned int id, const unsigned int tableId);
 
   bool isBuiltLog(const unsigned int id);
   void storeBuiltLog(GeoLogVol* nodePtr);

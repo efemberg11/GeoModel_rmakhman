@@ -66,8 +66,8 @@ The use of **Pre-compiled packages** (*Bottles*, in the Homebrew jargon) **speed
 
 The pre-compiled *bottles* are built for the two latest macOS releases, currently:
 
-* 11 Big_Sur on Intel chip 
-* 12 Monterey on Apple M1 chip
+* 11 "Big_Sur" on Intel chip 
+* 12 "Monterey" on Apple M1 chip
 
 For older macOS releases, Homebrew will try to compile the packages from source. If that fails, you will have to compile from source by yourself by following the instructions provided in the [development](../dev/index.md) section.
 

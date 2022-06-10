@@ -3,7 +3,7 @@
 In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel applications and development kits on different platforms.  The GeoModel applications include
 
 * **gmex**, the geometry explorer, an interactive 3d geometry visualizer
-* **fullsimlight**, a command-line tool to run Geant4 simulation.
+* **fullsimlight**, a command-line tool to run Geant4 simulation, and its graphical user interface, *fsl*.
 * **gmclash**, a Geant4 based command-line tool too perform clash detection
 * **gmgeantino**, a Geant4 based command-line tool to generate geantino maps
 * **gm2gdml** and **gdml2gm**, command line tools to convert GeoModel to and from GDML
@@ -12,7 +12,7 @@ In this section, you will find instructions on how to **install** the latest **s
 The development kits include header files and precompiled libraries for the development of detector description code. On some platforms (Mac) the development environment is installed together with the prebuild applications and libraries.  
 
 
-## Ubuntu 20.0.4 (focal, LTS) or 20.0.10 (groovy)
+## Ubuntu 20.0.4 (focal, LTS) or 21.0.10 (impish) or 22.0.4 (jammy, LTS)
 
 Add the geomodel repository to your source list: 
 
@@ -34,15 +34,25 @@ sudo apt install geomodel-g4-dev
 sudo apt install geomodel-visualization-dev
 ```
 
-
+If you have outdated packages, these commands will replace those packages with the most recent version.
 
 ## macOS
 
-On macOS, we use the Homebrew package manager to handle and install the GeoModel packages. If you don't have Homebrew installed on your machine, you should install it by following the instructions on the Homebrew website: <http://brew.sh>.
+On macOS, we use the Homebrew package manager to handle and install the GeoModel packages. If you don't have Homebrew installed on your machine, you should install it by following the instructions on the Homebrew website: <http://brew.sh>.  Please be attentive to any instructions printed after the installation procedure. 
+
+!!! note
+
+   Do you have the newer Mac computer based upon the M1 chip?  Then you will need to set the environment variable
+    ```
+   export DYLD_LIBRARY_PATH=/usr/local/lib:/opt/homebrew/lib
+ 
+    ```
+
+!!! tip
 
 ### First installation 
 
-At first, you add the dedicated Homebrew repository:
+At first, you add the dedicated GeoModel Homebrew repository:
 
 ```shell
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
@@ -67,8 +77,7 @@ For older macOS releases, Homebrew will try to compile the packages from source.
 
 !!! note
 
-    Homebrew is usually smart enough to figure out that the `geomodelvisualization` formula belongs to the `atlas/geomodel` Tap. However, if that's not the case, or in case you have other packages with similar names on your system, you can install the GeoModel formulas by passing to `brew` their complete name; *e.g.*,
-
+   As part of the installation procedure on the mac, the **qt** library is installed, unless it is already present on your system. The installation procedures prints further instructions; in particular, additional environment variables to define in your startup script. These instructions tend to get lost in the input.   Their details depend upon your system.  Be attentive, and follow the instructions  which are printed during the installation of **qt**.  
     ```
     brew install atlas/geomodel/geomodelvisualization
     ```
@@ -82,7 +91,7 @@ For older macOS releases, Homebrew will try to compile the packages from source.
 
 #### Quick instructions 
 
-As soon as you have followed the initial installation instructions above, you can update the GeoModel libraries and tools to the latest version simply by running the commands here below:
+If your installation is outdated, you can update the GeoModel libraries and tools to the latest version simply by running the commands here below:
 
 ```shell
 brew update

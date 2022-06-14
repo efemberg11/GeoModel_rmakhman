@@ -1,18 +1,49 @@
-#include "GeoModelKernel/GeoG4ExtensionSolidLoader.h"
-#include "GeoModelKernel/GeoVG4ExtensionSolid.h"
-#include <string>
+/*
+  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+*/
+
+#ifndef GEOPLUGINLOADER_H_
+#define GEOPLUGINLOADER_H_
+
+
 #include <iostream>
 #include <dlfcn.h>
 #include <libgen.h>
+#include <string> 
 
-GeoG4ExtensionSolidLoader::GeoG4ExtensionSolidLoader () {
+template <class Plugin> class GeoPluginLoader 
+{
+ public:
+
+  // Constructor:
+  GeoPluginLoader<Plugin>();
+
+  // Destructor:
+  ~GeoPluginLoader();
+
+  // load G4Solid plugin
+  Plugin *load(const std::string & path) const;
+  
+ private:
+  
+  GeoPluginLoader            (const GeoPluginLoader &)=delete;
+  GeoPluginLoader & operator=(const GeoPluginLoader &)=delete;
+
+};
+
+
+
+template <class Plugin>
+GeoPluginLoader<Plugin>::GeoPluginLoader () {
 }
 
-GeoG4ExtensionSolidLoader::~GeoG4ExtensionSolidLoader () {
+
+template <class Plugin>
+GeoPluginLoader<Plugin>::~GeoPluginLoader () {
 }
 
-
-GeoVG4ExtensionSolid *GeoG4ExtensionSolidLoader::load(const std::string & pString) const {
+template <class Plugin>
+Plugin *GeoPluginLoader<Plugin>::load(const std::string & pString) const {
   std::string bNameString=basename ((char *) pString.c_str());       // Strip off the directory
   bNameString=bNameString.substr(3);                        // Strip off leading "lib"
   bNameString=bNameString.substr(0,bNameString.find("."));  // Strip off extensions
@@ -43,7 +74,10 @@ GeoVG4ExtensionSolid *GeoG4ExtensionSolidLoader::load(const std::string & pStrin
   //
   // 
   //
-  GeoVG4ExtensionSolid * factory = (GeoVG4ExtensionSolid *) F();
+  Plugin * factory = (Plugin *) F();
   return factory;
 
 }
+
+
+#endif

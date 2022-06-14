@@ -24,7 +24,7 @@
 #include "GeoModelKernel/GeoShapeIntersection.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
-#include "GeoModelKernel/GeoG4ExtensionSolidLoader.h"
+#include "GeoModelKernel/GeoPluginLoader.h"
 #include "GeoModelKernel/GeoVG4ExtensionSolid.h"
 
 #include "G4VSolid.hh"
@@ -489,7 +489,7 @@ G4VSolid *Geo2G4SolidFactory::Build(const GeoShape* geoShape, std::string name) 
       plugin=(*p).second;
     }
     else {                   // make and store the new plugin.
-      static GeoG4ExtensionSolidLoader loader;
+      static GeoPluginLoader<GeoVG4ExtensionSolid> loader;
       std::string pName;
       char * qName=getenv("G4EXTENSION_SOLID_DIR");
       if (qName) {

@@ -293,7 +293,8 @@ install( TARGETS FullSimLight
 
    
 install(FILES include/FSLSensitiveDetectorPlugin.h 
-   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/FullSimLight
-   COMPONENT Development )
+              include/MagFieldPlugin.h 
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/FullSimLight
+  COMPONENT Development )
 
 

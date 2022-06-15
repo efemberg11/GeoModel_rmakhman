@@ -270,7 +270,7 @@ int main(int argc, char** argv) {
         G4bool initialized=false;
         //parse and apply G4Commands
         for (const G4String& element : simConfig::jf["g4ui_commands"]){
-            std::cout<<"Applying G4Commands: "<<element<<std::endl;
+            //std::cout<<"Applying G4Commands: "<<element<<std::endl;
             //Initialize the Geant4 kernel before applying the first FSL user interface command
             if(element.contains("FSLgun") && !initialized) {
                 runManager->Initialize();

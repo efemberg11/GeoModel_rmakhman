@@ -267,11 +267,15 @@ int main(int argc, char** argv) {
             detector->AddSensitiveDetectorPlugin(element);
         }
         
-        
-        
+        G4bool initialized=false;
         //parse and apply G4Commands
-        for (const auto& element : simConfig::jf["g4ui_commands"]){
-            //std::cout<<"G4Commands: "<<element<<std::endl;
+        for (const G4String& element : simConfig::jf["g4ui_commands"]){
+            std::cout<<"Applying G4Commands: "<<element<<std::endl;
+            //Initialize the Geant4 kernel before applying the first FSL user interface command
+            if(element.contains("FSLgun") && !initialized) {
+                runManager->Initialize();
+                initialized=true;
+            }
             UI->ApplyCommand(element);
         }
         
@@ -286,8 +290,8 @@ int main(int argc, char** argv) {
         << " ===================================================== "      << G4endl;
         
         
-        // Initialize G4 kernel
-        runManager->Initialize();
+        // Initialize the G4 kernel if it hasn't been initialized
+        if (!initialized) runManager->Initialize();
         runManager->BeamOn(simConfig::fsl.nEvents);
     }
     

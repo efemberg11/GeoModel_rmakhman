@@ -4,26 +4,6 @@
 
 #ifndef FSLSDPLUGINLOADER_H_
 #define FSLSDPLUGINLOADER_H_
-#include <string> 
-class FSLSensitiveDetectorPlugin;
-class FSLSDPluginLoader 
-{
- public:
-
-  // Constructor:
-  FSLSDPluginLoader();
-
-  // Destructor:
-  ~FSLSDPluginLoader();
-
-  // load G4Solid plugin
-  FSLSensitiveDetectorPlugin  *load(const std::string & path) const;
-  
- private:
-  
-  FSLSDPluginLoader(const FSLSDPluginLoader &)=delete;
-  FSLSDPluginLoader & operator=(const FSLSDPluginLoader &)=delete;
-
-};
-
+#include "GeoModelKernel/GeoPluginLoader.h"
+typedef GeoPluginLoader<FSLSensitiveDetectorPlugin> FSLSDPluginLoader;
 #endif

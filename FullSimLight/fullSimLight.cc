@@ -23,10 +23,13 @@
 #include "EmExtraPhysics.hh"
 #include "G4NeutronTrackingCut.hh"
 
+#include "GeoModelKernel/GeoPluginLoader.h"
+
+
 #include "FSLActionInitialization.hh"
 #include "FSLConfigurator.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
-
+#include "FSLUserActionPlugin.h"
 #include <getopt.h>
 #include <err.h>
 #include <iostream>
@@ -266,7 +269,15 @@ int main(int argc, char** argv) {
             
             detector->AddSensitiveDetectorPlugin(element);
         }
-        
+
+
+	// Set extra user actions:
+        for (const auto& element : simConfig::jf["User Action Extensions"]){
+	  GeoPluginLoader<FSLUserActionPlugin> loader;
+	  const FSLUserActionPlugin * plugin = loader.load(element);
+	  runManager->SetUserInitialization(plugin->getUserActionInitialization());
+	}
+	
         G4bool initialized=false;
         //parse and apply G4Commands
         for (G4String element : simConfig::jf["g4ui_commands"]){

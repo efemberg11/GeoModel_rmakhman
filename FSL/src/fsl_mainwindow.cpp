@@ -52,8 +52,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
     //Setting up the User Actions Display
     user_action_model = new QStandardItemModel(this);
-    user_action_horizontalHeader.append("Type of Action");
-    user_action_horizontalHeader.append("File");
+   // user_action_horizontalHeader.append("Type of Action");
+    user_action_horizontalHeader.append("Files");
     user_action_model->setHorizontalHeaderLabels(user_action_horizontalHeader);
     ui->user_action_table->setModel(user_action_model);
     ui->user_action_table->horizontalHeader()->setStretchLastSection(true);
@@ -84,11 +84,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_del_shape_ext_file, &QPushButton::released, this, &FSLMainWindow::del_shape_ext);
 
 
-    connect(ui->pB_run_actions, &QPushButton::released, this, &FSLMainWindow::assign_run_actions_file);
-    connect(ui->pB_event_actions, &QPushButton::released, this, &FSLMainWindow::assign_event_actions_file);
-    connect(ui->pB_stepping_actions, &QPushButton::released, this, &FSLMainWindow::assign_stepping_actions_file);
-    connect(ui->pB_stacking_actions, &QPushButton::released, this, &FSLMainWindow::assign_stacking_actions_file);
-    connect(ui->pB_tracking_actions, &QPushButton::released, this, &FSLMainWindow::assign_tracking_actions_file);
+    connect(ui->pB_add_user_action, &QPushButton::released, this, &FSLMainWindow::add_user_actions_file);
     connect(ui->pB_del_user_action, &QPushButton::released, this, &FSLMainWindow::del_user_action);
 
     connect(ui->actionQuit, &QAction::triggered, qApp, &QApplication::quit);
@@ -139,7 +135,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
     ui->tab->setEnabled(false);//Shape tab (Change name on UI)
     ui->Region->setEnabled(false);
-    ui->User_Actions->setEnabled(false);
+   // ui->User_Actions->setEnabled(false);
 
 
 
@@ -441,79 +437,23 @@ std::vector<std::string> FSLMainWindow::parse_froot_string(std::string input_fro
 
 }
 
-//Function to add a Run actions file
-void FSLMainWindow::assign_run_actions_file()
+//Function to add User actions extensions
+void FSLMainWindow::add_user_actions_file()
 {
-    QString q_run_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
+    QString q_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
 
-    if(q_run_file_name!="")
+    if(q_file_name!="")
     {
     int rows = ui->user_action_table->model()->rowCount();
     ui->user_action_table->model()->insertRows(rows,1);
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Run");
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_run_file_name);
+    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),q_file_name);
     }
 }
 
-//Function to add a Event actions file
-void FSLMainWindow::assign_event_actions_file()
-{
-    QString q_event_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
-
-    if(q_event_file_name!="")
-    {
-    int rows = ui->user_action_table->model()->rowCount();
-    ui->user_action_table->model()->insertRows(rows,1);
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Event");
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_event_file_name);
-    }
-}
-
-//Function to add a Stepping actions file
-void FSLMainWindow::assign_stepping_actions_file()
-{
-    QString q_stepping_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
-
-    if(q_stepping_file_name!="")
-    {
-    int rows = ui->user_action_table->model()->rowCount();
-    ui->user_action_table->model()->insertRows(rows,1);
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Stepping");
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_stepping_file_name);
-    }
-}
-
-//Function to add a Stacking actions file
-void FSLMainWindow::assign_stacking_actions_file()
-{
-    QString q_stacking_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
-
-    if(q_stacking_file_name!="")
-    {
-    int rows = ui->user_action_table->model()->rowCount();
-    ui->user_action_table->model()->insertRows(rows,1);
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Stacking");
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_stacking_file_name);
-    }
-}
-
-//Function to add a Tracking actions file
-void FSLMainWindow::assign_tracking_actions_file()
-{
-    QString q_tracking_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
-
-    if(q_tracking_file_name!="")
-    {
-    int rows = ui->user_action_table->model()->rowCount();
-    ui->user_action_table->model()->insertRows(rows,1);
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Tracking");
-    ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_tracking_file_name);
-    }
-}
-
-//Function to add a delete a user actions file
+//Delete User Action
 void FSLMainWindow::del_user_action()
 {
+
     QModelIndexList user_action_indexes =  ui->user_action_table->selectionModel()->selectedRows();
     int countRow = user_action_indexes.count();
 
@@ -522,45 +462,22 @@ void FSLMainWindow::del_user_action()
 }
 
 
+
 //Function to add user actions to respective lists.
 void FSLMainWindow::configure_actions()
 {
-    run_actions.clear();
-    event_actions.clear();
-    stepping_actions.clear();
-    stacking_actions.clear();
-    tracking_actions.clear();
+   // run_actions.clear();
+   // event_actions.clear();
+   // stepping_actions.clear();
+   // stacking_actions.clear();
+   // tracking_actions.clear();
     user_action_extensions.clear();
 
     for(int row = 0 ; row < ui->user_action_table->model()->rowCount(); ++row )
     {
-        std::string type_of_action = ((ui->user_action_table->model()->index(row,0)).data().toString()).toStdString();
-        std::string associated_file = ((ui->user_action_table->model()->index(row,1)).data().toString()).toStdString();
+        std::string file_name = ((ui->user_action_table->model()->index(row,0)).data().toString()).toStdString();
+        user_action_extensions.push_back(file_name);
 
-        if(type_of_action == "Run")
-        {
-            run_actions.push_back(associated_file);
-        }
-
-        else if(type_of_action == "Event")
-        {
-            event_actions.push_back(associated_file);
-        }
-
-        else if(type_of_action == "Stepping")
-        {
-            stepping_actions.push_back(associated_file);
-        }
-
-        else if(type_of_action == "Stacking")
-        {
-            stacking_actions.push_back(associated_file);
-        }
-
-        else if(type_of_action == "Tracking")
-        {
-            tracking_actions.push_back(associated_file);
-        }
 
     }
 
@@ -1212,60 +1129,17 @@ void FSLMainWindow::load_configuration()
     }
 
     user_action_model->removeRows(0,user_action_model->rowCount());
-    for(const auto& element : j_load["Run Actions"])
+    for(const auto& element : j_load["User Action Extensions"])
     {
-        std::string run_file = element;
-        QString q_run_file = QString::fromUtf8(run_file.c_str());
+        std::string u_file = element;
+        QString q_u_file = QString::fromUtf8(u_file.c_str());
         int rows = ui->user_action_table->model()->rowCount();
         ui->user_action_table->model()->insertRows(rows,1);
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Run");
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_run_file);
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),q_u_file);
 
     }
 
-    for(const auto& element : j_load["Event Actions"])
-    {
-        std::string event_file = element;
-        QString q_event_file = QString::fromUtf8(event_file.c_str());
-        int rows = ui->user_action_table->model()->rowCount();
-        ui->user_action_table->model()->insertRows(rows,1);
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Event");
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_event_file);
-
-    }
-
-    for(const auto& element : j_load["Stepping Actions"])
-    {
-        std::string stepping_file = element;
-        QString q_stepping_file = QString::fromUtf8(stepping_file.c_str());
-        int rows = ui->user_action_table->model()->rowCount();
-        ui->user_action_table->model()->insertRows(rows,1);
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Stepping");
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_stepping_file);
-
-    }
-
-    for(const auto& element : j_load["Stacking Actions"])
-    {
-        std::string stacking_file = element;
-        QString q_stacking_file = QString::fromUtf8(stacking_file.c_str());
-        int rows = ui->user_action_table->model()->rowCount();
-        ui->user_action_table->model()->insertRows(rows,1);
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Stacking");
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_stacking_file);
-
-    }
-
-    for(const auto& element : j_load["Tracking Actions"])
-    {
-        std::string tracking_file = element;
-        QString q_tracking_file = QString::fromUtf8(tracking_file.c_str());
-        int rows = ui->user_action_table->model()->rowCount();
-        ui->user_action_table->model()->insertRows(rows,1);
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Tracking");
-        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_tracking_file);
-
-    }
+   
 
     shape_model->removeRows(0,shape_model->rowCount());
     for(const auto& element : j_load["Shape Extensions"] )
@@ -1320,13 +1194,13 @@ void FSLMainWindow::create_configuration()
     j["Magnetic Field Plugin"] = magnetic_field_plugin_file;
 
     this->configure_actions();
-    j["Run Actions"] = run_actions;
-    j["Event Actions"] = event_actions;
-    j["Stepping Actions"] = stepping_actions;
-    j["Stacking Actions"] = stacking_actions;
-    j["Tracking Actions"] = tracking_actions;
+   // j["Run Actions"] = run_actions;
+   // j["Event Actions"] = event_actions;
+    //j["Stepping Actions"] = stepping_actions;
+    //j["Stacking Actions"] = stacking_actions;
+    //j["Tracking Actions"] = tracking_actions;
 
-  //  j["User Action Extensions"] = user_action_extensions;
+    j["User Action Extensions"] = user_action_extensions;
 
     this->configure_regions();
     j["Regions data"] = regions;

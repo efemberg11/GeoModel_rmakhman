@@ -1,6 +1,6 @@
 
 #include "FSLActionInitialization.hh"
-
+#include "GeoModelKernel/GeoPluginLoader.h"
 #include "FSLPrimaryGeneratorAction.hh"
 #include "FSLRunAction.hh"
 #include "FSLEventAction.hh"
@@ -22,8 +22,8 @@
 
 //const G4AnalysisManager* FSLActionInitialization::fMasterAnalysisManager = nullptr;
 
-FSLActionInitialization::FSLActionInitialization(bool isperformance)
-: G4VUserActionInitialization(), fIsPerformance(isperformance),
+FSLActionInitialization::FSLActionInitialization(bool isperformance, bool customuseractions)
+: G4VUserActionInitialization(), fIsPerformance(isperformance),fCustomUserActions(customuseractions),
   fSpecialScoringRegionName("") {
       
       fGeantinoMapsConfig = GeantinoMapsConfigurator::getGeantinoMapsConf();
@@ -35,10 +35,12 @@ FSLActionInitialization::~FSLActionInitialization() {}
 // called in case of MT
 void FSLActionInitialization::BuildForMaster() const {
     
-    FSLRunAction* masterRunAct = new FSLRunAction();
+    if(fCustomUserActions){}/*set run action from config file*/
+    else
+    {FSLRunAction* masterRunAct = new FSLRunAction();
     masterRunAct->SetPerformanceFlag(fIsPerformance);
     masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
-
+    
 #if USE_PYTHIA
     if (use_pythia()) {
       G4String str(get_pythia_config());
@@ -46,6 +48,7 @@ void FSLActionInitialization::BuildForMaster() const {
     }
 #endif
     SetUserAction(masterRunAct);
+}
 }
 
 
@@ -81,7 +84,7 @@ void FSLActionInitialization::Build() const {
   }
 #endif
   // do not create Run,Event,Stepping and Tracking actions in case of perfomance mode
-  if (!fIsPerformance) {
+  if (!fIsPerformance && !fCustomUserActions) {
       FSLRunAction* runact = new FSLRunAction();
       SetUserAction(runact);
       runact->SetSpecialScoringRegionName(fSpecialScoringRegionName);
@@ -113,4 +116,61 @@ void FSLActionInitialization::Build() const {
 #endif
       //MultiEventActions?? TO DO?
   }
+    
+  else if(fCustomUserActions)
+  {
+      for (const auto& element : runActions)
+      {
+          GeoPluginLoader<FSLUserRunActionPlugin> loader;
+          const FSLUserRunActionPlugin * plugin = loader.load(element);
+          G4UserRunAction*  runAct = plugin->getRunAction();
+          SetUserAction(runAct);
+          
+      }
+      
+      for (const auto& element : eventActions)
+      {
+          GeoPluginLoader<FSLUserEventActionPlugin> loader;
+          const FSLUserEventActionPlugin * plugin = loader.load(element);
+          G4UserEventAction*  evtAct = plugin->getEventAction();
+          SetUserAction(evtAct);
+          
+      }
+      
+      for (const auto& element : steppingActions)
+      {
+          GeoPluginLoader<FSLUserSteppingActionPlugin> loader;
+          const FSLUserSteppingActionPlugin * plugin = loader.load(element);
+          G4UserSteppingAction*  steAct = plugin->getSteppingAction();
+          SetUserAction(steAct);
+          
+      }
+      
+      
+      for (const auto& element : trackingActions)
+      {
+          GeoPluginLoader<FSLUserTrackingActionPlugin> loader;
+          const FSLUserTrackingActionPlugin * plugin = loader.load(element);
+          G4UserTrackingAction*  traAct = plugin->getTrackingAction();
+          SetUserAction(traAct);
+          
+      }
+      
+      for (const auto& element : stackingActions)
+      {
+          GeoPluginLoader<FSLUserStackingActionPlugin> loader;
+          const FSLUserStackingActionPlugin * plugin = loader.load(element);
+          G4UserStackingAction*  staAct = plugin->getStackingAction();
+          SetUserAction(staAct);
+          
+      }
+      
+      
+      
+      
+      
+      
+      
+  }
+  
 }

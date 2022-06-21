@@ -295,7 +295,12 @@ install( TARGETS FullSimLight
 install(FILES include/FSLSensitiveDetectorPlugin.h 
               include/MagFieldPlugin.h 
 	      include/FSLUserActionPlugin.h
-	      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/FullSimLight
+              include/FSLUserRunActionPlugin.h
+              include/FSLUserEventActionPlugin.h
+              include/FSLUserSteppingActionPlugin.h
+              include/FSLUserTrackingActionPlugin.h
+              include/FSLUserStackingActionPlugin.h
+	          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/FullSimLight
   COMPONENT Development )
 
 

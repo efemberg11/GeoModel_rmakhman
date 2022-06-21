@@ -139,7 +139,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
     ui->tab->setEnabled(false);//Shape tab (Change name on UI)
     ui->Region->setEnabled(false);
-    ui->User_Actions->setEnabled(false);
+   // ui->User_Actions->setEnabled(false);
 
 
 

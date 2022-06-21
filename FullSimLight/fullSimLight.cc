@@ -210,11 +210,11 @@ int main(int argc, char** argv) {
     // 3. User action
     FSLActionInitialization* actInit = new FSLActionInitialization(parIsPerformance);
     actInit->SetActions(
-                        simConfig::jf["Event Actions"],
-                        simConfig::jf["Run Actions"],
-                        simConfig::jf["Tracking Actions"],
-                        simConfig::jf["Stepping Actions"],
-                        simConfig::jf["Stacking Actions"]
+                        simConfig::fsl.eventActions,
+                        simConfig::fsl.runActions,
+                        simConfig::fsl.trackingActions,
+                        simConfig::fsl.steppingActions,
+                        simConfig::fsl.stackingActions
                        );
     
     // set the name of a region in which we are interested to see a very basic simulation

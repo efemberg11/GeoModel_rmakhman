@@ -8,6 +8,13 @@
 #include "FSLTrackingAction.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
 
+#include "FSLUserRunActionPlugin.h"
+#include "FSLUserEventActionPlugin.h"
+#include "FSLUserStackingActionPlugin.h"
+#include "FSLUserTrackingActionPlugin.h"
+#include "FSLUserSteppingActionPlugin.h"
+
+
 #include "G4Version.hh"
 #if G4VERSION_NUMBER>=1040
 #include "G4MultiRunAction.hh"
@@ -123,7 +130,7 @@ void FSLActionInitialization::Build() const {
       {
           GeoPluginLoader<FSLUserRunActionPlugin> loader;
           const FSLUserRunActionPlugin * plugin = loader.load(element);
-          G4UserRunAction*  runAct = plugin->getRunAction();
+          G4UserRunAction*  runAct = plugin->getUserRunAction();
           SetUserAction(runAct);
           
       }
@@ -132,7 +139,7 @@ void FSLActionInitialization::Build() const {
       {
           GeoPluginLoader<FSLUserEventActionPlugin> loader;
           const FSLUserEventActionPlugin * plugin = loader.load(element);
-          G4UserEventAction*  evtAct = plugin->getEventAction();
+          G4UserEventAction*  evtAct = plugin->getUserEventAction();
           SetUserAction(evtAct);
           
       }
@@ -141,7 +148,7 @@ void FSLActionInitialization::Build() const {
       {
           GeoPluginLoader<FSLUserSteppingActionPlugin> loader;
           const FSLUserSteppingActionPlugin * plugin = loader.load(element);
-          G4UserSteppingAction*  steAct = plugin->getSteppingAction();
+          G4UserSteppingAction*  steAct = plugin->getUserSteppingAction();
           SetUserAction(steAct);
           
       }
@@ -151,7 +158,7 @@ void FSLActionInitialization::Build() const {
       {
           GeoPluginLoader<FSLUserTrackingActionPlugin> loader;
           const FSLUserTrackingActionPlugin * plugin = loader.load(element);
-          G4UserTrackingAction*  traAct = plugin->getTrackingAction();
+          G4UserTrackingAction*  traAct = plugin->getUserTrackingAction();
           SetUserAction(traAct);
           
       }
@@ -160,7 +167,7 @@ void FSLActionInitialization::Build() const {
       {
           GeoPluginLoader<FSLUserStackingActionPlugin> loader;
           const FSLUserStackingActionPlugin * plugin = loader.load(element);
-          G4UserStackingAction*  staAct = plugin->getStackingAction();
+          G4UserStackingAction*  staAct = plugin->getUserStackingAction();
           SetUserAction(staAct);
           
       }

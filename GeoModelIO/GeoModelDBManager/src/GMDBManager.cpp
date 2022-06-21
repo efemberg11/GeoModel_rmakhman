@@ -9,6 +9,8 @@
 *  - Aug 2018, R.M.Bianchi
 *  - Jun 2020, R.M.Bianchi
 *  - Aug 2020, R.M.Bianchi - Added support to publish lists of FullPhysVol and AlignableTransform nodes
+* - Jun 2022 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+*              Added support for "Verbose" output
 */
 
 #include <GeoModelDBManager/GMDBManager.h>
@@ -106,6 +108,13 @@ GMDBManager::GMDBManager(const std::string &path) : m_dbpath(path), m_dbIsOK(fal
     std::cout << "DB Open Error: " << sqlite3_errmsg(m_d->m_dbSqlite) << std::endl;
     m_dbIsOK = false;
   }
+
+      // set verbosity level
+    m_verbose=0;
+    if(const char* env_p = std::getenv("GEOMODEL_GEOMODELIO_VERBOSE")) {
+        std::cout << "GeoModelDBManager -- You set the verbosity level to: " << env_p << '\n';
+        m_verbose = std::stoi(env_p);
+    }
 
 //  if (m_dbIsOK) {
 //    if ( ! (initDB()) ) {
@@ -1213,7 +1222,7 @@ bool GMDBManager::createCustomTable(const std::string tableName, const std::vect
     queryStr += colStr;
   }
   queryStr += ")";
-  std::cout << "- table definition: " << queryStr << std::endl;
+  if(m_verbose>0) std::cout << "- table definition: " << queryStr << std::endl;
 
   (void)execQuery(queryStr);
   tab.clear();

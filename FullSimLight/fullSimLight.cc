@@ -45,6 +45,7 @@
 static const std::string fullSimLightShareDir=FULLSIMLIGHTSHAREDIR;
 static std::string  parMacroFileName   = fullSimLightShareDir+"/macro.g4";
 static bool         parIsPerformance   = false;
+static bool         parIsCustomUserActions = false;
 static G4String     geometryFileName   ;
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
@@ -208,7 +209,16 @@ int main(int argc, char** argv) {
     if (activateRegions)    detector->SetAddRegions(true);
     
     // 3. User action
-    FSLActionInitialization* actInit = new FSLActionInitialization(parIsPerformance);
+    if(!isBatch)
+    {
+    if(simConfig::fsl.eventActions.size()>0 || simConfig::fsl.runActions.size()>0 ||
+       simConfig::fsl.trackingActions.size()>0 || simConfig::fsl.steppingActions.size()>0 ||
+       simConfig::fsl.stackingActions.size()>0) parIsCustomUserActions = true;
+    }
+    
+    FSLActionInitialization* actInit = new FSLActionInitialization(parIsPerformance,parIsCustomUserActions);
+    
+    if(parIsCustomUserActions){
     actInit->SetActions(
                         simConfig::fsl.eventActions,
                         simConfig::fsl.runActions,
@@ -216,7 +226,9 @@ int main(int argc, char** argv) {
                         simConfig::fsl.steppingActions,
                         simConfig::fsl.stackingActions
                        );
-    
+
+    }
+
     // set the name of a region in which we are interested to see a very basic simulation
     // stat e.g. "EMEC" (NOTE: only if the given region can be found and executed in
     // non-perfomance mode)

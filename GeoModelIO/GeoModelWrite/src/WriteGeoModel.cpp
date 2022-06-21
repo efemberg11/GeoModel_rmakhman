@@ -7,10 +7,15 @@
 // - Aug 2018 - Riccardo Maria Bianchi
 // - Feb 2019 - Riccardo Maria Bianchi
 // - May 2020 - Riccardo Maria Bianchi
-// - Aug 2020 - Riccardo Maria Bianchi - Added support to publish lists of FPV and AXF nodes
+// - Aug 2020 - Riccardo Maria Bianchi,
+//              Added support to publish lists of FPV and AXF nodes
 // - Aug 2020 - Marilena Bandieramonte (e-mail: marilena.bandieramonte@cern.ch)
-// - Jan 2021 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch> - Added support for custom tables, to store auxiliary data
-// - Aug 2021 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch> - Added support for GeoSerialTransformer nodes
+// - Jan 2021 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+//              Added support for custom tables, to store auxiliary data
+// - Aug 2021 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+//              Added support for GeoSerialTransformer nodes
+// - Jun 2022 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+//              Added support for "Verbose" output
 
 
 // local includes
@@ -1191,6 +1196,13 @@ WriteGeoModel::WriteGeoModel(GMDBManager &db)
 
 	// get DB metadata
 	m_memMap_Tables = m_dbManager->getAll_NodeTypesTableIDs();
+
+    // set verbosity level
+    m_verbose=0;
+    if(const char* env_p = std::getenv("GEOMODEL_GEOMODELIO_VERBOSE")) {
+        std::cout << "GeoModelWrite -- You set the verbosity level to: " << env_p << '\n';
+        m_verbose = std::stoi(env_p);
+    }
 }
 
 WriteGeoModel::~WriteGeoModel()
@@ -1695,11 +1707,13 @@ void WriteGeoModel::saveToDB( std::vector<GeoPublisher*>& publishers )
        }
     }*/
     if ( m_auxiliaryTablesVar.size() ) {
+        if (m_verbose>0) {
              std::cout << "\nINFO: Custom tables to store auxiliary data have been added, "
                 << "so we create these custom tables in the DB:" 
-                << std::endl; 
+                << std::endl;
+        }
        for ( auto& tableData : m_auxiliaryTablesVar ) {
-            std::cout << "\nsaving table: " << tableData.first << std::endl; 
+           if (m_verbose>0) { std::cout << "\nsaving table: " << tableData.first << std::endl; }
             m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, m_auxiliaryTablesVarData[ tableData.first ] );
        }
     }
@@ -1719,11 +1733,12 @@ void WriteGeoModel::storePublishedAuxiliaryData(GeoPublisher* publisher)
     AuxTableDefs tableDefs = publisher->getPublishedAuxData().first;
     AuxTableData tableAuxData = publisher->getPublishedAuxData().second;
     if ( tableDefs.size() ) {
+
              std::cout << "\nINFO: Custom tables to store auxiliary data have been added to an instance of GeoPublisher, "
                 << "so we create these custom tables in the DB:" 
                 << std::endl; 
        for ( auto& tableData : tableDefs ) {
-            std::cout << "\nsaving table: " << tableData.first << std::endl; 
+            if(m_verbose>0) { std::cout << "\nsaving table: " << tableData.first << std::endl; }
             m_dbManager->createCustomTable( tableData.first, (tableData.second).first, (tableData.second).second, tableAuxData[ tableData.first ] );
        }
     }

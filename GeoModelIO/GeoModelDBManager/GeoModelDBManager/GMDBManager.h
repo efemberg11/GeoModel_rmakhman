@@ -1,7 +1,15 @@
-// author: Riccardo.Maria.Bianchi@cern.ch - 2017
-// major updates: 
-// - Aug 2018, R.M.Bianchi
-// - Nov 2020, R.M.Bianchi
+/*
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+*/
+
+/*
+* author: 2017, Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>
+* major updates:
+*  - Aug 2020, R.M.Bianchi,
+*              Added support to publish lists of FullPhysVol and AlignableTransform nodes
+* - Jun 2022 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+*              Added support for "Verbose" output
+*/
 
 #ifndef GMDBManager_H
 #define GMDBManager_H
@@ -23,6 +31,7 @@
  * GMDBManager sets up the connection with SQL database
  * and performs some basics queries.
  */
+
 class GMDBManager
 {
 public:
@@ -279,6 +288,9 @@ private:
   bool m_dbIsOK;
 
   bool m_debug;
+
+  // verbosity level
+  int m_verbose;
 
   std::unordered_map<std::string, std::vector<std::string>> m_tableNames; /// stores the column names for each table
   std::unordered_map<std::string, std::string> m_childType_tableName;

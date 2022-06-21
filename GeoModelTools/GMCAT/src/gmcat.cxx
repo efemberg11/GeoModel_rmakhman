@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 #include <unistd.h>
+#include <stdlib.h> // setenv
+
 #ifdef __APPLE__
 const std::string shared_obj_extension=".dylib";
 #else
@@ -54,27 +56,31 @@ int main(int argc, char ** argv) {
   std::string outputFile;
   bool outputFileSet = false;
   for (int argi=1;argi<argc;argi++) {
-    std::string argument=argv[argi];
-    if (argument.find("-o")!=std::string::npos) {
-      argi++;
-      if (argi>=argc) {
-	std::cerr << usage << std::endl;
-	return 1;
+      std::string argument=argv[argi];
+      if (argument.find("-o")!=std::string::npos) {
+          argi++;
+          if (argi>=argc) {
+              std::cerr << usage << std::endl;
+              return 1;
+          }
+          outputFile=argv[argi];
+          outputFileSet = true;
       }
-      outputFile=argv[argi];
-      outputFileSet = true;
-    }
-    else if (argument.find(shared_obj_extension)!=std::string::npos) {
-      inputPlugins.push_back(argument);
-    }
-    else if (argument.find(".db")!=std::string::npos) {
-      inputFiles.push_back(argument);
-    }
-    else {
-      std::cerr << "Unrecognized argument " << argument << std::endl;
-      std::cerr << usage << std::endl;
-      return 2;
-    }
+      else if (argument.find("-v")!=std::string::npos) {
+          setenv("GEOMODEL_GEOMODELIO_VERBOSE", "1", 1); // does overwrite
+          std::cout << "You set the verbosity level to 1" << std::endl;
+      }
+      else if (argument.find(shared_obj_extension)!=std::string::npos) {
+          inputPlugins.push_back(argument);
+      }
+      else if (argument.find(".db")!=std::string::npos) {
+          inputFiles.push_back(argument);
+      }
+      else {
+          std::cerr << "Unrecognized argument " << argument << std::endl;
+          std::cerr << usage << std::endl;
+          return 2;
+      }
   }
   if( !outputFileSet ) {
       std::cerr << "\nERROR! You should set an output file.\n" << std::endl;

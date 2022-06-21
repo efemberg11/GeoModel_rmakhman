@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -11,6 +11,8 @@
  * - May 2020 - R.M.Bianchi
  * - Aug 2020 - R.M.Bianchi // added support for GeoPublisher
  * - Aug 2021 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch> - Added support for GeoSerialTransformer nodes
+// - Jun 2022 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+//              Added support for "Verbose" output
  */
 
 #ifndef GeoModelWrite_WriteGeoModel_H
@@ -229,6 +231,9 @@ private:
     // Usually, that means that persistification code has not been developed
     // for the particular GeoModel node
   std::vector<std::string> m_objectsNotPersistified;
+
+  // verbosity level
+  int m_verbose;
 
 };
 

@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 #include <unistd.h>
+#include <stdlib.h> // setenv
+
 #ifdef __APPLE__
 const std::string shared_obj_extension=".dylib";
 #else
@@ -63,6 +65,10 @@ int main(int argc, char ** argv) {
           }
           outputFile=argv[argi];
           outputFileSet = true;
+      }
+      else if (argument.find("-v")!=std::string::npos) {
+          setenv("GEOMODEL_GEOMODELIO_VERBOSE", "1", 1); // does overwrite
+          std::cout << "You set the verbosity level to 1" << std::endl;
       }
       else if (argument.find(shared_obj_extension)!=std::string::npos) {
           inputPlugins.push_back(argument);

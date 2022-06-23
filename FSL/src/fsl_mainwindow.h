@@ -103,8 +103,8 @@ public:
     int g4ui_number;
 
     //Parameters associated with the shape commands tab
-    int shape_number;
-    std::vector<std::string> shape_extensions;
+  //  int shape_number;
+  //  std::vector<std::string> shape_extensions;
 
     //Parameters associated with the Region tab
     std::vector<Region> regions;
@@ -149,14 +149,15 @@ public:
     void configure_actions();
 
 
-    void del_shape_ext();
-    void add_shape_ext();
-    void configure_shape_ext();
+   // void del_shape_ext();
+   // void add_shape_ext();
+   // void configure_shape_ext();
 
     void assign_geom_file();
     void assign_pythia_file();
     void assign_magnetic_field_plugin_file();
-    void assign_shape_ext_file();
+    void assign_magnetic_field_map();
+   //void assign_shape_ext_file();
 
     void assign_run_actions_file();
     void assign_event_actions_file();
@@ -184,7 +185,7 @@ private slots:
     void catch_error_message(std::string info);
     void get_sens_det_index(QModelIndex region_index);
     void get_g4ui_index(QModelIndex g4ui_index);
-    void get_shape_index(QModelIndex g4ui_index);
+   // void get_shape_index(QModelIndex g4ui_index);
     void add_region(std::string  region_name, std::string frootLV_names
                     ,double electron_cut , double proton_cut
                     ,double positron_cut , double gamma_cut);
@@ -205,7 +206,7 @@ private:
     Ui::FSLMainWindow *ui;
     QStringListModel *sens_det_model;
     QStringListModel *g4ui_model;
-    QStringListModel *shape_model;
+  //  QStringListModel *shape_model;
     ConfigRegions *region;
     QStandardItemModel *region_model;
     QStandardItemModel *user_action_model;

@@ -25,11 +25,11 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     //Setting up Models
     sens_det_model = new QStringListModel(this);
     g4ui_model = new QStringListModel(this);
-    shape_model = new QStringListModel(this);
-    ui->shape_view->setEditTriggers(QAbstractItemView::DoubleClicked);
+  //  shape_model = new QStringListModel(this);
+  //  ui->shape_view->setEditTriggers(QAbstractItemView::DoubleClicked);
     ui->sens_det_view->setModel(sens_det_model);
     ui->g4ui_view->setModel(g4ui_model);
-    ui->shape_view->setModel(shape_model);
+  //  ui->shape_view->setModel(shape_model);
     ui->sens_det_view->setEditTriggers(QAbstractItemView::DoubleClicked);
     ui->g4ui_view->setEditTriggers(QAbstractItemView::DoubleClicked);
 
@@ -73,6 +73,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_main_clear, &QPushButton::released, this, &FSLMainWindow::clear_main_status);
     connect(ui->pB_pythia_browse, &QPushButton::released, this, &FSLMainWindow::assign_pythia_file);
     connect(ui->pB_magnetic_field_plugin, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_plugin_file);
+    connect(ui->pB_magnetic_field_map, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_map);
 
     connect(ui->pB_add_sens_det, &QPushButton::released, this, &FSLMainWindow::add_sens_det);
     connect(ui->pB_del_sens_det, &QPushButton::released, this, &FSLMainWindow::del_sens_det);
@@ -80,8 +81,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_del_region, &QPushButton::released, this, &FSLMainWindow::del_region);
     connect(ui->pB_add_g4ui, &QPushButton::released, this, &FSLMainWindow::add_g4ui);
     connect(ui->pB_del_g4ui, &QPushButton::released, this, &FSLMainWindow::del_g4ui);
-    connect(ui->pB_add_shape_ext_file, &QPushButton::released, this, &FSLMainWindow::add_shape_ext);
-    connect(ui->pB_del_shape_ext_file, &QPushButton::released, this, &FSLMainWindow::del_shape_ext);
+   // connect(ui->pB_add_shape_ext_file, &QPushButton::released, this, &FSLMainWindow::add_shape_ext);
+   // connect(ui->pB_del_shape_ext_file, &QPushButton::released, this, &FSLMainWindow::del_shape_ext);
 
 
     connect(ui->pB_run_actions, &QPushButton::released, this, &FSLMainWindow::assign_run_actions_file);
@@ -105,7 +106,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->cB_particle->setCurrentIndex(0);
     ui->pB_pythia_browse->setEnabled(false);
     ui->cB_pythia_type_of_eve->setEnabled(false);
-    ui->lE_magnetic_field_map->setEnabled(false);
+    ui->pB_magnetic_field_map->setEnabled(false);
     ui->pB_magnetic_field_plugin->setEnabled(false);
     ui->cB_particle->setCurrentIndex(0);
     ui->lE_px->setText("0");
@@ -137,7 +138,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->lE_histo->setEnabled(false);
 
 
-    ui->tab->setEnabled(false);//Shape tab (Change name on UI)
+  //  ui->tab->setEnabled(false);//Shape tab (Change name on UI)
     ui->Region->setEnabled(false);
    // ui->User_Actions->setEnabled(false);
 
@@ -151,7 +152,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(this, &FSLMainWindow::send_error_message, this, &FSLMainWindow::catch_error_message);
     connect(ui->sens_det_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_sens_det_index(QModelIndex)));
     connect(ui->g4ui_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_g4ui_index(QModelIndex)));
-    connect(ui->shape_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_shape_index(QModelIndex)));
+  //  connect(ui->shape_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_shape_index(QModelIndex)));
     connect(region,&ConfigRegions::send_config,this,&FSLMainWindow::add_region);
     connect(&fullSimLight_process,SIGNAL(readyReadStandardOutput()),this,SLOT(fsmlreadyReadStandardOutput()));
     connect(&fullSimLight_process,SIGNAL(readyReadStandardError()),this,SLOT(fsmlreadyReadStandardError()));
@@ -173,7 +174,7 @@ FSLMainWindow::~FSLMainWindow()
     delete region;
     delete region_model;
     delete user_action_model;
-    delete shape_model;
+   // delete shape_model;
     delete p_x_validator;
     delete p_y_validator;
     delete p_z_validator;
@@ -228,7 +229,7 @@ void FSLMainWindow::configure_sens_det_actions()
 
 
 //Get index of the row in the Shape extensions display when clicked
-void FSLMainWindow::get_shape_index(QModelIndex shape_index)
+/*void FSLMainWindow::get_shape_index(QModelIndex shape_index)
 {
     shape_number = shape_index.row();
 }
@@ -261,7 +262,7 @@ void FSLMainWindow::configure_shape_ext()
                            index( i, 0 ).data( Qt::DisplayRole ).toString()).toStdString());
 
     }
-}
+}*/
 
 
 //Get index of row in g4ui display when clicked
@@ -652,6 +653,12 @@ void FSLMainWindow::assign_magnetic_field_plugin_file()
     magnetic_field_plugin_file = this->get_file_name();
 }
 
+//Function to assign magnetic field map
+void FSLMainWindow::assign_magnetic_field_map()
+{
+    magnetic_field_map = this->get_file_name();
+}
+
 //Function to configure particle energy and direction
 void FSLMainWindow::configure_energy_direction()
 {
@@ -738,7 +745,7 @@ void FSLMainWindow::configure_magnetic_field()
         magnetic_field = (ui->lE_fixed_MF->text()).toStdString();
         magnetic_field_plugin_file = "";
         magnetic_field_map = "";
-        ui->lE_magnetic_field_map->setEnabled(false);
+        ui->pB_magnetic_field_map->setEnabled(false);
         ui->pB_magnetic_field_plugin->setEnabled(false);
 
         ui->lE_fixed_MF->setEnabled(true);
@@ -749,11 +756,11 @@ void FSLMainWindow::configure_magnetic_field()
 
     else
     {
-        magnetic_field_map = (ui->lE_magnetic_field_map->text()).toStdString();
+      //  magnetic_field_map = (ui->lE_magnetic_field_map->text()).toStdString();
         magnetic_field = "";
         ui->lE_fixed_MF->setEnabled(false);
 
-        ui->lE_magnetic_field_map->setEnabled(true);
+        ui->pB_magnetic_field_map->setEnabled(true);
         ui->pB_magnetic_field_plugin->setEnabled(true);
     }
 }
@@ -1118,19 +1125,21 @@ void FSLMainWindow::load_configuration()
 
 
         magnetic_field_plugin_file = "";
-        ui->lE_magnetic_field_map->clear();
-        ui->lE_magnetic_field_map->setEnabled(false);
+      //  ui->lE_magnetic_field_map->clear();
+      //  ui->lE_magnetic_field_map->setEnabled(false);
+        magnetic_field_map = "";
+        ui->pB_magnetic_field_map->setEnabled(false);
         ui->pB_magnetic_field_plugin->setEnabled(false);
 
     }
 
     else{
-        ui->lE_magnetic_field_map->setEnabled(true);
+        ui->pB_magnetic_field_map->setEnabled(true);
         ui->pB_magnetic_field_plugin->setEnabled(true);
         ui->cB_magnetic_field->setCurrentIndex(1);
         magnetic_field_plugin_file = j_load["Magnetic Field Plugin"];
         magnetic_field_map = j_load["Magnetic Field Map"];
-        ui->lE_magnetic_field_map->setText(QString::fromUtf8(magnetic_field_map.c_str()));
+       // ui->lE_magnetic_field_map->setText(QString::fromUtf8(magnetic_field_map.c_str()));
 
         magnetic_field = "";
         ui->lE_fixed_MF->clear();
@@ -1267,7 +1276,7 @@ void FSLMainWindow::load_configuration()
 
     }
 
-    shape_model->removeRows(0,shape_model->rowCount());
+   /* shape_model->removeRows(0,shape_model->rowCount());
     for(const auto& element : j_load["Shape Extensions"] )
     {
         std::string ele = element;
@@ -1275,7 +1284,7 @@ void FSLMainWindow::load_configuration()
         shape_model->insertRow(shape_model->rowCount());
         QModelIndex shape_index = shape_model->index(shape_model->rowCount()-1);
         shape_model->setData(shape_index, q_element);
-    }
+    }*/
     }
 
 
@@ -1331,8 +1340,8 @@ void FSLMainWindow::create_configuration()
     this->configure_regions();
     j["Regions data"] = regions;
 
-    this->configure_shape_ext();
-    j["Shape Extensions"] = shape_extensions;
+   // this->configure_shape_ext();
+   // j["Shape Extensions"] = shape_extensions;
 
     this->configure_g4ui_command();
     j["g4ui_commands"] = g4ui_commands;

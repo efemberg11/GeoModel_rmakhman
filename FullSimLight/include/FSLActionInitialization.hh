@@ -31,7 +31,7 @@ private:
   G4String fSpecialScoringRegionName;
     
     
-    std::vector<std::string> userActions;
+  std::vector<std::string> userActions;
     
 
 

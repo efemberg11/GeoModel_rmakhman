@@ -7,7 +7,7 @@
 #include "FSLSteppingAction.hh"
 #include "FSLTrackingAction.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
-
+#include "FSLUserActionPlugin.h"
 #include "FSLUserRunActionPlugin.h"
 #include "FSLUserEventActionPlugin.h"
 #include "FSLUserStackingActionPlugin.h"
@@ -126,10 +126,16 @@ void FSLActionInitialization::Build() const {
     
   else if(fCustomUserActions)
   {
+    for (const std::string & element: userActions) {
+      GeoPluginLoader<FSLUserActionPlugin> loader;
+      const FSLUserActionPlugin * plugin = loader.load(element);
       
-      
-      
-      
+      if (plugin->getEventAction()) SetUserAction(plugin->getEventAction()); 
+      if (plugin->getRunAction()) SetUserAction(plugin->getRunAction()); 
+      if (plugin->getTrackingAction()) SetUserAction(plugin->getTrackingAction()); 
+      if (plugin->getStackingAction()) SetUserAction(plugin->getStackingAction()); 
+      if (plugin->getSteppingAction()) SetUserAction(plugin->getSteppingAction()); 
+
+    }
   }
-  
 }

@@ -91,11 +91,11 @@ public:
     std::string magnetic_field_map = "";
 
     //Parameters associated with the User Actions tab
-    std::vector<std::string> run_actions;
-    std::vector<std::string> event_actions;
-    std::vector<std::string> stepping_actions;
-    std::vector<std::string> stacking_actions;
-    std::vector<std::string> tracking_actions;
+  //  std::vector<std::string> run_actions;
+  //  std::vector<std::string> event_actions;
+  //  std::vector<std::string> stepping_actions;
+  //  std::vector<std::string> stacking_actions;
+  //  std::vector<std::string> tracking_actions;
     std::vector<std::string> user_action_extensions;
 
     //Parameters associated with the g4ui commands tab
@@ -145,6 +145,7 @@ public:
     std::vector<std::string> parse_froot_string(std::string input_froot_string);
     void configure_regions();
 
+    void add_user_action();
     void del_user_action();
     void configure_actions();
 
@@ -159,17 +160,17 @@ public:
     void assign_magnetic_field_map();
    //void assign_shape_ext_file();
 
-    void assign_run_actions_file();
-    void assign_event_actions_file();
-    void assign_stepping_actions_file();
-    void assign_stacking_actions_file();
-    void assign_tracking_actions_file();
+ //   void assign_run_actions_file();
+ //   void assign_event_actions_file();
+ //   void assign_stepping_actions_file();
+ //   void assign_stacking_actions_file();
+ //   void assign_tracking_actions_file();
 
-    void run_actions_file();
-    void event_actions_file();
-    void stepping_actions_file();
-    void stacking_actions_file();
-    void tracking_actions_file();
+ //   void run_actions_file();
+ //   void event_actions_file();
+ //   void stepping_actions_file();
+ //   void stacking_actions_file();
+ //   void tracking_actions_file();
 
     void configure_magnetic_field();
 

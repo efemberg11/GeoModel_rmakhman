@@ -66,6 +66,8 @@ struct fslConfig{
     std::vector<std::string> steppingActions;
     std::vector<std::string> stackingActions;
     std::vector<std::string> trackingActions;
+    std::vector<std::string> userActions;
+
 
     std::vector<std::string> g4UiCommands;
 };
@@ -75,7 +77,7 @@ regionConfig rc;
 json jf;
 
 inline void to_json(json& j, const fslConfig& p) {
-    j = json{{"Geometry", p.geometry},{"Physics list name", p.physicsList},{"Number of events", p.nEvents},{"Magnetic Field Intensity", p.magFieldIntensity},{"Generator", p.eventGeneratorName},{"Event input file", p.eventInputFile},{"Type of event", p.typeOfEvent},{"Sensitive Detector Extensions", p.sensitiveDetectors},{"Output Hits file", p.outputHitsFile},{"Output Histo file", p.outputHistoFile},{"Magnetic Field Type", p.magFieldType},{"Magnetic Field Map", p.magFieldMap},{"Magnetic Field Plugin", p.magFieldPlugin},{"Run Actions", p.runActions},{"Event Actions", p.eventActions},{"Stepping Actions", p.steppingActions},{"Stacking Actions", p.stackingActions},{"Tracking Actions", p.trackingActions},{"g4ui_commands", p.g4UiCommands}};
+    j = json{{"Geometry", p.geometry},{"Physics list name", p.physicsList},{"Number of events", p.nEvents},{"Magnetic Field Intensity", p.magFieldIntensity},{"Generator", p.eventGeneratorName},{"Event input file", p.eventInputFile},{"Type of event", p.typeOfEvent},{"Sensitive Detector Extensions", p.sensitiveDetectors},{"Output Hits file", p.outputHitsFile},{"Output Histo file", p.outputHistoFile},{"Magnetic Field Type", p.magFieldType},{"Magnetic Field Map", p.magFieldMap},{"Magnetic Field Plugin", p.magFieldPlugin},{"Run Actions", p.runActions},{"Event Actions", p.eventActions},{"Stepping Actions", p.steppingActions},{"Stacking Actions", p.stackingActions},{"Tracking Actions", p.trackingActions},{"User Action Extensions", p.userActions},{"g4ui_commands", p.g4UiCommands}};
     
 }
 inline void to_json(json& j, const regionConfig& r) {
@@ -100,6 +102,8 @@ inline void from_json(const json& j, fslConfig& p) {
     p.steppingActions=j.at("Stepping Actions").get<std::vector<std::string>>();
     p.stackingActions=j.at("Stacking Actions").get<std::vector<std::string>>();
     p.trackingActions=j.at("Tracking Actions").get<std::vector<std::string>>();
+    p.userActions=j.at("User Action Extensions").get<std::vector<std::string>>();
+
     p.g4UiCommands=j.at("g4ui_commands").get<std::vector<std::string>>();
     
 }

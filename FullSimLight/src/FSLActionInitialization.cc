@@ -126,54 +126,6 @@ void FSLActionInitialization::Build() const {
     
   else if(fCustomUserActions)
   {
-      for (const auto& element : runActions)
-      {
-          GeoPluginLoader<FSLUserRunActionPlugin> loader;
-          const FSLUserRunActionPlugin * plugin = loader.load(element);
-          G4UserRunAction*  runAct = plugin->getUserRunAction();
-          SetUserAction(runAct);
-          
-      }
-      
-      for (const auto& element : eventActions)
-      {
-          GeoPluginLoader<FSLUserEventActionPlugin> loader;
-          const FSLUserEventActionPlugin * plugin = loader.load(element);
-          G4UserEventAction*  evtAct = plugin->getUserEventAction();
-          SetUserAction(evtAct);
-          
-      }
-      
-      for (const auto& element : steppingActions)
-      {
-          GeoPluginLoader<FSLUserSteppingActionPlugin> loader;
-          const FSLUserSteppingActionPlugin * plugin = loader.load(element);
-          G4UserSteppingAction*  steAct = plugin->getUserSteppingAction();
-          SetUserAction(steAct);
-          
-      }
-      
-      
-      for (const auto& element : trackingActions)
-      {
-          GeoPluginLoader<FSLUserTrackingActionPlugin> loader;
-          const FSLUserTrackingActionPlugin * plugin = loader.load(element);
-          G4UserTrackingAction*  traAct = plugin->getUserTrackingAction();
-          SetUserAction(traAct);
-          
-      }
-      
-      for (const auto& element : stackingActions)
-      {
-          GeoPluginLoader<FSLUserStackingActionPlugin> loader;
-          const FSLUserStackingActionPlugin * plugin = loader.load(element);
-          G4UserStackingAction*  staAct = plugin->getUserStackingAction();
-          SetUserAction(staAct);
-          
-      }
-      
-      
-      
       
       
       

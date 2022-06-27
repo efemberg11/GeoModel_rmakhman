@@ -209,22 +209,14 @@ int main(int argc, char** argv) {
     if (activateRegions)    detector->SetAddRegions(true);
     
     // 3. User action
-    if(!isBatch)
-    {
-    if(simConfig::fsl.eventActions.size()>0 || simConfig::fsl.runActions.size()>0 ||
-       simConfig::fsl.trackingActions.size()>0 || simConfig::fsl.steppingActions.size()>0 ||
-       simConfig::fsl.stackingActions.size()>0) parIsCustomUserActions = true;
-    }
+    if(!isBatch && simConfig::fsl.userActions.size()>0) parIsCustomUserActions = true;
+    
     
     FSLActionInitialization* actInit = new FSLActionInitialization(parIsPerformance,parIsCustomUserActions);
     
     if(parIsCustomUserActions){
     actInit->SetActions(
-                        simConfig::fsl.eventActions,
-                        simConfig::fsl.runActions,
-                        simConfig::fsl.trackingActions,
-                        simConfig::fsl.steppingActions,
-                        simConfig::fsl.stackingActions
+                        simConfig::fsl.userActions
                        );
 
     }

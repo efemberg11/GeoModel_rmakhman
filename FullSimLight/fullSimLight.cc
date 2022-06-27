@@ -295,7 +295,7 @@ int main(int argc, char** argv) {
         for (const auto& element : simConfig::jf["User Action Extensions"]){
 	  GeoPluginLoader<FSLUserActionPlugin> loader;
 	  const FSLUserActionPlugin * plugin = loader.load(element);
-	  runManager->SetUserInitialization(plugin->getUserActionInitialization());
+	  //	  runManager->SetUserInitialization(plugin->getUserActionInitialization());
 	}
 	
         G4bool initialized=false;

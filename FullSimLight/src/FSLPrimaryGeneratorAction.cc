@@ -144,7 +144,7 @@ void  FSLPrimaryGeneratorAction::SetPrimaryName(const G4String& pname) {
   fPrimaryParticleName      = pname;
   gPrimaryType              = fPrimaryParticleName;
   fIsUserPrimaryType        = true;
-  std::cout<<"Primary name: "<<pname<<std::endl;
+  //std::cout<<"Primary name: "<<pname<<std::endl;
 }
 
 void  FSLPrimaryGeneratorAction::SetPrimaryDirection(const G4ThreeVector &pdir) {

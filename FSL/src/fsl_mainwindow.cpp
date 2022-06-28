@@ -356,7 +356,7 @@ void FSLMainWindow::configure_g4ui_command()
 
     }
 
-    g4ui_commands.push_back("/process/list");
+   // g4ui_commands.push_back("/process/list");
 
 
 

@@ -255,8 +255,16 @@ int main(int argc, char** argv) {
         
         detector->SetGeometryFileName (simConfig::fsl.geometry);
         runManager->SetUserInitialization(detector);
+                
         
         //parse RegionsData
+        std::vector<std::string> Regions;
+        std::vector<std::vector<G4String>> RootLVNames;
+        std::vector<double> electron_cut;
+        std::vector<double> proton_cut;
+        std::vector<double> positron_cut;
+        std::vector<double> gamma_cut;
+        
         for (const auto& element : simConfig::jf["Regions data"]){
             
 //            std::cout<<"RegionName: "<<element["RegionName"]<<std::endl;
@@ -267,7 +275,15 @@ int main(int argc, char** argv) {
 //            std::cout<<"ProtonCut: "<<element["ProtonCut"]<<std::endl;
             
             //actually read the data and save them in a simConfig::regionConfig object (might be useful for the configuration later on)
+            
             simConfig::from_json(element, simConfig::rc);
+            Regions.push_back(simConfig::rc.regionName);
+            RootLVNames.push_back(simConfig::rc.rootLVNames);
+            electron_cut.push_back(simConfig::rc.electronCut);
+            proton_cut.push_back(simConfig::rc.protonCut);
+            positron_cut.push_back(simConfig::rc.positronCut);
+            gamma_cut.push_back(simConfig::rc.gammaCut);
+            
 //            std::cout<<"RegionName: "<<rc.regionName<<std::endl;
 //            std::cout<<"RootLVNames size: "<<rc.rootLVNames.size()<<std::endl;
 //            std::cout<<"GammaCut: "<<rc.gammaCut<<std::endl;
@@ -276,6 +292,8 @@ int main(int argc, char** argv) {
 //            std::cout<<"ProtonCut: "<<rc.protonCut<<std::endl;
 //            std::cout<<"------------------------------------------------"<<std::endl;
         }
+        
+        detector->ConfigureRegionsFSL(Regions, RootLVNames, electron_cut, proton_cut, positron_cut, gamma_cut);
         
         for (const auto& element : simConfig::jf["Sensitive Detector Extensions"]){
             

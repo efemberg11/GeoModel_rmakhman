@@ -33,7 +33,7 @@ namespace simConfig {
 
 struct regionConfig {
     std::string   regionName;
-    std::vector<std::string> rootLVNames;
+    std::vector<G4String> rootLVNames;
     double  gammaCut;
     double  electronCut;
     double  positronCut;
@@ -100,7 +100,7 @@ inline void from_json(const json& j, fslConfig& p) {
 
 inline void from_json(const json& j, regionConfig& r) {
     r.regionName=j.at("RegionName").get<std::string>();
-    r.rootLVNames=j.at("RootLVNames").get<std::vector<std::string>>();
+    r.rootLVNames=j.at("RootLVNames").get<std::vector<G4String>>();
     r.gammaCut=j.at("GammaCut").get<double>();
     r.electronCut=j.at("ElectronCut").get<double>();
     r.positronCut=j.at("PositronCut").get<double>();
@@ -115,8 +115,6 @@ auto parse_json_file(std::string config_file_name)
     
     //read and store the configuration into the fslConfig struct
     simConfig::from_json(jf, fsl);
-    
-    
 
 }
 

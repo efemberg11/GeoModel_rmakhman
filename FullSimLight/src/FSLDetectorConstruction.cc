@@ -340,9 +340,15 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
     }
 
     // trying to add detector regions with the configurations given in the RegionConfigurator
+    if(Regions.size()>0)
+    {
+        fAddRegions = true;
+    }
+    
     if (fAddRegions)  {
         G4cout << "\n ===================  Trying to add detector regions ... ================== \n" << G4endl;
-        RegionConfigurator::Instance().CreateRegions(1);
+        RegionConfigurator::Instance().CreateRegions(Regions, RootLVNames, electron_cut,
+                                                     proton_cut, positron_cut, gamma_cut,1);
         G4cout << "\n ===================  Adding detector regions is DONE!  ================== \n" << G4endl;
     }
 

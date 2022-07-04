@@ -2,12 +2,12 @@
   Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef GXCLASHPOINTSYSTEM_H
-#define GXCLASHPOINTSYSTEM_H
+#ifndef GXHITDISPLAYSYSTEM_H
+#define GXHITDISPLAYSYSTEM_H
 
 /////////////////////////////////////////////////////////////////////////
 //                                                                     //
-//  Header file for class GXClashPointSystem                           //
+//  Header file for class GXHitDisplaySystem                           //
 //                                                                     //
 //  Author: Joseph F. Boudreau <boudreau@pitt.edu>                     //
 //                                                                     //
@@ -17,7 +17,7 @@
 
 #include "VP1Base/IVP13DSystemSimple.h"
 
-class GXClashPointSystem : public IVP13DSystemSimple {
+class GXHitDisplaySystem : public IVP13DSystemSimple {
 
   Q_OBJECT
 
@@ -27,13 +27,13 @@ public:
   //  Constructor  //
   ///////////////////
 
-  GXClashPointSystem();
+  GXHitDisplaySystem();
 
   //////////////////////////////////////////
   //  Reimplementations from base class:  //
   //////////////////////////////////////////
 
-  virtual ~GXClashPointSystem();
+  virtual ~GXHitDisplaySystem();
   void buildPermanentSceneGraph(StoreGateSvc* detstore, SoSeparator *root);
   void buildEventSceneGraph(StoreGateSvc*, SoSeparator *);
   void systemuncreate();
@@ -44,12 +44,9 @@ public:
 public slots:
 
   void selectInputFile();
-  void showClashPoint1(bool);
-  void showClashPoint2(bool);
-  void showClashPoint3(bool);
-  void showClashPoint4(bool);
+  void showHitDisplay1(bool);
   void setPointSize(int);
-
+  
 signals:
   void updateTransparencyType(unsigned type);
   

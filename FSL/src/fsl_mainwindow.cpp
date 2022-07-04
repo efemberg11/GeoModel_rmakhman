@@ -39,10 +39,10 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     region_model = new QStandardItemModel(this);
     region_horizontalHeader.append("Region Name");
     region_horizontalHeader.append("RootLV Names");
-    region_horizontalHeader.append("Electron Cut");
-    region_horizontalHeader.append("Proton Cut");
-    region_horizontalHeader.append("Positron Cut");
-    region_horizontalHeader.append("Gamma Cut");
+    region_horizontalHeader.append("Electron Cut (GeV)");
+    region_horizontalHeader.append("Proton Cut (GeV)");
+    region_horizontalHeader.append("Positron Cut (GeV)");
+    region_horizontalHeader.append("Gamma Cut (GeV)");
     region_model->setHorizontalHeaderLabels(region_horizontalHeader);
     ui->regions_table->setModel(region_model);
     ui->regions_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);

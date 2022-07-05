@@ -43,7 +43,8 @@ signals:
   void showHitDisplays1Changed(bool);
   void setPointSizeChanged(int);
   void inputFileChanged();
-
+  void nextEvent();
+  
 private:
 
   class Imp;

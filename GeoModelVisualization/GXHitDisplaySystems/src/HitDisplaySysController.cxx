@@ -52,6 +52,9 @@ HitDisplaySysController::HitDisplaySysController(IVP1System * sys)
   
   connect(m_d->ui.pushButton_selectInput, SIGNAL(clicked()),
 	  this, SIGNAL(inputFileChanged()));
+
+  connect (m_d->ui.nextEventButton, SIGNAL(clicked()),
+	   this, SIGNAL(nextEvent()));
   
   initLastVars();
 }
@@ -104,4 +107,5 @@ void HitDisplaySysController::actualRestoreSettings(VP1Deserialise& s)
 #include "VP1Base/VP1ControllerMacros.h"
 POSSIBLECHANGE_IMP(showHitDisplays1)
 POSSIBLECHANGE_IMP(setPointSize)
+
 

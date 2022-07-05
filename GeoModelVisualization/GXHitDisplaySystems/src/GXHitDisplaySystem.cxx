@@ -48,10 +48,12 @@ public:
 			       controller(0),
 			       switch0(nullptr)
   {}
-  GXHitDisplaySystem *theclass;
-  HitDisplaySysController * controller;
-  SoSwitch                * switch0;
-  SoDrawStyle             * drawStyle;
+  GXHitDisplaySystem *theclass{nullptr};
+  HitDisplaySysController * controller{nullptr};
+  SoSwitch                * switch0{nullptr};
+  SoDrawStyle             * drawStyle{nullptr};
+  SoCoordinate3           * coords{nullptr};
+  SoPointSet              * pointSet{nullptr};
 
     static SbColor4f color4f(const QColor& col) {
     return SbColor4f(std::max<float>(0.0f,std::min<float>(1.0f,col.redF())),
@@ -60,41 +62,25 @@ public:
 		     1.0);
   }
 
-
+  json j;
 };
 
 namespace hitdisp {
-    enum typeOfClash{ withMother=0, withSister, fullyEncapsSister, invalidSolid};
-    // a simple struct to model a clash detection error
-    struct clash {
-        typeOfClash clashType;
-        std::string volume1Name;
-        int         volume1CopyNo;
-        std::string volume1EntityType;
-        std::string volume2Name;
-        int         volume2CopyNo;
-        std::string volume2EntityType;
+
+    struct hit {
+        int         eventID;
         double      x,y,z;
-        double      distance;
     };
 
-    void to_json(json& j, const clash& p) {
-        j = json{{"typeOfClash", p.clashType}, {"volume1Name", p.volume1Name}, {"volume1CopyNo", p.volume1CopyNo}, {"volume1EntityType", p.volume1EntityType},{"volume2Name", p.volume2Name},{"volume2CopyNo", p.volume2CopyNo}
-, {"volume2EntityType", p.volume2EntityType},{"x", p.x},{"y", p.y},{"z", p.z},{"distance[mm]", p.distance} };
+    void to_json(json& j, const hit& p) {
+        j = json{{"Event ID", p.eventID},{"x", p.x},{"y", p.y},{"z", p.z} };
     }
 
-    void from_json(const json& j, clash& p) {
-        j.at("clashType").get_to(p.clashType);
-        j.at("volume1Name").get_to(p.volume1Name);
-        j.at("volume1CopyNo").get_to(p.volume1CopyNo);
-        j.at("volume1EntityType").get_to(p.volume1EntityType);
-        j.at("volume2Name").get_to(p.volume2Name);
-        j.at("volume2CopyNo").get_to(p.volume2CopyNo);
-        j.at("volume2EntityType").get_to(p.volume2EntityType);
+    void from_json(const json& j, hit& p) {
+      j.at("Event ID").get_to(p.eventID);
         j.at("x").get_to(p.x);
         j.at("y").get_to(p.y);
         j.at("z").get_to(p.z);
-        j.at("distance[mm]").get_to(p.distance);
 
     }
 } // namespace hitdisp
@@ -182,6 +168,7 @@ void GXHitDisplaySystem::buildPermanentSceneGraph(StoreGateSvc* /*detstore*/, So
 
   connect(m_d->controller,SIGNAL(showHitDisplays1Changed(bool)),this,SLOT(showHitDisplay1(bool)));
   connect(m_d->controller,SIGNAL(setPointSizeChanged(int)), this, SLOT(setPointSize(int)));
+  connect(m_d->controller,SIGNAL(nextEvent()), this, SLOT(nextEvent()));
 }
 
 
@@ -225,33 +212,13 @@ void GXHitDisplaySystem::selectInputFile() {
   char *wd=getcwd(buffer,1024);
   path = QFileDialog::getOpenFileName(nullptr, tr("Open Input File"),
 				      wd,
-				      tr("Clashpoint files (*.json)"),0,QFileDialog::DontUseNativeDialog);
-  SoGroup *switches[]={m_d->switch0};
+				      tr("Hit input files (*.json)"),0,QFileDialog::DontUseNativeDialog);
 
   if (path!="") {
     m_d->switch0->removeAllChildren();
     std::ifstream i(path.toStdString());
-    auto j=json::parse(i);
-
-    try {
-      SoCoordinate3 *coords[]={new SoCoordinate3};
-      unsigned int   counter[]={0};
-
-      for (const auto& element : j["ClashesReport"]){
-	    hitdisp::typeOfClash type=element["typeOfClash"];
-	    coords[type]->point.set1Value(counter[type]++,element["x"], element["y"], element["z"]);
-      }
-      for (int i=0;i<1;i++) {
-	    switches[i]->addChild(coords[i]);
-	    SoPointSet *pointSet=new SoPointSet;
-	    pointSet->numPoints=counter[i];
-	    switches[i]->addChild(pointSet);
-      }
-    }
-    catch (std::exception & e) {
-      std::cout << e.what() << std::endl;
-     }
-
+    m_d->j=json::parse(i);
+    nextEvent();
   }
 
 }
@@ -265,3 +232,40 @@ void GXHitDisplaySystem::showHitDisplay1(bool flag) {
   m_d->switch0->whichChild=flag ? SO_SWITCH_ALL:SO_SWITCH_NONE;
 }
 
+void GXHitDisplaySystem::nextEvent() {
+  std::cout << "Next Event" << std::endl;
+  if (m_d->pointSet) m_d->switch0->removeChild(m_d->pointSet);
+  if (m_d->coords)   m_d->switch0->removeChild(m_d->coords);
+  
+  m_d->coords = new SoCoordinate3;
+  m_d->pointSet = new SoPointSet;
+  m_d->switch0->addChild(m_d->coords);
+  m_d->switch0->addChild(m_d->pointSet);
+  
+ 
+  try {
+      unsigned int   counter=0;
+      static int lastEventID=-1;
+      int eventID           =-1;
+      for (const auto& element : m_d->j["Events"]){
+	int newEventID=element["Event ID"];
+	if (newEventID<lastEventID) continue;
+	if (eventID==-1) {
+	  eventID=newEventID;
+	}
+	else if (eventID!=newEventID){
+	  lastEventID=newEventID;
+	  break;
+	}
+	lastEventID=eventID;
+        
+	m_d->coords->point.set1Value(counter++,element["x"], element["y"], element["z"]);
+      }
+
+      m_d->pointSet->numPoints=counter;
+    }
+    catch (std::exception & e) {
+      std::cout << e.what() << std::endl;
+     }
+
+}

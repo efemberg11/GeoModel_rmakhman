@@ -46,6 +46,7 @@ public slots:
   void selectInputFile();
   void showHitDisplay1(bool);
   void setPointSize(int);
+  void nextEvent();
   
 signals:
   void updateTransparencyType(unsigned type);

@@ -42,20 +42,29 @@ FSLActionInitialization::~FSLActionInitialization() {}
 // called in case of MT
 void FSLActionInitialization::BuildForMaster() const {
     
-    if(fCustomUserActions){}/*set run action from config file*/
-    else
-    {FSLRunAction* masterRunAct = new FSLRunAction();
-    masterRunAct->SetPerformanceFlag(fIsPerformance);
-    masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
-    
-#if USE_PYTHIA
-    if (use_pythia()) {
-      G4String str(get_pythia_config());
-      masterRunAct->SetPythiaConfig(str);
+    //set run action from config file
+    if(fCustomUserActions){
+        for (const std::string & element: userActions) {
+            GeoPluginLoader<FSLUserActionPlugin> loader;
+            const FSLUserActionPlugin * plugin = loader.load(element);
+            if (plugin->getRunAction()) SetUserAction(plugin->getRunAction());
+        }
+        
     }
+    else
+    {
+        FSLRunAction* masterRunAct = new FSLRunAction();
+        masterRunAct->SetPerformanceFlag(fIsPerformance);
+        masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
+        
+#if USE_PYTHIA
+        if (use_pythia()) {
+            G4String str(get_pythia_config());
+            masterRunAct->SetPythiaConfig(str);
+        }
 #endif
-    SetUserAction(masterRunAct);
-}
+        SetUserAction(masterRunAct);
+    }
 }
 
 

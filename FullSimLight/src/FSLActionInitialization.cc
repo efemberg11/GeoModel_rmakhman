@@ -1,12 +1,19 @@
 
 #include "FSLActionInitialization.hh"
-
+#include "GeoModelKernel/GeoPluginLoader.h"
 #include "FSLPrimaryGeneratorAction.hh"
 #include "FSLRunAction.hh"
 #include "FSLEventAction.hh"
 #include "FSLSteppingAction.hh"
 #include "FSLTrackingAction.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
+#include "FSLUserActionPlugin.h"
+#include "FSLUserRunActionPlugin.h"
+#include "FSLUserEventActionPlugin.h"
+#include "FSLUserStackingActionPlugin.h"
+#include "FSLUserTrackingActionPlugin.h"
+#include "FSLUserSteppingActionPlugin.h"
+
 
 #include "G4Version.hh"
 #if G4VERSION_NUMBER>=1040
@@ -22,8 +29,8 @@
 
 //const G4AnalysisManager* FSLActionInitialization::fMasterAnalysisManager = nullptr;
 
-FSLActionInitialization::FSLActionInitialization(bool isperformance)
-: G4VUserActionInitialization(), fIsPerformance(isperformance),
+FSLActionInitialization::FSLActionInitialization(bool isperformance, bool customuseractions)
+: G4VUserActionInitialization(), fIsPerformance(isperformance),fCustomUserActions(customuseractions),
   fSpecialScoringRegionName("") {
       
       fGeantinoMapsConfig = GeantinoMapsConfigurator::getGeantinoMapsConf();
@@ -35,17 +42,29 @@ FSLActionInitialization::~FSLActionInitialization() {}
 // called in case of MT
 void FSLActionInitialization::BuildForMaster() const {
     
-    FSLRunAction* masterRunAct = new FSLRunAction();
-    masterRunAct->SetPerformanceFlag(fIsPerformance);
-    masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
-
-#if USE_PYTHIA
-    if (use_pythia()) {
-      G4String str(get_pythia_config());
-      masterRunAct->SetPythiaConfig(str);
+    //set run action from config file
+    if(fCustomUserActions){
+        for (const std::string & element: userActions) {
+            GeoPluginLoader<FSLUserActionPlugin> loader;
+            const FSLUserActionPlugin * plugin = loader.load(element);
+            if (plugin->getRunAction()) SetUserAction(plugin->getRunAction());
+        }
+        
     }
+    else
+    {
+        FSLRunAction* masterRunAct = new FSLRunAction();
+        masterRunAct->SetPerformanceFlag(fIsPerformance);
+        masterRunAct->SetSpecialScoringRegionName(fSpecialScoringRegionName);
+        
+#if USE_PYTHIA
+        if (use_pythia()) {
+            G4String str(get_pythia_config());
+            masterRunAct->SetPythiaConfig(str);
+        }
 #endif
-    SetUserAction(masterRunAct);
+        SetUserAction(masterRunAct);
+    }
 }
 
 
@@ -81,7 +100,7 @@ void FSLActionInitialization::Build() const {
   }
 #endif
   // do not create Run,Event,Stepping and Tracking actions in case of perfomance mode
-  if (!fIsPerformance) {
+  if (!fIsPerformance && !fCustomUserActions) {
       FSLRunAction* runact = new FSLRunAction();
       SetUserAction(runact);
       runact->SetSpecialScoringRegionName(fSpecialScoringRegionName);
@@ -112,5 +131,20 @@ void FSLActionInitialization::Build() const {
       }
 #endif
       //MultiEventActions?? TO DO?
+  }
+    
+  else if(fCustomUserActions)
+  {
+    for (const std::string & element: userActions) {
+      GeoPluginLoader<FSLUserActionPlugin> loader;
+      const FSLUserActionPlugin * plugin = loader.load(element);
+      
+      if (plugin->getEventAction()) SetUserAction(plugin->getEventAction()); 
+      if (plugin->getRunAction()) SetUserAction(plugin->getRunAction()); 
+      if (plugin->getTrackingAction()) SetUserAction(plugin->getTrackingAction()); 
+      if (plugin->getStackingAction()) SetUserAction(plugin->getStackingAction()); 
+      if (plugin->getSteppingAction()) SetUserAction(plugin->getSteppingAction()); 
+
+    }
   }
 }

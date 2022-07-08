@@ -30,7 +30,14 @@ public:
   RegionConfigurator(const RegionConfigurator&) = delete;
   RegionConfigurator& operator=(const RegionConfigurator&) = delete;
 
-  void CreateRegions(int verbose=0);
+  void CreateRegions(std::vector<std::string> Regions,
+                     std::vector<std::vector<G4String>> RootLVNames,
+                     std::vector<double> electronCut,
+                     std::vector<double> protonCut,
+                     std::vector<double> positronCut,
+                     std::vector<double> gammaCut,
+                     int verbose=0
+                     );
 
 private:
 
@@ -45,7 +52,13 @@ private:
     G4double                 fProtonCut;
   };
 
-  void InitRegionData();
+  void InitRegionData(std::vector<std::string> Regions,
+                      std::vector<std::vector<G4String>> RootLVNames,
+                      std::vector<double> electronCut,
+                      std::vector<double> protonCut,
+                      std::vector<double> positronCut,
+                      std::vector<double> gammaCut
+                      );
 
 
 private:

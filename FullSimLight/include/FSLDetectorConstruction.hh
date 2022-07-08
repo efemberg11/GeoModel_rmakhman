@@ -65,6 +65,22 @@ public:
   }
 
   void AddSensitiveDetectorPlugin(const std::string & SDPluginName) { sensitiveDetectorPluginName.push_back(SDPluginName);}
+    
+  void ConfigureRegionsFSL(std::vector<std::string> reg,
+                           std::vector<std::vector<G4String>> root_lv_names,
+                           std::vector<double> ele_cut,
+                           std::vector<double> pro_cut,
+                           std::vector<double> pos_cut,
+                           std::vector<double> gam_cut)
+  {
+      Regions = reg;
+      RootLVNames = root_lv_names;
+      electron_cut = ele_cut;
+      proton_cut = pro_cut;
+      positron_cut =  pos_cut;
+      gamma_cut = gam_cut;
+  }
+
   
   static G4double GetFieldValue() { return gFieldValue; }
   G4double GetTolerance (){return fTolerance;}
@@ -103,8 +119,14 @@ private:
 
 
   std::vector<std::string> sensitiveDetectorPluginName;
-
   
+  //Regions Data
+    std::vector<std::string> Regions;
+    std::vector<std::vector<G4String>> RootLVNames;
+    std::vector<double> electron_cut;
+    std::vector<double> proton_cut;
+    std::vector<double> positron_cut;
+    std::vector<double> gamma_cut;
 
 };
 

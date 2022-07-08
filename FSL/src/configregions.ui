@@ -37,7 +37,7 @@
       </font>
      </property>
      <property name="text">
-      <string>fRootLV Names</string>
+      <string>RootLV Names</string>
      </property>
     </widget>
    </item>
@@ -52,7 +52,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Electron Cut</string>
+      <string>Electron Cut (GeV)</string>
      </property>
     </widget>
    </item>
@@ -67,7 +67,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Proton Cut</string>
+      <string>Proton Cut (GeV)</string>
      </property>
     </widget>
    </item>
@@ -82,7 +82,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Positron Cut</string>
+      <string>Positron Cut (GeV)</string>
      </property>
     </widget>
    </item>
@@ -97,7 +97,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Gamma Cut</string>
+      <string>Gamma Cut (GeV)</string>
      </property>
     </widget>
    </item>

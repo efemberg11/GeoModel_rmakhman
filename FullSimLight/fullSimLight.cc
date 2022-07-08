@@ -45,6 +45,7 @@
 static const std::string fullSimLightShareDir=FULLSIMLIGHTSHAREDIR;
 static std::string  parMacroFileName   = fullSimLightShareDir+"/macro.g4";
 static bool         parIsPerformance   = false;
+static bool         parIsCustomUserActions = false;
 static G4String     geometryFileName   ;
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
@@ -208,7 +209,18 @@ int main(int argc, char** argv) {
     if (activateRegions)    detector->SetAddRegions(true);
     
     // 3. User action
-    FSLActionInitialization* actInit = new FSLActionInitialization(parIsPerformance);
+    if(!isBatch && simConfig::fsl.userActions.size()>0) parIsCustomUserActions = true;
+    
+    
+    FSLActionInitialization* actInit = new FSLActionInitialization(parIsPerformance,parIsCustomUserActions);
+    
+    if(parIsCustomUserActions){
+    actInit->SetActions(
+                        simConfig::fsl.userActions
+                       );
+
+    }
+
     // set the name of a region in which we are interested to see a very basic simulation
     // stat e.g. "EMEC" (NOTE: only if the given region can be found and executed in
     // non-perfomance mode)
@@ -243,8 +255,16 @@ int main(int argc, char** argv) {
         
         detector->SetGeometryFileName (simConfig::fsl.geometry);
         runManager->SetUserInitialization(detector);
+                
         
         //parse RegionsData
+        std::vector<std::string> Regions;
+        std::vector<std::vector<G4String>> RootLVNames;
+        std::vector<double> electron_cut;
+        std::vector<double> proton_cut;
+        std::vector<double> positron_cut;
+        std::vector<double> gamma_cut;
+        
         for (const auto& element : simConfig::jf["Regions data"]){
             
 //            std::cout<<"RegionName: "<<element["RegionName"]<<std::endl;
@@ -255,7 +275,15 @@ int main(int argc, char** argv) {
 //            std::cout<<"ProtonCut: "<<element["ProtonCut"]<<std::endl;
             
             //actually read the data and save them in a simConfig::regionConfig object (might be useful for the configuration later on)
+            
             simConfig::from_json(element, simConfig::rc);
+            Regions.push_back(simConfig::rc.regionName);
+            RootLVNames.push_back(simConfig::rc.rootLVNames);
+            electron_cut.push_back(simConfig::rc.electronCut);
+            proton_cut.push_back(simConfig::rc.protonCut);
+            positron_cut.push_back(simConfig::rc.positronCut);
+            gamma_cut.push_back(simConfig::rc.gammaCut);
+            
 //            std::cout<<"RegionName: "<<rc.regionName<<std::endl;
 //            std::cout<<"RootLVNames size: "<<rc.rootLVNames.size()<<std::endl;
 //            std::cout<<"GammaCut: "<<rc.gammaCut<<std::endl;
@@ -265,19 +293,14 @@ int main(int argc, char** argv) {
 //            std::cout<<"------------------------------------------------"<<std::endl;
         }
         
+        detector->ConfigureRegionsFSL(Regions, RootLVNames, electron_cut, proton_cut, positron_cut, gamma_cut);
+        
         for (const auto& element : simConfig::jf["Sensitive Detector Extensions"]){
             
             detector->AddSensitiveDetectorPlugin(element);
         }
 
 
-	// Set extra user actions:
-        for (const auto& element : simConfig::jf["User Action Extensions"]){
-	  GeoPluginLoader<FSLUserActionPlugin> loader;
-	  const FSLUserActionPlugin * plugin = loader.load(element);
-	  runManager->SetUserInitialization(plugin->getUserActionInitialization());
-	}
-	
         G4bool initialized=false;
         //parse and apply G4Commands
         for (G4String element : simConfig::jf["g4ui_commands"]){

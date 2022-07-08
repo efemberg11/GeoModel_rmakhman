@@ -13,7 +13,15 @@ RegionConfigurator& RegionConfigurator::Instance() {
 
 // loop over all RegionData and create a region for each if any of the listed
 // root logical volumes can be found
-void RegionConfigurator::CreateRegions(int verbose) {
+void RegionConfigurator::CreateRegions(std::vector<std::string> Regions,
+                                       std::vector<std::vector<G4String>> RootLVNames,
+                                       std::vector<double> electronCut,
+                                       std::vector<double> protonCut,
+                                       std::vector<double> positronCut,
+                                       std::vector<double> gammaCut,
+                                       int verbose)
+{
+  InitRegionData(Regions,RootLVNames,electronCut,protonCut,positronCut,gammaCut);
   std::vector<G4LogicalVolume*>* lvStore =  G4LogicalVolumeStore::GetInstance();
   std::vector<G4LogicalVolume*> lvList;
   for(const RegionData& aRegionData: fRegionData) {
@@ -69,14 +77,36 @@ void RegionConfigurator::CreateRegions(int verbose) {
 
 
 RegionConfigurator::RegionConfigurator() {
-  InitRegionData();
+ // InitRegionData(); Adding this in the Create Regions Method Instead
 }
 
 
-// One regin configuration, taken from Athena by using `G4PhysicsRegionConfigNew.py`
-// and `G4GeomtryToolConfig.py` with a configuration setting that can produce regions
-// and secondary production thresholds similar to that used in production.
-void RegionConfigurator::InitRegionData() {
+
+void RegionConfigurator::InitRegionData(std::vector<std::string> Regions,
+                                        std::vector<std::vector<G4String>> RootLVNames,
+                                        std::vector<double> electronCut,
+                                        std::vector<double> protonCut,
+                                        std::vector<double> positronCut,
+                                        std::vector<double> gammaCut
+                                        )
+{
+    fRegionData.resize(Regions.size());
+    for(unsigned int i=0;i<=Regions.size()-1;++i)
+    {
+        fRegionData[i].fRegionName  = Regions[i];
+        fRegionData[i].fGammaCut    = gammaCut[i];
+        fRegionData[i].fElectronCut = electronCut[i];
+        fRegionData[i].fPositronCut = positronCut[i];
+        fRegionData[i].fProtonCut   = protonCut[i];
+        fRegionData[i].fRootLVNames = RootLVNames[i];
+        
+    }
+    
+    // One region configuration, taken from Athena by using `G4PhysicsRegionConfigNew.py`
+    // and `G4GeomtryToolConfig.py` with a configuration setting that can produce regions
+    // and secondary production thresholds similar to that used in production.
+    
+    /*
   fRegionData.resize(11);
   //
   //  Region: Pixel
@@ -166,4 +196,6 @@ void RegionConfigurator::InitRegionData() {
   fRegionData[10].fPositronCut = 1.0;
   fRegionData[10].fProtonCut   = 1.0;
   fRegionData[10].fRootLVNames = {"SensitiveGas"};
+  */
+    
 }

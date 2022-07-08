@@ -8,8 +8,8 @@ file( GLOB UIS src/*.ui )
 # Add the library.
 add_library( GXHitDisplaySystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXHitDisplaySystems
-   PUBLIC Coin::Coin GXBase
-   PRIVATE Qt5::Core Qt5::Widgets nlohmann_json::nlohmann_json )
+   PUBLIC Coin::Coin GXBase 
+   PRIVATE Qt5::Core Qt5::Widgets HDF5::HDF5 )
 target_include_directories( GXHitDisplaySystems PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
@@ -20,9 +20,6 @@ set_target_properties( GXHitDisplaySystems PROPERTIES
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 if( GEOMODEL_USE_BUILTIN_COIN3D )
    add_dependencies( GXHitDisplaySystems Coin3DBuiltIn )
-endif()
-if( GEOMODEL_USE_BUILTIN_JSON )
-   add_dependencies( GXHitDisplaySystems JSONExt )
 endif()
 
 # Set up an alias with the same name that you would get by "finding" a pre-built

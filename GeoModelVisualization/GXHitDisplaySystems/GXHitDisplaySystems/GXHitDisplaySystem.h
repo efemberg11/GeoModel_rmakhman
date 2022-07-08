@@ -51,7 +51,7 @@ public slots:
 signals:
   void updateTransparencyType(unsigned type);
   
-private:
+public:
   class Imp;
   Imp * m_d;
 };

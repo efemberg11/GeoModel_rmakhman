@@ -15,7 +15,7 @@
 
 #include "GXHitDisplaySystems/GXHitDisplaySystem.h"
 #include "GXHitDisplaySystems/HitDisplaySysController.h"
-
+#include "H5Cpp.h"
 #include "VP1Base/VP1Serialise.h"
 #include "VP1Base/VP1Deserialise.h"
 #include "VP1Base/VP1Msg.h"
@@ -31,22 +31,31 @@
 #include <Inventor/SbVec3f.h>
 
 #include <QFileDialog>
-
-#include <nlohmann/json.hpp>
-
+#include <QMessageBox>
 #include <map>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
 
 
-using json = nlohmann::json;
+using namespace H5;
+
+
+
+struct Hit{
+  float X;
+  float Y;
+  float Z;
+  int   ID;
+};
+
+
+
 
 class GXHitDisplaySystem::Imp {
 public:
-  Imp(GXHitDisplaySystem*tc) : theclass(tc),
-			       controller(0),
-			       switch0(nullptr)
+  Imp(GXHitDisplaySystem*tc) : theclass(tc)
+			 
   {}
   GXHitDisplaySystem *theclass{nullptr};
   HitDisplaySysController * controller{nullptr};
@@ -55,6 +64,14 @@ public:
   SoCoordinate3           * coords{nullptr};
   SoPointSet              * pointSet{nullptr};
 
+  
+  CompType datatype{sizeof(Hit)};
+  H5File   *file{nullptr};
+  std::vector<Hit> hit;
+
+
+
+  
     static SbColor4f color4f(const QColor& col) {
     return SbColor4f(std::max<float>(0.0f,std::min<float>(1.0f,col.redF())),
 		     std::max<float>(0.0f,std::min<float>(1.0f,col.greenF())),
@@ -62,28 +79,28 @@ public:
 		     1.0);
   }
 
-  json j;
 };
 
-namespace hitdisp {
+extern "C" herr_t file_info(hid_t loc_id, const char *name, const H5L_info_t *linfo, void * md) {
 
-    struct hit {
-        int         eventID;
-        double      x,y,z;
-    };
+  GXHitDisplaySystem::Imp * m_d = (GXHitDisplaySystem::Imp *) md;
+  
+  if (!m_d->file)      return -1;
+  if (strlen(name)==0) return -1;
 
-    void to_json(json& j, const hit& p) {
-        j = json{{"Event ID", p.eventID},{"x", p.x},{"y", p.y},{"z", p.z} };
-    }
+  
+  const std::string datasetName=name;
+  DataSet dataset=m_d->file->openDataSet(datasetName);
+  size_t length=dataset.getStorageSize()/sizeof(Hit);
+  m_d->hit.resize(length);  
+  
+  
+  dataset.read(m_d->hit.data(),m_d->datatype);
+  
+  
+  return 1;
+}
 
-    void from_json(const json& j, hit& p) {
-      j.at("Event ID").get_to(p.eventID);
-        j.at("x").get_to(p.x);
-        j.at("y").get_to(p.y);
-        j.at("z").get_to(p.z);
-
-    }
-} // namespace hitdisp
 
 
 
@@ -94,12 +111,18 @@ GXHitDisplaySystem::GXHitDisplaySystem()
 		       "System providing visualizaton of hits",
 		       "boudreau@pitt.edu"), m_d(new Imp(this))
 {
+  m_d->datatype.insertMember("X", HOFFSET(Hit,X),PredType::NATIVE_FLOAT);
+  m_d->datatype.insertMember("Y", HOFFSET(Hit,Y),PredType::NATIVE_FLOAT);
+  m_d->datatype.insertMember("Z", HOFFSET(Hit,Z),PredType::NATIVE_FLOAT);
+  m_d->datatype.insertMember("ID", HOFFSET(Hit,ID),PredType::NATIVE_INT);
+
 }
 
 
 //_____________________________________________________________________________________
 GXHitDisplaySystem::~GXHitDisplaySystem()
 {
+  delete m_d->file;
   delete m_d;
 }
 
@@ -212,12 +235,14 @@ void GXHitDisplaySystem::selectInputFile() {
   char *wd=getcwd(buffer,1024);
   path = QFileDialog::getOpenFileName(nullptr, tr("Open Input File"),
 				      wd,
-				      tr("Hit input files (*.json)"),0,QFileDialog::DontUseNativeDialog);
+				      tr("Hit input files (*.h5)"),0,QFileDialog::DontUseNativeDialog);
 
   if (path!="") {
     m_d->switch0->removeAllChildren();
-    std::ifstream i(path.toStdString());
-    m_d->j=json::parse(i);
+
+    delete m_d->file;
+    m_d->file=new H5File(path.toStdString(), H5F_ACC_RDONLY);
+
     nextEvent();
   }
 
@@ -233,39 +258,32 @@ void GXHitDisplaySystem::showHitDisplay1(bool flag) {
 }
 
 void GXHitDisplaySystem::nextEvent() {
-  std::cout << "Next Event" << std::endl;
+  
+
+  
   if (m_d->pointSet) m_d->switch0->removeChild(m_d->pointSet);
   if (m_d->coords)   m_d->switch0->removeChild(m_d->coords);
+
+ 
+  static hsize_t count=0;
+  if (count==m_d->file->getNumObjs()) {
+    QMessageBox msgBox;
+    msgBox.setText("Last event reached.  Reset stream to beginning.");
+    msgBox.exec();
+    count=0;
+  }
+  H5Literate(m_d->file->getId(), H5_INDEX_NAME, H5_ITER_INC, &count, file_info, m_d);
+
+
+
   
   m_d->coords = new SoCoordinate3;
   m_d->pointSet = new SoPointSet;
   m_d->switch0->addChild(m_d->coords);
   m_d->switch0->addChild(m_d->pointSet);
-  
- 
-  try {
-      unsigned int   counter=0;
-      static int lastEventID=-1;
-      int eventID           =-1;
-      for (const auto& element : m_d->j["Events"]){
-	int newEventID=element["Event ID"];
-	if (newEventID<lastEventID) continue;
-	if (eventID==-1) {
-	  eventID=newEventID;
-	}
-	else if (eventID!=newEventID){
-	  lastEventID=newEventID;
-	  break;
-	}
-	lastEventID=eventID;
-        
-	m_d->coords->point.set1Value(counter++,element["x"], element["y"], element["z"]);
-      }
 
-      m_d->pointSet->numPoints=counter;
-    }
-    catch (std::exception & e) {
-      std::cout << e.what() << std::endl;
-     }
-
+  size_t counter(0);
+  for (const Hit & h: m_d->hit) m_d->coords->point.set1Value(counter++, h.X, h.Y, h.Z);
+  m_d->pointSet->numPoints=m_d->hit.size();
+  m_d->hit.clear();
 }

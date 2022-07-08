@@ -43,7 +43,7 @@ endif()
 # Find the dependencies of the project.
 find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )
 find_package( OpenGL REQUIRED )
-
+find_package( HDF5 REQUIRED COMPONENTS CXX )
 # Set up how the project should handle some of its dependenices. Either by
 # picking them up from the environment, or building them itself.
 include( SetupCoin3D )

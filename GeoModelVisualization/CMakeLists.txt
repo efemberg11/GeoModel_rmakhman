@@ -43,7 +43,7 @@ endif()
 # Find the dependencies of the project.
 find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )
 find_package( OpenGL REQUIRED )
-
+find_package( HDF5 REQUIRED COMPONENTS CXX )
 # Set up how the project should handle some of its dependenices. Either by
 # picking them up from the environment, or building them itself.
 include( SetupCoin3D )
@@ -66,6 +66,7 @@ add_subdirectory(VP1Gui)
 add_subdirectory(VP1Base)
 add_subdirectory(VP1HEPVis)
 add_subdirectory(VP1GuideLineSystems)
+add_subdirectory(GXHitDisplaySystems)
 
 # Create and install the version description of the project.
 include( WriteBasicConfigVersionFile )

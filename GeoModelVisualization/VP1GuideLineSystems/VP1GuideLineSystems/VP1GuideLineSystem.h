@@ -42,6 +42,10 @@ public:
   QByteArray saveState();
   void restoreFromState(QByteArray ba);
 
+signals:
+
+  void updateTransparencyType(unsigned type);
+  
 private:
   class Imp;
   Imp * m_d;

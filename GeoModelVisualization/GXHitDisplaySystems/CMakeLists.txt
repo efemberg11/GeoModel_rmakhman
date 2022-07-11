@@ -9,7 +9,7 @@ file( GLOB UIS src/*.ui )
 add_library( GXHitDisplaySystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXHitDisplaySystems
    PUBLIC Coin::Coin GXBase 
-   PRIVATE Qt5::Core Qt5::Widgets HDF5::HDF5 )
+   PRIVATE Qt5::Core Qt5::Widgets ${HDF5_LIBRARIES} )
 target_include_directories( GXHitDisplaySystems PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

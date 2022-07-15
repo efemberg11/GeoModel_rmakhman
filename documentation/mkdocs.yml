@@ -36,6 +36,7 @@ nav:
         - 'GeoModelGeantino': 'fullsimlight/gmgeantino/index.md'
         - 'GeoModelMassCalculator': 'fullsimlight/gmmasscalc/index.md'
         - 'GeoModel2GDML': 'fullsimlight/gm2gdml/index.md'
+        - 'fsl': 'fullsimlight/fsl/index.md'
     - FAQ: 'faq.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'

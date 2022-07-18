@@ -129,10 +129,13 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     p_z_validator = new QDoubleValidator(-100000.0,100000.0,8);
     mag_field_validator = new QDoubleValidator(-100000.0,100000.0,8);
     
-    p_x_validator->setLocale(QLocale::C);
-    p_y_validator->setLocale(QLocale::C);
-    p_z_validator->setLocale(QLocale::C);
-    mag_field_validator->setLocale(QLocale::C);
+    QLocale lo(QLocale::C);
+    lo.setNumberOptions(QLocale::RejectGroupSeparator);
+    
+    p_x_validator->setLocale(lo);
+    p_y_validator->setLocale(lo);
+    p_z_validator->setLocale(lo);
+    mag_field_validator->setLocale(lo);
     
     ui->lE_px->setValidator(p_x_validator);
     ui->lE_py->setValidator(p_y_validator);

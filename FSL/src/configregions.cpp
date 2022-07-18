@@ -18,10 +18,13 @@ ConfigRegions::ConfigRegions(QWidget *parent) :
     positron_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
     gamma_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
     
-    electron_cut_validator->setLocale(QLocale::C);
-    proton_cut_validator->setLocale(QLocale::C);
-    positron_cut_validator->setLocale(QLocale::C);
-    gamma_cut_validator->setLocale(QLocale::C);
+    QLocale loc(QLocale::C);
+    loc.setNumberOptions(QLocale::RejectGroupSeparator);
+    
+    electron_cut_validator->setLocale(loc);
+    proton_cut_validator->setLocale(loc);
+    positron_cut_validator->setLocale(loc);
+    gamma_cut_validator->setLocale(loc);
 
     ui->lE_electron->setValidator(electron_cut_validator);
     ui->lE_proton->setValidator(proton_cut_validator);

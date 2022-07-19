@@ -54,7 +54,6 @@ public:
 
     //Parameters associated with the main tab
     QLocale lo;
-    bool locale_bool;
     nlohmann::json j;
     QProcess fullSimLight_process;
     QProcess gmex_process;

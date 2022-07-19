@@ -420,10 +420,10 @@ void FSLMainWindow::configure_regions()
         std::vector<std::string> froot_names = this->parse_froot_string(((ui->regions_table->model()
                                                                           ->index(row,1)).data().toString()).toStdString());
 
-        double ele_cut = lo.toDouble((ui->regions_table->model()->index(row,2)).data().toString(), &locale_bool);
-        double prot_cut = lo.toDouble((ui->regions_table->model()->index(row,3)).data().toString(), &locale_bool);
-        double posit_cut = lo.toDouble((ui->regions_table->model()->index(row,4)).data().toString(), &locale_bool);
-        double gam_cut = lo.toDouble((ui->regions_table->model()->index(row,5)).data().toString(), &locale_bool);
+        double ele_cut = std::stod((ui->regions_table->model()->index(row,2)).data().toString().toStdString());
+        double prot_cut = std::stod((ui->regions_table->model()->index(row,3)).data().toString().toStdString());
+        double posit_cut = std::stod((ui->regions_table->model()->index(row,4)).data().toString().toStdString());
+        double gam_cut = std::stod((ui->regions_table->model()->index(row,5)).data().toString().toStdString());
 
         Region region_from_list = {reg_name, froot_names, ele_cut,prot_cut,posit_cut,gam_cut};
         regions.push_back(region_from_list);
@@ -688,9 +688,9 @@ void FSLMainWindow::assign_magnetic_field_map()
 //Function to configure particle energy and direction
 void FSLMainWindow::configure_energy_direction()
 {
-    p_x = lo.toDouble(ui->lE_px->text(), &locale_bool);
-    p_y = lo.toDouble(ui->lE_py->text(), &locale_bool);
-    p_z = lo.toDouble(ui->lE_pz->text(), &locale_bool);
+    p_x = std::stod(ui->lE_px->text().toStdString());
+    p_y = std::stod(ui->lE_py->text().toStdString());
+    p_z = std::stod(ui->lE_pz->text().toStdString());
     double p = sqrt(pow(p_x,2)+pow(p_y,2)+pow(p_z,2));
 
     x_dir = std::to_string(p_x/p);

@@ -48,10 +48,10 @@ void ConfigRegions::add_region_config()
 
     region_name = (ui->lE_reg_name->text()).toStdString();
     frootLV_names = (ui->lE_froot->text()).toStdString();
-    electron_cut = loc.toDouble(ui->lE_electron->text(), &loc_bool);
-    proton_cut = loc.toDouble(ui->lE_proton->text(), &loc_bool);
-    positron_cut = loc.toDouble(ui->lE_positron->text(), &loc_bool);
-    gamma_cut = loc.toDouble(ui->lE_gamma->text(), &loc_bool);
+    electron_cut = std::stod(ui->lE_electron->text().toStdString());
+    proton_cut = std::stod(ui->lE_proton->text().toStdString());
+    positron_cut = std::stod(ui->lE_positron->text().toStdString());
+    gamma_cut = std::stod(ui->lE_gamma->text().toStdString());
 
 
 

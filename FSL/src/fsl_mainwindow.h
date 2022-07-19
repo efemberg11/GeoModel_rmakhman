@@ -9,6 +9,8 @@
 #include <QStandardItemModel>
 #include <QDoubleValidator>
 #include "configregions.h"
+#include <clocale>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class FSLMainWindow; }

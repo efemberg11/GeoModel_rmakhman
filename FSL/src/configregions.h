@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QDoubleValidator>
 #include <QLocale>
+#include <clocale>
 
 namespace Ui {
 class ConfigRegions;

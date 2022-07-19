@@ -21,6 +21,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->setWindowTitle("FullSimLight-GUI (beta version)");
+    std::setlocale(LC_NUMERIC, "C");
 
     //Setting up Models
     sens_det_model = new QStringListModel(this);
@@ -688,9 +689,9 @@ void FSLMainWindow::assign_magnetic_field_map()
 //Function to configure particle energy and direction
 void FSLMainWindow::configure_energy_direction()
 {
-    p_x = std::stod(ui->lE_px->text().toStdString());
-    p_y = std::stod(ui->lE_py->text().toStdString());
-    p_z = std::stod(ui->lE_pz->text().toStdString());
+    p_x = ui->lE_px->text().toDouble();
+    p_y = ui->lE_py->text().toDouble();
+    p_z = ui->lE_pz->text().toDouble();
     double p = sqrt(pow(p_x,2)+pow(p_y,2)+pow(p_z,2));
 
     x_dir = std::to_string(p_x/p);

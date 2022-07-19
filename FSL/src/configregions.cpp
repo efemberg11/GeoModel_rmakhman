@@ -10,6 +10,7 @@ ConfigRegions::ConfigRegions(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("Regions Configuration");
+    std::setlocale(LC_NUMERIC, "C");
     connect(ui->pB_add_region, &QPushButton::released, this, &ConfigRegions::add_region_config);
 
 
@@ -48,10 +49,10 @@ void ConfigRegions::add_region_config()
 
     region_name = (ui->lE_reg_name->text()).toStdString();
     frootLV_names = (ui->lE_froot->text()).toStdString();
-    electron_cut = std::stod(ui->lE_electron->text().toStdString());
-    proton_cut = std::stod(ui->lE_proton->text().toStdString());
-    positron_cut = std::stod(ui->lE_positron->text().toStdString());
-    gamma_cut = std::stod(ui->lE_gamma->text().toStdString());
+    electron_cut = ui->lE_electron->text().toDouble();
+    proton_cut = ui->lE_proton->text().toDouble();
+    positron_cut = ui->lE_positron->text().toDouble();
+    gamma_cut = ui->lE_gamma->text().toDouble();
 
 
 

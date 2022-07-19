@@ -18,7 +18,7 @@ ConfigRegions::ConfigRegions(QWidget *parent) :
     positron_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
     gamma_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
     
-    QLocale loc(QLocale::C);
+    loc= QLocale::C;
     loc.setNumberOptions(QLocale::RejectGroupSeparator);
     
     electron_cut_validator->setLocale(loc);
@@ -48,10 +48,10 @@ void ConfigRegions::add_region_config()
 
     region_name = (ui->lE_reg_name->text()).toStdString();
     frootLV_names = (ui->lE_froot->text()).toStdString();
-    electron_cut = (ui->lE_electron->text()).toDouble();
-    proton_cut = (ui->lE_proton->text()).toDouble();
-    positron_cut = (ui->lE_positron->text()).toDouble();
-    gamma_cut = (ui->lE_gamma->text()).toDouble();
+    electron_cut = loc.toDouble(ui->lE_electron->text(), &loc_bool);
+    proton_cut = loc.toDouble(ui->lE_proton->text(), &loc_bool);
+    positron_cut = loc.toDouble(ui->lE_positron->text(), &loc_bool);
+    gamma_cut = loc.toDouble(ui->lE_gamma->text(), &loc_bool);
 
 
 

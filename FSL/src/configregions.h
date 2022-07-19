@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QDoubleValidator>
-
+#include <QLocale>
 
 namespace Ui {
 class ConfigRegions;
@@ -23,6 +23,8 @@ public:
     double positron_cut;
     double gamma_cut;
     void add_region_config();
+    QLocale loc;
+    bool loc_bool;
 
 signals:
     void send_config(std::string  region_name, std::string frootLV_names

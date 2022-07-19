@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <QStringListModel>
 #include <QProcess>
+#include <QLocale>
 #include <QStandardItemModel>
 #include <QDoubleValidator>
 #include "configregions.h"
@@ -52,6 +53,8 @@ public:
 
 
     //Parameters associated with the main tab
+    QLocale lo;
+    bool locale_bool;
     nlohmann::json j;
     QProcess fullSimLight_process;
     QProcess gmex_process;

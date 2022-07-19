@@ -10,6 +10,7 @@ ConfigRegions::ConfigRegions(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("Regions Configuration");
+    std::setlocale(LC_NUMERIC, "C");
     connect(ui->pB_add_region, &QPushButton::released, this, &ConfigRegions::add_region_config);
 
 
@@ -17,6 +18,14 @@ ConfigRegions::ConfigRegions(QWidget *parent) :
     proton_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
     positron_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
     gamma_cut_validator = new QDoubleValidator(-100000.0,100000.0,8);
+    
+    loc= QLocale::C;
+    loc.setNumberOptions(QLocale::RejectGroupSeparator);
+    
+    electron_cut_validator->setLocale(loc);
+    proton_cut_validator->setLocale(loc);
+    positron_cut_validator->setLocale(loc);
+    gamma_cut_validator->setLocale(loc);
 
     ui->lE_electron->setValidator(electron_cut_validator);
     ui->lE_proton->setValidator(proton_cut_validator);

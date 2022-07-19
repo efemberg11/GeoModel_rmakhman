@@ -5,9 +5,12 @@
 #include <nlohmann/json.hpp>
 #include <QStringListModel>
 #include <QProcess>
+#include <QLocale>
 #include <QStandardItemModel>
 #include <QDoubleValidator>
 #include "configregions.h"
+#include <clocale>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class FSLMainWindow; }
@@ -52,6 +55,7 @@ public:
 
 
     //Parameters associated with the main tab
+    QLocale lo;
     nlohmann::json j;
     QProcess fullSimLight_process;
     QProcess gmex_process;

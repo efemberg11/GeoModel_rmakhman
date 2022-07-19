@@ -21,6 +21,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->setWindowTitle("FullSimLight-GUI (beta version)");
+    std::setlocale(LC_NUMERIC, "C");
 
     //Setting up Models
     sens_det_model = new QStringListModel(this);
@@ -128,8 +129,15 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     p_y_validator = new QDoubleValidator(-100000.0,100000.0,8);
     p_z_validator = new QDoubleValidator(-100000.0,100000.0,8);
     mag_field_validator = new QDoubleValidator(-100000.0,100000.0,8);
-
-
+    
+    lo = QLocale::C;
+    lo.setNumberOptions(QLocale::RejectGroupSeparator);
+    
+    p_x_validator->setLocale(lo);
+    p_y_validator->setLocale(lo);
+    p_z_validator->setLocale(lo);
+    mag_field_validator->setLocale(lo);
+    
     ui->lE_px->setValidator(p_x_validator);
     ui->lE_py->setValidator(p_y_validator);
     ui->lE_pz->setValidator(p_z_validator);
@@ -417,6 +425,7 @@ void FSLMainWindow::configure_regions()
         double prot_cut = (ui->regions_table->model()->index(row,3)).data().toDouble();
         double posit_cut = (ui->regions_table->model()->index(row,4)).data().toDouble();
         double gam_cut = (ui->regions_table->model()->index(row,5)).data().toDouble();
+
 
         Region region_from_list = {reg_name, froot_names, ele_cut,prot_cut,posit_cut,gam_cut};
         regions.push_back(region_from_list);

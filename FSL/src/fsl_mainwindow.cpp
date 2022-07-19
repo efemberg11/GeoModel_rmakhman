@@ -421,10 +421,11 @@ void FSLMainWindow::configure_regions()
         std::vector<std::string> froot_names = this->parse_froot_string(((ui->regions_table->model()
                                                                           ->index(row,1)).data().toString()).toStdString());
 
-        double ele_cut = std::stod((ui->regions_table->model()->index(row,2)).data().toString().toStdString());
-        double prot_cut = std::stod((ui->regions_table->model()->index(row,3)).data().toString().toStdString());
-        double posit_cut = std::stod((ui->regions_table->model()->index(row,4)).data().toString().toStdString());
-        double gam_cut = std::stod((ui->regions_table->model()->index(row,5)).data().toString().toStdString());
+        double ele_cut = (ui->regions_table->model()->index(row,2)).data().toDouble();
+        double prot_cut = (ui->regions_table->model()->index(row,3)).data().toDouble();
+        double posit_cut = (ui->regions_table->model()->index(row,4)).data().toDouble();
+        double gam_cut = (ui->regions_table->model()->index(row,5)).data().toDouble();
+
 
         Region region_from_list = {reg_name, froot_names, ele_cut,prot_cut,posit_cut,gam_cut};
         regions.push_back(region_from_list);

@@ -13,10 +13,10 @@ As a simple example, suppose you as the user want to keep track of the various p
 Geant4 provides classes to assist with this task. Namely the G4UserSteppingAction class contains the function
 
 ```c++
-virtual void UserSteppingAction (const G4Step *);
+virtual void UserSteppingAction (const G4Step *aStep);
 ```
 
-By overriding this function we can get particle positions and names through the G4Step object. Now since we also want to write out our hits to a file for each event, we can use the G4UserEventAction, which conveniently provides the function
+By overriding this function we can get particle positions and names through the G4Step object. Now since we also want to write out our hits to a file for each event, we can use the G4UserEventAction class, which conveniently provides the function
  
 ```c++
 virtual void EndOfEventAction (const G4Event *anEvent);

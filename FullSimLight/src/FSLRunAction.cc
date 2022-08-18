@@ -14,10 +14,10 @@
 #include "FSLSteppingAction.hh"
 #include "FSLTrackingAction.hh"
 
-
 #include "G4ProductionCutsTable.hh"
 #include "G4Region.hh"
 #include "G4RegionStore.hh"
+
 
 G4AnalysisManager* FSLRunAction::fMasterAnalysisManager = nullptr;
 
@@ -30,8 +30,12 @@ FSLRunAction::FSLRunAction()
   }
 
 FSLRunAction::~FSLRunAction() {
+    
+#if G4VERSION_NUMBER<1100
     if(fGeantinoMapsConf->GetCreateGeantinoMaps())
         delete G4AnalysisManager::Instance();
+#endif
+    
 }
 
 G4Run* FSLRunAction::GenerateRun() {
@@ -53,6 +57,9 @@ void FSLRunAction::BeginOfRunAction(const G4Run* /*aRun*/){
     {
         // Create analysis manager
         G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+#if G4VERSION_NUMBER>=1100
+        analysisManager->SetDefaultFileType("root");
+#endif
         if (isMaster) {
             fMasterAnalysisManager = analysisManager;
             //G4cout<<"FSLRunAction::BeginOfRunAction, created MASTER istance of the G4AnalysisManager: "<<fMasterAnalysisManager<<G4endl;

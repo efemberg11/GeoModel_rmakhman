@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
     gm_config->SetMapsFilename(parOutputFileName);
     
     // 3. User action
-    FSLActionInitialization* FSLAct = new FSLActionInitialization(parIsPerformance);
+    FSLActionInitialization* FSLAct = new FSLActionInitialization(parIsPerformance, false);
     runManager->SetUserInitialization(FSLAct);
     
     

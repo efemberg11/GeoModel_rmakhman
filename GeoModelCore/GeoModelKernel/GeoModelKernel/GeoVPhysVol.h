@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOVPHYSVOL_H
@@ -85,6 +85,9 @@ class GeoVPhysVol : public GeoGraphNode
   virtual unsigned int getNChildNodes() const=0;
   virtual const GeoGraphNode * const *getChildNode (unsigned int i) const=0;
   virtual const GeoGraphNode * const *findChildNode(const GeoGraphNode *n) const=0;
+
+  /// Adds a Graph Node to the Geometry Graph
+  virtual void add(GeoGraphNode* graphNode) = 0;
 
  protected:
   virtual ~GeoVPhysVol();

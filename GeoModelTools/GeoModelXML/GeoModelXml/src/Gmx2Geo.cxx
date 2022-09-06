@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelXml/Gmx2Geo.h"
@@ -16,6 +16,8 @@
 #include <xercesc/util/PlatformUtils.hpp>
 
 #include "GeoModelKernel/GeoPhysVol.h"
+#include "GeoModelKernel/GeoVPhysVol.h"
+
 #include "GeoModelKernel/GeoVolumeTagCatalog.h"
 
 #include "ExpressionEvaluator/IEvaluator.h"
@@ -105,17 +107,17 @@ Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoPhysVol *addHere, GmxInterface &gmxIn
 //  ADA - check if an envelope is requested, in case we take is and fill it up with the addbranch's contents.
 
     XMLCh * envelope_tmp=XMLString::transcode("envelope");
-    GeoPhysVol* physVol=addHere;
+    GeoVPhysVol* physVol=addHere;
     if (addbranch->hasAttribute(envelope_tmp))
     {
         char *toRelease=XMLString::transcode(addbranch->getAttribute(envelope_tmp));
 	std::cout<<" envelope requested "<<toRelease<<std::endl;
         std::string envel=toRelease;
 	XMLString::release(&toRelease);
-	GeoPhysVol* tmpVol=dynamic_cast<GeoPhysVol*>(GeoVolumeTagCatalog::VolumeTagCatalog()->getTaggedVolume("Envelope",envel));
+	GeoVPhysVol* tmpVol=GeoVolumeTagCatalog::VolumeTagCatalog()->getTaggedVolume("Envelope",envel);
 	if (tmpVol) 
 	{
-		std::cout<< " volume "<<envel<<" found in the envelope catalog"<<std::endl;
+		std::cout<< " Volume "<<envel<<" found in the envelope catalog"<<std::endl;
 		physVol=tmpVol;
 	}
     }

@@ -13,18 +13,13 @@
 #include "G4UIsession.hh"
 #include "G4UIterminal.hh"
 
-#include "G4PhysListFactory.hh"
-#include "G4VUserPhysicsList.hh"
-#include "G4VModularPhysicsList.hh"
 
 #include "Randomize.hh"
 #include "FSLDetectorConstruction.hh"
-#include "StandardEmWithWoodcock.hh"
-#include "EmExtraPhysics.hh"
-#include "G4NeutronTrackingCut.hh"
+#include "FSLPhysListFactory.hh"
+#include "G4VModularPhysicsList.hh"
 
 #include "GeoModelKernel/GeoPluginLoader.h"
-
 
 #include "FSLActionInitialization.hh"
 #include "FSLConfigurator.hh"
@@ -41,7 +36,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
-                               
+
 static const std::string fullSimLightShareDir=FULLSIMLIGHTSHAREDIR;
 static std::string  parMacroFileName   = fullSimLightShareDir+"/macro.g4";
 static bool         parIsPerformance   = false;
@@ -168,36 +163,10 @@ int main(int argc, char** argv) {
 #endif
         }
     }
-    G4bool activateRegions = false;
-    G4VModularPhysicsList* physList = nullptr;
-    G4PhysListFactory factory;
-    if (factory.IsReferencePhysList(parPhysListName)) {
-        physList = factory.GetReferencePhysList(parPhysListName);
-    } else if (parPhysListName==G4String("FTFP_BERT_ATL_WDCK")) {
-        G4cout << "<<< Geant4 FTFP_BERT_ATL physics list with the local Woodcock settings " << G4endl;
-        physList = factory.GetReferencePhysList("FTFP_BERT_ATL");
-        // the local em-standard physics with Woodcock tracking for gamma
-        StandardEmWithWoodcock* em0AndWDCK = new StandardEmWithWoodcock;
-        // set the region name and low energy limit for Woodcock tracking
-        em0AndWDCK->SetRegionNameForWoodcockTracking("EMEC");
-        em0AndWDCK->SetLowEnergyLimitForWoodcockTracking(200.0*CLHEP::keV);
-        physList->ReplacePhysics(em0AndWDCK);
-        // the local version of the `G4EmExtraPhysics` that will use the local `GammaGeneralProcess`
-        G4VPhysicsConstructor* emExtra = new EmExtraPhysics;
-        physList->ReplacePhysics(emExtra);
-        //physList->RemovePhysics("G4GammaLeptoNuclearPhys");
-        // make sure that regions will also be added to the detector
-        activateRegions = true;
-    } else {
-        G4cerr << "ERROR: Physics List " << parPhysListName << " UNKNOWN!" << G4endl;
-        return -1;
-    }
-    // In cases of ATLAS physics lists, set the neutron tracking cut to be 150 [ns] as in Athena
-    if (parPhysListName.find("ATL") != std::string::npos) {
-        G4NeutronTrackingCut* neutronCut = new G4NeutronTrackingCut("neutronCutphysics", 1);
-        neutronCut->SetTimeLimit(150.0*CLHEP::ns);
-        physList->ReplacePhysics(neutronCut);
-    }
+
+    const FSLPhysListFactory *phyListFactory = FSLPhysListFactory::GetInstance();
+    G4VModularPhysicsList *physList = phyListFactory->GetPhysList(parPhysListName);
+    G4bool activateRegions = phyListFactory->GetActivateRegionsFlag();
     
     // register the final version of the physics list in the run manager
     runManager->SetUserInitialization(physList);

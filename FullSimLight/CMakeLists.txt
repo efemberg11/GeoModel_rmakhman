@@ -294,6 +294,7 @@ install( TARGETS FullSimLight
    
 install(FILES include/FSLSensitiveDetectorPlugin.h 
               include/MagFieldPlugin.h 
+              include/FSLPhysicsListPlugin.h
 	      include/FSLUserActionPlugin.h
               include/FSLUserRunActionPlugin.h
               include/FSLUserEventActionPlugin.h

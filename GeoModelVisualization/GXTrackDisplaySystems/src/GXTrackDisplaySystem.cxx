@@ -250,7 +250,7 @@ SoBaseColor* getColor(int pdg)
     returnColor->rgb.setValue(0.75,0.75,0.75); //gray
     break;
   case 11: // electron
-    returnColor->rgb.setValue(1,1,0); //blue
+    returnColor->rgb.setValue(0,0,1); //blue
     break;
   case -11: // positron
     returnColor->rgb.setValue(0.54,0.17,1); //violet
@@ -279,7 +279,7 @@ SoBaseColor* getColor(int pdg)
   case 321: // kaon+
     returnColor->rgb.setValue(0,1,1); //cyan
     break;
-  case -321: // kaon+
+  case -321: // kaon-
     returnColor->rgb.setValue(0,1,1); //cyan
     break;
   default:

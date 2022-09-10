@@ -1,14 +1,13 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 
 ////////////////////////////////////////////////////////////////
 //                                                            //
-//  Implementation of class HitDisplaySysController           //
+//  Implementation of class TrackDisplaySysController         //
 //                                                            //
-//  Author:  Joseph F. Boudreau (boudreau@pitt.edu)           //
-//  Initial version: March 2020                               //
+//  Based on implementation of class HitDisplaySysController  //
 //                                                            //
 ////////////////////////////////////////////////////////////////
 

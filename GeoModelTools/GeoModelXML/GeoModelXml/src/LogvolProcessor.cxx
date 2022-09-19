@@ -83,7 +83,6 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   gmxUtil.positionIndex.addToLevelMap(name,gmxUtil.positionIndex.level());
   XMLString::release(&name2release);
   XMLString::release(&name_tmp);
-  std::cout << "LogVol name: " << name << std::endl; 
 
   // get the value for the "named" option;
   // if "true", add a GeoNameTag to the GeoModel tree
@@ -197,7 +196,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     XMLString::release(&materials_tmp);
   }
   else { // Already in the registry; use it.
-    msglog << MSG::DEBUG << "LogVol w/ name '" << name << "' already present, picking it from cache..." << endmsg;
+    //msglog << MSG::DEBUG << "LogVol w/ name '" << name << "' already present, picking it from cache..." << endmsg;
     if(isNamed) {
         nameTag_physVolName = entry->second.name;
     }
@@ -216,7 +215,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
       name2release = XMLString::transcode(el->getNodeName());
       string name(name2release);
       XMLString::release(&name2release);
-      msglog << MSG::DEBUG << "Processing child: '" << name << "'..." << endmsg;
+      //msglog << MSG::DEBUG << "Processing child: '" << name << "'..." << endmsg;
       gmxUtil.processorRegistry.find(name)->process(el, gmxUtil, childrenAdd);
     }
   }
@@ -262,7 +261,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   
 
   if (sensitive || (alignable.compare(string("true")) == 0)) {
-    msglog << MSG::DEBUG << "Handling a FullPhysVol (i.e., an 'alignable' or 'sensitive' volume) ..." << endmsg;
+    //msglog << MSG::DEBUG << "Handling a FullPhysVol (i.e., an 'alignable' or 'sensitive' volume) ..." << endmsg;
     GeoFullPhysVol *pv = new GeoFullPhysVol(lv);
     if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
     for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
@@ -298,15 +297,15 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     }
   }
   else {
-    msglog << MSG::DEBUG << "Handling a standard PhysVol..." << endmsg;
+    //msglog << MSG::DEBUG << "Handling a standard PhysVol..." << endmsg;
     GeoPhysVol *pv = new GeoPhysVol(lv);
     if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
-    msglog << MSG::DEBUG << "Now, looping over all the children of the LogVol (in the GMX meaning)..." << endmsg; 
+    //msglog << MSG::DEBUG << "Now, looping over all the children of the LogVol (in the GMX meaning)..." << endmsg; 
     for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
       pv->add(*node);
-      msglog << MSG::DEBUG << "LVProc, PV child: " << *node << " -- " << getNodeType(*node) << endmsg;
+      //msglog << MSG::DEBUG << "LVProc, PV child: " << *node << " -- " << getNodeType(*node) << endmsg;
     }
-    msglog << MSG::DEBUG << "End of loop over children." << endmsg;
+    //msglog << MSG::DEBUG << "End of loop over children." << endmsg;
     toAdd.push_back(pv);
   }
 

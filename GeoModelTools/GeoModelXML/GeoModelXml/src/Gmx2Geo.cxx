@@ -152,8 +152,8 @@ const DOMElement *element;
 //-------------------------------------------------------------------------------------------
 //
 // Turn var printout on and off with message level
-    msglog << MSG::DEBUG << "\n\nGmx2Geo GmxUtil matrix, vector and var values:\n";
-    msglog << MSG::DEBUG <<     "==============================================\n\n";
+    //msglog << MSG::DEBUG << "\n\nGmx2Geo GmxUtil matrix, vector and var values:\n";
+    //msglog << MSG::DEBUG <<     "==============================================\n\n";
 
     XMLCh * defines_tmp = XMLString::transcode("defines");
     XMLCh * vector_tmp = XMLString::transcode("vector");
@@ -173,7 +173,7 @@ const DOMElement *element;
 //
 //   Vectors: a list of variables. Names subscripted by _k; values white-space separated numbers.
 //
-        msglog << "\n\n    Vectors\n    =======\n\n";
+        //msglog << "\n\n    Vectors\n    =======\n\n";
 
         vars = element->getElementsByTagName(vector_tmp);
         nVars = vars->getLength();
@@ -188,7 +188,7 @@ const DOMElement *element;
             int k = 0;
             do  {
                 list >> dble;
-                msglog << fullname + to_string(k) << " = " << dble << endl; 
+                //msglog << fullname + to_string(k) << " = " << dble << endl; 
                 eval.setVariable((fullname + to_string(k++)).c_str(), dble);
             } while(list.good());
             XMLString::release(&name);
@@ -197,7 +197,7 @@ const DOMElement *element;
 //
 //   Matrices: a matrix of variables. Names subscripted by _j_k; values: white-space separated numbers.
 //
-        msglog << "\n\n    Matrices\n    ========\n\n";
+        //msglog << "\n\n    Matrices\n    ========\n\n";
 
         vars = element->getElementsByTagName(matrix_tmp);
         nVars = vars->getLength();
@@ -215,7 +215,7 @@ const DOMElement *element;
             do  {
                 for (int col = 0; col < coldim; ++col) {
                         list >> dble;
-                        msglog << fullname + to_string(k) + '_' + to_string(col) << " = " << dble << endl; 
+                        //msglog << fullname + to_string(k) + '_' + to_string(col) << " = " << dble << endl; 
                         eval.setVariable((fullname + to_string(k) + '_' + to_string(col)).c_str(), dble);
                         if (!list.good()) break;
                 }
@@ -227,7 +227,7 @@ const DOMElement *element;
 //
 //    Vars: single variable
 //
-        msglog << "\n\n    Single variables\n    ================\n\n";
+        //msglog << "\n\n    Single variables\n    ================\n\n";
 
         vars = element->getElementsByTagName(var_tmp);
         nVars = vars->getLength();
@@ -246,7 +246,7 @@ const DOMElement *element;
 		std::abort();
             }
             eval.setVariable(name, evaluated);
-            msglog << name << "\t\t" << val << " = " << setprecision(10) << evaluated << endl;
+            //msglog << name << "\t\t" << val << " = " << setprecision(10) << evaluated << endl;
             XMLString::release(&name);
             XMLString::release(&val);
         }
@@ -260,7 +260,7 @@ const DOMElement *element;
     XMLString::release(&matrix_tmp);
     XMLString::release(&coldim_tmp);
 
-    msglog << endmsg;
+    //msglog << endmsg;
     return 1;
 }
 

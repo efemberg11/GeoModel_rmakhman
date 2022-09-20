@@ -5,6 +5,7 @@ class G4UserRunAction;
 class G4UserSteppingAction;
 class G4UserTrackingAction;
 class G4UserStackingAction;
+class G4VUserPrimaryGeneratorAction;
 
 class FSLUserActionPlugin {
  
@@ -23,6 +24,8 @@ class FSLUserActionPlugin {
   virtual G4UserSteppingAction *getSteppingAction() const { return nullptr;}
   virtual G4UserTrackingAction *getTrackingAction() const { return nullptr;}
   virtual G4UserStackingAction *getStackingAction() const { return nullptr;}
+  virtual G4VUserPrimaryGeneratorAction *getPrimaryGeneratorAction() const {return nullptr;}
+
 
   
  private:

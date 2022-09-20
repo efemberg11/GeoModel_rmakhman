@@ -53,7 +53,10 @@ option(GEOMODEL_BUILD_VISUALIZATION "Enable the build of GeoModelVisualization" 
 option(GEOMODEL_BUILD_GEOMODELG4 "Enable the build of GeoModelG4" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT "Enable the build of FullSimLight" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING "Enable FullSimLight profiling targets" OFF)
-option(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION "Build the LArCustomSolidExtension" OFF)
+#option(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION "Build the LArCustomSolidExtension" OFF)
+option(GEOMODEL_BUILD_ATLASEXTENSIONS "Build the Custom ATLAS Extensions" OFF)
+
+
 
 if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
   set(GEOMODEL_BUILD_FULLSIMLIGHT ON CACHE BOOL "Enable the build of FullSimLight" FORCE)
@@ -98,10 +101,16 @@ if(GEOMODEL_BUILD_FULLSIMLIGHT)
   list( APPEND BUILT_PACKAGES "FSL")
 endif()
 
-if(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION)
-  add_subdirectory(LArCustomSolidExtension)
-  list( APPEND BUILT_PACKAGES "LArCustomSolidExtension")
+#if(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION)
+#  add_subdirectory(LArCustomSolidExtension)
+#  list( APPEND BUILT_PACKAGES "LArCustomSolidExtension")
+#endif()
+
+if(GEOMODEL_BUILD_ATLASEXTENSIONS)
+  add_subdirectory(ATLAS-Extensions)
+  list( APPEND BUILT_PACKAGES "ATLAS-Extensions")
 endif()
+
 
 if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
   add_subdirectory(GeoModelG4)

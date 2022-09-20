@@ -50,14 +50,19 @@ struct fslConfig{
     std::string eventInputFile;
     std::string typeOfEvent;
     
+    std::string hepmc3InputFile;
+    std::string hepmc3TypeOfFile;
+    
+    std::string generatorPlugin;
+    
     std::vector<std::string> sensitiveDetectors;
-    std::string outputHitsFile;
-    std::string outputHistoFile;
+ //   std::string outputHitsFile;
+ //   std::string outputHistoFile;
     
     std::vector<regionConfig> regionsData;
     
     std::string magFieldType;
-    std::string magFieldIntensity;
+  //  std::string magFieldIntensity;
     std::string magFieldMap;
     std::string magFieldPlugin;
     
@@ -72,7 +77,10 @@ regionConfig rc;
 json jf;
 
 inline void to_json(json& j, const fslConfig& p) {
-    j = json{{"Geometry", p.geometry},{"Physics list name", p.physicsList},{"Number of events", p.nEvents},{"Magnetic Field Intensity", p.magFieldIntensity},{"Generator", p.eventGeneratorName},{"Event input file", p.eventInputFile},{"Type of event", p.typeOfEvent},{"Sensitive Detector Extensions", p.sensitiveDetectors},{"Output Hits file", p.outputHitsFile},{"Output Histo file", p.outputHistoFile},{"Magnetic Field Type", p.magFieldType},{"Magnetic Field Map", p.magFieldMap},{"Magnetic Field Plugin", p.magFieldPlugin},{"User Action Extensions", p.userActions},{"g4ui_commands", p.g4UiCommands}};
+    j = json{{"Geometry", p.geometry},{"Physics list name", p.physicsList},{"Number of events", p.nEvents},{"Generator", p.eventGeneratorName},{"Pythia event input file", p.eventInputFile},{"Pythia type of event", p.typeOfEvent},{"Sensitive Detector Extensions", p.sensitiveDetectors},{"Magnetic Field Type", p.magFieldType},{"Magnetic Field Map", p.magFieldMap},{"Magnetic Field Plugin", p.magFieldPlugin},{"User Action Extensions", p.userActions},{"g4ui_commands", p.g4UiCommands},
+        {"HepMC3 file", p.hepmc3InputFile}, {"HepMC3 type of file", p.hepmc3TypeOfFile},
+        {"Generator Plugin", p.generatorPlugin}
+    };
     
 }
 inline void to_json(json& j, const regionConfig& r) {
@@ -83,19 +91,17 @@ inline void from_json(const json& j, fslConfig& p) {
     p.physicsList=j.at("Physics list name").get<std::string>();
     p.nEvents=j.at("Number of events").get<int>();
     p.magFieldType=j.at("Magnetic Field Type").get<std::string>();
-    p.magFieldIntensity=j.at("Magnetic Field Intensity").get<std::string>();
     p.eventGeneratorName=j.at("Generator").get<std::string>();
-    p.eventInputFile=j.at("Event input file").get<std::string>();
-    p.typeOfEvent=j.at("Type of event").get<std::string>();
+    p.eventInputFile=j.at("Pythia event input file").get<std::string>();
+    p.typeOfEvent=j.at("Pythia type of event").get<std::string>();
     p.sensitiveDetectors=j.at("Sensitive Detector Extensions").get<std::vector<std::string>>();
-    p.outputHitsFile=j.at("Output Hits file").get<std::string>();
-    p.outputHistoFile=j.at("Output Histo file").get<std::string>();
     p.magFieldMap=j.at("Magnetic Field Map").get<std::string>();
     p.magFieldPlugin=j.at("Magnetic Field Plugin").get<std::string>();
     p.userActions=j.at("User Action Extensions").get<std::vector<std::string>>();
-
     p.g4UiCommands=j.at("g4ui_commands").get<std::vector<std::string>>();
-    
+    p.hepmc3InputFile = j.at("HepMC3 file").get<std::string>();
+    p.hepmc3TypeOfFile = j.at("HepMC3 type of file").get<std::string>();
+    p.generatorPlugin = j.at("Generator Plugin").get<std::string>();
 }
 
 inline void from_json(const json& j, regionConfig& r) {

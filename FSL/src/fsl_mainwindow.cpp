@@ -20,19 +20,24 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     , ui(new Ui::FSLMainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("FullSimLight-GUI (beta version)");
+    this->setWindowTitle("FullSimLight-GUI");
     std::setlocale(LC_NUMERIC, "C");
 
-    //Setting up Models
-    sens_det_model = new QStringListModel(this);
-    g4ui_model = new QStringListModel(this);
-  //  shape_model = new QStringListModel(this);
-  //  ui->shape_view->setEditTriggers(QAbstractItemView::DoubleClicked);
-    ui->sens_det_view->setModel(sens_det_model);
-    ui->g4ui_view->setModel(g4ui_model);
-  //  ui->shape_view->setModel(shape_model);
-    ui->sens_det_view->setEditTriggers(QAbstractItemView::DoubleClicked);
-    ui->g4ui_view->setEditTriggers(QAbstractItemView::DoubleClicked);
+    ui->tB_view_config->setMainWindow(this);
+    
+    //Setting up g4ui Model
+    //g4ui_model = new QStringListModel(this);
+    //ui->g4ui_view->setModel(g4ui_model);
+    //ui->g4ui_view->setEditTriggers(QAbstractItemView::DoubleClicked);
+    
+    //Setting up Sensitive Detector Model
+    sens_det_model = new QStandardItemModel(this);
+    sens_det_horizontalHeader.append("Plugins List");
+    sens_det_model->setHorizontalHeaderLabels(sens_det_horizontalHeader);
+    ui->sens_det_table->setModel(sens_det_model);
+    ui->sens_det_table->horizontalHeader()->setStretchLastSection(true);
+    ui->sens_det_table->resizeRowsToContents();
+    ui->sens_det_table->resizeColumnsToContents();
 
 
     //Setting up the Regions Display
@@ -54,7 +59,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     //Setting up the User Actions Display
     user_action_model = new QStandardItemModel(this);
    // user_action_horizontalHeader.append("Type of Action");
-    user_action_horizontalHeader.append("File");
+    user_action_horizontalHeader.append("Plugins List");
     user_action_model->setHorizontalHeaderLabels(user_action_horizontalHeader);
     ui->user_action_table->setModel(user_action_model);
     ui->user_action_table->horizontalHeader()->setStretchLastSection(true);
@@ -65,6 +70,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     //Setting up Connections
     connect(ui->pB_geom, &QPushButton::released, this, &FSLMainWindow::assign_geom_file);
     connect(ui->actionSave, &QAction::triggered, this, &FSLMainWindow::save_configuration);
+    connect(ui->pB_save_config, &QPushButton::released, this, &FSLMainWindow::save_configuration);
+
     connect(ui->actionSave_as, &QAction::triggered, this, &FSLMainWindow::save_configuration_as);
     connect(ui->actionOpen, &QAction::triggered, this, &FSLMainWindow::load_configuration);
     connect(ui->pB_view, &QPushButton::released, this, &FSLMainWindow::view_configuration);
@@ -72,7 +79,10 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_gmex, &QPushButton::released, this, &FSLMainWindow::run_gmex);
     connect(ui->pB_gmclash, &QPushButton::released, this, &FSLMainWindow::run_gmclash);
     connect(ui->pB_main_clear, &QPushButton::released, this, &FSLMainWindow::clear_main_status);
+    connect(ui->pB_browse_phys_list, &QPushButton::released, this, &FSLMainWindow::assign_phys_list_plugin);
     connect(ui->pB_pythia_browse, &QPushButton::released, this, &FSLMainWindow::assign_pythia_file);
+    connect(ui->pB_hepmc3_browse_files, &QPushButton::released, this, &FSLMainWindow::assign_hepmc3_file);
+    connect(ui->pB_gen_plug_browse_files, &QPushButton::released, this, &FSLMainWindow::assign_gen_plug_file);
     connect(ui->pB_magnetic_field_plugin, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_plugin_file);
     connect(ui->pB_magnetic_field_map, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_map);
 
@@ -80,8 +90,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_del_sens_det, &QPushButton::released, this, &FSLMainWindow::del_sens_det);
     connect(ui->pB_add_region, &QPushButton::released, this, &FSLMainWindow::pop_up_regions);
     connect(ui->pB_del_region, &QPushButton::released, this, &FSLMainWindow::del_region);
-    connect(ui->pB_add_g4ui, &QPushButton::released, this, &FSLMainWindow::add_g4ui);
-    connect(ui->pB_del_g4ui, &QPushButton::released, this, &FSLMainWindow::del_g4ui);
+    //connect(ui->pB_add_g4ui, &QPushButton::released, this, &FSLMainWindow::add_g4ui);
+    //connect(ui->pB_del_g4ui, &QPushButton::released, this, &FSLMainWindow::del_g4ui);
    // connect(ui->pB_add_shape_ext_file, &QPushButton::released, this, &FSLMainWindow::add_shape_ext);
    // connect(ui->pB_del_shape_ext_file, &QPushButton::released, this, &FSLMainWindow::del_shape_ext);
 
@@ -99,6 +109,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
 
     //Setting widget properties
     ui->sB_NOE->setMaximum(10000);
+    ui->sB_NOT->setMinimum(1);
     ui->sB_NOT->setMaximum(std::thread::hardware_concurrency());
     ui->sB_control->setMaximum(5);
     ui->sB_run->setMaximum(5);
@@ -108,6 +119,9 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->cB_particle->setCurrentIndex(0);
     ui->pB_pythia_browse->setEnabled(false);
     ui->cB_pythia_type_of_eve->setEnabled(false);
+    ui->pB_hepmc3_browse_files->setEnabled(false);
+    ui->cB_hepmc3_type_of_eve->setEnabled(false);
+    ui->pB_gen_plug_browse_files->setEnabled(false);
     ui->pB_magnetic_field_map->setEnabled(false);
     ui->pB_magnetic_field_plugin->setEnabled(false);
     ui->cB_particle->setCurrentIndex(0);
@@ -120,8 +134,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->sB_NOT->setValue(std::thread::hardware_concurrency());
     ui->sB_NOE->setValue(10);
     number_of_primaries_per_event = 1;
-    ui->lE_hits->setText("HITS.root");
-    ui->lE_histo->setText("HISTO.root");
+   // ui->lE_hits->setText("HITS.root");
+   // ui->lE_histo->setText("HISTO.root");
     ui->tB_view_config->setCurrentFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     ui->tB_view_config->setFontPointSize(13);
 
@@ -143,8 +157,8 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->lE_pz->setValidator(p_z_validator);
     ui->lE_fixed_MF->setValidator(mag_field_validator);
 
-    ui->lE_hits->setEnabled(false);
-    ui->lE_histo->setEnabled(false);
+ //   ui->lE_hits->setEnabled(false);
+ //   ui->lE_histo->setEnabled(false);
 
 
   //  ui->tab->setEnabled(false);//Shape tab (Change name on UI)
@@ -158,9 +172,9 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->cB_magnetic_field, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::configure_magnetic_field);
     connect(ui->cB_pythia_type_of_eve, QOverload<int>::of(&QComboBox::currentIndexChanged), this ,&FSLMainWindow::check_if_pythia_file);
 
-    connect(this, &FSLMainWindow::send_error_message, this, &FSLMainWindow::catch_error_message);
-    connect(ui->sens_det_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_sens_det_index(QModelIndex)));
-    connect(ui->g4ui_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_g4ui_index(QModelIndex)));
+    //connect(this, &FSLMainWindow::send_error_message, this, &FSLMainWindow::catch_error_message);
+  //  connect(ui->sens_det_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_sens_det_index(QModelIndex)));
+    //connect(ui->g4ui_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_g4ui_index(QModelIndex)));
   //  connect(ui->shape_view, SIGNAL(clicked(QModelIndex)), this, SLOT(get_shape_index(QModelIndex)));
     connect(region,&ConfigRegions::send_config,this,&FSLMainWindow::add_region);
     connect(&fullSimLight_process,SIGNAL(readyReadStandardOutput()),this,SLOT(fsmlreadyReadStandardOutput()));
@@ -179,7 +193,7 @@ FSLMainWindow::~FSLMainWindow()
 {
     delete ui;
     delete sens_det_model;
-    delete g4ui_model;
+    //delete g4ui_model;
     delete region;
     delete region_model;
     delete user_action_model;
@@ -193,26 +207,27 @@ FSLMainWindow::~FSLMainWindow()
 
 
 //Custom Signal to append to status bars
-void FSLMainWindow::catch_error_message(std::string info)
+/*void FSLMainWindow::catch_error_message(std::string info)
 {
     std::cout << info << std::endl;
-}
+}*/
 
 //Get index of the row in the sensitive detector extensions display when clicked
-void FSLMainWindow::get_sens_det_index(QModelIndex sens_det_index)
+/*void FSLMainWindow::get_sens_det_index(QModelIndex sens_det_index)
 {
     sens_det_number = sens_det_index.row();
-}
+}*/
 
 //Add the Sensitive detector file
 void FSLMainWindow::add_sens_det()
 {
-    std::string sens_det_file = this->get_file_name();
-    if(sens_det_file.find(".dylib") != std::string::npos || sens_det_file.find(".so") != std::string::npos)
-    {QString q_sens_det_file = QString::fromUtf8(sens_det_file.c_str());
-    sens_det_model->insertRow(sens_det_model->rowCount());
-    QModelIndex sens_det_index = sens_det_model->index(sens_det_model->rowCount()-1);
-    sens_det_model->setData(sens_det_index, q_sens_det_file);
+    QString q_sens_det_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
+
+    if(q_sens_det_file_name!="")
+    {
+    int rows = ui->sens_det_table->model()->rowCount();
+    ui->sens_det_table->model()->insertRows(rows,1);
+    ui->sens_det_table->model()->setData(ui->sens_det_table->model()->index(rows,0),q_sens_det_file_name);
     }
 }
 
@@ -220,7 +235,11 @@ void FSLMainWindow::add_sens_det()
 //Delete the sensitive_detector_ext
 void FSLMainWindow::del_sens_det()
 {
-    sens_det_model->removeRow(sens_det_number);
+    QModelIndexList sens_det_indexes =  ui->sens_det_table->selectionModel()->selectedRows();
+    int countRow = sens_det_indexes.count();
+
+    for( int i = countRow; i > 0; i--)
+        sens_det_model->removeRow( sens_det_indexes.at(i-1).row(), QModelIndex());
 }
 
 
@@ -228,69 +247,83 @@ void FSLMainWindow::del_sens_det()
 void FSLMainWindow::configure_sens_det_actions()
 {
     sensitive_detector_extensions.clear();
-    for(int i = 0; i<=ui->sens_det_view->model()->rowCount()-1; i++)
+
+    for(int row = 0 ; row < ui->sens_det_table->model()->rowCount(); ++row )
     {
-        sensitive_detector_extensions.push_back((sens_det_model->
-                           index( i, 0 ).data( Qt::DisplayRole ).toString()).toStdString());
+        std::string associated_file = ((ui->sens_det_table->model()->index(row,0)).data().toString()).toStdString();
+        sensitive_detector_extensions.push_back(associated_file);
 
     }
+
+
 }
-
-
-//Get index of the row in the Shape extensions display when clicked
-/*void FSLMainWindow::get_shape_index(QModelIndex shape_index)
-{
-    shape_number = shape_index.row();
-}
-
-//Add a shape extension
-void FSLMainWindow::add_shape_ext()
-{
-    std::string shape_ext_file = this->get_file_name();
-    if(shape_ext_file.find(".dylib") != std::string::npos || shape_ext_file.find(".so") != std::string::npos)
-    {QString q_shape_ext_file = QString::fromUtf8(shape_ext_file.c_str());
-    shape_model->insertRow(shape_model->rowCount());
-    QModelIndex shape_index = shape_model->index(shape_model->rowCount()-1);
-    shape_model->setData(shape_index, q_shape_ext_file);
-    }
-}
-
-//Delete the shape extension
-void FSLMainWindow::del_shape_ext()
-{
-    shape_model->removeRow(shape_number);
-}
-
-//Add the shape extenions to the shape extensions list.
-void FSLMainWindow::configure_shape_ext()
-{
-    shape_extensions.clear();
-    for(int i = 0; i<=ui->shape_view->model()->rowCount()-1; i++)
-    {
-        shape_extensions.push_back((shape_model->
-                           index( i, 0 ).data( Qt::DisplayRole ).toString()).toStdString());
-
-    }
-}*/
 
 
 //Get index of row in g4ui display when clicked
-void FSLMainWindow::get_g4ui_index(QModelIndex sens_det_index)
+/*void FSLMainWindow::get_g4ui_index(QModelIndex sens_det_index)
 {
     g4ui_number = sens_det_index.row();
-}
+}*/
 
 //Add a g4ui command
-void FSLMainWindow::add_g4ui()
+/*void FSLMainWindow::add_g4ui()
 {
-    QString g4ui_comm = ui->lE_g4ui->text();
-    if(g4ui_comm!="")
+    QString q_g4ui_comm =ui->lE_g4ui->text();
+    std::string g4ui_comm = ui->lE_g4ui->text().toStdString();
+    
+    if(g4ui_comm=="")
+    {
+    QMessageBox::information(this, "Info", "Can't add empty command");
+    }
+    
+    else if(g4ui_comm.find("/FSLgun/energy") != std::string::npos)
+    {
+    QMessageBox::information(this, "Info", "Particle energy is set from Generator tab");
+    }
+    
+    else if(g4ui_comm.find("/FSLgun/particle") != std::string::npos)
+    {
+    QMessageBox::information(this, "Info", "Particle must be set from Generator tab");
+    }
+    
+    else if(g4ui_comm.find("/FSLgun/direction") != std::string::npos)
+    {
+    QMessageBox::information(this, "Info", "Particle direction is set from Generator tab");
+    }
+    
+    else if(g4ui_comm.find("/FSLdet/setField") != std::string::npos)
+    {
+    QMessageBox::information(this, "Info", "Magnetic Field is set from Magnetic Field tab");
+    }
+    
+    else if(g4ui_comm.find("/FSLgun/primaryPerEvt") != std::string::npos)
+    {
+    QMessageBox::information(this, "Info", "Primary per evt can be set by editing config file in external editor");
+    }
+    
+    else if(g4ui_comm.find("/run/numberOfThreads") != std::string::npos)
+    {
+    QMessageBox::information(this, "Info", "Number of Threads can be set in the main tab");
+    }
+    
+    else if(g4ui_comm.find("/run/initialize") != std::string::npos)
+    {
+    QMessageBox::information(this, "Info", "Command already executed in FullSimLight");
+    }
+    
+    else if(g4ui_comm.find("/run/beamOn") != std::string::npos)
+    {
+    QMessageBox::information(this, "Info", "Command already executed in FullSimLight");
+    }
+    
+    else
     {
     g4ui_model->insertRow(g4ui_model->rowCount());
     QModelIndex g4ui_index = g4ui_model->index(g4ui_model->rowCount()-1);
-    g4ui_model->setData(g4ui_index, g4ui_comm);
+    g4ui_model->setData(g4ui_index, q_g4ui_comm);
     ui->lE_g4ui->clear();
     }
+
 
 }
 
@@ -298,7 +331,7 @@ void FSLMainWindow::add_g4ui()
 void FSLMainWindow::del_g4ui()
 {
     g4ui_model->removeRow(g4ui_number);
-}
+}*/
 
 //Add g4ui commands to g4ui commands list
 void FSLMainWindow::configure_g4ui_command()
@@ -334,13 +367,13 @@ void FSLMainWindow::configure_g4ui_command()
         g4ui_commands.push_back(tracking_command);
     }
 
-    for(int row = 0; row < ui->g4ui_view->model()->rowCount(); ++row)
+    /*for(int row = 0; row < ui->g4ui_view->model()->rowCount(); ++row)
     {
         std::string comm = (ui->g4ui_view->model()->index(row,0).data().toString()).toStdString();
         if(comm != ""){
         g4ui_commands.push_back(comm);
     }
-    }
+    }*/
 
     g4ui_commands.push_back("/control/cout/prefixString G4Worker_");
     g4ui_commands.push_back("/run/numberOfThreads " + ui->sB_NOT->text().toStdString());
@@ -354,13 +387,18 @@ void FSLMainWindow::configure_g4ui_command()
     {
     g4ui_commands.push_back("/run/initialize");
     }
+    
+    if(generator=="HepMC3 File")
+    {
+    g4ui_commands.push_back("/run/initialize");
+    }
 
     if(generator=="Particle Gun")
     {
     g4ui_commands.push_back("/FSLgun/primaryPerEvt " + std::to_string(number_of_primaries_per_event));
-    g4ui_commands.push_back("/FSLgun/energy  " + particle_energy);
-    g4ui_commands.push_back("/FSLgun/particle  " + particle);
-    g4ui_commands.push_back("/FSLgun/direction  " + particle_direction);
+    g4ui_commands.push_back("/FSLgun/energy " + particle_energy);
+    g4ui_commands.push_back("/FSLgun/particle " + particle);
+    g4ui_commands.push_back("/FSLgun/direction " + particle_direction);
 
     }
 
@@ -657,10 +695,29 @@ void FSLMainWindow::assign_geom_file()
     }
 }
 
+//Function to Physics List Plugin
+void FSLMainWindow::assign_phys_list_plugin()
+{
+    std::string phys_list = this->get_file_name();
+    if(phys_list!=""){ui->lE_PLN->setText(phys_list.c_str());}
+}
+
 //Function to select a pythia file
 void FSLMainWindow::assign_pythia_file()
 {
     pythia_input_file = this->get_file_name();
+}
+
+//Function to select a HepMC3 file
+void FSLMainWindow::assign_hepmc3_file()
+{
+    hepmc3_input_file = this->get_file_name();
+}
+
+//Function to select a Generator Plugin
+void FSLMainWindow::assign_gen_plug_file()
+{
+    generator_plugin = this->get_file_name();
 }
 
 void FSLMainWindow::check_if_pythia_file()
@@ -715,9 +772,14 @@ void FSLMainWindow::configure_generator()
 
     if(generator=="Particle Gun")
     {
+        ui->sB_NOT->setEnabled(true);
+        
         this->configure_energy_direction();
         ui->pB_pythia_browse->setEnabled(false);
         ui->cB_pythia_type_of_eve->setEnabled(false);
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        ui->pB_gen_plug_browse_files->setEnabled(false);
         ui->cB_particle->setEnabled(true);
         ui->lE_px->setEnabled(true);
         ui->lE_py->setEnabled(true);
@@ -727,16 +789,25 @@ void FSLMainWindow::configure_generator()
         particle = (ui->cB_particle->currentText()).toStdString();
         pythia_type_of_event = "";
         pythia_input_file = "";
+        hepmc3_input_file = "";
+        hepmc3_type_of_file = "";
+        generator_plugin = "";
     }
 
     else if(generator=="Pythia")
     {
+        ui->sB_NOT->setEnabled(true);
+        
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
         ui->cB_particle->setEnabled(false);
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
         ui->lE_pz->setEnabled(false);
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        ui->pB_gen_plug_browse_files->setEnabled(false);
+
 
         if(ui->cB_pythia_type_of_eve->currentIndex()==3)
         {
@@ -756,10 +827,75 @@ void FSLMainWindow::configure_generator()
         particle = "";
         particle_energy = "";
         particle_direction = "";
+        hepmc3_input_file = "";
+        hepmc3_type_of_file = "";
+        generator_plugin = "";
         p_x = 0;
         p_y = 0;
         p_z = 0;
 
+    }
+    
+    else if(generator=="HepMC3 File")
+    {
+        ui->sB_NOT->setValue(1);
+        ui->sB_NOT->setEnabled(false);
+        
+        ui->pB_hepmc3_browse_files->setEnabled(true);
+        ui->cB_hepmc3_type_of_eve->setEnabled(true);
+        
+        ui->cB_particle->setEnabled(false);
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->cB_pythia_type_of_eve->setEnabled(false);
+        ui->pB_gen_plug_browse_files->setEnabled(false);
+        
+        hepmc3_type_of_file = (ui->cB_hepmc3_type_of_eve->currentText()).toStdString();
+        
+        
+        particle = "";
+        particle_energy = "";
+        particle_direction = "";
+        pythia_type_of_event = "";
+        pythia_input_file = "";
+        generator_plugin = "";
+        p_x = 0;
+        p_y = 0;
+        p_z = 0;
+        
+    }
+    
+    
+    else if(generator=="Generator Plugin")
+    {
+        ui->sB_NOT->setEnabled(true);
+        
+        ui->pB_gen_plug_browse_files->setEnabled(true);
+        
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        
+        ui->cB_particle->setEnabled(false);
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->cB_pythia_type_of_eve->setEnabled(false);
+        
+        
+        particle = "";
+        particle_energy = "";
+        particle_direction = "";
+        pythia_type_of_event = "";
+        pythia_input_file = "";
+        hepmc3_input_file = "";
+        hepmc3_type_of_file = "";
+        p_x = 0;
+        p_y = 0;
+        p_z = 0;
+        
     }
 
 }
@@ -836,6 +972,24 @@ void FSLMainWindow::save_configuration()
     //    config_file_name = (ui->lE_CFN->text()).toStdString();
     std::ofstream o(config_file_name);
     o << std::setw(4) << j << std::endl;
+}
+
+void FSLMainWindow::save_display_output()
+{
+    std::string text = ui->tB_view_config->toPlainText().toStdString();
+    if (save_display_directory.empty()) save_display_directory= (QDir::currentPath()).toStdString() +"/fullSimLight.log";
+    
+    QString displayfileName = QFileDialog::getSaveFileName(this,
+                            tr("Save Output"), save_display_directory.c_str(), tr("Log Files (*.log)"));
+    if (displayfileName.isEmpty()) return;
+    std::string   save_display_file=displayfileName.toStdString();
+    std::string   save_display_base=basename(const_cast<char *> (save_display_file.c_str()));
+    save_display_directory=dirname(const_cast<char *> (save_display_file.c_str()));
+    
+    std::ofstream DisplayFile(save_display_directory+"/"+save_display_base);
+    DisplayFile << text;
+    DisplayFile.close();
+    
 }
 
 //Function to save current configuration
@@ -1022,20 +1176,22 @@ void FSLMainWindow::load_configuration()
     physics_list_name = j_load["Physics list name"];
     ui->lE_PLN->setText(QString::fromUtf8(physics_list_name.c_str()));
 
-    number_of_threads = j_load["Number of threads"];
-    ui->sB_NOT->setValue(number_of_threads);
+  //  number_of_threads = j_load["Number of threads"];
+  //  ui->sB_NOT->setValue(number_of_threads);
 
     number_of_events = j_load["Number of events"];
     ui->sB_NOE->setValue(number_of_events);
 
-    magnetic_field = j_load["Magnetic Field Intensity"];
-    ui->lE_fixed_MF->setText(QString::fromUtf8(magnetic_field.c_str()));
+  //  magnetic_field = j_load["Magnetic Field Intensity"];
+  //  ui->lE_fixed_MF->setText(QString::fromUtf8(magnetic_field.c_str()));
 
 
     generator = j_load["Generator"];
 
     if(generator=="Particle Gun")
     {
+        ui->sB_NOT->setEnabled(true);
+        
         ui->cB_gen_options->setCurrentIndex(0);
 
         ui->cB_particle->setEnabled(true);
@@ -1043,8 +1199,8 @@ void FSLMainWindow::load_configuration()
         ui->lE_py->setEnabled(true);
         ui->lE_pz->setEnabled(true);
 
-        particle = j_load["Particle"];
-        ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
+   //     particle = j_load["Particle"];
+   //     ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
 
         p_x = j_load["p_x"];
         p_y = j_load["p_y"];
@@ -1058,17 +1214,25 @@ void FSLMainWindow::load_configuration()
         ui->cB_pythia_type_of_eve->setCurrentIndex(0);
         ui->pB_pythia_browse->setEnabled(false);
         ui->cB_pythia_type_of_eve->setEnabled(false);
+        
+        ui->cB_hepmc3_type_of_eve->setCurrentIndex(0);
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        
+        ui->pB_gen_plug_browse_files->setEnabled(false);
+
 
     }
 
-    else
+    else if(generator=="Pythia")
     {
+        ui->sB_NOT->setEnabled(true);
+        
+        ui->cB_gen_options->setCurrentIndex(1);
 
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
-        ui->cB_gen_options->setCurrentIndex(1);
-
-        pythia_type_of_event = j_load["Type of event"];
+        pythia_type_of_event = j_load["Pythia type of event"];
 
         if(pythia_type_of_event != "")
         {
@@ -1078,7 +1242,7 @@ void FSLMainWindow::load_configuration()
         }
         else 
         {
-        pythia_input_file = j_load["Event input file"];
+        pythia_input_file = j_load["Pythia event input file"];
         ui->cB_pythia_type_of_eve->setCurrentIndex(3);
         ui->pB_pythia_browse->setEnabled(true);
 
@@ -1089,23 +1253,90 @@ void FSLMainWindow::load_configuration()
         ui->lE_px->clear();
         ui->lE_py->clear();
         ui->lE_pz->clear();
-
-
+        ui->cB_particle->setCurrentIndex(0);
         ui->cB_particle->setEnabled(false);
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
         ui->lE_pz->setEnabled(false);
+        
+        ui->cB_hepmc3_type_of_eve->setCurrentIndex(0);
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        
+        ui->pB_gen_plug_browse_files->setEnabled(false);
 
+
+    }
+        
+    else if(generator=="HepMC3 File")
+    {
+        ui->sB_NOT->setValue(1);
+        ui->sB_NOT->setEnabled(false);
+        
+        ui->cB_gen_options->setCurrentIndex(2);
+        ui->pB_hepmc3_browse_files->setEnabled(true);
+        ui->cB_hepmc3_type_of_eve->setEnabled(true);
+        
+        hepmc3_type_of_file = j_load["HepMC3 type of file"];
+        hepmc3_input_file = j_load["HepMC3 file"];
+        
+        ui->cB_hepmc3_type_of_eve->setCurrentText(QString::fromUtf8(hepmc3_type_of_file.c_str()));
+        
+        ui->lE_px->clear();
+        ui->lE_py->clear();
+        ui->lE_pz->clear();
+        ui->cB_particle->setCurrentIndex(0);
+        ui->cB_particle->setEnabled(false);
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
+        
+        ui->cB_pythia_type_of_eve->setCurrentIndex(0);
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->cB_pythia_type_of_eve->setEnabled(false);
+        
+        ui->pB_gen_plug_browse_files->setEnabled(false);
+
+        
+    }
+        
+    else if(generator=="Generator Plugin")
+    {
+        ui->sB_NOT->setEnabled(true);
+        
+        ui->cB_gen_options->setCurrentIndex(3);
+        ui->pB_gen_plug_browse_files->setEnabled(true);
+        generator_plugin = j_load["Generator Plugin"];
+        
+        ui->lE_px->clear();
+        ui->lE_py->clear();
+        ui->lE_pz->clear();
+        ui->cB_particle->setCurrentIndex(0);
+        ui->cB_particle->setEnabled(false);
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
+        
+        ui->cB_pythia_type_of_eve->setCurrentIndex(0);
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->cB_pythia_type_of_eve->setEnabled(false);
+        
+        ui->cB_hepmc3_type_of_eve->setCurrentIndex(0);
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        
+        
     }
 
     sens_det_model->removeRows(0,sens_det_model->rowCount());
-    for(const auto& element : j_load["Sensitive Detector Extensions"] )
+    for(const auto& element : j_load["Sensitive Detector Extensions"])
     {
-        std::string ele = element;
-        QString q_element = QString::fromUtf8(ele.c_str());
-        sens_det_model->insertRow(sens_det_model->rowCount());
-        QModelIndex sens_det_index = sens_det_model->index(sens_det_model->rowCount()-1);
-        sens_det_model->setData(sens_det_index, q_element);
+        std::string sens_det_file = element;
+        QString q_sens_det_file = QString::fromUtf8(sens_det_file.c_str());
+        int rows = ui->sens_det_table->model()->rowCount();
+        ui->sens_det_table->model()->insertRows(rows,1);
+        ui->sens_det_table->model()->setData(ui->sens_det_table->model()->index(rows,0),q_sens_det_file);
+
     }
 
     region_model->removeRows(0,region_model->rowCount());
@@ -1148,8 +1379,8 @@ void FSLMainWindow::load_configuration()
     {
         ui->lE_fixed_MF->setEnabled(true);
         ui->cB_magnetic_field->setCurrentIndex(0);
-        magnetic_field = j_load["Magnetic Field Intensity"];
-        ui->lE_fixed_MF->setText(QString::fromUtf8(magnetic_field.c_str()));
+       // magnetic_field = j_load["Magnetic Field Intensity"];
+        //ui->lE_fixed_MF->setText(QString::fromUtf8(magnetic_field.c_str()));
 
 
         magnetic_field_plugin_file = "";
@@ -1176,7 +1407,7 @@ void FSLMainWindow::load_configuration()
 
     }
 
-    g4ui_model->removeRows(0,g4ui_model->rowCount());
+    //g4ui_model->removeRows(0,g4ui_model->rowCount());
     ui->cB_control->setCheckState(Qt::Unchecked);
     ui->cB_event->setCheckState(Qt::Unchecked);
     ui->cB_run->setCheckState(Qt::Unchecked);
@@ -1223,14 +1454,33 @@ void FSLMainWindow::load_configuration()
 
         }
 
-        else if(g4ui_comm.find("/FSLdet/setField") != std::string::npos
-                || g4ui_comm.find("/FSLgun/primaryPerEvt") != std::string::npos
-                || g4ui_comm.find("/FSLgun/energy") != std::string::npos
-                || g4ui_comm.find("/FSLgun/particle") != std::string::npos
+        else if(g4ui_comm.find("/FSLdet/setField") != std::string::npos)
+            
+        {
+            magnetic_field = g4ui_comm.substr(17,g4ui_comm.size()-17-6);
+            ui->lE_fixed_MF->setText(QString::fromUtf8(magnetic_field.c_str()));
+        }
+        
+        else if(g4ui_comm.find("/FSLgun/particle") != std::string::npos)
+        {
+            particle = g4ui_comm.substr(17,g4ui_comm.size()-16);
+            ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
+        }
+
+        else if(g4ui_comm.find("/run/numberOfThreads") != std::string::npos)
+        {
+            number_of_threads = stoi(g4ui_comm.substr(21,g4ui_comm.size()-20));
+            if(generator!="HepMC3 File"){ui->sB_NOT->setValue(number_of_threads);}
+        }
+        
+        else if(g4ui_comm.find("/FSLgun/primaryPerEvt") != std::string::npos)
+        {
+            number_of_primaries_per_event = stoi(g4ui_comm.substr(22,g4ui_comm.size()-21));
+        }
+        
+        else if(g4ui_comm.find("/FSLgun/energy") != std::string::npos
                 || g4ui_comm.find("/FSLgun/direction") != std::string::npos
-                || g4ui_comm.find("/run/numberOfThreads") != std::string::npos
                 || g4ui_comm.find("/control/cout/prefixString G4Worker_") != std::string::npos
-                || g4ui_comm.find("/process/list") != std::string::npos
                 || g4ui_comm.find("/run/initialize") != std::string::npos
                 || g4ui_comm.find("/run/beamOn") != std::string::npos)
         {
@@ -1239,10 +1489,10 @@ void FSLMainWindow::load_configuration()
 
         else
         {
-            QString q_g4ui_comm = QString::fromUtf8(g4ui_comm.c_str());
-            g4ui_model->insertRow(g4ui_model->rowCount());
-            QModelIndex g4ui_index = g4ui_model->index(g4ui_model->rowCount()-1);
-            g4ui_model->setData(g4ui_index, q_g4ui_comm);
+           // QString q_g4ui_comm = QString::fromUtf8(g4ui_comm.c_str());
+           // g4ui_model->insertRow(g4ui_model->rowCount());
+           // QModelIndex g4ui_index = g4ui_model->index(g4ui_model->rowCount()-1);
+            //g4ui_model->setData(g4ui_index, q_g4ui_comm);
         }
 
 
@@ -1331,6 +1581,437 @@ void FSLMainWindow::load_configuration()
 
 }
 
+
+//Function to load configuration from Command Line
+void FSLMainWindow::load_configuration_CL(std::string config_file_path)
+{
+    config_file_name = config_file_path;
+
+    if(config_file_name.find(".json") != std::string::npos)
+    {
+    std::ifstream ifs(config_file_name);
+    auto j_load = nlohmann::json::parse(ifs);
+
+    //    QFileInfo file(QString::fromUtf8(load_file_name.c_str()));
+    ui->lE_CFN->setText(("Config file: " + config_file_name).c_str());
+    ui->lE_CFN->adjustSize();
+    
+    geom_file_address = j_load["Geometry"];
+
+    ui->le_GI->setText(geom_file_address.c_str());
+    ui->le_GI->adjustSize();
+
+    
+    physics_list_name = j_load["Physics list name"];
+    ui->lE_PLN->setText(QString::fromUtf8(physics_list_name.c_str()));
+
+  //  number_of_threads = j_load["Number of threads"];
+  //  ui->sB_NOT->setValue(number_of_threads);
+
+    number_of_events = j_load["Number of events"];
+    ui->sB_NOE->setValue(number_of_events);
+
+  //  magnetic_field = j_load["Magnetic Field Intensity"];
+  //  ui->lE_fixed_MF->setText(QString::fromUtf8(magnetic_field.c_str()));
+
+
+    generator = j_load["Generator"];
+
+    if(generator=="Particle Gun")
+    {
+        ui->sB_NOT->setEnabled(true);
+        
+        ui->cB_gen_options->setCurrentIndex(0);
+
+        ui->cB_particle->setEnabled(true);
+        ui->lE_px->setEnabled(true);
+        ui->lE_py->setEnabled(true);
+        ui->lE_pz->setEnabled(true);
+
+   //     particle = j_load["Particle"];
+   //     ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
+
+        p_x = j_load["p_x"];
+        p_y = j_load["p_y"];
+        p_z = j_load["p_z"];
+
+        ui->lE_px->setText(QString::number(p_x));
+        ui->lE_py->setText(QString::number(p_y));
+        ui->lE_pz->setText(QString::number(p_z));
+
+
+        ui->cB_pythia_type_of_eve->setCurrentIndex(0);
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->cB_pythia_type_of_eve->setEnabled(false);
+        
+        ui->cB_hepmc3_type_of_eve->setCurrentIndex(0);
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        
+        ui->pB_gen_plug_browse_files->setEnabled(false);
+
+
+    }
+
+    else if(generator=="Pythia")
+    {
+        ui->sB_NOT->setEnabled(true);
+        
+        ui->cB_gen_options->setCurrentIndex(1);
+
+        ui->cB_pythia_type_of_eve->setEnabled(true);
+
+        pythia_type_of_event = j_load["Pythia type of event"];
+
+        if(pythia_type_of_event != "")
+        {
+        ui->cB_pythia_type_of_eve->setCurrentText(QString::fromUtf8(pythia_type_of_event.c_str()));
+        ui->pB_pythia_browse->setEnabled(false);
+
+        }
+        else
+        {
+        pythia_input_file = j_load["Pythia event input file"];
+        ui->cB_pythia_type_of_eve->setCurrentIndex(3);
+        ui->pB_pythia_browse->setEnabled(true);
+
+        }
+
+
+
+        ui->lE_px->clear();
+        ui->lE_py->clear();
+        ui->lE_pz->clear();
+        ui->cB_particle->setCurrentIndex(0);
+        ui->cB_particle->setEnabled(false);
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
+        
+        ui->cB_hepmc3_type_of_eve->setCurrentIndex(0);
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        
+        ui->pB_gen_plug_browse_files->setEnabled(false);
+
+
+    }
+        
+    else if(generator=="HepMC3 File")
+    {
+        ui->sB_NOT->setValue(1);
+        ui->sB_NOT->setEnabled(false);
+        
+        ui->cB_gen_options->setCurrentIndex(2);
+        ui->pB_hepmc3_browse_files->setEnabled(true);
+        ui->cB_hepmc3_type_of_eve->setEnabled(true);
+        
+        hepmc3_type_of_file = j_load["HepMC3 type of file"];
+        hepmc3_input_file = j_load["HepMC3 file"];
+        
+        ui->cB_hepmc3_type_of_eve->setCurrentText(QString::fromUtf8(hepmc3_type_of_file.c_str()));
+        
+        ui->lE_px->clear();
+        ui->lE_py->clear();
+        ui->lE_pz->clear();
+        ui->cB_particle->setCurrentIndex(0);
+        ui->cB_particle->setEnabled(false);
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
+        
+        ui->cB_pythia_type_of_eve->setCurrentIndex(0);
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->cB_pythia_type_of_eve->setEnabled(false);
+        
+        ui->pB_gen_plug_browse_files->setEnabled(false);
+
+        
+    }
+        
+    else if(generator=="Generator Plugin")
+    {
+        ui->sB_NOT->setEnabled(true);
+        
+        ui->cB_gen_options->setCurrentIndex(3);
+        ui->pB_gen_plug_browse_files->setEnabled(true);
+        generator_plugin = j_load["Generator Plugin"];
+        
+        ui->lE_px->clear();
+        ui->lE_py->clear();
+        ui->lE_pz->clear();
+        ui->cB_particle->setCurrentIndex(0);
+        ui->cB_particle->setEnabled(false);
+        ui->lE_px->setEnabled(false);
+        ui->lE_py->setEnabled(false);
+        ui->lE_pz->setEnabled(false);
+        
+        ui->cB_pythia_type_of_eve->setCurrentIndex(0);
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->cB_pythia_type_of_eve->setEnabled(false);
+        
+        ui->cB_hepmc3_type_of_eve->setCurrentIndex(0);
+        ui->pB_hepmc3_browse_files->setEnabled(false);
+        ui->cB_hepmc3_type_of_eve->setEnabled(false);
+        
+        
+    }
+        
+    sens_det_model->removeRows(0,sens_det_model->rowCount());
+    for(const auto& element : j_load["Sensitive Detector Extensions"])
+    {
+        std::string sens_det_file = element;
+        QString q_sens_det_file = QString::fromUtf8(sens_det_file.c_str());
+        int rows = ui->sens_det_table->model()->rowCount();
+        ui->sens_det_table->model()->insertRows(rows,1);
+        ui->sens_det_table->model()->setData(ui->sens_det_table->model()->index(rows,0),q_sens_det_file);
+
+    }
+
+    region_model->removeRows(0,region_model->rowCount());
+    for(const auto& element: j_load["Regions data"]){
+        Region r;
+        from_json(element,r);
+
+        int rows = ui->regions_table->model()->rowCount();
+        ui->regions_table->model()->insertRows(rows,1);
+
+        QString q_r_name = QString::fromUtf8(r.Region_name.c_str());
+        std::string r_froot = "";
+
+        for(const auto& element: r.fRootLVnames)
+        {
+            r_froot = r_froot+element+",";
+        }
+
+        if(r_froot!="")
+        {
+            r_froot.pop_back();
+        }
+
+        QString q_r_froot = QString::fromUtf8(r_froot.c_str());
+
+
+        ui->regions_table->model()->setData(ui->regions_table->model()->index(rows,0),q_r_name);
+        ui->regions_table->model()->setData(ui->regions_table->model()->index(rows,1),q_r_froot);
+        ui->regions_table->model()->setData(ui->regions_table->model()->index(rows,2),r.electron_cut);
+        ui->regions_table->model()->setData(ui->regions_table->model()->index(rows,3),r.proton_cut);
+        ui->regions_table->model()->setData(ui->regions_table->model()->index(rows,4),r.positron_cut);
+        ui->regions_table->model()->setData(ui->regions_table->model()->index(rows,5),r.gamma_cut);
+
+
+    }
+
+    magnetic_field_type = j_load["Magnetic Field Type"];
+
+    if(magnetic_field_type == "Fixed Axial")
+    {
+        ui->lE_fixed_MF->setEnabled(true);
+        ui->cB_magnetic_field->setCurrentIndex(0);
+       // magnetic_field = j_load["Magnetic Field Intensity"];
+        //ui->lE_fixed_MF->setText(QString::fromUtf8(magnetic_field.c_str()));
+
+
+        magnetic_field_plugin_file = "";
+      //  ui->lE_magnetic_field_map->clear();
+      //  ui->lE_magnetic_field_map->setEnabled(false);
+        magnetic_field_map = "";
+        ui->pB_magnetic_field_map->setEnabled(false);
+        ui->pB_magnetic_field_plugin->setEnabled(false);
+
+    }
+
+    else{
+        ui->pB_magnetic_field_map->setEnabled(true);
+        ui->pB_magnetic_field_plugin->setEnabled(true);
+        ui->cB_magnetic_field->setCurrentIndex(1);
+        magnetic_field_plugin_file = j_load["Magnetic Field Plugin"];
+        magnetic_field_map = j_load["Magnetic Field Map"];
+       // ui->lE_magnetic_field_map->setText(QString::fromUtf8(magnetic_field_map.c_str()));
+
+        magnetic_field = "";
+        ui->lE_fixed_MF->clear();
+        ui->lE_fixed_MF->setEnabled(false);
+
+
+    }
+
+    //g4ui_model->removeRows(0,g4ui_model->rowCount());
+    ui->cB_control->setCheckState(Qt::Unchecked);
+    ui->cB_event->setCheckState(Qt::Unchecked);
+    ui->cB_run->setCheckState(Qt::Unchecked);
+    ui->cB_tracking->setCheckState(Qt::Unchecked);
+    ui->sB_control->setValue(0);
+    ui->sB_event->setValue(0);
+    ui->sB_run->setValue(0);
+    ui->sB_tracking->setValue(0);
+
+    for(const auto& element : j_load["g4ui_commands"])
+    {
+        std::string g4ui_comm = element;
+
+
+        if(g4ui_comm.find("/run/verbose") != std::string::npos)
+        {
+            ui->cB_run->setCheckState(Qt::Checked);
+            int verbosity = g4ui_comm.back() - '0';
+            ui->sB_run->setValue(verbosity);
+
+        }
+
+        else if(g4ui_comm.find("/control/verbose") != std::string::npos)
+        {
+            ui->cB_control->setCheckState(Qt::Checked);
+            int verbosity = g4ui_comm.back() - '0';
+            ui->sB_control->setValue(verbosity);
+
+        }
+
+        else if(g4ui_comm.find("/event/verbose") != std::string::npos)
+        {
+            ui->cB_event->setCheckState(Qt::Checked);
+            int verbosity = g4ui_comm.back() - '0';
+            ui->sB_event->setValue(verbosity);
+
+        }
+
+        else if(g4ui_comm.find("/tracking/verbose") != std::string::npos)
+        {
+            ui->cB_tracking->setCheckState(Qt::Checked);
+            int verbosity = g4ui_comm.back() - '0';
+            ui->sB_tracking->setValue(verbosity);
+
+        }
+
+        else if(g4ui_comm.find("/FSLdet/setField") != std::string::npos)
+            
+        {
+            magnetic_field = g4ui_comm.substr(17,g4ui_comm.size()-17-6);
+            ui->lE_fixed_MF->setText(QString::fromUtf8(magnetic_field.c_str()));
+        }
+        
+        else if(g4ui_comm.find("/FSLgun/particle") != std::string::npos)
+        {
+            particle = g4ui_comm.substr(17,g4ui_comm.size()-16);
+            ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
+        }
+
+        else if(g4ui_comm.find("/run/numberOfThreads") != std::string::npos)
+        {
+            number_of_threads = stoi(g4ui_comm.substr(21,g4ui_comm.size()-20));
+            if(generator!="HepMC3 File"){ui->sB_NOT->setValue(number_of_threads);}
+        }
+        
+        else if(g4ui_comm.find("/FSLgun/primaryPerEvt") != std::string::npos)
+        {
+            number_of_primaries_per_event = stoi(g4ui_comm.substr(22,g4ui_comm.size()-21));
+        }
+        
+        else if(g4ui_comm.find("/FSLgun/energy") != std::string::npos
+                || g4ui_comm.find("/FSLgun/direction") != std::string::npos
+                || g4ui_comm.find("/control/cout/prefixString G4Worker_") != std::string::npos
+                || g4ui_comm.find("/run/initialize") != std::string::npos
+                || g4ui_comm.find("/run/beamOn") != std::string::npos)
+        {
+
+        }
+
+        else
+        {
+           // QString q_g4ui_comm = QString::fromUtf8(g4ui_comm.c_str());
+            //g4ui_model->insertRow(g4ui_model->rowCount());
+           // QModelIndex g4ui_index = g4ui_model->index(g4ui_model->rowCount()-1);
+            //g4ui_model->setData(g4ui_index, q_g4ui_comm);
+        }
+
+
+    }
+
+
+   /* user_action_model->removeRows(0,user_action_model->rowCount());
+    for(const auto& element : j_load["Run Actions"])
+    {
+        std::string run_file = element;
+        QString q_run_file = QString::fromUtf8(run_file.c_str());
+        int rows = ui->user_action_table->model()->rowCount();
+        ui->user_action_table->model()->insertRows(rows,1);
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Run");
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_run_file);
+
+    }
+
+    for(const auto& element : j_load["Event Actions"])
+    {
+        std::string event_file = element;
+        QString q_event_file = QString::fromUtf8(event_file.c_str());
+        int rows = ui->user_action_table->model()->rowCount();
+        ui->user_action_table->model()->insertRows(rows,1);
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Event");
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_event_file);
+
+    }
+
+    for(const auto& element : j_load["Stepping Actions"])
+    {
+        std::string stepping_file = element;
+        QString q_stepping_file = QString::fromUtf8(stepping_file.c_str());
+        int rows = ui->user_action_table->model()->rowCount();
+        ui->user_action_table->model()->insertRows(rows,1);
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Stepping");
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_stepping_file);
+
+    }
+
+    for(const auto& element : j_load["Stacking Actions"])
+    {
+        std::string stacking_file = element;
+        QString q_stacking_file = QString::fromUtf8(stacking_file.c_str());
+        int rows = ui->user_action_table->model()->rowCount();
+        ui->user_action_table->model()->insertRows(rows,1);
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Stacking");
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_stacking_file);
+
+    }
+
+    for(const auto& element : j_load["Tracking Actions"])
+    {
+        std::string tracking_file = element;
+        QString q_tracking_file = QString::fromUtf8(tracking_file.c_str());
+        int rows = ui->user_action_table->model()->rowCount();
+        ui->user_action_table->model()->insertRows(rows,1);
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),"Tracking");
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,1),q_tracking_file);
+
+    }
+    */
+
+   /* shape_model->removeRows(0,shape_model->rowCount());
+    for(const auto& element : j_load["Shape Extensions"] )
+    {
+        std::string ele = element;
+        QString q_element = QString::fromUtf8(ele.c_str());
+        shape_model->insertRow(shape_model->rowCount());
+        QModelIndex shape_index = shape_model->index(shape_model->rowCount()-1);
+        shape_model->setData(shape_index, q_element);
+    }*/
+    
+
+    user_action_model->removeRows(0,user_action_model->rowCount());
+    for(const auto& element : j_load["User Action Extensions"])
+    {
+        std::string run_file = element;
+        QString q_run_file = QString::fromUtf8(run_file.c_str());
+        int rows = ui->user_action_table->model()->rowCount();
+        ui->user_action_table->model()->insertRows(rows,1);
+        ui->user_action_table->model()->setData(ui->user_action_table->model()->index(rows,0),q_run_file);
+
+    }
+
+}
+    else {std::cout << "File must be of json type" << std::endl; exit(-1);}
+
+}
+
 //Function to create the configuration
 void FSLMainWindow::create_configuration()
 {
@@ -1338,33 +2019,37 @@ void FSLMainWindow::create_configuration()
     number_of_events = ui->sB_NOE->value();
     number_of_threads = ui->sB_NOT->value();
     physics_list_name = (ui->lE_PLN->text()).toStdString();
-    hits_file = (ui->lE_hits->text()).toStdString();
-    histo_file = (ui->lE_histo->text()).toStdString();
+   // hits_file = (ui->lE_hits->text()).toStdString();
+   // histo_file = (ui->lE_histo->text()).toStdString();
 
     j["Geometry"] = geom_file_address;
     j["Physics list name"] = physics_list_name;
-    j["Number of threads"] = number_of_threads;
+ //   j["Number of threads"] = number_of_threads;
     j["Number of events"] = number_of_events;
 
     this->configure_generator();
     j["Generator"] = generator;
-    j["Particle"] = particle;
+ //   j["Particle"] = particle;
     j["p_x"] = p_x;
     j["p_y"] = p_y;
     j["p_z"] = p_z;
-    j["Particle energy"] = particle_energy;
-    j["Particle direction"] = particle_direction;
-    j["Event input file"] = pythia_input_file;
-    j["Type of event"] = pythia_type_of_event;
+//    j["Particle energy"] = particle_energy;
+//    j["Particle direction"] = particle_direction;
+    j["Pythia event input file"] = pythia_input_file;
+    j["Pythia type of event"] = pythia_type_of_event;
+    j["HepMC3 file"] = hepmc3_input_file;
+    j["HepMC3 type of file"] = hepmc3_type_of_file;
+    j["Generator Plugin"] = generator_plugin;
+
 
     this->configure_sens_det_actions();
     j["Sensitive Detector Extensions"] = sensitive_detector_extensions;
-    j["Output Hits file"] = hits_file;
-    j["Output Histo file"] = histo_file;
+ //   j["Output Hits file"] = hits_file;
+ //   j["Output Histo file"] = histo_file;
 
     this->configure_magnetic_field();
     j["Magnetic Field Type"] = magnetic_field_type;
-    j["Magnetic Field Intensity"] = magnetic_field;
+ //   j["Magnetic Field Intensity"] = magnetic_field;
     j["Magnetic Field Map"] = magnetic_field_map;
     j["Magnetic Field Plugin"] = magnetic_field_plugin_file;
 

@@ -1,18 +1,18 @@
-
 #include "FSLActionInitialization.hh"
 #include "GeoModelKernel/GeoPluginLoader.h"
 #include "FSLPrimaryGeneratorAction.hh"
+#include "HepMC3PrimaryGeneratorAction.hh"
 #include "FSLRunAction.hh"
 #include "FSLEventAction.hh"
 #include "FSLSteppingAction.hh"
 #include "FSLTrackingAction.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
-#include "FSLUserActionPlugin.h"
-#include "FSLUserRunActionPlugin.h"
-#include "FSLUserEventActionPlugin.h"
-#include "FSLUserStackingActionPlugin.h"
-#include "FSLUserTrackingActionPlugin.h"
-#include "FSLUserSteppingActionPlugin.h"
+#include "FullSimLight/FSLUserActionPlugin.h"
+#include "FullSimLight/FSLUserRunActionPlugin.h"
+#include "FullSimLight/FSLUserEventActionPlugin.h"
+#include "FullSimLight/FSLUserStackingActionPlugin.h"
+#include "FullSimLight/FSLUserTrackingActionPlugin.h"
+#include "FullSimLight/FSLUserSteppingActionPlugin.h"
 
 
 #include "G4Version.hh"
@@ -71,7 +71,31 @@ void FSLActionInitialization::BuildForMaster() const {
 void FSLActionInitialization::Build() const {
 
 #if !USE_PYTHIA
-  SetUserAction(new FSLPrimaryGeneratorAction());
+  
+  if(generator == "HepMC3 File")
+  {
+      std::cout << "Reading in events from file: " << hepmc3_file_path << std::endl;
+      SetUserAction(new HepMC3PrimaryGeneratorAction(hepmc3_file_path,hepmc3_file_type));
+      
+  }
+    
+  else if(generator == "Generator Plugin")
+  {
+      std::cout << "Loading in event generator from plugin" << std::endl;
+      GeoPluginLoader<FSLUserActionPlugin> generator_loader;
+      const FSLUserActionPlugin * gen_plugin = generator_loader.load(generator_plugin);
+      
+      if (gen_plugin->getPrimaryGeneratorAction()) SetUserAction(gen_plugin->getPrimaryGeneratorAction());
+      else
+      {
+          std::cout << "Error loading in Plugin, exiting now..." << std::endl;
+          exit(-1);
+      }
+      
+  }
+  else
+  {SetUserAction(new FSLPrimaryGeneratorAction());}
+
 #else
   if (use_pythia()) {
     // seed each generator/thread by 1234 if perfomance mode run and use the event
@@ -79,7 +103,30 @@ void FSLActionInitialization::Build() const {
     G4int pythiaSeed = fIsPerformance ? -1 : 0;
     SetUserAction(new PythiaPrimaryGeneratorAction(pythiaSeed));
   } else {
-    SetUserAction(new FSLPrimaryGeneratorAction());
+      if(generator == "HepMC3 File")
+      {
+          std::cout << "Reading in events from file: " << hepmc3_file_path << std::endl;
+          SetUserAction(new HepMC3PrimaryGeneratorAction(hepmc3_file_path,hepmc3_file_type));
+          
+      }
+        
+      else if(generator == "Generator Plugin")
+      {
+          std::cout << "Loading in event generator from plugin" << std::endl;
+          GeoPluginLoader<FSLUserActionPlugin> generator_loader;
+          const FSLUserActionPlugin * gen_plugin = generator_loader.load(generator_plugin);
+          
+          if (gen_plugin->getPrimaryGeneratorAction()) SetUserAction(gen_plugin->getPrimaryGeneratorAction());
+          else
+          {
+              std::cout << "Error loading in Plugin, exiting now..." << std::endl;
+              exit(-1);
+          }
+          
+      }
+      else
+      {SetUserAction(new FSLPrimaryGeneratorAction());}
+
   }
 #endif
 

@@ -24,7 +24,7 @@
 #include "FSLActionInitialization.hh"
 #include "FSLConfigurator.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
-#include "FSLUserActionPlugin.h"
+#include "FullSimLight/FSLUserActionPlugin.h"
 #include <getopt.h>
 #include <err.h>
 #include <iostream>
@@ -189,6 +189,14 @@ int main(int argc, char** argv) {
                        );
 
     }
+    
+    if(!isBatch)
+    {
+        actInit->SetGenerator(simConfig::fsl.eventGeneratorName);
+        actInit->SetHepMC3FilePath(simConfig::fsl.hepmc3InputFile);
+        actInit->SetHepMC3FileType(simConfig::fsl.hepmc3TypeOfFile);
+        actInit->SetGeneratorPlugin(simConfig::fsl.generatorPlugin);
+    }
 
     // set the name of a region in which we are interested to see a very basic simulation
     // stat e.g. "EMEC" (NOTE: only if the given region can be found and executed in
@@ -224,6 +232,12 @@ int main(int argc, char** argv) {
         
         detector->SetGeometryFileName (simConfig::fsl.geometry);
         runManager->SetUserInitialization(detector);
+        
+        if(simConfig::fsl.magFieldType=="Map")
+        {
+        detector->SetMagFieldPluginPath(simConfig::fsl.magFieldPlugin);
+        detector->SetMagFieldMapPath(simConfig::fsl.magFieldMap);
+        }
                 
         
         //parse RegionsData
@@ -288,7 +302,7 @@ int main(int argc, char** argv) {
         << "   Geometry file      =  " << simConfig::fsl.geometry                    << G4endl
         << "   Physics list name  =  " << simConfig::fsl.physicsList                 << G4endl
         << "   Generator          =  " << simConfig::fsl.eventGeneratorName          << G4endl
-        << "   Magnetic Field     =  " << simConfig::fsl.magFieldIntensity           << G4endl
+        << "   Magnetic Field     =  " << simConfig::fsl.magFieldType           << G4endl
         << "   Run Overlap Check  =  " << parRunOverlapCheck              << G4endl
         << " ===================================================== "      << G4endl;
         

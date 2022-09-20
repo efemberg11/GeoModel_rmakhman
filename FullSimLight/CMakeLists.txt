@@ -55,6 +55,10 @@ message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
 #----------------------------------------------------------------------------
 
 find_package(Pythia QUIET) # optional
+find_package(HepMC3 REQUIRED)
+#find_package(ROOT QUIET) #optional
+#option(HEPMC3_ROOTIO_USE "Enable the use of HEPMC3 with ROOT" OFF)
+
 
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
@@ -117,6 +121,26 @@ if(Pythia_FOUND)
   target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
 endif()
 
+#if(HEPMC3_ROOTIO_USE)
+#  message( STATUS "HEPMC3 Root Dependency Switched on")
+#  target_link_libraries(gmclash PUBLIC  ${HEPMC3_ROOTIO_LIB} ${ROOT_LIBRARIES})
+ # target_link_libraries(gmmasscalc PUBLIC  ${HEPMC3_ROOTIO_LIB} ${ROOT_LIBRARIES})
+ # target_link_libraries(fullSimLight PUBLIC ${HEPMC3_ROOTIO_LIB} ${ROOT_LIBRARIES})
+ # target_link_libraries(gmgeantino PUBLIC  ${HEPMC3_ROOTIO_LIB} ${ROOT_LIBRARIES})
+ # target_link_libraries(gm2gdml PUBLIC ${HEPMC3_ROOTIO_LIB} ${ROOT_LIBRARIES})
+ # target_include_directories(gmclash PUBLIC ${ROOT_INCLUDE_DIRS})
+ # target_include_directories(gmmasscalc PUBLIC  ${ROOT_INCLUDE_DIRS})
+ # target_include_directories(fullSimLight PUBLIC  ${ROOT_INCLUDE_DIRS})
+ # target_include_directories(gmgeantino PUBLIC  ${ROOT_INCLUDE_DIRS})
+ # target_include_directories(gm2gdml PUBLIC  ${ROOT_INCLUDE_DIRS})
+
+ # target_compile_definitions(gmclash PRIVATE USE_ROOT)
+  #target_compile_definitions(gmmasscalc PRIVATE USE_ROOT)
+ # target_compile_definitions(fullSimLight PRIVATE USE_ROOT)
+ # target_compile_definitions(gmgeantino PRIVATE USE_ROOT)
+ # target_compile_definitions(gm2gdml PRIVATE USE_ROOT)
+#endif()
+
 #----------------------------------------------------------------------------
 # Add extra 'include' directories
 #
@@ -152,11 +176,17 @@ target_link_libraries(testMagneticField ${Geant4_LIBRARIES} MagFieldServices Mag
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
 
-target_link_libraries(gmclash PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-target_link_libraries(gmmasscalc PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-target_link_libraries(fullSimLight PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-target_link_libraries(gmgeantino PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
-target_link_libraries(gm2gdml PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces)
+target_link_libraries(gmclash PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces ${HEPMC3_LIB})
+target_link_libraries(gmmasscalc PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces ${HEPMC3_LIB})
+target_link_libraries(fullSimLight PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces ${HEPMC3_LIB})
+target_link_libraries(gmgeantino PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces ${HEPMC3_LIB})
+target_link_libraries(gm2gdml PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} MagFieldServices MagFieldInterfaces ${HEPMC3_LIB})
+
+target_include_directories(gmclash PUBLIC ${HEPMC3_INCLUDE_DIR})
+target_include_directories(gmmasscalc PUBLIC ${HEPMC3_INCLUDE_DIR})
+target_include_directories(fullSimLight PUBLIC ${HEPMC3_INCLUDE_DIR})
+target_include_directories(gmgeantino PUBLIC ${HEPMC3_INCLUDE_DIR})
+target_include_directories(gm2gdml PUBLIC ${HEPMC3_INCLUDE_DIR})
 
 # Check if we are building FullSimLight individually,
 # or as a part of the main GeoModel.
@@ -292,15 +322,15 @@ install( TARGETS FullSimLight
    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
 
    
-install(FILES include/FSLSensitiveDetectorPlugin.h 
-              include/MagFieldPlugin.h 
-              include/FSLPhysicsListPlugin.h
-	      include/FSLUserActionPlugin.h
-              include/FSLUserRunActionPlugin.h
-              include/FSLUserEventActionPlugin.h
-              include/FSLUserSteppingActionPlugin.h
-              include/FSLUserTrackingActionPlugin.h
-              include/FSLUserStackingActionPlugin.h
+install(FILES FullSimLight/FSLSensitiveDetectorPlugin.h 
+              FullSimLight/MagFieldPlugin.h 
+              FullSimLight/FSLPhysicsListPlugin.h
+	      FullSimLight/FSLUserActionPlugin.h
+              FullSimLight/FSLUserRunActionPlugin.h
+              FullSimLight/FSLUserEventActionPlugin.h
+              FullSimLight/FSLUserSteppingActionPlugin.h
+              FullSimLight/FSLUserTrackingActionPlugin.h
+              FullSimLight/FSLUserStackingActionPlugin.h
 	          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/FullSimLight
   COMPONENT Development )
 

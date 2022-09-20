@@ -11,7 +11,7 @@
 #include "EmExtraPhysics.hh"
 
 #include "GeoModelKernel/GeoPluginLoader.h"
-#include "FSLPhysicsListPlugin.h"
+#include "FullSimLight/FSLPhysicsListPlugin.h"
 
 #include <string>
 

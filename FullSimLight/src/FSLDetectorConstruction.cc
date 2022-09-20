@@ -1,6 +1,7 @@
 #include "FSLDetectorConstruction.hh"
 #include "FSLDetectorMessenger.hh"
 #include "RegionConfigurator.hh"
+#include "FullSimLight/MagFieldPlugin.h"
 #include "MassCalculator.hh"
 #include "ClashDetector.hh"
 #include "MagFieldServices/AtlasFieldSvc.h"
@@ -71,7 +72,7 @@
 #include "GeoModelKernel/GeoVolumeCursor.h"
 
 // For Sensitive Detector plugins:
-#include "FSLSensitiveDetectorPlugin.h"
+#include "FullSimLight/FSLSensitiveDetectorPlugin.h"
 #include "FSLSDPluginLoader.h"
 #include "G4VSensitiveDetector.hh"
 #include "G4LogicalVolumeStore.hh"
@@ -410,14 +411,26 @@ void FSLDetectorConstruction::ConstructSDandField()
         G4cout << G4endl << " *** MAGNETIC FIELD IS OFF  *** " << G4endl << G4endl;
     }
     else // if (!fFieldConstant)
-    {
-      G4cout << G4endl << " *** MAGNETIC FIELD SET FROM FILE  *** " << G4endl << G4endl;
-      if (fField.Get() == 0)
-      {
-          StandardFieldSvc* FSLMagField = new StandardFieldSvc("StandardFieldSvc");
-          G4MagneticField* g4Field =  FSLMagField->getField();
-          if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
-          fField.Put(g4Field);
+        {
+          G4cout << G4endl << " *** MAGNETIC FIELD SET FROM FILE  *** " << G4endl << G4endl;
+          if (fField.Get() == 0)
+          {
+              if(mag_field_plugin_path == "")
+              {
+              StandardFieldSvc* FSLMagField = new StandardFieldSvc("StandardFieldSvc");
+              G4MagneticField* g4Field =  FSLMagField->getField();
+              if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
+              fField.Put(g4Field);
+              }
+              else
+              {
+              GeoPluginLoader<MagFieldPlugin> loader;
+              MagFieldPlugin *plugin=loader.load(mag_field_plugin_path);
+              G4MagneticField *g4Field=plugin->getField(mag_field_map_path);
+              delete plugin;
+              if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
+              fField.Put(g4Field);
+              }
 
           //This is thread-local
           G4FieldManager* fieldMgr =

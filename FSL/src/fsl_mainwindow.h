@@ -66,7 +66,8 @@ public:
     int number_of_events = 0;
     std::string config_file_name = "";
     std::string save_directory = "";
-
+    std::string save_display_directory = "";
+    
     //Parameters associated with the Generator tab
     std::string generator = "";
     std::string particle = "";
@@ -81,12 +82,16 @@ public:
     int number_of_primaries_per_event;
     std::string pythia_input_file = "";
     std::string pythia_type_of_event = "";
+    
+    std::string hepmc3_input_file = "";
+    std::string hepmc3_type_of_file = "";
 
+    std::string generator_plugin = "";
     //Parameters associated with the Sensitive Detectors tab
     std::vector<std::string> sensitive_detector_extensions;
-    int sens_det_number;
-    std::string hits_file = "";
-    std::string histo_file = "";
+    //int sens_det_number;
+   // std::string hits_file = "";
+   // std::string histo_file = "";
 
     //Parameters associated with the Magnetic field tab
     std::string magnetic_field_type = "";
@@ -104,7 +109,7 @@ public:
 
     //Parameters associated with the g4ui commands tab
     std::vector<std::string> g4ui_commands;
-    int g4ui_number;
+   // int g4ui_number;
 
     //Parameters associated with the shape commands tab
   //  int shape_number;
@@ -124,12 +129,14 @@ public:
     //Functions used in Configuration
     void save_configuration();
     void save_configuration_as();
+    void save_display_output();
     void create_configuration();
     void view_configuration();
     void run_configuration();
     void run_gmex();
     void run_gmclash();
     void load_configuration();
+    void load_configuration_CL(std::string config_file_path); //Load configuration from Command Line
     std::vector<std::string> display_configuration(const std::string &s);
 
     void clear_main_status();
@@ -140,8 +147,8 @@ public:
     void del_sens_det();
     void configure_sens_det_actions();
 
-    void add_g4ui();
-    void del_g4ui();
+  //  void add_g4ui();
+  //  void del_g4ui();
     void configure_g4ui_command();
 
     void pop_up_regions();
@@ -159,6 +166,9 @@ public:
    // void configure_shape_ext();
 
     void assign_geom_file();
+    void assign_phys_list_plugin();
+    void assign_gen_plug_file();
+    void assign_hepmc3_file();
     void assign_pythia_file();
     void assign_magnetic_field_plugin_file();
     void assign_magnetic_field_map();
@@ -187,9 +197,9 @@ signals:
     void send_error_message(std::string info);
 
 private slots:
-    void catch_error_message(std::string info);
-    void get_sens_det_index(QModelIndex region_index);
-    void get_g4ui_index(QModelIndex g4ui_index);
+   // void catch_error_message(std::string info);
+   // void get_sens_det_index(QModelIndex region_index);
+   // void get_g4ui_index(QModelIndex g4ui_index);
    // void get_shape_index(QModelIndex g4ui_index);
     void add_region(std::string  region_name, std::string frootLV_names
                     ,double electron_cut , double proton_cut
@@ -209,14 +219,16 @@ private slots:
 
 private:
     Ui::FSLMainWindow *ui;
-    QStringListModel *sens_det_model;
-    QStringListModel *g4ui_model;
+ //   QStringListModel *sens_det_model;
+  //  QStringListModel *g4ui_model;
   //  QStringListModel *shape_model;
     ConfigRegions *region;
     QStandardItemModel *region_model;
     QStandardItemModel *user_action_model;
+    QStandardItemModel *sens_det_model;
     QStringList region_horizontalHeader;
     QStringList user_action_horizontalHeader;
+    QStringList sens_det_horizontalHeader;
     QDoubleValidator *p_x_validator;
     QDoubleValidator *p_y_validator;
     QDoubleValidator *p_z_validator;

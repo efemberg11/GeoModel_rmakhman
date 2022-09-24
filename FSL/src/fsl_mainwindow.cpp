@@ -565,7 +565,23 @@ void FSLMainWindow::assign_tracking_actions_file()
 //Function to add a user action file
 void FSLMainWindow::add_user_action()
 {
-    QString q_user_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
+    QString q_user_file_name;
+    QFileDialog dialog(this);
+    dialog.setDirectory((FSLPLUGINROOT+std::string("/FullSimLight/UserActionPlugins")).c_str());
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("sharedlibs (*.so *.dylib)"));
+    if (dialog.exec()) {
+      QStringList sList=dialog.selectedFiles();
+      if (sList.size()!=1) {
+      }
+      else {
+        q_user_file_name=sList[0];
+      }
+    }
+
+  
+  
+    //QString q_user_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
 
     if(q_user_file_name!="")
     {
@@ -735,7 +751,20 @@ void FSLMainWindow::check_if_pythia_file()
 //Function to select a magnetic field plugin file
 void FSLMainWindow::assign_magnetic_field_plugin_file()
 {
-    magnetic_field_plugin_file = this->get_file_name();
+
+  QFileDialog dialog(this);
+  dialog.setDirectory((FSLPLUGINROOT+std::string("/FullSimLight/MagneticFieldPlugins")).c_str());
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  dialog.setNameFilter(tr("sharedlibs (*.so *.dylib)"));
+  if (dialog.exec()) {
+    QStringList sList=dialog.selectedFiles();
+    if (sList.size()!=1) {
+    }
+    else {
+      magnetic_field_plugin_file=sList[0].toStdString();
+      std:: cout << magnetic_field_plugin_file << std::endl;
+    }
+  }
 }
 
 //Function to assign magnetic field map

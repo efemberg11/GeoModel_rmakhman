@@ -75,7 +75,7 @@ set_target_properties( ATLASMagneticFieldMapPlugin PROPERTIES
 
 
 install( TARGETS ATLASMagneticFieldMapPlugin
-	 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	 LIBRARY DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/FullSimLight/MagneticFieldPlugins
 	 COMPONENT Runtime
 	 NAMELINK_COMPONENT Development )
 

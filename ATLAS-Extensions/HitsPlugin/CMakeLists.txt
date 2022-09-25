@@ -74,9 +74,10 @@ set_target_properties( GenerateHitsPlugin PROPERTIES
 
 
 install( TARGETS GenerateHitsPlugin
-	 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	 LIBRARY DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/FullSimLight/UserActionPlugins
 	 COMPONENT Runtime
-	 NAMELINK_COMPONENT Development )
+	 NAMELINK_COMPONENT Development 
+	 )
 
 
 

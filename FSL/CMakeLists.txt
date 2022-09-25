@@ -58,6 +58,9 @@ set(PROJECT_SOURCES ${sources} ${headers}  ${uis} )
 
 add_executable(fsl ${PROJECT_SOURCES} )
 
+add_definitions (-DFSLPLUGINROOT="${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}" )
+
+
 target_link_libraries(fsl PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 if( GEOMODEL_USE_BUILTIN_JSON )

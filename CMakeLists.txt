@@ -107,8 +107,8 @@ endif()
 #endif()
 
 if(GEOMODEL_BUILD_ATLASEXTENSIONS)
-  add_subdirectory(ATLAS-Extensions)
-  list( APPEND BUILT_PACKAGES "ATLAS-Extensions")
+  add_subdirectory(ATLASExtensions)
+  list( APPEND BUILT_PACKAGES "ATLASExtensions")
 endif()
 
 

@@ -74,6 +74,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Add sub-projects and targets
 add_subdirectory(MagneticField)
+add_subdirectory(Plugins)
 
 
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:

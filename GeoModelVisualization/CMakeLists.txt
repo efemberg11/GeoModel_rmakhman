@@ -67,6 +67,7 @@ add_subdirectory(VP1Base)
 add_subdirectory(VP1HEPVis)
 add_subdirectory(VP1GuideLineSystems)
 add_subdirectory(GXHitDisplaySystems)
+add_subdirectory(GXTrackDisplaySystems)
 
 # Create and install the version description of the project.
 include( WriteBasicConfigVersionFile )

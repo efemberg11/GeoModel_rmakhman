@@ -17,6 +17,7 @@
 #include "VP1GuideLineSystems/VP1GuideLineSystem.h"
 #include "GXClashPointSystems/GXClashPointSystem.h"
 #include "GXHitDisplaySystems/GXHitDisplaySystem.h"
+#include "GXTrackDisplaySystems/GXTrackDisplaySystem.h"
 #include "VP1Base/VP1QtUtils.h"
 
 VP1GeometryChannel::VP1GeometryChannel()
@@ -34,4 +35,5 @@ void VP1GeometryChannel::init()
   addSystem(new VP1GuideLineSystem, IVP13DStandardChannelWidget::StartDisabled);
   addSystem(new GXClashPointSystem,  IVP13DStandardChannelWidget::StartDisabled);
   addSystem(new GXHitDisplaySystem,  IVP13DStandardChannelWidget::StartDisabled);
+  addSystem(new GXTrackDisplaySystem,  IVP13DStandardChannelWidget::StartDisabled);
 }

@@ -32,8 +32,7 @@ endif()
 
 
 # Project's dependencies.
-# GeoModel dependencies
-find_package( FullSimLight REQUIRED )
+
 
 
 # Use the GNU install directory names.

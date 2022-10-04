@@ -44,6 +44,7 @@ include( GNUInstallDirs )
 # Set up the build of the libraries of the project.
 add_subdirectory(HitsPlugin)
 add_subdirectory(Examples/UserActionPlugins)
+add_subdirectory(TracksPlugin)
 
 
 

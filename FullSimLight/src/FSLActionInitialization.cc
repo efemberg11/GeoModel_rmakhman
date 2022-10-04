@@ -8,11 +8,6 @@
 #include "FSLTrackingAction.hh"
 #include "PythiaPrimaryGeneratorAction.hh"
 #include "FullSimLight/FSLUserActionPlugin.h"
-#include "FullSimLight/FSLUserRunActionPlugin.h"
-#include "FullSimLight/FSLUserEventActionPlugin.h"
-#include "FullSimLight/FSLUserStackingActionPlugin.h"
-#include "FullSimLight/FSLUserTrackingActionPlugin.h"
-#include "FullSimLight/FSLUserSteppingActionPlugin.h"
 
 
 #include "G4Version.hh"

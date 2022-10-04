@@ -327,11 +327,6 @@ install(FILES FullSimLight/FSLSensitiveDetectorPlugin.h
               FullSimLight/MagFieldPlugin.h 
               FullSimLight/FSLPhysicsListPlugin.h
 	      FullSimLight/FSLUserActionPlugin.h
-              FullSimLight/FSLUserRunActionPlugin.h
-              FullSimLight/FSLUserEventActionPlugin.h
-              FullSimLight/FSLUserSteppingActionPlugin.h
-              FullSimLight/FSLUserTrackingActionPlugin.h
-              FullSimLight/FSLUserStackingActionPlugin.h
 	          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/FullSimLight
   COMPONENT Development )
 

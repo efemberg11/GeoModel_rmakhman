@@ -32,6 +32,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
          "Framework finding behaviour on macOS" )
     # GeoModel dependencies
     find_package( GeoModelCore REQUIRED )
+    find_package( FullSimLight REQUIRED )
+
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root project.")

@@ -1,20 +1,18 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 
-# CMake settings
-cmake_minimum_required( VERSION 3.14 )
-
-# Dummy call to 'project()', needed to set 'PROJECT_SOURCE_DIR'
-project( "Plugins" )
+# Set up the project.
+cmake_minimum_required( VERSION 3.1 )
+project( "FSLUserActionsPlugins" )
 
 #Set up the project. Check if we build it with GeoModel or individually
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am built as a top-level project.
     # Make the root module directory visible to CMake.
-    list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
+    list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../cmake )
     # get global GeoModel version
     include( GeoModel-version ) 
     # set the project, with the version taken from the GeoModel parent project
-    project( "ATLAS-Extensions" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
+    project( "FSLUserActionsPlugins" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
     # Define color codes for CMake messages
     include( cmake_colors_defs )
     # Warn the users about what they are doing
@@ -23,28 +21,29 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
          "Framework finding behaviour on macOS" )
-    # Set up how the project handle some of its dependenices. Either by picking them
+    # Set up how the project handle some of its dependencies. Either by picking them
     # up from the environment, or building them itself.
-
-    # Find the base GeoModel packages, which must be installed on the target system already
-    find_package( GeoModelCore REQUIRED )
-    # Set a flag to steer the build of the subpackages
-    #set( VISUALIZATION_INDIVIDUAL_BUILD ON )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
     # Set the project
-    project( "ATLAS-Extensions" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
+    project( "FSLUserActionsPlugins" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 endif()
+
+
+# Project's dependencies.
+# GeoModel dependencies
+find_package( FullSimLight REQUIRED )
 
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
-# Set up the build of the libraries of the project.
-add_subdirectory(HitsPlugin)
-add_subdirectory(Examples/UserActionPlugins)
-
-
-
+# Set sub-packages to build.
+add_subdirectory( DummyUserActionPlugin )
+#add_subdirectory( DummyEventActionPlugin )
+#add_subdirectory( DummySteppingActionPlugin )
+#add_subdirectory( DummyRunActionPlugin )
+#add_subdirectory( DummyTrackingActionPlugin )
+#add_subdirectory( DummyStackingActionPlugin )
 

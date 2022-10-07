@@ -1,5 +1,5 @@
 #ifndef __TRKSTRACKINGACTION_HH__
-#define __TEKSTRACKINGACTION_HH__
+#define __TRKSTRACKINGACTION_HH__
 
 #include "G4UserTrackingAction.hh"
 

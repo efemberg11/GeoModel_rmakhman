@@ -11,7 +11,7 @@ class MagFieldPlugin {
   // Destructor
   virtual ~MagFieldPlugin()=default;
   
-  virtual G4MagneticField *getField(std::string map_path) =0;
+  virtual G4MagneticField *getField() =0;
   
  private:
   

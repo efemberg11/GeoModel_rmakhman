@@ -108,88 +108,88 @@ void RegionConfigurator::InitRegionData(std::vector<std::string> Regions,
     
     /*
   fRegionData.resize(11);
-  //
-  //  Region: Pixel
+  
+    Region: Pixel
   fRegionData[0].fRegionName  = "Pixel";
   fRegionData[0].fGammaCut    = 0.05;
   fRegionData[0].fElectronCut = 0.05;
   fRegionData[0].fPositronCut = 0.05;
   fRegionData[0].fProtonCut   = 1.0;
   fRegionData[0].fRootLVNames = {"siLog", "siBLayLog", "dbmDiamondLog"};
-  //
-  //  Region: SCT
+  
+    Region: SCT
   fRegionData[1].fRegionName  = "SCT";
   fRegionData[1].fGammaCut    = 0.05;
   fRegionData[1].fElectronCut = 0.05;
   fRegionData[1].fPositronCut = 0.05;
   fRegionData[1].fProtonCut   = 1.0;
   fRegionData[1].fRootLVNames = {"BRLSensor", "ECSensor0", "ECSensor1", "ECSensor2", "ECSensor3"};
-  //
-  //  Region: TRT
+  
+    Region: TRT
   fRegionData[2].fRegionName  = "TRT";
   fRegionData[2].fGammaCut    = 0.05;
   fRegionData[2].fElectronCut = 30.0;
   fRegionData[2].fPositronCut = 30.0;
   fRegionData[2].fProtonCut   = 1.0;
   fRegionData[2].fRootLVNames = {"Gas", "GasMA"};
-  //
-  //  Region: TRT_Ar
+  
+    Region: TRT_Ar
   fRegionData[3].fRegionName  = "TRT_Ar";
   fRegionData[3].fGammaCut    = 0.05;
   fRegionData[3].fElectronCut = 30.0;
   fRegionData[3].fPositronCut = 30.0;
   fRegionData[3].fProtonCut   = 1.0;
   fRegionData[3].fRootLVNames = {"Gas_Ar", "GasMA_Ar"};
-  //
-  //  Region: EMB
+  
+    Region: EMB
   fRegionData[4].fRegionName  = "EMB";
   fRegionData[4].fGammaCut    = 0.1;
   fRegionData[4].fElectronCut = 0.1;
   fRegionData[4].fPositronCut = 0.1;
   fRegionData[4].fProtonCut   = 1.0;
   fRegionData[4].fRootLVNames = {"LAr::EMB::STAC"};
-  //
-  //  Region: EMEC
+  
+    Region: EMEC
   fRegionData[5].fRegionName  = "EMEC";
   fRegionData[5].fGammaCut    = 0.1;
   fRegionData[5].fElectronCut = 0.1;
   fRegionData[5].fPositronCut = 0.1;
   fRegionData[5].fProtonCut   = 1.0;
   fRegionData[5].fRootLVNames = {"LAr::EMEC::Mother"};
-  //
-  //  Region: HEC
+  
+    Region: HEC
   fRegionData[6].fRegionName  = "HEC";
   fRegionData[6].fGammaCut    = 1.0;
   fRegionData[6].fElectronCut = 1.0;
   fRegionData[6].fPositronCut = 1.0;
   fRegionData[6].fProtonCut   = 1.0;
   fRegionData[6].fRootLVNames = {"LAr::HEC::LiquidArgon"};
-  //
-  //  Region: FCAL
+  
+    Region: FCAL
   fRegionData[7].fRegionName  = "FCAL";
   fRegionData[7].fGammaCut    = 0.03;
   fRegionData[7].fElectronCut = 0.03;
   fRegionData[7].fPositronCut = 0.03;
   fRegionData[7].fProtonCut   = 1.0;
   fRegionData[7].fRootLVNames = {"LAr::FCAL::LiquidArgonC"};
-  //
-  //  Region: DriftWall
+  
+    Region: DriftWall
   fRegionData[8].fRegionName  = "DriftWall";
   fRegionData[8].fGammaCut    = 1.0;
   fRegionData[8].fElectronCut = 0.05;
   fRegionData[8].fPositronCut = 0.05;
   fRegionData[8].fProtonCut   = 1.0;
   fRegionData[8].fRootLVNames = {"MDTDriftWall"};
-  //
-  //  Region: DriftWall1
+  
+    Region: DriftWall1
   fRegionData[9].fRegionName  = "DriftWall1";
   fRegionData[9].fGammaCut    = 1.0;
   fRegionData[9].fElectronCut = 1.0;
   fRegionData[9].fPositronCut = 1.0;
   fRegionData[9].fProtonCut   = 1.0;
   fRegionData[9].fRootLVNames = {"Endplug"};
-  //
-  //  Region: DriftWall2
+  
+    Region: DriftWall2
   fRegionData[10].fRegionName  = "DriftWall2";
   fRegionData[10].fGammaCut    = 1.0;
   fRegionData[10].fElectronCut = 1.0;

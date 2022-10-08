@@ -84,7 +84,7 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(ui->pB_hepmc3_browse_files, &QPushButton::released, this, &FSLMainWindow::assign_hepmc3_file);
     connect(ui->pB_gen_plug_browse_files, &QPushButton::released, this, &FSLMainWindow::assign_gen_plug_file);
     connect(ui->pB_magnetic_field_plugin, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_plugin_file);
-    connect(ui->pB_magnetic_field_map, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_map);
+    //connect(ui->pB_magnetic_field_map, &QPushButton::released, this, &FSLMainWindow::assign_magnetic_field_map);
 
     connect(ui->pB_add_sens_det, &QPushButton::released, this, &FSLMainWindow::add_sens_det);
     connect(ui->pB_del_sens_det, &QPushButton::released, this, &FSLMainWindow::del_sens_det);
@@ -119,11 +119,16 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     ui->cB_particle->setCurrentIndex(0);
     ui->pB_pythia_browse->setEnabled(false);
     ui->cB_pythia_type_of_eve->setEnabled(false);
+    ui->lE_PCF->setEnabled(false);
     ui->pB_hepmc3_browse_files->setEnabled(false);
     ui->cB_hepmc3_type_of_eve->setEnabled(false);
+    ui->lE_HEPMC3->setEnabled(false);
     ui->pB_gen_plug_browse_files->setEnabled(false);
-    ui->pB_magnetic_field_map->setEnabled(false);
+    ui->lE_GP->setEnabled(false);
+    //ui->pB_magnetic_field_map->setEnabled(false);
     ui->pB_magnetic_field_plugin->setEnabled(false);
+    //ui->lE_MAP->setEnabled(false);
+    ui->lE_MAG_PLUG->setEnabled(false);
     ui->cB_particle->setCurrentIndex(0);
     ui->lE_px->setText("0");
     ui->lE_py->setText("10");
@@ -221,7 +226,20 @@ FSLMainWindow::~FSLMainWindow()
 //Add the Sensitive detector file
 void FSLMainWindow::add_sens_det()
 {
-    QString q_sens_det_file_name =  QString::fromUtf8((this->get_file_name()).c_str());
+    QString q_sens_det_file_name;
+    QFileDialog dialog(this);
+    dialog.setDirectory((FSLPLUGINROOT+std::string("/FullSimLight/SensitiveDetectorPlugins")).c_str());
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("sharedlibs (*.so *.dylib)"));
+    if (dialog.exec()) {
+      QStringList sList=dialog.selectedFiles();
+      if (sList.size()!=1) {
+      }
+      else {
+        q_sens_det_file_name=sList[0];
+      }
+    }
+    
 
     if(q_sens_det_file_name!="")
     {
@@ -714,26 +732,53 @@ void FSLMainWindow::assign_geom_file()
 //Function to Physics List Plugin
 void FSLMainWindow::assign_phys_list_plugin()
 {
-    std::string phys_list = this->get_file_name();
-    if(phys_list!=""){ui->lE_PLN->setText(phys_list.c_str());}
+    QFileDialog dialog(this);
+    dialog.setDirectory((FSLPLUGINROOT+std::string("/FullSimLight/PhysicsListPlugins")).c_str());
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("sharedlibs (*.so *.dylib)"));
+    if (dialog.exec()) {
+      QStringList sList=dialog.selectedFiles();
+      if (sList.size()!=1) {
+      }
+      else {
+          ui->lE_PLN->setText(sList[0]);
+        //std:: cout << magnetic_field_plugin_file << std::endl;
+      }
+    }
 }
 
 //Function to select a pythia file
 void FSLMainWindow::assign_pythia_file()
 {
-    pythia_input_file = this->get_file_name();
+    std::string pythia_file = this->get_file_name();
+    if(pythia_file!=""){ui->lE_PCF->setText(pythia_file.c_str());}
 }
 
 //Function to select a HepMC3 file
 void FSLMainWindow::assign_hepmc3_file()
 {
-    hepmc3_input_file = this->get_file_name();
+    std::string hepmc3_file = this->get_file_name();
+    if(hepmc3_file!=""){ui->lE_HEPMC3->setText(hepmc3_file.c_str());}
+
 }
 
 //Function to select a Generator Plugin
 void FSLMainWindow::assign_gen_plug_file()
 {
-    generator_plugin = this->get_file_name();
+    QFileDialog dialog(this);
+    dialog.setDirectory((FSLPLUGINROOT+std::string("/FullSimLight/EventGeneratorPlugins")).c_str());
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("sharedlibs (*.so *.dylib)"));
+    if (dialog.exec()) {
+      QStringList sList=dialog.selectedFiles();
+      if (sList.size()!=1) {
+      }
+      else {
+          ui->lE_GP->setText(sList[0]);
+        //std:: cout << magnetic_field_plugin_file << std::endl;
+      }
+    }
+
 }
 
 void FSLMainWindow::check_if_pythia_file()
@@ -741,10 +786,13 @@ void FSLMainWindow::check_if_pythia_file()
     if(ui->cB_pythia_type_of_eve->currentIndex()==3)
     {
         ui->pB_pythia_browse->setEnabled(true);
+        ui->lE_PCF->setEnabled(true);
     }
     else
     {
         ui->pB_pythia_browse->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_PCF->setEnabled(false);
     }
 }
 
@@ -761,17 +809,18 @@ void FSLMainWindow::assign_magnetic_field_plugin_file()
     if (sList.size()!=1) {
     }
     else {
-      magnetic_field_plugin_file=sList[0].toStdString();
-      std:: cout << magnetic_field_plugin_file << std::endl;
+        ui->lE_MAG_PLUG->setText(sList[0]);
+      //std:: cout << magnetic_field_plugin_file << std::endl;
     }
   }
 }
 
 //Function to assign magnetic field map
-void FSLMainWindow::assign_magnetic_field_map()
+/*void FSLMainWindow::assign_magnetic_field_map()
 {
-    magnetic_field_map = this->get_file_name();
-}
+    std::string mag_field_map = this->get_file_name();
+    if(mag_field_map!=""){ui->lE_MAP->setText(mag_field_map.c_str());}
+}*/
 
 //Function to configure particle energy and direction
 void FSLMainWindow::configure_energy_direction()
@@ -813,6 +862,13 @@ void FSLMainWindow::configure_generator()
         ui->lE_px->setEnabled(true);
         ui->lE_py->setEnabled(true);
         ui->lE_pz->setEnabled(true);
+        
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_HEPMC3->clear();
+        ui->lE_GP->clear();
 
 
         particle = (ui->cB_particle->currentText()).toStdString();
@@ -836,18 +892,27 @@ void FSLMainWindow::configure_generator()
         ui->pB_hepmc3_browse_files->setEnabled(false);
         ui->cB_hepmc3_type_of_eve->setEnabled(false);
         ui->pB_gen_plug_browse_files->setEnabled(false);
+        
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_HEPMC3->clear();
+        ui->lE_GP->clear();
 
 
         if(ui->cB_pythia_type_of_eve->currentIndex()==3)
         {
         pythia_type_of_event = "";
         ui->pB_pythia_browse->setEnabled(true);
+        ui->lE_PCF->setEnabled(true);
 
         }
 
         else
         {
+        ui->lE_PCF->clear();
         pythia_input_file = "";
+        ui->pB_pythia_browse->setEnabled(false);
+        ui->lE_PCF->setEnabled(false);
         pythia_type_of_event = (ui->cB_pythia_type_of_eve->currentText()).toStdString();
 
         }
@@ -872,6 +937,8 @@ void FSLMainWindow::configure_generator()
         
         ui->pB_hepmc3_browse_files->setEnabled(true);
         ui->cB_hepmc3_type_of_eve->setEnabled(true);
+        ui->lE_HEPMC3->setEnabled(true);
+
         
         ui->cB_particle->setEnabled(false);
         ui->lE_px->setEnabled(false);
@@ -880,6 +947,11 @@ void FSLMainWindow::configure_generator()
         ui->pB_pythia_browse->setEnabled(false);
         ui->cB_pythia_type_of_eve->setEnabled(false);
         ui->pB_gen_plug_browse_files->setEnabled(false);
+        
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_GP->clear();
         
         hepmc3_type_of_file = (ui->cB_hepmc3_type_of_eve->currentText()).toStdString();
         
@@ -900,7 +972,8 @@ void FSLMainWindow::configure_generator()
     else if(generator=="Generator Plugin")
     {
         ui->sB_NOT->setEnabled(true);
-        
+        ui->lE_GP->setEnabled(true);
+
         ui->pB_gen_plug_browse_files->setEnabled(true);
         
         ui->pB_hepmc3_browse_files->setEnabled(false);
@@ -912,6 +985,11 @@ void FSLMainWindow::configure_generator()
         ui->lE_pz->setEnabled(false);
         ui->pB_pythia_browse->setEnabled(false);
         ui->cB_pythia_type_of_eve->setEnabled(false);
+        
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_HEPMC3->clear();
         
         
         particle = "";
@@ -937,10 +1015,15 @@ void FSLMainWindow::configure_magnetic_field()
     {
         magnetic_field = (ui->lE_fixed_MF->text()).toStdString();
         magnetic_field_plugin_file = "";
-        magnetic_field_map = "";
-        ui->pB_magnetic_field_map->setEnabled(false);
+        //magnetic_field_map = "";
+        //ui->pB_magnetic_field_map->setEnabled(false);
         ui->pB_magnetic_field_plugin->setEnabled(false);
-
+        ui->lE_MAG_PLUG->setEnabled(false);
+        //ui->lE_MAP->setEnabled(false);
+        
+        ui->lE_MAG_PLUG->clear();
+        //ui->lE_MAP->clear();
+        
         ui->lE_fixed_MF->setEnabled(true);
 
 
@@ -953,8 +1036,10 @@ void FSLMainWindow::configure_magnetic_field()
         magnetic_field = "";
         ui->lE_fixed_MF->setEnabled(false);
 
-        ui->pB_magnetic_field_map->setEnabled(true);
+        //ui->pB_magnetic_field_map->setEnabled(true);
         ui->pB_magnetic_field_plugin->setEnabled(true);
+        ui->lE_MAG_PLUG->setEnabled(true);
+        //ui->lE_MAP->setEnabled(true);
     }
 }
 
@@ -1227,6 +1312,13 @@ void FSLMainWindow::load_configuration()
         ui->lE_px->setEnabled(true);
         ui->lE_py->setEnabled(true);
         ui->lE_pz->setEnabled(true);
+        
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_HEPMC3->clear();
+        ui->lE_GP->clear();
 
    //     particle = j_load["Particle"];
    //     ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
@@ -1262,18 +1354,24 @@ void FSLMainWindow::load_configuration()
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
         pythia_type_of_event = j_load["Pythia type of event"];
+        
+        
 
         if(pythia_type_of_event != "")
         {
         ui->cB_pythia_type_of_eve->setCurrentText(QString::fromUtf8(pythia_type_of_event.c_str()));
         ui->pB_pythia_browse->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_PCF->setEnabled(false);
 
         }
         else 
         {
         pythia_input_file = j_load["Pythia event input file"];
+        ui->lE_PCF->setText(QString::fromUtf8(pythia_input_file.c_str()));
         ui->cB_pythia_type_of_eve->setCurrentIndex(3);
         ui->pB_pythia_browse->setEnabled(true);
+        ui->lE_PCF->setEnabled(true);
 
         }
 
@@ -1287,6 +1385,11 @@ void FSLMainWindow::load_configuration()
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
         ui->lE_pz->setEnabled(false);
+        
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_HEPMC3->clear();
+        ui->lE_GP->clear();
         
         ui->cB_hepmc3_type_of_eve->setCurrentIndex(0);
         ui->pB_hepmc3_browse_files->setEnabled(false);
@@ -1305,11 +1408,15 @@ void FSLMainWindow::load_configuration()
         ui->cB_gen_options->setCurrentIndex(2);
         ui->pB_hepmc3_browse_files->setEnabled(true);
         ui->cB_hepmc3_type_of_eve->setEnabled(true);
+        ui->lE_HEPMC3->setEnabled(true);
+
         
         hepmc3_type_of_file = j_load["HepMC3 type of file"];
         hepmc3_input_file = j_load["HepMC3 file"];
         
         ui->cB_hepmc3_type_of_eve->setCurrentText(QString::fromUtf8(hepmc3_type_of_file.c_str()));
+        ui->lE_HEPMC3->setText(QString::fromUtf8(hepmc3_input_file.c_str()));
+
         
         ui->lE_px->clear();
         ui->lE_py->clear();
@@ -1319,6 +1426,11 @@ void FSLMainWindow::load_configuration()
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
         ui->lE_pz->setEnabled(false);
+        
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_GP->clear();
         
         ui->cB_pythia_type_of_eve->setCurrentIndex(0);
         ui->pB_pythia_browse->setEnabled(false);
@@ -1335,8 +1447,16 @@ void FSLMainWindow::load_configuration()
         
         ui->cB_gen_options->setCurrentIndex(3);
         ui->pB_gen_plug_browse_files->setEnabled(true);
+        ui->lE_GP->setEnabled(true);
+
         generator_plugin = j_load["Generator Plugin"];
+        ui->lE_GP->setText(QString::fromUtf8(generator_plugin.c_str()));
         
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_HEPMC3->clear();
+
         ui->lE_px->clear();
         ui->lE_py->clear();
         ui->lE_pz->clear();
@@ -1415,18 +1535,29 @@ void FSLMainWindow::load_configuration()
         magnetic_field_plugin_file = "";
       //  ui->lE_magnetic_field_map->clear();
       //  ui->lE_magnetic_field_map->setEnabled(false);
-        magnetic_field_map = "";
-        ui->pB_magnetic_field_map->setEnabled(false);
+        //magnetic_field_map = "";
+        //ui->pB_magnetic_field_map->setEnabled(false);
         ui->pB_magnetic_field_plugin->setEnabled(false);
+        
+        //ui->lE_MAP->clear();
+        ui->lE_MAG_PLUG->clear();
+        //ui->lE_MAP->setEnabled(false);
+        ui->lE_MAG_PLUG->setEnabled(false);
 
     }
 
     else{
-        ui->pB_magnetic_field_map->setEnabled(true);
+        //ui->pB_magnetic_field_map->setEnabled(true);
         ui->pB_magnetic_field_plugin->setEnabled(true);
+        //ui->lE_MAP->setEnabled(true);
+        ui->lE_MAG_PLUG->setEnabled(true);
         ui->cB_magnetic_field->setCurrentIndex(1);
         magnetic_field_plugin_file = j_load["Magnetic Field Plugin"];
-        magnetic_field_map = j_load["Magnetic Field Map"];
+        //magnetic_field_map = j_load["Magnetic Field Map"];
+        
+        //ui->lE_MAP->setText(QString::fromUtf8(magnetic_field_map.c_str()));
+        ui->lE_MAG_PLUG->setText(QString::fromUtf8(magnetic_field_plugin_file.c_str()));
+
        // ui->lE_magnetic_field_map->setText(QString::fromUtf8(magnetic_field_map.c_str()));
 
         magnetic_field = "";
@@ -1656,6 +1787,13 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
         ui->lE_px->setEnabled(true);
         ui->lE_py->setEnabled(true);
         ui->lE_pz->setEnabled(true);
+        
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_HEPMC3->clear();
+        ui->lE_GP->clear();
 
    //     particle = j_load["Particle"];
    //     ui->cB_particle->setCurrentText(QString::fromUtf8(particle.c_str()));
@@ -1691,18 +1829,24 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
         ui->cB_pythia_type_of_eve->setEnabled(true);
 
         pythia_type_of_event = j_load["Pythia type of event"];
+        
+        
 
         if(pythia_type_of_event != "")
         {
         ui->cB_pythia_type_of_eve->setCurrentText(QString::fromUtf8(pythia_type_of_event.c_str()));
         ui->pB_pythia_browse->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_PCF->setEnabled(false);
 
         }
         else
         {
         pythia_input_file = j_load["Pythia event input file"];
+        ui->lE_PCF->setText(QString::fromUtf8(pythia_input_file.c_str()));
         ui->cB_pythia_type_of_eve->setCurrentIndex(3);
         ui->pB_pythia_browse->setEnabled(true);
+        ui->lE_PCF->setEnabled(true);
 
         }
 
@@ -1716,6 +1860,11 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
         ui->lE_pz->setEnabled(false);
+        
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_HEPMC3->clear();
+        ui->lE_GP->clear();
         
         ui->cB_hepmc3_type_of_eve->setCurrentIndex(0);
         ui->pB_hepmc3_browse_files->setEnabled(false);
@@ -1734,11 +1883,15 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
         ui->cB_gen_options->setCurrentIndex(2);
         ui->pB_hepmc3_browse_files->setEnabled(true);
         ui->cB_hepmc3_type_of_eve->setEnabled(true);
+        ui->lE_HEPMC3->setEnabled(true);
+
         
         hepmc3_type_of_file = j_load["HepMC3 type of file"];
         hepmc3_input_file = j_load["HepMC3 file"];
         
         ui->cB_hepmc3_type_of_eve->setCurrentText(QString::fromUtf8(hepmc3_type_of_file.c_str()));
+        ui->lE_HEPMC3->setText(QString::fromUtf8(hepmc3_input_file.c_str()));
+
         
         ui->lE_px->clear();
         ui->lE_py->clear();
@@ -1748,6 +1901,11 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
         ui->lE_pz->setEnabled(false);
+        
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_GP->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_GP->clear();
         
         ui->cB_pythia_type_of_eve->setCurrentIndex(0);
         ui->pB_pythia_browse->setEnabled(false);
@@ -1764,8 +1922,16 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
         
         ui->cB_gen_options->setCurrentIndex(3);
         ui->pB_gen_plug_browse_files->setEnabled(true);
+        ui->lE_GP->setEnabled(true);
+
         generator_plugin = j_load["Generator Plugin"];
+        ui->lE_GP->setText(QString::fromUtf8(generator_plugin.c_str()));
         
+        ui->lE_PCF->setEnabled(false);
+        ui->lE_HEPMC3->setEnabled(false);
+        ui->lE_PCF->clear();
+        ui->lE_HEPMC3->clear();
+
         ui->lE_px->clear();
         ui->lE_py->clear();
         ui->lE_pz->clear();
@@ -1844,18 +2010,29 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
         magnetic_field_plugin_file = "";
       //  ui->lE_magnetic_field_map->clear();
       //  ui->lE_magnetic_field_map->setEnabled(false);
-        magnetic_field_map = "";
-        ui->pB_magnetic_field_map->setEnabled(false);
+        //magnetic_field_map = "";
+        //ui->pB_magnetic_field_map->setEnabled(false);
         ui->pB_magnetic_field_plugin->setEnabled(false);
+        
+        //ui->lE_MAP->clear();
+        ui->lE_MAG_PLUG->clear();
+        //ui->lE_MAP->setEnabled(false);
+        ui->lE_MAG_PLUG->setEnabled(false);
 
     }
 
     else{
-        ui->pB_magnetic_field_map->setEnabled(true);
+        //ui->pB_magnetic_field_map->setEnabled(true);
         ui->pB_magnetic_field_plugin->setEnabled(true);
+        //ui->lE_MAP->setEnabled(true);
+        ui->lE_MAG_PLUG->setEnabled(true);
         ui->cB_magnetic_field->setCurrentIndex(1);
         magnetic_field_plugin_file = j_load["Magnetic Field Plugin"];
-        magnetic_field_map = j_load["Magnetic Field Map"];
+        //magnetic_field_map = j_load["Magnetic Field Map"];
+        
+        //ui->lE_MAP->setText(QString::fromUtf8(magnetic_field_map.c_str()));
+        ui->lE_MAG_PLUG->setText(QString::fromUtf8(magnetic_field_plugin_file.c_str()));
+
        // ui->lE_magnetic_field_map->setText(QString::fromUtf8(magnetic_field_map.c_str()));
 
         magnetic_field = "";
@@ -2048,6 +2225,11 @@ void FSLMainWindow::create_configuration()
     number_of_events = ui->sB_NOE->value();
     number_of_threads = ui->sB_NOT->value();
     physics_list_name = (ui->lE_PLN->text()).toStdString();
+    pythia_input_file =(ui->lE_PCF->text()).toStdString();
+    hepmc3_input_file =(ui->lE_HEPMC3->text()).toStdString();
+    generator_plugin =(ui->lE_GP->text()).toStdString();
+    //magnetic_field_map = (ui->lE_MAP->text()).toStdString();
+    magnetic_field_plugin_file = (ui->lE_MAG_PLUG->text()).toStdString();
    // hits_file = (ui->lE_hits->text()).toStdString();
    // histo_file = (ui->lE_histo->text()).toStdString();
 
@@ -2079,7 +2261,7 @@ void FSLMainWindow::create_configuration()
     this->configure_magnetic_field();
     j["Magnetic Field Type"] = magnetic_field_type;
  //   j["Magnetic Field Intensity"] = magnetic_field;
-    j["Magnetic Field Map"] = magnetic_field_map;
+    //j["Magnetic Field Map"] = magnetic_field_map;
     j["Magnetic Field Plugin"] = magnetic_field_plugin_file;
 
     this->configure_actions();

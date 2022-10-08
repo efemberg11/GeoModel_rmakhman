@@ -66,7 +66,6 @@ public:
 
   void AddSensitiveDetectorPlugin(const std::string & SDPluginName) { sensitiveDetectorPluginName.push_back(SDPluginName);}
   void SetMagFieldPluginPath(const std::string &MFPluginName) {mag_field_plugin_path = MFPluginName;}
-  void SetMagFieldMapPath(const std::string &MFPathName){mag_field_map_path = MFPathName;}
     
   void ConfigureRegionsFSL(std::vector<std::string> reg,
                            std::vector<std::vector<G4String>> root_lv_names,
@@ -122,7 +121,6 @@ private:
 
   std::vector<std::string> sensitiveDetectorPluginName;
   std::string mag_field_plugin_path;
-  std::string mag_field_map_path;
   
   //Regions Data
     std::vector<std::string> Regions;

@@ -233,10 +233,9 @@ int main(int argc, char** argv) {
         detector->SetGeometryFileName (simConfig::fsl.geometry);
         runManager->SetUserInitialization(detector);
         
-        if(simConfig::fsl.magFieldType=="Map")
+        if(simConfig::fsl.magFieldType=="Plugin")
         {
         detector->SetMagFieldPluginPath(simConfig::fsl.magFieldPlugin);
-        detector->SetMagFieldMapPath(simConfig::fsl.magFieldMap);
         }
                 
         

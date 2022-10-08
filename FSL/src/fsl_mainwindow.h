@@ -97,7 +97,7 @@ public:
     std::string magnetic_field_type = "";
     std::string magnetic_field = "";
     std::string magnetic_field_plugin_file = "";
-    std::string magnetic_field_map = "";
+    //std::string magnetic_field_map = "";
 
     //Parameters associated with the User Actions tab
   //  std::vector<std::string> run_actions;
@@ -171,7 +171,7 @@ public:
     void assign_hepmc3_file();
     void assign_pythia_file();
     void assign_magnetic_field_plugin_file();
-    void assign_magnetic_field_map();
+    //void assign_magnetic_field_map();
    //void assign_shape_ext_file();
 
  //   void assign_run_actions_file();

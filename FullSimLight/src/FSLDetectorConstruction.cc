@@ -412,7 +412,7 @@ void FSLDetectorConstruction::ConstructSDandField()
     }
     else // if (!fFieldConstant)
         {
-          G4cout << G4endl << " *** MAGNETIC FIELD SET FROM FILE  *** " << G4endl << G4endl;
+          G4cout << G4endl << " *** MAGNETIC FIELD SET FROM PLUGIN  *** " << G4endl << G4endl;
           if (fField.Get() == 0)
           {
               if(mag_field_plugin_path == "")
@@ -426,7 +426,7 @@ void FSLDetectorConstruction::ConstructSDandField()
               {
               GeoPluginLoader<MagFieldPlugin> loader;
               MagFieldPlugin *plugin=loader.load(mag_field_plugin_path);
-              G4MagneticField *g4Field=plugin->getField(mag_field_map_path);
+              G4MagneticField *g4Field=plugin->getField();
               delete plugin;
               if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
               fField.Put(g4Field);

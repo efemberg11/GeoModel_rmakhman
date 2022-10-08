@@ -36,7 +36,6 @@ endif()
 # Project's dependencies.
 # GeoModel dependencies
 
-
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 

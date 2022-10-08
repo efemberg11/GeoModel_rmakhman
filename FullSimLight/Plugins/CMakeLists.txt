@@ -45,6 +45,11 @@ include( GNUInstallDirs )
 add_subdirectory(HitsPlugin)
 add_subdirectory(Examples/UserActionPlugins)
 add_subdirectory(TracksPlugin)
+add_subdirectory(Examples/PhysicsListPlugins/FSLTestPhysListPlugins)
+add_subdirectory(Examples/EventGeneratorPlugins/FSLExamplePrimaryGeneratorPlugin)
+add_subdirectory(Examples/SensitiveDetectorPlugins/SDPlugin)
+add_subdirectory(Examples/MagneticFieldPlugins/UniformMagneticFieldPlugin)
+
 
 
 

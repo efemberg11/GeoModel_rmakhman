@@ -4,8 +4,6 @@
 #include "FullSimLight/MagFieldPlugin.h"
 #include "MassCalculator.hh"
 #include "ClashDetector.hh"
-#include "MagFieldServices/AtlasFieldSvc.h"
-#include "StandardFieldSvc.h"
 
 // Geant4 includes
 #include "G4Version.hh"
@@ -415,14 +413,6 @@ void FSLDetectorConstruction::ConstructSDandField()
           G4cout << G4endl << " *** MAGNETIC FIELD SET FROM PLUGIN  *** " << G4endl << G4endl;
           if (fField.Get() == 0)
           {
-              if(mag_field_plugin_path == "")
-              {
-              StandardFieldSvc* FSLMagField = new StandardFieldSvc("StandardFieldSvc");
-              G4MagneticField* g4Field =  FSLMagField->getField();
-              if(g4Field==nullptr) std::cout<<"Error, g4Field is null!"<<std::endl;
-              fField.Put(g4Field);
-              }
-              else
               {
               GeoPluginLoader<MagFieldPlugin> loader;
               MagFieldPlugin *plugin=loader.load(mag_field_plugin_path);

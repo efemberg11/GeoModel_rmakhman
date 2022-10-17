@@ -37,17 +37,16 @@ endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# Find the dependencies of the project.
+find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )
+
+# Qt5 settings.
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-
+# Use the GNU install directory names.
+include( GNUInstallDirs )
 
 
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cpp)

@@ -19,6 +19,12 @@ curl "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags/"
 curl -Ss --request GET "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags" | jq -r '.[0] | .name'
 ```
 
+### Get the commit hash of the latest tag 
+
+```
+curl -Ss --request GET "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags" | jq -r '.[0] | .commit.id'
+```
+
 ## Pipelines
 
 Given the GeoModel project ID: 95156, get all the latest pipelines:

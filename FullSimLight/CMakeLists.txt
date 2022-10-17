@@ -73,7 +73,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
 # Add sub-projects and targets
-#add_subdirectory(MagneticField)
 add_subdirectory(Plugins)
 
 

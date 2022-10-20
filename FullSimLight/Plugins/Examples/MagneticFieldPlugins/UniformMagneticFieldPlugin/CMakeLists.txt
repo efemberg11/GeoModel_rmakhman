@@ -62,7 +62,7 @@ include( GNUInstallDirs )
 add_definitions (-DMAPPATH="${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}" )
 
 
-target_include_directories( UniformMagneticFieldPlugin PUBLIC ${CMAKE_SOURCE_DIR}/FullSimLight )
+target_include_directories( UniformMagneticFieldPlugin PUBLIC ${CMAKE_SOURCE_DIR} )
 
 
 target_link_libraries ( UniformMagneticFieldPlugin PUBLIC ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} Eigen3::Eigen)

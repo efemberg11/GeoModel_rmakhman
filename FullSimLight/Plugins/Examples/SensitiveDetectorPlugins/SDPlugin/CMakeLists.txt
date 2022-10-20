@@ -59,7 +59,7 @@ include(${Geant4_USE_FILE})
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
-target_include_directories( SDPlugin PUBLIC  ${CMAKE_SOURCE_DIR}/FullSimLight)
+target_include_directories( SDPlugin PUBLIC  ${CMAKE_SOURCE_DIR} )
 
 target_link_libraries ( SDPlugin PUBLIC ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES})
 

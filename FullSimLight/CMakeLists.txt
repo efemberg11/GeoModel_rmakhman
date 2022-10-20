@@ -105,10 +105,12 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
 
 if( NOT HepMC3_FOUND)
     file(GLOB hepmc3src ${PROJECT_SOURCE_DIR}/src/HepMC3*.cc)
-    message(NOTICE "NOTE ==> HepMC3 was not found, we don't compile FullSimLight tools using it.")
+    message(STATUS "NOTE ==> HepMC3 was not found, we don't compile FullSimLight tools using it.")
     #message("Removing those HepMC3-related sources: ${hepmc3src}") # debug msg
     list(REMOVE_ITEM sources ${hepmc3src})
     #message("new sources without HepMC3 support: ${sources}") # debug msg
+else()
+    message(STATUS "Found HepMC3, so support for it will be compiled. (${HepMC3_INCLUDE_DIRS})")
 endif()
 
 #----------------------------------------------------------------------------

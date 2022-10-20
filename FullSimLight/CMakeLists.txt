@@ -7,7 +7,6 @@ cmake_minimum_required( VERSION 3.14 )
 project( "FullSimLight" )
 
 #Set up the project. Check if we build it with GeoModel or individually
-
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am top-level project.
     # Make the root module directory visible to CMake.
@@ -20,6 +19,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( cmake_colors_defs )
     # Warn the users about what they are doing
     message(STATUS "${BoldGreen}Building ${PROJECT_NAME} individually, as a top-level project.${ColourReset}")
+    # Set a default build type
+    include( BuildType )
     # Set default build and C++ options
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
@@ -38,6 +39,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     find_package( GeoModelG4 REQUIRED ${GeoModel_VERSION} )
     # Set a flag to steer the  of the subpackages
     set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
+    # Print Build Info on screen
+    include( PrintBuildInfo )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
@@ -55,7 +58,7 @@ message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
 #----------------------------------------------------------------------------
 
 find_package(Pythia QUIET) # optional
-find_package(HepMC3 REQUIRED)
+find_package(HepMC3 QUIET) # optional
 #find_package(ROOT QUIET) #optional
 #option(HEPMC3_ROOTIO_USE "Enable the use of HEPMC3 with ROOT" OFF)
 
@@ -97,6 +100,16 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 #
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
+#message("sources: ${sources}") # debug msg
+
+
+if( NOT HepMC3_FOUND)
+    file(GLOB hepmc3src ${PROJECT_SOURCE_DIR}/src/HepMC3*.cc)
+    message(NOTICE "NOTE ==> HepMC3 was not found, we don't compile FullSimLight tools using it.")
+    #message("Removing those HepMC3-related sources: ${hepmc3src}") # debug msg
+    list(REMOVE_ITEM sources ${hepmc3src})
+    #message("new sources without HepMC3 support: ${sources}") # debug msg
+endif()
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
@@ -119,6 +132,10 @@ add_executable(gm2gdml geoModel2GDML.cc ${sources} ${headers})
 if(Pythia_FOUND)
   target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
   target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
+endif()
+
+if(HepMC3_FOUND)
+    target_compile_definitions(fullSimLight PRIVATE USE_HEPMC3)
 endif()
 
 #if(HEPMC3_ROOTIO_USE)

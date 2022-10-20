@@ -61,7 +61,7 @@ include(${Geant4_USE_FILE})
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
-target_include_directories( DummyUserActionPlugin PUBLIC  ${CMAKE_SOURCE_DIR}/FullSimLight ${HDF5_CXX_INCLUDE_DIRS})
+target_include_directories( DummyUserActionPlugin PUBLIC  ${CMAKE_SOURCE_DIR} ${HDF5_CXX_INCLUDE_DIRS})
 
 target_link_libraries ( DummyUserActionPlugin PUBLIC ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} ${HDF5_CXX_LIBRARIES})
 

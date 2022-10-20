@@ -62,17 +62,13 @@ include(${Geant4_USE_FILE})
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
-target_include_directories( GenerateTracksPlugin PUBLIC  ${CMAKE_SOURCE_DIR}/FullSimLight ${HDF5_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories( GenerateTracksPlugin PUBLIC  ${CMAKE_SOURCE_DIR} ${HDF5_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries ( GenerateTracksPlugin PUBLIC ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} ${HDF5_CXX_LIBRARIES})
-
-
 
 set_target_properties( GenerateTracksPlugin PROPERTIES
 		       VERSION ${PROJECT_VERSION}
 		       SOVERSION ${PROJECT_VERSION_MAJOR} )
-
-
 
 install( TARGETS GenerateTracksPlugin
 	 LIBRARY DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/FullSimLight/UserActionPlugins

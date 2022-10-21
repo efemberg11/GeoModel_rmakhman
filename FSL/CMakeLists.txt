@@ -33,9 +33,20 @@ else()
 endif()
 
 
-
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+
+# Support for the HepMC3 exchange format
+# This is ON by default, but it can be disabled by the user if not used/needed,
+# or if HepMC3 is not installed
+option(GEOMODEL_USE_HEPMC3 "Enable the build of all GeoModel sub-packages" ON)
+if(GEOMODEL_USE_HEPMC3)
+    find_package(HepMC3 REQUIRED)
+endif()
+if(HepMC3_FOUND)
+    target_compile_definitions(fullSimLight PRIVATE USE_HEPMC3)
+endif()
+
 
 # Find the dependencies of the project.
 find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )

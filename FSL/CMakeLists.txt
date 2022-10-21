@@ -38,10 +38,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Support for the HepMC3 exchange format
 # This is ON by default, but it can be disabled by the user if not used/needed,
-# or if HepMC3 is not installed
-option(GEOMODEL_USE_HEPMC3 "Enable the build of all GeoModel sub-packages" ON)
+# or if HepMC3 is not installed.
+option(GEOMODEL_USE_HEPMC3 "Buil GeoModel tools with support for the HepMC3 exchancge format (Note: HepMC3 must be installed on the target machine)" ON)
 if(GEOMODEL_USE_HEPMC3)
-    find_package(HepMC3 REQUIRED)
+    find_package(HepMC3 REQUIRED) # required by default, but it can be disabled 
 endif()
 if(HepMC3_FOUND)
     target_compile_definitions(fullSimLight PRIVATE USE_HEPMC3)

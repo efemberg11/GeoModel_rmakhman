@@ -72,7 +72,8 @@ if(GEOMODEL_USE_HEPMC3)
     find_package(HepMC3 REQUIRED) # required by default, but it can be disabled 
 endif()
 if(HepMC3_FOUND)
-    target_compile_definitions(fullSimLight PRIVATE USE_HEPMC3)
+    #target_compile_definitions(fullSimLight PRIVATE USE_HEPMC3)
+    add_compile_definitions( USE_HEPMC3 )
 endif()
 
 
@@ -123,7 +124,7 @@ if( NOT HepMC3_FOUND)
     list(REMOVE_ITEM sources ${hepmc3src})
     #message("new sources without HepMC3 support: ${sources}") # debug msg
 else()
-    message(STATUS "Found HepMC3, so support for it will be compiled. (${HepMC3_INCLUDE_DIR})")
+    message(STATUS "Found HepMC3, so support for it will be compiled. (${HEPMC3_INCLUDE_DIR})")
 endif()
 
 #----------------------------------------------------------------------------

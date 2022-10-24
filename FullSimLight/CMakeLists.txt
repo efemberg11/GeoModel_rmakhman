@@ -72,7 +72,6 @@ if(GEOMODEL_USE_HEPMC3)
     find_package(HepMC3 REQUIRED) # required by default, but it can be disabled 
 endif()
 if(HepMC3_FOUND)
-    #target_compile_definitions(fullSimLight PRIVATE USE_HEPMC3)
     add_compile_definitions( USE_HEPMC3 )
 endif()
 

@@ -117,7 +117,7 @@ variables:
     - cd Geant4-build
     - ls;
     - ls ../
-    - ls ../install
+    - if [ -d "../install" ] then; ls ../install; fi
     - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON  ../geant4 
     - make -j4
     - make install

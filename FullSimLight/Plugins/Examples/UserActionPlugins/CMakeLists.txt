@@ -2,7 +2,7 @@
 
 # Set up the project.
 cmake_minimum_required( VERSION 3.1 )
-project( "FSLUserActionsPlugins" )
+project( "UserActionsPlugins" )
 
 #Set up the project. Check if we build it with GeoModel or individually
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)

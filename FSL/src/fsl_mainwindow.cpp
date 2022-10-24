@@ -191,6 +191,13 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
     connect(&fullSimLight_process,SIGNAL(started()),this,SLOT(fsml_process_started()));
     connect(&fullSimLight_process,SIGNAL(finished(int , QProcess::ExitStatus )),this,SLOT(fsml_process_finished()));
 
+    // Disable options if the underlying packages/tools are not installed/found
+    // (e.g., HepMC3, Pythia, ...)
+    // TODO: add check for Pythia, external plugins, and anything is not embedded in FullSimLight by default
+#ifndef USE_HEPMC3
+    ui->cB_gen_options->setItemData(2, false, Qt::UserRole -1);
+    ui->groupBox_hepmc3->setEnabled(false);
+#endif
 
 }
 
@@ -934,11 +941,12 @@ void FSLMainWindow::configure_generator()
     {
         ui->sB_NOT->setValue(1);
         ui->sB_NOT->setEnabled(false);
-        
+       
+#ifdef USE_HEPMC3
         ui->pB_hepmc3_browse_files->setEnabled(true);
         ui->cB_hepmc3_type_of_eve->setEnabled(true);
         ui->lE_HEPMC3->setEnabled(true);
-
+#endif
         
         ui->cB_particle->setEnabled(false);
         ui->lE_px->setEnabled(false);
@@ -1152,6 +1160,7 @@ void FSLMainWindow::run_configuration()
     QStringList args;   //Contains arguments of the command
     
     //Needs to be fixed. Should not be a hard coded path.
+    //TODO: add check if exe is found. If not, throw an error message
     Command = "fullSimLight";
     
     args<<"-c"<< QString::fromUtf8(tmpConf.c_str());
@@ -1173,6 +1182,7 @@ void FSLMainWindow::run_gmex()
     QStringList args;   //Contains arguments of the command
     
     //Needs to be fixed. Should not be a hard coded path.
+    //TODO: add check if exe is found. If not, throw an error message
     Command = "gmex";
      
     args << QString::fromUtf8(geom_file_address.c_str());
@@ -1194,6 +1204,7 @@ void FSLMainWindow::run_gmclash()
     QStringList args;   //Contains arguments of the command
     
     //Needs to be fixed. Should not be a hard coded path.
+    //TODO: add check if exe is found. If not, throw an error message
     Command = "gmclash";
      
     args << QString("-g") <<  QString::fromUtf8(geom_file_address.c_str());
@@ -1404,18 +1415,18 @@ void FSLMainWindow::load_configuration()
     {
         ui->sB_NOT->setValue(1);
         ui->sB_NOT->setEnabled(false);
-        
+#ifdef USE_HEPMC3    
         ui->cB_gen_options->setCurrentIndex(2);
         ui->pB_hepmc3_browse_files->setEnabled(true);
         ui->cB_hepmc3_type_of_eve->setEnabled(true);
         ui->lE_HEPMC3->setEnabled(true);
-
         
         hepmc3_type_of_file = j_load["HepMC3 type of file"];
         hepmc3_input_file = j_load["HepMC3 file"];
         
         ui->cB_hepmc3_type_of_eve->setCurrentText(QString::fromUtf8(hepmc3_type_of_file.c_str()));
         ui->lE_HEPMC3->setText(QString::fromUtf8(hepmc3_input_file.c_str()));
+#endif
 
         
         ui->lE_px->clear();
@@ -1879,7 +1890,8 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
     {
         ui->sB_NOT->setValue(1);
         ui->sB_NOT->setEnabled(false);
-        
+
+#ifdef USE_HEPMC3
         ui->cB_gen_options->setCurrentIndex(2);
         ui->pB_hepmc3_browse_files->setEnabled(true);
         ui->cB_hepmc3_type_of_eve->setEnabled(true);
@@ -1891,7 +1903,7 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path)
         
         ui->cB_hepmc3_type_of_eve->setCurrentText(QString::fromUtf8(hepmc3_type_of_file.c_str()));
         ui->lE_HEPMC3->setText(QString::fromUtf8(hepmc3_input_file.c_str()));
-
+#endif
         
         ui->lE_px->clear();
         ui->lE_py->clear();

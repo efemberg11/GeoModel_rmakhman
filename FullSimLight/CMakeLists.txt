@@ -7,7 +7,6 @@ cmake_minimum_required( VERSION 3.14 )
 project( "FullSimLight" )
 
 #Set up the project. Check if we build it with GeoModel or individually
-
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am top-level project.
     # Make the root module directory visible to CMake.
@@ -20,6 +19,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( cmake_colors_defs )
     # Warn the users about what they are doing
     message(STATUS "${BoldGreen}Building ${PROJECT_NAME} individually, as a top-level project.${ColourReset}")
+    # Set a default build type
+    include( BuildType )
     # Set default build and C++ options
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
@@ -38,6 +39,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     find_package( GeoModelG4 REQUIRED ${GeoModel_VERSION} )
     # Set a flag to steer the  of the subpackages
     set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
+    # Print Build Info on screen
+    include( PrintBuildInfo )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
@@ -54,10 +57,24 @@ find_package(Geant4 REQUIRED)
 message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
 #----------------------------------------------------------------------------
 
+# Support for the Pythia MC generator
 find_package(Pythia QUIET) # optional
-find_package(HepMC3 REQUIRED)
-#find_package(ROOT QUIET) #optional
-#option(HEPMC3_ROOTIO_USE "Enable the use of HEPMC3 with ROOT" OFF)
+if(Pythia_FOUND)
+  target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
+  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
+endif()
+
+# Support for the HepMC3 exchange format
+# This is ON by default, but it can be disabled by the user if not used/needed,
+# or if HepMC3 is not installed.
+option(GEOMODEL_USE_HEPMC3 "Build GeoModel tools with support for the HepMC3 exchancge format (Note: HepMC3 must be installed on the target machine)" ON)
+if(GEOMODEL_USE_HEPMC3)
+    find_package(HepMC3 REQUIRED) # required by default, but it can be disabled 
+endif()
+if(HepMC3_FOUND)
+    #target_compile_definitions(fullSimLight PRIVATE USE_HEPMC3)
+    add_compile_definitions( USE_HEPMC3 )
+endif()
 
 
 #----------------------------------------------------------------------------
@@ -97,6 +114,18 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 #
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
+#message("sources: ${sources}") # debug msg
+
+
+if( NOT HepMC3_FOUND)
+    file(GLOB hepmc3src ${PROJECT_SOURCE_DIR}/src/HepMC3*.cc)
+    message(STATUS "! NOTE ==> The support for HepMC3 was disabled by the user; therefore, support for it in FullSimLight will not be compiled.")
+    #message("Removing those HepMC3-related sources: ${hepmc3src}") # debug msg
+    list(REMOVE_ITEM sources ${hepmc3src})
+    #message("new sources without HepMC3 support: ${sources}") # debug msg
+else()
+    message(STATUS "Found HepMC3, so support for it will be compiled. (${HEPMC3_INCLUDE_DIR})")
+endif()
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
@@ -116,10 +145,7 @@ add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 #add_executable(testMagneticField testMagneticField.cc)
 add_executable(gm2gdml geoModel2GDML.cc ${sources} ${headers})
 
-if(Pythia_FOUND)
-  target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
-  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
-endif()
+
 
 #if(HEPMC3_ROOTIO_USE)
 #  message( STATUS "HEPMC3 Root Dependency Switched on")

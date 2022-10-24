@@ -1,11 +1,13 @@
 #include "FSLActionInitialization.hh"
 #include "GeoModelKernel/GeoPluginLoader.h"
-#include "FSLPrimaryGeneratorAction.hh"
-#include "HepMC3PrimaryGeneratorAction.hh"
 #include "FSLRunAction.hh"
 #include "FSLEventAction.hh"
 #include "FSLSteppingAction.hh"
 #include "FSLTrackingAction.hh"
+#include "FSLPrimaryGeneratorAction.hh"
+#if USE_HEPMC3
+#include "HepMC3PrimaryGeneratorAction.hh"
+#endif
 #include "PythiaPrimaryGeneratorAction.hh"
 #include "FullSimLight/FSLUserActionPlugin.h"
 
@@ -66,7 +68,8 @@ void FSLActionInitialization::BuildForMaster() const {
 void FSLActionInitialization::Build() const {
 
 #if !USE_PYTHIA
-  
+ 
+#if USE_HEPMC3
   if(generator == "HepMC3 File")
   {
       std::cout << "Reading in events from file: " << hepmc3_file_path << std::endl;
@@ -74,8 +77,10 @@ void FSLActionInitialization::Build() const {
       
   }
     
-  else if(generator == "Generator Plugin")
-  {
+  else if(generator == "Generator Plugin") {
+#else
+  if(generator == "Generator Plugin") {
+#endif
       std::cout << "Loading in event generator from plugin" << std::endl;
       GeoPluginLoader<FSLUserActionPlugin> generator_loader;
       const FSLUserActionPlugin * gen_plugin = generator_loader.load(generator_plugin);
@@ -98,6 +103,9 @@ void FSLActionInitialization::Build() const {
     G4int pythiaSeed = fIsPerformance ? -1 : 0;
     SetUserAction(new PythiaPrimaryGeneratorAction(pythiaSeed));
   } else {
+
+
+#if USE_HEPMC3
       if(generator == "HepMC3 File")
       {
           std::cout << "Reading in events from file: " << hepmc3_file_path << std::endl;
@@ -105,8 +113,10 @@ void FSLActionInitialization::Build() const {
           
       }
         
-      else if(generator == "Generator Plugin")
-      {
+  else if(generator == "Generator Plugin") {
+#else
+  if(generator == "Generator Plugin") {
+#endif
           std::cout << "Loading in event generator from plugin" << std::endl;
           GeoPluginLoader<FSLUserActionPlugin> generator_loader;
           const FSLUserActionPlugin * gen_plugin = generator_loader.load(generator_plugin);

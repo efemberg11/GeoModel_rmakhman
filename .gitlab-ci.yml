@@ -263,7 +263,11 @@ mac-gm-atlasextras:
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
 
 
-### UBUNTU BUILD JOBS
+### UBUNTU ALL-IN-ONE BUILD JOBS
+
+### These jobs build the various GeoModel sub-packages with the use of the CMake
+### build options.
+
 ubu-coin:
   <<: *ubuntu-job
   <<: *coin-job
@@ -352,7 +356,6 @@ ubu-gm-atlasextras:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
 
-
 #TODO: this does not work properly. Needs some work...
 # ubu-gm-fullsimlight-customxercesc-builtinjson:
 #   <<: *ubuntu-job
@@ -366,6 +369,114 @@ ubu-gm-atlasextras:
 #     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib
 #   rules:
 #     - when: manual
+
+
+
+
+### UBUNTU SINGLE BUILD JOBS
+
+### These jobs build the various GeoModel sub-packages as single top-tree packages,
+### one of top of the others. This is what is used, for example, when building 
+### distribution kits, such as the Homebrew 'bottles' for macOS. 
+### Therefore, these jobs test the succesfull build of the GeoModel side for the 
+### distribution kits. If these jobs fail, the formula building the 
+### distribution kits will fail as well.
+
+ubu-single-gmbase:
+  <<: *ubuntu-job
+  stage: step-A
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    script:
+      - mkdir build
+      - cd build
+      - cmake ${CMAKE_ARGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+      - cmake --build . -- -j2
+      - cmake --build . -- install
+    artifacts:
+      paths:
+        - install
+
+ubu-single-gmtools:
+  <<: *ubuntu-job
+  stage: step-B
+  needs: ["ubu-single-gmbase"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    script:
+      - mkdir build
+      - cd build
+      - cmake ${CMAKE_ARGS} ../GeoModelTools # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+      - cmake --build . -- -j2
+      - cmake --build . -- install
+    artifacts:
+      paths:
+        - install
+
+ubu-single-gmviz:
+  <<: *ubuntu-job
+  stage: step-B
+  needs: ["ubu-single-gmbase"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    script:
+      - mkdir build
+      - cd build
+      - cmake ${CMAKE_ARGS} ../GeoModelVisualization # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+      - cmake --build . -- -j2
+      - cmake --build . -- install
+    artifacts:
+      paths:
+        - install
+
+ubu-single-gmg4:
+  <<: *ubuntu-job
+  stage: step-B
+  needs: ["ubu-single-gmbase"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    script:
+      - mkdir build
+      - cd build
+      - cmake ${CMAKE_ARGS} ../GeoModelG4 # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+      - cmake --build . -- -j2
+      - cmake --build . -- install
+    artifacts:
+      paths:
+        - install
+
+ubu-single-gmfullsimlight:
+  <<: *ubuntu-job
+  stage: step-C
+  needs: ["ubu-single-gmg4", "ubu-geant4"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    script:
+      - mkdir build
+      - cd build
+      - cmake ${CMAKE_ARGS} ../FullSimLight # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+      - cmake --build . -- -j2
+      - cmake --build . -- install
+    artifacts:
+      paths:
+        - install
+
+ubu-single-gmfsl:
+  <<: *ubuntu-job
+  stage: step-D
+  needs: ["ubu-single-gmfullsimlight"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    script:
+      - mkdir build
+      - cd build
+      - cmake ${CMAKE_ARGS} ../FSL # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+      - cmake --build . -- -j2
+      - cmake --build . -- install
+    artifacts:
+      paths:
+        - install
+
 
 #####################
 ### Documentation ###

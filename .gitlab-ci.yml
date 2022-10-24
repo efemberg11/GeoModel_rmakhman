@@ -387,15 +387,15 @@ ubu-single-gmbase:
   stage: step-A
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    script:
-      - mkdir build
-      - cd build
-      - cmake ${CMAKE_ARGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-      - cmake --build . -- -j2
-      - cmake --build . -- install
-    artifacts:
-      paths:
-        - install
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
 
 ubu-single-gmtools:
   <<: *ubuntu-job
@@ -403,79 +403,79 @@ ubu-single-gmtools:
   needs: ["ubu-single-gmbase"]
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    script:
-      - mkdir build
-      - cd build
-      - cmake ${CMAKE_ARGS} ../GeoModelTools # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-      - cmake --build . -- -j2
-      - cmake --build . -- install
-    artifacts:
-      paths:
-        - install
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../GeoModelTools # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
 
 ubu-single-gmviz:
   <<: *ubuntu-job
-  stage: step-B
-  needs: ["ubu-single-gmbase"]
+  stage: step-C
+  needs: ["ubu-single-gmbase", "ubu-soqt"]
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    script:
-      - mkdir build
-      - cd build
-      - cmake ${CMAKE_ARGS} ../GeoModelVisualization # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-      - cmake --build . -- -j2
-      - cmake --build . -- install
-    artifacts:
-      paths:
-        - install
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../GeoModelVisualization # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
 
 ubu-single-gmg4:
   <<: *ubuntu-job
-  stage: step-B
-  needs: ["ubu-single-gmbase"]
+  stage: step-C
+  needs: ["ubu-single-gmbase", "ubu-geant4"]
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    script:
-      - mkdir build
-      - cd build
-      - cmake ${CMAKE_ARGS} ../GeoModelG4 # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-      - cmake --build . -- -j2
-      - cmake --build . -- install
-    artifacts:
-      paths:
-        - install
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../GeoModelG4 # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
 
 ubu-single-gmfullsimlight:
   <<: *ubuntu-job
-  stage: step-C
+  stage: step-D
   needs: ["ubu-single-gmg4", "ubu-geant4"]
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    script:
-      - mkdir build
-      - cd build
-      - cmake ${CMAKE_ARGS} ../FullSimLight # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-      - cmake --build . -- -j2
-      - cmake --build . -- install
-    artifacts:
-      paths:
-        - install
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../FullSimLight # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
 
 ubu-single-gmfsl:
   <<: *ubuntu-job
-  stage: step-D
+  stage: step-E
   needs: ["ubu-single-gmfullsimlight"]
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    script:
-      - mkdir build
-      - cd build
-      - cmake ${CMAKE_ARGS} ../FSL # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-      - cmake --build . -- -j2
-      - cmake --build . -- install
-    artifacts:
-      paths:
-        - install
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../FSL # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
 
 
 #####################

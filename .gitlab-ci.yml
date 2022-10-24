@@ -256,7 +256,7 @@ mac-gm-fullsimlight:
 mac-gm-atlasextras:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-C
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE

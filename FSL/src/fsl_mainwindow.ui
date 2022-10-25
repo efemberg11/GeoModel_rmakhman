@@ -29,7 +29,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="main">
        <attribute name="title">
@@ -595,7 +595,7 @@
          </spacer>
         </item>
         <item row="2" column="4">
-         <widget class="QGroupBox" name="groupBox_5">
+         <widget class="QGroupBox" name="groupBox_pythia">
           <property name="font">
            <font>
             <pointsize>15</pointsize>
@@ -667,7 +667,7 @@
          </widget>
         </item>
         <item row="3" column="4">
-         <widget class="QGroupBox" name="groupBox_10">
+         <widget class="QGroupBox" name="groupBox_hepmc3">
           <property name="font">
            <font>
             <pointsize>15</pointsize>
@@ -742,7 +742,7 @@
          </spacer>
         </item>
         <item row="4" column="4">
-         <widget class="QGroupBox" name="groupBox_12">
+         <widget class="QGroupBox" name="groupBox_plugin">
           <property name="font">
            <font>
             <pointsize>15</pointsize>

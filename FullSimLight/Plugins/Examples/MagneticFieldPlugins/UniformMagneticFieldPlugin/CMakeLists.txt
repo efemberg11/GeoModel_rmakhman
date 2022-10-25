@@ -62,7 +62,14 @@ include( GNUInstallDirs )
 add_definitions (-DMAPPATH="${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}" )
 
 
-target_include_directories( UniformMagneticFieldPlugin PUBLIC ${CMAKE_SOURCE_DIR}/FullSimLight )
+# Add the FullSimLight headers dir.
+# Path is different if built as a single top project, 
+# or as an all-in-one build together with all other GeoModel subpackages 
+if( FullSimLight_INDIVIDUAL_BUILD )
+    target_include_directories( UniformMagneticFieldPlugin PUBLIC ${CMAKE_SOURCE_DIR} )
+else() # all-in-one--build
+    target_include_directories( UniformMagneticFieldPlugin PUBLIC ${CMAKE_SOURCE_DIR}/FullSimLight )
+endif()
 
 
 target_link_libraries ( UniformMagneticFieldPlugin PUBLIC ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} Eigen3::Eigen)

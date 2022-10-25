@@ -19,6 +19,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( cmake_colors_defs )
     # Warn the users about what they are doing
     message(STATUS "${BoldGreen}Building ${PROJECT_NAME} individually, as a top-level project.${ColourReset}")
+    # Set a default build type
+    include( BuildType )
     # Set default build and C++ options
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
@@ -36,6 +38,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     find_package( GeoModelIO REQUIRED ${GeoModel_VERSION} ) 
     # Set a flag to steer the build of the subpackages
     #set( VISUALIZATION_INDIVIDUAL_BUILD ON )
+    # Print Build Info on screen
+    include( PrintBuildInfo )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")

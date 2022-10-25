@@ -30,7 +30,11 @@ file( GLOB HEADERS GeoModel2G4/*.h )
 
 # include Geant4 headers
 include(${Geant4_USE_FILE})
-add_definitions (-DG4EXTENSION_SOLID_DIR=${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} )
+
+# set the path where the G4 extensions are found (e.g., the LArCustomSolid ATLAS extension)
+set(PATHEXTENSIONS ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} )
+add_definitions (-DG4EXTENSION_SOLID_DIR=${PATHEXTENSIONS})
+message("==> NOTE: G4 solid extensions will be searched in: ${PATHEXTENSIONS}. If you need custom extensions check if this is the right path. If not, set the right path by setting the environmental variable 'G4EXTENSION_SOLID_DIR' before running the application that uses the GeoModel2G4 library (e.g., 'export G4EXTENSION_SOLID_DIR=/usr/local/Cellar/geomodel-extension-atlaslar/5.4.0/lib') " )
 
 # Set target and properties
 add_library( GeoModel2G4 SHARED ${HEADERS} ${SOURCES} )

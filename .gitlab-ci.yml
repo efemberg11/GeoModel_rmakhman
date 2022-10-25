@@ -105,7 +105,6 @@ variables:
 
 
 .geant4-build-template-job: &geant4-job
-  stage: step-B
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
@@ -118,7 +117,7 @@ variables:
     - cd Geant4-build
     - ls;
     - ls ../
-    - ls ../install
+    - if [ -d "../install" ]; then ls ../install; fi
     - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON  ../geant4 
     - make -j4
     - make install
@@ -257,7 +256,7 @@ mac-gm-fullsimlight:
 mac-gm-atlasextras:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-C
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
@@ -317,12 +316,13 @@ ubu-gm-examples:
 ubu-geant4:
   <<: *ubuntu-job
   <<: *geant4-job
+  stage: step-A
 
 
 ubu-gm-examples-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
+  stage: step-B
   needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
@@ -331,7 +331,7 @@ ubu-gm-examples-gmg4:
 ubu-gm-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
+  stage: step-B
   needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
@@ -341,7 +341,7 @@ ubu-gm-gmg4:
 ubu-gm-fullsimlight:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
+  stage: step-B
   needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
@@ -350,7 +350,7 @@ ubu-gm-fullsimlight:
 ubu-gm-atlasextras:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
+  stage: step-B
   needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}

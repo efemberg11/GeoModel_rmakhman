@@ -1,10 +1,12 @@
-# Custom Plugins
+# Plugins Example
 
 FullSimLight provides a convenient mechanism for users to extend their simulations through plugins in the form of shared libraries. Plugins can be used to add
 
 - User Actions
 - Sensititve Detectors 
 - Magnetic Field Maps
+- Physics Lists
+- Event Generators
 
 ## Hits Plugin
 

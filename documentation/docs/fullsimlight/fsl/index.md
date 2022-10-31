@@ -23,7 +23,7 @@ One can also load in a configuration by running fsl with the -c flag.
 ## Main Tab
 
 
-{{ imgutils_image_caption('fsl.png', 
+{{ imgutils_image_caption('fsl-main.png', 
    alt='fsl', 
    cap='fsl main tab',
    width ='700px',
@@ -38,3 +38,58 @@ The main tab allows configuration of the following parameters.
 - Number of Events
 
 It also contains the view button which shows the current configuration on the main display. The user can also run FullSimLight in the main display at any time with the current configuration by clicking on the FullSimLight button in the main tab. fsl provides similar buttons to run gmex and gmclash once a geometry input has been selected through the interface.
+
+
+## Generator Tab
+
+
+{{ imgutils_image_caption('fsl-gen.png', 
+   alt='fsl', 
+   cap='fsl main tab',
+   width ='700px',
+   urlFix=False) 
+}}
+
+
+## Magnetic Field Tab
+
+
+{{ imgutils_image_caption('fsl-mag.png', 
+   alt='fsl', 
+   cap='fsl main tab',
+   width ='700px',
+   urlFix=False) 
+}}
+
+
+## Regions Tab
+
+
+{{ imgutils_image_caption('fsl-reg.png', 
+   alt='fsl', 
+   cap='fsl main tab',
+   width ='700px',
+   urlFix=False) 
+}}
+
+
+## Sensitive Detectors Tab
+
+
+{{ imgutils_image_caption('fsl-sen.png', 
+   alt='fsl', 
+   cap='fsl main tab',
+   width ='700px',
+   urlFix=False) 
+}}
+
+
+## User Actions Tab
+
+
+{{ imgutils_image_caption('fsl-user.png', 
+   alt='fsl', 
+   cap='fsl main tab',
+   width ='700px',
+   urlFix=False) 
+}}

@@ -347,7 +347,11 @@ Run the executable with the --help option to see the available options:
 
 ``` bash
 -g :   MANDATORY: the Geometry file name [.db/.gdml/.dylib/.so]
+-r :   OPTIONAL : root volume name (default: the Geometry top volume)
 -o :   OPTIONAL : clashes report file name (default: gmclash_report.json)
+-t :   OPTIONAL : tolerance threshold value in mm (default: 0)
+-n :   OPTIONAL : number of random points (default: 1000)
+-v :   OPTIONAL : verbose output (default: off)
 ```
 
 The output json file format is the following:

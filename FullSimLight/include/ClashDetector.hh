@@ -22,49 +22,64 @@ using json = nlohmann::json;
 /**
  * @file    ClashDetector.hh
  * @author  Marilena Bandieramonte
- * @date   0905.2022
+ * @author  Evgueni Tcherniaev
+ * @date    05.11.2022
  *
  */
 
-class ClashDetector {
-    
+class ClashDetector
+{
 public:
-    
-    ClashDetector(G4VPhysicalVolume *world);
-    ~ClashDetector(){};
-    ClashDetector(const ClashDetector&) = delete;
-    ClashDetector& operator=(const ClashDetector&) = delete;
-    
-    // Verifies if the placed volume is overlapping with existing
-    // daughters or with the mother volume. Provides default resolution
-    // for the number of points to be generated and verified.
-    // A tolerance for the precision of the overlap check can be specified,
-    // by default it is set to maximum precision.
-    // Reports a maximum of overlaps errors according to parameter in input.
-    // Returns true if the volume is overlapping.
-    bool g4CheckOverlaps(G4VPhysicalVolume* volume, std::vector<json>& jlist, G4int res = 1000, G4double tol = 0., G4int maxErr = 1 );
-    
-    void recursivelyCheckOverlap(G4LogicalVolume* envelope,std::vector<json>& jlist);
-    
-    //Retrieves the corresponding point in global coordinates,
-    //using the chain of G4VPhysicalVolumes stored in the fTree vector
-    G4ThreeVector localToGlobal(G4ThreeVector& local, bool skipFirstIt);
-    
-    // Iterate from the volume envelope through all the daughter volumes, and look for the ancestors of
-    // 'volume', populating the fTree vector of G4VPhysicalVolumes
-    bool iterateFromWorld(G4LogicalVolume* envelope, G4VPhysicalVolume* volume, G4ThreeVector& local);
-    
-    void SetGMClashVerbosity(const G4bool flag)     { fGmclashVerbosity = flag; }
-    void SetTolerance (const G4double tolerance){fTolerance=tolerance;}
-    G4double GetTolerance (){return fTolerance;}
+
+  ClashDetector(const G4VPhysicalVolume* world);
+  ~ClashDetector() {};
+  ClashDetector(const ClashDetector&) = delete;
+  ClashDetector& operator=(const ClashDetector&) = delete;
+
+  void CheckOverlapsInTree(const G4VPhysicalVolume* root = nullptr);
+
+  void SetGMClashVerbosity(G4bool flag) { fVerbosity = flag; }
+  void SetResolution(G4int resolution) { fResolution = resolution; }
+  void SetTolerance(G4double tolerance) { fTolerance = tolerance; }
+  G4int NumberOfChecks() const { return fNumberOfChecks; }
+  G4int NumberOfClashes() const { return jlist.size(); }
+  void PrintOutReport(const G4String& reportFileName) const;
 
 private:
-  
-    G4bool   fGmclashVerbosity;
-    std::vector<G4VPhysicalVolume*> fTree;
-    G4VPhysicalVolume *fWorld;
-    G4double fTolerance;
-    
+
+  // Find the path from World volume to target volume
+  void setPath(const G4VPhysicalVolume* target);
+
+  // Transform local point to the global coordinates,
+  // using sequence of G4VPhysicalVolumes stored in the fPath vector
+  G4ThreeVector localToGlobal(const G4ThreeVector& local);
+
+  // Append the overlap to the JSON list.
+  void reportOverlap(G4int type,
+                     const G4VPhysicalVolume* volume1,
+                     const G4VPhysicalVolume* volume2,
+                     const G4ThreeVector& localPoint,
+                     G4double size);
+
+  // Verifies if the placed volume is overlapping with existing daughters
+  // or with the mother volume.
+  // Provides default resolution for the number of points to be generated
+  // and verified.
+  // A tolerance for the precision of the overlap check can be specified,
+  // by default it is set to maximum precision.
+  // Returns true if the volume is overlapping.
+  bool CheckOverlaps(const G4VPhysicalVolume* volume);
+
+private:
+
+  std::vector<const G4VPhysicalVolume*> fPath;
+  std::vector<json> jlist;
+  const G4VPhysicalVolume* fWorld = nullptr;
+  G4bool fVerbosity = false;
+  G4int fResolution = 1000;
+  G4double fTolerance = 0.;
+  G4int fNumberOfChecks = 0;
+
 }; // ClashDetector
 
 #endif // ClashDetector_h 1

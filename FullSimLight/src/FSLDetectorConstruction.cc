@@ -291,23 +291,20 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
     if (fRunOverlapCheck){
         G4cout << "\n ===================  Starting Clashes Detection  =================== \n" << G4endl;
         fTimer.Start();
-        std::vector<json> jlist;
-        ClashDetector cd=ClashDetector(fWorld);
+        ClashDetector cd = ClashDetector(fWorld);
         cd.SetGMClashVerbosity(fGmclashVerbosity);
         cd.SetTolerance(fTolerance);
-        cd.recursivelyCheckOverlap(envelope, jlist);
+        cd.CheckOverlapsInTree(fWorld);
         fTimer.Stop();
-        G4cout << "\n**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
+        G4cout << G4endl;
+        G4cout << "**** Real time elapsed   : " <<fTimer.GetRealElapsed()   << G4endl;
         G4cout << "**** User time elapsed   : " <<fTimer.GetUserElapsed()   << G4endl;
         G4cout << "**** System time elapsed : " <<fTimer.GetSystemElapsed() << G4endl;
 
-        json jReport={{"ClashesReport",jlist}};
         std::cout<<"\n**** Writing out the clashes report file: "<<fReportFileName<<std::endl;
-        std::ofstream outJsonFile(fReportFileName);
-        outJsonFile << std::setw(4) << jReport << std::endl;
-        outJsonFile.close();
+        cd.PrintOutReport(fReportFileName);
 
-        G4cout<<"\n=================== Recursive overlap check done! =================== "<<G4endl;
+        G4cout<<"\n=================== Clashes Detection done! =================== "<<G4endl;
         exit(0);
     }
 

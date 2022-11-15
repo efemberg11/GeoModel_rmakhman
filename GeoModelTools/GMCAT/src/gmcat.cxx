@@ -180,12 +180,15 @@ int main(int argc, char ** argv) {
 
     /* loop over the Volumes in the tree */
     while (!aV.atEnd()) {
-      GeoNameTag *nameTag=new GeoNameTag(aV.getName());
-      GeoTransform *transform= new GeoTransform(aV.getTransform());
-      world->add(nameTag);
-      world->add(transform);
-      world->add((GeoVPhysVol *) &*aV.getVolume());
-      aV.next();
+
+	if (aV.getName()!="ANON") {
+	  GeoNameTag *nameTag=new GeoNameTag(aV.getName());
+	  world->add(nameTag);
+	}
+	GeoTransform *transform= new GeoTransform(aV.getTransform());
+	world->add(transform);
+	world->add((GeoVPhysVol *) &*aV.getVolume());
+	aV.next();
     }
 
     delete db;

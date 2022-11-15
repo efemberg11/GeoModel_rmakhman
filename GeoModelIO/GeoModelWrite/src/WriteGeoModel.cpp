@@ -339,7 +339,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol)
       // get the copy number of the parent
       const unsigned int parentCopyN = getLatestParentCopyNumber(parentId, parentType);
       std::string childType  = getGeoTypeFromVPhysVol(vol);
-	    storeChildPosition(parentId, parentType, physId, parentCopyN, getChildPosition( parentId, parentType, parentCopyN), childType, volCopyN);
+      storeChildPosition(parentId, parentType, physId, parentCopyN, getChildPosition( parentId, parentType, parentCopyN), childType, volCopyN);
     }
 }
 
@@ -1468,9 +1468,12 @@ unsigned int WriteGeoModel::storeObj(const GeoAlignableTransform* pointer, const
 
   void WriteGeoModel::storeChildPosition(const unsigned int &parentId, const std::string &parentType, const unsigned int &childId, const unsigned int &parentCopyN, const unsigned int &childPos, const std::string &childType, const unsigned int &childCopyN)
 {
-	addChildPosition(parentId, parentType, childId, parentCopyN, childPos, childType, childCopyN); // FIXME: change the positions of the parameters to a more logical order, like: parentID, parentType, parentCopyN, childPos, ChildType, childId, childCopyN
-	return;
-}
+  std::string key=std::to_string(parentId)+":"+parentType+":"+std::to_string(childId)+":"+childType+":"+std::to_string(childPos);
+   if (m_linkSet.find(key)==m_linkSet.end()) {
+     addChildPosition(parentId, parentType, childId, parentCopyN, childPos, childType, childCopyN); // FIXME: change the positions of the parameters to a more logical order, like: parentID, parentType, parentCopyN, childPos, ChildType, childId, childCopyN
+    m_linkSet.insert(key);
+  }
+ }
 
 
   unsigned int WriteGeoModel::addRecord(std::vector<std::vector<std::string>>* container, const std::vector<std::string> values) const
@@ -1747,7 +1750,7 @@ void WriteGeoModel::storePublishedAuxiliaryData(GeoPublisher* publisher)
 
 void WriteGeoModel::storePublishedNodes(GeoPublisher* store)
 {
-    // loop over the published AlignableTransform nodes
+  // loop over the published AlignableTransform nodes
     std::map<GeoAlignableTransform*, std::any> mapAXF = store->getPublishedAXF();
     storeRecordPublishedNodes<std::map<GeoAlignableTransform*, std::any>>(mapAXF, &m_publishedAlignableTransforms_String);   
 

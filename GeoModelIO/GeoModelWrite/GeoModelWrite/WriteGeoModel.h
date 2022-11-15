@@ -38,6 +38,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <set>
 
 // FWD declarations
 class GeoPublisher;
@@ -181,6 +182,7 @@ private:
 	GMDBManager* m_dbManager;
 
     // work caches
+  std::set<std::string>                         m_linkSet;
   std::unordered_map<std::string, unsigned int> m_parentChildrenMap;
   std::unordered_map<std::string, unsigned int> m_volumeCopiesMap;
   std::unordered_map<std::string, unsigned int> m_memMap;

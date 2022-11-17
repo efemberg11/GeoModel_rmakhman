@@ -6,7 +6,7 @@ fsl is a GUI for FullSimLight introduced in GeoModel release 4.3.0. It allows u
 ./fsl
 ```
 
- Compatability of the simulation is ensured by the fsl interface by enabling and disabling options based on the selections made. Once the user has configured the simulation to their desire, they can save the configuration in a json file that can be used to run FullSimLight through the -c flag. 
+ Compatibility of the simulation is ensured by the fsl interface by enabling and disabling options based on the selections made. Once the user has configured the simulation to their desire, they can save the configuration in a json file that can be used to run FullSimLight through the -c flag. 
  
 ```bash
 ./fullSimLight -c /path/to/config.json
@@ -30,7 +30,7 @@ One can also load in a configuration by running fsl with the -c flag.
    urlFix=False) 
 }}
 
-The main tab allows configuration of the following parameters.
+The main tab allows configuration of the following parameters:
 
 - Geometry Input
 - Physics List
@@ -51,7 +51,7 @@ It also contains the view button which shows the current configuration on the ma
    urlFix=False) 
 }}
 
-The generator tab shown above contains a list of event generators that can be selected for event generation. The options provided are
+The generator tab shown above contains a list of event generators that can be selected for event generation. The options provided are:
 
 - Particle Gun
 - Pythia
@@ -60,7 +60,7 @@ The generator tab shown above contains a list of event generators that can be se
 
 ### 1. Particle Gun
 
-To use a particle gun, the user must specify the particle type and momentum vector.
+To use a Geant4 particle gun, the user must specify the particle type and the momentum vector.
 
 ### 2. Pythia
 
@@ -70,15 +70,16 @@ To use Pythia one can select one of the pre-customized options which are
 - higgs
 - minbias
 
-Alternatively one can also provide a custom file. 
+Details about the default options can be found in the `PythiaPrimaryGeneratorAction` [class](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/master/FullSimLight/src/PythiaPrimaryGeneratorAction.cc). 
+Alternatively one can also provide a custom Pythia configuration input file. 
 
 ### 3. HepMC3 File
 
-HepMC3 files containing events can be used in FullSimLight in the both the standard Asciiv3 format (introduced in HepMC3) as well as the old Ascii format (used in HepMC and HepMC2).
+HepMC3 files containing events can be used in FullSimLight in both the standard Asciiv3 format (introduced in HepMC3) as well as the old Ascii format (used in HepMC and HepMC2).
 
 ### 4. Generator Plugin
 
-In order to generate events one can also specify a plugin. Visit the Plugin Support page for more details.
+In order to generate events one can also specify a plugin. Visit the [Plugin Support page](https://geomodel.web.cern.ch/home/fullsimlight/plugin-support/) for more details.
 
 ## Magnetic Field Tab
 
@@ -93,7 +94,7 @@ In order to generate events one can also specify a plugin. Visit the Plugin Supp
 To set a Magnetic Field, there are two options
 
 - Fixed Axial
-- MAgnetic Field Plugin
+- Magnetic Field Plugin
 
 
 ### 1. Fixed Axial
@@ -102,7 +103,7 @@ Sets a constant Magnetic field in the z-direction at the specified magnitude.
 
 ### 2. Magnetic Field Plugin
 
-In order to generate a Magnetic Field one can also specify a plugin. Visit the Plugin Support page for more details. A custom ATLAS Magnetic Field Plugin comes with the GeoModel package ready to use. This is automatically contained in the atlas-conf.json configuration file provided by GeoModel. ***Warning: This Plugin requires the ATLAS Magnetic Field Map to be installed in a standard location. This Map is available to all ATLAS users on request.***
+In order to generate a Magnetic Field one can also specify a plugin. Visit the [Plugin Support page](https://geomodel.web.cern.ch/home/fullsimlight/plugin-support/) for more details. A custom ATLAS Magnetic Field Plugin comes with the GeoModel package ready to use. This is automatically contained in the atlas-conf.json configuration file provided by GeoModel. ***Warning: This Plugin requires the ATLAS Magnetic Field Map to be installed in a standard location. This Map is available to all ATLAS users on request.***
 
 
 ## Regions Tab
@@ -115,7 +116,7 @@ In order to generate a Magnetic Field one can also specify a plugin. Visit the P
    urlFix=False) 
 }}
 
-Regions can be added through the regions tab in FSL as shown above. For each region one must specify 
+Geant4 regions can be added through the regions tab in FSL as shown above. For each region one must specify 
 
 - Region name
 - Root Logical Volumes
@@ -124,19 +125,19 @@ Regions can be added through the regions tab in FSL as shown above. For each reg
 - Positron cut (GeV)
 - Gamma cut (GeV)
 
-A list of ATLAS specific regions comes in the atlas-conf.json condfiguration file provided by GeoModel.
+A list of ATLAS specific regions comes in the atlas-conf.json configuration file provided by GeoModel.
 
 ## Sensitive Detectors Tab
 
 
 {{ imgutils_image_caption('fsl-sen.png', 
    alt='fsl', 
-   cap='fsl sensitive detector tab',
+   cap='fsl sensitive detectors tab',
    width ='700px',
    urlFix=False) 
 }}
 
-In order to add Sensitive Detectors one can create plugins which can then be added to the simulation through the menu shown above. Visit the Plugin Support page for more details.
+In order to add Geant4 Sensitive Detectors one can create plugins which can then be added to the simulation through the menu shown above. Visit the [Plugin Support page](https://geomodel.web.cern.ch/home/fullsimlight/plugin-support/) for more details.
 
 
 ## User Actions Tab
@@ -149,4 +150,4 @@ In order to add Sensitive Detectors one can create plugins which can then be add
    urlFix=False) 
 }}
 
-In order to add User Actions one can create plugins which can then be added to the simulation through the menu shown above. Visit the Plugin Support page for more details.
+In order to add Geant4 User Actions one can create plugins which can then be added to the simulation through the menu shown above. Visit the [Plugin Support page](https://geomodel.web.cern.ch/home/fullsimlight/plugin-support/) for more details.

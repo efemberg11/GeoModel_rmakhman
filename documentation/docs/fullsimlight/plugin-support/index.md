@@ -1,10 +1,10 @@
 # Plugin Support
 
-FullSimLight provides the user support with writing plugins by providing the abstract classes which one has the override. These abstract classes serve as a link to interface various Geant4 functionality with simulation using FullSimLight. Header files containing these abstract classes are automatically installed with FullSimLight installation.
+FullSimLight provides the user support with writing plugins by providing the abstract classes which one has to override. These abstract classes serve as a link to interface various Geant4 functionality with simulation using FullSimLight. Header files containing these abstract classes are automatically installed with FullSimLight installation.
 
 ## User Actions & Event Generators
 <!---->
-The header file which contains the abstract classes to create plugins with User actions is ***FSLUserActionPlugin.h***. 
+The header file which contains the abstract classes to create plugins with User actions is `FSLUserActionPlugin.h`. 
 
 
 ```c++
@@ -37,8 +37,6 @@ class FSLUserActionPlugin {
   #A primary generator plugin inherits from this.
   virtual G4VUserPrimaryGeneratorAction *getPrimaryGeneratorAction() const {return nullptr;}
 
-
-  
  private:
   
   FSLUserActionPlugin (const FSLUserActionPlugin &)=delete;
@@ -52,7 +50,7 @@ class FSLUserActionPlugin {
 
 ## Sensitive Detectors
 <!---->
-The header file which contains the abstract classes to create plugins with Sensitive detectors is ***FSLSensitiveDetectorPlugin.h***. 
+The header file which contains the abstract classes to create plugins with Sensitive detectors is `FSLSensitiveDetectorPlugin.h`. 
 
 
 ```c++
@@ -123,7 +121,7 @@ inline FSLSensitiveDetectorPlugin::ConstIterator FSLSensitiveDetectorPlugin::end
 
 ## Physics List
 <!---->
-The header file which contains the abstract classes to create plugins with Physics lists is ***FSLPhysicsListPlugin.h***. 
+The header file which contains the abstract classes to create plugins with Physics lists is `FSLPhysicsListPlugin.h`. 
 
 
 ```c++
@@ -151,7 +149,7 @@ public:
 
 ## Magnetic Field
 <!---->
-The header file which contains the abstract classes to create plugins with Magnetic fields is ***MagFieldPlugin.h***. 
+The header file which contains the abstract classes to create plugins with Magnetic fields is `MagFieldPlugin.h`. 
 
 
 ```c++

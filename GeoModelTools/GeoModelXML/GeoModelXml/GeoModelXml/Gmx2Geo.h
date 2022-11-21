@@ -68,5 +68,6 @@ private:
     int doPositionIndex(xercesc::DOMDocument *doc, GmxUtil &gmxUtil, std::string levelMapName = "");
     int doReadoutGeometry(xercesc::DOMDocument *doc, GmxUtil &gmxUtil);
     void addParam(xercesc::DOMNode *node, std::map<std::string, std::string> &params);
+    void addColumn(xercesc::DOMNode *node, std::vector<std::string>& colNames, std::vector<std::string>& colTypes, std::vector<std::variant<int,long,float,double,std::string>>& data, bool& columnsDefined);
 };
 #endif // GMX2GEO_H

@@ -308,6 +308,7 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
     for (int i = 0; i < nRG; ++i) {
         map<string, string> rgParams; // New empty list
         const DOMElement *rg = dynamic_cast<DOMElement *>(rgs->item(i));
+        
 //
 //    Loop over readoutgeometry children
 //
@@ -325,6 +326,16 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
                 name2release = XMLString::transcode(sensorClass->getAttribute(name_tmp));
                 string clas(name2release); // class is reserved word
                 XMLString::release(&name2release);
+
+                //This is how we publish a table per sensor class;
+                // not clear if a table per type or class is best?
+                std::vector<std::string> colNames;
+                std::vector<std::string> colTypes;
+                std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData; 
+                
+                colNames.push_back("SensorType");
+                colTypes.push_back("STRING");
+                bool columsDefined = false;
 //
 //    Loop over sensorclass children
 //
@@ -342,19 +353,30 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
                         name2release = XMLString::transcode(sensorType->getAttribute(XMLString::transcode("name")));
                         string name(name2release);
                         XMLString::release(&name2release);
+                        
+                        std::vector<std::variant<int,long,float,double,std::string>> data;
+                        data.push_back(name);
+
 //
 //    Loop over sensortype parameters
 //
                         for (DOMNode *stChild = scChild->getFirstChild(); stChild != 0; stChild = stChild->getNextSibling()) {
                             if (stChild->getNodeType() != DOMNode::ELEMENT_NODE) continue; // Skip char data
                             addParam(stChild, stParams);
+                            addColumn(stChild,colNames,colTypes,data,columsDefined);
                         }
 //
 //    Call the user's call back routine to add this sensor type with its specific parameters
 //
+                        tableData.push_back(data);
                         gmxUtil.gmxInterface()->addSensorType(clas, name, stParams);
+
+                    //finished loop over first sensorType, so we now should have all the columns for this type
+                    columsDefined = true;
                     }
+
                 }
+                gmxUtil.gmxInterface()->publish(clas,colNames,colTypes,tableData);
             }
         }
     }
@@ -378,6 +400,28 @@ void Gmx2Geo::addParam(DOMNode *node, map<string, string> &params) {
     XMLString::release(&name2release);
     params[name] = value;
 
+    XMLString::release(&name_tmp);
+    XMLString::release(&value_tmp);
+}
+
+void Gmx2Geo::addColumn(DOMNode *node, std::vector<std::string>& colNames, std::vector<std::string>& colTypes, std::vector<std::variant<int,long,float,double,std::string>>& data, bool& columnsDefined) {
+  XMLCh * name_tmp = XMLString::transcode("name");
+  XMLCh * value_tmp = XMLString::transcode("value_tmp");
+
+    const DOMElement *param = dynamic_cast<DOMElement *>(node);
+    char *name2release = XMLString::transcode(param->getAttribute(XMLString::transcode("name")));
+    string name(name2release);
+    XMLString::release(&name2release);
+    name2release = XMLString::transcode(param->getAttribute(XMLString::transcode("value")));
+    string value(name2release);
+    XMLString::release(&name2release);
+    //only do this for the first iteration; after that the columns are already defined
+    //so we only need to fill the matching data for the other instances
+    if(!columnsDefined){
+        colNames.push_back(name);
+        colTypes.push_back("STRING");
+    } 
+    data.push_back(value);
     XMLString::release(&name_tmp);
     XMLString::release(&value_tmp);
 }

@@ -70,14 +70,28 @@ char *tagName;
         gmxUtil.positionIndex.incrementLevel(); // Logvol has unfortunately already decremented this; temp. restore it
         gmxUtil.positionIndex.indices(index, gmxUtil.eval);
 
-        // the call to addAlignable below only prints log messages, it is not very useful at the moment.
-        // Since it accesses PV through an hard-coded [2] index, it crashes if the PV is not exactly at [2]
-        // for instance when a NameTag is omitted (which I am pushing, to save memory).
-        // NOTE: So, I comment it out for the moment... RMB
-        //
-        // ****** Using "[2]" is an ugly way to reach the PV. Define const int in LogvolProcessor?
-        //gmxUtil.gmxInterface()->addAlignable(level, index, (GeoVFullPhysVol *) objectsToAdd[2], 
-        //                                     (GeoAlignableTransform *) toAdd.back());
+        //Checking all objects to find right one not so efficient - Define const int in LogvolProcessor?
+        //sanity check... see if we find a FullPhysVol somewhere in the object list...
+        GeoVFullPhysVol * fpv;
+        for(GeoGraphNode * iFpv:objectsToAdd){ //maybe this needs to be in reverse???
+        fpv = dynamic_cast<GeoVFullPhysVol*> (iFpv);
+        if (fpv) break; //if we find it, use it...
+        }
+
+        //now check that the AlignableTransform is actually valid!
+        GeoAlignableTransform * gat = dynamic_cast<GeoAlignableTransform *>(toAdd.back());
+
+        if(fpv && gat) gmxUtil.gmxInterface()->addAlignable(level, index,fpv,gat);
+        else{
+             std::cout<<"WARNING:";
+             if(!gat) std::cout<<" No valid AlignableTransform";
+             if(!fpv) std::cout<<" No valid FullPhysicalVolume";
+             std::cout<<" found for ";
+            for (map<string, int>::iterator i = index.begin(); i != index.end(); ++i) {
+            std::cout << i->second << "   ";
+            }
+            std::cout<<std::endl;
+        }
 
         gmxUtil.positionIndex.decrementLevel(); 
 	XMLString::release(&alignable_tmp);

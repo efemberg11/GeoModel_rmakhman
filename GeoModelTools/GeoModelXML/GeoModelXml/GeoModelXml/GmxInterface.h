@@ -18,8 +18,11 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <variant>
 #include "GeoModelKernel/GeoVFullPhysVol.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
+
+class GeoPublisher;
 
 class GmxInterface {
 public:
@@ -30,6 +33,11 @@ public:
   virtual void addSplitSensor(const std::string& name, std::map<std::string, int> &index, std::pair<std::string, int> &extraIndex, int id, GeoVFullPhysVol *fpv);
   virtual void addAlignable(int level, std::map<std::string, int> &index,
 			    GeoVFullPhysVol *fpv, GeoAlignableTransform *transform);
+  virtual void addSplitAlignable(int level, std::map<std::string, int> &index, std::pair<std::string, int> &extraIndex,
+			    GeoVFullPhysVol *fpv, GeoAlignableTransform *transform);
+  //allow a publisher to be passed through from GMXPlugin, to write necessary AuxTables to SQLite
+  void setPublisher(GeoPublisher * publisher);
+  void publish(std::string& tableName, std::vector<std::string>& colNames, std::vector<std::string>& colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>>& tableData);
 
   // helpers
   template <typename T>
@@ -83,5 +91,9 @@ public:
       throw std::runtime_error(err);
     }
   }
+
+private:
+GeoPublisher * m_publisher = nullptr;
+
 };
 #endif // GMX_INTERFACE_H

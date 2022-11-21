@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoMaterial.h"
@@ -344,7 +344,13 @@ void GeoMaterial::lock ()
   m_dedDxConst = dEDxConstant;
   m_deDxI0    = dEDxI0 ;
   m_intLength = NILinv ? 1.0 / NILinv : 0;
-  m_radLength = radInv ? 1.0 / radInv : 0;
+  // HACK: Some compilers, such as clang, will vectorize the preceding
+  // and following assignments.  But that will involve doing the divisions
+  // speculatively, before testing for zero.  This can cause issues
+  // if one is looking at FPEs.  The test below should always be true,
+  // but will inhibit this vectorization.
+  if (m_intLength > 0)
+    m_radLength = radInv ? 1.0 / radInv : 0;
 }
 
 double GeoMaterial::getDeDxConstant () const

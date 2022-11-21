@@ -24,11 +24,14 @@ class GMXPlugin : public GeoVGeometryPlugin  {
   // Constructor:
   GMXPlugin();
 
+  // Constructor with name to provide to publisher  
+  GMXPlugin(std::string name):GeoVGeometryPlugin(name){}
+
   // Destructor:
   ~GMXPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, bool publish);
+  virtual void create(GeoPhysVol *world, bool publish) override;
 
  private:
 
@@ -76,8 +79,7 @@ GMXPlugin::~GMXPlugin()
 
 //## Other Operations (implementation)
 void GMXPlugin::create(GeoPhysVol *world, bool publish)
-{
-
+{  
   std::cout<< "This is GMXPlugin: creating a GeoModelXml detector "<<std::endl;
   std::vector<std::string> filesToParse;
   char* fPath=getenv("GMX_FILES");
@@ -112,6 +114,10 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
    	return;
     }
     GmxInterface gmxInterface;
+    //If we want to write the SQLite, pass a publisher through to fill Aux tables
+    //(needed for ReadoutGeometry)
+    if(publish) gmxInterface.setPublisher(getPublisher());
+
     if (levelmaps!=nullptr){
         std::string mapname = f.substr(0, f.length() - 4);
         mapname+="_levelMap.txt";
@@ -126,5 +132,5 @@ void GMXPlugin::create(GeoPhysVol *world, bool publish)
 }
 
 extern "C" GMXPlugin *createGMXPlugin() {
-  return new GMXPlugin;
+  return new GMXPlugin("GeoModelXML");
 }

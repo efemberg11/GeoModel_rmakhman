@@ -74,7 +74,7 @@ set(PROJECT_SOURCES ${sources} ${headers}  ${uis} )
 add_executable(fsl ${PROJECT_SOURCES} )
 
 
-target_link_libraries(fsl PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(fsl PRIVATE Qt5::Widgets)
 
 if( GEOMODEL_USE_BUILTIN_JSON )
    add_dependencies(fsl JSONExt )

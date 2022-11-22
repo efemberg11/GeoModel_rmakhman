@@ -25,11 +25,16 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     endif()
     # Set a flag to steer the  of the subpackages
     set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
+    find_package (FullSimLight REQUIRED)
+    add_definitions (-DFSLPLUGINROOT="${FullSimLight_DIR}/../../../${CMAKE_INSTALL_DATAROOTDIR}" )
+    message  ( STATUS "FSL plugin files sought here: ${FullSimLight_DIR}/../../../${CMAKE_INSTALL_DATAROOTDIR}" )
+
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
     # Set the project
     project( "fsl" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
+    add_definitions (-DFSLPLUGINROOT="${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}" )
 endif()
 
 
@@ -67,8 +72,6 @@ set(PROJECT_SOURCES ${sources} ${headers}  ${uis} )
 
 
 add_executable(fsl ${PROJECT_SOURCES} )
-
-add_definitions (-DFSLPLUGINROOT="${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}" )
 
 
 target_link_libraries(fsl PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

@@ -35,7 +35,7 @@ char *toRelease;
     toRelease = XMLString::transcode(elem->getNodeName());
     string nodeName(toRelease);
     XMLString::release(&toRelease);
-    if (nodeName != string("assembly")) {
+    if (nodeName != string("assembly") && nodeName != string("set")) {
         msglog << MSG::FATAL << "Error in xml/gmx file: assemblyref " << XMLString::transcode(idref) << " referenced a " << 
                               nodeName << " instead of an assembly.\n";
 	std::abort();

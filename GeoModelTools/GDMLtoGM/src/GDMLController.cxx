@@ -263,6 +263,7 @@ void GDMLController::registerHandlers()
 	new MEEHandler("MEE",this);
 	new atomHandler("atom",this);
 	new fractionHandler("fraction",this);
+	new fractionHandler("composite",this);
 	new isotopeHandler("isotope",this);
 	new elementHandler("element",this);
 	new materialHandler("material",this);

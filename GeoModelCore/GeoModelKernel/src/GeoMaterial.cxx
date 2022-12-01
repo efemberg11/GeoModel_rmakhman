@@ -294,7 +294,7 @@ void GeoMaterial::lock ()
 
   if (getNumElements () == 0)
     {
-      throw std::out_of_range ("Attempt to lock a material with no elements");
+      throw std::out_of_range ("Attempt to lock a material with no elements "+getName());
       return;
     }
 

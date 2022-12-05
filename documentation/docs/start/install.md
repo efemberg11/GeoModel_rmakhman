@@ -42,14 +42,12 @@ On macOS, we use the Homebrew package manager to handle and install the GeoModel
 
 !!! note
 
-   Do you have the newer Mac computer based upon the M1 chip?  Then you will need to set the environment variable
+    Do you have the newer Mac computer based upon the M1 chip?  Then you will need to set the environment variable
    
-   ```
-   export DYLD_LIBRARY_PATH=/usr/local/lib:/opt/homebrew/lib
- 
-   ```
+    ```
+    export DYLD_LIBRARY_PATH=/usr/local/lib:/opt/homebrew/lib
+    ```
 
-!!! tip
 
 ### First installation 
 

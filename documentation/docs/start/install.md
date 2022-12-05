@@ -75,19 +75,16 @@ All the above packages also automatically install the base package `geomodel`, w
 
 The use of **Pre-compiled packages** (*Bottles*, in the Homebrew jargon) **speeds up** the installation on the user's machine a lot. GeoModel bottles are provided at least for the **latest two** macOS releases.
 
-The pre-compiled *bottles* are built for the two latest macOS releases, currently:
+The pre-compiled *bottles* are built for the latest macOS release, currently:
 
-* 11 "Big_Sur" on Intel chip 
-* 12 "Monterey" on Apple M1 chip
+* 12 "Monterey" (Apple M1 chip and Intel chip)
 
 For older macOS releases, Homebrew will try to compile the packages from source. If that fails, you will have to compile from source by yourself by following the instructions provided in the [development](../dev/index.md) section.
 
 !!! note
 
-   As part of the installation procedure on the mac, the **qt** library is installed, unless it is already present on your system. The installation procedures prints further instructions; in particular, additional environment variables to define in your startup script. These instructions tend to get lost in the input.   Their details depend upon your system.  Be attentive, and follow the instructions  which are printed during the installation of **qt**.  
-    ```
-    brew install atlas/geomodel/geomodelvisualization
-    ```
+    As part of the installation procedure on the mac, the **qt** library is installed, unless it is already present on your system. The installation procedures prints further instructions; in particular, additional environment variables to define in your startup script. These instructions tend to get lost in the input.   Their details depend upon your system.  Be attentive, and follow the instructions  which are printed during the installation of **qt**.  
+   
 
 !!! tip
     

@@ -1,15 +1,18 @@
 # Install the GeoModel Applications and Development kits
 
-In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel applications and development kits on different platforms.  The GeoModel applications include
+In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel applications and development kits on different platforms.  
+
+The GeoModel applications include:
 
 * **gmex**, the geometry explorer, an interactive 3d geometry visualizer
 * **fullsimlight**, a command-line tool to run Geant4 simulation, and its graphical user interface, *fsl*.
 * **gmclash**, a Geant4 based command-line tool too perform clash detection
 * **gmgeantino**, a Geant4 based command-line tool to generate geantino maps
+* **gmmasscalc**, a Geant4 based command-line tool to compute the mass of a given piece of detector geometry
 * **gm2gdml** and **gdml2gm**, command line tools to convert GeoModel to and from GDML
 * **gmcat**, a command line tool to assemble geometry from multiple inputs
 
-The development kits include header files and precompiled libraries for the development of detector description code. On some platforms (Mac) the development environment is installed together with the prebuild applications and libraries.  
+The development kits include header files and precompiled libraries for the development of detector description code. On some platforms (macOS) the development environment is installed together with the prebuild applications and libraries.  
 
 
 ## Ubuntu 20.0.4 (focal, LTS) or 21.0.10 (impish) or 22.0.4 (jammy, LTS)
@@ -20,12 +23,14 @@ Add the geomodel repository to your source list:
 sudo add-apt-repository ppa:kaktusjoe/geomodel
 sudo apt-get update
 ```
+
 Install geomodel precompiled applications
 ```
 sudo apt install geomodel-visualization  # to get gmex (the geometry explorer)
 sudo apt install fullsimlight            # to get fullsimlight, gm2gdml, gmclash, gmgeantino
 sudo apt install geomodel-tools          # to get gmcat, gdml2gm
 ```
+
 Install the geomodel development kits (header files and precompiled libraries)
 ```
 sudo apt install geomodel-core-dev
@@ -38,7 +43,7 @@ If you have outdated packages, these commands will replace those packages with t
 
 ## macOS
 
-On macOS, we use the Homebrew package manager to handle and install the GeoModel packages. If you don't have Homebrew installed on your machine, you should install it by following the instructions on the Homebrew website: <http://brew.sh>.  Please be attentive to any instructions printed after the installation procedure. 
+On macOS, we use the [Homebrew package manager](http://brew.sh) to handle and install the GeoModel packages. If you don't have Homebrew installed on your machine, you should first install it by following the instructions on the Homebrew website: <http://brew.sh>.  Please be attentive to any instructions printed after the installation procedure; there might be environment variables to set.
 
 !!! note
 
@@ -51,29 +56,40 @@ On macOS, we use the Homebrew package manager to handle and install the GeoModel
 
 ### First installation 
 
-At first, you add the dedicated GeoModel Homebrew repository:
+#### Add the GeoModel tap 
+
+If this is the first time you install the pre-compiled GeoModel packages through the Homebrew package manager, then first you have to add the dedicated GeoModel Homebrew repository to your local repositories' list. To do so, you can type:
 
 ```shell
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
 brew update 
 ```
 
-The first command will set the Homebrew repository (a *Tap*, in Homebrew jargon) storing the "recipes" to install the GeoModel libraries on macOS; this command is only needed the first time you install the `atlas/geomodel` Tap. The second command makes sure that all latest versions are taken; this should be run all times you want to update or install a GeoModel package.
+The first command will add to your local repositories' list the GeoModel Homebrew repository (a *tap*, in Homebrew jargon), which stores all the "recipes" (*Formulae* in Homebrew) to install the GeoModel libraries on macOS; this command is only needed the first time you install the `atlas/geomodel` tap. The second command makes sure that all latest versions are taken; this should be run all times you want to update or install a GeoModel package.
 
-Then, you install the pre-compiled GeoModel applications:
+#### Install the GeoModel packages 
+
+After that, you can install the pre-compiled GeoModel applications:
 
 ```shell
 brew install geomodel-visualization # to get gmex (the geometry explorer)
-brew install geomodel-fsl           # to get fullsimlight, the FSL GUI, gm2gdml, gmclash, gmgeantino, the ATLAS LArCustomSolid extension
+brew install geomodel-fsl           # to get fullsimlight, the FSL GUI, gm2gdml, gmclash, gmgeantino, gmmasscalc, plus the ATLAS LArCustomSolid extension
 brew install geomodel-tools         # to get gmcat, gdml2gm
 ```
 
-All the above packages also automatically install the base package `geomodel`, which contains the core libraries and the I/O layer. The `geomodel-fsl` package also installs `geomodel-fullsimlight`, `geomodel-geomodelg4`, and the ATLAS extension `geomodel-extension-atlaslar`.
+All the above packages also automatically install the core package `geomodel`, which contains the core libraries and the I/O layer. 
+
+The `geomodel-fsl` package also installs the following packages: 
+
+* `geomodel-fullsimlight`, which contain the standalone Geant4 based application for GeoModel
+* `geomodel-geomodelg4`, which contains the translation layer between GeoModel and Geant4
+* `geomodel-extension-atlaslar`, which is an [ATLAS experiment's](https://atlas.cern) extension 
 
 
-The use of **Pre-compiled packages** (*Bottles*, in the Homebrew jargon) **speeds up** the installation on the user's machine a lot. GeoModel bottles are provided at least for the **latest two** macOS releases.
 
-The pre-compiled *bottles* are built for the latest macOS release, currently:
+The use of **pre-compiled packages** (*Bottles*, in the Homebrew jargon) **speeds up** and **simplify** the installation on the user's machine.
+
+The pre-compiled *bottles* are provided for the latest macOS release, currently:
 
 * 12 "Monterey" (Apple M1 chip and Intel chip)
 
@@ -121,14 +137,17 @@ atlas/geomodel/geomodel-visualization
 
 You can now update the GeoModel recipes with `brew upgrade ...`. 
 
-Please notice that, if you get an error like the one below:
 
-```shell
-➜  ~ brew upgrade geomodel
-Error: atlas/geomodel/geomodel not installed
-```
+!!! note
 
-that means that, even if the GeoModel repository (`tap`) has been installed, at a certain point the `geomodel` Homebrew package has been removed (for example, to test other versions). Therefore, the `upgrade` command cannot work. You should re-install the package with `brew install geomodel`. The same with all the other GeoModel Homebrew packages.
+    Please notice that, if you get an error like the one below:
+
+    ```shell
+    ➜  ~ brew upgrade geomodel
+    Error: atlas/geomodel/geomodel not installed
+    ```
+
+    that means that, even if the GeoModel repository (`tap`) has been installed, at a certain point the `geomodel` Homebrew package has been removed (for example, to test other versions). Therefore, the `upgrade` command cannot work. You should re-install the package with `brew install geomodel`. The same with all the other GeoModel Homebrew packages.
 
 
 
@@ -136,7 +155,7 @@ that means that, even if the GeoModel repository (`tap`) has been installed, at 
 
 ## Installation from source code.
 
-On any other platform, you can build GeoModel from sources, following [these instructions](../dev/index.md)
+On any other platform (such as Centos or Fedora), you can build GeoModel from sources, following [these instructions](../dev/index.md)
 
 
 

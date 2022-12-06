@@ -81,7 +81,7 @@ For older macOS releases, Homebrew will try to compile the packages from source.
 
 !!! note
 
-    As part of the installation procedure on the mac, the **qt** library is installed, unless it is already present on your system. The installation procedures prints further instructions; in particular, additional environment variables to define in your startup script. These instructions tend to get lost in the input.   Their details depend upon your system.  Be attentive, and follow the instructions  which are printed during the installation of **qt**.  
+    As part of the installation procedure on the mac, the open source version of the [**Qt**](https://www.qt.io/download-open-source) software framework is installed, unless it is already present on your system. The installation procedures prints further instructions; in particular, additional environment variables to define in your startup script. These instructions tend to get lost in the input.   Their details depend upon your system.  Be attentive, and follow the instructions  which are printed during the installation of **Qt**.  
    
 
 !!! tip

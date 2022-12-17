@@ -59,6 +59,6 @@ if( GEOMODEL_USE_BUILTIN_EIGEN3 )
 else()
 
    # Just find an existing installation of Eigen3.
-   find_package( Eigen3 REQUIRED )
+   find_package( Eigen3 REQUIRED NO_MODULE )
 
 endif()

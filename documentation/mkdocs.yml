@@ -39,6 +39,7 @@ nav:
         - 'fsl': 'fullsimlight/fsl/index.md'
         - 'Plugin Examples': 'fullsimlight/plugins/index.md'
         - 'Plugin Support': 'fullsimlight/plugin-support/index.md'
+        - 'ATLAS Extensions': 'fullsimlight/atlas-extensions/index.md'
     - FAQ: 'faq.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'

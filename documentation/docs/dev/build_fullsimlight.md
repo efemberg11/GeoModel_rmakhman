@@ -1,5 +1,7 @@
-
 # How to build FullSimLight
+
+# Prerequisites
+FullSimLight depends on Geant4, Xerces-C and HDF5. Additionally, the user might want to install [Pythia8] (http://home.thep.lu.se/Pythia/ ) and [HepMC3](https://gitlab.cern.ch/hepmc/HepMC3) as optional dependencies.
 
 # Standard build
 
@@ -35,7 +37,7 @@ ls ../install
 
 ## How to use a custom version of Xerces-C
 
-The Geant4 GDML format depends on teh Xerces-C library. Therefore, different Geant4 releases can use different versions of the Xerecs-C library.
+The Geant4 GDML format depends on the Xerces-C library. Therefore, different Geant4 releases can use different versions of the Xerces-C library.
 
 If you want to build FullSimLight with a custom, locally installed Xerces-C library, you can pass the `XercesC_INCLUDE_DIR` and `XercesC_LIBRARY` variable to CMake while configuring the build of FullSimLight:
 

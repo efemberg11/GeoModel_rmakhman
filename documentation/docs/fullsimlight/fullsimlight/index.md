@@ -8,6 +8,8 @@ FullSimLight package consists of different tools based on [Geant4](https://geant
 - gmgeantino: a tool to generate geantino maps from your input geometry
 - gm2gdml: a tool to convert geometries and dump them in gdml format.
 
+For instructions on how to build FullSimLight, please refer to the [Build FullSimLight ](https://geomodel.web.cern.ch/home/dev/build_fullsimlight/) page. 
+
 ## Detector Construction
 
 ### Geometry:
@@ -17,13 +19,15 @@ Use the -g flag to specify the name of the input geometry file.
 
 ### ATLAS Geometry Files:
 
-The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are available at: 
+At installation time an ATLAS geometry file and the ATLAS Magnetic field map file will be automatically downloaded and installed under *< path-to-install >/share/FullSimLight/ATLAS* if the user will activate the `GEOMODEL_INSTALL_FSLDATA` flag at compile time. 
 
+Additional .gdml and .SQLite files of ATLAS geometry tag ATLAS-R2-2016-01-00-01 are available at: 
+s
 ```bash
 wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
 wget https://geomodel.web.cern.ch/atlas-geometry-data/geometry-ATLAS-R2-2016-01-00-01.db 
 ```
-For instructions on how to produce your own SQLite dump of your preferred ATLAS geometry tag, please have a look at the ATLAS Extensions section.
+For instructions on how to produce your own SQLite dump of your preferred ATLAS geometry tag, please refet to the [ATLAS Extensions](https://geomodel.web.cern.ch/home/fullsimlight/atlas-extensions/) page.
 
 
 ## FullSimLight: run and options

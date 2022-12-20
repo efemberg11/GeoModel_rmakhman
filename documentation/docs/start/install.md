@@ -5,6 +5,7 @@ In this section, you will find instructions on how to **install** the latest **s
 The GeoModel applications include:
 
 * **gmex**, the geometry explorer, an interactive 3d geometry visualizer
+* **gmstatistics**, tool to monitor the memory consumption
 * **fullsimlight**, a command-line tool to run Geant4 simulation, and its graphical user interface, *fsl*.
 * **gmclash**, a Geant4 based command-line tool too perform clash detection
 * **gmgeantino**, a Geant4 based command-line tool to generate geantino maps

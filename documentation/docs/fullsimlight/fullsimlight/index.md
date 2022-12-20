@@ -3,6 +3,7 @@
 FullSimLight package consists of different tools based on [Geant4](https://geant4.web.cern.ch) toolkit, that can be run on multiple geometries: 
 
 - fullSimLight: a light particle transport simulation (geometry, transport in magnetic field and basic physics scoring)
+- fsl: GUI for fullSimLight configuration
 - gmclash: a tool that runs clash detection on your input geometry, producing a json file report
 - gmgeantino: a tool to generate geantino maps from your input geometry
 - gm2gdml: a tool to convert geometries and dump them in gdml format.
@@ -17,17 +18,14 @@ Use the -g flag to specify the name of the input geometry file.
 ### ATLAS Geometry Files:
 
 The .gdml and .SQLite files of ATLAS geometry tags ATLAS-R2-2016-01-00-01 are available at: 
-```bash
-wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
-wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
-```
-The new ATLAS geometry SQLite files where the EMEC is built using 3 new different variants (Wheel, Cone, Slices) are available at:
 
 ```bash
-wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Wheel.db
-wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Cone.db
-wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01_with_EMEC_Slices.db
+wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
+wget https://geomodel.web.cern.ch/atlas-geometry-data/geometry-ATLAS-R2-2016-01-00-01.db 
 ```
+For instructions on how to produce your own SQLite dump of your preferred ATLAS geometry tag, please have a look at the ATLAS Extensions section.
+
+
 ## FullSimLight: run and options
 
 The fullSimLight application can be built and used both with sequential and multithreaded Geant4 builds. In case of multithreaded Geant4 toolkit, the applications will run in proper multithreaded mode. You can find the executables under the build/bin directory and/or under the *<  path-to-install > /bin* dir. 
@@ -56,11 +54,12 @@ export G4INCLDATA=$G4INSTALL/data/G4INCL1.0
 export G4ENSDFSTATEDATA=$G4INSTALL/data/G4ENSDFSTATE2.2
 ```
 
-Run the executable with the --help option to see the available options:
+To run FullSimLight you can specify a json configuration file (generated with fsl) with the -c flag or use the following command line parameters. Run the executable with the --help option to see the available options:
 
 ``` bash
--m :   REQUIRED : the standard Geant4 macro file name 
--g :   REQUIRED : the Geometry file name 
+-c :   json configuration file generated with fsl
+-g :   [REQUIRED] : the Geometry file name - if not specified in the configuration file
+-m :   [OPTIONAL] : the standard Geant4 macro file name  
 -o :   flag  ==> run the geometry overlap check (default: FALSE)
 -f :   physics list name (default: FTFP_BERT) 
 -P :   use Pythia primary generator [config. available: ttbar/higgs/minbias or use a Pythia command input file]
@@ -69,7 +68,7 @@ Run the executable with the --help option to see the available options:
 ``` 
 
 FullSimLight uses by default the Geant4 particle gun as primary generator, but it supports also
-input events from the Pythia generator (see the Primary generator section for more details)
+input events from the Pythia generator (see the Primary generator section for more details), HepMC3 formats or custom generators plugins.
 A minimal set of "observable" is collected during the simulation per-primary
 particle type: mean energy deposit, mean charged and neutral step lengths,
 mean number of steps made by charged and neutral particles, mean number of
@@ -89,30 +88,48 @@ in this case.
 
 ## Examples
 
-During the installation a default macro file *<  macro.g4 >* will be installed in your *< install-path >/share/FullSimLight* directory.
+FullSimLight can be very easily configured and run via fsl, both from within the GUI or from the command-line, passing the configuration file with the -c flag. Alternatively FullSimLight can be executed via command line using the basic available flags. The only mandatory parameter necessary for starting a simulation is the geometry file (can be specified inside the config file or with the -g flag). Following are some examples that illustrates the different possibilities. 
 
-To execute the application using the < macro.g4 >  macro file, with the default FTFP_BERT
-Physics List, not in performance mode and building the detector from < mygeometry.gdml > file:
-
-``` bash
-./fullSimLight -m ../share/FullSimLight/macro.g4 -g mygeometry.gdml
-``` 
-
-To execute the application using the <  macro.g4 >  macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin* :
+If you have created your custom configuration file <myconfig.json> with fsl, you can simply run fullSimLight as follows:
 
 ``` bash
-./fullSimLight -m ../share/FullSimLight/macro.g4  -g libHGTDPlugin.1.0.0.dylib
+./fullSimLight -c myconfig.json  
 ``` 
 
-To execute the application using the <  macro.g4 >  macro file, with the customized ATLAS FTFP_BERT_ATL Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db file :
+To run fullSimLight with the ATLAS configuration file you only need to run fullSimLight using the custom **atlas-config.json** file and passing the desired geometry file via command line, as follows: 
 
 ``` bash
-./fullSimLight -m ../share/FullSimLight/macro.g4 -f FTFP_BERT_ATL -p -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db
+./fullSimLight -c atlas-config.json -g geometry-ATLAS-R2-2016-01-00-01.db 
 ``` 
 
-N.B. In order to have the FTFP_BERT_ATL available in Geant4, you need to install an ATLAS patched version of Geant4, that you can find [here](https://gitlab.cern.ch/atlas-simulation-team/geant4/-/tags).
+During the installation a default macro file *<macro.g4>* will be installed in your *< install-path >/share/FullSimLight* directory. So the macro file doesn't need to be specified if you intend to use the default one.
 
-## Parameters settings via Geant4 macro
+To execute the application using the default < macro.g4 >  macro file, with the default FTFP_BERT
+Physics List, not in performance mode and building the detector from < mygeometry.db > file:
+
+``` bash
+./fullSimLight -g mygeometry.db
+```
+
+To execute the application using the default <  macro.g4 >  macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin* :
+
+``` bash
+./fullSimLight  -g libHGTDPlugin.1.0.0.dylib
+```
+
+To execute the application using a custom <mymacro.g4> macro file, with the ATLAS FTFP_BERT_ATL Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01.db  file :
+
+``` bash
+./fullSimLight -m mymacro.g4 -f FTFP_BERT_ATL -p -g geometry-ATLAS-R2-2016-01-00-01.db 
+``` 
+
+Please note that the last option is deprecated, as it doesn't allow full flexibility, and we suggest to configure your simulation via fsl.
+
+
+## Parameters configuration via fsl (suggested) 
+For details on how to configure your simulation with fsl, please refer to the [fsl page](https://geomodel.web.cern.ch/home/fullsimlight/fsl).
+
+## Parameters configuration via Geant4 macro (deprecated)
 
 FullSimLight and in general Geant4 based simulations, need a Geant4 macro to read some input parameters. The default macro used by fullSimLight is called 'macro.g4' and it should  be found under the *<  install-path > /share/FullSimLight* directory. The macro can be edited to change some parameters, i.e the verbosity, the number of threads, or to tune the simulation. The most relevant macro commands are explained in what follows.
 
@@ -218,7 +235,7 @@ By default, i.e. if it is not specified by the above command, the type will be r
  For example, in order to simulate the default *ttbar* events, the command to be run is the following:
  
  ``` bash
-./fullSimLight -m ../share/FullSimLight/pythia.g4 -P ttbar -g geometry-ATLAS-R2-2016-01-00-01_wSPECIALSHAPE.db 
+./fullSimLight -m ../share/FullSimLight/pythia.g4 -P ttbar -g geometry-ATLAS-R2-2016-01-00-01.db 
  ``` 
  
  The number of events that the user wants to simulate must be specified in the Geant4 macro file. A specific *pythia.g4* macro file can be found in the *<  path-to-install >/share/FullSimLight* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 

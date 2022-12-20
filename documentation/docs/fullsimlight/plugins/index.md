@@ -1,29 +1,66 @@
-# Plugins Example
+# Plugins Examples
 
-FullSimLight provides a convenient mechanism for users to extend their simulations through plugins in the form of shared libraries. Plugins can be used to add
+FullSimLight provides a convenient mechanism for users to extend their simulations through plugins in the form of shared libraries. Plugins can be used to add:
 
+- Geometry description
 - User Actions
-- Sensititve Detectors 
-- Magnetic Field Maps
+- Sensitive Detectors 
+- Magnetic Field
 - Physics Lists
 - Event Generators
 
-## Hits Plugin
+For a description of the available example plugins look at the following sections. 
+
+##Geometry plugins
+
+Some geometry example plugins are available at the [GeoModelATLAS](https://gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS) repository, under the [Example Plugins](https://gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS/-/tree/master/ExamplePlugins) folder. The `ToyGeometryPlugin` and the `AccordionPlugin` are the right examples to start with. 
+
+##User Actions plugins
+
+You can find some example user actions plugins under the FullSimLight/Plugins folder. In particular we provide a DummyUserAction plugin available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/Examples/UserActionPlugins) and a [Hits plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/HitsPlugin) and a [Track plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/TracksPlugin). 
+
+###Hits Plugin
+
+The [Hits plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/HitsPlugin) implements both `G4UserSteppingAction` and `G4UserEventAction`. At each step the particle position (x,y,z coordinates) is saved and at the end of the event the hits are saved into a HDF5 output file. The same file can be in a second step visualized in `gmex`.
+
+###Tracks Plugin
+
+The [Tracks Plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/TracksPlugin) implements `G4UserRunAction`, `G4UserEventAction`, `G4UserSteppingAction`, `G4UserTrackingAction`. For each track at each step the position is recorded and mapped into a map. At the end of the event the information is saved into a HDF5 output file (the default name is Tracks_data.h5). The tracks file data can be in a second step visualized in `gmex`.
+
+##Sensitive Detectors plugins
+
+One sensitive detectors example plugin is provided [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/master/FullSimLight/Plugins/Examples/SensitiveDetectorPlugins/SDPlugin/src/SDPlugin.cxx). It's a dummy plugin that serves the purpose of showing how to implement the corresponding FullSimLight abstract interface. 
+
+##Magnetic Field plugins
+
+An example Magnetic field plugin can be found [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/Examples/MagneticFieldPlugins/UniformMagneticFieldPlugin). It implements a uniform magnetic field. 
+An ATLAS specific Magnetic Field plugin is also available in the [ATLAS Extensions](https://gitlab.cern.ch/atlas/geomodelatlas/ATLASExtensions) repository. Please refer to the ATLAS Extensions page for further info.
+
+##Physics list plugins
+
+A physics list plugin example is available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/Examples/PhysicsListPlugins/FSLTestPhysListPlugins). It implements a custom physics list that is based on the standard `FTFP_BERT`, adding the `G4OpticalPhysics` process. 
+
+##Event Generators plugins
+
+An Event generator example plugin is available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/Examples/EventGeneratorPlugins/FSLExamplePrimaryGeneratorPlugin). 
+It shows how to customize the use of the `G4ParticleGun`and set some properties as the particle type, name, energy, position, polarization, and momentum direction. 
+
+## How to write a plugin: the Hits Plugin example
 
 As a simple example, suppose you as the user want to keep track of the various particles and their positions as the simulation progresses. In particular, if you run the simulation with a certain number of events, then for each event you want to write to a file all the particles and their positions ***"hits"***.
 
-Geant4 provides classes to assist with this task. Namely the G4UserSteppingAction class contains the function
+Geant4 provides classes to assist with this task. Namely the `G4UserSteppingAction` class contains the function:    
 
 ```c++
 virtual void UserSteppingAction (const G4Step *aStep);
 ```
 
-By overriding this function we can get particle positions and names through the G4Step object. Now since we also want to write out our hits to a file for each event, we can use the G4UserEventAction class, which conveniently provides the function
+By overriding this function we can get particle positions and names through the `G4Step` object. Now since we also want to write out our hits to a file for each event, we can use the `G4UserEventAction` class, which conveniently provides the function:
  
 ```c++
 virtual void EndOfEventAction (const G4Event *anEvent);
 ```
-which is called at the end of every event. We can also access the event ID through the G4Event object. Before proceding let us setup our project. Navigating to the directory of choice we can run on the terminal
+which is called at the end of every event. We can also access the event ID through the `G4Event` object. Before proceeding let us set up our project. Navigating to the directory of choice we can run on the terminal
  
 ```bash
 mkdir HitsPlugin
@@ -34,7 +71,7 @@ mkdir src
 cd src
 touch HitsPlugin.cxx
 ```
-This creates the directory structure
+This creates the directory structure:
 
 ```bash
  HitsPlugin
@@ -44,7 +81,7 @@ This creates the directory structure
        └── HitsPlugin.cxx    
 ```
 
-Opening up the CMakeLists.txt file, we call our project GenerateHitsPlugin and configure the file as follows
+Opening up the CMakeLists.txt file, we call our project GenerateHitsPlugin and configure the file as follows:
 
 ```cmake
 # Set up the project.
@@ -71,7 +108,7 @@ target_link_libraries ( GenerateHitsPlugin PUBLIC FullSimLight ${Geant4_LIBRARIE
 target_include_directories( GenerateHitsPlugin PUBLIC ${FullSimLight_INCLUDE_DIR})
 ```
 
-Now we are ready to write our implementation of recording hits in HitsPlugin.cxx. This will require three classes and one additional function at the end of the file.
+Now we are ready to write our implementation of recording hits in `HitsPlugin.cxx`. This will require three classes and one additional function at the end of the file.
 
 ```c++
 class GenerateHitsStep;
@@ -80,13 +117,13 @@ class GenerateHitsPlugin;
 extern "C" GenerateHitsPlugin * createGenerateHitsPlugin();
 ```
 
-- The first two classes GenerateHitsStep & GenerateHitsEvent will inherit from G4UserSteppingAction and G4UserEventAction respectively, since these contains the methods that are relevant for our purpose as discussed earlier. In general you will need one class for every type of User Action you decide to use.
+- The first two classes `GenerateHitsStep` & `GenerateHitsEvent` will inherit from `G4UserSteppingAction` and `G4UserEventAction` respectively, since these contain the methods that are relevant for our purpose as discussed earlier. In general you will need one class for every type of User Action you decide to use.
 
-- The final class GenerateHitsPlugin is neccesary for defining the plugin and ***must have the same name as the name specified within the add_library command in the CMakeLists.txt file.*** This class will inherit from the FSLUserActionPlugin class, which is the abstract class provided by FullSimLight to allow it to interface with our custom defined User Actions. This class must always be defined.
+- The final class `GenerateHitsPlugin` is neccesary for defining the plugin and ***must have the same name as the name specified within the add_library command in the CMakeLists.txt file.*** This class will inherit from the `FSLUserActionPlugin` class, which is the abstract class provided by FullSimLight to allow it to interface with our custom defined User Actions. This class must always be defined.
 
-- Finally the function createGenerateHitsPlugin is neccesary for properly loading in the plugin to FullSimLight and ***must always have the name create + name of plugin class.*** This function must always be defined.
+- Finally the function `createGenerateHitsPlugin` is neccesary for properly loading in the plugin to FullSimLight and ***must always have the name create + name of plugin class.*** This function must always be defined.
 
-Now that we have an outline of what we need to do. Let's first include all the relevant header files based on the above discussion
+Now that we have an outline of what we need to do, let's include all the relevant header files based on the above discussion.
 
 ```c++
 #include <iostream>
@@ -98,7 +135,7 @@ Now that we have an outline of what we need to do. Let's first include all the r
 #include "G4Step.hh"
 #include <G4Event.hh>
 ```
-Next lets define a Hit struct which provides a convenient way of storing a particles position and ID
+Next let's define a `Hit` struct which provides a convenient way of storing a particle position and ID
 
 ```c++
 struct Hit{
@@ -108,7 +145,7 @@ struct Hit{
   unsigned int  id;
 };
 ```
-Let us also create a map which associates various particles with an ID. This is useful as we can access particle names through the G4Step object and then associate those names with IDs for more efficient storage.
+Let us also create a map which associates various particles with an ID. This is useful as we can access particle names through the `G4Step` object and then associate those names with IDs for more efficient storage.
 
 ```c++
 //Not a comprehensive list of all particles
@@ -116,7 +153,7 @@ std::map<G4String, unsigned int> particle_ids { {"gamma", 1},
 {"e-", 2}, {"e+", 2}, {"mu-", 3}, {"mu+", 3}, };
 ```
 
-We can now define our first class GenerateHitsStep which will inherit from G4UserSteppingAction and will record hits for us.
+We can now define our first class `GenerateHitsStep` which will inherit from `G4UserSteppingAction` and will record hits for us.
 
 ```c++
 class GenerateHitsStep:
@@ -175,7 +212,7 @@ void GenerateHitsStep::UserSteppingAction(const G4Step* step){
 }
 
 ```
-Next we define GenerateHitsEvent class which will inherit from G4UserEventAction and will write hits to a file at the end of every event.
+Next we define `GenerateHitsEvent` class which will inherit from `G4UserEventAction` and will write hits to a file at the end of every event.
 
 ```c++
 class GenerateHitsEvent:
@@ -233,7 +270,7 @@ void GenerateHitsEvent::EndOfEventAction(const G4Event* evt)
 
 ```
 
-Now we need to define the GenerateHitsPlugin class which will provide the interface with FullSimLight. This class will inherit from FSLUserActionPlugin class and override methods depending upon the User Actions used.
+Now we need to define the `GenerateHitsPlugin` class which will provide the interface with FullSimLight. This class will inherit from `FSLUserActionPlugin` class and override methods depending upon the User Actions used.
 
 ```c++
 class GenerateHitsPlugin:public FSLUserActionPlugin {
@@ -275,7 +312,7 @@ G4UserEventAction *GenerateHitsPlugin::getEventAction() const {
 }
 ```
 
-Finally we need to define the function createGenerateHitsPlugin() which will return a new instance of our plugin class.
+Finally we need to define the function `createGenerateHitsPlugin()` which will return a new instance of our plugin class.
 
 
 ```c++
@@ -286,21 +323,21 @@ extern "C" GenerateHitsPlugin *createGenerateHitsPlugin() {
 
 ```
 
-With the implmentation completed, we can now move into the build folder and run.
+With the implementation completed, we can now move into the build folder and run.
 
 ```bash
 cmake ..
 make
 ```
 
-In the build folder you will see
+In the build folder you will see:
 
 ```bash
 libGenerateHitsPlugin.dylib (Mac)
 libGenerateHitsPlugin.so (Linux)
 ```
 
-Our plugin is ready to use! We can now open up fsl by running the fsl command and can add our plugin in the User Actions tab as shown below
+Our plugin is ready to use! We can now open up `fsl` by running the `fsl` command and can add our plugin in the User Actions tab as shown below:
 
 {{ imgutils_image_caption('plugin.png', 
    alt='fsl', 

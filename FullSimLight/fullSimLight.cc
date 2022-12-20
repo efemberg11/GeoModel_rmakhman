@@ -41,11 +41,11 @@ static const std::string fullSimLightShareDir=FULLSIMLIGHTSHAREDIR;
 static std::string  parMacroFileName   = fullSimLightShareDir+"/macro.g4";
 static bool         parIsPerformance   = false;
 static bool         parIsCustomUserActions = false;
-static G4String     geometryFileName   ;
+static G4String     geometryFileName   = "";
 static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
 bool isBatch = true;
-static std::string  parConfigFileName  = "config.json";
+static std::string  parConfigFileName  = "atlas-config.json";
 
 
 
@@ -144,11 +144,11 @@ int main(int argc, char** argv) {
 #endif
     
     // 1. Physics list
-    if(!isBatch){
+    if(!isBatch)
+    {
         
         simConfig::parse_json_file(parConfigFileName);
         parPhysListName = simConfig::fsl.physicsList;
-        
         
         if(simConfig::fsl.eventGeneratorName=="Pythia")
         {
@@ -180,14 +180,11 @@ int main(int argc, char** argv) {
     // 3. User action
     if(!isBatch && simConfig::fsl.userActions.size()>0) parIsCustomUserActions = true;
     
-    
     FSLActionInitialization* actInit = new FSLActionInitialization(parIsPerformance,parIsCustomUserActions);
     
     if(parIsCustomUserActions){
-    actInit->SetActions(
-                        simConfig::fsl.userActions
-                       );
-
+        actInit->SetActions(simConfig::fsl.userActions);
+        
     }
     
     if(!isBatch)
@@ -218,27 +215,23 @@ int main(int argc, char** argv) {
         
     } else
     {
-        
-      //  std::ifstream ifs(parConfigFileName);
-       // auto jf=json::parse(ifs);
-        
-      //  simConfig::fslConfig fsl;
-      //  simConfig::regionConfig rc;
-        
-        //read and store the configuration into the fslConfig struct
-      //  simConfig::from_json(jf, fsl);
-        
-        
-        
-        detector->SetGeometryFileName (simConfig::fsl.geometry);
+        if(geometryFileName=="" && simConfig::fsl.geometry==""){
+            G4cout << "  *** ERROR : Geometry file is required. Please provide it in a json configuration file or via command line using the -g flag " << G4endl;
+            Help();
+            exit(-1);
+        }
+        //gives the possibility to override the geometry from the command line
+        if(geometryFileName!="") detector->SetGeometryFileName (geometryFileName);
+        else
+            detector->SetGeometryFileName (simConfig::fsl.geometry);
         runManager->SetUserInitialization(detector);
+        
         
         if(simConfig::fsl.magFieldType=="Plugin")
         {
-        detector->SetMagFieldPluginPath(simConfig::fsl.magFieldPlugin);
+            detector->SetMagFieldPluginPath(simConfig::fsl.magFieldPlugin);
         }
                 
-        
         //parse RegionsData
         std::vector<std::string> Regions;
         std::vector<std::vector<G4String>> RootLVNames;
@@ -248,16 +241,7 @@ int main(int argc, char** argv) {
         std::vector<double> gamma_cut;
         
         for (const auto& element : simConfig::jf["Regions data"]){
-            
-//            std::cout<<"RegionName: "<<element["RegionName"]<<std::endl;
-//            std::cout<<"RootLVNames: "<<element["RootLVNames"]<<std::endl;
-//            std::cout<<"GammaCut: "<<element["GammaCut"]<<std::endl;
-//            std::cout<<"ElectronCut: "<<element["ElectronCut"]<<std::endl;
-//            std::cout<<"PositronCut: "<<element["PositronCut"]<<std::endl;
-//            std::cout<<"ProtonCut: "<<element["ProtonCut"]<<std::endl;
-            
-            //actually read the data and save them in a simConfig::regionConfig object (might be useful for the configuration later on)
-            
+
             simConfig::from_json(element, simConfig::rc);
             Regions.push_back(simConfig::rc.regionName);
             RootLVNames.push_back(simConfig::rc.rootLVNames);
@@ -265,14 +249,7 @@ int main(int argc, char** argv) {
             proton_cut.push_back(simConfig::rc.protonCut);
             positron_cut.push_back(simConfig::rc.positronCut);
             gamma_cut.push_back(simConfig::rc.gammaCut);
-            
-//            std::cout<<"RegionName: "<<rc.regionName<<std::endl;
-//            std::cout<<"RootLVNames size: "<<rc.rootLVNames.size()<<std::endl;
-//            std::cout<<"GammaCut: "<<rc.gammaCut<<std::endl;
-//            std::cout<<"ElectronCut: "<<rc.electronCut<<std::endl;
-//            std::cout<<"PositronCut: "<<rc.positronCut<<std::endl;
-//            std::cout<<"ProtonCut: "<<rc.protonCut<<std::endl;
-//            std::cout<<"------------------------------------------------"<<std::endl;
+
         }
         
         detector->ConfigureRegionsFSL(Regions, RootLVNames, electron_cut, proton_cut, positron_cut, gamma_cut);

@@ -7,6 +7,7 @@ If you still didn't clone the repository you can clone it recursively:
 ```c++
 git clone --recursive https://gitlab.cern.ch/GeoModelDev/GeoModel.git
 ```
+
 Alternatively, if you already cloned the GeoModel repository, it will be sufficient to type the following commands from the main repository folder:
 
 ```c++
@@ -20,7 +21,7 @@ A flag is available to build the ATLAS extentions (by default OFF) and it should
 cmake ../ -DGEOMODEL_BUILD_ATLASEXTENSIONS=ON
 ```
 
-A configuration file {{atlas-conf.json}} with all the ATLAS specific customizations is provided with the ATLASExtensions and will be installed under {{<install>/share/FullSimLight/ATLAS}}. In order to run a Geant4 ATLAS with your favourite geometry tag you only have to run the following:
+A configuration file **atlas-conf.json** with all the ATLAS specific customizations is provided with the ATLASExtensions and will be installed under **<install>/share/FullSimLight/ATLAS**. In order to run a Geant4 ATLAS with your favourite geometry tag you only have to run the following:
 ```c++
 ./fullSimLight  -g geometry.db -c atlas-conf.json
 ```

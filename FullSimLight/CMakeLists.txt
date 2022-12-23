@@ -57,12 +57,6 @@ find_package(Geant4 REQUIRED)
 message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
 #----------------------------------------------------------------------------
 
-# Support for the Pythia MC generator
-find_package(Pythia QUIET) # optional
-if(Pythia_FOUND)
-  target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
-  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
-endif()
 
 # Support for the HepMC3 exchange format
 # This is ON by default, but it can be disabled by the user if not used/needed,
@@ -143,6 +137,14 @@ add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 #add_executable(plotGeantinoMaps plotGeantinoMaps.cc)
 #add_executable(testMagneticField testMagneticField.cc)
 add_executable(gm2gdml geoModel2GDML.cc ${sources} ${headers})
+
+
+# Support for the Pythia MC generator
+find_package(Pythia QUIET) # optional
+if(Pythia_FOUND)
+  target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
+  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
+endif()
 
 
 

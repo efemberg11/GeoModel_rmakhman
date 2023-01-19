@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <GeoInpDefs>
     
-<TableDef name="HelloCables">
-  <ColDef name="BARRELACCORDIONCABLES_DATA_ID" type="LONG"/>
+<TableDef name="HELLOCABLES">
+  <ColDef name="HELLOCABLES_DATA_ID" type="LONG"/>
   <ColDef name="DLAR" type="DOUBLE"/>
   <ColDef name="DKAP" type="DOUBLE"/>
   <ColDef name="DCU" type="DOUBLE"/>
@@ -17,8 +17,8 @@
 </TableDef>
 
 
-<TableDef name="HelloBoxes">
-  <ColDef name="BARRELDMBOXES_DATA_ID" type="LONG"/>
+<TableDef name="HELLOBOXES">
+  <ColDef name="HELLOBOXES_DATA_ID" type="LONG"/>
   <ColDef name="BOXNAME" type="STRING"/>
   <ColDef name="HLEN" type="DOUBLE"/>
   <ColDef name="HWDT" type="DOUBLE"/>

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -60,11 +60,13 @@ void GmxInterface::addSensor(const string& name, map<string, int> &index, int se
         if(i!=index.begin()) idString <<"_";
         idString << i->first <<"_"<<i->second; 
     }
+    //finally, add the sensor type
+    idString << "_" << name;
     msglog << "\nSequential ID = " << sequentialId << endmsg;
     if (m_publisher) m_publisher->publishNode<GeoVFullPhysVol*,std::string>(fpv,idString.str());
 }
 
-void GmxInterface::addSplitSensor(const string& name, map<string, int> &index, std::pair<std::string, int> &extraIndex, int sequentialId, GeoVFullPhysVol *fpv) {
+void GmxInterface::addSplitSensor(const string& name, map<string, int> &index, std::pair<std::string, int> &extraIndex, int sequentialId, GeoVFullPhysVol *fpv,int splitLevel) {
     std::stringstream idString;
     msglog << MSG::DEBUG << "GmxInterface::addSensor called for " << fpv->getLogVol()->getName() << ", type " << name << 
                          ". Indices:   ";		
@@ -75,7 +77,10 @@ void GmxInterface::addSplitSensor(const string& name, map<string, int> &index, s
     }
     msglog << "\n and additional Indices " << extraIndex.first << " : "<<
       extraIndex.second;
-      idString<<"_split_"<<extraIndex.first<<"_"<<extraIndex.second;
+      idString<<"_split_"<<splitLevel;
+
+    //finally, add the sensor type
+    idString << "_" << name;
     msglog << "\nSequential ID = " << sequentialId << endmsg;
     if (m_publisher) m_publisher->publishNode<GeoVFullPhysVol*,std::string>(fpv,idString.str());
    

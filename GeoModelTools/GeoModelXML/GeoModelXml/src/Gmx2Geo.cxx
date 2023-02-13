@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelXml/Gmx2Geo.h"
@@ -312,14 +312,17 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
 //
 //    Loop over readoutgeometry children
 //
+
         for (DOMNode *rgChild = rg->getFirstChild(); rgChild != 0; rgChild = rgChild->getNextSibling()) {
             if (rgChild->getNodeType() != DOMNode::ELEMENT_NODE) continue; // Skip char data
             name2release = XMLString::transcode(rgChild->getNodeName());
             tagName = name2release;
             XMLString::release(&name2release);
+            
             if (tagName == "param") {
                 addParam(rgChild, rgParams);
             }
+
             else if (tagName == "sensorclass") {
                 map<string, string> scParams(rgParams); // Initialised with all previous params
                 const DOMElement *sensorClass = dynamic_cast<DOMElement *>(rgChild);
@@ -333,17 +336,22 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
                 std::vector<std::string> colTypes;
                 std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData; 
                 
+                colNames.push_back(clas+"_data_id");
+                colTypes.push_back("INT");
+
                 colNames.push_back("SensorType");
                 colTypes.push_back("STRING");
                 bool columsDefined = false;
 //
 //    Loop over sensorclass children
 //
+                int sensorIndex = 0;
                 for (DOMNode *scChild = sensorClass->getFirstChild(); scChild != 0; scChild = scChild->getNextSibling()) {
                     if (scChild->getNodeType() != DOMNode::ELEMENT_NODE) continue; // Skip char data
                     name2release = XMLString::transcode(scChild->getNodeName());
                     tagName = name2release;
                     XMLString::release(&name2release);
+                    std::vector<std::variant<int,long,float,double,std::string>> data;
                     if (tagName == "param") {
                         addParam(scChild, scParams);
                     }
@@ -353,9 +361,12 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
                         name2release = XMLString::transcode(sensorType->getAttribute(XMLString::transcode("name")));
                         string name(name2release);
                         XMLString::release(&name2release);
-                        
+                        sensorIndex++;
                         std::vector<std::variant<int,long,float,double,std::string>> data;
+                        data.push_back(sensorIndex);
                         data.push_back(name);
+
+                    
 
 //
 //    Loop over sensortype parameters
@@ -363,8 +374,8 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
                         for (DOMNode *stChild = scChild->getFirstChild(); stChild != 0; stChild = stChild->getNextSibling()) {
                             if (stChild->getNodeType() != DOMNode::ELEMENT_NODE) continue; // Skip char data
                             addParam(stChild, stParams);
-                            addColumn(stChild,colNames,colTypes,data,columsDefined);
                         }
+                        fillTable(stParams,colNames,colTypes,data,columsDefined);
 //
 //    Call the user's call back routine to add this sensor type with its specific parameters
 //
@@ -379,6 +390,7 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
                 gmxUtil.gmxInterface()->publish(clas,colNames,colTypes,tableData);
             }
         }
+
     }
     
     XMLString::release(&readoutgeometry_tmp);
@@ -404,24 +416,14 @@ void Gmx2Geo::addParam(DOMNode *node, map<string, string> &params) {
     XMLString::release(&value_tmp);
 }
 
-void Gmx2Geo::addColumn(DOMNode *node, std::vector<std::string>& colNames, std::vector<std::string>& colTypes, std::vector<std::variant<int,long,float,double,std::string>>& data, bool& columnsDefined) {
-  XMLCh * name_tmp = XMLString::transcode("name");
-  XMLCh * value_tmp = XMLString::transcode("value_tmp");
-
-    const DOMElement *param = dynamic_cast<DOMElement *>(node);
-    char *name2release = XMLString::transcode(param->getAttribute(XMLString::transcode("name")));
-    string name(name2release);
-    XMLString::release(&name2release);
-    name2release = XMLString::transcode(param->getAttribute(XMLString::transcode("value")));
-    string value(name2release);
-    XMLString::release(&name2release);
-    //only do this for the first iteration; after that the columns are already defined
-    //so we only need to fill the matching data for the other instances
-    if(!columnsDefined){
-        colNames.push_back(name);
-        colTypes.push_back("STRING");
-    } 
-    data.push_back(value);
-    XMLString::release(&name_tmp);
-    XMLString::release(&value_tmp);
+void Gmx2Geo::fillTable(map<string, string> &params, std::vector<std::string>& colNames, std::vector<std::string>& colTypes, std::vector<std::variant<int,long,float,double,std::string>>& data, bool& columnsDefined) {
+for (auto param:params){
+        //only do this for the first iteration; after that the columns are already defined
+        //so we only need to fill the matching data for the other instances
+        if(!columnsDefined){
+            colNames.push_back(param.first);
+            colTypes.push_back("STRING");
+        }
+        data.push_back(param.second); 
+    }
 }

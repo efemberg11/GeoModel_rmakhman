@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEO_MODEL_XML_GMX_INTERFACE_H
@@ -30,7 +30,7 @@ public:
   virtual int splitSensorId(std::map<std::string, int> &index, std::pair<std::string, int> &extraIndex, std::map<std::string, int> &updatedIndex) const; //For "artificially" adding to Identifiers; specify the field (e.g. "eta_module") and the value to add
   virtual void addSensorType(const std::string& cls, const std::string& type, const std::map<std::string, std::string>& parameters);
   virtual void addSensor(const std::string& name, std::map<std::string, int> &index, int id, GeoVFullPhysVol *fpv);
-  virtual void addSplitSensor(const std::string& name, std::map<std::string, int> &index, std::pair<std::string, int> &extraIndex, int id, GeoVFullPhysVol *fpv);
+  virtual void addSplitSensor(const std::string& name, std::map<std::string, int> &index, std::pair<std::string, int> &extraIndex, int id, GeoVFullPhysVol *fpv,int splitLevel=0);
   virtual void addAlignable(int level, std::map<std::string, int> &index,
 			    GeoVFullPhysVol *fpv, GeoAlignableTransform *transform);
   virtual void addSplitAlignable(int level, std::map<std::string, int> &index, std::pair<std::string, int> &extraIndex,

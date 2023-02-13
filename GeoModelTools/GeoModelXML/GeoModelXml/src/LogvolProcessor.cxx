@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -72,7 +72,8 @@ std::string getNodeType(const GeoGraphNode* node) {
 
 void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
   GeoLogVol *lv;
-  GeoNameTag *nameTag_physVolName;
+  GeoNameTag *nameTag_physChildVolName;//USed for "sensitive" PhysVols 
+  GeoNameTag *nameTag_physVolName;//Actually the logVol name, which gets used for the PhysVols if they have "named" attribute (and aren't sensitive)
 
   gmxUtil.positionIndex.incrementLevel();
 
@@ -109,6 +110,10 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   string envelope(env);
   bool is_envelope=(envelope.compare(string("true"))==0);
   XMLString::release(&env);
+  
+  XMLCh * sensitive_tmp = XMLString::transcode("sensitive");
+  bool sensitive = element->hasAttribute(sensitive_tmp);
+  XMLString::release(&sensitive_tmp);
 
 //
 //    Look for the logvol in the map; if not yet there, add it
@@ -215,7 +220,6 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
       name2release = XMLString::transcode(el->getNodeName());
       string name(name2release);
       XMLString::release(&name2release);
-      //msglog << MSG::DEBUG << "Processing child: '" << name << "'..." << endmsg;
       gmxUtil.processorRegistry.find(name)->process(el, gmxUtil, childrenAdd);
     }
   }
@@ -223,19 +227,24 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
 //   Make a list of things to be added
 //
   if(isNamed) {
-      toAdd.push_back(nameTag_physVolName);
+      if(!sensitive) toAdd.push_back(nameTag_physVolName);//If sensitive, it gets a different name in a moment...
   }
 
-  XMLCh * sensitive_tmp = XMLString::transcode("sensitive");
-  bool sensitive = element->hasAttribute(sensitive_tmp);
   int sensId = 0;
-  //std::vector<int> extraSensIds;//extra Identfiers to be used in case we split this volume into multiple DetectorElements
   map<string, int> index;
-  //map<string, int> updatedIndex;//extra indices to be used in case we split this volume
   if (sensitive) {
     gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
     gmxUtil.positionIndex.indices(index, gmxUtil.eval);
     sensId = gmxUtil.gmxInterface()->sensorId(index);
+    std::string newName = name;
+    for(auto index_i:index){
+            newName.append("_");
+            newName.append(index_i.first);
+            newName.append("_");
+            newName.append(std::to_string(index_i.second));
+    }
+    nameTag_physChildVolName = new GeoNameTag(newName);//Make sensitive always have a name, to extra Id information from
+    toAdd.push_back(nameTag_physChildVolName);
     if(hasIdentifier) { //TODO: check if all "sensitive" volumes must have an identifier. If that's the case, then we can remove this "if" here
         //        toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
         toAdd.push_back(new GeoIdentifierTag(sensId));
@@ -247,7 +256,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
           gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
       }
   }
-  XMLString::release(&sensitive_tmp);
+
   //
   //    Make a new PhysVol/FullPhysVol and add everything to it, then add it to the list of things for my caller to add
   //
@@ -290,7 +299,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
         for(int i=0;i<splitLevel;i++){
           std::string field = "eta_module";//eventually specify in Xml the field to split in?
           std::pair<std::string,int> extraIndex(field,i);
-          gmxUtil.gmxInterface()->addSplitSensor(sensitiveName, index,extraIndex, sensId, dynamic_cast<GeoVFullPhysVol *> (pv));
+          gmxUtil.gmxInterface()->addSplitSensor(sensitiveName, index,extraIndex, sensId, dynamic_cast<GeoVFullPhysVol *> (pv),splitLevel);
         }
 	    }
 	    else gmxUtil.gmxInterface()->addSensor(sensitiveName, index, sensId, dynamic_cast<GeoVFullPhysVol *> (pv));

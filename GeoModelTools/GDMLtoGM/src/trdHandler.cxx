@@ -24,6 +24,6 @@ void trdHandler::ElementHandle()
   double y2=getAttributeAsDouble("y2");
   double z=getAttributeAsDouble("z");
 
-  GeoShape* trd=new GeoTrd(lunit*x1,lunit*x2,lunit*y1,lunit*y2,lunit*z);
+  GeoShape* trd=new GeoTrd(lunit*x1/2.,lunit*x2/2.,lunit*y1/2.,lunit*y2/2.,lunit*z/2.);
   theController->saveSolid(name,trd);
 }

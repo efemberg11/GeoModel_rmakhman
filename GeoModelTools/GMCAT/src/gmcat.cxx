@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdio>
 #include <unistd.h>
 #include <stdlib.h> // setenv
 
@@ -33,6 +34,42 @@ const std::string shared_obj_extension=".so";
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 
 int main(int argc, char ** argv) {
+
+
+  struct Metadata {
+    std::string dateString;
+    std::string geoModelDataBranch;
+  } metadata;
+
+  // Fill metadata;
+
+  {
+    // Ceci n'es pas une pipe:
+    FILE *ceci=popen("date -Im","r");
+    if (ceci) {
+      char buff[1024];
+      if (fscanf(ceci,"%s",buff)) {
+	metadata.dateString=buff;
+      }
+      pclose(ceci);
+    }
+  }
+
+  char *geomodel_xml_dir=getenv("GEOMODEL_XML_DIR");
+  if (geomodel_xml_dir)  {
+    std::string cmd="git -C "+ std::string(geomodel_xml_dir) + " rev-parse --abbrev-ref HEAD";
+    // Ceci n'es pas une pipe:
+    FILE *ceci=popen(cmd.c_str(),"r");
+    if (ceci) {
+      char buff[1024];
+      if (fscanf(ceci,"%s",buff)) {
+	metadata.geoModelDataBranch=buff;
+      }
+      pclose(ceci);
+    }
+  }
+
+  
   //
   // Usage message:
   //
@@ -204,9 +241,18 @@ int main(int argc, char ** argv) {
     std::cerr << "gmcat -- Error opening the output file: " << outputFile << std::endl;
     return 7;
   }
-
+  //
+  // Fill the header file with metadata
+  //
+  std::vector<std::string>                                                   gmcatColNames={"Date",             "GeoModelDataBranch"};
+  std::vector<std::string>                                                   gmcatColTypes={"STRING",           "STRING"            };
+  std::vector<std::vector<std::variant<int,long,float,double,std::string>>>  gmcatData    ={{metadata.dateString, metadata.geoModelDataBranch}};
+  
+  db.createCustomTable("AAHEADER", gmcatColNames,gmcatColTypes,gmcatData); 
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
+
+
   if (vecPluginsPublishers.size() > 0) {
       dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
   } else {

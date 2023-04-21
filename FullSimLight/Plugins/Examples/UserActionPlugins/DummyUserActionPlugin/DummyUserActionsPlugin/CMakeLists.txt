@@ -1,6 +1,6 @@
 # Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 # Set up the project.
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required(VERSION 3.16...3.26)
 project( "DummyUserActionsPlugin" )
 
 

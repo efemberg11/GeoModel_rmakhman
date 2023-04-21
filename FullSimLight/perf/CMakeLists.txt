@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-cmake_policy(VERSION 3.12...3.18)
+cmake_minimum_required(VERSION 3.16...3.26)
 
 project(FullSimLightPerf)
 

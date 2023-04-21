@@ -1,5 +1,5 @@
 # Set up the project.
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required(VERSION 3.16...3.26)
 
 set(CMAKE_CXX_STANDARD 17)
 

@@ -20,11 +20,7 @@ option( GEOMODEL_USE_BUILTIN_COIN3D
 if( GEOMODEL_USE_BUILTIN_COIN3D )
 
    # Tell the user what's happening.
-   if( COLOR_DEFS )
-	   message( STATUS "${BoldMagenta}'GEOMODEL_USE_BUILTIN_COIN3D' was set to 'true' ==> Building Coin and SoQt  as part of the project${ColourReset}" )
-   else()
-	   message( STATUS "'GEOMODEL_USE_BUILTIN_COIN3D' was set to 'true' ==> Building Coin and SoQt as part of the project" )
-   endif()
+	message( STATUS "${BoldMagenta}'GEOMODEL_USE_BUILTIN_COIN3D' was set to 'true' ==> Building Coin and SoQt  as part of the project${ColourReset}" )
 
    # External(s) required for the build.
    find_package( Boost REQUIRED )

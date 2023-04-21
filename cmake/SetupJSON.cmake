@@ -21,11 +21,7 @@ option( GEOMODEL_USE_BUILTIN_JSON
 if( GEOMODEL_USE_BUILTIN_JSON )
 
    # Tell the user what's happening.
-   if( COLOR_DEFS )
-     message( STATUS "${BoldMagenta}'GEOMODEL_USE_BUILTIN_JSON' was set to 'true' ==> Building nlohmann_json as part of the project${ColourReset}" )
-   else()
-     message( STATUS "'GEOMODEL_USE_BUILTIN_JSON' was set to 'true' ==> Building nlohmann_json as part of the project" )
-   endif()
+   message( STATUS "${BoldMagenta}'GEOMODEL_USE_BUILTIN_JSON' was set to 'true' ==> Building nlohmann_json as part of the project${ColourReset}" )
 
    # The include directory and library that will be produced.
    set( nlohmann_json_INCLUDE_DIR

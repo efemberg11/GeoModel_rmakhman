@@ -151,24 +151,11 @@ if(Pythia_FOUND)
 endif()
 
 
-# Check if we are building FullSimLight individually,
-# or as a part of the main GeoModel.
-# In the first case, we link against the imported targets, which are taken
-# from the base GeoModel packages already installed on the system.
-# This is used when building distribution packages.
-if ( ${PROJECT_NAME}_INDIVIDUAL_BUILD ) # if built individually
-  target_link_libraries( gmclash PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-  target_link_libraries( gmmasscalc PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-  target_link_libraries( fullSimLight PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-  target_link_libraries( gmgeantino PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-  target_link_libraries( gm2gdml PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-else() # if built as a part of GeoModel
-  target_link_libraries( gmclash PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
-  target_link_libraries( gmmasscalc PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
-  target_link_libraries( fullSimLight PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
-  target_link_libraries( gmgeantino PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
-  target_link_libraries( gm2gdml PUBLIC GeoModelKernel GeoModelRead GeoModelWrite )
-endif()
+target_link_libraries( gmclash PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
+target_link_libraries( gmmasscalc PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
+target_link_libraries( fullSimLight PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
+target_link_libraries( gmgeantino PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
+target_link_libraries( gm2gdml PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
 
 # targets that need 'nlohmann_json'
 target_link_libraries( gmclash PRIVATE nlohmann_json::nlohmann_json )

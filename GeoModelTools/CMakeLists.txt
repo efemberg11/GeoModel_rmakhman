@@ -32,8 +32,6 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED ${GeoModel_VERSION} )
     find_package( GeoModelIO REQUIRED ${GeoModel_VERSION} ) 
-    # Set a flag to steer the build of the subpackages
-    #set( VISUALIZATION_INDIVIDUAL_BUILD ON )
     # Print Build Info on screen
     include( PrintBuildInfo )
 else()

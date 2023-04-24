@@ -40,17 +40,7 @@ message("==> NOTE: G4 solid extensions will be searched in: ${PATHEXTENSIONS}. I
 add_library( GeoModel2G4 SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModel2G4
   PUBLIC  ${GEANT4_LIBRARIES}
-  PRIVATE GeoMaterial2G4 )
-# Check if we are building FullSimLight individually,
-# or as a part of the main GeoModel.
-# In the first case, we link against the imported targets, which are taken
-# from the base GeoModel packages already installed on the system.^[OB
-# This is used when building distribution packages.
-if ( GeoModelG4_INDIVIDUAL_BUILD ) # if built individually
-    target_link_libraries( GeoModel2G4 PRIVATE GeoModelCore::GeoModelKernel )
-else()
-    target_link_libraries( GeoModel2G4 PRIVATE GeoModelKernel )
-endif()
+  PRIVATE GeoMaterial2G4 GeoModelCore::GeoModelKernel )
 
 target_include_directories( GeoModel2G4 SYSTEM PUBLIC ${GEANT4_INCLUDE_DIRS} )
 target_include_directories( GeoModel2G4 PUBLIC

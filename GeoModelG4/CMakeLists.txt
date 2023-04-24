@@ -31,8 +31,6 @@ if( (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR GEOMODEL_BUILD_GEOMODELG4_
         find_package( Geant4 REQUIRED )
         include( SetupXercesC )
     endif()
-    # Set a flag to steer the  of the subpackages
-    set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
     # Print Build Info on screen
     include( PrintBuildInfo )
 else()

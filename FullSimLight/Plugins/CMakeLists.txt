@@ -28,8 +28,6 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
 
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED )
-    # Set a flag to steer the build of the subpackages
-    #set( VISUALIZATION_INDIVIDUAL_BUILD ON )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")

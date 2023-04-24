@@ -21,8 +21,6 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Set up how the project handle some of its dependenices. Either by picking them
     # up from the environment, or building them itself.
     include( SetupJSON )
-    # Set a flag to steer the  of the subpackages
-    set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
     find_package (FullSimLight REQUIRED)
     add_definitions (-DFSLPLUGINROOT="${FullSimLight_DIR}/../../../${CMAKE_INSTALL_DATAROOTDIR}" )
     message  ( STATUS "FSL plugin files sought here: ${FullSimLight_DIR}/../../../${CMAKE_INSTALL_DATAROOTDIR}" )

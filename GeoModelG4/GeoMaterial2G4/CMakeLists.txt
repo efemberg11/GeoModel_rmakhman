@@ -18,18 +18,7 @@ include(${Geant4_USE_FILE})
 
 # Set target and properties
 add_library( GeoMaterial2G4 SHARED ${HEADERS} ${SOURCES} )
-
-# Check if we are building FullSimLight individually,
-# or as a part of the main GeoModel.
-# In the first case, we link against the imported targets, which are taken
-# from the base GeoModel packages already installed on the system.
-# This is used when building distribution packages.
-if ( GeoModelG4_INDIVIDUAL_BUILD ) # if built individually
-    target_link_libraries( GeoMaterial2G4 PUBLIC GeoModelCore::GeoModelKernel )
-else()
-    target_link_libraries( GeoMaterial2G4 PUBLIC GeoModelKernel )
-endif()
-target_link_libraries( GeoMaterial2G4 PUBLIC ${Geant4_LIBRARIES} )
+target_link_libraries( GeoMaterial2G4 PUBLIC GeoModelCore::GeoModelKernel ${Geant4_LIBRARIES} )
 
 target_include_directories( GeoMaterial2G4 PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

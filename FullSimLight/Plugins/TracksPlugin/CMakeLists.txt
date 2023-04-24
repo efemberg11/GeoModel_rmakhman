@@ -50,7 +50,6 @@ set(PROJECT_SOURCES ${HEADERS} ${SOURCES} TracksPlugin.cc)
 # Set up the library.
 add_library(GenerateTracksPlugin SHARED ${HEADERS} ${SOURCES} TracksPlugin.cc)
 
-#find_package (Eigen3 REQUIRED)
 find_package(Geant4 REQUIRED)
 #find_package(FullSimLight REQUIRED)
 find_package( HDF5 REQUIRED COMPONENTS CXX )

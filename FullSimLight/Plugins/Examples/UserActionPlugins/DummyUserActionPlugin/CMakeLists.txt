@@ -49,7 +49,6 @@ set(PROJECT_SOURCES ${SOURCES})
 # Set up the library.
 add_library(DummyUserActionPlugin SHARED ${SOURCES})
 
-#find_package (Eigen3 REQUIRED)
 find_package(Geant4 REQUIRED)
 #find_package(FullSimLight REQUIRED)
 find_package( HDF5 REQUIRED COMPONENTS CXX )

@@ -23,8 +23,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   include( BuildType )
   # Set default build and C++ options
   include( configure_cpp_options )
-  set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
-       "Framework finding behaviour on macOS" )
+  set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING "Framework finding behaviour on macOS" )
   # Set up how the project handle some of its dependenices. Either by picking them
   # up from the environment, or building them itself.
   include( SetupJSON )
@@ -46,10 +45,8 @@ endif()
 ## External dependencies.
 #----------------------------------------------------------------------------
 # Find Geant4 package, batch mode only executable (i.e. no need ui and vis).
-#
 find_package(Geant4 REQUIRED)
 message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
-#----------------------------------------------------------------------------
 
 # Support for the HepMC3 exchange format
 # This is OFF by default, but it can be enbled by the user if used/needed;
@@ -58,10 +55,6 @@ option(GEOMODEL_USE_HEPMC3 "Build GeoModel tools with support for the HepMC3 exc
 if(GEOMODEL_USE_HEPMC3)
   find_package(HepMC3 REQUIRED) # required by default, but it can be disabled 
 endif()
-if(HepMC3_FOUND)
-  add_compile_definitions( USE_HEPMC3 )
-endif()
-
 
 # Support for Pythia event generator
 # This is OFF by default, but it can be enbled by the user if used/needed;
@@ -69,48 +62,18 @@ endif()
 option(GEOMODEL_USE_PYTHIA "Build GeoModel tools with support for the Pythia event generator  (Note: Pythia must be installed on the target machine)" OFF )
 if(GEOMODEL_USE_PYTHIA)
   find_package(Pythia REQUIRED) # if support for Pythia is enabled, it must be installed.
-  if(Pythia_FOUND)
-    message( STATUS "Found Pythia (${Pythia_INCLUDE_DIR}), and support for Pythia is enabled; so, support for it will be compiled.")
-    add_compile_definitions( USE_PYTHIA )
-  endif()
-else()
-  message(STATUS "! NOTE ==> The support for Pythia is disabled by default, and it is not compiled at the moment. However, it can be enabled by the user by giving the option '-DGEOMODEL_USE_Pythia=1' to CMake; in that case, you must be sure Pythia is installed on the system.")
 endif()
-
-
-#----------------------------------------------------------------------------
-# Setup Geant4 include directories and compile definitions
-# Setup include directory for this project
-#
-add_definitions (-DG4VERSION="${Geant4_VERSION}" )
-
-# Find includes in corresponding build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-
-# Add sub-projects and targets
-add_subdirectory(Plugins)
-
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
 #
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
-
-# Remove from the build HepMC3-related sources if that is not found
-# TODO: remove these lines and put pre-comp fences with 'USE_HEPMC3' def
-if( NOT HepMC3_FOUND)
+if(NOT HepMC3_FOUND)
   file(GLOB hepmc3src ${PROJECT_SOURCE_DIR}/src/HepMC3*.cc)
-  message(STATUS "! NOTE ==> The support for HepMC3 was disabled by the user; therefore, support for it in FullSimLight will not be compiled.")
   list(REMOVE_ITEM sources ${hepmc3src})
-else()
-  message(STATUS "Found HepMC3, so support for it will be compiled. (${HEPMC3_INCLUDE_DIR})")
 endif()
-
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
@@ -118,51 +81,61 @@ endif()
 set(OUTPUT bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${OUTPUT})
 
-add_definitions (-DG4SHAREDIR="${Geant4_INCLUDE_DIR}/../../share" )
-add_definitions (-DFULLSIMLIGHTSHAREDIR="${CMAKE_INSTALL_PREFIX}/share/FullSimLight" )
+# Plugin Interface Library
+add_library(FullSimLight INTERFACE)
+add_library(FullSimLight::FullSimLight ALIAS FullSimLight)
+target_include_directories( FullSimLight INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
-add_executable(fullSimLight fullSimLight.cc ${sources} ${headers})
-add_executable(gmclash geoModelClash.cc ${sources} ${headers})
-add_executable(gmmasscalc geoModelMassCalculator.cc ${sources} ${headers})
+# OBJECT library for the shared functionality
+add_library(FullSimLight_obj OBJECT ${sources} ${headers})
+target_compile_definitions(FullSimLight_obj 
+  PUBLIC
+    G4SHAREDIR="${Geant4_INCLUDE_DIR}/../../share"
+    FULLSIMLIGHTSHAREDIR="${CMAKE_INSTALL_PREFIX}/share/FullSimLight"
+    G4VERSION="${Geant4_VERSION}"
+    $<$<BOOL:${Pythia_FOUND}>:USE_PYTHIA>
+    $<$<BOOL:${HepMC3_FOUND}>:USE_HEPMC3>)
+target_include_directories(FullSimLight_obj
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    ${HEPMC3_INCLUDE_DIR})
+target_link_libraries(FullSimLight_obj
+  PUBLIC
+    nlohmann_json::nlohmann_json
+    GeoModel2G4
+    GeoModelCore::GeoModelKernel
+    GeoModelIO::GeoModelRead
+    GeoModelIO::GeoModelWrite
+    ${HEPMC3_LIB}
+    ${Geant4_LIBRARIES}
+    $<$<BOOL:${Pythia_FOUND}>:Pythia::Pythia>
+  PRIVATE
+    FullSimLight::FullSimLight)
+
+# Primary executables
+add_executable(fullSimLight fullSimLight.cc)
+target_link_libraries(fullSimLight PRIVATE FullSimLight_obj)
+
+add_executable(gmclash geoModelClash.cc)
+target_link_libraries(gmclash PRIVATE FullSimLight_obj)
+
+add_executable(gmmasscalc geoModelMassCalculator.cc)
+target_link_libraries(gmmasscalc PRIVATE FullSimLight_obj)
+
+add_executable(gmgeantino geantinoMaps.cc)
+target_link_libraries(gmgeantino PRIVATE FullSimLight_obj)
+
+add_executable(gm2gdml geoModel2GDML.cc)
+target_link_libraries(gm2gdml PRIVATE FullSimLight_obj)
+
 add_executable(fillHistogramExample fillHistogramExample.cc src/Histo.cc include/Histo.hh)
-add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
-add_executable(gm2gdml geoModel2GDML.cc ${sources} ${headers})
-
-
-#----------------------------------------------------------------------------
-# Add extra 'include' directories
-#
-
-#----------------------------------------------------------------------------
-# Link all needed libraries
-#
+target_include_directories(fillHistogramExample PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(fillHistogramExample ${Geant4_LIBRARIES})
-target_link_libraries(gmclash PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} ${HEPMC3_LIB})
-target_link_libraries(gmmasscalc PUBLIC GeoModel2G4 ${Geant4_LIBRARIES}  ${HEPMC3_LIB})
-target_link_libraries(fullSimLight PUBLIC GeoModel2G4 ${Geant4_LIBRARIES}  ${HEPMC3_LIB})
-target_link_libraries(gmgeantino PUBLIC GeoModel2G4 ${Geant4_LIBRARIES}  ${HEPMC3_LIB})
-target_link_libraries(gm2gdml PUBLIC GeoModel2G4 ${Geant4_LIBRARIES}  ${HEPMC3_LIB})
-
-# FIXUP: To check after REBASE complete
-if(Pythia_FOUND)
-  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
-endif()
-
-
-target_link_libraries( gmclash PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-target_link_libraries( gmmasscalc PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-target_link_libraries( fullSimLight PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-target_link_libraries( gmgeantino PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-target_link_libraries( gm2gdml PUBLIC GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite )
-
-# targets that need 'nlohmann_json'
-target_link_libraries( gmclash PRIVATE nlohmann_json::nlohmann_json )
-target_link_libraries( gmmasscalc PRIVATE nlohmann_json::nlohmann_json )
-target_link_libraries( fullSimLight PRIVATE nlohmann_json::nlohmann_json )
-target_link_libraries( gmgeantino PRIVATE nlohmann_json::nlohmann_json )
-target_link_libraries( gm2gdml PRIVATE nlohmann_json::nlohmann_json )
 
 #----------------------------------------------------------------------------
+# Add sub-projects and targets
+add_subdirectory(Plugins)
+
 # Add profiling test targets
 if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
   if(NOT Pythia_FOUND)
@@ -198,25 +171,15 @@ foreach(_script ${FULLSIMLIGHT_SCRIPTS})
     )
 endforeach()
 
-
 #----------------------------------------------------------------------------
-# Install the executable to 'bin/' directory under the
+# Install the executables to 'bin/' directory under the
 # CMAKE_INSTALL_PREFIX
 #
-install(TARGETS fullSimLight DESTINATION ${OUTPUT})
-install(TARGETS gmclash DESTINATION ${OUTPUT})
-install(TARGETS gmmasscalc DESTINATION ${OUTPUT})
-install(TARGETS fillHistogramExample DESTINATION ${OUTPUT})
-install(TARGETS gmgeantino DESTINATION ${OUTPUT})
-install(TARGETS gm2gdml DESTINATION ${OUTPUT})
+install(TARGETS fullSimLight gmclash gmmasscalc fillHistogramExample gmgeantino gm2gdml
+  DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION share/FullSimLight)
 
-add_library( FullSimLight INTERFACE )
-add_library( FullSimLight::FullSimLight ALIAS FullSimLight )
-target_include_directories( FullSimLight INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
-
 # Set up the packaging of the project using CPack.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 
 include ( GNUInstallDirs )
 include( WriteBasicConfigVersionFile )

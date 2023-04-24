@@ -3,18 +3,15 @@
 # CMake settings
 cmake_minimum_required(VERSION 3.16...3.26)
 
-# Dummy call to 'project()', needed to set 'PROJECT_SOURCE_DIR'
-project( "FullSimLight" )
-
 #Set up the project. Check if we build it with GeoModel or individually
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   # I am top-level project.
   # Make the root module directory visible to CMake.
   list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
   # get global GeoModel version
   include( GeoModel-version ) 
   # set the project, with the version taken from the GeoModel parent project
-  project( "FullSimLight" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
+  project( FullSimLight VERSION ${GeoModel_VERSION} LANGUAGES CXX )
   # Define color codes for CMake messages
   include( cmake_colors_defs )
   # Warn the users about what they are doing
@@ -38,9 +35,8 @@ else()
   # I am called from other project with add_subdirectory().
   message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
   # Set the project
-  project( "FullSimLight" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
+  project( FullSimLight VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 endif()
-
 
 ## External dependencies.
 #----------------------------------------------------------------------------

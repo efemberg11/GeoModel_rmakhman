@@ -18,10 +18,7 @@ include(${Geant4_USE_FILE})
 
 # Set target and properties
 add_library( GeoMaterial2G4 SHARED ${HEADERS} ${SOURCES} )
-# If the in-house build of the nlohmann_json library is used, add explicit dependency
-if( GEOMODEL_USE_BUILTIN_XERCESC )
-    add_dependencies( GeoMaterial2G4 XercesCBuiltIn )
-endif()
+
 # Check if we are building FullSimLight individually,
 # or as a part of the main GeoModel.
 # In the first case, we link against the imported targets, which are taken

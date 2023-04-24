@@ -28,9 +28,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   # Set up how the project handle some of its dependenices. Either by picking them
   # up from the environment, or building them itself.
   include( SetupJSON )
-  if( NOT TARGET XercesCBuiltIn )
-      include( SetupXercesC )
-  endif()
+  include( SetupXercesC )
   # Find the base GeoModel packages, which must be installed on the target system already
   find_package( GeoModelCore REQUIRED ${GeoModel_VERSION} )
   find_package( GeoModelIO REQUIRED ${GeoModel_VERSION} )
@@ -136,15 +134,7 @@ add_executable(gm2gdml geoModel2GDML.cc ${sources} ${headers})
 #----------------------------------------------------------------------------
 # Add extra 'include' directories
 #
-# If the in-house build of the Xerces-C library is used, add explicit dependency: for Geant4
-if( GEOMODEL_USE_BUILTIN_XERCESC )
-  add_dependencies( fullSimLight XercesCBuiltIn )
-  add_dependencies( gmclash XercesCBuiltIn )
-  add_dependencies( gmmasscalc XercesCBuiltIn )
-  add_dependencies( fillHistogramExample XercesCBuiltIn )
-  add_dependencies( gmgeantino XercesCBuiltIn )
-  add_dependencies( gm2gdml XercesCBuiltIn )
-endif()
+
 #----------------------------------------------------------------------------
 # Link all needed libraries
 #

@@ -32,6 +32,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
          "Framework finding behaviour on macOS" )
     # GeoModel dependencies
     find_package( GeoModelCore REQUIRED )
+    find_package( FullSimLight REQUIRED )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root project.")
@@ -51,26 +52,17 @@ set(PROJECT_SOURCES ${HEADERS} ${SOURCES} TracksPlugin.cc)
 add_library(GenerateTracksPlugin SHARED ${HEADERS} ${SOURCES} TracksPlugin.cc)
 
 find_package(Geant4 REQUIRED)
-#find_package(FullSimLight REQUIRED)
 find_package( HDF5 REQUIRED COMPONENTS CXX )
 
 message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
-#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
-include(${Geant4_USE_FILE})
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
 # Add the FullSimLight headers dir.
-# Path is different if built as a single top project, 
-# or as an all-in-one build together with all other GeoModel subpackages 
-if( FullSimLight_INDIVIDUAL_BUILD )
-    target_include_directories( GenerateTracksPlugin PUBLIC  ${CMAKE_SOURCE_DIR} ${HDF5_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-else() # all-in-one--build
-    target_include_directories( GenerateTracksPlugin PUBLIC  ${CMAKE_SOURCE_DIR}/FullSimLight ${HDF5_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-endif()
+target_include_directories( GenerateTracksPlugin PUBLIC ${HDF5_CXX_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries ( GenerateTracksPlugin PUBLIC ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} ${HDF5_CXX_LIBRARIES})
+target_link_libraries ( GenerateTracksPlugin PUBLIC FullSimLight::FullSimLight ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} ${HDF5_CXX_LIBRARIES})
 
 set_target_properties( GenerateTracksPlugin PROPERTIES
 		       VERSION ${PROJECT_VERSION}

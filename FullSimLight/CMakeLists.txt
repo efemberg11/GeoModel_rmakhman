@@ -33,8 +33,6 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   find_package( GeoModelCore REQUIRED ${GeoModel_VERSION} )
   find_package( GeoModelIO REQUIRED ${GeoModel_VERSION} )
   find_package( GeoModelG4 REQUIRED ${GeoModel_VERSION} )
-  # Set a flag to steer the  of the subpackages
-  set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
   # Print Build Info on screen
   include( PrintBuildInfo )
 else()
@@ -213,7 +211,9 @@ install(TARGETS gmgeantino DESTINATION ${OUTPUT})
 install(TARGETS gm2gdml DESTINATION ${OUTPUT})
 install(FILES ${FULLSIMLIGHT_SCRIPTS} DESTINATION share/FullSimLight)
 
-add_library ( FullSimLight INTERFACE )
+add_library( FullSimLight INTERFACE )
+add_library( FullSimLight::FullSimLight ALIAS FullSimLight )
+target_include_directories( FullSimLight INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 
 # Set up the packaging of the project using CPack.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
@@ -236,7 +236,7 @@ install(
 install( EXPORT ${PROJECT_NAME}-export
   FILE ${PROJECT_NAME}Targets.cmake
   COMPONENT Development
-#   NAMESPACE "${PROJECT_NAME}::"
+  NAMESPACE "${PROJECT_NAME}::"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME} )
 
 # Install the hand-written project configuration.

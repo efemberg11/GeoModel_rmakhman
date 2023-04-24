@@ -20,9 +20,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
          "Framework finding behaviour on macOS" )
     # Set up how the project handle some of its dependenices. Either by picking them
     # up from the environment, or building them itself.
-    if( NOT TARGET JSONExt )
-        include( SetupJSON )
-    endif()
+    include( SetupJSON )
     # Set a flag to steer the  of the subpackages
     set( ${PROJECT_NAME}_INDIVIDUAL_BUILD ON )
     find_package (FullSimLight REQUIRED)
@@ -80,18 +78,7 @@ set(PROJECT_SOURCES ${sources} ${headers}  ${uis} )
 
 
 add_executable(fsl ${PROJECT_SOURCES} )
-
-
-target_link_libraries(fsl PRIVATE Qt5::Widgets)
-
-if( GEOMODEL_USE_BUILTIN_JSON )
-   add_dependencies(fsl JSONExt )
-endif()
- 
-if( nlohmann_json_FOUND )
-    target_link_libraries( fsl PRIVATE nlohmann_json::nlohmann_json )
-endif()
-  
+target_link_libraries(fsl PRIVATE Qt5::Widgets nlohmann_json::nlohmann_json)
 
 # Install the executable.
 install( TARGETS fsl

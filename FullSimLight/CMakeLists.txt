@@ -27,9 +27,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
        "Framework finding behaviour on macOS" )
   # Set up how the project handle some of its dependenices. Either by picking them
   # up from the environment, or building them itself.
-  if( NOT TARGET JSONExt )
-      include( SetupJSON )
-  endif()
+  include( SetupJSON )
   if( NOT TARGET XercesCBuiltIn )
       include( SetupXercesC )
   endif()
@@ -138,19 +136,6 @@ add_executable(gm2gdml geoModel2GDML.cc ${sources} ${headers})
 #----------------------------------------------------------------------------
 # Add extra 'include' directories
 #
-# If the in-house build of the nlohmann_json library is used, add explicit dependency
-if( GEOMODEL_USE_BUILTIN_JSON )
-  add_dependencies( fullSimLight JSONExt )
-  add_dependencies( gmclash JSONExt )
-  add_dependencies( gmmasscalc JSONExt )
-  add_dependencies( fillHistogramExample JSONExt )
-  add_dependencies( gmgeantino JSONExt )
-  add_dependencies( gm2gdml JSONExt )
-  # Acquire Installation Directory of JSONExt
-  ExternalProject_Get_Property (JSONExt install_dir)
-  # Include the installed 'include' PATH
-  include_directories (${install_dir}/include)
-endif()
 # If the in-house build of the Xerces-C library is used, add explicit dependency: for Geant4
 if( GEOMODEL_USE_BUILTIN_XERCESC )
   add_dependencies( fullSimLight XercesCBuiltIn )
@@ -196,20 +181,11 @@ else() # if built as a part of GeoModel
 endif()
 
 # targets that need 'nlohmann_json'
-# NOTE: We link to `nlohmann_json` only  if we use a version of nlohmann_json
-# that provides a CMake config file (i.e., either built from source, or also
-# installed with Homebrew on macOS).
-# This is not needed if the single-header library is installed in a regular
-# system include folder (e.g., '/usr/local/include', '/usr/include', ...)
-if( nlohmann_json_FOUND )
-  target_link_libraries( gmclash PRIVATE nlohmann_json::nlohmann_json )
-  target_link_libraries( gmmasscalc PRIVATE nlohmann_json::nlohmann_json )
-  target_link_libraries( fullSimLight PRIVATE nlohmann_json::nlohmann_json )
-  target_link_libraries( gmgeantino PRIVATE nlohmann_json::nlohmann_json )
-  target_link_libraries( gm2gdml PRIVATE nlohmann_json::nlohmann_json )
-else()
-  message(STATUS "WARNING - 'nlohmann_json' not found by CMake!! Anyway, if you installed the single header file in a standard system include dir, I will be able to use it.")
-endif()
+target_link_libraries( gmclash PRIVATE nlohmann_json::nlohmann_json )
+target_link_libraries( gmmasscalc PRIVATE nlohmann_json::nlohmann_json )
+target_link_libraries( fullSimLight PRIVATE nlohmann_json::nlohmann_json )
+target_link_libraries( gmgeantino PRIVATE nlohmann_json::nlohmann_json )
+target_link_libraries( gm2gdml PRIVATE nlohmann_json::nlohmann_json )
 
 #----------------------------------------------------------------------------
 # Add profiling test targets

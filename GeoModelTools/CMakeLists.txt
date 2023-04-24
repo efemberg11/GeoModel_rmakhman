@@ -27,9 +27,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
          "Framework finding behaviour on macOS" )
     # Set up how the project handle some of its dependenices. Either by picking them
     # up from the environment, or building them itself.
-    if( NOT TARGET JSONExt )
-        include( SetupJSON )
-    endif()
+    include( SetupJSON )
     if( NOT TARGET XercesCBuiltIn )
         include( SetupXercesC )
     endif()

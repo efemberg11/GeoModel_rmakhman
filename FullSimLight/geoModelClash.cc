@@ -156,7 +156,7 @@ void FindNumberOfVolumes(const G4VPhysicalVolume* volume, G4int level)
   for (G4int i = 0; i < nv; ++i)
   {
     G4VPhysicalVolume* daughter = volume->GetLogicalVolume()->GetDaughter(i);
-    if (daughter->GetLogicalVolume()->GetNoDaughters() >= 0) FindNumberOfVolumes(daughter, level + 1);
+    FindNumberOfVolumes(daughter, level + 1);
   }
 }
 

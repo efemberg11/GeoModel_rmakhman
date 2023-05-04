@@ -7,7 +7,7 @@
 #include "G4VModularPhysicsList.hh"
 
 #include <string>
-
+#include <memory>
 
 
 class FSLPhysListFactory
@@ -26,7 +26,7 @@ private:
 
     static bool fActivateRegionsFlag;
     
-    static const FSLPhysListFactory* fgInstance;
+    static std::unique_ptr<FSLPhysListFactory> fgInstance;
 };
 
 #endif //__FSLPhysListFactory_HH__

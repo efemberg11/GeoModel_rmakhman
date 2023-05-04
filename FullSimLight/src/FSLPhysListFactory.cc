@@ -17,7 +17,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-const FSLPhysListFactory* FSLPhysListFactory::fgInstance = nullptr;
+std::unique_ptr<FSLPhysListFactory> FSLPhysListFactory::fgInstance;
 
 bool FSLPhysListFactory::fActivateRegionsFlag;
 
@@ -25,23 +25,23 @@ bool FSLPhysListFactory::fActivateRegionsFlag;
 
 const FSLPhysListFactory* FSLPhysListFactory::GetInstance()
 {
-    return fgInstance;
+  return fgInstance.get();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FSLPhysListFactory::FSLPhysListFactory()
 {
-    fgInstance=this;
+  if (!fgInstance) {
+    fgInstance=std::unique_ptr<FSLPhysListFactory>(this);
     fActivateRegionsFlag = false;
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 FSLPhysListFactory::~FSLPhysListFactory()
 {
-    delete fgInstance;
-    fgInstance = nullptr;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

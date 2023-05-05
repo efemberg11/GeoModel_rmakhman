@@ -59,11 +59,11 @@ message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
 
 
 # Support for the HepMC3 exchange format
-# This is ON by default, but it can be disabled by the user if not used/needed,
-# or if HepMC3 is not installed.
-option(GEOMODEL_USE_HEPMC3 "Build GeoModel tools with support for the HepMC3 exchancge format (Note: HepMC3 must be installed on the target machine)" ON)
+# This is OFF by default, but it can be enbled by the user if used/needed;
+# for that, of course, HepMC3 must be installed on the system.
+option(GEOMODEL_USE_HEPMC3 "Build GeoModel tools with support for the HepMC3 exchancge format (Note: HepMC3 must be installed on the target machine)" OFF )
 if(GEOMODEL_USE_HEPMC3)
-    find_package(HepMC3 REQUIRED) # required by default, but it can be disabled 
+    find_package(HepMC3 REQUIRED) # if support for HEPMC3 is enabled, it must be installed.
 endif()
 if(HepMC3_FOUND)
     add_compile_definitions( USE_HEPMC3 )
@@ -112,7 +112,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
 
 if( NOT HepMC3_FOUND)
     file(GLOB hepmc3src ${PROJECT_SOURCE_DIR}/src/HepMC3*.cc)
-    message(STATUS "! NOTE ==> The support for HepMC3 was disabled by the user; therefore, support for it in FullSimLight will not be compiled.")
+    message(STATUS "! NOTE ==> The support for HepMC3 is disabled by default, and it is not compiled at the moment. However, it can be enabled by the user by giving the option '-DGEOMODEL_USE_HEPMC3=1' to CMake; in that case, you must be sure HepMC3 is installed on the system.")
     #message("Removing those HepMC3-related sources: ${hepmc3src}") # debug msg
     list(REMOVE_ITEM sources ${hepmc3src})
     #message("new sources without HepMC3 support: ${sources}") # debug msg

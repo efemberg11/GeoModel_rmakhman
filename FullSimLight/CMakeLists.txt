@@ -203,17 +203,26 @@ target_link_libraries(fillHistogramExample ${Geant4_LIBRARIES})
 #target_link_libraries(plotGeantinoMaps ${ROOT_LIBRARIES})
 
 
-target_link_libraries(gmclash PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} ${HEPMC3_LIB})
-target_link_libraries(gmmasscalc PUBLIC GeoModel2G4 ${Geant4_LIBRARIES}  ${HEPMC3_LIB})
-target_link_libraries(fullSimLight PUBLIC GeoModel2G4 ${Geant4_LIBRARIES}  ${HEPMC3_LIB})
-target_link_libraries(gmgeantino PUBLIC GeoModel2G4 ${Geant4_LIBRARIES}  ${HEPMC3_LIB})
-target_link_libraries(gm2gdml PUBLIC GeoModel2G4 ${Geant4_LIBRARIES}  ${HEPMC3_LIB})
+target_link_libraries(gmclash PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(gmmasscalc PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(fullSimLight PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(gmgeantino PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} )
+target_link_libraries(gm2gdml PUBLIC GeoModel2G4 ${Geant4_LIBRARIES} )
 
-target_include_directories(gmclash PUBLIC ${HEPMC3_INCLUDE_DIR})
-target_include_directories(gmmasscalc PUBLIC ${HEPMC3_INCLUDE_DIR})
-target_include_directories(fullSimLight PUBLIC ${HEPMC3_INCLUDE_DIR})
-target_include_directories(gmgeantino PUBLIC ${HEPMC3_INCLUDE_DIR})
-target_include_directories(gm2gdml PUBLIC ${HEPMC3_INCLUDE_DIR})
+
+if( HepMC3_FOUND)
+    target_link_libraries(gmclash PUBLIC GeoModel2G4 ${HEPMC3_LIB})
+    target_link_libraries(gmmasscalc PUBLIC GeoModel2G4 ${HEPMC3_LIB})
+    target_link_libraries(fullSimLight PUBLIC GeoModel2G4 ${HEPMC3_LIB})
+    target_link_libraries(gmgeantino PUBLIC GeoModel2G4 ${HEPMC3_LIB})
+    target_link_libraries(gm2gdml PUBLIC GeoModel2G4 ${HEPMC3_LIB})
+    target_include_directories(gmclash PUBLIC ${HEPMC3_INCLUDE_DIR})
+    target_include_directories(gmmasscalc PUBLIC ${HEPMC3_INCLUDE_DIR})
+    target_include_directories(fullSimLight PUBLIC ${HEPMC3_INCLUDE_DIR})
+    target_include_directories(gmgeantino PUBLIC ${HEPMC3_INCLUDE_DIR})
+    target_include_directories(gm2gdml PUBLIC ${HEPMC3_INCLUDE_DIR})
+endif()
+
 
 # Check if we are building FullSimLight individually,
 # or as a part of the main GeoModel.

@@ -28,29 +28,28 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     find_package (FullSimLight REQUIRED)
     add_definitions (-DFSLPLUGINROOT="${FullSimLight_DIR}/../../../${CMAKE_INSTALL_DATAROOTDIR}" )
     message  ( STATUS "FSL plugin files sought here: ${FullSimLight_DIR}/../../../${CMAKE_INSTALL_DATAROOTDIR}" )
-
+    if(FullSimLight_HAS_HEPMC3)
+	add_compile_definitions( USE_HEPMC3 )
+	message (STATUS "HEPMC3 Enabled in FullSimLight")
+    else()
+        message (STATUS "HEPMC3 Disabled in FullSimLight")
+    endif()	
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
     # Set the project
     project( "fsl" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
     add_definitions (-DFSLPLUGINROOT="${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}" )
+    if(GEOMODEL_USE_HEPMC3)
+	add_compile_definitions( USE_HEPMC3 )
+     endif()	
 endif()
 
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
-# Support for the HepMC3 exchange format
-# This is ON by default, but it can be disabled by the user if not used/needed,
-# or if HepMC3 is not installed.
-option(GEOMODEL_USE_HEPMC3 "Build GeoModel tools with support for the HepMC3 exchancge format (Note: HepMC3 must be installed on the target machine)" ON)
-if(GEOMODEL_USE_HEPMC3)
-    find_package(HepMC3 REQUIRED) # required by default, but it can be disabled 
-endif()
-if(HepMC3_FOUND)
-    add_compile_definitions( USE_HEPMC3 )
-endif()
+
 
 
 # Find the dependencies of the project.

@@ -117,7 +117,7 @@ if( NOT HepMC3_FOUND)
     list(REMOVE_ITEM sources ${hepmc3src})
     #message("new sources without HepMC3 support: ${sources}") # debug msg
 else()
-    message(STATUS "Found HepMC3, so support for it will be compiled. (${HEPMC3_INCLUDE_DIR})")
+    message(STATUS "Found HepMC3, and support for HepMC3 is enabled; so, support for it will be compiled. (${HEPMC3_INCLUDE_DIR})")
 endif()
 
 #----------------------------------------------------------------------------

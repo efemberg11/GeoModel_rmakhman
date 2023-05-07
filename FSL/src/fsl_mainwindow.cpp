@@ -244,6 +244,14 @@ FSLMainWindow::FSLMainWindow(QWidget *parent)
         "it.");
     ui->groupBox_hepmc3->setTitle("HepMC3 [disabled]");
 #endif
+#ifndef USE_Pythia
+    ui->cB_gen_options->setItemData(1, false, Qt::UserRole - 1);
+    ui->groupBox_pythia->setEnabled(false);
+    ui->groupBox_pythia->setToolTip(
+        "Support for Pythia is disabled. Refer to the documentation to enable "
+        "it.");
+    ui->groupBox_pythia->setTitle("Pythia [disabled]");
+#endif
 }
 
 FSLMainWindow::~FSLMainWindow() {
@@ -907,8 +915,9 @@ void FSLMainWindow::configure_generator() {
     else if (generator == "Pythia") {
         ui->sB_NOT->setEnabled(true);
 
+#ifdef USE_Pythia
         ui->cB_pythia_type_of_eve->setEnabled(true);
-
+#endif
         ui->cB_particle->setEnabled(false);
         ui->lE_px->setEnabled(false);
         ui->lE_py->setEnabled(false);
@@ -921,14 +930,13 @@ void FSLMainWindow::configure_generator() {
         ui->lE_GP->setEnabled(false);
         ui->lE_HEPMC3->clear();
         ui->lE_GP->clear();
-
+#ifdef USE_Pythia
         if (ui->cB_pythia_type_of_eve->currentIndex() == 3) {
             pythia_type_of_event = "";
             ui->pB_pythia_browse->setEnabled(true);
             ui->lE_PCF->setEnabled(true);
 
         }
-
         else {
             ui->lE_PCF->clear();
             pythia_input_file = "";
@@ -937,6 +945,7 @@ void FSLMainWindow::configure_generator() {
             pythia_type_of_event =
                 (ui->cB_pythia_type_of_eve->currentText()).toStdString();
         }
+#endif
 
         particle = "";
         particle_energy = "";
@@ -1122,7 +1131,7 @@ void FSLMainWindow::save_configuration_as() {
         save_directory = (QDir::currentPath()).toStdString() + "/";
 
     QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save Configuration"), save_directory.c_str(),
+						    this, tr("Save Configuration"), (save_directory+"fsl.json").c_str(),
         tr("Configuration Files (*.json)"));
     if (fileName.isEmpty()) return;
     std::string save_file = fileName.toStdString();
@@ -1335,6 +1344,7 @@ void FSLMainWindow::load_configuration() {
         else if (generator == "Pythia") {
             ui->sB_NOT->setEnabled(true);
 
+#ifdef USE_Pythia
             ui->cB_gen_options->setCurrentIndex(1);
 
             ui->cB_pythia_type_of_eve->setEnabled(true);
@@ -1356,7 +1366,7 @@ void FSLMainWindow::load_configuration() {
                 ui->pB_pythia_browse->setEnabled(true);
                 ui->lE_PCF->setEnabled(true);
             }
-
+#endif
             ui->lE_px->clear();
             ui->lE_py->clear();
             ui->lE_pz->clear();
@@ -1780,7 +1790,7 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path) {
 
         else if (generator == "Pythia") {
             ui->sB_NOT->setEnabled(true);
-
+#ifdef USE_Pythia
             ui->cB_gen_options->setCurrentIndex(1);
 
             ui->cB_pythia_type_of_eve->setEnabled(true);
@@ -1802,7 +1812,7 @@ void FSLMainWindow::load_configuration_CL(std::string config_file_path) {
                 ui->pB_pythia_browse->setEnabled(true);
                 ui->lE_PCF->setEnabled(true);
             }
-
+#endif
             ui->lE_px->clear();
             ui->lE_py->clear();
             ui->lE_pz->clear();

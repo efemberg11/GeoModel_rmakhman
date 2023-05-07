@@ -5,6 +5,7 @@ include( ${SELF_DIR}/FullSimLightTargets.cmake )
 # Set the version of the installed project.
 set( FullSimLight_VERSION "@PROJECT_VERSION@" )
 set( FullSimLight_HAS_HEPMC3 @GEOMODEL_USE_HEPMC3@ )
+set( FullSimLight_HAS_Pythia @GEOMODEL_USE_PYTHIA@ )
 
 # Print some standard messages about the package being found.
 include( FindPackageHandleStandardArgs )

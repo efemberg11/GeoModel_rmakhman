@@ -69,6 +69,26 @@ if(HepMC3_FOUND)
     add_compile_definitions( USE_HEPMC3 )
 endif()
 
+# Support for Pythia event generator
+# This is OFF by default, but it can be enbled by the user if used/needed;
+# for that, of course, Pythia must be installed on the system.
+
+option(GEOMODEL_USE_PYTHIA "Build GeoModel tools with support for the Pythia event generator  (Note: Pythia must be installed on the target machine)" OFF )
+
+if(GEOMODEL_USE_PYTHIA)
+    find_package(Pythia REQUIRED) # if support for Pythia is enabled, it must be installed.
+endif()
+if(Pythia_FOUND)
+  message (STATUS "Found Pythia: ${Pythia_INCLUDE_DIR}")
+  add_compile_definitions( USE_PYTHIA )
+else()
+     message (STATUS "Pythia not found, will be skipped")
+endif()
+
+
+
+
+
 
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
@@ -138,13 +158,6 @@ add_executable(gmgeantino geantinoMaps.cc ${sources} ${headers})
 #add_executable(testMagneticField testMagneticField.cc)
 add_executable(gm2gdml geoModel2GDML.cc ${sources} ${headers})
 
-
-# Support for the Pythia MC generator
-find_package(Pythia QUIET) # optional
-if(Pythia_FOUND)
-  target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
-  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
-endif()
 
 
 
@@ -221,6 +234,13 @@ if( HepMC3_FOUND)
     target_include_directories(fullSimLight PUBLIC ${HEPMC3_INCLUDE_DIR})
     target_include_directories(gmgeantino PUBLIC ${HEPMC3_INCLUDE_DIR})
     target_include_directories(gm2gdml PUBLIC ${HEPMC3_INCLUDE_DIR})
+endif()
+
+if(Pythia_FOUND)
+  target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
+  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
+  target_compile_definitions(gmgeantino PRIVATE USE_PYTHIA)
+  target_link_libraries(gmgeantino PRIVATE Pythia::Pythia)
 endif()
 
 

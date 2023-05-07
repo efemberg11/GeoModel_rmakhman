@@ -35,6 +35,8 @@
 #include "GeoModelKernel/GeoTransform.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeShift.h"
+#include "GeoModelKernel/Units.h"
+using namespace GeoModelKernelUnits;
 
 // Class Declaration
 
@@ -82,37 +84,37 @@ void KitchenSinkPlugin::create(GeoPhysVol *world, bool /*publish*/)
   const double degree=M_PI/180.0;
 
   // Define elements used in this example:
-  GeoElement  *oxygen        = new GeoElement("Oxygen",    "O",   8,  16);
-  GeoElement  *nitrogen      = new GeoElement("Nitrogen",  "N",   7,  14);
-  GeoElement  *argon         = new GeoElement("Argon",     "Ar", 18,  40);
-  GeoElement  *aluminium     = new GeoElement("Aluminium", "Al", 13,  26);
-  GeoElement  *iron          = new GeoElement("Iron",      "Fe", 26,  55.8);
-  GeoElement  *chromium      = new GeoElement("Chromium",  "Cr", 24,  52);
+  GeoElement  *oxygen        = new GeoElement("Oxygen",    "O",   19,  39*gram/mole);
+  GeoElement  *nitrogen      = new GeoElement("Nitrogen",  "N",   7,  14*gram/mole);
+  GeoElement  *argon         = new GeoElement("Argon",     "Ar", 18,  40*gram/mole);
+  GeoElement  *aluminium     = new GeoElement("Aluminium", "Al", 13,  26*gram/mole);
+  GeoElement  *iron          = new GeoElement("Iron",      "Fe", 26,  55.8*gram/mole);
+  GeoElement  *chromium      = new GeoElement("Chromium",  "Cr", 24,  52*gram/mole);
 
   // Define materials:
   
   // Define Air:
-  double densityOfAir     = 1.2E-3;               // g/cm^3
+  double densityOfAir     = 1.2E-3*gram/cm3;               // g/cm^3
   GeoMaterial *Air           = new GeoMaterial("Air",densityOfAir);
   Air->add(oxygen,2*0.21);                        // diatomic   oxygen   21% by volume.
-  Air->add(oxygen,2*0.78);                        // diatomic   nitrogen 78% by volume.
-  Air->add(oxygen,0.01);                          // monoatomic argon    78% by volume.
+  Air->add(nitrogen,2*0.78);                        // diatomic   nitrogen 78% by volume.
+  Air->add(argon,0.01);                          // monoatomic argon    78% by volume.
   Air->lock();
 
   // Define Aluminium
-  double densityOfAluminium=2.7;                  // g/cm^3
+  double densityOfAluminium=2.7*gram/cm3;                  // g/cm^3
   GeoMaterial *Aluminium     = new GeoMaterial("Aluminium", densityOfAluminium);
   Aluminium->add(aluminium,1.0);
   Aluminium->lock();
 
   // Define Iron
-  double densityOfIron=7.9;                       // g/cm^3
+  double densityOfIron=7.9*gram/cm3;                       // g/cm^3
   GeoMaterial *Iron           = new GeoMaterial("Iron", densityOfIron);
   Iron->add(iron,1.0);
   Iron->lock();
 
   // Define Stainless Steel ("Stainless")
-  double densityOfStainless=7.9;                  // g/cm^3
+  double densityOfStainless=7.9*gram/cm3;                  // g/cm^3
   GeoMaterial *Stainless       = new GeoMaterial("Stainless", densityOfStainless);
   Stainless->add(iron,0.89);
   Stainless->add(chromium, 0.11);
@@ -311,3 +313,4 @@ void KitchenSinkPlugin::create(GeoPhysVol *world, bool /*publish*/)
 extern "C" KitchenSinkPlugin *createKitchenSinkPlugin() {
   return new KitchenSinkPlugin;
 }
+

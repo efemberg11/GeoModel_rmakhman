@@ -141,6 +141,15 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
 #message("sources: ${sources}") # debug msg
 
 
+# Remove from the build HepMC3-related sources if that is not found
+# TODO: remove these lines and put pre-comp fences with 'USE_HEPMC3' def
+if( NOT HepMC3_FOUND)
+    file(GLOB hepmc3src ${PROJECT_SOURCE_DIR}/src/HepMC3*.cc)
+    #message("Removing those HepMC3-related sources: ${hepmc3src}") # debug msg
+    list(REMOVE_ITEM sources ${hepmc3src})
+    #message("new sources without HepMC3 support: ${sources}") # debug msg
+endif()
+
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries

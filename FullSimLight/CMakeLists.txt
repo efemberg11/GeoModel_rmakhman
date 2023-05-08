@@ -64,9 +64,20 @@ message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
 option(GEOMODEL_USE_HEPMC3 "Build GeoModel tools with support for the HepMC3 exchancge format (Note: HepMC3 must be installed on the target machine)" OFF )
 if(GEOMODEL_USE_HEPMC3)
     find_package(HepMC3 REQUIRED) # if support for HEPMC3 is enabled, it must be installed.
+    if(HepMC3_FOUND)
+        message( STATUS "Found HepMC3 (${HEPMC3_INCLUDE_DIR}), and support for HepMC3 is enabled; so, support for it will be compiled.")
+        add_compile_definitions( USE_HEPMC3 )
+    endif()
+else()
+    message(STATUS "! NOTE ==> The support for HepMC3 is disabled by default, and it is not compiled at the moment. However, it can be enabled by the user by giving the option '-DGEOMODEL_USE_HEPMC3=1' to CMake; in that case, you must be sure HepMC3 is installed on the system.")
 endif()
-if(HepMC3_FOUND)
-    add_compile_definitions( USE_HEPMC3 )
+# If HepMC3 is not found, weather it is enabled or not by the user, 
+# we remove from the build the sources that use it
+if( NOT HepMC3_FOUND)
+    file(GLOB hepmc3src ${PROJECT_SOURCE_DIR}/src/HepMC3*.cc)
+    #message("Removing those HepMC3-related sources: ${hepmc3src}") # debug msg
+    list(REMOVE_ITEM sources ${hepmc3src})
+    #message("new sources without HepMC3 support: ${sources}") # debug msg
 endif()
 
 # Support for Pythia event generator
@@ -77,12 +88,12 @@ option(GEOMODEL_USE_PYTHIA "Build GeoModel tools with support for the Pythia eve
 
 if(GEOMODEL_USE_PYTHIA)
     find_package(Pythia REQUIRED) # if support for Pythia is enabled, it must be installed.
-endif()
-if(Pythia_FOUND)
-  message (STATUS "Found Pythia: ${Pythia_INCLUDE_DIR}")
-  add_compile_definitions( USE_PYTHIA )
+    if(Pythia_FOUND)
+      message( STATUS "Found Pythia (${Pythia_INCLUDE_DIR}), and support for Pythia is enabled; so, support for it will be compiled.")
+      add_compile_definitions( USE_PYTHIA )
+    endif()
 else()
-     message (STATUS "Pythia not found, will be skipped")
+    message(STATUS "! NOTE ==> The support for Pythia is disabled by default, and it is not compiled at the moment. However, it can be enabled by the user by giving the option '-DGEOMODEL_USE_Pythia=1' to CMake; in that case, you must be sure Pythia is installed on the system.")
 endif()
 
 
@@ -130,15 +141,6 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/inc/*.hh)
 #message("sources: ${sources}") # debug msg
 
 
-if( NOT HepMC3_FOUND)
-    file(GLOB hepmc3src ${PROJECT_SOURCE_DIR}/src/HepMC3*.cc)
-    message(STATUS "! NOTE ==> The support for HepMC3 is disabled by default, and it is not compiled at the moment. However, it can be enabled by the user by giving the option '-DGEOMODEL_USE_HEPMC3=1' to CMake; in that case, you must be sure HepMC3 is installed on the system.")
-    #message("Removing those HepMC3-related sources: ${hepmc3src}") # debug msg
-    list(REMOVE_ITEM sources ${hepmc3src})
-    #message("new sources without HepMC3 support: ${sources}") # debug msg
-else()
-    message(STATUS "Found HepMC3, and support for HepMC3 is enabled; so, support for it will be compiled. (${HEPMC3_INCLUDE_DIR})")
-endif()
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
@@ -238,9 +240,20 @@ endif()
 
 if(Pythia_FOUND)
   target_compile_definitions(fullSimLight PRIVATE USE_PYTHIA)
-  target_link_libraries(fullSimLight PRIVATE Pythia::Pythia)
   target_compile_definitions(gmgeantino PRIVATE USE_PYTHIA)
-  target_link_libraries(gmgeantino PRIVATE Pythia::Pythia)
+  target_compile_definitions(gmmasscalc PRIVATE USE_PYTHIA)
+  target_compile_definitions(gm2gdml PRIVATE USE_PYTHIA)
+  target_compile_definitions(gmclash PRIVATE USE_PYTHIA)
+  target_link_libraries(fullSimLight PUBLIC Pythia::Pythia)
+  target_link_libraries(gmgeantino PUBLIC Pythia::Pythia)
+  target_link_libraries(gmmasscalc PUBLIC Pythia::Pythia)
+  target_link_libraries(gm2gdml PUBLIC Pythia::Pythia)
+  target_link_libraries(gmclash PUBLIC Pythia::Pythia)
+  target_include_directories(fullSimLight PUBLIC ${Pythia_INCLUDE_DIR})
+  target_include_directories(gmgeantino PUBLIC ${Pythia_INCLUDE_DIR})
+  target_include_directories(gmmasscalc PUBLIC ${Pythia_INCLUDE_DIR})
+  target_include_directories(gm2gdml PUBLIC ${Pythia_INCLUDE_DIR})
+  target_include_directories(gmclash PUBLIC ${Pythia_INCLUDE_DIR})
 endif()
 
 

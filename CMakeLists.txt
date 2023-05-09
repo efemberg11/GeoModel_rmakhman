@@ -107,8 +107,16 @@ endif()
 #endif()
 
 if(GEOMODEL_BUILD_ATLASEXTENSIONS)
-  add_subdirectory(ATLASExtensions)
-  list( APPEND BUILT_PACKAGES "ATLASExtensions")
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ATLASExtensions)
+        if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ATLASExtensions/CMakeLists.txt)
+            add_subdirectory(ATLASExtensions)
+            list( APPEND BUILT_PACKAGES "ATLASExtensions")
+        else()
+            message(FATAL_ERROR "You enabled the build of the ATLASExtensions submodule, by setting the 'GEOMODEL_BUILD_ATLASEXTENSIONS=1' option. However, no 'CMakeLists.txt' file was found in the ATLASExtensions folder! You probably forgot to recursively clone the submodule. Run this from the source top folder: 'git submodule update --init'. Then, re-run CMake." )
+        endif()
+    else()
+        message(FATAL_ERROR "You enabled the build of the ATLASExtensions submodule, by setting the 'GEOMODEL_BUILD_ATLASEXTENSIONS=1' option. However, no 'ATLASExtensions' folder is found in the repository! Please, check the integrity of your copy of the GeoModel repository." )
+    endif()
 endif()
 
 

@@ -285,6 +285,7 @@ FSLMainWindow::~FSLMainWindow() {
 void FSLMainWindow::add_sens_det() {
     QString q_sens_det_file_name;
     QFileDialog dialog(this);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
     dialog.setDirectory(
         (FSLPLUGINROOT + std::string("/FullSimLight/SensitiveDetectorPlugins"))
             .c_str());
@@ -641,6 +642,7 @@ QString::fromUtf8((this->get_file_name()).c_str());
 void FSLMainWindow::add_user_action() {
     QString q_user_file_name;
     QFileDialog dialog(this);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
     dialog.setDirectory(
         (FSLPLUGINROOT + std::string("/FullSimLight/UserActionPlugins"))
             .c_str());
@@ -727,7 +729,8 @@ void FSLMainWindow::clear_main_status() { ui->tB_view_config->clear(); }
 
 // Function to allow user to select a file
 std::string FSLMainWindow::get_file_name() {
-    QString filename = QFileDialog::getOpenFileName(this, "Choose File");
+    QString filename = QFileDialog::getOpenFileName(
+        this, "Choose File", 0, 0, 0, QFileDialog::DontUseNativeDialog);
 
     return filename.toStdString();
 }
@@ -736,7 +739,8 @@ std::string FSLMainWindow::get_file_name() {
 std::string FSLMainWindow::get_directory() {
     QString dir = QFileDialog::getExistingDirectory(
         this, tr("Open Directory"), "/home",
-        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks |
+            QFileDialog::DontUseNativeDialog);
 
     return dir.toStdString();
 }
@@ -747,7 +751,8 @@ void FSLMainWindow::assign_geom_file() {
         geom_file_directory = (QDir::currentPath()).toStdString() + "/";
     QString fileName = QFileDialog::getOpenFileName(
         this, tr("Select Geometry"), geom_file_directory.c_str(),
-        tr("Geometry inputs (*.db *.gdml *.so *.dylib)"));
+        tr("Geometry inputs (*.db *.gdml *.so *.dylib)"), 0,
+        QFileDialog::DontUseNativeDialog);
 
     if (fileName.isEmpty()) return;
 
@@ -778,6 +783,7 @@ void FSLMainWindow::assign_geom_file() {
 // Function to Physics List Plugin
 void FSLMainWindow::assign_phys_list_plugin() {
     QFileDialog dialog(this);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
     dialog.setDirectory(
         (FSLPLUGINROOT + std::string("/FullSimLight/PhysicsListPlugins"))
             .c_str());
@@ -812,6 +818,7 @@ void FSLMainWindow::assign_hepmc3_file() {
 // Function to select a Generator Plugin
 void FSLMainWindow::assign_gen_plug_file() {
     QFileDialog dialog(this);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
     dialog.setDirectory(
         (FSLPLUGINROOT + std::string("/FullSimLight/EventGeneratorPlugins"))
             .c_str());
@@ -841,6 +848,7 @@ void FSLMainWindow::check_if_pythia_file() {
 // Function to select a magnetic field plugin file
 void FSLMainWindow::assign_magnetic_field_plugin_file() {
     QFileDialog dialog(this);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
     dialog.setDirectory(
         (FSLPLUGINROOT + std::string("/FullSimLight/MagneticFieldPlugins"))
             .c_str());
@@ -936,8 +944,7 @@ void FSLMainWindow::configure_generator() {
             ui->pB_pythia_browse->setEnabled(true);
             ui->lE_PCF->setEnabled(true);
 
-        }
-        else {
+        } else {
             ui->lE_PCF->clear();
             pythia_input_file = "";
             ui->pB_pythia_browse->setEnabled(false);
@@ -1111,7 +1118,7 @@ void FSLMainWindow::save_display_output() {
 
     QString displayfileName = QFileDialog::getSaveFileName(
         this, tr("Save Output"), save_display_directory.c_str(),
-        tr("Log Files (*.log)"));
+        tr("Log Files (*.log)"), 0, QFileDialog::DontUseNativeDialog);
     if (displayfileName.isEmpty()) return;
     std::string save_display_file = displayfileName.toStdString();
     std::string save_display_base =
@@ -1131,8 +1138,9 @@ void FSLMainWindow::save_configuration_as() {
         save_directory = (QDir::currentPath()).toStdString() + "/";
 
     QString fileName = QFileDialog::getSaveFileName(
-						    this, tr("Save Configuration"), (save_directory+"fsl.json").c_str(),
-        tr("Configuration Files (*.json)"));
+        this, tr("Save Configuration"), (save_directory + "fsl.json").c_str(),
+        tr("Configuration Files (*.json)"), 0,
+        QFileDialog::DontUseNativeDialog);
     if (fileName.isEmpty()) return;
     std::string save_file = fileName.toStdString();
     std::string save_base = basename(const_cast<char *>(save_file.c_str()));
@@ -1260,7 +1268,8 @@ void FSLMainWindow::load_configuration() {
         save_directory = (QDir::currentPath()).toStdString() + "/";
     QString fileName = QFileDialog::getOpenFileName(
         this, tr("Open Configuration"), save_directory.c_str(),
-        tr("Configuration Files (*.json)"));
+        tr("Configuration Files (*.json)"), 0,
+        QFileDialog::DontUseNativeDialog);
 
     if (fileName.isEmpty()) return;
 

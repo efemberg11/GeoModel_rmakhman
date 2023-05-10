@@ -74,8 +74,9 @@ After that, you can install the pre-compiled GeoModel applications:
 
 ```shell
 brew install geomodel-visualization # to get gmex (the geometry explorer)
-brew install geomodel-fsl           # to get fullsimlight, the FSL GUI, gm2gdml, gmclash, gmgeantino, gmmasscalc, plus the ATLAS LArCustomSolid extension
+brew install geomodel-fsl           # to get fullsimlight, the FSL GUI, gm2gdml, gmclash, gmgeantino, gmmasscalc
 brew install geomodel-tools         # to get gmcat, gdml2gm
+brew install geomodel-extensions-atlas # to get the ATLAS extensions: the LAr custom shape and the MagneticField plugin for FullSimLight
 ```
 
 All the above packages also automatically install the core package `geomodel`, which contains the core libraries and the I/O layer. 

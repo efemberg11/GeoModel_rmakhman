@@ -85,7 +85,9 @@ The `geomodel-fsl` package also installs the following packages:
 
 * `geomodel-fullsimlight`, which contain the standalone Geant4 based application for GeoModel
 * `geomodel-geomodelg4`, which contains the translation layer between GeoModel and Geant4
-* `geomodel-extension-atlaslar`, which is an [ATLAS experiment's](https://atlas.cern) extension 
+
+
+The `geomodel-extensions-atlas` package installs the [ATLAS experiment's](https://atlas.cern) extensions to be used in FSL/FullSimLight; namely, a custom shape for the LAr electromagnetic calorimeter and a plugin to define a custom magnetic field for the experiment. The package also downloads and installs the magnetic field datafile needed by the plugin. Thos extensions are semi-specific to the ATLAS experiment, but they can certainly be used as foundation and example to build other extensions for other experiments.
 
 
 
@@ -115,7 +117,7 @@ If your installation is outdated, you can update the GeoModel libraries and tool
 
 ```shell
 brew update
-brew upgrade geomodel geomodel-geomodeltools geomodel-visualization geomodel-geomodelg4 geomodel-fullsimlight geomodel-fsl geomodel-extension-atlaslar 
+brew upgrade geomodel geomodel-geomodeltools geomodel-visualization geomodel-geomodelg4 geomodel-fullsimlight geomodel-fsl geomodel-extensions-atlas
 ```
 
 #### Some more details 

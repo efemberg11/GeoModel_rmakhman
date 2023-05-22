@@ -1160,6 +1160,11 @@ void FSLMainWindow::run_configuration() {
         QMessageBox::information(this, "Info", "First Select Geometry input");
         return;
     }
+    if(magnetic_field_type == "Plugin" && (ui->lE_MAG_PLUG->text()).toStdString().empty())
+    {
+    QMessageBox::information(this, "Info", "Please Specify Plugin Path for Magnetic Field");
+    return;
+    }
     create_configuration();
 
     std::string tmpConf = "/tmp/fslconfig-" + std::to_string(getuid()) + "-" +

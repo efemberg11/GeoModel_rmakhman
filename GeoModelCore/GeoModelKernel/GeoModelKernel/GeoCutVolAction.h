@@ -45,36 +45,37 @@
  * |--------------------------------------------------------------------------|
  */
 
+#include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoVolumeAction.h"
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 #include <stack>
 
 class GeoPhysVol;
+class GeoFullPhysVol;
 
 class GeoCutVolAction : public GeoVolumeAction 
 {
  public:
   // Constructor parameters:
-  // Shape: the shape to be cut
-  // Transformation: Shape transformation with respect to the mother Physical Volume
-  GeoCutVolAction(const GeoShape& Shape,
-		  const GeoTrf::Transform3D& Transform);
+  //  * shape: the shape to be cut
+  //  * xf: Shape transformation with respect to the mother Physical Volume
+  GeoCutVolAction(const GeoShape& shape
+		  , const GeoTrf::Transform3D& xf);
 
-  ~GeoCutVolAction();
-
-  virtual void handleVPhysVol (const GeoVPhysVol *);
+  virtual void handleVPhysVol (const GeoVPhysVol* vPV);
   
   // Get the cutoff result
   GeoPhysVol* getPV();
+  GeoFullPhysVol* getFPV();
 
  private: 
-  GeoPhysVol*               m_physVol;
+  GeoVPhysVol*               m_physVol{nullptr};
 
-  const GeoShape&           m_shape;
-  GeoTrf::Transform3D      m_transform;
+  const GeoShape&            m_shape;
+  const GeoTrf::Transform3D& m_transform;
 
-  std::stack<GeoPhysVol*>*  m_copyStack;
+  std::stack<GeoVPhysVol*>   m_copyStack;
 };
 
 #endif

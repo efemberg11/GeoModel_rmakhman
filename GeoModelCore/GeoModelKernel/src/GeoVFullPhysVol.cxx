@@ -25,10 +25,11 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
   //                                                                                                //     
   // Get ready for something to go wrong:                                                           //     
   //                                                                                                //     
-  static std::string errorMessage("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume:  ");
+  static std::string errorMessage("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nLogVol name of shared volume:  ");
   //                                                                                                //     
   //------------------------------------------------------------------------------------------------//     
-  if(isShared()) throw std::runtime_error(errorMessage);
+  
+  if(isShared()) throw std::runtime_error(errorMessage+getLogVol()->getName());
 
   std::scoped_lock<std::mutex> guard(m_mutex);
   
@@ -59,7 +60,7 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
     tProd = transform * tProd;
     child = parent;
     if(child->isShared()) {
-      throw std::runtime_error(errorMessage);
+      throw std::runtime_error(errorMessage+ getLogVol()->getName() + " because of " + child->getLogVol()->getName());
     }
     else {
       parent = child->getParent();
@@ -107,7 +108,7 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
   static std::string errorMessage("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume:  ");
   //                                                                                                //     
   //------------------------------------------------------------------------------------------------//     
-  if(isShared()) throw std::runtime_error(errorMessage);
+  if(isShared()) throw std::runtime_error(errorMessage + getLogVol()->getName());
 
   std::scoped_lock<std::mutex> guard(m_mutex);
   
@@ -138,7 +139,7 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
     tProd = transform * tProd;
     child = parent;
     if(child->isShared()) {
-      throw std::runtime_error(errorMessage);
+      throw std::runtime_error(errorMessage + getLogVol()->getName() + " because of " + child->getLogVol()->getName());
     }
     else {
       parent = child->getParent();
@@ -169,7 +170,7 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedDefAbsoluteTransform(const 
   throw std::runtime_error("Failed to find the cached default absolute transform for " + getLogVol()->getName());
 }
 
-const std::string &  GeoVFullPhysVol::getAbsoluteName ()
+const std::string &  GeoVFullPhysVol::getAbsoluteName () const
 {
   //------------------------------------------------------------------------------------------------//     
   //                                                                                                //     

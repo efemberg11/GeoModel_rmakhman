@@ -44,7 +44,7 @@ class GeoVFullPhysVol : public GeoVPhysVol
   void clearPositionInfo() const;
 
   /// Returns the absolute name of this node.
-  const std::string& getAbsoluteName();
+  const std::string& getAbsoluteName() const;
 
   /// Returns the identification bits.
   unsigned int getId() const;
@@ -59,7 +59,7 @@ class GeoVFullPhysVol : public GeoVPhysVol
 
  private:
   /// The absolute name of this volume.
-  std::string m_absName;
+  mutable std::string m_absName;
 
   /// An identifier. This is locally cached in a full physical volume.
   mutable Query<int> *m_id;

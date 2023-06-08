@@ -1,5 +1,5 @@
 # Set up the project.
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required(VERSION 3.16...3.26)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -31,6 +31,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
          "Framework finding behaviour on macOS" )
     # GeoModel dependencies
+    find_package( FullSimLight REQUIRED )
     find_package( GeoModelCore REQUIRED )
 else()
     # I am called from other project with add_subdirectory().
@@ -49,28 +50,15 @@ set(PROJECT_SOURCES ${SOURCES})
 # Set up the library.
 add_library(DummyUserActionPlugin SHARED ${SOURCES})
 
-#find_package (Eigen3 REQUIRED)
 find_package(Geant4 REQUIRED)
-#find_package(FullSimLight REQUIRED)
 find_package( HDF5 REQUIRED COMPONENTS CXX )
 
 message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
-#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
-include(${Geant4_USE_FILE})
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
-# Add the FullSimLight headers dir.
-# Path is different if built as a single top project, 
-# or as an all-in-one build together with all other GeoModel subpackages 
-if( FullSimLight_INDIVIDUAL_BUILD )
-    target_include_directories( DummyUserActionPlugin PUBLIC  ${CMAKE_SOURCE_DIR} ${HDF5_CXX_INCLUDE_DIRS})
-else() # all-in-one--build
-    target_include_directories( DummyUserActionPlugin PUBLIC  ${CMAKE_SOURCE_DIR}/FullSimLight ${HDF5_CXX_INCLUDE_DIRS})
-endif()
-
-target_link_libraries ( DummyUserActionPlugin PUBLIC ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} ${HDF5_CXX_LIBRARIES})
+target_link_libraries ( DummyUserActionPlugin PUBLIC FullSimLight::FullSimLight ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} ${HDF5_CXX_LIBRARIES})
 
 
 

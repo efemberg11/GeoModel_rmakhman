@@ -1,20 +1,18 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # === Preamble ===
-cmake_minimum_required(VERSION 3.12...3.19.1)
-
-# Make the 'cmake' module directory visible to CMake.
-list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
-
-# Define color codes for CMake messages
-include( cmake_colors_defs )
-
+cmake_minimum_required(VERSION 3.16...3.26)
 
 # === Project's settings ===
-include( GeoModel-version )
+include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GeoModel-version.cmake )
 project( "GeoModel" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
+# Make the 'cmake' module directory visible to CMake.
+list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake )
+
 # === Project wide setup ===
+# Define color codes for CMake messages
+include( cmake_colors_defs )
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 # Set a default build type
@@ -22,17 +20,15 @@ include( BuildType )
 # Set default build and C++ options
 include( configure_cpp_options )
 
-# === Externally provided content ===
-
 # By default prefer not to use frameworks on macOS.
 # But use it at a "LAST" resource, if no other options worked.
 # For details on the behaviour of this cache variable, see:
 # - https://cmake.org/cmake/help/v3.0/command/find_file.html
 if( APPLE )
-set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
-   "Framework finding behaviour on macOS" )
+  set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING "Framework finding behaviour on macOS" )
 endif()
 
+# === Externally provided content ===
 # Set up how the project handle some of its dependenices. Either by picking them
 # up from the environment, or building them itself.
 include( SetupEigen3 )
@@ -53,10 +49,7 @@ option(GEOMODEL_BUILD_VISUALIZATION "Enable the build of GeoModelVisualization" 
 option(GEOMODEL_BUILD_GEOMODELG4 "Enable the build of GeoModelG4" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT "Enable the build of FullSimLight" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING "Enable FullSimLight profiling targets" OFF)
-#option(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION "Build the LArCustomSolidExtension" OFF)
 option(GEOMODEL_BUILD_ATLASEXTENSIONS "Build the Custom ATLAS Extensions" OFF)
-
-
 
 if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
   set(GEOMODEL_BUILD_FULLSIMLIGHT ON CACHE BOOL "Enable the build of FullSimLight" FORCE)
@@ -71,11 +64,10 @@ list( APPEND BUILT_PACKAGES "GeoModelCore")
 add_subdirectory(GeoModelIO)
 list( APPEND BUILT_PACKAGES "GeoModelIO")
 
-
 if(GEOMODEL_BUILD_ALL)
-    set(GEOMODEL_BUILD_TOOLS         TRUE)
-    set(GEOMODEL_BUILD_VISUALIZATION TRUE)
-    set(GEOMODEL_BUILD_FULLSIMLIGHT  TRUE)
+  set(GEOMODEL_BUILD_TOOLS         TRUE)
+  set(GEOMODEL_BUILD_VISUALIZATION TRUE)
+  set(GEOMODEL_BUILD_FULLSIMLIGHT  TRUE)
 endif()
 
 if(GEOMODEL_BUILD_TOOLS)
@@ -101,11 +93,6 @@ if(GEOMODEL_BUILD_FULLSIMLIGHT)
   list( APPEND BUILT_PACKAGES "FSL")
 endif()
 
-#if(GEOMODEL_BUILD_LARCUSTOMSOLIDEXTENSION)
-#  add_subdirectory(LArCustomSolidExtension)
-#  list( APPEND BUILT_PACKAGES "LArCustomSolidExtension")
-#endif()
-
 if(GEOMODEL_BUILD_ATLASEXTENSIONS)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ATLASExtensions)
         if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ATLASExtensions/CMakeLists.txt)
@@ -119,38 +106,18 @@ if(GEOMODEL_BUILD_ATLASEXTENSIONS)
     endif()
 endif()
 
-
 if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
   add_subdirectory(GeoModelG4)
   list( APPEND BUILT_PACKAGES "GeoModelG4")
 endif()
 
-
 # Print Build Info on screen
 include( PrintBuildInfo )
 
-
-# A function to get a string with comma-separated package names from a list of packages
-# NOTE: We could make use of list(JOIN ...) on CMake >= 3.12,
-# but on Ubuntu 18 the apt package installs 3.10 instead
-function(getCSVStringFromList inputList outputString)
-  #message("input: ${inputList}") # for debug
-  set(tempList "")
-  foreach( item ${inputList})
-    list(APPEND tempList ${item})
-  endforeach()
-  string (REPLACE ";" ", " outStr "${tempList}")
-  #message("string: ${outStr}") # for debug
-  set( ${outputString} ${outStr} PARENT_SCOPE)
-endfunction()
-
-
 # Let the users know which and how many packages they are building
 list(LENGTH BUILT_PACKAGES BUILT_PACKAGES_LENGTH)
-#
-# list(JOIN BUILT_PACKAGES ", " BUILT_PACKAGES_STR) # list(JOIN) needs /CMake 3.12, which is missing on Ubuntu 18 by default
-getCSVStringFromList( "${BUILT_PACKAGES}" BUILT_PACKAGES_STR )
-#
+string(REPLACE ";" ", " BUILT_PACKAGES_STR "${BUILT_PACKAGES}")
+
 message(STATUS "${BoldWhite}-----${ColourReset}")
-message( STATUS "${BoldGreen}Building the following ${BUILT_PACKAGES_LENGTH} packages: ${BUILT_PACKAGES_STR}${ColourReset}")
+message(STATUS "${BoldGreen}Building the following ${BUILT_PACKAGES_LENGTH} packages: ${BUILT_PACKAGES_STR}${ColourReset}")
 message(STATUS "${BoldWhite}-----${ColourReset}")

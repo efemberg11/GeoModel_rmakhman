@@ -13,9 +13,6 @@ target_include_directories( GeoModelKernel PUBLIC
    $<INSTALL_INTERFACE:include> )
 source_group( "GeoModelKernel" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
-if( GEOMODEL_USE_BUILTIN_EIGEN3 )
-   add_dependencies( GeoModelKernel Eigen3 )
-endif()
 set_target_properties( GeoModelKernel PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )

@@ -6,12 +6,6 @@ file( GLOB HEADERS GDMLInterface/*.h )
 
 # Create the library.
 add_library( GDMLtoGM SHARED ${HEADERS} ${SOURCES} )
-
-# If the in-house build of the Xerces-C library is used, add explicit dependency
-if( GEOMODEL_USE_BUILTIN_XERCESC )
-    add_dependencies( GDMLtoGM XercesCBuiltIn )
-endif()
-
 target_link_libraries( GDMLtoGM PUBLIC XercesC::XercesC
     ExpressionEvaluator GeoModelXMLParser GeoModelCore::GeoModelKernel )
 target_include_directories( GDMLtoGM PUBLIC

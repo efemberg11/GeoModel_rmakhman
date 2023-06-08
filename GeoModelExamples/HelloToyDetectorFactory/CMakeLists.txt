@@ -5,7 +5,7 @@
 # author: Riccardo Maria BIANCHI @ CERN - Nov, 2018
 ################################################################################
 
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.16...3.26)
 
 #project(HelloToyDetectorFactory)
 

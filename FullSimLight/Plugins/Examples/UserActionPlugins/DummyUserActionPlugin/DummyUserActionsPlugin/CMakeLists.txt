@@ -1,6 +1,6 @@
 # Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
 # Set up the project.
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required(VERSION 3.16...3.26)
 project( "DummyUserActionsPlugin" )
 
 
@@ -23,9 +23,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
          "Framework finding behaviour on macOS" )
     # Set up how the project handle some of its dependenices. Either by picking them
     # up from the environment, or building them itself.
-    if( NOT TARGET XercesCBuiltIn )
-        include( SetupXercesC )
-    endif()
+    include( SetupXercesC )
     # Find the base GeoModelATLAS packages, which must be installed on the target system already
     find_package( GeoModelDataManagers REQUIRED ${GeoModelATLAS_VERSION} )
 else()

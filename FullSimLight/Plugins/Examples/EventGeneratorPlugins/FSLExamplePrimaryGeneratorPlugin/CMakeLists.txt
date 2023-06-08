@@ -1,5 +1,5 @@
 # Set up the project.
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required(VERSION 3.16...3.26)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -54,22 +54,11 @@ add_library(ExamplePrimaryGeneratorPlugin SHARED ${SOURCES})
 find_package(Geant4 REQUIRED)
 
 message( STATUS "Found Geant4: ${Geant4_INCLUDE_DIR}")
-#message("Geant4_USE_FILE: ${Geant4_USE_FILE}") # debug msg
-include(${Geant4_USE_FILE})
 
 # Use the GNU install directory names.
 include( GNUInstallDirs )
 
-# Add the FullSimLight headers dir.
-# Path is different if built as a single top project, 
-# or as an all-in-one build together with all other GeoModel subpackages 
-if( FullSimLight_INDIVIDUAL_BUILD )
-    target_include_directories( ExamplePrimaryGeneratorPlugin PUBLIC  ${CMAKE_SOURCE_DIR} )
-else() # all-in-one--build
-    target_include_directories( ExamplePrimaryGeneratorPlugin PUBLIC  ${CMAKE_SOURCE_DIR}/FullSimLight )
-endif()
-
-target_link_libraries ( ExamplePrimaryGeneratorPlugin PUBLIC ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES})
+target_link_libraries ( ExamplePrimaryGeneratorPlugin PUBLIC FullSimLight::FullSimLight ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES})
 
 
 set_target_properties( ExamplePrimaryGeneratorPlugin PROPERTIES

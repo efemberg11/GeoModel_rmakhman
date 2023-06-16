@@ -83,6 +83,7 @@ class GMDBManager::Imp {
     sqlite3_stmt* selectAllFromTableSortBy(std::string tableName,
                                            std::string sortColumn = "") const;
     sqlite3_stmt* selectAllFromTableChildrenPositions() const;
+    bool checkTable_imp(std::string tableName) const;
 };
 
 GMDBManager::GMDBManager(const std::string& path)
@@ -239,12 +240,13 @@ void GMDBManager::printAllRecords(const std::string& tableName) const {
 // instead when appropriate? In that case, we should create dedicated methods
 // for all tables, I guess.
 // TODO: fill a cache and returns that if asked a second time
-std::vector<std::vector<std::string>> GMDBManager::getTableRecords(
-    std::string tableName) const {
+std::vector<std::vector<std::string>> GMDBManager::getTableRecords(std::string tableName) const {
+    
     // container to be returned
     std::vector<std::vector<std::string>> records;
     // get the query statetement ready to be executed
     sqlite3_stmt* stmt = nullptr;
+
     if ("ChildrenPositions" == tableName) {
         stmt = m_d->selectAllFromTableChildrenPositions();
     } else {
@@ -997,6 +999,20 @@ sqlite3_stmt* GMDBManager::Imp::selectAllFromTableSortBy(
     return st;
 }
 
+bool GMDBManager::Imp::checkTable_imp(
+    std::string tableName) const {
+    theManager->checkIsDBOpen();
+    sqlite3_stmt* st = nullptr;  // SQLite statement to be returned
+    int rc = -1;                 // SQLite return code
+    // set the SQL query string
+    std::string sql =
+        fmt::format("SELECT * FROM {0}", tableName);
+    // prepare the query
+    rc = sqlite3_prepare_v2(m_dbSqlite, sql.c_str(), -1, &st, NULL);
+    if (rc != SQLITE_OK) return false;
+    return true;
+}
+
 sqlite3_stmt* GMDBManager::Imp::selectAllFromTableChildrenPositions() const {
     theManager->checkIsDBOpen();
     sqlite3_stmt* st = nullptr;
@@ -1099,8 +1115,7 @@ void GMDBManager::getAllDBTableColumns() {
 
 // TODO: currently, we retrieve published data as strings, but we want to
 // retrieve that according to the original data type
-std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable(
-    std::string suffix) {
+std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable( std::string suffix ) {
     std::string tableName = "PublishedFullPhysVols";  // default table name
     if ("" != suffix) {
         tableName += "_";
@@ -1111,8 +1126,7 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable(
 }
 // TODO: currently, we retrieve published data as strings, but we want to
 // retrieve that according to the original data type
-std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable(
-    std::string suffix) {
+std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable( std::string suffix ) {
     std::string tableName =
         "PublishedAlignableTransforms";  // default table name
     if ("" != suffix) {
@@ -1121,6 +1135,10 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable(
     }
 
     return getTableRecords(tableName);
+}
+
+bool GMDBManager::checkTable(std::string tableName) const {
+    return m_d->checkTable_imp(tableName);
 }
 
 // create a user-defined custom table to store the published nodes

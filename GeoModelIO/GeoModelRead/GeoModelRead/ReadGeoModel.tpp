@@ -14,15 +14,25 @@
 
 namespace GeoModelIO {
 
-    template <typename T, class N> std::map<T,N> ReadGeoModel::getPublishedNodes( std::string publisherName /*optional variable*/) 
+    template <typename T, class N> std::map<T,N> ReadGeoModel::getPublishedNodes(std::string publisherName, bool doCheckTable /*optional variables*/) 
     {
+ 
+
         std::map<T, N> mapNodes;
         std::string keyType = "";
 
         std::vector<std::vector<std::string>> vecRecords;
         if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
+            if(doCheckTable){ 
+                bool tableExists = m_dbManager->checkTable("PublishedFullPhysVols_"+publisherName);
+                if(!tableExists) return mapNodes;
+            }
             vecRecords = m_dbManager->getPublishedFPVTable( publisherName );
         } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
+            if(doCheckTable){ 
+                bool tableExists = m_dbManager->checkTable("PublishedAlignableTransforms_"+publisherName);
+                if(!tableExists) return mapNodes;
+            }
             vecRecords = m_dbManager->getPublishedAXFTable( publisherName );
         } else {
             std::cout << "ERROR! The node type '" << typeid(N).name() 

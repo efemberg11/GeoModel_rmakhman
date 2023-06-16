@@ -150,6 +150,18 @@ int main(int argc, char *argv[])
   std::map<unsigned int, GeoFullPhysVol*> mapFPV = readInGeo.getPublishedNodes<unsigned int, GeoFullPhysVol*>("HelloToyExample");
   std::map<std::string, GeoAlignableTransform*> mapAXF = readInGeo.getPublishedNodes<std::string, GeoAlignableTransform*>("HelloToyExample");
 
+  //check for a table we know doesn't exist
+  if (db->checkTable("PublishedFullPhysVols_HelloToyExample")) std::cout<<"We find the table that we expected - good!"<<std::endl;
+  else std::cout<<"Uh oh, we don't find the expected table - bad!"<<std::endl;
+  if(!db->checkTable("PublishedFullPhysVols_ByeByeToyExample")) std::cout<<"We don't find the table that we didn't expect - good!"<<std::endl;
+  else std::cout<<"Uh oh, we found a table which doesn't exist - bad!"<<std::endl;  
+
+  //Now test via the specific accessors with additional checks
+  std::map<unsigned int, GeoFullPhysVol*> mapFPV_test = readInGeo.getPublishedNodes<unsigned int, GeoFullPhysVol*>("ByeByeToyExample",true);
+  std::map<std::string, GeoAlignableTransform*> mapAXF_test = readInGeo.getPublishedNodes<std::string, GeoAlignableTransform*>("ByeByeToyExample",true);
+  if(mapFPV_test.size()==0) std::cout<<"Returned an empty FPV map when using checks for a non-existing table - good!"<<std::endl;
+  if(mapAXF_test.size()==0) std::cout<<"Returned an empty AXF map when using checks for a non-existing table - good!"<<std::endl;
+
   unsigned int ii=0;
   std::cout << "\n\nPublished AlignableTransforms from the DB...\n";
   std::cout << "['xf' is the output of 'getTransform()']\n";

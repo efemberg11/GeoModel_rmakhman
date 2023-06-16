@@ -247,6 +247,12 @@ class GMDBManager {
     /// methods to dump the DB
     std::vector<std::vector<std::string>> getChildrenTable();
 
+    //Table names for Aux tables are of the form prefix_suffix
+    //where prefix depends on the type of data in the table
+    //and suffix depends on the plugin/publisher that provided it
+
+    //These two require only the suffix, the prefix is already specified based on the 
+    //table type being accessed
     std::vector<std::vector<std::string>> getPublishedFPVTable(
         std::string suffix = "");
     std::vector<std::vector<std::string>> getPublishedAXFTable(
@@ -258,8 +264,11 @@ class GMDBManager {
     std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
     std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDs();
 
-    std::vector<std::vector<std::string>> getTableRecords(
-        std::string tableName) const;  // TODO: should be private?
+    std::vector<std::vector<std::string>> getTableRecords(std::string tableName) const;  // TODO: should be private?
+
+    //Test if a given table exists
+    //This requires the *full* table name (i.e. prefix_suffix)
+    bool checkTable(std::string tableName) const;
 
     /**
      * @brief Create a custom DB table to store auxiliary data.

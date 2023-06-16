@@ -100,9 +100,10 @@ class ReadGeoModel {
 
     GeoPhysVol* buildGeoModel();
 
+    //NB, this template method needs only the "publisher name" to be specified (i.e. the last suffix), since
+    //the first part of the table name get added automatically according to the data type it is templated on
     template <typename T, class N>
-    std::map<T, N> getPublishedNodes(
-        std::string publisherName = "" /*optional variable*/);
+    std::map<T, N> getPublishedNodes(std::string publisherName = "", bool doCheckTable = false);
 
     void printDBTable(const std::string& tableName) {
         m_dbManager->printAllRecords(tableName);

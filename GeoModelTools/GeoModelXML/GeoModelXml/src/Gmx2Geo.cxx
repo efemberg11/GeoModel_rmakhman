@@ -33,7 +33,7 @@
 using namespace std;
 using namespace xercesc;
 
-Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager, std::string levelMapName, const processorList& procs) {
+Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoVPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager, std::string levelMapName, const processorList& procs) {
 //
 //    Create the xml tree (DOMDocument)
 //

@@ -6,6 +6,7 @@
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 
 
+#include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'

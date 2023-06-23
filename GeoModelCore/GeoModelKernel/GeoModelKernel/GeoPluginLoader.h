@@ -16,7 +16,7 @@ template <class Plugin> class GeoPluginLoader
  public:
 
   // Constructor:
-  GeoPluginLoader<Plugin>();
+  GeoPluginLoader();
 
   // Destructor:
   ~GeoPluginLoader();

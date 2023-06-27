@@ -7,7 +7,7 @@
 
 If, after starting `gmex`, you get a window that tells you that was not possible to open an "OpenGL context", that can happen for two reasons:
 
-* trty to restart your machine. Seriously! :-) Sometimes, after updates to the graphical packages (those can happen behind the scene, without you to notice them), the system needs to be restarted. I experienced that personally: `gmex` was failing to start, when I was trying a new version of our 3D engine, Coin3D, and I was trying to find for the cause in the code of Coin3D itself... But then my OpenGL-accelerated terminal emulator, Alacritty, had stopped working as well; and that gave me a hint that something global was happening... So, I Googled, and I found a suggestion to resart the machine to get the graphics drivers sync between each others. Try that first, it can help! ;-)
+* try to restart your machine. Seriously! :-) Sometimes, after updates to the graphical packages (those can happen behind the scene, without you to notice them), the system needs to be restarted. I experienced that personally: `gmex` was failing to start, when I was trying a new version of our 3D engine, Coin3D, and I was trying to find for the cause in the code of Coin3D itself... But then my OpenGL-accelerated terminal emulator, Alacritty, had stopped working as well; and that gave me a hint that something global was happening... So, I Googled, and I found a suggestion to resart the machine to get the graphics drivers sync between each others. Try that first, it can help! ;-)
 * your OpenGL installation / support is not correct / fully-installed. In that case, you should look for instructions to install proper OpenGL support on your system.
 
 ## Packages

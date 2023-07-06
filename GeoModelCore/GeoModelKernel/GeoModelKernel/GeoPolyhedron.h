@@ -167,6 +167,7 @@
 
 class GeoPolyhedron
 {
+  friend class Geo_BooleanProcessor;
   friend std::ostream & operator<< (std::ostream &, const GeoPolyhedron & ph);
 
 private:

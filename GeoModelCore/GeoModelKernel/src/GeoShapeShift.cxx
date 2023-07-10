@@ -25,6 +25,36 @@ double GeoShapeShift::volume () const
   return m_op->volume ();
 }
 
+void GeoShapeShift::extent (double& xmin, double& ymin, double& zmin,
+                            double& xmax, double& ymax, double& zmax) const
+{
+  const GeoShape* shape = getOp();
+  const GeoTrf::Transform3D& trans = getX();
+  double x_min, y_min, z_min, x_max, y_max, z_max;
+  shape->extent(x_min, y_min, z_min, x_max, y_max, z_max);
+  GeoTrf::Vector3D vv[8];
+  vv[0] = trans * GeoTrf::Vector3D(x_min, y_min, z_min);
+  vv[1] = trans * GeoTrf::Vector3D(x_max, y_min, z_min);
+  vv[2] = trans * GeoTrf::Vector3D(x_min, y_max, z_min);
+  vv[3] = trans * GeoTrf::Vector3D(x_max, y_max, z_min);
+  vv[4] = trans * GeoTrf::Vector3D(x_min, y_min, z_max);
+  vv[5] = trans * GeoTrf::Vector3D(x_max, y_min, z_max);
+  vv[6] = trans * GeoTrf::Vector3D(x_min, y_max, z_max);
+  vv[7] = trans * GeoTrf::Vector3D(x_max, y_max, z_max);
+  xmin = xmax = vv[0].x();
+  ymin = ymax = vv[0].y();
+  zmin = zmax = vv[0].z();
+  for (int i = 1; i < 8; ++i)
+  {
+    xmin = std::min(xmin, vv[i].x());
+    ymin = std::min(ymin, vv[i].y());
+    zmin = std::min(zmin, vv[i].z());
+    xmax = std::max(xmax, vv[i].x());
+    ymax = std::max(ymax, vv[i].y());
+    zmax = std::max(zmax, vv[i].z());
+  }
+}
+
 const std::string & GeoShapeShift::type () const
 {
   return s_classType;
@@ -54,20 +84,20 @@ void GeoShapeShift::exec (GeoShapeAction *action) const
       action->getPath ()->pop ();
       return;
     }
-  
+
   if (action->getDepthLimit ().isValid ()
       && action->getPath ()->getLength () > action->getDepthLimit ())
     {
     }
 
-  else 
-	{
+  else
+        {
     m_op->exec(action);
     if (action->shouldTerminate ())
-	{
+        {
       action->getPath ()->pop ();
       return;
-	}
+        }
   }
   action->getPath()->pop();
 }

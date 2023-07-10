@@ -30,6 +30,17 @@ double GeoTrd::volume () const
     ((fDx1 + fDx2) * (fDy1 + fDy2) + (fDx2 - fDx1) * (fDy2 - fDy1) * (1./3.));
 }
 
+void GeoTrd::extent (double& xmin, double& ymin, double& zmin,
+                     double& xmax, double& ymax, double& zmax) const
+{
+  xmax = std::max(m_xHalfLength1, m_xHalfLength2);
+  ymax = std::max(m_yHalfLength1, m_yHalfLength2);
+  zmax = m_zHalfLength;
+  xmin = -xmax;
+  ymin = -ymax;
+  zmin = -zmax;
+}
+
 const std::string & GeoTrd::type () const
 {
   return s_classType;
@@ -44,4 +55,3 @@ void GeoTrd::exec (GeoShapeAction *action) const
 {
   action->handleTrd(this);
 }
-

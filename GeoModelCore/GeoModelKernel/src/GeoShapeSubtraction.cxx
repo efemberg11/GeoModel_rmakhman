@@ -34,6 +34,12 @@ double GeoShapeSubtraction::volume () const
   return vol;
 }
 
+void GeoShapeSubtraction::extent (double& xmin, double& ymin, double& zmin,
+                                  double& xmax, double& ymax, double& zmax) const
+{
+  getOpA()->extent(xmin, ymin, zmin, xmax, ymax, zmax);
+}
+
 const std::string & GeoShapeSubtraction::type () const
 {
   return s_classType;

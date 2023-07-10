@@ -11,7 +11,7 @@
  * @brief This shape represents a BREP solid consisting
  *      of two equivalent polygonial faces perpendicular to Z axis.
  *      The polygones are described by array of (x,y) vertices,
- *      The solid is considered valid if the number of polygon vertices >=3 
+ *      The solid is considered valid if the number of polygon vertices >=3
  *
  *      Constructor parameter is a half length along Z axis
  */
@@ -19,30 +19,53 @@
 #include <vector>
 #include "GeoModelKernel/GeoShape.h"
 
-
 class GeoSimplePolygonBrep : public GeoShape
 {
  public:
+  //    Constructor for the BREP.  Note that the constructor
+  //    does not fully build this object. The BREP is not valid
+  //    until at least three vertices have been added.
   GeoSimplePolygonBrep(double dz);
 
+  //    Returns the volume of the shape, for mass inventory
   virtual double volume() const;
 
+  //    Returns the bonding box of the shape
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns the BREP shape type, as a string
   virtual const std::string& type() const;
+
+  //    Returns the BREP shape type, as a coded integer
   virtual ShapeType typeID() const;
 
-  void addVertex(double XVertex, double YVertex);
-  unsigned int getNVertices() const;
-
-  bool isValid () const;
-
-  const double & getXVertex(unsigned int i) const;
-  const double & getYVertex(unsigned int i) const;
-
-  virtual void exec(GeoShapeAction *action) const;
-
+  //    For type identification
   static const std::string& getClassType();
+
+  //    For type identification
   static ShapeType getClassTypeID();
 
+  //    Executes a GeoShapeAction
+  virtual void exec(GeoShapeAction *action) const;
+
+  //    Add another vertex to the polygon. A minimum of three
+  //    vertices are required to create a valid solid.
+  void addVertex(double XVertex, double YVertex);
+
+  //    Returns the number of vertices in the polygon
+  unsigned int getNVertices() const;
+
+  //    True if the polygon has at least three vertices, false otherwise
+  bool isValid () const;
+
+  //    Returns X coordinate of the specified vertex
+  const double & getXVertex(unsigned int i) const;
+
+  //    Returns Y coordinate of the specified vertex
+  const double & getYVertex(unsigned int i) const;
+
+  //    Half-length along Z axis
   const double& getDZ() const;
 
  protected:

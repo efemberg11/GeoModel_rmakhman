@@ -7,7 +7,7 @@
 
 /**
  * @class: GeoEllipticalTube
- *  
+ *
  * @brief This is a tube with elliptical cross section
  * The equation of the surface in x/y is 1.0 = (x/dx)**2 + (y/dy)**2
  */
@@ -17,27 +17,45 @@
 class GeoEllipticalTube : public GeoShape
 {
  public:
-  GeoEllipticalTube(double XHalfLength, double YHalfLength, double ZHalfLength); 
+  //    Constructor for the ELLIPTICAL TUBE
+  GeoEllipticalTube(double XHalfLength, double YHalfLength, double ZHalfLength);
 
+  //    Returns the volume of the shape, for mass inventory
   virtual double volume () const;
 
+  //    Returns the bonding box of the shape
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns the ELLIPTICAL TUBE shape type, as a string
   virtual const std::string & type () const;
+
+  //    Returns the ELLIPTICAL TUBE shape type, as a coded integer
   virtual ShapeType typeID () const;
 
+  //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
+  //    For type identification
   static const std::string& getClassType ();
+
+  //    For type identification
   static ShapeType getClassTypeID ();
 
+  //    X semi-axis
   const double& getXHalfLength() const;
+
+  //    Y semi-axis
   const double& getYHalfLength() const;
+
+  //    Elliptical tube half-length in the Z direction
   const double& getZHalfLength() const;
 
  protected:
   virtual ~GeoEllipticalTube();
 
  private:
-  
+
   GeoEllipticalTube(const GeoEllipticalTube &right);
   GeoEllipticalTube & operator=(const GeoEllipticalTube &right);
 
@@ -48,7 +66,6 @@ class GeoEllipticalTube : public GeoShape
   double m_yHalfLength;
   double m_zHalfLength;
 };
-
 
 inline const std::string& GeoEllipticalTube::getClassType ()
 {
@@ -74,6 +91,5 @@ inline const double& GeoEllipticalTube::getZHalfLength() const
 {
   return m_zHalfLength;
 }
-
 
 #endif

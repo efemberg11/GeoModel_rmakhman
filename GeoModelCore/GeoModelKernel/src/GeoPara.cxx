@@ -27,6 +27,26 @@ double GeoPara::volume () const
   return 8.0 * m_xHalfLength * m_yHalfLength * m_zHalfLength;
 }
 
+void GeoPara::extent (double& xmin, double& ymin, double& zmin,
+                      double& xmax, double& ymax, double& zmax) const
+{
+  double dx = m_xHalfLength;
+  double dy = m_yHalfLength;
+  double dz = m_zHalfLength;
+
+  double x0 = dz * std::tan(m_theta) * std::cos(m_phi);
+  double x1 = dy * std::tan(m_alpha);
+  xmin = std::min(std::min(std::min(-x0-x1-dx, -x0+x1-dx), x0-x1-dx), x0+x1-dx);
+  xmax = std::max(std::max(std::max(-x0-x1+dx, -x0+x1+dx), x0-x1+dx), x0+x1+dx);
+
+  double y0 = dz * std::tan(m_theta) * std::sin(m_phi);
+  ymin = std::min(-y0-dy, y0-dy);
+  ymax = std::max(-y0+dy, y0+dy);
+
+  zmin = -dz;
+  zmax = dz;
+}
+
 const std::string & GeoPara::type () const
 {
   return s_classType;
@@ -39,6 +59,5 @@ ShapeType GeoPara::typeID () const
 
 void GeoPara::exec (GeoShapeAction *action) const
 {
-	action->handlePara(this);
+  action->handlePara(this);
 }
-

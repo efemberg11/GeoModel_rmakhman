@@ -16,30 +16,35 @@
 class GeoShapeSubtraction : public GeoShape
 {
  public:
+  //    Constructor taking two shape operands
   GeoShapeSubtraction (const GeoShape* A, const GeoShape* B);
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory
   virtual double volume () const;
 
-  //	Returns the NOT shape type, as a string.
+  //    Returns the bonding box of the shape
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns the NOT shape type, as a string.
   virtual const std::string & type () const;
 
-  //	Returns the NOT shape type, as a coded integer.
+  //    Returns the NOT shape type, as a coded integer.
   virtual ShapeType typeID () const;
 
-  //	Returns the first operand in the subtraction
+  //    Returns the first operand in the subtraction
   const GeoShape* getOpA () const;
 
-  //	Returns the second operand in the subtraction
+  //    Returns the second operand in the subtraction
   const GeoShape* getOpB () const;
 
-  //	Executes a GeoShapeAction
+  //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
-  //	For type identification.
+  //    For type identification.
   static const std::string& getClassType ();
 
-  //	For type identification.
+  //    For type identification.
   static ShapeType getClassTypeID ();
 
  protected:
@@ -49,10 +54,10 @@ class GeoShapeSubtraction : public GeoShape
   GeoShapeSubtraction(const GeoShapeSubtraction &right);
   GeoShapeSubtraction & operator=(const GeoShapeSubtraction &right);
 
-  //	The shape operand in the Subtraction operation
+  //    The shape operand in the Subtraction operation
   const GeoShape* m_opA;
 
-  //	The shape operand in the Subtraction operation
+  //    The shape operand in the Subtraction operation
   const GeoShape* m_opB;
 
   static const std::string s_classType;

@@ -34,6 +34,21 @@ double GeoShapeUnion::volume () const
   return vol;
 }
 
+void GeoShapeUnion::extent (double& xmin, double& ymin, double& zmin,
+                            double& xmax, double& ymax, double& zmax) const
+{
+  double xminA, yminA, zminA, xmaxA, ymaxA, zmaxA;
+  double xminB, yminB, zminB, xmaxB, ymaxB, zmaxB;
+  getOpA()->extent(xminA, yminA, zminA, xmaxA, ymaxA, zmaxA);
+  getOpB()->extent(xminB, yminB, zminB, xmaxB, ymaxB, zmaxB);
+  xmin = std::min(xminA, xminB);
+  ymin = std::min(yminA, yminB);
+  zmin = std::min(zminA, zminB);
+  xmax = std::max(xmaxA, xmaxB);
+  ymax = std::max(ymaxA, ymaxB);
+  zmax = std::max(zmaxA, zmaxB);
+}
+
 const std::string & GeoShapeUnion::type () const
 {
   return s_classType;
@@ -86,4 +101,3 @@ void GeoShapeUnion::exec (GeoShapeAction *action) const
   }
   action->getPath()->pop();
 }
-

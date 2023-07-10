@@ -1,6 +1,7 @@
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 #include "GeoModelKernel/Query.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include <stdexcept>
 
 const std::string         GeoUnidentifiedShape::_classType="UnidentifiedShape";
 const ShapeType           GeoUnidentifiedShape::_classTypeID=0xFFFFFFFF;
@@ -18,7 +19,7 @@ GeoUnidentifiedShape::GeoUnidentifiedShape(const std::string & name, const std::
   _name(name),
   _asciiData(asciiData) {}
 
-// Constructor with volume: 
+// Constructor with volume:
 GeoUnidentifiedShape::GeoUnidentifiedShape(const std::string & name, const std::string & asciiData, double volume):
   _name(name),
   _asciiData(asciiData),
@@ -38,7 +39,15 @@ const std::string & GeoUnidentifiedShape::asciiData() const {
 double GeoUnidentifiedShape::volume () const {
   return _volume;
 }
-  
+
+// Returns the bonding box of the shape
+void GeoUnidentifiedShape::extent (double& xmin, double& ymin, double& zmin,
+                                   double& xmax, double& ymax, double& zmax) const
+{
+  throw std::runtime_error ("GeoShapeSubtraction::extent is not implemented");
+  xmin = ymin = zmin = xmax = ymax = zmax = 0.;
+}
+
 // Returns the shape type, as a string.
 const std::string & GeoUnidentifiedShape::type () const {
   return _classType;

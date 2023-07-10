@@ -43,13 +43,13 @@
 class GeoTwistedTrap : public GeoShape
 {
  public:
-    
+
   GeoTwistedTrap(double  pPhiTwist,
                  double  pDx1,  // half x length at -pDz,-pDy
                  double  pDx2,  // half x length at -pDz,+pDy
                  double  pDy,
                  double  pDz);
-    
+
   GeoTwistedTrap(double  pPhiTwist,   // twist angle
                  double  pDz,     // half z length
                  double  pTheta,  // direction between end planes
@@ -63,25 +63,29 @@ class GeoTwistedTrap : public GeoShape
                  double  pAlph    // tilt angle
   );
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory
   virtual double volume () const;
-  
-  //	Returns the TWISTED TRAP shape type, as a string.
+
+  //    Returns the bonding box of the shape.
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns the TWISTED TRAP shape type, as a string.
   virtual const std::string & type () const;
-  
-  //	Returns the TWISTED TRAP shape type, as a coded integer.
+
+  //    Returns the TWISTED TRAP shape type, as a coded integer.
   virtual ShapeType typeID () const;
-  
-  //	Executes a GeoShapeAction
+
+  //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
-  
-  //	For type identification.
+
+  //    For type identification.
   static const std::string& getClassType ();
-  
-  //	For type identification.
+
+  //    For type identification.
   static ShapeType getClassTypeID ();
-  
-    
+
+
   inline double getY1HalfLength() const { return m_dy1 ; }
   inline double getX1HalfLength() const { return m_dx1 ; }
   inline double getX2HalfLength() const { return m_dx2 ; }
@@ -93,7 +97,7 @@ class GeoTwistedTrap : public GeoShape
   inline double getTheta()        const { return m_theta ; }
   inline double getPhi()          const { return m_phi ; }
   inline double getTiltAngleAlpha() const { return m_alph ; }
-  
+
  protected:
   virtual ~GeoTwistedTrap();
 
@@ -115,7 +119,7 @@ class GeoTwistedTrap : public GeoShape
   double m_dz;        // Half-length along the z axis
   double m_alph ;
   double m_phiTwist;  // twist angle ( dphi in surface equation)
-    
+
   const double m_CarTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;
   const double m_RadTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;
   const double m_AngTolerance = 1E-9 * SYSTEM_OF_UNITS::rad;
@@ -131,4 +135,5 @@ inline ShapeType GeoTwistedTrap::getClassTypeID ()
 {
   return s_classTypeID;
 }
+
 #endif

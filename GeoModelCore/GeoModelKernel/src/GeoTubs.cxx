@@ -26,6 +26,14 @@ double GeoTubs::volume () const
   return m_dPhi * (m_rMax * m_rMax - m_rMin * m_rMin) * m_zHalfLength;
 }
 
+void GeoTubs::extent (double& xmin, double& ymin, double& zmin,
+                      double& xmax, double& ymax, double& zmax) const
+{
+  GeoShape::diskExtent(m_rMin, m_rMax, m_sPhi, m_dPhi, xmin, ymin, xmax, ymax);
+  zmin =-m_zHalfLength;
+  zmax = m_zHalfLength;
+}
+
 const std::string & GeoTubs::type () const
 {
   return s_classType;
@@ -40,4 +48,3 @@ void GeoTubs::exec (GeoShapeAction *action) const
 {
   action->handleTubs(this);
 }
-

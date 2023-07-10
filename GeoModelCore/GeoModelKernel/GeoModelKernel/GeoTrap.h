@@ -18,55 +18,59 @@ class GeoTrap : public GeoShape
  public:
   GeoTrap (double ZHalfLength, double Theta, double Phi, double Dydzn, double Dxdyndzn, double Dxdypdzn, double Angleydzn, double Dydzp, double Dxdyndzp, double Dxdypdzp, double Angleydzp);
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory.
   virtual double volume () const;
-  
-  //	Returns the TRAP shape type, as a string.
+
+  //    Returns the bonding box of the shape.
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns the TRAP shape type, as a string.
   virtual const std::string & type () const;
-  
-  //	Returns the TRAP shape type, as a coded integer.
+
+  //    Returns the TRAP shape type, as a coded integer.
   virtual ShapeType typeID () const;
-  
-  //	Executes a GeoShapeAction
+
+  //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
-  
-  //	For type identification.
+
+  //    For type identification.
   static const std::string& getClassType ();
-  
-  //	For type identification.
+
+  //    For type identification.
   static ShapeType getClassTypeID ();
-  
-  //	Z half length.
+
+  //    Z half length.
   const double& getZHalfLength () const;
-  
-  //	Polar (theta) angle.
+
+  //    Polar (theta) angle.
   const double& getTheta () const;
-  
-  //	Azimuthal (phi) angle.
+
+  //    Azimuthal (phi) angle.
   const double& getPhi () const;
-  
-  //	Y half length at -z.
+
+  //    Y half length at -z.
   const double& getDydzn () const;
-  
-  //	X half length at -z, -y.
+
+  //    X half length at -z, -y.
   const double& getDxdyndzn () const;
-  
-  //	X half length at -z, +y
+
+  //    X half length at -z, +y.
   const double& getDxdypdzn () const;
-  
+
   const double& getAngleydzn () const;
-  
-  //	Y half length at +z.
+
+  //    Y half length at +z.
   const double& getDydzp () const;
-  
-  //	X half length at +z, -y
+
+  //    X half length at +z, -y.
   const double& getDxdyndzp () const;
-  
-  //	X half length at +z, +y
+
+  //    X half length at +z, +y.
   const double& getDxdypdzp () const;
-  
+
   const double& getAngleydzp () const;
-  
+
  protected:
   virtual ~GeoTrap();
 

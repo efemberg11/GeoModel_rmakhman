@@ -18,18 +18,26 @@ GeoTorus::GeoTorus (double Rmin, double Rmax, double Rtor, double SPhi, double D
 {
 }
 
-
 GeoTorus::~GeoTorus()
 {
 }
 
-//## Other Operations (implementation)
 double GeoTorus::volume () const
 {
 #ifndef M_PI
   double M_PI = acos (-1.0);
-#endif 
+#endif
   return m_dPhi * M_PI * m_rTor *(m_rMax * m_rMax - m_rMin * m_rMin);
+}
+
+void GeoTorus::extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const
+{
+  double rmin = m_rTor - m_rMax;
+  double rmax = m_rTor + m_rMax;
+  GeoShape::diskExtent(rmin, rmax, m_sPhi, m_dPhi, xmin, ymin, xmax, ymax);
+  zmin =-m_rMax;
+  zmax = m_rMax;
 }
 
 const std::string & GeoTorus::type () const

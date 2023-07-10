@@ -12,52 +12,56 @@ class GeoCons : public GeoShape
  public:
   GeoCons (double RMin1, double RMin2, double RMax1, double RMax2, double DZ, double SPhi, double DPhi);
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory.
   virtual double volume () const;
 
-  //	Returns the CONS shape type, as a string.
+  //    Returns the bonding box of the shape.
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns the CONS shape type, as a string.
   virtual const std::string & type () const;
-  
-  //	Returns the CONS shape type, as a coded integer.
+
+  //    Returns the CONS shape type, as a coded integer.
   virtual ShapeType typeID () const;
-  
-  //	Executes a GeoShapeAction
+
+  //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
-  
-  //	For type identification.
+
+  //    For type identification.
   static const std::string& getClassType ();
-  
-  //	For type identification.
+
+  //    For type identification.
   static ShapeType getClassTypeID ();
-  
-  //	Inside radius at -dZ
+
+  //    Inside radius at -dZ
   const double& getRMin1 () const;
-  
-  //	Inside radius at +dZ
+
+  //    Inside radius at +dZ
   const double& getRMin2 () const;
-  
-  //	Outside radius at -dZ
+
+  //    Outside radius at -dZ
   const double& getRMax1 () const;
-  
-  //	Outside radius at +dZ
+
+  //    Outside radius at +dZ
   const double& getRMax2 () const;
-  
-  //	Half length in Z direction.
+
+  //    Half length in Z direction.
   const double& getDZ () const;
-  
-  //	Starting angle of the segment in radians
+
+  //    Starting angle of the segment in radians.
   const double& getSPhi () const;
-  
-  //	Delta angle of the segment in radians.
+
+  //    Delta angle of the segment in radians.
   const double& getDPhi () const;
-  
+
  protected:
   virtual ~GeoCons();
-  
+
  private:
   GeoCons(const GeoCons &right);
   GeoCons & operator=(const GeoCons &right);
-  
+
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 

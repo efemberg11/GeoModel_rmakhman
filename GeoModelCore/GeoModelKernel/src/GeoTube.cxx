@@ -29,6 +29,17 @@ double GeoTube::volume () const
   return 2 * M_PI * (m_rMax * m_rMax - m_rMin * m_rMin) * m_zHalfLength;
 }
 
+void GeoTube::extent (double& xmin, double& ymin, double& zmin,
+                      double& xmax, double& ymax, double& zmax) const
+{
+  xmin =-m_rMax;
+  ymin =-m_rMax;
+  zmin =-m_zHalfLength;
+  xmax = m_rMax;
+  ymax = m_rMax;
+  zmax = m_zHalfLength;
+}
+
 const std::string & GeoTube::type () const
 {
   return s_classType;

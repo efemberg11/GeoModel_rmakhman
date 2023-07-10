@@ -30,7 +30,27 @@ double GeoSimplePolygonBrep::volume () const
   {
     area += m_xVertices[k - 1] * m_yVertices[k] - m_xVertices[k] * m_yVertices[k - 1];
   }
-  return fabs(area) * m_dZ;
+  return std::abs(area) * m_dZ;
+}
+
+void GeoSimplePolygonBrep::extent (double& xmin, double& ymin, double& zmin,
+                                   double& xmax, double& ymax, double& zmax) const
+{
+  if (!isValid())
+    throw std::runtime_error ("Extent requested for incomplete simple polygon brep");
+  xmin = xmax = m_xVertices[0];
+  ymin = ymax = m_yVertices[0];
+  for (size_t k = 1; k < getNVertices(); ++k)
+  {
+    double x = m_xVertices[k];
+    double y = m_yVertices[k];
+    xmin = std::min(xmin, x);
+    xmax = std::max(xmax, x);
+    ymin = std::min(ymin, y);
+    ymax = std::max(ymax, y);
+  }
+  zmin =-m_dZ;
+  zmax = m_dZ;
 }
 
 const std::string & GeoSimplePolygonBrep::type() const
@@ -53,4 +73,3 @@ void GeoSimplePolygonBrep::exec(GeoShapeAction *action) const
 {
   action->handleSimplePolygonBrep(this);
 }
-

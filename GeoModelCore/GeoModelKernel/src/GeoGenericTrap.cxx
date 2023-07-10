@@ -35,6 +35,23 @@ double GeoGenericTrap::volume() const
   return m_zHalfLength * ((AB + CD)* (1./3.) + (AD + CB)* (1./6.));
 }
 
+void GeoGenericTrap::extent (double& xmin, double& ymin, double& zmin,
+                             double& xmax, double& ymax, double& zmax) const
+{
+  xmin = xmax = m_vertices[0].x();
+  ymin = ymax = m_vertices[0].y();
+  int nv = m_vertices.size();
+  for (int i = 1; i < nv; ++i)
+  {
+    if (xmin > m_vertices[i].x()) xmin = m_vertices[i].x();
+    if (xmax < m_vertices[i].x()) xmax = m_vertices[i].x();
+    if (ymin > m_vertices[i].y()) ymin = m_vertices[i].y();
+    if (ymax < m_vertices[i].y()) ymax = m_vertices[i].y();
+  }
+  zmin =-m_zHalfLength;
+  zmax = m_zHalfLength;
+}
+
 const std::string& GeoGenericTrap::type() const
 {
   return s_classType;
@@ -59,4 +76,3 @@ const GeoGenericTrapVertices& GeoGenericTrap::getVertices() const
 {
   return m_vertices;
 }
-

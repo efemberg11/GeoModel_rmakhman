@@ -16,12 +16,12 @@
  *           if (myShape->typeId()==GeoBox::classTypeId()) {
  *             .....
  *           }
- *	This avoids the need for dynamic casting with these
- *	classes.
+ *      This avoids the need for dynamic casting with these
+ *      classes.
  *
- *	Also noteworthy: Shapes are allocated on the heap and
- *	deleted automatically when their reference count falls
- *	to zero.
+ *      Also noteworthy: Shapes are allocated on the heap and
+ *      deleted automatically when their reference count falls
+ *      to zero.
  */
 
 #include "GeoModelKernel/RCBase.h"
@@ -38,35 +38,44 @@ class GeoShapeAction;
 class GeoShape : public RCBase
 {
  public:
-  // Constructor for shape.  Must provide the name, a string to identify this shape.
+  //    Constructor for shape. Must provide the name, a string to identify this shape.
   GeoShape ();
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory.
   virtual double volume () const = 0;
 
-  //	Boolean OR operation for shapes
+  //    Returns the bonding box of the shape.
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const = 0;
+
+  //    Boolean OR operation for shapes
   const GeoShapeUnion & add (const GeoShape& shape) const;
-  
-  //	Subtraction operation for shapes.
+
+  //    Subtraction operation for shapes.
   const GeoShapeSubtraction & subtract (const GeoShape& shape) const;
-  
-  //	Intersection of shapes.
+
+  //    Intersection of shapes.
   const GeoShapeIntersection & intersect (const GeoShape& shape) const;
-  
-  //	Shift shapes, for boolean operations.
+
+  //    Shift shapes, for boolean operations.
   const GeoShapeShift & operator << (const GeoTrf::Transform3D &shift) const;
-  
-  //	Returns the shape type, as a string.
+
+  //    Returns the shape type, as a string.
   virtual const std::string & type () const = 0;
-  
-  //	Returns the shape type, as an coded integer.
+
+  //    Returns the shape type, as an coded integer.
   virtual ShapeType typeID () const = 0;
-  
-  //	Executes a GeoShapeAction
+
+  //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const = 0;
-  
+
  protected:
   virtual ~GeoShape();
+
+  //    Returns the bounding box of the specified disk. This method is used
+  //    for calculation of the extend of a tube, cone, polycone, torus.
+  static void diskExtent(double rmin, double rmax, double sphi, double dphi,
+                         double& xmin, double& ymin, double& xmax, double& ymax);
 
  private:
   GeoShape(const GeoShape &right);

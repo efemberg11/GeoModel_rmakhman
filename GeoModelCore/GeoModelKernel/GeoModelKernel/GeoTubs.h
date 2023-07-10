@@ -12,37 +12,41 @@ class GeoTubs : public GeoShape
  public:
   GeoTubs (double RMin, double RMax, double ZHalfLength, double SPhi, double DPhi);
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory.
   virtual double volume () const;
 
-  //	Returns the TUBS shape type, as a string.
+  //    Returns the bonding box of the shape.
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns the TUBS shape type, as a string.
   virtual const std::string & type () const;
 
-  //	Returns the TUBS shape type, as a coded integer.
+  //    Returns the TUBS shape type, as a coded integer.
   virtual ShapeType typeID () const;
 
-  //	Executes a GeoShapeAction
+  //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
 
-  //	For type identification.
+  //    For type identification.
   static const std::string& getClassType ();
 
-  //	For type identification.
+  //    For type identification.
   static ShapeType getClassTypeID ();
 
-  //	Minimum (inner) tube section radius.
+  //    Minimum (inner) tube section radius.
   const double& getRMin () const;
 
-  //	Maximum (outer) tube section radius.
+  //    Maximum (outer) tube section radius.
   const double& getRMax () const;
 
-  //	Tube section half-length in the z direction.
+  //    Tube section half-length in the z direction.
   const double& getZHalfLength () const;
 
-  //	Starting angle of the tube section in radians.
+  //    Starting angle of the tube section in radians.
   const double& getSPhi () const;
 
-  //	Delta angle of the tube section in radians.
+  //    Delta angle of the tube section in radians.
   const double& getDPhi () const;
 
  protected:

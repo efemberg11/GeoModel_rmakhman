@@ -25,9 +25,19 @@ GeoCons::~GeoCons()
 
 double GeoCons::volume () const
 {
-  return (m_dPhi * (1./3)) * m_dZ * (m_rMax1 * m_rMax1 + m_rMax2 * m_rMax2 + m_rMax1 * m_rMax2
-                                 - m_rMin1 * m_rMin1 - m_rMin2 * m_rMin2 -
-                                 m_rMin1 * m_rMin2);
+  return (m_dPhi * (1./3.)) * m_dZ *
+    (m_rMax1 * m_rMax1 + m_rMax2 * m_rMax2 + m_rMax1 * m_rMax2 -
+     m_rMin1 * m_rMin1 - m_rMin2 * m_rMin2 - m_rMin1 * m_rMin2);
+}
+
+void GeoCons::extent (double& xmin, double& ymin, double& zmin,
+                      double& xmax, double& ymax, double& zmax) const
+{
+  double rmin = std::min(m_rMin1, m_rMin2);
+  double rmax = std::max(m_rMax1, m_rMax2);
+  GeoShape::diskExtent(rmin, rmax, m_sPhi, m_dPhi, xmin, ymin, xmax, ymax);
+  zmin =-m_dZ;
+  zmax = m_dZ;
 }
 
 const std::string & GeoCons::type () const

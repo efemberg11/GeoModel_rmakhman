@@ -11,24 +11,45 @@
 class GeoTessellatedSolid : public GeoShape
 {
  public:
+  //    Constructor for the TESSELLATED SOLID.  Note that the constructor
+  //    does not fully build this object.  The TESSELLATED SOLID is not valid
+  //    until at least four facets have been added.
   GeoTessellatedSolid();
 
+  //    Returns the volume of the shape, for mass inventory
   virtual double volume() const;
 
+  //    Returns the bonding box of the shape
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns the TESSELLATED SOLID shape type, as a string
   virtual const std::string& type() const;
+
+  //    Returns the TESSELLATED SOLID shape type, as a coded integer
   virtual ShapeType typeID() const;
 
+  //    For type identification
   static const std::string& getClassType();
+
+  //    For type identification
   static ShapeType getClassTypeID();
 
+  //    Executes a GeoShapeAction
   virtual void exec(GeoShapeAction *action) const;
 
+  //    Add another facet to the tessellated solid. A minimum of four
+  //    facets are required to create a valid tesselated solid.
   void addFacet(GeoFacet*);
+
+  //    Returns specified facet
   GeoFacet* getFacet(size_t) const;
+
+  //    Returns the number of facets
   size_t getNumberOfFacets() const;
 
-  // True if the tessellated solid has at least four facets (tetrahedron).
-  // False otherwise.
+  // True if the tessellated solid has at least four facets (tetrahedron),
+  // false otherwise.
   bool isValid () const;
 
  protected:

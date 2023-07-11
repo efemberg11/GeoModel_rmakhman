@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 
 # === Preamble ===
 cmake_minimum_required(VERSION 3.16...3.26)
@@ -49,6 +49,7 @@ option(GEOMODEL_BUILD_VISUALIZATION "Enable the build of GeoModelVisualization" 
 option(GEOMODEL_BUILD_GEOMODELG4 "Enable the build of GeoModelG4" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT "Enable the build of FullSimLight" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING "Enable FullSimLight profiling targets" OFF)
+option(GEOMODEL_BUILD_FSL "Enable the build of FSL and FullSimLight" OFF)
 option(GEOMODEL_BUILD_ATLASEXTENSIONS "Build the Custom ATLAS Extensions" OFF)
 
 if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
@@ -68,6 +69,7 @@ if(GEOMODEL_BUILD_ALL)
   set(GEOMODEL_BUILD_TOOLS         TRUE)
   set(GEOMODEL_BUILD_VISUALIZATION TRUE)
   set(GEOMODEL_BUILD_FULLSIMLIGHT  TRUE)
+  set(GEOMODEL_BUILD_FSL           TRUE)
 endif()
 
 if(GEOMODEL_BUILD_TOOLS)
@@ -88,6 +90,12 @@ endif()
 if(GEOMODEL_BUILD_FULLSIMLIGHT)
   set(GEOMODEL_BUILD_GEOMODELG4 TRUE) # FullSimLight needs GeoModelG4
   add_subdirectory(FullSimLight)
+  list( APPEND BUILT_PACKAGES "FullSimLight")
+endif()
+
+if(GEOMODEL_BUILD_FSL)
+  set(GEOMODEL_BUILD_GEOMODELG4 TRUE) # FullSimLight needs GeoModelG4
+  add_subdirectory(FullSimLight)# FSL needs FullSimLight
   add_subdirectory(FSL)
   list( APPEND BUILT_PACKAGES "FullSimLight")
   list( APPEND BUILT_PACKAGES "FSL")

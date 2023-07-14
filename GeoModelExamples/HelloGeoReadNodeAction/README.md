@@ -1,6 +1,6 @@
-# The 'helloGeoRead' GeoModel example
+# The 'HelloGeoReadNodeAction' GeoModel example
 
-The `helloGeoRead` example shows you how to read persistified GeoModel data in a standalone program.
+The `HelloGeoReadNodeAction` example shows you how to read persistified GeoModel data in a standalone program.
 
 The example program:
 
@@ -48,9 +48,9 @@ From your work folder:
 
 ```bash
 git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples.git
-mkdir build_hellogeoRead
-cd build_hellogeoRead
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelExamples/HelloGeoRead
+mkdir build_hellogeoReadNodeAction
+cd build_hellogeoReadNodeAction
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelExamples/HelloGeoReadNodeAction
 make -j4
 make install
 ```
@@ -60,14 +60,14 @@ make install
 Get sample geometry data to play with:
 
 ```bash
-wget https://atlas-vp1.web.cern.ch/atlas-vp1/doc_new/sample_datafiles/geometry/geometry-ATLAS-R2-2015-03-01-00.db
-ln -s $PWD/geometry-ATLAS-R2-2015-03-01-00.db ../geometry.db
+wget https://geomodel.web.cern.ch/atlas-geometry-data/geometry-ATLAS-R3S-2021-03-02-00.db 
+ln -s $PWD/geometry-ATLAS-R3S-2021-03-02-00.db  ../geometry.db
 ```
 
 Now, you can run the example by typing:
 
 ```bash
-./hellogeoRead
+./hellogeoReadNodeAction geometry.db
 ```
 
 

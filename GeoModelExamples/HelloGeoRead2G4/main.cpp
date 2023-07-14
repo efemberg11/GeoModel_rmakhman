@@ -1,10 +1,11 @@
 // Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 /*
- * HelloGeo.cpp
+ * HelloGeoReadG4.cpp
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Nov, 2018
+ *  Updated on: Jul, 2023 by Marilena Bandieramonte
  *
  */
 
@@ -31,44 +32,32 @@
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 
-// GeoModelExperiment* createTheExperiment(GeoPhysVol* world)
-// {
-//   if (world == nullptr)
-//   {
-//     // Setup the 'World' volume from which everything else will be suspended
-//     double densityOfAir=0.1;
-//     const GeoMaterial* worldMat = new GeoMaterial("std::Air", densityOfAir);
-//     const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-//     const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
-//     world = new GeoPhysVol(worldLog);
-//   }
-//   // Setup the 'Experiment' manager
-//   GeoModelExperiment* theExperiment = new GeoModelExperiment(world);
-//   return theExperiment;
-// }
-
-
-
-// TODO: int main(int argc, char *argv[])
-int main()
+int main(int argc, char *argv[])
 {
 
-  // Set a valid local geometry db path before first run
-  static const std::string path = "../geometry.db";
+    if(argc != 2)
+    {
+        fprintf(stderr, "\nERROR!\nUsage: %s geometry.db\n\n", argv[0]);
+        return 1;
+    }
+    // Get the input SQLite '.db' file containing the geometry
+    std::string line;
+    std::string fileName;
+    fileName = argv[1];
+    std::cout << "Using this SQLite '.db' file:" << fileName << std::endl;
 
-  std::cout << "Using this DB file:" << path << std::endl;
 
   // check if DB file exists. If not, return.
   // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
-  std::ifstream infile(path.c_str());
-    if ( infile.good() ) {
-      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
-        exit(EXIT_FAILURE);
+  std::ifstream infile(fileName.c_str());
+    if ( ! infile.good() ) {
+      std::cout << "\n\tERROR!! A '" << fileName << "' file does not exist!! Please, check the path of the input file before running this program. Exiting...";
+      exit(EXIT_FAILURE);
   }
   infile.close();
 
   // open the DB
-  GMDBManager* db = new GMDBManager(path);
+  GMDBManager* db = new GMDBManager(fileName);
 
   /* Open database */
   if (db->checkIsDBOpen()) {

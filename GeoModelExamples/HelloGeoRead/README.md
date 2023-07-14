@@ -60,14 +60,14 @@ make install
 Get sample geometry data to play with:
 
 ```bash
-wget https://atlas-vp1.web.cern.ch/atlas-vp1/doc_new/sample_datafiles/geometry/geometry-ATLAS-R2-2015-03-01-00.db
-ln -s $PWD/geometry-ATLAS-R2-2015-03-01-00.db ../geometry.db
+wget https://geomodel.web.cern.ch/atlas-geometry-data/geometry-ATLAS-R3S-2021-03-02-00.db 
+ln -s $PWD/geometry-ATLAS-R3S-2021-03-02-00.db  ../geometry.db
 ```
 
 Now, you can run the example by typing:
 
 ```bash
-./hellogeoRead
+./hellogeoRead geometry.db
 ```
 
 

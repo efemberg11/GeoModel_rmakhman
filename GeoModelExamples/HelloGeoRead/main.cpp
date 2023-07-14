@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
     if(argc != 2)
     {
-        fprintf(stderr, "\nERROR!\nusage: %s input.db\n\n", argv[0]);
+        fprintf(stderr, "\nERROR!\nUsage: %s geometry.db\n\n", argv[0]);
         return 1;
     }
     // Get the input SQLite '.db' file containing the geometry

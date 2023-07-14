@@ -32,6 +32,9 @@ class GeoPcon : public GeoShape
   virtual void extent (double& xmin, double& ymin, double& zmin,
                        double& xmax, double& ymax, double& zmax) const;
 
+  //    Returns true if the shape contains the point, false otherwise.
+  virtual bool contains (double x, double y, double z) const;
+
   //    Returns the PCON shape type, as a string.
   virtual const std::string & type () const;
 

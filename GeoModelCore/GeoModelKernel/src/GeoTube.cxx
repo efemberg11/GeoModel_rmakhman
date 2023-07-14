@@ -24,9 +24,9 @@ GeoTube::~GeoTube()
 double GeoTube::volume () const
 {
 #ifndef M_PI
-  double M_PI = acos (-1.0);
+  constexpr double M_PI = 3.14159265358979323846;
 #endif
-  return 2 * M_PI * (m_rMax * m_rMax - m_rMin * m_rMin) * m_zHalfLength;
+  return 2.0 * M_PI * (m_rMax * m_rMax - m_rMin * m_rMin) * m_zHalfLength;
 }
 
 void GeoTube::extent (double& xmin, double& ymin, double& zmin,
@@ -38,6 +38,13 @@ void GeoTube::extent (double& xmin, double& ymin, double& zmin,
   xmax = m_rMax;
   ymax = m_rMax;
   zmax = m_zHalfLength;
+}
+
+bool GeoTube::contains (double x, double y, double z) const
+{
+  if (std::abs(z) - m_zHalfLength > 0.0) return false;
+  double rr = x * x + y * y;
+  return ((rr <= m_rMax * m_rMax) && (rr >= m_rMin * m_rMin));
 }
 
 const std::string & GeoTube::type () const

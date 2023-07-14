@@ -27,17 +27,18 @@ GeoShapeSubtraction::~GeoShapeSubtraction()
 
 double GeoShapeSubtraction::volume () const
 {
-  GeoPolyhedrizeAction a;
-  exec(&a);
-  const GeoPolyhedron *poly = a.getPolyhedron();
-  double vol = poly->GetVolume ();
-  return vol;
+  return (fVolume < 0.) ? (fVolume = GeoShape::volume()) : fVolume;
 }
 
 void GeoShapeSubtraction::extent (double& xmin, double& ymin, double& zmin,
                                   double& xmax, double& ymax, double& zmax) const
 {
   getOpA()->extent(xmin, ymin, zmin, xmax, ymax, zmax);
+}
+
+bool GeoShapeSubtraction::contains (double x, double y, double z) const
+{
+  return (!getOpA()->contains(x, y, z)) ? false : !getOpB()->contains(x, y, z);
 }
 
 const std::string & GeoShapeSubtraction::type () const

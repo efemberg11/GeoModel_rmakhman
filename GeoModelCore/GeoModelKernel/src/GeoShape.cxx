@@ -8,6 +8,7 @@
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include <cmath>
+#include <cstdint>
 
 GeoShape::GeoShape ()
 {
@@ -15,6 +16,54 @@ GeoShape::GeoShape ()
 
 GeoShape::~GeoShape()
 {
+}
+
+double GeoShape::volume () const
+{
+  constexpr int npoints = 1000000;     // number of random points
+  constexpr double expansion = 0.001;  // bounding box expansion
+  constexpr double f = 1./4294967296.; // 2^-32 - int to double conversion
+
+  // set up bonding box
+  double xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
+  extent(xmin, ymin, zmin, xmax, ymax, zmax);
+  double delx = (xmax - xmin) * expansion;
+  double dely = (ymax - ymin) * expansion;
+  double delz = (zmax - zmin) * expansion;
+  xmin -= delx;
+  ymin -= dely;
+  zmin -= delz;
+  xmax += delx;
+  ymax += dely;
+  zmax += delz;
+
+  uint32_t y = 2463534242; // seed for random number generation
+  int icount = 0; // counter of inside points
+  for (auto i = 0; i < npoints; ++i)
+  {
+    // generate three random numbers
+    uint32_t x = y;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    double randx = x * f;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    double randy = x * f;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    double randz = x * f;
+    y = x;
+
+    // calculate coordinates of random point and check its position
+    double px = xmin + (xmax - xmin) * randx;
+    double py = ymin + (ymax - ymin) * randy;
+    double pz = zmin + (zmax - zmin) * randz;
+    icount += contains(px, py, pz);
+  }
+  return (xmax - xmin) * (ymax - ymin) * (zmax -zmin) * icount / npoints;
 }
 
 const GeoShapeUnion & GeoShape::add (const GeoShape& shape) const
@@ -45,7 +94,7 @@ void GeoShape::diskExtent(double rmin, double rmax, double sphi, double dphi,
                           double& xmin, double& ymin, double& xmax, double& ymax)
 {
 #ifndef M_PI
-  double M_PI = std::acos (-1.0);
+  constexpr double M_PI = 3.14159265358979323846;
 #endif
   xmin = ymin =-rmax;
   xmax = ymax = rmax;

@@ -21,18 +21,18 @@ GeoGenericTrap::~GeoGenericTrap()
 double GeoGenericTrap::volume() const
 {
   // diagonals
-  GeoTwoVector A = m_vertices[3] - m_vertices[1];
-  GeoTwoVector B = m_vertices[2] - m_vertices[0];
-  GeoTwoVector C = m_vertices[7] - m_vertices[5];
-  GeoTwoVector D = m_vertices[6] - m_vertices[4];
+  GeoTwoVector a = m_vertices[3] - m_vertices[1];
+  GeoTwoVector b = m_vertices[2] - m_vertices[0];
+  GeoTwoVector c = m_vertices[7] - m_vertices[5];
+  GeoTwoVector d = m_vertices[6] - m_vertices[4];
 
   // kross products
-  double AB = A.x()*B.y() - A.y()*B.x();
-  double CD = C.x()*D.y() - C.y()*D.x();
-  double AD = A.x()*D.y() - A.y()*D.x();
-  double CB = C.x()*B.y() - C.y()*B.x();
+  double ab = a.x()*b.y() - a.y()*b.x();
+  double cd = c.x()*d.y() - c.y()*d.x();
+  double ad = a.x()*d.y() - a.y()*d.x();
+  double cb = c.x()*b.y() - c.y()*b.x();
 
-  return m_zHalfLength * ((AB + CD)* (1./3.) + (AD + CB)* (1./6.));
+  return m_zHalfLength * ((ab + cd)* (1./3.) + (ad + cb)* (1./6.));
 }
 
 void GeoGenericTrap::extent (double& xmin, double& ymin, double& zmin,
@@ -50,6 +50,28 @@ void GeoGenericTrap::extent (double& xmin, double& ymin, double& zmin,
   }
   zmin =-m_zHalfLength;
   zmax = m_zHalfLength;
+}
+
+bool GeoGenericTrap::contains (double x, double y, double z) const
+{
+  if (std::abs(z) - m_zHalfLength > 0.0) return false;
+  double t = 0.5 * (1.0 + z / m_zHalfLength);
+  GeoTrf::Vector2D v[4];
+  v[0] = m_vertices[0] + (m_vertices[4] - m_vertices[0]) * t;
+  v[1] = m_vertices[1] + (m_vertices[5] - m_vertices[1]) * t;
+  v[2] = m_vertices[2] + (m_vertices[6] - m_vertices[2]) * t;
+  v[3] = m_vertices[3] + (m_vertices[7] - m_vertices[3]) * t;
+  int nv = 4;
+  bool in = false;
+  for (int i = 0, k = nv - 1; i < nv; k = i++)
+  {
+    if ((v[i].y() > y) != (v[k].y() > y))
+    {
+      double ctg = (v[k].x() - v[i].x()) / (v[k].y() - v[i].y());
+      in ^= (x < (y - v[i].y()) * ctg + v[i].x());
+    }
+  }
+  return in;
 }
 
 const std::string& GeoGenericTrap::type() const

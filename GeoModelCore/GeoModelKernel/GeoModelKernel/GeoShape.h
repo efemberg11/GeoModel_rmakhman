@@ -42,13 +42,16 @@ class GeoShape : public RCBase
   GeoShape ();
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume () const = 0;
+  virtual double volume () const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
                        double& xmax, double& ymax, double& zmax) const = 0;
 
-  //    Boolean OR operation for shapes
+  //    Returns true if the shape contains the point, false otherwise.
+  virtual bool contains (double x, double y, double z) const = 0;
+
+  //    Boolean OR operation for shapes.
   const GeoShapeUnion & add (const GeoShape& shape) const;
 
   //    Subtraction operation for shapes.

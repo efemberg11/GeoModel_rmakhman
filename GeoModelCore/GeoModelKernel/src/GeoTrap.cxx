@@ -50,13 +50,12 @@ void GeoTrap::extent (double& xmin, double& ymin, double& zmin,
   double dy2 = m_dydzp;
   double dx3 = m_dxdyndzp;
   double dx4 = m_dxdypdzp;
-  double theta = m_theta;
-  double phi = m_phi;
   double alpha1 = m_angleydzn;
   double alpha2 = m_angleydzp;
 
-  double dzTthetaCphi = dz * std::tan(theta) * std::cos(phi);
-  double dzTthetaSphi = dz * std::tan(theta) * std::sin(phi);
+  double tanTheta = std::tan(m_theta);
+  double dzTthetaCphi = dz * tanTheta * std::cos(m_phi);
+  double dzTthetaSphi = dz * tanTheta * std::sin(m_phi);
   double dy1Talpha1 = dy1 * std::tan(alpha1);
   double dy2Talpha2 = dy2 * std::tan(alpha2);
 
@@ -80,6 +79,36 @@ void GeoTrap::extent (double& xmin, double& ymin, double& zmin,
   ymax = std::max(y3, y4);
   zmin =-dz;
   zmax = dz;
+}
+
+bool GeoTrap::contains (double x, double y, double z) const
+{
+  double z0 = z;
+  if (std::abs(z0) - m_zHalfLength > 0.0) return false;
+
+  double dz = m_zHalfLength;
+  double dy1 = m_dydzn;
+  double dx1 = m_dxdyndzn;
+  double dx2 = m_dxdypdzn;
+  double dy2 = m_dydzp;
+  double dx3 = m_dxdyndzp;
+  double dx4 = m_dxdypdzp;
+  double alpha1 = m_angleydzn;
+  double alpha2 = m_angleydzp;
+
+  double tz = 0.5 * (1.0 + z0 / dz);
+  double tanTheta = std::tan(m_theta);
+  double tanAlpha = std::tan(alpha1 + (alpha2 - alpha1) * tz);
+  double dy = dy1 + (dy2 - dy1) * tz;
+  double y0 = y - z0 * tanTheta * std::sin(m_phi);
+  if (std::abs(y0) - dy > 0.0) return false;
+
+  double ty = 0.5 * (1.0 + y0 / dy);
+  double dxneg = dx1 + (dx3 - dx1) * tz;
+  double dxpos = dx2 + (dx4 - dx2) * tz;
+  double dx = dxneg + (dxpos - dxneg) * ty;
+  double x0 = x - y0 * tanAlpha - z0 * tanTheta * std::cos(m_phi);
+  return (std::abs(x0) - dx <= 0.0);
 }
 
 const std::string & GeoTrap::type () const

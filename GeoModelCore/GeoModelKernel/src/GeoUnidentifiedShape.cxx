@@ -44,8 +44,15 @@ double GeoUnidentifiedShape::volume () const {
 void GeoUnidentifiedShape::extent (double& xmin, double& ymin, double& zmin,
                                    double& xmax, double& ymax, double& zmax) const
 {
-  throw std::runtime_error ("GeoShapeSubtraction::extent is not implemented");
+  throw std::runtime_error ("GeoUndefinedShape::extent is not implemented");
   xmin = ymin = zmin = xmax = ymax = zmax = 0.;
+}
+
+// Returns true if the shape contains the point, false otherwise
+bool GeoUnidentifiedShape::contains (double x, double y, double z) const
+{
+  throw std::runtime_error ("GeoUndefinedShape::contains(x,y,z) is not implemented");
+  return false;
 }
 
 // Returns the shape type, as a string.

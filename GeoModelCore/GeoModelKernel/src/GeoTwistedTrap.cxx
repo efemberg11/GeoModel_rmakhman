@@ -129,6 +129,31 @@ void GeoTwistedTrap::extent (double& xmin, double& ymin, double& zmin,
   zmax = m_dz;
 }
 
+bool GeoTwistedTrap::contains (double x, double y, double z) const
+{
+  double z0 = z;
+  if (std::abs(z0) - m_dz > 0.0) return false;
+  double tz = 0.5 * (1.0 + z0 / m_dz);
+
+  double twist = -0.5 * m_phiTwist + m_phiTwist * tz;
+  double cosTwist = std::cos(-twist);
+  double sinTwist = std::sin(-twist);
+  double tanTheta = std::tan(m_theta);
+  double xc = z0 * tanTheta * std::cos(m_phi);
+  double yc = z0 * tanTheta * std::sin(m_phi);
+
+  double dy = m_dy1 + (m_dy2 - m_dy1) * tz;
+  double y0 = sinTwist * (x - xc) + cosTwist * (y - yc);
+  if (std::abs(y0) - dy > 0.0) return false;
+  double ty = 0.5 * (1.0 + y0 / dy);
+
+  double dxneg = m_dx1 + (m_dx3 - m_dx1) * tz;
+  double dxpos = m_dx2 + (m_dx4 - m_dx2) * tz;
+  double dx = dxneg + (dxpos - dxneg) * ty;
+  double x0 = cosTwist * (x - xc) - sinTwist * (y - yc) - y0 * std::tan(m_alph);
+  return (std::abs(x0) - dx <= 0.0);
+}
+
 const std::string & GeoTwistedTrap::type () const
 {
   return s_classType;

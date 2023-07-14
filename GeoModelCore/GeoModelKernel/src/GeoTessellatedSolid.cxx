@@ -4,6 +4,7 @@
 
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include <stdexcept>
 
 const std::string GeoTessellatedSolid::s_classType = "TessellatedSolid";
 const ShapeType GeoTessellatedSolid::s_classTypeID = 0x21;
@@ -64,6 +65,12 @@ void GeoTessellatedSolid::extent (double& xmin, double& ymin, double& zmin,
       zmax = std::max(zmax, z);
     }
   }
+}
+
+bool GeoTessellatedSolid::contains (double x, double y, double z) const
+{
+  throw std::runtime_error ("GeoTessellatedSolid::contains(x,y,z) is not implemented");
+  return false;
 }
 
 const std::string& GeoTessellatedSolid::type() const

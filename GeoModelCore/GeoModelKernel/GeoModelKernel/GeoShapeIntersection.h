@@ -24,6 +24,9 @@ class GeoShapeIntersection : public GeoShape
   virtual void extent (double& xmin, double& ymin, double& zmin,
                        double& xmax, double& ymax, double& zmax) const;
 
+  //    Returns true if the shape contains the point, false otherwise
+  virtual bool contains (double x, double y, double z) const;
+
   //    Returns the AND shape type, as a string.
   virtual const std::string & type () const;
 
@@ -57,6 +60,9 @@ class GeoShapeIntersection : public GeoShape
 
   //    The second shape operand in the AND operation.
   const GeoShape* m_opB;
+
+  //    Cached volume
+  mutable double fVolume = -1.;
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;

@@ -27,11 +27,7 @@ GeoShapeUnion::~GeoShapeUnion()
 
 double GeoShapeUnion::volume () const
 {
-  GeoPolyhedrizeAction a;
-  exec (&a);
-  const GeoPolyhedron *poly = a.getPolyhedron ();
-  double vol = poly->GetVolume ();
-  return vol;
+  return (fVolume < 0.0) ? (fVolume = GeoShape::volume()) : fVolume;
 }
 
 void GeoShapeUnion::extent (double& xmin, double& ymin, double& zmin,
@@ -47,6 +43,11 @@ void GeoShapeUnion::extent (double& xmin, double& ymin, double& zmin,
   xmax = std::max(xmaxA, xmaxB);
   ymax = std::max(ymaxA, ymaxB);
   zmax = std::max(zmaxA, zmaxB);
+}
+
+bool GeoShapeUnion::contains (double x, double y, double z) const
+{
+  return (getOpA()->contains(x, y, z)) ? true : getOpB()->contains(x, y, z);
 }
 
 const std::string & GeoShapeUnion::type () const

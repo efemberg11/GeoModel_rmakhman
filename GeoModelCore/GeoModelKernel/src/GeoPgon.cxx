@@ -24,7 +24,7 @@ GeoPgon::~GeoPgon()
 double GeoPgon::volume () const
 {
 #ifndef M_PI
-  double M_PI = acos (-1.0);
+  constexpr double M_PI = 3.14159265358979323846;
 #endif
   if (!isValid ())
     throw std::runtime_error ("Volume requested for incomplete polygon");
@@ -51,7 +51,7 @@ void GeoPgon::extent (double& xmin, double& ymin, double& zmin,
                       double& xmax, double& ymax, double& zmax) const
 {
 #ifndef M_PI
-  double M_PI = acos (-1.0);
+  constexpr double M_PI = 3.14159265358979323846;
 #endif
   if (!isValid ())
     throw std::runtime_error ("Extent requested for incomplete polygon");
@@ -95,6 +95,64 @@ void GeoPgon::extent (double& xmin, double& ymin, double& zmin,
     }
     phi += alpha;
   }
+}
+
+bool GeoPgon::contains (double x, double y, double z) const
+{
+#ifndef M_PI
+  constexpr double M_PI = 3.14159265358979323846;
+#endif
+  if (!isValid ()) return false;
+  size_t nz = getNPlanes();
+  if (z < getZPlane(0) || z > getZPlane(nz - 1)) return false;
+
+  constexpr double two_PI = 2.0 * M_PI;
+  double sphi = getSPhi();
+  double dphi = getDPhi();
+  if (dphi < two_PI)
+  {
+    GeoTrf::Vector2D r(x, y);
+    GeoTrf::Vector2D ns(std::sin(sphi), -std::cos(sphi));
+    GeoTrf::Vector2D ne(-std::sin(sphi + dphi), std::cos(sphi + dphi));
+    double ds = ns.dot(r);
+    double de = ne.dot(r);
+    bool in_wedge = (dphi <= M_PI) ? (ds <= 0 && de <= 0) : (ds <= 0 || de <= 0);
+    if (!in_wedge) return false;
+  }
+
+  double r = 0.0;
+  if (x * x + y * y > 0.0)
+  {
+    while (sphi > 0) sphi -= two_PI;
+    while (sphi < 0) sphi += two_PI;
+    double phi = std::atan2(y, x);
+    while (phi < sphi) phi += two_PI;
+
+    if (dphi > two_PI) dphi = two_PI;
+    int nsides = getNSides();
+    double sector = dphi / nsides;
+    int iphi = (phi - sphi) / sector;
+    if (iphi == nsides) iphi--;
+
+    double rot = sphi + sector * (iphi + 0.5);
+    r = std::cos(rot) * x + std::sin(rot) * y;
+  }
+
+  for (size_t k = 0; k < nz - 1; ++k)
+  {
+    double zmin = getZPlane(k);
+    double zmax = getZPlane(k + 1);
+    if (z < zmin || z > zmax || zmin == zmax) continue;
+    double t = (z - zmin) / (zmax - zmin);
+    double rmin1 = getRMinPlane(k);
+    double rmin2 = getRMinPlane(k + 1);
+    double rmin = rmin1 + (rmin2 - rmin1) * t;
+    double rmax1 = getRMaxPlane(k);
+    double rmax2 = getRMaxPlane(k + 1);
+    double rmax = rmax1 + (rmax2 - rmax1) * t;
+    if (r <= rmax && r >= rmin) return true;
+  }
+  return false;
 }
 
 const std::string & GeoPgon::type () const

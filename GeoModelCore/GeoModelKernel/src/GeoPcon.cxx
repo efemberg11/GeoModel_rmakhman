@@ -57,6 +57,44 @@ void GeoPcon::extent (double& xmin, double& ymin, double& zmin,
   GeoShape::diskExtent(rmin, rmax, getSPhi(), getDPhi(), xmin, ymin, xmax, ymax);
 }
 
+bool GeoPcon::contains (double x, double y, double z) const
+{
+#ifndef M_PI
+  constexpr double M_PI = 3.14159265358979323846;
+#endif
+  if (!isValid ()) return false;
+  size_t nz = getNPlanes();
+  if (z < getZPlane(0) || z > getZPlane(nz - 1)) return false;
+
+  if (m_dPhi < 2.0 * M_PI)
+  {
+    GeoTrf::Vector2D r(x, y);
+    GeoTrf::Vector2D ns(std::sin(m_sPhi), -std::cos(m_sPhi));
+    GeoTrf::Vector2D ne(-std::sin(m_sPhi + m_dPhi), std::cos(m_sPhi + m_dPhi));
+    double ds = ns.dot(r);
+    double de = ne.dot(r);
+    bool inwedge = (m_dPhi <= M_PI) ? (ds <= 0 && de <= 0) : (ds <= 0 || de <= 0);
+    if (!inwedge) return false;
+  }
+
+  double rr = x * x + y * y;
+  for (size_t k = 0; k < nz - 1; ++k)
+  {
+    double zmin = getZPlane(k);
+    double zmax = getZPlane(k + 1);
+    if (z < zmin || z > zmax || zmin == zmax) continue;
+    double t = (z - zmin) / (zmax - zmin);
+    double rmin1 = getRMinPlane(k);
+    double rmin2 = getRMinPlane(k + 1);
+    double rmin = rmin1 + (rmin2 - rmin1) * t;
+    double rmax1 = getRMaxPlane(k);
+    double rmax2 = getRMaxPlane(k + 1);
+    double rmax = rmax1 + (rmax2 - rmax1) * t;
+    if (rr <= rmax * rmax && rr >= rmin * rmin) return true;
+  }
+  return false;
+}
+
 const std::string & GeoPcon::type () const
 {
   return s_classType;

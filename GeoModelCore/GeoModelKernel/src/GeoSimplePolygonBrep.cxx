@@ -53,6 +53,22 @@ void GeoSimplePolygonBrep::extent (double& xmin, double& ymin, double& zmin,
   zmax = m_dZ;
 }
 
+bool GeoSimplePolygonBrep::contains (double x, double y, double z) const
+{
+  if (std::abs(z) - m_dZ > 0.0) return false;
+  size_t nv = getNVertices();
+  bool in = false;
+  for (size_t i = 0, k = nv - 1; i < nv; k = i++)
+  {
+    if ((m_yVertices[i] > y) != (m_yVertices[k] > y))
+    {
+      double ctg = (m_xVertices[k] - m_xVertices[i]) / (m_yVertices[k] - m_yVertices[i]);
+      in ^= (x < (y - m_yVertices[i]) * ctg + m_xVertices[i]);
+    }
+  }
+  return in;
+}
+
 const std::string & GeoSimplePolygonBrep::type() const
 {
   return s_classType;

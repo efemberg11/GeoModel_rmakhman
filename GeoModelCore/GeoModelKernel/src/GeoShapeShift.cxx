@@ -55,6 +55,14 @@ void GeoShapeShift::extent (double& xmin, double& ymin, double& zmin,
   }
 }
 
+bool GeoShapeShift::contains (double x, double y, double z) const
+{
+  const GeoShape* shape = getOp();
+  const GeoTrf::Transform3D& trans = getX();
+  GeoTrf::Vector3D p = trans.inverse() * GeoTrf::Vector3D(x, y, z);
+  return shape->contains(p.x(), p.y(), p.z());
+}
+
 const std::string & GeoShapeShift::type () const
 {
   return s_classType;

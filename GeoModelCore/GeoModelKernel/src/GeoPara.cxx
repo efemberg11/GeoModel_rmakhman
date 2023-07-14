@@ -47,6 +47,22 @@ void GeoPara::extent (double& xmin, double& ymin, double& zmin,
   zmax = dz;
 }
 
+bool GeoPara::contains (double x, double y, double z) const
+{
+  double cosPhi = std::cos(m_phi);
+  double sinPhi = std::sin(m_phi);
+  double tanTheta = std::tan(m_theta);
+  double tanAlpha = std::tan(m_alpha);
+
+  double z0 = z;
+  double y0 = y - z0 * tanTheta * sinPhi;
+  double x0 = x - y0 * tanAlpha - z0 * tanTheta * cosPhi;
+  double distx = std::abs(x0) - m_xHalfLength;
+  double disty = std::abs(y0) - m_yHalfLength;
+  double distz = std::abs(z0) - m_zHalfLength;
+  return (std::max(std::max(distx, disty), distz) <= 0.0);
+}
+
 const std::string & GeoPara::type () const
 {
   return s_classType;

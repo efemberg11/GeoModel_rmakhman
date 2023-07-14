@@ -2,9 +2,9 @@
   Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
 */
 
-#include <cmath>
 #include "GeoModelKernel/GeoPolyhedrizeAction.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include <cmath>
 
 #include "GeoModelKernel/GeoEllipticalTube.h"
 const std::string GeoEllipticalTube::s_classType = "EllipticalTube";
@@ -24,9 +24,9 @@ GeoEllipticalTube::~GeoEllipticalTube()
 double GeoEllipticalTube::volume () const
 {
 #ifndef M_PI
-  double M_PI = acos (-1.0);
+  constexpr double M_PI = 3.14159265358979323846;
 #endif
-  return 2 * M_PI * m_xHalfLength * m_yHalfLength * m_zHalfLength;
+  return 2.0 * M_PI * m_xHalfLength * m_yHalfLength * m_zHalfLength;
 }
 
 void GeoEllipticalTube::extent (double& xmin, double& ymin, double& zmin,
@@ -38,6 +38,13 @@ void GeoEllipticalTube::extent (double& xmin, double& ymin, double& zmin,
   xmax = m_xHalfLength;
   ymax = m_yHalfLength;
   zmax = m_zHalfLength;
+}
+
+bool GeoEllipticalTube::contains (double x, double y, double z) const
+{
+  if (std::abs(z) - m_zHalfLength > 0.0) return false;
+  return ((x * x) / (m_xHalfLength * m_xHalfLength) +
+          (y * y) / (m_yHalfLength * m_yHalfLength) <= 1.0);
 }
 
 const std::string & GeoEllipticalTube::type () const

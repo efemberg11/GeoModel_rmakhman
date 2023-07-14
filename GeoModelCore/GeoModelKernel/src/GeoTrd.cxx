@@ -41,6 +41,17 @@ void GeoTrd::extent (double& xmin, double& ymin, double& zmin,
   zmin = -zmax;
 }
 
+bool GeoTrd::contains (double x, double y, double z) const
+{
+  if (std::abs(z) - m_zHalfLength > 0.0) return false;
+  double t = 0.5 * (1.0 + z / m_zHalfLength);
+  double dx = m_xHalfLength1 + (m_xHalfLength2 - m_xHalfLength1) * t;
+  double dy = m_yHalfLength1 + (m_yHalfLength2 - m_yHalfLength1) * t;
+  double distx = std::abs(x) - dx;
+  double disty = std::abs(y) - dy;
+  return (std::max(distx, disty) <= 0.0);
+}
+
 const std::string & GeoTrd::type () const
 {
   return s_classType;

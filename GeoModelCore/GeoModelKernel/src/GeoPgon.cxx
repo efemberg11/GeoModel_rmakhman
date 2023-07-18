@@ -99,44 +99,44 @@ void GeoPgon::extent (double& xmin, double& ymin, double& zmin,
 
 bool GeoPgon::contains (double x, double y, double z) const
 {
-#ifndef M_PI
-  constexpr double M_PI = 3.14159265358979323846;
-#endif
   if (!isValid ()) return false;
   size_t nz = getNPlanes();
   if (z < getZPlane(0) || z > getZPlane(nz - 1)) return false;
 
-  constexpr double two_PI = 2.0 * M_PI;
+  size_t nsides = getNSides();
   double sphi = getSPhi();
   double dphi = getDPhi();
-  if (dphi < two_PI)
-  {
-    GeoTrf::Vector2D r(x, y);
-    GeoTrf::Vector2D ns(std::sin(sphi), -std::cos(sphi));
-    GeoTrf::Vector2D ne(-std::sin(sphi + dphi), std::cos(sphi + dphi));
-    double ds = ns.dot(r);
-    double de = ne.dot(r);
-    bool in_wedge = (dphi <= M_PI) ? (ds <= 0 && de <= 0) : (ds <= 0 || de <= 0);
-    if (!in_wedge) return false;
-  }
+
+  double dangle = dphi / nsides; // sector angle 
+  double dhalfangle = 0.5 * dangle;
+  double cosHalfAngle = std::cos(dhalfangle);
+  double sinHalfAngle = std::sin(dhalfangle);
+  double cosAngle = (cosHalfAngle + sinHalfAngle) * (cosHalfAngle - sinHalfAngle);
+  double sinAngle = 2.0 * cosHalfAngle * sinHalfAngle;
 
   double r = 0.0;
-  if (x * x + y * y > 0.0)
+  double rot = -(sphi + dhalfangle); // initial rotation
+  double cosRot = std::cos(rot);
+  double sinRot = std::sin(rot);
+  bool inwedge = false;
+  for (size_t iside = 0; iside < nsides; ++iside)
   {
-    while (sphi > 0) sphi -= two_PI;
-    while (sphi < 0) sphi += two_PI;
-    double phi = std::atan2(y, x);
-    while (phi < sphi) phi += two_PI;
-
-    if (dphi > two_PI) dphi = two_PI;
-    int nsides = getNSides();
-    double sector = dphi / nsides;
-    int iphi = (phi - sphi) / sector;
-    if (iphi == nsides) iphi--;
-
-    double rot = sphi + sector * (iphi + 0.5);
-    r = std::cos(rot) * x + std::sin(rot) * y;
+    double xrot = x * cosRot - y * sinRot;
+    double yrot = x * sinRot + y * cosRot;
+    double dista = sinHalfAngle * xrot + cosHalfAngle * yrot;
+    double distb = sinHalfAngle * xrot - cosHalfAngle * yrot;
+    if (dista >= 0.0 && distb >= 0.0)
+    {
+      r = xrot;
+      inwedge = true;
+      break;
+    }
+    double cosTmp = cosRot;
+    double sinTmp = sinRot;
+    cosRot = cosTmp * cosAngle + sinTmp * sinAngle;
+    sinRot = sinTmp * cosAngle - cosTmp * sinAngle;
   }
+  if (!inwedge) return false;
 
   for (size_t k = 0; k < nz - 1; ++k)
   {

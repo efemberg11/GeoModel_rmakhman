@@ -52,6 +52,13 @@ option(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING "Enable FullSimLight profiling targ
 option(GEOMODEL_BUILD_FSL "Enable the build of FSL and FullSimLight" OFF)
 option(GEOMODEL_BUILD_ATLASEXTENSIONS "Build the Custom ATLAS Extensions" OFF)
 
+
+if(GEOMODEL_BUILD_FSL AND GEOMODEL_BUILD_FULLSIMLIGHT)
+  message(STATUS "==> NOTE: You enabled both BUILD_FSL and BUILD_FULLSIMLIGHT. Since BUILD_FSL triggers the build of the FullSimLight package as well, I set BUILD_FULLSIMLIGHT to FALSE to avoid errors of 'double inclusion'")
+  set(GEOMODEL_BUILD_FULLSIMLIGHT FALSE)
+endif()
+
+
 if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
   set(GEOMODEL_BUILD_FULLSIMLIGHT ON CACHE BOOL "Enable the build of FullSimLight" FORCE)
   include(CTest) # needs to be included at the top level
@@ -68,7 +75,6 @@ list( APPEND BUILT_PACKAGES "GeoModelIO")
 if(GEOMODEL_BUILD_ALL)
   set(GEOMODEL_BUILD_TOOLS         TRUE)
   set(GEOMODEL_BUILD_VISUALIZATION TRUE)
-  set(GEOMODEL_BUILD_FULLSIMLIGHT  TRUE)
   set(GEOMODEL_BUILD_FSL           TRUE)
 endif()
 

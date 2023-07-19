@@ -19,8 +19,6 @@ The example program:
 
 To build the GeoModelExamples please refer to the documentation at [GeoModel website](https://geomodel.web.cern.ch/home/)
 
-
-
 ## Run `hellogeoRead2G4`
 
 Get sample geometry data to play with:

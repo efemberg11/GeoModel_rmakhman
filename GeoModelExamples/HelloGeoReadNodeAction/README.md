@@ -13,47 +13,9 @@ The example program:
  The example program uses many of the GeoModel packages.
 
 
-## Dependencies
-
-### Install Qt5
-
-To build and run GeoModel libraries, you must have a working Qt5 installation on your computer.
-If you are not sure how to install it, please take a look at the Appendix on Qt5, below.
-
-### Build GeoModelCore
-
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelCore.git
-mkdir build_gmcore
-cd build_gmcore
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelCore
-make -j 4
-make install
-```
-
-### Build GeoModelIO
-
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelIO.git
-mkdir build_gmio
-cd build_gmio
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelIO
-make -j 4
-make install
-```
-
 ## Build
 
-From your work folder:
-
-```bash
-git clone ssh://git@gitlab.cern.ch:7999/GeoModelDev/GeoModelExamples.git
-mkdir build_hellogeoReadNodeAction
-cd build_hellogeoReadNodeAction
-cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=RelWithDebInfo ../GeoModelExamples/HelloGeoReadNodeAction
-make -j4
-make install
-```
+To build the GeoModelExamples please refer to the documentation at [GeoModel website](https://geomodel.web.cern.ch/home/)
 
 ## Run
 
@@ -69,14 +31,3 @@ Now, you can run the example by typing:
 ```bash
 ./hellogeoReadNodeAction geometry.db
 ```
-
-
- ----
-
-## Appendix
-
-### Notes on Qt5
-
-To build and run GeoModel I/O libraries, you must have a working Qt5 installation on your computer. Qt5 classes are used for I/O operations with the underlying SQLite daemon, to store/handle data, and to handle logging.
-
-If you are not sure how to install it, please take a look at [the notes on Qt5, in the GeoModelIO repository](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/blob/master/README_QT5_NOTES.md).

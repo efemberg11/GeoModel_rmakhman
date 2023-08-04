@@ -1,7 +1,7 @@
 // Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 /*
- * HelloGeo.cpp
+ * HelloGeoWrite.cpp
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Apr, 2019

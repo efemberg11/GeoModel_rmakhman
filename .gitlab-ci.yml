@@ -559,7 +559,7 @@ docs-deploy:
     stage: step-B
     needs: ["docs-build"]
     rules:
-      - if: '$CI_COMMIT_BRANCH == "master"' # Deploy, only if changes are pushed to master.
+      - if: '$CI_COMMIT_BRANCH == "main"' # Deploy, only if changes are pushed to main.
         changes:
         - documentation/**/*
     variables:
@@ -579,12 +579,12 @@ docs-deploy:
 
 ## Build a 'base' Docker image
 ## containing the GeoModel base packages
-##  Note: we build the docker image only from 'master' and tags
+##  Note: we build the docker image only from 'main' and tags
 build_system_docker:
   stage: step-A
   only:
     refs:
-      - master
+      - main
       - tags
   variables:
     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
@@ -600,15 +600,15 @@ build_system_docker:
 ##  Construct one Docker image containing
 ##  also Geant4
 ##  Note:
-##  - we build the docker image only from 'master' and tags
-##  - image's final name is, e.g., "geomodel:master-base"
+##  - we build the docker image only from 'main' and tags
+##  - image's final name is, e.g., "geomodel:main-base"
 ##
 build_full_docker:
   stage: step-B
   allow_failure: true
   only:
     refs:
-      - master
+      - main
       - tags
   variables:
     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-full
@@ -628,14 +628,14 @@ build_full_docker:
 ##  Construct one Docker image only for
 ##  viewer puposes
 ##  Note:
-##  - we build the docker image only from 'master' and tags
-##  - image's final name is, e.g., "geomodel:master-light"
+##  - we build the docker image only from 'main' and tags
+##  - image's final name is, e.g., "geomodel:main-light"
 ##
 build_light_docker:
   stage: step-B
   only:
     refs:
-      - master
+      - main
       - tags
   variables:
     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-light

@@ -4,11 +4,12 @@
 
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include <cmath>
 #include <iostream>
 
 const std::string GeoTwistedTrap::s_classType = "TwistedTrap";
 const ShapeType GeoTwistedTrap::s_classTypeID = 0x19; //this code should not be used by other shapes
- 
+
 
 GeoTwistedTrap::GeoTwistedTrap(double  pPhiTwist,
                                double  pDx1,
@@ -16,16 +17,16 @@ GeoTwistedTrap::GeoTwistedTrap(double  pPhiTwist,
                                double  pDy,
                                double  pDz )
 : m_theta(0.),
-m_phi(0.),
-m_dy1(pDy),
-m_dx1(pDx1),
-m_dx2(pDx2),
-m_dy2(pDy),
-m_dx3(pDx1),
-m_dx4(pDx2),
-m_dz(pDz),
-m_alph(0.),
-m_phiTwist(pPhiTwist)
+  m_phi(0.),
+  m_dy1(pDy),
+  m_dx1(pDx1),
+  m_dx2(pDx2),
+  m_dy2(pDy),
+  m_dx3(pDx1),
+  m_dx4(pDx2),
+  m_dz(pDz),
+  m_alph(0.),
+  m_phiTwist(pPhiTwist)
 {
 }
 
@@ -42,16 +43,16 @@ GeoTwistedTrap(double  pPhiTwist,  // twist angle
                double  pDx4,    // half x length at +pDz,+pDy
                double  pAlph )  // tilt angle
 : m_theta(pTheta),
-m_phi(pPhi),
-m_dy1(pDy1),
-m_dx1(pDx1),
-m_dx2(pDx2),
-m_dy2(pDy2),
-m_dx3(pDx3),
-m_dx4(pDx4),
-m_dz(pDz),
-m_alph(pAlph),
-m_phiTwist(pPhiTwist)
+  m_phi(pPhi),
+  m_dy1(pDy1),
+  m_dx1(pDx1),
+  m_dx2(pDx2),
+  m_dy2(pDy2),
+  m_dx3(pDx3),
+  m_dx4(pDx4),
+  m_dz(pDz),
+  m_alph(pAlph),
+  m_phiTwist(pPhiTwist)
 {
      if  ( ! ( ( m_dx1  > 2*m_CarTolerance)
             && ( m_dx2  > 2*m_CarTolerance)
@@ -60,9 +61,9 @@ m_phiTwist(pPhiTwist)
             && ( m_dy1  > 2*m_CarTolerance)
             && ( m_dy2  > 2*m_CarTolerance)
             && ( m_dz   > 2*m_CarTolerance)
-            && ( std::fabs(m_phiTwist) > 2*m_AngTolerance )
-            && ( std::fabs(m_phiTwist) < SYSTEM_OF_UNITS::pi/2 )
-            && ( std::fabs(m_alph) < SYSTEM_OF_UNITS::pi/2 )
+            && ( std::abs(m_phiTwist) > 2*m_AngTolerance )
+            && ( std::abs(m_phiTwist) < SYSTEM_OF_UNITS::pi/2 )
+            && ( std::abs(m_alph) < SYSTEM_OF_UNITS::pi/2 )
             && ( m_theta < SYSTEM_OF_UNITS::pi/2 && m_theta >= 0 ) )
          )
      {
@@ -79,7 +80,7 @@ m_phiTwist(pPhiTwist)
                << " theta should be >= 0 and < "<< (SYSTEM_OF_UNITS::pi/2)/SYSTEM_OF_UNITS::deg << " deg"<< std::endl
                << " tilt angle alpha should be < "<< (SYSTEM_OF_UNITS::pi/2)/SYSTEM_OF_UNITS::deg << " deg"<<std::endl
                << std::endl;
-    
+
      }
 }
 
@@ -94,6 +95,65 @@ double GeoTwistedTrap::volume () const
                  (m_dx4 + m_dx3 - m_dx2 - m_dx1) * (m_dy2 - m_dy1) * (1./3.));
 }
 
+void GeoTwistedTrap::extent (double& xmin, double& ymin, double& zmin,
+                             double& xmax, double& ymax, double& zmax) const
+{
+  double cosPhi = std::cos(m_phi);
+  double sinPhi = std::sin(m_phi);
+  double tanTheta = std::tan(m_theta);
+  double tanAlpha = std::tan(m_alph);
+
+  double xmid1 = m_dy1 * tanAlpha;
+  double x1 = std::abs(xmid1 + m_dx1);
+  double x2 = std::abs(xmid1 - m_dx1);
+  double x3 = std::abs(xmid1 + m_dx2);
+  double x4 = std::abs(xmid1 - m_dx2);
+  double xmax1 = std::max(std::max(std::max(x1, x2), x3), x4);
+  double rmax1 = std::hypot(xmax1, m_dy1);
+
+  double xmid2 = m_dy2 * tanAlpha;
+  double x5 = std::abs(xmid2 + m_dx3);
+  double x6 = std::abs(xmid2 - m_dx3);
+  double x7 = std::abs(xmid2 + m_dx4);
+  double x8 = std::abs(xmid2 - m_dx4);
+  double xmax2 = std::max(std::max(std::max(x5, x6), x7), x8);
+  double rmax2 = hypot(xmax2, m_dy2);
+
+  double x0 = m_dz * tanTheta * cosPhi;
+  double y0 = m_dz * tanTheta * sinPhi;
+  xmin = std::min(-x0 - rmax1, x0 - rmax2);
+  ymin = std::min(-y0 - rmax1, y0 - rmax2);
+  xmax = std::max(-x0 + rmax1, x0 + rmax2);
+  ymax = std::max(-y0 + rmax1, y0 + rmax2);
+  zmin =-m_dz;
+  zmax = m_dz;
+}
+
+bool GeoTwistedTrap::contains (double x, double y, double z) const
+{
+  double z0 = z;
+  if (std::abs(z0) - m_dz > 0.0) return false;
+  double tz = 0.5 * (1.0 + z0 / m_dz);
+
+  double twist = -0.5 * m_phiTwist + m_phiTwist * tz;
+  double cosTwist = std::cos(-twist);
+  double sinTwist = std::sin(-twist);
+  double tanTheta = std::tan(m_theta);
+  double xc = z0 * tanTheta * std::cos(m_phi);
+  double yc = z0 * tanTheta * std::sin(m_phi);
+
+  double dy = m_dy1 + (m_dy2 - m_dy1) * tz;
+  double y0 = sinTwist * (x - xc) + cosTwist * (y - yc);
+  if (std::abs(y0) - dy > 0.0) return false;
+  double ty = 0.5 * (1.0 + y0 / dy);
+
+  double dxneg = m_dx1 + (m_dx3 - m_dx1) * tz;
+  double dxpos = m_dx2 + (m_dx4 - m_dx2) * tz;
+  double dx = dxneg + (dxpos - dxneg) * ty;
+  double x0 = cosTwist * (x - xc) - sinTwist * (y - yc) - y0 * std::tan(m_alph);
+  return (std::abs(x0) - dx <= 0.0);
+}
+
 const std::string & GeoTwistedTrap::type () const
 {
   return s_classType;
@@ -104,7 +164,7 @@ ShapeType GeoTwistedTrap::typeID () const
   return s_classTypeID;
 }
 
-void GeoTwistedTrap::exec (GeoShapeAction *action) const
+void GeoTwistedTrap::exec (GeoShapeAction* action) const
 {
-  action->handleTwistedTrap(this); 
+  action->handleTwistedTrap(this);
 }

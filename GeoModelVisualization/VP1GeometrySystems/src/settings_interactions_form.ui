@@ -77,7 +77,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In the case where either the selected volume or one its daugthers (or daughters daughters, etc.), is defined as a boolean volume, this might not give an entirely accurate result.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Mass (unreliable)</string>
+         <string>Mass (slow!)</string>
         </property>
        </widget>
       </item>

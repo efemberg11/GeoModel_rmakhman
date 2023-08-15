@@ -1126,11 +1126,17 @@ double VP1GeometrySystem::Imp::inclusiveMass(const PVConstLink& pv) {
 
   GeoVolumeCursor av(pv);
   while (!av.atEnd()) {
-    mass += inclusiveMass(av.getVolume());
-    mass -= volume(av.getVolume())*density;
+    std::string materialName=av.getVolume()->getLogVol()->getMaterial()->getName();
+    
+    if (QString(materialName.c_str()).endsWith("Ether") || QString(materialName.c_str()).endsWith("HyperUranium")) {
+      // Do nothing.  These are not real volumes. 
+    }
+    else {
+      double delta =  inclusiveMass(av.getVolume()) -  (volume(av.getVolume())*density);
+      mass += delta;
+    }
     av.next();
   }
-
   return mass;
 }
 

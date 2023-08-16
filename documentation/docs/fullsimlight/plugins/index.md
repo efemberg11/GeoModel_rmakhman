@@ -13,36 +13,36 @@ For a description of the available example plugins look at the following section
 
 ##Geometry plugins
 
-Some geometry example plugins are available at the [GeoModelATLAS](https://gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS) repository, under the [Example Plugins](https://gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS/-/tree/master/ExamplePlugins) folder. The `ToyGeometryPlugin` and the `AccordionPlugin` are the right examples to start with. 
+Some geometry example plugins are available at the [GeoModelATLAS](https://gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS) repository, under the [Example Plugins](https://gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS/-/tree/main/ExamplePlugins) folder. The `ToyGeometryPlugin` and the `AccordionPlugin` are the right examples to start with. 
 
 ##User Actions plugins
 
-You can find some example user actions plugins under the FullSimLight/Plugins folder. In particular we provide a DummyUserAction plugin available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/Examples/UserActionPlugins) and a [Hits plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/HitsPlugin) and a [Track plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/TracksPlugin). 
+You can find some example user actions plugins under the FullSimLight/Plugins folder. In particular we provide a DummyUserAction plugin available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/Examples/UserActionPlugins) and a [Hits plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/HitsPlugin) and a [Track plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/TracksPlugin). 
 
 ###Hits Plugin
 
-The [Hits plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/HitsPlugin) implements both `G4UserSteppingAction` and `G4UserEventAction`. At each step the particle position (x,y,z coordinates) is saved and at the end of the event the hits are saved into a HDF5 output file. The same file can be in a second step visualized in `gmex`.
+The [Hits plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/HitsPlugin) implements both `G4UserSteppingAction` and `G4UserEventAction`. At each step the particle position (x,y,z coordinates) is saved and at the end of the event the hits are saved into a HDF5 output file. The same file can be in a second step visualized in `gmex`.
 
 ###Tracks Plugin
 
-The [Tracks Plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/TracksPlugin) implements `G4UserRunAction`, `G4UserEventAction`, `G4UserSteppingAction`, `G4UserTrackingAction`. For each track at each step the position is recorded and mapped into a map. At the end of the event the information is saved into a HDF5 output file (the default name is Tracks_data.h5). The tracks file data can be in a second step visualized in `gmex`.
+The [Tracks Plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/TracksPlugin) implements `G4UserRunAction`, `G4UserEventAction`, `G4UserSteppingAction`, `G4UserTrackingAction`. For each track at each step the position is recorded and mapped into a map. At the end of the event the information is saved into a HDF5 output file (the default name is Tracks_data.h5). The tracks file data can be in a second step visualized in `gmex`.
 
 ##Sensitive Detectors plugins
 
-One sensitive detectors example plugin is provided [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/master/FullSimLight/Plugins/Examples/SensitiveDetectorPlugins/SDPlugin/src/SDPlugin.cxx). It's a dummy plugin that serves the purpose of showing how to implement the corresponding FullSimLight abstract interface. 
+One sensitive detectors example plugin is provided [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/main/FullSimLight/Plugins/Examples/SensitiveDetectorPlugins/SDPlugin/src/SDPlugin.cxx). It's a dummy plugin that serves the purpose of showing how to implement the corresponding FullSimLight abstract interface. 
 
 ##Magnetic Field plugins
 
-An example Magnetic field plugin can be found [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/Examples/MagneticFieldPlugins/UniformMagneticFieldPlugin). It implements a uniform magnetic field. 
+An example Magnetic field plugin can be found [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/Examples/MagneticFieldPlugins/UniformMagneticFieldPlugin). It implements a uniform magnetic field. 
 An ATLAS specific Magnetic Field plugin is also available in the [ATLAS Extensions](https://gitlab.cern.ch/atlas/geomodelatlas/ATLASExtensions) repository. Please refer to the ATLAS Extensions page for further info.
 
 ##Physics list plugins
 
-A physics list plugin example is available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/Examples/PhysicsListPlugins/FSLTestPhysListPlugins). It implements a custom physics list that is based on the standard `FTFP_BERT`, adding the `G4OpticalPhysics` process. 
+A physics list plugin example is available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/Examples/PhysicsListPlugins/FSLTestPhysListPlugins). It implements a custom physics list that is based on the standard `FTFP_BERT`, adding the `G4OpticalPhysics` process. 
 
 ##Event Generators plugins
 
-An Event generator example plugin is available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/FullSimLight/Plugins/Examples/EventGeneratorPlugins/FSLExamplePrimaryGeneratorPlugin). 
+An Event generator example plugin is available [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/Examples/EventGeneratorPlugins/FSLExamplePrimaryGeneratorPlugin). 
 It shows how to customize the use of the `G4ParticleGun`and set some properties as the particle type, name, energy, position, polarization, and momentum direction. 
 
 ## How to write a plugin: the Hits Plugin example

@@ -14,7 +14,7 @@ For instructions on how to build FullSimLight, please refer to the [Build FullSi
 
 ### Geometry:
 
-The supported geometry formats are SQLite (.db), GDML (.gdml) and plugins that build from scratch a GeoModel geometry (.dylib/.so). An example of geometry plugins can be found in the [GeoModelExamples folder](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/master/GeoModelExamples/KitchenSinkPlugin). 
+The supported geometry formats are SQLite (.db), GDML (.gdml) and plugins that build from scratch a GeoModel geometry (.dylib/.so). An example of geometry plugins can be found in the [GeoModelExamples folder](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/GeoModelExamples/KitchenSinkPlugin). 
 Use the -g flag to specify the name of the input geometry file. 
 
 ### ATLAS Geometry Files:

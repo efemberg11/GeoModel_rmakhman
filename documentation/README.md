@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.cern.ch/GeoModelDev/documentation/badges/master/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/documentation/commits/master)
+[![pipeline status](https://gitlab.cern.ch/GeoModelDev/documentation/badges/main/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/documentation/commits/main)
 
 
 # GeoModel - A Detector Description Toolkit for HEP experiments

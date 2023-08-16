@@ -3,7 +3,7 @@
 This package contains a modernised version of Nigel Hessey's GeoModelXml to be 
 used with `gmex` (GeoModelExplorer) and the corresponding plugin (GMXPlugin)
 
-Installation requires that the [GeoModel](https://gitlab.cern.ch/GeoModelDev/GeoModel) suite is installed. Please refer to https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/master/README.md for additional documentation.
+Installation requires that the [GeoModel](https://gitlab.cern.ch/GeoModelDev/GeoModel) suite is installed. Please refer to https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/main/README.md for additional documentation.
 
 
 ## Nigel's documentation

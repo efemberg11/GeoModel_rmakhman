@@ -41,22 +41,22 @@ The answer is:
 ...
 ```
 
-Get only the pipelines for branch `master`:
+Get only the pipelines for branch `main`:
 
 ```
-curl  "https://gitlab.cern.ch/api/v4/projects/95156/pipelines?ref=master"
+curl  "https://gitlab.cern.ch/api/v4/projects/95156/pipelines?ref=main"
 ```
 
-Get only the pipelines for branch `master` and with status `success`:
+Get only the pipelines for branch `main` and with status `success`:
 
 ```
-curl  "https://gitlab.cern.ch/api/v4/projects/95156/pipelines?ref=master&status=success"
+curl  "https://gitlab.cern.ch/api/v4/projects/95156/pipelines?ref=main&status=success"
 ```
 
 Get the latest successful pipeline, just the latest one:
 
 ```
-curl -v -H "Content-Type: application/json" "https://gitlab.cern.ch/api/v4/projects/95156/pipelines?ref=master&status=success&per_page=1&page=1"
+curl -v -H "Content-Type: application/json" "https://gitlab.cern.ch/api/v4/projects/95156/pipelines?ref=main&status=success&per_page=1&page=1"
 ```
 
 To get the JSON content from the curl response, you can use `jq`, the JSON processor. On macOS, you can install `jq` with Homebrew: `brew install jq`. 
@@ -64,7 +64,7 @@ To get the JSON content from the curl response, you can use `jq`, the JSON proce
 For example, get the `web_url` link for the latest successful pipeline:
 
 ```
-curl -v -H "Content-Type: application/json" "https://gitlab.cern.ch/api/v4/projects/95156/pipelines?ref=master&status=success&per_page=1&page=1" | jq -r '.[0] | .web_url'
+curl -v -H "Content-Type: application/json" "https://gitlab.cern.ch/api/v4/projects/95156/pipelines?ref=main&status=success&per_page=1&page=1" | jq -r '.[0] | .web_url'
 ```
 
 Then, to get the DAG page from the latest pipeline, just use the link from above and add “dag”:

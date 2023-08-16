@@ -169,7 +169,7 @@ wget http://cern.ch/atlas-software-dist-eos/externals/Simage/Coin3D-simage-2c958
 unzip Coin3D-simage-2c958a61ea8b.zip
 cd Coin3D-simage-2c958a61ea8b
 ./configure --prefix=$PWD/../install
-wget -O cc7.patch https://gitlab.cern.ch/atlas/atlasexternals/-/raw/master/External/Simage/patches/libpng_centos7.patch?inline=false 
+wget -O cc7.patch https://gitlab.cern.ch/atlas/atlasexternals/-/raw/main/External/Simage/patches/libpng_centos7.patch?inline=false 
 patch -p1 < cc7.patch
 make -j4
 make install 
@@ -185,7 +185,7 @@ Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package
 ```bash
 # Build Coin3D
 wget https://geomodel.web.cern.ch/sources/coin-5a97506-20210210.zip -O coin.zip
-unzip coin.zip; mv coin-master coin
+unzip coin.zip; mv coin-* coin
 mkdir build_coin
 cd build_coin
 cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release -DCOIN_BUILD_TESTS=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../coin
@@ -207,7 +207,7 @@ cd ..
 
 ## Quick instructions - Build everything
 
-With these instructions you will build the whole software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](../about/contacts.md). 
+With these instructions you will build the whole software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'main' branch. If something does not compile, please [let the developers' team know](../about/contacts.md). 
 
 With these instructions, you will build: `GeoModelCore`, `GeoModelIO`, `GeoModelTools`, `GeoModelVisualization` (a.k.a., `gmex`).
 

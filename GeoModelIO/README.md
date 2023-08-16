@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/badges/master/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/commits/master)
+[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/badges/main/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/commits/main)
 
 # GeoModelIO
 
@@ -59,7 +59,7 @@ export GEOMODEL_ENV_IO_NTHREADS=-1
 
 If you want to work on the library code, or if you want to use the latest version of the code, you have to build it by yourself.
 
-First, install or build the [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore) dependency, by following [its instructions](https://gitlab.cern.ch/GeoModelDev/GeoModelCore/blob/master/README.md).
+First, install or build the [GeoModelCore](https://gitlab.cern.ch/GeoModelDev/GeoModelCore) dependency, by following [its instructions](https://gitlab.cern.ch/GeoModelDev/GeoModelCore/blob/main/README.md).
 
 Then, get the code of this library and compile it:
 

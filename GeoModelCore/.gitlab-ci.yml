@@ -68,6 +68,6 @@ deploying:
       "EOS_PATH": "/eos/project/g/geomodel/www/doxygen"
     image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer
     only:
-        - master
+        - main
     script:
         - deploy-eos

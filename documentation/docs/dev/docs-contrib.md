@@ -33,7 +33,7 @@ Thus, if you only want to update the documentation, you can merely:
 1. fork the GeoModel repository
 2. edit the documentation files you want to update
 3. push your changes
-4. create a Merge Request to get your changes merged into the GeoModel `master` branch
+4. create a Merge Request to get your changes merged into the GeoModel `main` branch
 
 However, if you want to preview your changes on your machine---and we recommend that---, you need to install `MkDocs` on your machine.
 

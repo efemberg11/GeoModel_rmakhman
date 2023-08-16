@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelExamples/badges/master/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelExamples/commits/master)
+[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelExamples/badges/main/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelExamples/commits/main)
 
 # GeoModelExamples
 
@@ -91,4 +91,4 @@ You can visualize it by opening it with VP1Light. Please refer to the [Visualiza
 
 To build and run GeoModel I/O libraries, you must have a working Qt5 installation on your computer. Qt5 classes are used for I/O operations with the underlying SQLite daemon, to store/handle data, and to handle logging.
 
-If you are not sure how to install it, please take a look at [the notes on Qt5, in the GeoModelIO repository](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/blob/master/README_QT5_NOTES.md).
+If you are not sure how to install it, please take a look at [the notes on Qt5, in the GeoModelIO repository](https://gitlab.cern.ch/GeoModelDev/GeoModelIO/blob/main/README_QT5_NOTES.md).

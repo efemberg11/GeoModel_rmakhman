@@ -70,7 +70,7 @@ To use Pythia one can select one of the pre-customized options which are
 - higgs
 - minbias
 
-Details about the default options can be found in the `PythiaPrimaryGeneratorAction` [class](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/master/FullSimLight/src/PythiaPrimaryGeneratorAction.cc). 
+Details about the default options can be found in the `PythiaPrimaryGeneratorAction` [class](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/main/FullSimLight/src/PythiaPrimaryGeneratorAction.cc). 
 Alternatively one can also provide a custom Pythia configuration input file. 
 
 ### 3. HepMC3 File

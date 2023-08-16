@@ -1709,9 +1709,8 @@ unsigned int WriteGeoModel::addFullPhysVol(
     unsigned int idx = addRecord(container, values);
     if (isRootVolume) {
         std::vector<std::string> rootValues;
-        //    rootValues << QString::number(idx) << "GeoFullPhysVol";
         rootValues.insert(rootValues.begin(),
-                          {std::to_string(idx), "GeoPhysVol"});  // INT
+                          {std::to_string(idx), "GeoFullPhysVol"});  // INT
         m_rootVolume = rootValues;
     }
     return idx;

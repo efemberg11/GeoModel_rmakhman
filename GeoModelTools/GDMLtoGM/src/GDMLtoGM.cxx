@@ -31,7 +31,7 @@ class GDMLtoGM : public GeoVGeometryPlugin  {
   ~GDMLtoGM();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, bool publish = false ) override;
+  virtual void create(GeoVPhysVol *world, bool publish = false ) override;
 
  private:
 
@@ -43,12 +43,11 @@ class GDMLtoGM : public GeoVGeometryPlugin  {
 
 
 GDMLtoGM::~GDMLtoGM()
-{
-}
+{}
 
 
 //## Other Operations (implementation)
-void GDMLtoGM::create(GeoPhysVol *world, bool /* 'publish' is not used here */)
+void GDMLtoGM::create(GeoVPhysVol *world, bool /* 'publish' is not used here */)
 {
 	char* fPath=getenv("GDML_FILE_NAME");
 	std::string fileName;

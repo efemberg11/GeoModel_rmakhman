@@ -51,7 +51,7 @@ variables:
 .ubuntu-template-job-default: &ubuntu-job
   <<: *ubuntu-job-base
   before_script:
-    - apt-get update -qq && apt-get install -y -qq git wget unzip build-essential freeglut3-dev libboost-all-dev qtbase5-dev libqt5opengl5-dev mercurial libeigen3-dev libsqlite3-dev nlohmann-json3-dev libexpat1-dev libxerces-c-dev libhdf5-dev libhepmc3-dev cmake
+    - apt-get update -qq && apt-get install -y -qq apt-utils git wget unzip build-essential freeglut3-dev libboost-all-dev qtbase5-dev libqt5opengl5-dev mercurial libeigen3-dev libsqlite3-dev nlohmann-json3-dev libexpat1-dev libxerces-c-dev libhdf5-dev libhepmc3-dev cmake
 
 
 # .ubuntu-template-job-registry: &ubuntu-job-registry

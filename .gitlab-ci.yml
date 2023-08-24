@@ -579,6 +579,7 @@ docs-deploy:
 ### Docker images ###
 #####################
 
+## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
 ## Build a 'base' Docker image
 ## containing the GeoModel base packages
 ##  Note: we build the docker image only from 'main' and tags
@@ -599,6 +600,9 @@ build_system_docker:
   script:
     - ignore
 
+
+
+## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
 ##  Construct one Docker image containing
 ##  also Geant4
 ##  Note:
@@ -627,6 +631,8 @@ build_full_docker:
     - build_system_docker
   timeout: 2h 0m 
 
+
+## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
 ##  Construct one Docker image only for
 ##  viewer puposes
 ##  Note:

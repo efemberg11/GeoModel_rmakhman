@@ -12,6 +12,7 @@ if( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND
    "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" )
    target_compile_options( gmcat PRIVATE "-gdwarf-2" )
 endif()
+target_compile_options( gmcat PRIVATE "-DGMVERSION=${GeoModel_VERSION}" )
 
 # Install the executable.
 install( TARGETS gmcat

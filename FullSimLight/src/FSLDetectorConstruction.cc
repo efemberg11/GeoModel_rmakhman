@@ -108,7 +108,7 @@ FSLDetectorConstruction::~FSLDetectorConstruction()
   delete fDetectorMessenger;
 }
 
-GeoPhysVol*  FSLDetectorConstruction::CreateTheWorld(GeoPhysVol* world)
+GeoVPhysVol*  FSLDetectorConstruction::CreateTheWorld(GeoVPhysVol* world)
 {
     if (world == nullptr)
     {
@@ -139,7 +139,7 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 {
     fTimer.Start();
 
-    GeoPhysVol* world = nullptr;
+    GeoVPhysVol* world = nullptr;
     G4LogicalVolume* envelope;
     if (fGeometryFileName.contains(".dylib") || fGeometryFileName.contains(".so"))
     {

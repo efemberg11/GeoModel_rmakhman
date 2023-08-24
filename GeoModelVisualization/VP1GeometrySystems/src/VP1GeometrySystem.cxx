@@ -127,9 +127,9 @@ public:
   std::map<SoSeparator*,VolumeHandle*> sonodesep2volhandle;
   //Might be needed later:  std::map<GeoPVConstLink,VolumeHandle*> pv2volhandle;
 
-  GeoPhysVol* getGeometry();
-  GeoPhysVol* createTheWorld(GeoPhysVol* world = nullptr);
-  GeoPhysVol* getGeometryFromLocalDB();
+  GeoVPhysVol* getGeometry();
+  GeoVPhysVol* createTheWorld(GeoVPhysVol* world = nullptr);
+  GeoVPhysVol* getGeometryFromLocalDB();
 
   SoTexture2* getDummyTexture();
   SoMaterial* getDummyMaterial();
@@ -496,13 +496,13 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
 }
 
 //_____________________________________________________________________________________
-GeoPhysVol* VP1GeometrySystem::Imp::getGeometry()
+GeoVPhysVol* VP1GeometrySystem::Imp::getGeometry()
 {
   return getGeometryFromLocalDB(); // for production
 }
 
 //_____________________________________________________________________________________
-GeoPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoPhysVol* world)
+GeoVPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoVPhysVol* world)
 {
   if (world == nullptr)
   {
@@ -529,7 +529,7 @@ QString VP1GeometrySystem::Imp::selectGeometryFile() {
 }
 
 //_____________________________________________________________________________________
-GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
+GeoVPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 {
 
   QString path;
@@ -554,7 +554,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
 
   if (path=="") return nullptr;
 
-  GeoPhysVol *world=getenv("GX_GEOMETRY_FILE1") ? createTheWorld(nullptr) : nullptr;
+  GeoVPhysVol *world=getenv("GX_GEOMETRY_FILE1") ? createTheWorld(nullptr) : nullptr;
 
   int g=0;
   while (path!="") {
@@ -572,7 +572,7 @@ GeoPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
 
       /* build the GeoModel geometry */
-      GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+      GeoVPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
       if (world) {
 

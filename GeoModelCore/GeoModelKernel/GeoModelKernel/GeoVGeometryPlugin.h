@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOVGEOMETRYPLUGIN_H
@@ -33,7 +33,7 @@ class GeoVGeometryPlugin
 
   //! Create the system geometry.
   /// Note: this is a pure virtual method, so you need to implement it in your derived plugin class
-  virtual void create ( GeoPhysVol* world, bool publish = false ) = 0;
+  virtual void create ( GeoVPhysVol* world, bool publish = false ) = 0;
 
   //! Returns the plugin's name
   std::string getName() { return m_pluginName; }

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2018 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -32,7 +32,7 @@ class GMXPlugin : public GeoVGeometryPlugin  {
   ~GMXPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, bool publish) override;
+  virtual void create(GeoVPhysVol *world, bool publish) override;
 
  private:
 
@@ -79,7 +79,7 @@ GMXPlugin::~GMXPlugin()
 
 
 //## Other Operations (implementation)
-void GMXPlugin::create(GeoPhysVol *world, bool publish)
+void GMXPlugin::create(GeoVPhysVol *world, bool publish)
 {  
   std::cout<< "This is GMXPlugin: creating a GeoModelXml detector "<<std::endl;
   std::vector<std::string> filesToParse;

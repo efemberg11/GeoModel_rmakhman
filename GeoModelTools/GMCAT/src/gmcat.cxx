@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration   
+ *   Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration   
 */
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
@@ -24,81 +24,23 @@
 #include <cstdio>
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/utsname.h>
 
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 #ifdef __APPLE__
 const std::string shared_obj_extension=".dylib";
 #else
 const std::string shared_obj_extension=".so";
 #endif
 
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
-#define STR_VALUE(arg) #arg
-#define STR_NAME(name) STR_VALUE(name)
 
-std::string getCommandOutput(const std::string & cmd, bool firstLineOnly=false)
-{
-  std::string response;
-  // Ceci n'est pas une pipe:
-  FILE *ceci=popen(cmd.c_str(),"r");
-  if (ceci) {
-    static const int MSGSIZE=1024;
-    char buff[MSGSIZE];
-    while (fgets(buff,MSGSIZE,ceci)!=NULL) {
-      response+=std::string(buff);
-      if (firstLineOnly) break;
-    }
-    pclose(ceci);
-  }
-  return response;
-}
-
-
+void publishMetaData( GMDBManager & db,
+		      std::vector<std::string> &inputFiles,
+		      std::vector<std::string> &inputPlugins,
+		      std::string              &outputFile);
 
 int main(int argc, char ** argv) {
 
 
-  struct Metadata {
-    std::string dateString=getCommandOutput("date -Im");
-    std::string username=getlogin();
-    std::string hostname;
-    std::string os;
-    std::string gmversion=STR_NAME(GMVERSION);
-    std::string geoModelDataBranch="Undefined";      // or overwritten below
-    std::string gmdataIsClean     ="Not applicable"; // or overwritten below
-    std::string gmdataCommitHash  ="Undefined";      // or overwritten below
-  } metadata;
-
-  //  metadata.dateString=getCommandOutput("date -Im");
-  //  metadata.username=getlogin();
-  char buff[1024];
-  gethostname(buff,1024);
-  metadata.hostname=buff;
- 
-  utsname uts;
-  uname (&uts);
-  metadata.os=std::string(uts.sysname)+  "-" + std::string(uts.machine);
-
-  char *geomodel_xml_dir=getenv("GEOMODEL_XML_DIR");
-  if (geomodel_xml_dir)  {
-    {
-      metadata.geoModelDataBranch=getCommandOutput("git -C "+ std::string(geomodel_xml_dir) + " rev-parse --abbrev-ref HEAD");
-      std::string shortGitStatus=getCommandOutput("git -C "+ std::string(geomodel_xml_dir) + " status -s ");
-      if (shortGitStatus!="") {
-	metadata.gmdataIsClean="no";
-      }
-      else {
-	std::string synchedToOrigin=getCommandOutput("git -C "+ std::string(geomodel_xml_dir) + " diff origin/"+metadata.geoModelDataBranch,true);
-	if (synchedToOrigin!="") {
-	  metadata.gmdataIsClean="no";
-	}
-	else {
-	  metadata.gmdataIsClean="yes";
-	  metadata.gmdataCommitHash=getCommandOutput("git -C " + std::string(geomodel_xml_dir) + " log -1 --format=format:\"%H\"");
-	}
-      }
-    }
-  }
 
   //
   // Usage message:
@@ -240,7 +182,7 @@ int main(int argc, char ** argv) {
     GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
 
     /* build the GeoModel geometry */
-    GeoVPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+    GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
     /* get an handle on a Volume Cursor, to traverse the whole set of Volumes */
     GeoVolumeCursor aV(dbPhys);
@@ -271,64 +213,19 @@ int main(int argc, char ** argv) {
     std::cerr << "gmcat -- Error opening the output file: " << outputFile << std::endl;
     return 7;
   }
-  //
-  // Fill the header file with metadata
-  //
-  std::vector<std::string>                                                   gmcatColNames={"Date",
-											    "GeoModelDataBranch",
-											    "Username",
-											    "Hostname",
-											    "OS",
-											    "GeoModelVersion",
-											    "GeoModelDataIsClean",
-											    "GeoModelDataCommitHash"
-  };
-  std::vector<std::string>                                                   gmcatColTypes={"STRING",
-											    "STRING" ,
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING"
-  };
-  std::vector<std::vector<std::variant<int,long,float,double,std::string>>>  gmcatData    ={{
-      metadata.dateString,
-      metadata.geoModelDataBranch,
-      metadata.username,
-      metadata.hostname,
-      metadata.os,
-      metadata.gmversion,
-      metadata.gmdataIsClean,
-      metadata.gmdataCommitHash
-    }};
 
-  unsigned int pcounter(0);
-  for (std::string plugin : inputPlugins) {
-    gmcatColNames.push_back("P"+std::to_string(pcounter++));
-    gmcatColTypes.push_back("STRING");
-    gmcatData[0].push_back((plugin));
-  }
-  unsigned int fcounter(0);
-  for (std::string file : inputFiles) {
-    gmcatColNames.push_back("F"+std::to_string(fcounter++));
-    gmcatColTypes.push_back("STRING");
-    gmcatData[0].push_back(file);
-  }
-  
-  db.createCustomTable("AAHEADER", gmcatColNames,gmcatColTypes,gmcatData); 
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
 
-
   if (vecPluginsPublishers.size() > 0) {
-      dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
+    dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
   } else {
-      dumpGeoModelGraph.saveToDB();
+    dumpGeoModelGraph.saveToDB();
   }
 
   world->unref();
 
-
+  publishMetaData(db,inputFiles,inputPlugins,outputFile);
+  
   return 0;
 }

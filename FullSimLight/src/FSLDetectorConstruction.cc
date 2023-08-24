@@ -139,7 +139,7 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 {
     fTimer.Start();
 
-    GeoVPhysVol* world = nullptr;
+    GeoPhysVol* world = nullptr;
     G4LogicalVolume* envelope;
     if (fGeometryFileName.contains(".dylib") || fGeometryFileName.contains(".so"))
     {
@@ -152,9 +152,8 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 
         }
 
-        world = nullptr;
         world = CreateTheWorld(nullptr);
-        factory->create(dynamic_cast<GeoPhysVol*>(world));
+        factory->create(world);
 
         G4cout << "ReadGeoModel::buildGeoModel() done." << G4endl;
         fTimer.Stop();
@@ -219,10 +218,8 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 
 
         /* build the GeoModel geometry */
-        // builds the whole GeoModel tree in memory
-        // and get an handle to the 'world' volume
-        world = readInGeo.buildGeoModel();
-
+        //GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
+        world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory and get an handle to the 'world' volume
         G4cout << "ReadGeoModel::buildGeoModel() done." << G4endl;
         fTimer.Stop();
         G4cout << "First step done. GeoModelTree built from the SQLite file." << G4endl;

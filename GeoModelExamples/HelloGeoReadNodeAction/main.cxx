@@ -1,4 +1,4 @@
-// Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+// Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 
 /*
  * HelloGeoReadNodeAction.cpp
@@ -30,7 +30,7 @@
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 
-GeoPhysVol* createTheWorld(GeoPhysVol* world)
+GeoVPhysVol* createTheWorld(GeoVPhysVol* world)
 {
   if (world == nullptr)
   {
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
 
   /* build the GeoModel geometry */
-  GeoPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
+  GeoVPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
   std::cout << "ReadGeoModel::buildGeoModel() done." << std::endl;
 
   std::cout << "Reading records from the imported geometry DB file..." << std::endl;
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
   // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
   std::cout << "Getting the 'world' GeoPhysVol, i.e. the root volume of the GeoModel tree" << std::endl;
-  GeoPhysVol* world = createTheWorld(dbPhys);
+  GeoVPhysVol* world = createTheWorld(dbPhys);
   std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;
   const GeoLogVol* logVol = world->getLogVol();
   std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;

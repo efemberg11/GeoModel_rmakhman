@@ -44,7 +44,6 @@ class KitchenSinkPlugin : public GeoVGeometryPlugin  {
 
  public:
 
-<<<<<<< HEAD
   // Constructor:
   KitchenSinkPlugin();
 

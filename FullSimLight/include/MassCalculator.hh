@@ -1,3 +1,7 @@
+/*
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+*/
+
 #ifndef MassCalculator_h
 #define MassCalculator_h 1
 
@@ -44,7 +48,7 @@ public:
     double inclusiveMass(const PVConstLink& pv);
     void calculateMass(G4LogicalVolume* logVol, G4VPhysicalVolume * physVol, std::vector<json>& jlist, double& exclusiveMass, bool writeRep);
     void iterateFromWorldMass(G4LogicalVolume* logVolume, std::vector<json>& jlist, double& inclusiveMass, double& exclusiveMass, G4String prefix, G4String material);
-    void recursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoPhysVol* /*worldgeoModel*/, std::vector<json>& jlist);
+    void recursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoVPhysVol* /*worldgeoModel*/, std::vector<json>& jlist);
     void SetPrefixLogicalVolume(const G4String &prefixLV) { fPrefixLogicalVolume = prefixLV; }
     void SetMaterial(const G4String &material) { fMaterial = material; }
     void SetVerbosity(const int verbosity){ fVerbosityFlag = verbosity; }

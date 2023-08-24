@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2018 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 // -------------------------------------------------------------------
@@ -51,7 +51,7 @@ class KitchenSinkPlugin : public GeoVGeometryPlugin  {
   ~KitchenSinkPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, bool publish=false);
+  virtual void create(GeoVPhysVol *world, bool publish=false);
 
  private:
 
@@ -79,9 +79,8 @@ KitchenSinkPlugin::~KitchenSinkPlugin()
 // example (normally one may "publish" a list of FullPhysVol's and Alignable
 // transforms, but this example has none such).
 //
-void KitchenSinkPlugin::create(GeoPhysVol *world, bool /*publish*/)
-{
-  const double degree=M_PI/180.0;
+void KitchenSinkPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
+  const double degree = M_PI / 180.0;
 
   // Define elements used in this example:
   GeoElement  *oxygen        = new GeoElement("Oxygen",    "O",   19,  39*gram/mole);

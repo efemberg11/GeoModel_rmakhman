@@ -1,4 +1,4 @@
-// Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+// Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 
 /*
  * This example writes a sample geometry, reads it back in, then writes it again.
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
   GeoModelIO::ReadGeoModel geoReader = GeoModelIO::ReadGeoModel(db2);
   std::cout << "OK! ReadGeoModel is set." << std::endl;
   /* build the GeoModel geometry */
-  GeoPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
+  GeoVPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
   std::cout << "ReadGeoModel::buildGeoModel() done." << std::endl;
 
 

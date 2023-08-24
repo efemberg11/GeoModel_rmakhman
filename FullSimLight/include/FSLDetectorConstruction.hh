@@ -1,7 +1,10 @@
-
+/*
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+*/
 #ifndef FSLDetectorConstruction_h
 #define FSLDetectorConstruction_h 1
 
+#include "GeoModelKernel/GeoVPhysVol.h"
 #include "G4VUserDetectorConstruction.hh"
 
 #include "G4GDMLParser.hh"
@@ -86,7 +89,7 @@ public:
   static G4double GetFieldValue() { return gFieldValue; }
   G4double GetTolerance (){return fTolerance;}
 
-  GeoPhysVol* CreateTheWorld(GeoPhysVol* world);
+  GeoVPhysVol* CreateTheWorld(GeoVPhysVol* world);
 
   /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
   void PullUnidentifiedVolumes( G4LogicalVolume* v );

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -205,10 +205,10 @@ std::string ReadGeoModel::getEnvVar(std::string const& key) const {
     return val == NULL ? std::string("") : std::string(val);
 }
 
-GeoPhysVol* ReadGeoModel::buildGeoModel() {
+GeoVPhysVol* ReadGeoModel::buildGeoModel() {
     if (m_deepDebug) std::cout << "ReadGeoModel::buildGeoModel()" << std::endl;
 
-    GeoPhysVol* rootVolume = buildGeoModelPrivate();
+    GeoVPhysVol* rootVolume = buildGeoModelPrivate();
 
     // warn the user if there are unknown/unhalded shapes
     if (m_unknown_shapes.size() > 0) {
@@ -225,7 +225,7 @@ GeoPhysVol* ReadGeoModel::buildGeoModel() {
     return rootVolume;
 }
 
-GeoPhysVol* ReadGeoModel::buildGeoModelPrivate() {
+GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
     // *** get all data from the DB ***
     std::chrono::system_clock::time_point start =
         std::chrono::system_clock::now();  // timing: get start time
@@ -1039,7 +1039,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(
 }
 
 // Get the root volume
-GeoPhysVol* ReadGeoModel::getRootVolume() {
+GeoVPhysVol* ReadGeoModel::getRootVolume() {
     if (m_deepDebug) {
         muxCout.lock();
         std::cout << "ReadGeoModel::getRootVolume()" << std::endl;
@@ -1051,8 +1051,7 @@ GeoPhysVol* ReadGeoModel::getRootVolume() {
     const unsigned int tableId = std::stoi(m_root_vol_data[2]);
     const unsigned int copyNumber =
         1;  // the Root volume has only one copy by definition
-    GeoPhysVol* root = dynamic_cast<GeoPhysVol*>(
-        buildVPhysVolInstance(id, tableId, copyNumber));
+    GeoVPhysVol* root = buildVPhysVolInstance(id, tableId, copyNumber);
     checkNodePtr(root, "root", __func__, __PRETTY_FUNCTION__);
     return root;
 }

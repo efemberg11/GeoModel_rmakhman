@@ -1,3 +1,7 @@
+/*
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+*/
+
 #include "MassCalculator.hh"
 #include "GeoModelKernel/GeoVolumeCursor.h"
 
@@ -222,7 +226,7 @@ void MassCalculator::iterateFromWorldMass(G4LogicalVolume* logVolume, std::vecto
     
 }
 
-void MassCalculator::recursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoPhysVol* /*worldgeoModel*/, std::vector<json>& jlist){
+void MassCalculator::recursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoVPhysVol* /*worldgeoModel*/, std::vector<json>& jlist){
     
     masscalc::massReport singleMassReport;
     json jSingleMassReport;

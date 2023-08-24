@@ -98,7 +98,7 @@ class ReadGeoModel {
     ReadGeoModel(GMDBManager* db, unsigned long* progress = nullptr);
     virtual ~ReadGeoModel();
 
-    GeoPhysVol* buildGeoModel();
+    GeoVPhysVol* buildGeoModel();
 
     // NB, this template method needs only the "publisher name" to be specified
     // (i.e. the last suffix), since the first part of the table name get added
@@ -133,7 +133,7 @@ class ReadGeoModel {
     void buildAllSerialTransformers();
     void buildAllNameTags();
 
-    GeoPhysVol* buildGeoModelPrivate();
+    GeoVPhysVol* buildGeoModelPrivate();
 
     GeoBox* buildDummyShape();
 
@@ -142,7 +142,7 @@ class ReadGeoModel {
         std::vector<std::vector<std::string>> records);
     void processParentChild(const std::vector<std::string>& parentchild);
 
-    GeoPhysVol* getRootVolume();
+    GeoVPhysVol* getRootVolume();
 
     GeoVPhysVol* buildVPhysVolInstance(const unsigned int id,
                                        const unsigned int tableId,

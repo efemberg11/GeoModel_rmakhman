@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration   
+ *   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration   
 */
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
@@ -210,7 +210,7 @@ int main(int argc, char ** argv) {
     GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
 
     /* build the GeoModel geometry */
-    GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+    GeoVPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
     /* get an handle on a Volume Cursor, to traverse the whole set of Volumes */
     GeoVolumeCursor aV(dbPhys);

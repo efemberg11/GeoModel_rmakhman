@@ -1,3 +1,7 @@
+/*
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+*/
+#include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/GeoMaterial.h"
@@ -18,7 +22,7 @@ class MinimalPlugin : public GeoVGeometryPlugin  {
   ~MinimalPlugin();
 
   // Creation of geometry:
-  virtual void create(GeoPhysVol *world, bool publish=false);
+  virtual void create(GeoVPhysVol *world, bool publish = false);
 
  private:
 
@@ -46,9 +50,8 @@ MinimalPlugin::~MinimalPlugin()
 // example (normally one may "publish" a list of FullPhysVol's and Alignable
 // transforms, but this example has none such).
 //
-void MinimalPlugin::create(GeoPhysVol *world, bool /*publish*/)
-{
-  const double degree=M_PI/180.0;
+void MinimalPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
+  const double degree = M_PI / 180.0;
 
   // Define elements used in this example:
   GeoElement  *aluminium     = new GeoElement("Aluminium", "Al", 13,  26 * GeoModelKernelUnits::g/GeoModelKernelUnits::mole);

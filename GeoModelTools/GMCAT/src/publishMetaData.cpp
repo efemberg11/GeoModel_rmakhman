@@ -36,7 +36,7 @@ void publishMetaData( GMDBManager & db,
     std::string username=getlogin();
     std::string hostname;
     std::string os;
-    std::string wd=get_current_dir_name();
+    std::string wd;
     std::string gmversion=STR_NAME(GMVERSION);
     std::string outputFile;
     std::string geoModelDataBranch="Undefined";      // or overwritten below
@@ -51,6 +51,13 @@ void publishMetaData( GMDBManager & db,
     std::string commitHash  ="Undefined";      // or overwritten below
   } xtraMetadata;
   
+#ifdef __APPLE__
+  char wdbuff[1024];
+  metadata.wd=std::string(getcwd(wdbuff,1024));
+#else
+  metadata.wd=get_current_dir_name();
+#endif
+
   metadata.outputFile=outputFile;
   
   char buff[1024];

@@ -32,7 +32,7 @@ void publishMetaData( GMDBManager & db,
 		      std::string              &outputFile) {
 
   struct Metadata {
-    std::string dateString=getCommandOutput("date -Im");
+    std::string dateString=getCommandOutput("date -Iminutes");
     std::string username=getlogin();
     std::string hostname;
     std::string os;

@@ -80,6 +80,7 @@ variables:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 .soqt-build-template: &soqt-job
   variables:
@@ -100,6 +101,7 @@ variables:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 
 
@@ -124,6 +126,7 @@ variables:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 
 
@@ -151,6 +154,7 @@ variables:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 
 
@@ -437,6 +441,7 @@ ubu-single-gmbase:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 ubu-single-gmtools:
   <<: *ubuntu-job
@@ -453,6 +458,7 @@ ubu-single-gmtools:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 ubu-single-gmviz:
   <<: *ubuntu-job
@@ -469,6 +475,7 @@ ubu-single-gmviz:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 ubu-single-gmg4:
   <<: *ubuntu-job
@@ -485,6 +492,7 @@ ubu-single-gmg4:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 ubu-single-gmfullsimlight:
   <<: *ubuntu-job
@@ -501,6 +509,7 @@ ubu-single-gmfullsimlight:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 ubu-single-gmfsl:
   <<: *ubuntu-job
@@ -517,6 +526,7 @@ ubu-single-gmfsl:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 
 #####################

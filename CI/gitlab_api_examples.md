@@ -3,7 +3,7 @@
 **NOTE:** Here below, `95156` is the ID of the GeoModel project on the CERN GitLab installation. You can find the ID of your project by looking at the main page of your GitLab repository, you'll find the ID under the name of the repository.
 
 **NOTE:** Being the GeoModel respoitory public, we don't need authorization. If your project is not public, you need to pass a variable in the header. Please [see this post](https://stackoverflow.com/a/59949488/320369) for an example.
-But please notice, to get CI jobs and pipelines through the API, you need at least a Personal Access Token, even if the repository is fully public. 
+But please notice, to get CI **jobs** through the API, you need at least a Personal Access Token, even if the repository is fully public. 
 
 [TOC]
 

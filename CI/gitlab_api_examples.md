@@ -3,7 +3,9 @@
 **NOTE:** Here below, `95156` is the ID of the GeoModel project on the CERN GitLab installation. You can find the ID of your project by looking at the main page of your GitLab repository, you'll find the ID under the name of the repository.
 
 **NOTE:** Being the GeoModel respoitory public, we don't need authorization. If your project is not public, you need to pass a variable in the header. Please [see this post](https://stackoverflow.com/a/59949488/320369) for an example.
+But please notice, to get CI jobs and pipelines through the API, you need at least a Personal Access Token, even if the repository is fully public. 
 
+[TOC]
 
 ## Tags 
 
@@ -80,7 +82,7 @@ https://gitlab.cern.ch/GeoModelDev/GeoModel/-/pipelines/2163714/dag
 We can ask for the latest CI job with:
 
 ```sh
-curl -Ss --header "PRIVATE-TOKEN:glpat-tm3qsxar1vzQ7h8fEZZh" "https://gitlab.cern.ch/api/v4/projects/95156/jobs/?page=1&per_page=1"
+curl -Ss --header "PRIVATE-TOKEN:<token>" "https://gitlab.cern.ch/api/v4/projects/95156/jobs/?page=1&per_page=1"
 ```
 
 this gives:
@@ -92,7 +94,7 @@ this gives:
 But we can prettify the output with `jq` itself (note teh dot at the end!):
 
 ```sh
-curl -Ss --header "PRIVATE-TOKEN:glpat-tm3qsxar1vzQ7h8fEZZh" "https://gitlab.cern.ch/api/v4/projects/95156/jobs/?page=1&per_page=1" | jq .
+curl -Ss --header "PRIVATE-TOKEN:<token>" "https://gitlab.cern.ch/api/v4/projects/95156/jobs/?page=1&per_page=1" | jq .
 ```
 
 which gives this nice output:

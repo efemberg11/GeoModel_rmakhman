@@ -221,3 +221,13 @@ which gives this nice output:
 
 From the output above it is easy to spot useful metadata to exploit in API calls and scripts!
 
+
+### Get job's metadata 
+
+With `jq` you can extract multiple job's metadata, here's an example of a call that extracts the name of the job and the boolean that says if the job is for a tag or not: 
+
+```sh
+curl -Ss --header "PRIVATE-TOKEN:<token>" "https://gitlab.cern.ch/api/v4/projects/95156/jobs/?page=1&per_page=1" | jq -r '.[] | .name + "--" + (.tag|tostring)'
+
+ubu-single-gmfsl--false
+```

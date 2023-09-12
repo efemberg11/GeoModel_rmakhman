@@ -1,0 +1,61 @@
+<materials>
+
+  <element name="Hydrogen"    shortname="H"  Z="1"  A="1.00794"/>
+  <element name="Berylium"    shortname="Be" Z="4"  A="9.012182"/>
+  <element name="Carbon"      shortname="C"  Z="6"  A="12.011"/>
+  <element name="Nitrogen"    shortname="N"  Z="7"  A="14.00674"/>
+  <element name="Oxygen"      shortname="O"  Z="8"  A="15.9994"/>
+  <element name="Aluminium"   shortname="Al" Z="13" A="26.981539"/>
+  <element name="Silicon"     shortname="Si" Z="14" A="28.0855"/>
+  <element name="Argon"       shortname="Ar" Z="18" A="39.948"/>
+  <element name="Iron"        shortname="Fe" Z="26" A="55.845"/>
+  <element name="Copper"      shortname="Cu" Z="29" A="63.546"/>
+  <element name="Silver"      shortname="Ag" Z="47" A="107.8682"/>
+
+  
+  <material name="N2" density="1.2504e-3 * 273.15/293.15 * 96265/100000">
+    <elementref fraction="1.00000" ref="Nitrogen"/>
+  </material>
+
+  <material name="Air" density="1.205e-3">
+    <elementref fraction="0.7541" ref="Nitrogen"/>
+    <elementref fraction="0.2321" ref="Oxygen"/>
+    <elementref fraction="0.0138" ref="Argon"/>
+  </material>
+  
+  <material name="ArgonGas" density="1.789e-3" >
+    <elementref fraction="1.00000" ref="Argon"/>
+  </material>
+  
+  <chemical name="CO2">
+    <elemcontent ref="Carbon" quantity="1"/>
+    <elemcontent ref="Oxygen" quantity="2"/>
+  </chemical>
+  
+  <material name="CO2Gas" density="1.98e-3">
+    <chemicalref fraction="1" ref="CO2"/>
+  </material>
+  
+  <chemical name="Phenol">
+    <elemcontent ref="Carbon" quantity="6"/>
+    <elemcontent ref="Hydrogen" quantity="6"/>
+    <elemcontent ref="Oxygen" quantity="1"/>
+  </chemical>
+  
+  <chemical name="Formaldehyde">
+    <elemcontent ref="Carbon" quantity="1"/>
+    <elemcontent ref="Hydrogen" quantity="2"/>
+    <elemcontent ref="Oxygen" quantity="1"/>
+  </chemical>
+  
+  <material name="Bakelite" density="1.3" >
+    <chemicalref ref="Phenol" fraction="0.5" />
+    <chemicalref ref="Formaldehyde" fraction="0.5" />
+  </material>
+   
+  <material name="ArCO2" density="1.79e-3" >
+    <materialref ref="ArgonGas" fraction="0.93" />
+    <materialref ref="CO2Gas" fraction="0.7" />
+  </material>
+
+</materials> 

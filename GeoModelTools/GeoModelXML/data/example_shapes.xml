@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Jun 2021, Riccardo Maria BIANCHI, riccardo.maria.bianchi@cern.ch -->
+<!DOCTYPE geomodel SYSTEM "geomodel.dtd" [
+
+<!-- include the file where the materials are defined -->
+<!ENTITY materials SYSTEM "materials.gmx" >
+
+]>
+
+<geomodel name="Shapes_Example" version="1.0"
+  xmlns="http://www.nikhef.nl/%7Er29/gmx">
+
+  <!-- Definition of materials -->
+  <!-- Load materials -->
+  &materials;
+
+  <!-- Definition of variables -->
+  <defines>
+
+    <!--Units-->
+    <var name="PI" value="acos(-1.0)"/>
+    <var name="DEG" value="PI/180."/> <!-- Use as value="10*DEG" so it converts to radians for you -->
+
+    <var name="TubeInnerRadius" value="0" />
+    <var name="TubeOuterRadius" value="600." />
+    <var name="TubeHalfLength"  value="1200." />
+
+    <var name="TorusPipeInnerRadius"  value="100." />
+    <var name="TorusPipeOuterRadius"  value="200." />
+    <var name="TorusMainRadius"  value="1200." />
+    <var name="TorusStartPhi"  value="0 * DEG" />
+    <var name="TorusDeltaPhi"  value="270 * DEG" />
+
+  </defines>
+
+  <!-- Definition of shapes -->
+  <shapes>
+    <tube name="Tube"  rmin="TubeInnerRadius"
+                       rmax="TubeOuterRadius"
+                       zhalflength="TubeHalfLength"/>
+
+    <box name="Box" xhalflength="500" 
+                    yhalflength="500" 
+                    zhalflength="500"/>
+    
+    <torus name="Torus" rmin="TorusPipeInnerRadius"
+                        rmax="TorusPipeOuterRadius"
+                        rtor="TorusMainRadius"
+                        sphi="TorusStartPhi"
+                        dphi="TorusDeltaPhi"/>
+  </shapes>
+
+  <!-- Defining logical volumes -->
+  <logvol name="MyBox" shape="Box" material="N2"/>
+  <logvol name="MyTube" shape="Tube" material="N2" />
+  <logvol name="MyTorus" shape="Torus" material="N2" />
+
+  <assembly name="ShapeTube" >
+    <transform>
+      <transformation name="negativeShift">
+        <translation z="-3000."/>
+      </transformation>
+      <logvolref ref="MyTube"/>
+    </transform>
+  </assembly>
+
+  <assembly name="ShapeBox" >
+      <logvolref ref="MyBox"/>
+  </assembly>
+
+  <assembly name="ShapeTorus" >
+    <transform>
+      <transformation name="positiveShift">
+        <translation z="+3000."/>
+      </transformation>
+      <logvolref ref="MyTorus"/>
+    </transform>
+  </assembly>
+
+
+
+
+  <!-- Adding volume branches -->
+  <addbranch>
+      <assemblyref ref="ShapeTube" />
+      <assemblyref ref="ShapeBox" />
+      <assemblyref ref="ShapeTorus" />
+  </addbranch>
+
+</geomodel>

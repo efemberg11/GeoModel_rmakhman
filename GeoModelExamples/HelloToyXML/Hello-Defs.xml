@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<GeoInpDefs>
+    
+<TableDef name="HELLOCABLES">
+  <ColDef name="HELLOCABLES_DATA_ID" type="LONG"/>
+  <ColDef name="DLAR" type="DOUBLE"/>
+  <ColDef name="DKAP" type="DOUBLE"/>
+  <ColDef name="DCU" type="DOUBLE"/>
+  <ColDef name="PERKAP" type="DOUBLE"/>
+  <ColDef name="PERCU" type="DOUBLE"/>
+  <ColDef name="PERAIR" type="DOUBLE"/>
+  <ColDef name="HEIGHT" type="DOUBLE"/>
+  <ColDef name="THICKIN" type="DOUBLE"/>
+  <ColDef name="THICKFAC" type="DOUBLE"/>
+  <ColDef name="ACCORCAB" type="INT"/>
+  <ColDef name="CLEARANCE" type="DOUBLE"/>
+</TableDef>
+
+
+<TableDef name="HELLOBOXES">
+  <ColDef name="HELLOBOXES_DATA_ID" type="LONG"/>
+  <ColDef name="BOXNAME" type="STRING"/>
+  <ColDef name="HLEN" type="DOUBLE"/>
+  <ColDef name="HWDT" type="DOUBLE"/>
+  <ColDef name="HHGT" type="DOUBLE"/>
+  <ColDef name="XTR" type="DOUBLE"/>
+  <ColDef name="YTR" type="DOUBLE"/>
+  <ColDef name="ZTR" type="DOUBLE"/>
+  <ColDef name="XROT" type="DOUBLE"/>
+</TableDef>
+
+</GeoInpDefs>

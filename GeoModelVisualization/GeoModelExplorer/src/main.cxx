@@ -28,6 +28,23 @@
 
 int main(int argc, char** argv)
 {
+
+  // We don't know for sure which one of these causes the trouble..We add them all till we understand why this
+  // is happening and correct the problem where it occurs.
+
+  
+    setenv("LC_ADDRESS","en_US.UTF-8",1);
+    setenv("LC_NAME","en_US.UTF-8",1);
+    setenv("LC_MONETARY","en_US.UTF-8",1);
+    setenv("LC_PAPER","en_US.UTF-8",1);
+    setenv("LC_IDENTIFICATION","en_US.UTF-8",1);
+    setenv("LC_TELEPHONE","en_US.UTF-8",1);
+    setenv("LC_MEASUREMENT","en_US.UTF-8",1);
+    setenv("LC_TIME","en_US.UTF-8",1);
+    setenv("LC_NUMERIC","en_US.UTF-8",1);
+    
+
+  
   auto pManip= [] (const char * variable, const char *plus) {
 		 const char *path=getenv(variable);
 		 if (path) {
@@ -38,23 +55,10 @@ int main(int argc, char** argv)
 		   setenv(variable, plus, true);
 		 }
 	       };
-  // Preprocessor:  we are passing the install directory to this
-  // class, from the CMake configuration.
-  // Drivers will be loaded from this install directory.
-  // However in some cases "linux" is part of the install directory
-  // name and that may be defined in a macro to be 1. So if that is
-  // the case we temporarily undef it.
-#ifdef linux
-#define waslinux linux
-#undef linux
-  const char * standardPlaces = GEOMODEL_INSTALL_PREFIX;
-#define linux waslinux
-#else
-  const char * standardPlaces = GEOMODEL_INSTALL_PREFIX;
-#endif
-  std::cout << "standardPlaces: " << standardPlaces << std::endl;
-  std::string gxpluginpath= std::string(standardPlaces)+"/lib/gxplugins";
+  
+  std::string gxpluginpath= GXPLUGINDIR;
   pManip("GXPLUGINPATH",gxpluginpath.c_str());
+  std::cout << "Plugins resolved in path: " << getenv("GXPLUGINPATH") << std::endl;
   QStringList arguments;
   for (int i = 0; i<=argc; i++){
     arguments << argv[i];

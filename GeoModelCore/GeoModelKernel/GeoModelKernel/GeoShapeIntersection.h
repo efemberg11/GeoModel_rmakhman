@@ -7,43 +7,45 @@
 
 #include "GeoModelKernel/GeoShape.h"
 
-
 #ifndef _GeoShapePersistification_On_
   class Persistifier;
 #endif
 
-
 class GeoShapeIntersection : public GeoShape
 {
  public:
-
-
-
-  //	Constructor taking two shape operands.
+  //    Constructor taking two shape operands
   GeoShapeIntersection (const GeoShape* A, const GeoShape* B);
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory
   virtual double volume () const;
 
-  //	Returns the AND shape type, as a string.
+  //    Returns the bonding box of the shape
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns true if the shape contains the point, false otherwise
+  virtual bool contains (double x, double y, double z) const;
+
+  //    Returns the AND shape type, as a string.
   virtual const std::string & type () const;
 
-  //	Returns the AND shape type, as a coded integer.
+  //    Returns the AND shape type, as a coded integer.
   virtual ShapeType typeID () const;
 
-  //	Returns the first operand being ANDed
+  //    Returns the first operand being ANDed
   const GeoShape* getOpA () const;
 
-  //	Returns the second operand being ANDed.
+  //    Returns the second operand being ANDed.
   const GeoShape* getOpB () const;
 
-  //	Executes a GeoShapeAction
+  //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
-  //	For type identification.
+  //    For type identification.
   static const std::string& getClassType ();
 
-  //	For type identification.
+  //    For type identification.
   static ShapeType getClassTypeID ();
 
  protected:
@@ -53,11 +55,14 @@ class GeoShapeIntersection : public GeoShape
   GeoShapeIntersection(const GeoShapeIntersection &right);
   GeoShapeIntersection & operator=(const GeoShapeIntersection &right);
 
-  //	The first shape operand in the AND operation.
+  //    The first shape operand in the AND operation.
   const GeoShape* m_opA;
 
-  //	The second shape operand in the AND operation.
+  //    The second shape operand in the AND operation.
   const GeoShape* m_opB;
+
+  //    Cached volume
+  mutable double fVolume = -1.;
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;

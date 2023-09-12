@@ -70,7 +70,9 @@
 //   SbPolyhedronSphere (rmin,rmax,phi,dphi,the,dthe)
 //                                        - create polyhedron for Sphere;
 //   SbPolyhedronTorus (rmin,rmax,rtor,phi,dphi)
-//                                        - create polyhedron for Torus;
+//                                        - create polyhedron for GeoTorus;
+//   SbPolyhedronEllipticalTube (rmin,rmax,rtor,phi,dphi)
+//                                        - create polyhedron for GeoEllipticalTube;
 // Public functions:
 //
 //   GetNoVertices ()       - returns number of vertices;

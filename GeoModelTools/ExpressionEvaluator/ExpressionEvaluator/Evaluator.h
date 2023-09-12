@@ -7,23 +7,11 @@
 
 #include <string>
 
-// namespace HepTool {
+#include "ExpressionEvaluator/IEvaluator.h"
 
-/**
- * Evaluator of arithmetic expressions with an extendable dictionary.
- * Example:
- * @code
- *   #include "CLHEP/Evaluator/Evaluator.h"
- *   HepTool::Evaluator eval;
- *   eval.setStdMath();
- *   double res = eval.evaluate("sin(30*degree)");
- *   if (eval.status() != HepTool::Evaluator::OK) eval.print_error();
- * @endcode
- *
- * @author Evgeni Chernyaev <Evgueni.Tcherniaev@cern.ch>
- * @ingroup evaluator
- */
-class Evaluator {
+namespace GeoModelTools {
+
+class Evaluator: public IEvaluator {
  public: 
 
   /**
@@ -59,7 +47,7 @@ class Evaluator {
   /**
    * Destructor.
    */
-  ~Evaluator(); 
+  virtual ~Evaluator(); 
 
   /**
    * Evaluates the arithmetic expression given as character string. 
@@ -245,20 +233,20 @@ class Evaluator {
    *   steradian               (steradian  = 1.)
    * @endcode
    */
-  void setSystemOfUnits(double meter    = 1.0,
+   /*void setSystemOfUnits(double meter    = 1.0,
                         double kilogram = 1.0,
                         double second   = 1.0,
                         double ampere   = 1.0,
                         double kelvin   = 1.0,
                         double mole     = 1.0,
                         double candela  = 1.0);
-
+   */
 private: 
   void * p;                                 // private data 
-  Evaluator(const Evaluator &);             // copy constructor is not allowed
-  Evaluator & operator=(const Evaluator &); // assignment is not allowed
+  // Evaluator(const Evaluator &);             // copy constructor is not allowed
+  // Evaluator & operator=(const Evaluator &); // assignment is not allowed
 };
 
-//  } // namespace HepTool
+}
 
 #endif /* HEP_EVALUATOR_H */

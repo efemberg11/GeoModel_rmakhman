@@ -1,14 +1,14 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # CMake settings
-cmake_minimum_required( VERSION 3.14 )
+cmake_minimum_required(VERSION 3.16...3.26)
 
 # Dummy call to 'project()', needed to set 'PROJECT_SOURCE_DIR'
 project( "GeoModelTools" )
 
 #Set up the project. Check if we build it with GeoModel or individually
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-    # I am top-level project.
+    # I am built as a top-level project.
     # Make the root module directory visible to CMake.
     list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake )
     # get global GeoModel version
@@ -19,23 +19,21 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( cmake_colors_defs )
     # Warn the users about what they are doing
     message(STATUS "${BoldGreen}Building ${PROJECT_NAME} individually, as a top-level project.${ColourReset}")
+    # Set a default build type
+    include( BuildType )
     # Set default build and C++ options
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
          "Framework finding behaviour on macOS" )
     # Set up how the project handle some of its dependenices. Either by picking them
     # up from the environment, or building them itself.
-    if( NOT TARGET JSONExt )
-        include( SetupJSON )
-    endif()
-    if( NOT TARGET XercesCBuiltIn )
-        include( SetupXercesC )
-    endif()
+    include( SetupJSON )
+    include( SetupXercesC )
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED ${GeoModel_VERSION} )
     find_package( GeoModelIO REQUIRED ${GeoModel_VERSION} ) 
-    # Set a flag to steer the build of the subpackages
-    #set( VISUALIZATION_INDIVIDUAL_BUILD ON )
+    # Print Build Info on screen
+    include( PrintBuildInfo )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
@@ -48,10 +46,12 @@ endif()
 include( GNUInstallDirs )
 
 # Set up the build of the libraries of the project.
+add_subdirectory( GeoModelXML )
 add_subdirectory( GeoModelXMLParser )
 add_subdirectory( GeoModelJSONParser )
 add_subdirectory( ExpressionEvaluator )
 add_subdirectory( GMCAT )
+add_subdirectory( GMSTATISTICS )
 add_subdirectory( GDMLtoGM )
 
 # Create and install the version description of the project.

@@ -17,9 +17,11 @@
 #include <VP1HEPVis/SbTwistTrapFlatSide.h>
 
 #include "GeoModelKernel/Units.h"
+
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'SYSTEM_OF_UNITS::cm'
 
 #include <cassert>
+//#include <cstdlib>//For setenv/unsetenv
 
 #define perMillion 0.000001
 #define deg (M_PI/180.0)
@@ -1767,16 +1769,18 @@ SbPolyhedronCons::SbPolyhedronCons(double Rmn1,
   if (dphi > wholeCircle) k += 4;
 
   if (k != 0) {
-    std::cerr << "SbPolyhedronCone(s)/Tube(s): error in input parameters";
-    if ((k & 1) != 0) std::cerr << " (radiuses)";
-    if ((k & 2) != 0) std::cerr << " (half-length)";
-    if ((k & 4) != 0) std::cerr << " (angles)";
-    std::cerr << std::endl;
-    std::cerr << " Rmn1=" << Rmn1 << " Rmx1=" << Rmx1;
-    std::cerr << " Rmn2=" << Rmn2 << " Rmx2=" << Rmx2;
-    std::cerr << " Dz=" << Dz << " Phi1=" << Phi1 << " Dphi=" << Dphi
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
+          std::cerr << "SbPolyhedronCone(s)/Tube(s): error in input parameters";
+          if ((k & 1) != 0) std::cerr << " (radiuses)";
+          if ((k & 2) != 0) std::cerr << " (half-length)";
+          if ((k & 4) != 0) std::cerr << " (angles)";
+          std::cerr << std::endl;
+          std::cerr << " Rmn1=" << Rmn1 << " Rmx1=" << Rmx1;
+          std::cerr << " Rmn2=" << Rmn2 << " Rmx2=" << Rmx2;
+          std::cerr << " Dz=" << Dz << " Phi1=" << Phi1 << " Dphi=" << Dphi
               << std::endl;
-    return;
+      }
+      return;
   }
 
   //   P R E P A R E   T W O   P O L Y L I N E S
@@ -1846,33 +1850,41 @@ SbPolyhedronPgon::SbPolyhedronPgon(double phi,
   //   C H E C K   I N P U T   P A R A M E T E R S
 
   if (dphi <= 0. || dphi > 2*M_PI) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronPgon/Pcon: wrong delta phi = " << dphi
       << std::endl;
+      }
     return;
   }
 
   if (nz < 2) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronPgon/Pcon: number of z-planes less than two = " << nz
       << std::endl;
+      }
     return;
   }
 
   if (npdv < 0) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronPgon/Pcon: error in number of phi-steps =" << npdv
       << std::endl;
+      }
     return;
   }
 
   int i;
   for (i=0; i<nz; i++) {
     if (rmin[i] < 0. || rmax[i] < 0. || rmin[i] > rmax[i]) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
       std::cerr
         << "SbPolyhedronPgon: error in radiuses rmin[" << i << "]="
         << rmin[i] << " rmax[" << i << "]=" << rmax[i]
         << std::endl;
+      }
       return;
     }
   }
@@ -1940,23 +1952,29 @@ SbPolyhedronSphere::SbPolyhedronSphere(double rmin, double rmax,
   //   C H E C K   I N P U T   P A R A M E T E R S
 
   if (dphi <= 0. || dphi > 2*M_PI) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronSphere: wrong delta phi = " << dphi
       << std::endl;
+      }
     return;
   }
 
   if (the < 0. || the > M_PI) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronSphere: wrong theta = " << the
       << std::endl;
+      }
     return;
   }
 
   if (dthe <= 0. || dthe > M_PI) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronSphere: wrong delta theta = " << dthe
       << std::endl;
+      }
     return;
   }
 
@@ -1964,18 +1982,22 @@ SbPolyhedronSphere::SbPolyhedronSphere(double rmin, double rmax,
     dthe = M_PI - the; //G.Barrand : coming from LHCb/S.Ponce.
 
   if (the+dthe > M_PI) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronSphere: wrong theta + delta theta = "
       << the << " " << dthe
       << std::endl;
+      }
     return;
   }
 
   if (rmin < 0. || rmin >= rmax) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronSphere: error in radiuses"
       << " rmin=" << rmin << " rmax=" << rmax
       << std::endl;
+      }
     return;
   }
 
@@ -2041,17 +2063,21 @@ SbPolyhedronTorus::SbPolyhedronTorus(double rmin,
   //   C H E C K   I N P U T   P A R A M E T E R S
 
   if (dphi <= 0. || dphi > 2*M_PI) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronTorus: wrong delta phi = " << dphi
       << std::endl;
+      }
     return;
   }
 
   if (rmin < 0. || rmin >= rmax || rmax >= rtor) {
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     std::cerr
       << "SbPolyhedronTorus: error in radiuses"
       << " rmin=" << rmin << " rmax=" << rmax << " rtorus=" << rtor
       << std::endl;
+      }
     return;
   }
 

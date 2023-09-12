@@ -32,4 +32,17 @@ void GeoPublisher::setName(std::string name)
     m_name = name;
 }
 
+/*
+void GeoPublisher::storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::string>> tableData )
+{
+    m_auxiliaryTablesStr[ tableName ] = std::make_pair(colNames, colTypes);
+    m_auxiliaryTablesStrData[ tableName ] = tableData;
+}
+*/
+
+void GeoPublisher::storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData )
+{
+    m_auxiliaryTablesVar[ tableName ] = std::make_pair(colNames, colTypes);
+    m_auxiliaryTablesVarData[ tableName ] = tableData;
+}
 

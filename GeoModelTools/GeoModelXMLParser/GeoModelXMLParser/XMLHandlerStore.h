@@ -5,8 +5,6 @@
 #ifndef XMLHandlerStore_H
 #define XMLHandlerStore_H
 
-class XMLHandler;
-
 #include <map>
 #include <string>
 
@@ -14,17 +12,22 @@ class XMLHandler;
 
 //using namespace xercesc;
 
+namespace GeoModelTools {
+
+class XMLHandler;
 typedef std::map<std::string,XMLHandler*,std::less<std::string> > handlerStore;
 
 class XMLHandlerStore:public handlerStore {
 public:
 	static XMLHandlerStore* GetHandlerStore();
-	void RegisterHandler(XMLHandler*);
+	void RegisterHandler(GeoModelTools::XMLHandler*);
 	XMLHandler* GetHandler(xercesc::DOMNode *);
 	void Handle(xercesc::DOMNode *);
 private:
 	XMLHandlerStore();
 	static XMLHandlerStore *s_theStore;
 };
+
+}  // end namespace
 
 #endif

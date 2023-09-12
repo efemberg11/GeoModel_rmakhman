@@ -32,8 +32,23 @@ brew install cmake eigen doxygen wget boost xerces-c nlohmann-json sqlite
 
 # if you want to build the visualization tools as well, please install and configure Qt5
 brew install qt5
-echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> ~/.zshrc
 ```
+Then, add the path to your shell, by running the command below, depending on your macOS machine:
+
+* Intel chip:
+```
+echo 'export PATH="/usr/local/opt/qt@5/bin:$PATH"' >> ~/.zshrc
+```
+
+* Apple M1 (ARM64) chip:
+```
+echo 'export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"' >> ~/.zshrc
+```
+
+!!! note 
+
+    After having installed `qt` with brew, and having run the `echo` command stated above, you should either open a new shell or run `source ~/.zshrc` in order to get the `qt` in the `PATH`.
+     
 
 !!! warning
 
@@ -56,15 +71,50 @@ sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip buil
 
 ### Linux/Fedora
 
+**On Fedora < 34**:
 On Fedora, you can install all the needed third-party dependencies by using the built-in `dnf` package manager:
 
 ```bash
 dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial xerces-c-devel unzip freeglut-devel wget eigen3-devel
 ```
 
-### Centos/RedHat
+**On Fedora >= 34**:
 
-*coming soon*
+```
+dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5-qtbase-devel boost mercurial xerces-c-devel unzip freeglut-devel wget eigen3-devel giflib-devel libjpeg-devel sqlite-devel
+```
+
+
+### Centos7
+
+Packages shipped with Centos7, or installed by the YUM package manager, unfortunately are often too old. So, one needs to circumvent that, either by using pre-compiled bundles, or building from sources.
+
+#### CMake and Qt 
+
+You need a recent version of `CMake` to build `GeoModel`, so you might need to install a newer version compared to what is installed on your Centos7 machine. Please, refer to the original `CMake` documentation for [updated installation instructions](https://cmake.org/).
+
+You also need a recent version of the Qt graphics framework installed. Please refer to the [official documentation](https://www.qt.io/) for updated instructions. When installing, please be aware that **you only need** the "Community" version of Qt (Open Source), not the commercial one.
+
+#### Using the built-in third-party packages 
+
+For the `Xerces-C`, `nlohmann-json`, `Coin3D`, `Simage`, and `SoQt` dependencies, one can use the built-in versions shipeed with `GeoModel`. They are **tested** to work smoothly with the related `GeoModel` version, and they avoid the installation from sources of all these packages.
+
+For example, on Centos7, after having set a recent version of `CMake`, you can build the full `GeoModel` tools-suite, with support for the XML parser and the visualization tools, with the command below:
+
+```bash
+cmake -DCMAKE_INSTALL_PREFIX=../install -DGEOMODEL_USE_BUILTIN_EIGEN3=1 -DGEOMODEL_USE_BUILTIN_XERCESC=1 -DGEOMODEL_USE_BUILTIN_JSON=1 -DGEOMODEL_USE_BUILTIN_COIN3D=1 -DGEOMODEL_BUILD_VISUALIZATION=1 -DGEOMODEL_BUILD_TOOLS=1 ../GeoModel/
+```
+
+#### Using CVMFS and LCG
+
+If one has CVMFS access, one way to easily set up a recent version of `CMake`, `Qt` and all the other dependency packages, is the use of the `LCG` bundles provided by the CERN "SFT" group:
+
+```bash
+source /cvmfs/sft.cern.ch/lcg/views/LCG_100/x86_64-centos7-gcc9-opt/setup.sh
+```
+
+After that, you can build the `GeoModel` without any extra options. 
+
 
 
 ## Visualization 3D graphics dependencies
@@ -73,7 +123,7 @@ dnf install --assumeyes make automake gcc gcc-c++ cmake git qt5  boost mercurial
 
 On macOS, you can install the needed graphics dependencies with `brew`.
 
-If you have not installed the `atlas/geomodel` Tap already, please install it now, by running the command below; otherwise, jspi this and jump to the next point.
+If you have not installed the `atlas/geomodel` Tap already, please install it now, by running the command below; otherwise, skip this and jump to the next point.
 
 ```
 brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
@@ -84,10 +134,10 @@ Now, update your `atlas/geomodel` Tap to the latest version and install the grap
 
 ```
 brew update
-brew install soqt-geomodel  
+brew install geomodel-thirdparty-soqt 
 ```
 
-The second command will install all the latest graphics libraries needed by the visualization tools of GeoModel:  `simage-geomodel`, `coin-geomodel`, and `soqt-geomodel`.
+The second command will install all the latest graphics libraries needed by the visualization tools of GeoModel:  `geomodel-thirdparty-simage`, `geomodel-thirdparty-coin`, and `geomodel-thirdparty-soqt`.
 
 
 ### 3D graphics dependencies - Linux
@@ -101,12 +151,13 @@ On all platforms *except Centos7*, you can build Simage by followoing these inst
 
 ```bash
 # Build Simage
-wget http://cern.ch/atlas-software-dist-eos/externals/Simage/Coin3D-simage-2c958a61ea8b.zip
-unzip Coin3D-simage-2c958a61ea8b.zip
-cd Coin3D-simage-2c958a61ea8b
-./configure --prefix=$PWD/../install
-make -j
-make install 
+wget http://cern.ch/atlas-software-dist-eos/externals/Simage/simage-1.8.1-src.zip
+unzip simage-1.8.1-src.zip
+mkdir build_simage
+cd build_simage
+cmake -DCMAKE_INSTALL_PREFIX=../install -DSIMAGE_BUILD_DOCUMENTATION=0 -DSIMAGE_BUILD_EXAMPLES=0 -DSIMAGE_LIBSNDFILE_SUPPORT=0 -DSIMAGE_MPEG2ENC_SUPPORT=0 -DSIMAGE_OGGVORBIS_SUPPORT=0 ../simage
+make -j4
+make install
 cd ..
 ```
 
@@ -118,9 +169,9 @@ wget http://cern.ch/atlas-software-dist-eos/externals/Simage/Coin3D-simage-2c958
 unzip Coin3D-simage-2c958a61ea8b.zip
 cd Coin3D-simage-2c958a61ea8b
 ./configure --prefix=$PWD/../install
-wget -O cc7.patch https://gitlab.cern.ch/atlas/atlasexternals/-/raw/master/External/Simage/patches/libpng_centos7.patch?inline=false 
+wget -O cc7.patch https://gitlab.cern.ch/atlas/atlasexternals/-/raw/main/External/Simage/patches/libpng_centos7.patch?inline=false 
 patch -p1 < cc7.patch
-make -j
+make -j4
 make install 
 cd ..
 ```
@@ -128,40 +179,27 @@ cd ..
 
 #### b) Coin3D & SoQt
 
-!!! warning
-
-    The Coin sources are not compatible with CMake 3.19 (see https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/7). Therefore, for the moment, until the Coin sources will be ported to CMake 3.19, you should use CMake <= 3.18.X to compile Coin. 
-
-    Please note that, at the time of writing, Homebrew, the package manager for macOS, has updated its version of CMake from 3.18.4 to 3.19. Thus, you cannot build Coin on macOS with the CMake version installed by the `brew` command.
-
-    You can install CMake on your system by downloading the installer from the [CMake website](https://cmake.org/download/).
-
-    Or, you could have still  an older version on your system, which you can use. On macOS, and if those were installed with `brew`, you can check which versions of CMake you have in the path `/usr/local/Cellar/cmake/`. Then, you can use one of the ones you have installed by running its `cmake` binary command directly; for example: `/usr/local/Cellar/cmake/3.18.4/bin/cmake ...` .
-
-
-
 Now, you should build Coin3D (the 3D graphics engine) and SoQt (the glue package between the 3D graphics engine, Coin, and the windowing system, Qt5):
 
 
 ```bash
 # Build Coin3D
-wget -O coin.zip https://atlas-vp1.web.cern.ch/atlas-vp1/sources/coin_c8a8003d4_1Dec2020.zip
-unzip coin.zip
+wget https://geomodel.web.cern.ch/sources/coin-5a97506-20210210.zip -O coin.zip
+unzip coin.zip; mv coin-* coin
 mkdir build_coin
 cd build_coin
-# NOTE: replace the path below with the patch of your CMake <= 3.18.X installation
-path-to-cmake-3.18/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DCOIN_BUILD_TESTS=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../coin
-make -j
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release -DCOIN_BUILD_TESTS=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../coin
+make -j4
 make install
 cd ..
 
 # Build SoQt
-wget -O soqt.zip http://cern.ch/atlas-software-dist-eos/externals/SoQt/soqt_5796270_1Dec2020.zip
+wget https://geomodel.web.cern.ch/sources/soqt_6b1c74f_20210210.zip -O soqt.zip 
 unzip soqt.zip
 mkdir build_soqt
 cd build_soqt
-path-to-cmake-3.18/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install -DSOQT_BUILD_DOCUMENTATION=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../soqt
-make -j
+cmake -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_BUILD_TYPE=Release -DSOQT_BUILD_DOCUMENTATION=0 -DSOQT_BUILD_MAC_X11=0 -DSOQT_BUILD_TESTS=0 -DCMAKE_CXX_FLAGS=-Wno-deprecated-declarations ../soqt
+make -j4
 make install
 cd ..
 ```
@@ -169,14 +207,14 @@ cd ..
 
 ## Quick instructions - Build everything
 
-With these instructions you will build the whole the whole software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'master' branch. If something does not compile, please [let the developers' team know](../about/contacts.md). 
+With these instructions you will build the whole software stack for GeoModel development. The GeoModel libraries will be built from the HEAD version of the 'main' branch. If something does not compile, please [let the developers' team know](../about/contacts.md). 
 
 With these instructions, you will build: `GeoModelCore`, `GeoModelIO`, `GeoModelTools`, `GeoModelVisualization` (a.k.a., `gmex`).
 
 
 !!! note
 
-    These instructions will install the libraries and the tools in a **local** `install` folder. That is very useful for developmemnt, because yuo can handle multiple versions installed on the same system.
+    These instructions will install the libraries and the tools in a **local** `install` folder. That is very useful for developmemnt, because you can handle multiple versions installed on the same system.
 
     However, if you prefer to install the tools and the libraries in the `/usrl/local` system directory, just remove from the commands the option `-DCMAKE_INSTALL_PREFIX=../install`.
 
@@ -222,32 +260,6 @@ cd ..
 
 
 
-
-## (Optional) Build an example GeoModelPlugin
-
-
-
-```bash
-# Build the GeoModelATLAS/GeoModelDataManagers
-git clone https://gitlab.cern.ch/GeoModelATLAS/GeoModelDataManagers.git
-mkdir build_managers
-cd build_managers
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelDataManagers
-make -j
-make install
-cd ..
-
-# Build atlas/GeoModelPlugins
-git clone https://gitlab.cern.ch/atlas/GeoModelPlugins.git
-mkdir build_plugins
-cd build_plugins
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install ../GeoModelPlugins
-make -j
-make install
-cd ..
-```
-
-
 ## Post install settings
 
 Assuming you followed the above instructions and you used `../install` as the installation path, in order to run the applications you need to set a couple of system variables.
@@ -276,7 +288,7 @@ This will be automated in a future version.
 export LD_LIBRARY_PATH=${PWD}/../install/lib/ # this is a temporary fix
 ```
 
-### Linux/Fedora
+### Linux / Fedora & Centos7
 
 ```bash
 export LD_LIBRARY_PATH=../install/lib:../install/lib64:$LD_LIBRARY_PATH # this is a temporary fix, we will fix the installation on Fedora

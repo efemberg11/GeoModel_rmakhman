@@ -1,5 +1,6 @@
 # List of the CI build stages.
 stages:
+  - step-pre
   - step-A
   - step-B
   - step-C
@@ -11,7 +12,6 @@ stages:
 variables:
   CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
-  XERCESC_VERSION_BASE: 3.2.2
   # also, 'CMAKE_EXTRA_FLAGS' will be specified by specific jobs when needed, and used by job templates like 'geomodel-job'
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -27,17 +27,21 @@ variables:
   allow_failure: true
   timeout: 30 minutes
   before_script:
+    - brew tap davidchall/hep
+    - brew bundle --file=CI/Brewfile # install third-party dependencies, if needed
     - export PATH="/usr/local/opt/expat/bin:$PATH" # to make CMake use expat from Homebrew instead of the old one shipped with the system in /usr/lib
     - export LDFLAGS="-L/usr/local/opt/expat/lib"
     - export CPPFLAGS="-I/usr/local/opt/expat/include"
-    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
-  
+    - export PATH="/usr/local/opt/qt5/bin:$PATH" # to make Qt5 discoverable by CMake
+
 
 # general Ubuntu job template
 .ubuntu-template-job-base: &ubuntu-job-base
-  image: ubuntu:18.04
+  image: ubuntu:22.04
   tags:
     - docker
+  rules:
+    - when: always
 
 
 # NOTE
@@ -47,10 +51,7 @@ variables:
 .ubuntu-template-job-default: &ubuntu-job
   <<: *ubuntu-job-base
   before_script:
-    - apt-get update -qq && apt-get install -y -qq git wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
-    - wget https://cmake.org/files/v3.14/cmake-3.14.7-Linux-x86_64.tar.gz
-    - tar -C /usr/local --strip-components=1 --no-same-owner -xvf cmake-*-Linux-x86_64.tar.gz
-    - rm cmake-*-Linux-x86_64.tar.gz
+    - apt-get update -qq && apt-get install -y -qq apt-utils git wget unzip build-essential freeglut3-dev libboost-all-dev qtbase5-dev libqt5opengl5-dev mercurial libeigen3-dev libsqlite3-dev nlohmann-json3-dev libexpat1-dev libxerces-c-dev libhdf5-dev libhepmc3-dev cmake
 
 
 # .ubuntu-template-job-registry: &ubuntu-job-registry
@@ -79,6 +80,7 @@ variables:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 .soqt-build-template: &soqt-job
   variables:
@@ -99,49 +101,32 @@ variables:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 
-.xercesc-build-template-job: &xercesc-job
-  stage: step-A
-  variables:
-    XERCESC_VERSION: ${XERCESC_VERSION_BASE}
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC_VERSION}.tar.gz
-    - tar -xf xerces-c-${XERCESC_VERSION}.tar.gz
-    - mkdir xerces-c-build-${XERCESC_VERSION}
-    - cd xerces-c-build-${XERCESC_VERSION}
-    - cmake ${CMAKE_ARGS} ../xerces-c-${XERCESC_VERSION}
-    - make -j4
-    - make install
-  artifacts:
-    paths:
-      - install
 
 
 .geant4-build-template-job: &geant4-job
-  stage: step-B
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    XERCESC_VERSION: ${XERCESC_VERSION_BASE}
   script:
     - pwd; ls
     - git clone https://gitlab.cern.ch/geant4/geant4.git
     - cd geant4
-    - git checkout tags/v10.6.0
+    - git checkout tags/v11.0.2
     - cd ../
     - mkdir Geant4-build
     - cd Geant4-build
     - ls;
     - ls ../
-    - ls ../install
-    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON -DXERCESC_ROOT_DIR=../install ../geant4 -DGEANT4_USE_SYSTEM_EXPAT=OFF
+    - if [ -d "../install" ]; then ls ../install; fi
+    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON  ../geant4 
     - make -j4
     - make install
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 
 
@@ -169,6 +154,7 @@ variables:
   artifacts:
     paths:
       - install
+    expire_in: 1 day
 
 
 
@@ -191,81 +177,36 @@ debug-job:
 ### MACOS BUILD JOBS
 
 # *** NOTE ***
-# gitlab-runner on needs to be run in user's space "shell executor" on macOS, 
-# thus, it's not possibke to containerize the jobs. 
+# gitlab-runner on needs to be run in user's space "shell executor" on macOS,
+# thus, it's not possibke to containerize the jobs.
 # Also, `brew` cannot be run in parallel jobs, as it throw error, making the job fail.
-# Thus, for our macOS pipeline, we first setup the build machine with a configuration script.
-# Then, we run all the macOS jobs.
-# At the end, we clean the build machine with a cleaning script
-# (Of course, we could install all needed packages on the build machine by hand at once; but we prefer to have a clean build machine everytime; to test even the third-party packages)
-
-# macOS configuration script.
-# It installs all the needed third-party dependencies
-mac-config:
-  <<: *macos-job 
-  stage: step-A
-  script:
-    - brew tap atlas/geomodel https://gitlab.cern.ch/GeoModelDev/packaging/homebrew-geomodel.git 
-    - brew update
-    - brew install qt5 wget expat boost nlohmann-json xerces-c eigen
-    - brew install atlas/geomodel/cmake-geomodel # TODO: remove this as soon as we update Coin/SoQt sources to latest version for CMake 3.19
-    
-
-# macOS job to install our custom-build of Geant4
-mac-config-g4:
-  <<: *macos-job
-  stage: step-B
-  needs: ["mac-config"]
-  script:
-    - brew install atlas/geomodel/geant4 
-
-
-# macOS cleaning script.
-# It removes all the third-party dependencies
-mac-clean:
-  <<: *macos-job 
-  stage: step-E
-  needs: ["mac-gm-visualization", "mac-gm-fullsimlight", "mac-gm-gmg4", "mac-gm-examples-gmg4"]
-  script:
-    - brew uninstall --ignore-dependencies qt5 wget expat boost nlohmann-json xerces-c eigen 
-    - brew remove -f atlas/geomodel/cmake-geomodel #TODO: remove this as soon as we update Coin/SoQt
-
-# macOS cleaning job to remove our custom-build of Geant4
-mac-clean-g4:
-  <<: *macos-job
-  stage: step-F
-  needs: ["mac-clean"]
-  script:
-    - brew remove -f atlas/geomodel/geant4 
-
+# Thus, for our macOS pipeline, we use 'brew bundle' to check and install all needed
+# dependencies, which are listed in a custom Brewfile under the CI folder.
 
 mac-coin:
   <<: *macos-job
   <<: *coin-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
 
 
 mac-soqt:
   <<: *macos-job
   <<: *soqt-job
-  stage: step-C
+  stage: step-B
   needs: ["mac-coin"]
-  #stage: step-B
 
 
-mac-gm-base:
+
+mac-gm:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
 
 
 mac-gm-tools:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
@@ -274,8 +215,8 @@ mac-gm-tools:
 mac-gm-visualization:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-D
-  needs: ["mac-config", "mac-coin", "mac-soqt"]
+  stage: step-C
+  needs: ["mac-coin", "mac-soqt"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
@@ -284,8 +225,8 @@ mac-gm-visualization:
 mac-gm-examples:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-B
-  needs: ["mac-config"]
+  stage: step-A
+  # needs: ["mac-config"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
@@ -293,18 +234,16 @@ mac-gm-examples:
 mac-gm-gmg4:
   <<: *macos-job
   <<: *geomodel-job
-  stage: step-C
-  needs: ["mac-config", "mac-config-g4"]
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
-  
+
 
 mac-gm-examples-gmg4:
   <<: *macos-job
   <<: *geomodel-job
-  needs: ["mac-config", "mac-config-g4"]
-  stage: step-C
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
@@ -313,14 +252,45 @@ mac-gm-examples-gmg4:
 mac-gm-fullsimlight:
   <<: *macos-job
   <<: *geomodel-job
-  needs: ["mac-config", "mac-config-g4"]
-  stage: step-C
+  stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
 
 
-### UBUNTU BUILD JOBS
+mac-gm-fsl:
+  <<: *macos-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_FSL=TRUE
+
+
+mac-gm-all:
+  <<: *macos-job
+  <<: *geomodel-job
+  stage: step-C
+  needs: ["mac-coin", "mac-soqt"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+
+
+mac-gm-atlasextras:
+  <<: *macos-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
+
+
+### UBUNTU ALL-IN-ONE BUILD JOBS
+
+### These jobs build the various GeoModel sub-packages with the use of the CMake
+### build options.
+
 ubu-coin:
   <<: *ubuntu-job
   <<: *coin-job
@@ -332,25 +302,23 @@ ubu-soqt:
   stage: step-B
   needs: ["ubu-coin"]
 
-ubu-gm-base-builtin:
+ubu-gm-base:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubu-gm-tools-builtin:
+ubu-gm-tools:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-ubu-gm-visualization-builtin:
+ubu-gm-visualization:
   <<: *ubuntu-job
   <<: *geomodel-job
   needs: ["ubu-coin", "ubu-soqt"]
@@ -358,116 +326,231 @@ ubu-gm-visualization-builtin:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
-ubu-gm-examples-builtin:
+ubu-gm-examples:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
-    CMAKE_EXTRA_FLAGS:  -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-ubu-XercesC:
-  <<: *ubuntu-job
-  <<: *xercesc-job
-
-ubu-XercesC-323:
-  <<: *ubuntu-job
-  <<: *xercesc-job
-  variables:
-    XERCESC_VERSION: 3.2.3
-    CMAKE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install/xerces-c-${XERCESC_VERSION} # was: ${CMAKE_BASE_ARGS}
 
 ubu-geant4:
   <<: *ubuntu-job
   <<: *geant4-job
-  needs: ["ubu-XercesC"]
+  stage: step-A
 
 
-ubu-gm-examples-gmg4-builtinjson:
+ubu-gm-examples-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC"]
+  stage: step-B
+  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
 
-ubu-gm-gmg4-builtinjson:
+ubu-gm-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC"]
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
-
-ubu-gm-gmg4-builtinxercesc-builtinjson:
-  <<: *ubuntu-job
-  <<: *geomodel-job
-  stage: step-C
+  stage: step-B
   needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE
 
 
-ubu-gm-fullsimlight-builtinjson:
+ubu-gm-fullsimlight:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC"]
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE
-
-ubu-gm-fullsimlight-builtinxercesc-builtinjson:
-  <<: *ubuntu-job
-  <<: *geomodel-job
-  stage: step-C
+  stage: step-B
   needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE 
 
 
-ubu-gm-fullsimlight-customxercesc-builtinjson:
+ubu-gm-fsl:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-B
+  needs: ["ubu-geant4"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FSL=TRUE
+
+
+ubu-gm-all:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
-  needs: ["ubu-geant4", "ubu-XercesC-323"]
+  needs: ["ubu-coin", "ubu-soqt", "ubu-geant4"]
   variables:
-    XERCESC_VERSION: 3.2.3
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib 
-  allow_failure: true
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
 
 
-### Documentation
+ubu-gm-atlasextras:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-B
+  needs: ["ubu-geant4"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
+
+#TODO: this does not work properly. Needs some work...
+# ubu-gm-fullsimlight-customxercesc-builtinjson:
+#   <<: *ubuntu-job
+#   <<: *geomodel-job
+#   stage: step-C
+#   needs: ["ubu-geant4"]
+#   variables:
+#     XERCESC_VERSION: 3.2.3
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib
+#   rules:
+#     - when: manual
+
+
+
+
+### UBUNTU SINGLE BUILD JOBS
+
+### These jobs build the various GeoModel sub-packages as single top-tree packages,
+### one of top of the others. This is what is used, for example, when building 
+### distribution kits, such as the Homebrew 'bottles' for macOS. 
+### Therefore, these jobs test the succesfull build of the GeoModel side for the 
+### distribution kits. If these jobs fail, the formula building the 
+### distribution kits will fail as well.
+
+ubu-single-gmbase:
+  <<: *ubuntu-job
+  stage: step-A
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmtools:
+  <<: *ubuntu-job
+  stage: step-B
+  needs: ["ubu-single-gmbase"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../GeoModelTools # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmviz:
+  <<: *ubuntu-job
+  stage: step-C
+  needs: ["ubu-single-gmbase", "ubu-soqt"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../GeoModelVisualization # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmg4:
+  <<: *ubuntu-job
+  stage: step-C
+  needs: ["ubu-single-gmbase", "ubu-geant4"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../GeoModelG4 # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmfullsimlight:
+  <<: *ubuntu-job
+  stage: step-D
+  needs: ["ubu-single-gmg4", "ubu-geant4"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../FullSimLight # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmfsl:
+  <<: *ubuntu-job
+  stage: step-E
+  needs: ["ubu-single-gmfullsimlight"]
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ../FSL # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+
+#####################
+### Documentation ###
+#####################
 
 docs-build:
     stage: step-A
     rules:
       - changes:
         - documentation/**/*
+    allow_failure: true
+    timeout: 30 minutes
     image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
     before_script:
+        - apt-get update -qq && apt-get install -y -qq git wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
         - pip install --upgrade pip
-        - pip install markdown
-        - pip install mkdocs-material
-        - pip install markdown-include
-        - pip install mkdocs-macros-plugin
+        - pip install -r documentation/requirements.txt
+        #- pip install markdown
+        #- pip install mkdocs-material
+        #- pip install markdown-include
+        #- pip install 'mkdocs-macros-plugin==0.5.0'
         - pip install mkdocs-mermaid2-plugin # adds support for mermaid diagrams / flowcharts
-        #- pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
+        ##- pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
     script:
         #- git --version #TODO: update the docker image to have git
         - ls
@@ -486,16 +569,124 @@ docs-deploy:
     stage: step-B
     needs: ["docs-build"]
     rules:
-      - changes:
+      - if: '$CI_COMMIT_BRANCH == "main"' # Deploy, only if changes are pushed to main.
+        changes:
         - documentation/**/*
+    allow_failure: true
+    timeout: 30 minutes
     variables:
       "EOS_PATH": "/eos/project/g/geomodel/www/home"
     image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
-    #only:
-    #    - master
     script:
         - ls
         - cd documentation
         - ls
         - deploy-eos
+
+
+
+#####################
+### Docker images ###
+#####################
+
+## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
+## Build a 'base' Docker image
+## containing the GeoModel base packages
+##  Note: we build the docker image only from 'main' and tags
+build_system_docker:
+  stage: step-A
+  only:
+    refs:
+      - main
+      - tags
+  variables:
+    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
+    DOCKER_FILE: 'CI/DockerfileBase'
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+  tags:
+    - docker-image-build
+  script:
+    - ignore
+
+
+
+## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
+##  Construct one Docker image containing
+##  also Geant4
+##  Note:
+##  - we build the docker image only from 'main' and tags
+##  - image's final name is, e.g., "geomodel:main-base"
+##
+build_full_docker:
+  stage: step-B
+  allow_failure: true
+  only:
+    refs:
+      - main
+      - tags
+  variables:
+    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-full
+    DOCKER_FILE: 'CI/DockerfileFull'
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
+  tags:
+    - docker-image-build
+  script:
+    - ignore
+  needs:
+    - build_system_docker
+  timeout: 2h 0m 
+
+
+## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
+##  Construct one Docker image only for
+##  viewer puposes
+##  Note:
+##  - we build the docker image only from 'main' and tags
+##  - image's final name is, e.g., "geomodel:main-light"
+##
+build_light_docker:
+  stage: step-B
+  only:
+    refs:
+      - main
+      - tags
+  variables:
+    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-light
+    DOCKER_FILE: 'CI/DockerfileLight'
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
+  tags:
+    - docker-image-build
+  script:
+    - ignore
+  needs:
+    - build_system_docker
+
+##########
+## TAGS ##
+##########
+after-tag-creation:
+  stage: step-A
+  # only run on tags
+  #only:
+  #  - tags
+  # manual mode, for testing the script
+  when: manual
+  script:
+    - 'TAG=$(curl -Ss --request GET "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags" | jq -r ".[0] | .name")'
+    - 'echo "Latest TAG: ${TAG}"'
+    - test -z "$TAG" && echo "no tag found" && exit 1
+    - 'VERSION=$(sed -n -E "s#(^.*GeoModel_VERSION.*[\"])(.*)([\"].*)\$#\2#p" cmake/GeoModel-version.cmake)' # -E for extended regex on macOS, as -r on linux
+    - 'echo "Latest GeoModel VERSION: ${VERSION}"'
+    - test -z "$VERSION" && echo "no version found" && exit 1
+    - 'echo "Latest TAG: ${TAG} -- Latest GeoModel VERSION: ${VERSION}"'
+    - test "$TAG" != "$VERSION" && echo "ERROR --> There is a TAG/VERSION mismatch" && exit 1
+    - echo "OK."
 

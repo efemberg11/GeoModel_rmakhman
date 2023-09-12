@@ -1,5 +1,11 @@
+On linux:
 
 ```
-wget https://cern.ch/atlas-vp1/geometryfiles/geometry_atlas.db
+wget https://geomodel.web.cern.ch/examples/geometry_atlas.db 
 ```
 
+On mac:
+
+```
+curl https://geomodel.web.cern.ch/examples/geometry_atlas.db -o geometry_atlas.db
+```

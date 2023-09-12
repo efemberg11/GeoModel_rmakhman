@@ -2,7 +2,7 @@
 # Package: Geo2G4
 ################################################################################
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16...3.26)
 
 # Declare the package name
 project( "Geo2G4" VERSION 1.0.0 LANGUAGES CXX )

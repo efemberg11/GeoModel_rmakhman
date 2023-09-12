@@ -2,6 +2,9 @@
 
 # Add the executable.
 add_executable( gmex src/main.cxx )
+
+add_definitions (-DGXPLUGINDIR="${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/gxplugins" )
+
 target_link_libraries( gmex PRIVATE GXGui Qt5::Core )
 target_compile_definitions( gmex PRIVATE
    GEOMODEL_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" )

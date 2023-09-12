@@ -2071,14 +2071,18 @@ HepPolyhedron BooleanProcessor::execute(int op,
     case OP_UNION:
       return b;
     case OP_INTERSECTION:
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     	std::cerr
         << "BooleanProcessor: intersection with empty polyhedron"
         << std::endl;
+      }
       return HepPolyhedron();
     case OP_SUBTRACTION:
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     	std::cerr
         << "BooleanProcessor: subtraction from empty polyhedron"
         << std::endl;
+      }
       return HepPolyhedron();
     }
   }
@@ -2088,9 +2092,11 @@ HepPolyhedron BooleanProcessor::execute(int op,
     case OP_UNION:
       return a;
     case OP_INTERSECTION:
+      if ( getenv("VP1MSG_DEBUG_OUTPUT") ) { // TODO: to be replaced by VP1Msg::debug(), when moved outside of VP1Base
     	std::cerr
         << "BooleanProcessor: intersection with empty polyhedron"
         << std::endl;
+      }
       return HepPolyhedron();
     case OP_SUBTRACTION:
       return a;

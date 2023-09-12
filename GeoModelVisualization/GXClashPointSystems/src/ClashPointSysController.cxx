@@ -30,7 +30,7 @@ public:
   bool last_showClashPoints2;
   bool last_showClashPoints3;
   bool last_showClashPoints4;
-  
+  int  last_setPointSize;  
 };
 #include <iostream>
 //____________________________________________________________________
@@ -59,6 +59,8 @@ ClashPointSysController::ClashPointSysController(IVP1System * sys)
   addUpdateSlot(SLOT(possibleChange_showClashPoints4()));
   connectToLastUpdateSlot(m_d->ui.checkBox_clashPoints_4);
 
+  addUpdateSlot(SLOT(possibleChange_setPointSize()));
+  connectToLastUpdateSlot(m_d->ui.pointSizeSpinBox);
   
   connect(m_d->ui.pushButton_selectInput, SIGNAL(clicked()),
 	  this, SIGNAL(inputFileChanged()));
@@ -97,11 +99,14 @@ bool ClashPointSysController::showClashPoints4() const
   return m_d->ui.checkBox_clashPoints_4->isChecked();
 }
 
+int ClashPointSysController::setPointSize() const {
+  return m_d->ui.pointSizeSpinBox->value();
+}
 
 //____________________________________________________________________
 int ClashPointSysController::currentSettingsVersion() const
 {
-  return 1;
+  return 2;
 }
 
 //____________________________________________________________________
@@ -112,6 +117,7 @@ void ClashPointSysController::actualSaveSettings(VP1Serialise&s) const
   s.save(m_d->ui.checkBox_clashPoints_2);//version 1+
   s.save(m_d->ui.checkBox_clashPoints_3);//version 1+
   s.save(m_d->ui.checkBox_clashPoints_4);//version 1+
+  s.save(m_d->ui.pointSizeSpinBox);      //version 2+
 }
 
 //____________________________________________________________________
@@ -122,6 +128,7 @@ void ClashPointSysController::actualRestoreSettings(VP1Deserialise& s)
   s.restore(m_d->ui.checkBox_clashPoints_2);
   s.restore(m_d->ui.checkBox_clashPoints_3);
   s.restore(m_d->ui.checkBox_clashPoints_4);
+  s.restore(m_d->ui.pointSizeSpinBox);
 
 }
 
@@ -135,3 +142,5 @@ POSSIBLECHANGE_IMP(showClashPoints1)
 POSSIBLECHANGE_IMP(showClashPoints2)
 POSSIBLECHANGE_IMP(showClashPoints3)
 POSSIBLECHANGE_IMP(showClashPoints4)
+POSSIBLECHANGE_IMP(setPointSize)
+

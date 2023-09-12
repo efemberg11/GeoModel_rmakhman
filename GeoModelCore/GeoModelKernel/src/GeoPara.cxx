@@ -22,16 +22,45 @@ m_phi (Phi)
 GeoPara::~GeoPara()
 {}
 
-  double GeoPara::volume () const
+double GeoPara::volume () const
 {
-  //## begin GeoPara::volume%3CD2A6DB00FC.body preserve=yes
-  GeoTrf::Vector3D
-    v0 (1, 0, 0),
-    v1 (sin (m_alpha), cos (m_alpha), 0),
-    v2 (sin (m_theta) * cos (m_phi), sin (m_theta) * sin (m_phi), cos (m_theta));
-  double factor = (v0.cross (v1).dot (v2));
+  return 8.0 * m_xHalfLength * m_yHalfLength * m_zHalfLength;
+}
 
-  return 8.0 * factor * m_xHalfLength * m_yHalfLength * m_zHalfLength;
+void GeoPara::extent (double& xmin, double& ymin, double& zmin,
+                      double& xmax, double& ymax, double& zmax) const
+{
+  double dx = m_xHalfLength;
+  double dy = m_yHalfLength;
+  double dz = m_zHalfLength;
+
+  double x0 = dz * std::tan(m_theta) * std::cos(m_phi);
+  double x1 = dy * std::tan(m_alpha);
+  xmin = std::min(std::min(std::min(-x0-x1-dx, -x0+x1-dx), x0-x1-dx), x0+x1-dx);
+  xmax = std::max(std::max(std::max(-x0-x1+dx, -x0+x1+dx), x0-x1+dx), x0+x1+dx);
+
+  double y0 = dz * std::tan(m_theta) * std::sin(m_phi);
+  ymin = std::min(-y0-dy, y0-dy);
+  ymax = std::max(-y0+dy, y0+dy);
+
+  zmin = -dz;
+  zmax = dz;
+}
+
+bool GeoPara::contains (double x, double y, double z) const
+{
+  double cosPhi = std::cos(m_phi);
+  double sinPhi = std::sin(m_phi);
+  double tanTheta = std::tan(m_theta);
+  double tanAlpha = std::tan(m_alpha);
+
+  double z0 = z;
+  double y0 = y - z0 * tanTheta * sinPhi;
+  double x0 = x - y0 * tanAlpha - z0 * tanTheta * cosPhi;
+  double distx = std::abs(x0) - m_xHalfLength;
+  double disty = std::abs(y0) - m_yHalfLength;
+  double distz = std::abs(z0) - m_zHalfLength;
+  return (std::max(std::max(distx, disty), distz) <= 0.0);
 }
 
 const std::string & GeoPara::type () const
@@ -46,6 +75,5 @@ ShapeType GeoPara::typeID () const
 
 void GeoPara::exec (GeoShapeAction *action) const
 {
-	action->handlePara(this);
+  action->handlePara(this);
 }
-

@@ -3,7 +3,8 @@
 #define sectionHandler_H
 
 #include "GDMLInterface/GDMLHandler.h"
-#include "GDMLInterface/GDMLController.h"
+
+class GDMLController;
 
 struct section {
 	double scalingFactor;
@@ -15,15 +16,9 @@ struct section {
 
 class sectionHandler:public GDMLHandler {
 public:
-	sectionHandler(std::string n, GDMLController* c): GDMLHandler(n,c) {}
-	void ElementHandle() {
-		s.scalingFactor=getAttributeAsDouble("scalingFactor");
-		s.xOffset=getAttributeAsDouble("xOffset");
-		s.yOffset=getAttributeAsDouble("yOffset");
-		s.zOrder=getAttributeAsInt("zOrder");
-		s.zPosition=getAttributeAsDouble("zPosition");
-	}
-	section& getSection() {return s;}
+	sectionHandler(std::string n, GDMLController* c);
+	void ElementHandle();
+	section& getSection();
 private:
 	section s;
 };

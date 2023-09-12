@@ -22,6 +22,7 @@
 #include <xercesc/util/OutOfMemoryException.hpp>
 
 using namespace xercesc;
+using namespace GeoModelTools;
 
 DOMNode* XercesParser::s_currentElement=0;
 
@@ -197,6 +198,7 @@ void XercesParser::navigateTree()
 	node = dynamic_cast<DOMNode*>(m_doc->getDocumentElement());
 	if( !node ) throw;
 	s_currentElement=node;
+    //std::cout << "\ncalling elementLoop()...\n";
 	elementLoop(node);
 }
 
@@ -206,6 +208,7 @@ void XercesParser::elementLoop()
 
 void XercesParser::elementLoop(DOMNode *e)
 {
+    //std::cout<<"elementLoop()"<<std::endl;
 	if (!e)
 	{
 		std::cout<<"Calling elementLoop() with NULL pointer!!!"<<std::endl;
@@ -226,12 +229,14 @@ void XercesParser::elementLoop(DOMNode *e)
 	{
 		char* name=XMLString::transcode(e->getNodeName());
 		sName=name;
-//		std::cout <<" found element "<<name<<std::endl;
+        //std::cout <<"found element "<< sName <<std::endl;
 		XMLString::release(&name);
+        //std::cout << "OUTER - sName: " << sName << "\n";
 		for (child=e->getFirstChild();child!=0;child=child->getNextSibling())
 		{
+            //std::cout << "INNER - sName: " << sName << "\n";
 			if (child->getNodeType()==DOMNode::ELEMENT_NODE) {
-//				std::cout<<sName<<" child name "<<XMLString::transcode(child->getNodeName())<<std::endl;
+                //std::cout<< "- " << sName <<" child name: "<<XMLString::transcode(child->getNodeName())<<std::endl;
 				elementLoop(child);
 			}
 		}

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOPHYSVOL_H
@@ -36,7 +36,8 @@ class GeoPhysVol : public GeoVPhysVol
   GeoPhysVol(const GeoPhysVol &right) = delete;
   GeoPhysVol & operator=(const GeoPhysVol &right) = delete;
 
-  void add(GeoGraphNode* graphNode);
+  /// Adds a Graph Node to the Geometry Graph
+  virtual void add(GeoGraphNode* graphNode) override final;
 
   /// Returns the number of child physical volumes.
   virtual unsigned int getNChildVols() const override final;

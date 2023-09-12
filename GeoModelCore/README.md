@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelCore/badges/master/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelCore/commits/master)
+[![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModelCore/badges/main/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModelCore/commits/main)
 
 # GeoModelCore
 

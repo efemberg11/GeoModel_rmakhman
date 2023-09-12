@@ -17,30 +17,38 @@
 class GeoShapeShift : public GeoShape
 {
  public:
+  //    Constructor
   GeoShapeShift (const GeoShape* A, const GeoTrf::Transform3D &X);
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory
   virtual double volume () const;
 
-  //	Returns the OR shape type, as a string.
+  //    Returns the bonding box of the shape
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns true if the shape contains the point, false otherwise
+  virtual bool contains (double x, double y, double z) const;
+
+  //    Returns the OR shape type, as a string.
   virtual const std::string & type () const;
 
-  //	Returns the OR shape type, as a coded integer.
+  //    Returns the OR shape type, as a coded integer.
   virtual ShapeType typeID () const;
 
-  //	Returns the first operand being ORed
+  //    Returns the first operand being ORed
   const GeoShape* getOp () const;
 
-  //	Returns the shift of this shape.
+  //    Returns the shift of this shape.
   const GeoTrf::Transform3D & getX () const;
 
-  //	Executes a GeoShapeAction
+  //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
-  //	For type identification.
+  //    For type identification.
   static const std::string& getClassType ();
 
-  //	For type identification.
+  //    For type identification.
   static ShapeType getClassTypeID ();
 
  protected:
@@ -50,10 +58,10 @@ class GeoShapeShift : public GeoShape
   GeoShapeShift(const GeoShapeShift &right);
   GeoShapeShift & operator=(const GeoShapeShift &right);
 
-  //	The shape operand in the NOT operation.
+  //    The shape operand in the NOT operation.
   const GeoShape* m_op;
 
-  //	Gives the amount by which the volume is shifted.
+  //    Gives the amount by which the volume is shifted.
   GeoTrf::Transform3D m_shift;
 
   static const std::string s_classType;

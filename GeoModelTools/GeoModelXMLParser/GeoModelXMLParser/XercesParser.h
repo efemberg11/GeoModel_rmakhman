@@ -13,6 +13,8 @@
 
 //using namespace xercesc;
 
+namespace GeoModelTools {
+
 class XercesParser: public IAGDDParser {
 public:
 	XercesParser();
@@ -38,5 +40,7 @@ private:
 protected:
 	static xercesc::DOMNode *s_currentElement;
 };
+
+}  // end namespace
 
 #endif

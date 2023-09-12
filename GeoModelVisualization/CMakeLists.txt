@@ -1,7 +1,7 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
 # CMake settings
-cmake_minimum_required( VERSION 3.14 )
+cmake_minimum_required(VERSION 3.16...3.26)
 
 # Dummy call to 'project()', needed to set 'PROJECT_SOURCE_DIR'
 project( "GeoModelTools" )
@@ -24,6 +24,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( cmake_colors_defs )
     # Warn the users about what they are doing
     message(STATUS "${BoldGreen}Building ${PROJECT_NAME} individually, as a top-level project.${ColourReset}")
+    # Set a default build type
+    include( BuildType )
     # Set default build and C++ options
     include( configure_cpp_options )
     set( CMAKE_FIND_FRAMEWORK "LAST" CACHE STRING
@@ -31,8 +33,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Find the base GeoModel packages, which must be installed on the target system already
     find_package( GeoModelCore REQUIRED ${GeoModel_VERSION} )
     find_package( GeoModelIO REQUIRED ${GeoModel_VERSION} )
-    # Set a flag to steer the build of the subpackages
-    set( VISUALIZATION_INDIVIDUAL_BUILD ON )
+    # Print Build Info on screen
+    include( PrintBuildInfo )
 else()
     # I am called from other project with add_subdirectory().
     message( STATUS "Building ${PROJECT_NAME} as part of the root GeoModel project.")
@@ -43,7 +45,7 @@ endif()
 # Find the dependencies of the project.
 find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )
 find_package( OpenGL REQUIRED )
-
+find_package( HDF5 REQUIRED COMPONENTS CXX )
 # Set up how the project should handle some of its dependenices. Either by
 # picking them up from the environment, or building them itself.
 include( SetupCoin3D )
@@ -66,6 +68,8 @@ add_subdirectory(VP1Gui)
 add_subdirectory(VP1Base)
 add_subdirectory(VP1HEPVis)
 add_subdirectory(VP1GuideLineSystems)
+add_subdirectory(GXHitDisplaySystems)
+add_subdirectory(GXTrackDisplaySystems)
 
 # Create and install the version description of the project.
 include( WriteBasicConfigVersionFile )

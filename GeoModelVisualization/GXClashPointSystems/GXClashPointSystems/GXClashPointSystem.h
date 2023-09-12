@@ -48,6 +48,10 @@ public slots:
   void showClashPoint2(bool);
   void showClashPoint3(bool);
   void showClashPoint4(bool);
+  void setPointSize(int);
+
+signals:
+  void updateTransparencyType(unsigned type);
   
 private:
   class Imp;

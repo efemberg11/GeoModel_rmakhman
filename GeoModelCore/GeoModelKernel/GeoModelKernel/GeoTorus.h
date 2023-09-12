@@ -13,20 +13,44 @@ class GeoTorus : public GeoShape
  public:
   GeoTorus (double Rmin, double Rmax, double Rtor, double SPhi, double DPhi);
 
+  //    Returns the volume of the shape, for mass inventory.
   virtual double volume () const;
 
+  //    Returns the bonding box of the shape.
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns true if the shape contains the point, false otherwise.
+  virtual bool contains (double x, double y, double z) const;
+
+  //    Returns the TORUS shape type, as a string.
   virtual const std::string & type () const;
+
+  //    Returns the TORUS shape type, as a coded integer.
   virtual ShapeType typeID () const;
 
-  static const std::string& getClassType ();
-  static ShapeType getClassTypeID ();
-
+  //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
 
+  //    For type identification.
+  static const std::string& getClassType ();
+
+  //    For type identification.
+  static ShapeType getClassTypeID ();
+
+  //    Inner radius.
   const double& getRMin () const;
+
+  //    Outer radius.
   const double& getRMax () const;
+
+  //    Radius of the torus.
   const double& getRTor () const;
+
+  //    Starting angle of the segment in radians.
   const double& getSPhi () const;
+
+  //    Delta angle of the segment in radians.
   const double& getDPhi () const;
 
  protected:
@@ -80,6 +104,5 @@ inline const double& GeoTorus::getDPhi () const
 {
   return m_dPhi;
 }
-
 
 #endif

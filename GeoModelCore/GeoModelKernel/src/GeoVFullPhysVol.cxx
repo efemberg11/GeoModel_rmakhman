@@ -25,11 +25,14 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
   //                                                                                                //     
   // Get ready for something to go wrong:                                                           //     
   //                                                                                                //     
-  static std::string errorMessage("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume:  ");
+  static std::string errorMessage("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nLogVol name of shared volume:  ");
   //                                                                                                //     
   //------------------------------------------------------------------------------------------------//     
-  if(isShared()) throw std::runtime_error(errorMessage);
+  
+  if(isShared()) throw std::runtime_error(errorMessage+getLogVol()->getName());
 
+  std::scoped_lock<std::mutex> guard(m_mutex);
+  
   if(store==nullptr && !m_absPosInfo) m_absPosInfo = new GeoAbsPositionInfo();
 
   //
@@ -57,7 +60,7 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
     tProd = transform * tProd;
     child = parent;
     if(child->isShared()) {
-      throw std::runtime_error(errorMessage);
+      throw std::runtime_error(errorMessage+ getLogVol()->getName() + " because of " + child->getLogVol()->getName());
     }
     else {
       parent = child->getParent();
@@ -75,8 +78,23 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
   }
 }
 
+const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedAbsoluteTransform(const GeoVAlignmentStore* store) const
+{
+  if(store==nullptr) {
+    std::scoped_lock<std::mutex> guard(m_mutex);
+    if(m_absPosInfo->getAbsTransform()) return *m_absPosInfo->getAbsTransform();
+  }
+  else {
+    const GeoTrf::Transform3D* storedPos = store->getAbsPosition(this);
+    if(storedPos) return *storedPos;
+  }
+  throw std::runtime_error("Failed to find the cached absolute transform for " + getLogVol()->getName());
+}
+
+
 void GeoVFullPhysVol::clearPositionInfo() const
 {
+  std::scoped_lock<std::mutex> guard(m_mutex);
   delete m_absPosInfo;
   m_absPosInfo = nullptr;
 }
@@ -90,8 +108,10 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
   static std::string errorMessage("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume:  ");
   //                                                                                                //     
   //------------------------------------------------------------------------------------------------//     
-  if(isShared()) throw std::runtime_error(errorMessage);
+  if(isShared()) throw std::runtime_error(errorMessage + getLogVol()->getName());
 
+  std::scoped_lock<std::mutex> guard(m_mutex);
+  
   if(store==nullptr && !m_absPosInfo) m_absPosInfo = new GeoAbsPositionInfo();
 
   //
@@ -119,7 +139,7 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
     tProd = transform * tProd;
     child = parent;
     if(child->isShared()) {
-      throw std::runtime_error(errorMessage);
+      throw std::runtime_error(errorMessage + getLogVol()->getName() + " because of " + child->getLogVol()->getName());
     }
     else {
       parent = child->getParent();
@@ -137,7 +157,20 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
   }
 }
 
-const std::string &  GeoVFullPhysVol::getAbsoluteName ()
+const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedDefAbsoluteTransform(const GeoVAlignmentStore* store) const
+{
+  if(store==nullptr) {
+    std::scoped_lock<std::mutex> guard(m_mutex);
+    if(m_absPosInfo->getDefAbsTransform()) return *m_absPosInfo->getDefAbsTransform();
+  }
+  else {
+    const GeoTrf::Transform3D* storedPos = store->getDefAbsPosition(this);
+    if(storedPos) return *storedPos;
+  }
+  throw std::runtime_error("Failed to find the cached default absolute transform for " + getLogVol()->getName());
+}
+
+const std::string &  GeoVFullPhysVol::getAbsoluteName () const
 {
   //------------------------------------------------------------------------------------------------//     
   //                                                                                                //     

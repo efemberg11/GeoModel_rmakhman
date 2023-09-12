@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -13,12 +13,23 @@ target_include_directories( GeoModelKernel PUBLIC
    $<INSTALL_INTERFACE:include> )
 source_group( "GeoModelKernel" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
-if( GEOMODEL_USE_BUILTIN_EIGEN3 )
-   add_dependencies( GeoModelKernel Eigen3 )
-endif()
 set_target_properties( GeoModelKernel PROPERTIES
    VERSION ${PROJECT_VERSION}
    SOVERSION ${PROJECT_VERSION_MAJOR} )
+
+# Code in this file makes heavy use of eigen and runs orders of magnitude
+# more slowly without optimization.  So force this to be optimized even
+# in debug builds.  If you need to debug it you might want to change this.
+# Specifying optimization via an attribute on the particular
+# function didn't work, because that still didn't allow inlining.
+if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
+  set_source_files_properties(
+     ${CMAKE_CURRENT_SOURCE_DIR}/src/GeoXF.cxx
+     ${CMAKE_CURRENT_SOURCE_DIR}/src/GeoAlignableTransform.cxx
+     PROPERTIES
+     COMPILE_FLAGS "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}"
+     COMPILE_DEFINITIONS "FLATTEN" )
+endif()
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.

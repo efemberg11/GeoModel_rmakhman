@@ -1,3 +1,7 @@
+/*
+ *   Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration   
+*/
+
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
@@ -17,16 +21,27 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdio>
 #include <unistd.h>
+#include <stdlib.h>
+
+#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 #ifdef __APPLE__
 const std::string shared_obj_extension=".dylib";
 #else
 const std::string shared_obj_extension=".so";
 #endif
 
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
+
+void publishMetaData( GMDBManager & db,
+		      std::vector<std::string> &inputFiles,
+		      std::vector<std::string> &inputPlugins,
+		      std::string              &outputFile);
 
 int main(int argc, char ** argv) {
+
+
+
   //
   // Usage message:
   //
@@ -50,27 +65,31 @@ int main(int argc, char ** argv) {
   std::string outputFile;
   bool outputFileSet = false;
   for (int argi=1;argi<argc;argi++) {
-    std::string argument=argv[argi];
-    if (argument.find("-o")!=std::string::npos) {
-      argi++;
-      if (argi>=argc) {
-	std::cerr << usage << std::endl;
-	return 1;
+      std::string argument=argv[argi];
+      if (argument.find("-o")!=std::string::npos) {
+          argi++;
+          if (argi>=argc) {
+              std::cerr << usage << std::endl;
+              return 1;
+          }
+          outputFile=argv[argi];
+          outputFileSet = true;
       }
-      outputFile=argv[argi];
-      outputFileSet = true;
-    }
-    else if (argument.find(shared_obj_extension)!=std::string::npos) {
-      inputPlugins.push_back(argument);
-    }
-    else if (argument.find(".db")!=std::string::npos) {
-      inputFiles.push_back(argument);
-    }
-    else {
-      std::cerr << "Unrecognized argument " << argument << std::endl;
-      std::cerr << usage << std::endl;
-      return 2;
-    }
+      else if (argument.find("-v")!=std::string::npos) {
+          setenv("GEOMODEL_GEOMODELIO_VERBOSE", "1", 1); // does overwrite
+          std::cout << "You set the verbosity level to 1" << std::endl;
+      }
+      else if (argument.find(shared_obj_extension)!=std::string::npos) {
+          inputPlugins.push_back(argument);
+      }
+      else if (argument.find(".db")!=std::string::npos) {
+          inputFiles.push_back(argument);
+      }
+      else {
+          std::cerr << "Unrecognized argument " << argument << std::endl;
+          std::cerr << usage << std::endl;
+          return 2;
+      }
   }
   if( !outputFileSet ) {
       std::cerr << "\nERROR! You should set an output file.\n" << std::endl;
@@ -84,19 +103,19 @@ int main(int argc, char ** argv) {
   if (access(outputFile.c_str(),F_OK)==0) {
     if (!access(outputFile.c_str(),W_OK)) {
       if (system(("rm -f "+ outputFile).c_str())) {
-	std::cerr << "Error, cannot overwrite existing file " << outputFile << std::endl;
+	std::cerr << "gmcat -- Error, cannot overwrite existing file " << outputFile << std::endl;
 	return 3;
       }
     }
     else {
-      std::cerr << "Error, cannot overwrite existing file " << outputFile << " (permission denied)" << std::endl;
+      std::cerr << "gmcat -- Error, cannot overwrite existing file " << outputFile << " (permission denied)" << std::endl;
       return 4;
     }
   }
 
 
   //
-  // Create elements and materials:
+  // Create elements and materials for the "World" volume, which is the container:
   //
 
   const double  gr =   SYSTEM_OF_UNITS::gram;
@@ -133,7 +152,7 @@ int main(int argc, char ** argv) {
     GeoGeometryPluginLoader loader;
     GeoVGeometryPlugin *factory=loader.load(plugin);
     if (!factory) {
-      std::cerr << "Could not load plugin " << plugin << std::endl;
+      std::cerr << "gmcat -- Could not load plugin " << plugin << std::endl;
       return 5;
     }
     
@@ -155,7 +174,7 @@ int main(int argc, char ** argv) {
   for (const std::string & file : inputFiles) {
     GMDBManager* db = new GMDBManager(file);
     if (!db->checkIsDBOpen()){
-      std::cerr << "Error opening input file " << file << std::endl;
+      std::cerr << "gmcat -- Error opening the input file: " << file << std::endl;
       return 6;
     }
 
@@ -163,18 +182,24 @@ int main(int argc, char ** argv) {
     GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
 
     /* build the GeoModel geometry */
-    GeoPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+    GeoVPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
+    /* get an handle on a Volume Cursor, to traverse the whole set of Volumes */
     GeoVolumeCursor aV(dbPhys);
 
+    /* loop over the Volumes in the tree */
     while (!aV.atEnd()) {
-      GeoNameTag *nameTag=new GeoNameTag(aV.getName());
-      GeoTransform *transform= new GeoTransform(aV.getTransform());
-      world->add(nameTag);
-      world->add(transform);
-      world->add((GeoVPhysVol *) &*aV.getVolume());
-      aV.next();
+
+	if (aV.getName()!="ANON") {
+	  GeoNameTag *nameTag=new GeoNameTag(aV.getName());
+	  world->add(nameTag);
+	}
+	GeoTransform *transform= new GeoTransform(aV.getTransform());
+	world->add(transform);
+	world->add((GeoVPhysVol *) &*aV.getVolume());
+	aV.next();
     }
+
     delete db;
   }
   //
@@ -185,16 +210,22 @@ int main(int argc, char ** argv) {
   // check the DB connection
   //
   if (!db.checkIsDBOpen()) {
-    std::cerr << "Error opening output file " << outputFile << std::endl;
+    std::cerr << "gmcat -- Error opening the output file: " << outputFile << std::endl;
     return 7;
   }
 
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   world->exec(&dumpGeoModelGraph);
-  dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
+
+  if (vecPluginsPublishers.size() > 0) {
+    dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
+  } else {
+    dumpGeoModelGraph.saveToDB();
+  }
 
   world->unref();
 
-
+  publishMetaData(db,inputFiles,inputPlugins,outputFile);
+  
   return 0;
 }

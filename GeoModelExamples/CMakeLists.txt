@@ -6,23 +6,30 @@
 ################################################################################
 
 # Set up the project.
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required(VERSION 3.16...3.26)
 project( "GeoModelExamples" VERSION 4.1.0 LANGUAGES CXX )
 
 # Getting-started examples
+add_subdirectory( KitchenSinkPlugin )
+add_subdirectory( MinimalPlugin )
+
 add_subdirectory( HelloGeo )
 add_subdirectory( HelloGeoWrite )
+add_subdirectory( HelloGeoWriteReadWrite )
 add_subdirectory( HelloGeoRead )
-add_subdirectory( HelloDummyMaterial )
-add_subdirectory( HelloToy )
-add_subdirectory( HelloToyDetectorFactory )
+add_subdirectory( HelloGeoReadNodeAction )
+
+#add_subdirectory( HelloDummyMaterial )
+#add_subdirectory( HelloToy )
+#add_subdirectory( HelloToyDetectorFactory )
+#add_subdirectory( HelloToyXML ) # this should be moved to GeoModelATLAS, because it uses GeoModelDataManagers
 
 # GeoModel reference examples
-add_subdirectory( GeoActions )
-add_subdirectory( GeoShapeExamples )
-add_subdirectory( GeoShiftUnion )
-add_subdirectory( GeoTessellatedSolidExamples )
-add_subdirectory( GeoFullPhysVol )
+#add_subdirectory( GeoActions )
+#add_subdirectory( GeoShapeExamples )
+#add_subdirectory( GeoShiftUnion )
+#add_subdirectory( GeoTessellatedSolidExamples )
+#add_subdirectory( GeoFullPhysVol )
 
 # GeoModel <--> Geant4 examples are built on explicit request only
 if(GEOMODEL_BUILD_EXAMPLES_W_GEANT4)

@@ -14,30 +14,38 @@
 class GeoShapeUnion : public GeoShape
 {
  public:
+  //    Constructor taking two shape operands
   GeoShapeUnion (const GeoShape* A, const GeoShape* B);
 
-  //	Returns the volume of the shape, for mass inventory
+  //    Returns the volume of the shape, for mass inventory
   virtual double volume () const;
 
-  //	Returns the OR shape type, as a string.
+  //    Returns the bonding box of the shape
+  virtual void extent (double& xmin, double& ymin, double& zmin,
+                       double& xmax, double& ymax, double& zmax) const;
+
+  //    Returns true if the shape contains the point, false otherwise
+  virtual bool contains (double x, double y, double z) const;
+
+  //    Returns the OR shape type, as a string.
   virtual const std::string & type () const;
 
-  //	Returns the OR shape type, as a coded integer.
+  //    Returns the OR shape type, as a coded integer.
   virtual ShapeType typeID () const;
 
-  //	Returns the first operand being ORed
+  //    Returns the first operand being ORed
   const GeoShape* getOpA () const;
 
-  //	Returns the second operand being ORed.
+  //    Returns the second operand being ORed.
   const GeoShape* getOpB () const;
 
-  //	Executes a GeoShapeAction
+  //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
-  //	For type identification.
+  //    For type identification.
   static const std::string& getClassType ();
 
-  //	For type identification.
+  //    For type identification.
   static ShapeType getClassTypeID ();
 
  protected:
@@ -47,11 +55,14 @@ class GeoShapeUnion : public GeoShape
   GeoShapeUnion(const GeoShapeUnion &right);
   GeoShapeUnion & operator=(const GeoShapeUnion &right);
 
-  //	The first shape operand in the OR operation.
+  //    The first shape operand in the OR operation
   const GeoShape* m_opA;
 
-  //	The second shape operand in the OR operation.
+  //    The second shape operand in the OR operation
   const GeoShape* m_opB;
+
+  //    Cached volume
+  mutable double fVolume = -1.;
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;

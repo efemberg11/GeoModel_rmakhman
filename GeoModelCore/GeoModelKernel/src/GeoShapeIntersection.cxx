@@ -27,11 +27,27 @@ GeoShapeIntersection::~GeoShapeIntersection()
 
 double GeoShapeIntersection::volume () const
 {
-  GeoPolyhedrizeAction a;
-  exec(&a);
-  const GeoPolyhedron *poly = a.getPolyhedron();
-  double vol = poly->GetVolume ();
-  return vol;
+  return (fVolume < 0.) ? (fVolume = GeoShape::volume()) : fVolume;
+}
+
+void GeoShapeIntersection::extent (double& xmin, double& ymin, double& zmin,
+                                   double& xmax, double& ymax, double& zmax) const
+{
+  double xminA, yminA, zminA, xmaxA, ymaxA, zmaxA;
+  double xminB, yminB, zminB, xmaxB, ymaxB, zmaxB;
+  getOpA()->extent(xminA, yminA, zminA, xmaxA, ymaxA, zmaxA);
+  getOpB()->extent(xminB, yminB, zminB, xmaxB, ymaxB, zmaxB);
+  xmin = std::max(xminA, xminB);
+  ymin = std::max(yminA, yminB);
+  zmin = std::max(zminA, zminB);
+  xmax = std::min(xmaxA, xmaxB);
+  ymax = std::min(ymaxA, ymaxB);
+  zmax = std::min(zmaxA, zmaxB);
+}
+
+bool GeoShapeIntersection::contains (double x, double y, double z) const
+{
+  return (getOpA()->contains(x, y, z)) ? getOpB()->contains(x, y, z) : false;
 }
 
 const std::string & GeoShapeIntersection::type () const

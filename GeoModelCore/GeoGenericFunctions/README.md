@@ -21,7 +21,7 @@ make install
 Usually, Externals packages are buit and installed through the build of the package [atlasexternals](), downloading and compiling the sources of the different packages and installing them in an "install" folder, to let Athena-code uses them through a series of scripts.
 However, this implies that, if you change the source code of an External package, you must push your changes somewhere (or you must package them ina zip file) for the `atlasexternals` build script to get your latest changes. And that implies a series of additional steps, which are not convenient if you are actively debugging or developing code.
 
-Thus, after having installed the `atlasexternals` as usual (let's assume, using the path `../../install/VP1LightExternals/` as `DISTDIR`; see the [atlasexternals docs](https://gitlab.cern.ch/atlas/atlasexternals/blob/master/README.md) for further details, or [this guide for developers](https://gitlab.cern.ch/atlas/atlasexternals/blob/master/CONTRIBUTING.md)), if you want to compile interacively this external while you are developing Athena or AnalysisBase/VP1Light packages, you can use these example commands (replace the paths with your own):
+Thus, after having installed the `atlasexternals` as usual (let's assume, using the path `../../install/VP1LightExternals/` as `DISTDIR`; see the [atlasexternals docs](https://gitlab.cern.ch/atlas/atlasexternals/blob/main/README.md) for further details, or [this guide for developers](https://gitlab.cern.ch/atlas/atlasexternals/blob/main/CONTRIBUTING.md)), if you want to compile interacively this external while you are developing Athena or AnalysisBase/VP1Light packages, you can use these example commands (replace the paths with your own):
 
 
 ```bash

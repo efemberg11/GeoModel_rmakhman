@@ -1,15 +1,23 @@
 /*
-  Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
 */
 
 
 ////////////////////////////////////////////////////////////////
-//                                                            //
-//  Implementation of class GeoSysController                  //
-//                                                            //
-//  Author: Thomas H. Kittelmann (Thomas.Kittelmann@cern.ch)  //
-//  Initial version: October 2008                             //
-//                                                            //
+//                                                           
+//  Implementation of class GeoSysController                  
+//                                                            
+//  Author: Thomas H. Kittelmann (Thomas.Kittelmann@cern.ch)  
+//  Initial version: October 2008
+//  
+//  Major updates:
+// 
+//  - Riccardo Maria BIANCHI (riccardo.maria.bianchi@cern.ch)  
+//    2019
+//
+//  - Riccardo Maria BIANCHI (riccardo.maria.bianchi@cern.ch)  
+//    Jul 2021: Added support to filter volumes based on names
+//                                                            
 ////////////////////////////////////////////////////////////////
 
 #define VP1IMPVARNAME m_d
@@ -47,7 +55,6 @@ public:
   std::map<VP1GeoFlags::SubSystemFlag,QCheckBox*> subSysCheckBoxMap;
   float last_transparency;
   bool last_showVolumeOutLines;
-  //  VP1GeoFlags::MuonChamberAdaptionStyleFlags last_muonChamberAdaptionStyle;
   int last_labels; //!< needed for POSSIBLECHANGE_IMP macro.
   QList<int> last_labelPosOffset; //!< needed for  POSSIBLECHANGE_IMP macro.
   SoPickStyle * pickStyle;
@@ -56,8 +63,6 @@ public:
 
   QString lastSaveMaterialsFile;
   QString lastLoadMaterialsFile;
-  
-//  std::map<QString, QList<QCheckBox*> > labelProvidingSystems; //!< First is name of system, second is list of types of information provided (system stores actual information)
 };
 
 
@@ -77,7 +82,7 @@ GeoSysController::GeoSysController(IVP1System * sys)
   //  m_d->ui_disp.widget_drawOptions->setLineWidthsDisabled();
   m_d->ui_disp.widget_drawOptions->setPointSizesDisabled();
 //   m_d->ui_disp.widget_drawOptions->setBaseLightingDisabled();
-  m_d->ui_disp.widget_drawOptions->setComplexity(0.6);
+  m_d->ui_disp.widget_drawOptions->setComplexity(1.0); // default 'curved surface accuracy' value
 
   m_d->pickStyle = new SoPickStyle;
   m_d->pickStyle->ref();
@@ -119,15 +124,16 @@ GeoSysController::GeoSysController(IVP1System * sys)
   connect(m_d->ui_misc.lineEdit_expand_vols_volname,SIGNAL(returnPressed()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
   connect(m_d->ui_misc.pushButton_expand_vols_volname,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
 
+  // filter volumes
+  connect(m_d->ui_misc.lineEdit_filter_logvolname,SIGNAL(returnPressed()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
+  connect(m_d->ui_misc.pushButton_filter_logvolname,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
+  connect(m_d->ui_misc.pushButton_filter_reset,SIGNAL(clicked()),this,SLOT(emit_autoExpandByVolumeOrMaterialName()));
+
+
   connect(m_d->ui_int.checkBox_localAxes, SIGNAL(stateChanged(int)), this, SIGNAL(displayLocalAxesChanged(int)));
   connect(m_d->ui_int.slider_AxesScale, SIGNAL(valueChanged(int)), this, SIGNAL(axesScaleChanged(int)));
 
-
   setLastSelectedVolume(0);
-
- 
- 
-
 }
 
 //____________________________________________________________________
@@ -335,6 +341,20 @@ float GeoSysController::transparency() const
 }
 
 //____________________________________________________________________
+void GeoSysController::setTransparency(float value) const
+{
+  assert( 0. <= value && value <= 100.);
+  m_d->ui_disp.spinBox_transp->setValue(value);
+  return;
+}
+
+//____________________________________________________________________
+bool GeoSysController::isTranspLocked() const
+{
+      return m_d->ui_misc.lockTransp->isChecked();
+}
+
+//____________________________________________________________________
 bool GeoSysController::showVolumeOutLines() const
 {
   return m_d->ui_disp.checkBox_showVolumeOutLines->isChecked();
@@ -344,14 +364,63 @@ bool GeoSysController::showVolumeOutLines() const
 //____________________________________________________________________
 void GeoSysController::emit_autoExpandByVolumeOrMaterialName()
 {
-  bool volname(sender()==m_d->ui_misc.pushButton_expand_vols_volname
-	       ||sender()==m_d->ui_misc.lineEdit_expand_vols_volname);
-  QString name(volname?m_d->ui_misc.lineEdit_expand_vols_volname->text()
-	       :m_d->ui_misc.lineEdit_expand_vols_matname->text());
-  if (name.isEmpty())
-    return;
-  messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+")");
-  emit autoExpandByVolumeOrMaterialName(!volname,name);
+  // if we filter on visible objects, then...
+	if (sender()==m_d->ui_misc.pushButton_expand_vols_volname
+			|| sender()==m_d->ui_misc.lineEdit_expand_vols_volname)
+      {
+          // check if a name is set in the 'volume' field
+          bool volname(sender()==m_d->ui_misc.pushButton_expand_vols_volname
+				      ||sender()==m_d->ui_misc.lineEdit_expand_vols_volname);
+
+          // get volume's or material's name
+		      QString name(volname ? m_d->ui_misc.lineEdit_expand_vols_volname->text()
+				      : m_d->ui_misc.lineEdit_expand_vols_matname->text());
+
+          // return if name is empty
+          if (name.isEmpty()) {
+			       return;
+          }
+
+          // emit the signal
+		      messageVerbose("emitting autoExpandByVolumeOrMaterialName("+str(!volname)+", "+name+")");
+		      emit autoExpandByVolumeOrMaterialName(!volname,name);
+	}
+  // if we use the 'filter volumes' feature, then...
+	else if (sender()==m_d->ui_misc.pushButton_filter_logvolname
+			|| sender()==m_d->ui_misc.lineEdit_filter_logvolname
+            || sender()==m_d->ui_misc.pushButton_filter_reset)
+  {
+        // handle as "filter" if was sent by the 'filter volume' field or 'Apply' button...
+        bool filter(sender()==m_d->ui_misc.pushButton_filter_logvolname
+				      || sender()==m_d->ui_misc.lineEdit_filter_logvolname);
+
+        // handle as "reset the view" if sent by the 'reset filters' button...
+        bool resetView(sender()==m_d->ui_misc.pushButton_filter_reset);
+       
+        // get additional options
+        int maxDepth(m_d->ui_misc.spinBox_maxDepth->value()==-1 ? 9999 : m_d->ui_misc.spinBox_maxDepth->value());
+        bool stopAtFirst(m_d->ui_misc.radioButton_StopAtFirst->isChecked() ? true : false );
+        bool visitChildren(m_d->ui_misc.radioButton_DoNotVisitChildren->isChecked() ? false : true);
+
+        bool bymatname = false; // TODO: set this in the UI!
+        QString nameRegEx(m_d->ui_misc.lineEdit_filter_logvolname->text());
+
+        // return if name is empty
+        if (nameRegEx.isEmpty()) {
+			     return;
+        }
+
+        // clear regex if we are resetting the filters
+        if (resetView) {
+            m_d->ui_misc.radioButton_StopAtFirst->setChecked(true);
+            m_d->ui_misc.radioButton_DoNotVisitChildren->setChecked(true);
+            m_d->ui_misc.lineEdit_filter_logvolname->clear();
+        }
+
+        messageDebug("emitting signalFilterVolumes("+nameRegEx + ", " + str(bymatname) + ", " + str(maxDepth) + ", " + str(stopAtFirst)+ ", " + str(visitChildren) + ", " + str(resetView)+")");
+        emit signalFilterVolumes(nameRegEx, bymatname, maxDepth, stopAtFirst, visitChildren, resetView);
+	} 
+	return;
 }
 
 //____________________________________________________________________

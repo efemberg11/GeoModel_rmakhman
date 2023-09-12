@@ -73,6 +73,7 @@ public:
 
   static VolState getChildStates(const VolumeHandle*theclass );
   static void applyChildStates(const VolState&,VolumeHandle*theclass);
+  static bool hasNonStandardShapeChildren(const SoGroup*g);
 
 };
 
@@ -138,7 +139,7 @@ void VolumeHandle::initialiseChildren()
   while (!av.atEnd()) {
 
     //Add transformation between parent and child to find the complete transformation of the child:
-    const GeoTrf::Transform3D::MatrixType & mtx=av.getTransform().matrix();
+    const GeoTrf::Transform3D::MatrixType  mtx=av.getTransform().matrix();
     SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, conventions
 		  mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // differ!
 		  mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),
@@ -181,7 +182,7 @@ bool VolumeHandle::hasName(const std::string& n) const
 //____________________________________________________________________
 SoMaterial * VolumeHandle::material()
 {
-  VP1Msg::messageDebug("VolumeHandle::material() - LogVol name: " + QString::fromStdString(m_d->pV->getLogVol()->getName()));
+  VP1Msg::messageDebug2("VolumeHandle::material() - LogVol name: " + QString::fromStdString(m_d->pV->getLogVol()->getName()));
   // if it's not the first time here and
   // the material has been assigned already, then return that
   if (m_d->material)
@@ -238,7 +239,7 @@ SoSeparator * VolumeHandle::nodeSoSeparator() const
 //____________________________________________________________________
 void VolumeHandle::ensureBuildNodeSep()
 {
-  VP1Msg::messageDebug("VolumeHandle::ensureBuildNodeSep()");
+  VP1Msg::messageDebug3("VolumeHandle::ensureBuildNodeSep()");
   if (m_d->nodesep && m_d->label_sep)
     return;
 
@@ -344,15 +345,15 @@ void VolumeHandle::ensureBuildNodeSep()
 //____________________________________________________________________
 void VolumeHandle::Imp::attach(VolumeHandle*vh)
 {
-  VP1Msg::messageDebug("VolumeHandle::Imp::attach() - name: " + vh->getName());
+  VP1Msg::messageDebug3("VolumeHandle::Imp::attach() - name: " + vh->getName());
   if (!isattached) {
     vh->ensureBuildNodeSep();
     if (attachsepHelper) {
-      VP1Msg::messageDebug("adding node...");
+      VP1Msg::messageDebug3("adding node...");
       attachsepHelper->addNodeUnderMaterial(nodesep,vh->material());
     }
     if (attachlabelSepHelper) {
-      VP1Msg::messageDebug("adding label...");
+      VP1Msg::messageDebug3("adding label...");
       attachlabelSepHelper->addNode(label_sep);
     }
     isattached=true;
@@ -680,6 +681,35 @@ void VolumeHandle::Imp::applyChildStates(const VolState& vs,VolumeHandle*theclas
     }
   }
 }
+
+
+//____________________________________________________________________
+bool VolumeHandle::Imp::hasNonStandardShapeChildren(const SoGroup*g)
+{
+  const int n(g->getNumChildren());
+  for (int i=0; i < n; ++i) {
+    const SoNode*c = g->getChild(i);
+    if (c->getTypeId().isDerivedFrom(SoShape::getClassTypeId())) {
+      if (c->getTypeId().isDerivedFrom(SoPcons::getClassTypeId())
+	  ||c->getTypeId().isDerivedFrom(SoPolyhedron::getClassTypeId())
+	  ||c->getTypeId().isDerivedFrom(SoTransparency::getClassTypeId()))
+	return true;
+    } else if (c->getTypeId().isDerivedFrom(SoGroup::getClassTypeId())) {
+      if (hasNonStandardShapeChildren(static_cast<const SoGroup*>(c)))
+	return true;
+    }
+  }
+  return false;
+}
+
+//____________________________________________________________________
+bool VolumeHandle::isInitialisedAndHasNonStandardShape() const
+{
+  VP1HEPVisUtils::initAllCustomClasses();
+  return m_d->nodesep ? Imp::hasNonStandardShapeChildren(m_d->nodesep) : false;
+}
+
+
 
 
 //____________________________________________________________________

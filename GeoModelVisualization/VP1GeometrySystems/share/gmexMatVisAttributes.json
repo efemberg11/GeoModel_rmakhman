@@ -49,7 +49,8 @@
                 "R": 0.0
             },
             "name": [
-                "Aluminium"
+                "Aluminium",
+                "std::Aluminium"
             ],
             "shininess": 0.23000000417232513,
             "specular": {
@@ -325,7 +326,8 @@
                 "R": 0.0
             },
             "name": [
-                "Epoxy"
+                "Epoxy",
+                "tile::SiO2CondEpox"
             ],
             "shininess": 0.7212120294570923,
             "specular": {
@@ -460,7 +462,8 @@
                 "R": 0.0
             },
             "name": [
-                "Iron"
+                "Iron",
+                "std::Iron"
             ],
             "shininess": 0.6000000238418579,
             "specular": {
@@ -714,6 +717,7 @@
             },
             "name": [
                 "MatGlue",
+                "tile::Glue",
 		"pix::GlueOmegaStave_BL0",
 		"pix::GlueOmegaStave_L10",
 		"pix::GlueOmegaStave_L20"
@@ -1155,7 +1159,10 @@
                 "R": 0.0
             },
             "name": [
-                "Scintillator"
+                "Scintillator",
+                "Polyvinyltoluene",
+                "tile::Scintillator",
+                "tile::Polyvinyltoluene"
             ],
             "shininess": 0.9818180203437805,
             "specular": {
@@ -1182,7 +1189,8 @@
                 "R": 0.0
             },
             "name": [
-                "Services"
+                "Services",
+                "LArServices"
             ],
             "shininess": 0.20000000298023224,
             "specular": {

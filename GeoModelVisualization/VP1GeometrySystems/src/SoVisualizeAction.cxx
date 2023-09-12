@@ -89,7 +89,7 @@ void SoVisualizeAction::handleCons(const GeoCons *cons)
 
 void SoVisualizeAction::handleTorus(const GeoTorus *torus)
 {
-  //qDebug() << "SoVisualizeAction::handleCons";
+  //qDebug() << "SoVisualizeAction::handleTorus";
   SoTorus::initClass();
   SoTorus *sotorus= new SoTorus;
   sotorus->fRInner = torus->getRMin();

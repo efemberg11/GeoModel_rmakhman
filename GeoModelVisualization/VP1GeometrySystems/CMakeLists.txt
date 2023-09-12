@@ -26,9 +26,6 @@ set_target_properties( GXGeometrySystems PROPERTIES
 if( GEOMODEL_USE_BUILTIN_COIN3D )
    add_dependencies( GXGeometrySystems Coin3DBuiltIn )
 endif()
-if( GEOMODEL_USE_BUILTIN_JSON )
-   add_dependencies( GXGeometrySystems JSONExt )
-endif()
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.

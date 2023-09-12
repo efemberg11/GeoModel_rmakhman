@@ -10,6 +10,7 @@
 #include <vector>
 
 using namespace xercesc;
+using namespace GeoModelTools;
 
 DOMNode* XMLHandler::s_currentElement=0;
 bool XMLHandler::s_printFlag=false;
@@ -67,7 +68,10 @@ std::string XMLHandler::getAttributeAsString(const std::string name) const
 {
 	bool isPresent;
 	std::string temp=getAttribute(name,isPresent);
-	if (!isPresent) throw;
+	if (!isPresent) {
+        std::cerr << "\nERROR!! XMLHandler::getAttributeAsString(name) --> Attribute '" << name << "' is not present! Check your data!" << std::endl;
+        throw std::runtime_error ("XML attribute not found!");;
+    }
 	return temp;
 }
 double XMLHandler::getAttributeAsDouble(const std::string name) const
@@ -112,7 +116,7 @@ std::vector<double> XMLHandler::getAttributeAsVector(const std::string name) con
         std::vector<double> vect;
         std::string temp=getAttribute(name,isPresent);
         if (!isPresent) throw;
-        std::vector<std::string> v=ExpressionEvaluator::GetEvaluator()->tokenize(";",temp);
+        std::vector<std::string> v=tokenize(";",temp);
         for (unsigned int i=0;i<v.size();i++)
         {
              vect.push_back(ExpressionEvaluator::GetEvaluator()->Eval(v[i].c_str()));
@@ -126,7 +130,7 @@ std::vector<int> XMLHandler::getAttributeAsIntVector(const std::string name) con
         std::vector<int> vect;
         std::string temp=getAttribute(name,isPresent);
         if (!isPresent) throw;
-        std::vector<std::string> v=ExpressionEvaluator::GetEvaluator()->tokenize(";",temp);
+        std::vector<std::string> v=tokenize(";",temp);
         for (unsigned int i=0;i<v.size();i++)
         {
              vect.push_back(ExpressionEvaluator::GetEvaluator()->Eval(v[i].c_str()));
@@ -185,7 +189,7 @@ std::vector<double> XMLHandler::getAttributeAsVector(const std::string name, boo
 	std::string temp=getAttribute(name,isPresent);
 	if (isPresent) 
 	{
-		std::vector<std::string> v=ExpressionEvaluator::GetEvaluator()->tokenize(";",temp);
+		std::vector<std::string> v=tokenize(";",temp);
 		for (unsigned int i=0;i<v.size();i++)
 		{
 			vect.push_back(ExpressionEvaluator::GetEvaluator()->Eval(v[i].c_str()));
@@ -200,7 +204,7 @@ std::vector<int> XMLHandler::getAttributeAsIntVector(const std::string name, boo
         std::string temp=getAttribute(name,isPresent);
         if (isPresent)
         {
-                std::vector<std::string> v=ExpressionEvaluator::GetEvaluator()->tokenize(";",temp);
+                std::vector<std::string> v=tokenize(";",temp);
                 for (unsigned int i=0;i<v.size();i++)
                 {
                         vect.push_back(ExpressionEvaluator::GetEvaluator()->Eval(v[i].c_str()));
@@ -271,7 +275,7 @@ std::vector<double> XMLHandler::getAttributeAsVector(const std::string name, con
 	std::string temp=getAttribute(name,isPresent);
 	if (isPresent) 
 	{
-		std::vector<std::string> v=ExpressionEvaluator::GetEvaluator()->tokenize(";",temp);
+		std::vector<std::string> v=tokenize(";",temp);
 		for (unsigned int i=0;i<v.size();i++)
 		{
 			vect.push_back(ExpressionEvaluator::GetEvaluator()->Eval(v[i].c_str()));
@@ -288,7 +292,7 @@ std::vector<int> XMLHandler::getAttributeAsIntVector(const std::string name, con
         std::string temp=getAttribute(name,isPresent);
         if (isPresent)
         {
-                std::vector<std::string> v=ExpressionEvaluator::GetEvaluator()->tokenize(";",temp);
+                std::vector<std::string> v=tokenize(";",temp);
                 for (unsigned int i=0;i<v.size();i++)
                 {
                         vect.push_back(ExpressionEvaluator::GetEvaluator()->Eval(v[i].c_str()));
@@ -296,4 +300,19 @@ std::vector<int> XMLHandler::getAttributeAsIntVector(const std::string name, con
                 return vect;
         }
         return def;
+}
+
+std::vector<std::string>& XMLHandler::tokenize(const std::string& sep,const std::string& expr)
+{
+        static std::vector<std::string> tempvect;
+        tempvect.clear();
+
+        std::string::size_type i=0, j=0;
+        while( (j=expr.find(sep,i))!=std::string::npos) {
+                tempvect.push_back(expr.substr(i,j-i));
+                i = j+sep.size();
+        }
+        tempvect.push_back(expr.substr(i));
+
+        return tempvect;
 }

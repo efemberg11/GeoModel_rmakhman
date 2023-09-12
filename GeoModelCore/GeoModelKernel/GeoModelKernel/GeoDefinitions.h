@@ -23,6 +23,7 @@ namespace GeoTrf {
   typedef Eigen::Matrix<double, 3, 1> Vector3D;
   typedef Eigen::Matrix<double, 2, 1> Vector2D;
   typedef Eigen::Matrix<double, 3, 3> RotationMatrix3D;
+  typedef Eigen::DiagonalMatrix <double, 3> Diagonal3DMatrix;
 
   /// check if we can use Eigen Hyperplane for this
   struct Plane3D {
@@ -73,6 +74,14 @@ namespace GeoTrf {
       {}
     virtual ~Translate3D() {}
   };
+
+ class Scale3D : public Transform3D {
+ public:
+   Scale3D(double x, double y, double z)
+     : Transform3D(Diagonal3DMatrix(x,y,z))
+     {}
+   virtual ~Scale3D() {}
+ };
 
   class TranslateX3D : public Transform3D {
   public:

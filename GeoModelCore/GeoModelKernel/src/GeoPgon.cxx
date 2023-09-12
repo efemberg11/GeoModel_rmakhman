@@ -23,35 +23,136 @@ GeoPgon::~GeoPgon()
 
 double GeoPgon::volume () const
 {
+#ifndef M_PI
+  constexpr double M_PI = 3.14159265358979323846;
+#endif
   if (!isValid ())
     throw std::runtime_error ("Volume requested for incomplete polygon");
-  double v = 0;
-  int sides = getNSides ();
-  double alpha = m_dPhi/sides;
-  double sinAlpha = sin(alpha);
-  
-  for (size_t s = 0; s < getNPlanes () - 1; s++) {
-    double z2 = getZPlane (s);;
-    double z1 = getZPlane (s + 1);;
-    double fRmin1 = getRMinPlane (s + 1);
-    double fRmin2 = getRMinPlane (s);
-    double fRmax1 = getRMaxPlane (s + 1);
-    double fRmax2 = getRMaxPlane (s);
+  double vol = 0.0;
+  for (size_t k = 0; k < getNPlanes() - 1; ++k) {
+    double z1 = getZPlane(k);
+    double z2 = getZPlane(k + 1);
+    double a1 = getRMinPlane(k);
+    double a2 = getRMinPlane(k + 1);
+    double b1 = getRMaxPlane(k);
+    double b2 = getRMaxPlane(k + 1);
+    vol += (b1*b1 + b1*b2 + b2*b2 - a1*a1 - a1*a2 - a2*a2) * (z2 - z1);
+  }
+  int nsides = getNSides();
+  double dphi = getDPhi();
+  if (dphi > 2.0 * M_PI) dphi = 2.0 * M_PI;
+  double alpha = dphi / nsides;
+  double sinAlpha = std::sin(alpha);
+  double cosHalfAlpha = std::cos(0.5 * alpha);
+  return std::abs(vol) * nsides * sinAlpha / (cosHalfAlpha * cosHalfAlpha * 6.0);
+}
 
-    double b1 = (fRmax1 - fRmax2)/(z1 - z2);
-    double b2 = (fRmin1 - fRmin2)/(z1 - z2);
+void GeoPgon::extent (double& xmin, double& ymin, double& zmin,
+                      double& xmax, double& ymax, double& zmax) const
+{
+#ifndef M_PI
+  constexpr double M_PI = 3.14159265358979323846;
+#endif
+  if (!isValid ())
+    throw std::runtime_error ("Extent requested for incomplete polygon");
+  double rmin = getRMinPlane(0);
+  double rmax = getRMaxPlane(0);
+  zmin = zmax = getZPlane(0);
+  for (size_t k = 1; k < getNPlanes(); ++k)
+  {
+    rmin = std::min(rmin, getRMinPlane(k));
+    rmax = std::max(rmax, getRMaxPlane(k));
+    zmin = std::min(zmin, getZPlane(k));
+    zmax = std::max(zmax, getZPlane(k));
+  }
+  size_t nsides = getNSides();
+  double dphi = getDPhi();
+  if (dphi >  2.0 * M_PI) dphi = 2.0 * M_PI;
+  if (dphi == 2.0 * M_PI) rmin = 0.0;
+  double alpha = dphi / nsides;
+  double invCosHalfAlpha = 1. / std::cos(0.5 * alpha);
+  rmin *= invCosHalfAlpha;
+  rmax *= invCosHalfAlpha;
+  double phi = getSPhi();
+  xmin = xmax = rmin * std::cos(phi);
+  ymin = ymax = rmin * std::sin(phi);
+  for (size_t k = 0; k <= nsides; ++k)
+  {
+    double x = rmax * std::cos(phi);
+    xmin = std::min(xmin, x);
+    xmax = std::max(xmax, x);
+    double y = rmax * std::sin(phi);
+    ymin = std::min(ymin, y);
+    ymax = std::max(ymax, y);
+    if (rmin > 0.)
+    {
+      double xx = rmin * std::cos(phi);
+      xmin = std::min(xmin, xx);
+      xmax = std::max(xmax, xx);
+      double yy = rmin * std::sin(phi);
+      ymin = std::min(ymin, yy);
+      ymax = std::max(ymax, yy);
+    }
+    phi += alpha;
+  }
+}
 
-    double a1 = fRmax2  - b1 * z2;
-    double a2 = fRmin2  - b2 * z2;
+bool GeoPgon::contains (double x, double y, double z) const
+{
+  if (!isValid ()) return false;
+  size_t nz = getNPlanes();
+  if (z < getZPlane(0) || z > getZPlane(nz - 1)) return false;
 
-    //v+=fabs((a1*a1-a2*a2)*(z1-z2) + (a1*b1-a2*b2)*(z1*z1-z2*z2) + (b1*b1-b2*b2)*(z1*z1*z1-z2*z2*z2)/3.);
-    // Equivalent which should be less sensitive to numerical precision errors:
-    v += fabs(z1 - z2) * ((a1 - a2) * (a1 + a2)  + 
-			  (a1*b1 - a2*b2) * (z1 + z2) +
-			  (b1 - b2) * (b1 + b2) * (z1*z1+z2*z2+z1*z2)*(1./3));  
-  } 
-  v *=  0.5 * sides * sinAlpha;
-  return v;
+  size_t nsides = getNSides();
+  double sphi = getSPhi();
+  double dphi = getDPhi();
+
+  double dangle = dphi / nsides; // sector angle 
+  double dhalfangle = 0.5 * dangle;
+  double cosHalfAngle = std::cos(dhalfangle);
+  double sinHalfAngle = std::sin(dhalfangle);
+  double cosAngle = (cosHalfAngle + sinHalfAngle) * (cosHalfAngle - sinHalfAngle);
+  double sinAngle = 2.0 * cosHalfAngle * sinHalfAngle;
+
+  double r = 0.0;
+  double rot = -(sphi + dhalfangle); // initial rotation
+  double cosRot = std::cos(rot);
+  double sinRot = std::sin(rot);
+  bool inwedge = false;
+  for (size_t iside = 0; iside < nsides; ++iside)
+  {
+    double xrot = x * cosRot - y * sinRot;
+    double yrot = x * sinRot + y * cosRot;
+    double dista = sinHalfAngle * xrot + cosHalfAngle * yrot;
+    double distb = sinHalfAngle * xrot - cosHalfAngle * yrot;
+    if (dista >= 0.0 && distb >= 0.0)
+    {
+      r = xrot;
+      inwedge = true;
+      break;
+    }
+    double cosTmp = cosRot;
+    double sinTmp = sinRot;
+    cosRot = cosTmp * cosAngle + sinTmp * sinAngle;
+    sinRot = sinTmp * cosAngle - cosTmp * sinAngle;
+  }
+  if (!inwedge) return false;
+
+  for (size_t k = 0; k < nz - 1; ++k)
+  {
+    double zmin = getZPlane(k);
+    double zmax = getZPlane(k + 1);
+    if (z < zmin || z > zmax || zmin == zmax) continue;
+    double t = (z - zmin) / (zmax - zmin);
+    double rmin1 = getRMinPlane(k);
+    double rmin2 = getRMinPlane(k + 1);
+    double rmin = rmin1 + (rmin2 - rmin1) * t;
+    double rmax1 = getRMaxPlane(k);
+    double rmax2 = getRMaxPlane(k + 1);
+    double rmax = rmax1 + (rmax2 - rmax1) * t;
+    if (r <= rmax && r >= rmin) return true;
+  }
+  return false;
 }
 
 const std::string & GeoPgon::type () const

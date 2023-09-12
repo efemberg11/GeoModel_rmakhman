@@ -11,11 +11,23 @@
 /run/numberOfThreads 1
 /control/cout/prefixString G4Worker_
 ########################################################################
-##  DETECTOR AND MAGNETIC FIELD
+##  MAGNETIC FIELD
 ## ---------------------------------------------------------------------
-###/mydet/setGdmlFile  atlas2018.gdml
+/FSLdet/setField 0 tesla
+########################################################################
+##  Geantino Maps Configuration
 ## ---------------------------------------------------------------------
-/mydet/setField 0 tesla
+/gmaps/rmin 0 mm
+/gmaps/rmax 200 mm
+/gmaps/zmin -3000 mm
+/gmaps/zmax 3000 mm
+/gmaps/xmin -200 mm
+/gmaps/xmax 200 mm
+/gmaps/ymin -200 mm
+/gmaps/ymax 200 mm
+/gmaps/etamin -6
+/gmaps/etamax 6
+/gmaps/volumeslist Pixel SCT TRT
 ########################################################################
 ##  INIT
 ## ---------------------------------------------------------------------
@@ -23,16 +35,16 @@
 ########################################################################
 ##  PRIMARY GENERATOR
 ## ---------------------------------------------------------------------
-/mygun/primaryPerEvt 2
-## ---------------------------------------------------------------------
-/mygun/particle geantino
-## ---------------------------------------------------------------------
-/mygun/energy  10 GeV
-## ---------------------------------------------------------------------
-####/mygun/direction  0 1 0
+/gps/verbose 0
+/gps/particle geantino
+#/gps/pos/type Plane
+#/gps/pos/shape Square
+#/gps/pos/centre 1 2 1 cm
+#/gps/pos/halfx 2 cm
+#/gps/pos/halfy 2 cm
+/gps/ang/type iso
+/gps/energy 10 GeV
 ########################################################################
-##  EXECUTE with 10 events and print the list of processes at the end
+##  EXECUTE with 100000 events
 ## ---------------------------------------------------------------------
-/run/beamOn 1000
-## ---------------------------------------------------------------------
-/process/list
+/run/beamOn 100000

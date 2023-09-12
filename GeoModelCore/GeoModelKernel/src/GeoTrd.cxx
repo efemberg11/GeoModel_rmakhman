@@ -26,8 +26,30 @@ double GeoTrd::volume () const
   double fDx1 = m_xHalfLength1;
   double fDx2 = m_xHalfLength2;
   double fDy2 = m_yHalfLength2;
-  return 4.0 * ((fDx1 + fDx2) * (fDy1 + fDy2) * (fDz * 0.5) +
-		(fDx2 - fDx1) * (fDy2 - fDy1) * (fDz * (1./6)));
+  return 2.0 * fDz *
+    ((fDx1 + fDx2) * (fDy1 + fDy2) + (fDx2 - fDx1) * (fDy2 - fDy1) * (1./3.));
+}
+
+void GeoTrd::extent (double& xmin, double& ymin, double& zmin,
+                     double& xmax, double& ymax, double& zmax) const
+{
+  xmax = std::max(m_xHalfLength1, m_xHalfLength2);
+  ymax = std::max(m_yHalfLength1, m_yHalfLength2);
+  zmax = m_zHalfLength;
+  xmin = -xmax;
+  ymin = -ymax;
+  zmin = -zmax;
+}
+
+bool GeoTrd::contains (double x, double y, double z) const
+{
+  if (std::abs(z) - m_zHalfLength > 0.0) return false;
+  double t = 0.5 * (1.0 + z / m_zHalfLength);
+  double dx = m_xHalfLength1 + (m_xHalfLength2 - m_xHalfLength1) * t;
+  double dy = m_yHalfLength1 + (m_yHalfLength2 - m_yHalfLength1) * t;
+  double distx = std::abs(x) - dx;
+  double disty = std::abs(y) - dy;
+  return (std::max(distx, disty) <= 0.0);
 }
 
 const std::string & GeoTrd::type () const
@@ -44,4 +66,3 @@ void GeoTrd::exec (GeoShapeAction *action) const
 {
   action->handleTrd(this);
 }
-

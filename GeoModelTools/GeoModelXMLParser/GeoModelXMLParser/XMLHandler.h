@@ -11,6 +11,8 @@
 
 #include "ExpressionEvaluator/ExpressionEvaluator.h"
 
+namespace GeoModelTools {
+
 class XMLHandlerStore;
 
 class XMLHandler {
@@ -38,12 +40,12 @@ protected:
 	bool isAttribute(const std::string) const;
 
 	std::string getAttribute(const std::string, bool&) const;
-  std::string getAttributeAsString(const std::string) const;
-  double getAttributeAsDouble(const std::string) const;
-  float getAttributeAsFloat(const std::string) const;
-  int getAttributeAsInt(const std::string) const;
-  long getAttributeAsLong(const std::string) const;
-  std::vector<double> getAttributeAsVector(const std::string) const;
+	std::string getAttributeAsString(const std::string) const;
+	double getAttributeAsDouble(const std::string) const;
+	float getAttributeAsFloat(const std::string) const;
+	int getAttributeAsInt(const std::string) const;
+	long getAttributeAsLong(const std::string) const;
+	std::vector<double> getAttributeAsVector(const std::string) const;
 	std::vector<int> getAttributeAsIntVector(const std::string) const;
 	std::string getAttributeAsString(const std::string, bool&) const;
 	double getAttributeAsDouble(const std::string, bool&) const;
@@ -51,23 +53,26 @@ protected:
 	int getAttributeAsInt(const std::string, bool&) const;
   	long getAttributeAsLong(const std::string, bool&) const;
 	std::vector<double> getAttributeAsVector(const std::string, bool&) const;
-  std::vector<int> getAttributeAsIntVector(const std::string, bool&) const;
+	std::vector<int> getAttributeAsIntVector(const std::string, bool&) const;
 	std::string getAttributeAsString(const std::string, const std::string) const;
 	double getAttributeAsDouble(const std::string, const double) const;
   	float getAttributeAsFloat(const std::string, const float) const;
 	int getAttributeAsInt(const std::string, const int) const;
   	long getAttributeAsLong(const std::string, const long) const;
 	std::vector<double> getAttributeAsVector(const std::string, const std::vector<double>) const;
-  std::vector<int> getAttributeAsIntVector(const std::string, const std::vector<int>) const;
+	std::vector<int> getAttributeAsIntVector(const std::string, const std::vector<int>) const;
 	static bool s_printFlag;
 
-  ExpressionEvaluator* Evaluator() const
-  {
-    static ExpressionEvaluator* eval=ExpressionEvaluator::GetEvaluator();
-    return eval;
-  }
+	ExpressionEvaluator* Evaluator() const
+	{
+		static ExpressionEvaluator* eval=ExpressionEvaluator::GetEvaluator();
+		return eval;
+	}
+	static std::vector<std::string>& tokenize(const std::string&,const std::string&);
 private:
 	void RegisterToStore();
 };
+
+}  // end namespace
 
 #endif

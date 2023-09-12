@@ -24,25 +24,49 @@ double GeoSimplePolygonBrep::volume () const
 {
   if (!isValid())
     throw std::runtime_error ("Volume requested for incomplete simple polygon brep");
-
-  //Todo: Cache the polygon area so we wont have to do this every time.
-  PolygonTriangulator pt(m_xVertices,m_yVertices);
-
-  double area(0);//Fixme: Should be cached!
-
-  double x1, x2, x3, y1, y2, y3;
-  PolygonTriangulator::Triangles::const_iterator it, itE = pt.triangles()->end();
-  for (it = pt.triangles()->begin(); it!=itE; ++it) {
-    x1 = m_xVertices.at(it->at(0)-1);
-    x2 = m_xVertices.at(it->at(1)-1);
-    x3 = m_xVertices.at(it->at(2)-1);
-    y1 = m_yVertices.at(it->at(0)-1);
-    y2 = m_yVertices.at(it->at(1)-1);
-    y3 = m_yVertices.at(it->at(2)-1);
-    area += fabs ( -x2*y1 + x3*y1 + x1 * y2 - x3 * y2 - x1*y3 + x2*y3 );//This is actually twice the area of the triangle we are adding
+  int n = getNVertices();
+  double area = m_xVertices[n - 1] * m_yVertices[0] - m_xVertices[0] * m_yVertices[n - 1];
+  for (int k = 1; k < n; ++k)
+  {
+    area += m_xVertices[k - 1] * m_yVertices[k] - m_xVertices[k] * m_yVertices[k - 1];
   }
+  return std::abs(area) * m_dZ;
+}
 
-  return area * m_dZ;//area is thus twice the area, but dZ is only half the depth, so the two factors of two cancel out.
+void GeoSimplePolygonBrep::extent (double& xmin, double& ymin, double& zmin,
+                                   double& xmax, double& ymax, double& zmax) const
+{
+  if (!isValid())
+    throw std::runtime_error ("Extent requested for incomplete simple polygon brep");
+  xmin = xmax = m_xVertices[0];
+  ymin = ymax = m_yVertices[0];
+  for (size_t k = 1; k < getNVertices(); ++k)
+  {
+    double x = m_xVertices[k];
+    double y = m_yVertices[k];
+    xmin = std::min(xmin, x);
+    xmax = std::max(xmax, x);
+    ymin = std::min(ymin, y);
+    ymax = std::max(ymax, y);
+  }
+  zmin =-m_dZ;
+  zmax = m_dZ;
+}
+
+bool GeoSimplePolygonBrep::contains (double x, double y, double z) const
+{
+  if (std::abs(z) - m_dZ > 0.0) return false;
+  size_t nv = getNVertices();
+  bool in = false;
+  for (size_t i = 0, k = nv - 1; i < nv; k = i++)
+  {
+    if ((m_yVertices[i] > y) != (m_yVertices[k] > y))
+    {
+      double ctg = (m_xVertices[k] - m_xVertices[i]) / (m_yVertices[k] - m_yVertices[i]);
+      in ^= (x < (y - m_yVertices[i]) * ctg + m_xVertices[i]);
+    }
+  }
+  return in;
 }
 
 const std::string & GeoSimplePolygonBrep::type() const
@@ -65,4 +89,3 @@ void GeoSimplePolygonBrep::exec(GeoShapeAction *action) const
 {
   action->handleSimplePolygonBrep(this);
 }
-

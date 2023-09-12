@@ -1,0 +1,3 @@
+[submodule "ATLASExtensions"]
+	path = ATLASExtensions
+	url = https://gitlab.cern.ch/atlas/geomodelatlas/ATLASExtensions.git

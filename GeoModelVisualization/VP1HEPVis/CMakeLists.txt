@@ -10,7 +10,7 @@ target_include_directories( GXHEPVis PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )
 target_link_libraries( GXHEPVis
-   PUBLIC Coin::Coin OpenGL::GL GeoModelCore::GeoModelKernel)
+    PUBLIC Coin::Coin OpenGL::GL GeoModelCore::GeoModelKernel)
 source_group( "VP1HEPVis" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GXHEPVis PROPERTIES

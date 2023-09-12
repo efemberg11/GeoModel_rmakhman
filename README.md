@@ -1,6 +1,7 @@
 [![Latest Release](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/badges/release.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/releases)
 [![pipeline status](https://gitlab.cern.ch/GeoModelDev/GeoModel/badges/master/pipeline.svg)](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/commits/master)
 
+
 # GeoModel --- A user-friendly C++ Toolkit for HEP Detector Description
 
 GeoModel is a user-friendly C++ Toolkit and Suite for HEP Detector Description with minimal dependencies.

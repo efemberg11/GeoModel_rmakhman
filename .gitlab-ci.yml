@@ -7,6 +7,7 @@ stages:
   - step-D
   - step-E
   - step-F
+  - post-deploy
 
 # List global variables
 variables:
@@ -689,4 +690,25 @@ after-tag-creation:
     - 'echo "Latest TAG: ${TAG} -- Latest GeoModel VERSION: ${VERSION}"'
     - test "$TAG" != "$VERSION" && echo "ERROR --> There is a TAG/VERSION mismatch" && exit 1
     - echo "OK."
+
+
+
+###########
+# A special job, only meant to change the default expiry policy 
+# from '1day' to 'never' for jobs which run on 'tags'.
+# This is done to keep the artifacts from tags indefinitely,
+# while deleting all the others.
+##########
+persist-tag-artifacts:
+  # Use this job to specify artifacts that should never expire for tag pipelines.
+  stage: post-deploy
+  rules:
+    - if: '$CI_COMMIT_TAG != null'
+  script:
+    - echo "Persisting artifacts for tag pipelines"
+  artifacts:
+    # Specify artifacts from previous jobs to be persisted indefinitely
+    paths:
+      - install
+    expire_in: never
 

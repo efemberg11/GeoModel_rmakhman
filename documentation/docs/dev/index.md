@@ -66,7 +66,11 @@ echo 'export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"' >> ~/.zshrc
 On Ubuntu, you can install all the needed third-party dependencies by using the built-in `apt` package manager:
 
 ```bash
-sudo apt-get update -qq && sudo apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default libeigen3-dev libxerces-c-dev libsqlite3-dev nlohmann-json3-dev hdf5-tools libhdf5-dev qt5-qmake qtbase5-dev-tools qt5-doc libhepmc3-dev mesa-utils build-essential libgl1-mesa-dev libcoin-dev  libsoqt520-dev
+
+sudo add-apt-repository ppa:kaktusjoe/geomodel
+sudo apt update
+
+sudo apt install git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default libeigen3-dev libxerces-c-dev libsqlite3-dev nlohmann-json3-dev hdf5-tools libhdf5-dev qt5-qmake qtbase5-dev-tools qt5-doc libhepmc3-dev mesa-utils build-essential libgl1-mesa-dev libcoin-dev  libsoqt520-dev
 ```
 
 ### Linux/Fedora

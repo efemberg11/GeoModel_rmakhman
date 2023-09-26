@@ -6,9 +6,15 @@
 #include <vector>
 #include <algorithm>
 #include <sys/utsname.h>
+#include <array>
 #define STR_VALUE(arg) #arg
 #define STR_NAME(name) STR_VALUE(name)
 
+std::string resolveVariable(const std::string& varName) {
+   const char* var = std::getenv(varName.c_str());
+   if (!var) return std::string{};
+   return std::string(var);
+}
 std::string getCommandOutput(const std::string & cmd, bool firstLineOnly=false)
 {
   std::string response;
@@ -16,9 +22,9 @@ std::string getCommandOutput(const std::string & cmd, bool firstLineOnly=false)
   FILE *ceci=popen(cmd.c_str(),"r");
   if (ceci) {
     static const int MSGSIZE=1024;
-    char buff[MSGSIZE];
-    while (fgets(buff,MSGSIZE,ceci)!=NULL) {
-      response+=std::string(buff);
+    std::array<char, 1024> buff{};
+    while (fgets(buff.data(),MSGSIZE,ceci)!=NULL) {
+      response+=std::string(buff.data());
       if (firstLineOnly) break;
     }
     pclose(ceci);
@@ -33,8 +39,8 @@ void publishMetaData( GMDBManager & db,
 
   struct Metadata {
     std::string dateString=getCommandOutput("date -Iminutes");
-    std::string username=getlogin();
-    std::string hostname;
+    std::string username{resolveVariable("USER")};
+    std::string hostname{resolveVariable("HOSTNAME")};
     std::string os;
     std::string wd;
     std::string gmversion=STR_NAME(GMVERSION);
@@ -55,24 +61,19 @@ void publishMetaData( GMDBManager & db,
   char wdbuff[1024];
   metadata.wd=std::string(getcwd(wdbuff,1024));
 #else
-  metadata.wd=get_current_dir_name();
+  metadata.wd= resolveVariable("PWD");
 #endif
 
   metadata.outputFile=outputFile;
-  
-  char buff[1024];
-  gethostname(buff,1024);
-  metadata.hostname=buff;
- 
   utsname uts;
   uname (&uts);
   metadata.os=std::string(uts.sysname)+  "-" + std::string(uts.machine);
 
-  char *geomodel_xml_dir=getenv("GEOMODEL_XML_DIR");
-  if (geomodel_xml_dir)  {
+  std::string geomodel_xml_dir=resolveVariable("GEOMODEL_XML_DIR");
+  if (!geomodel_xml_dir.empty())  {
     {
-      metadata.geoModelDataBranch=getCommandOutput("git -C "+ std::string(geomodel_xml_dir) + " rev-parse --abbrev-ref HEAD");
-      std::string shortGitStatus=getCommandOutput("git -C "+ std::string(geomodel_xml_dir) + " status -s ");
+      metadata.geoModelDataBranch=getCommandOutput("git -C "+ geomodel_xml_dir + " rev-parse --abbrev-ref HEAD");
+      std::string shortGitStatus=getCommandOutput("git -C "+ geomodel_xml_dir + " status -s ");
       if (shortGitStatus!="") {
 	metadata.gmdataIsClean="no";
       }
@@ -180,7 +181,7 @@ void publishMetaData( GMDBManager & db,
 	
 
 
-  
+  return;
   if (xtraMetadata.branch!="Undefined") {
     std::vector<std::string>                                                   xtraColNames={
       "UserCodeGitRepository",

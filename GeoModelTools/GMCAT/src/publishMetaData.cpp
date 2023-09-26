@@ -181,7 +181,6 @@ void publishMetaData( GMDBManager & db,
 	
 
 
-  return;
   if (xtraMetadata.branch!="Undefined") {
     std::vector<std::string>                                                   xtraColNames={
       "UserCodeGitRepository",

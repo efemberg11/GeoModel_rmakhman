@@ -675,7 +675,7 @@ build_system_docker:
 #   timeout: 2h 0m 
 
 
-  build_full_docker:
+build_full_docker:
   stage: step-B
   allow_failure: true
   needs:

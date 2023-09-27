@@ -611,35 +611,35 @@ build_system_docker:
   script:
     - ignore
 
-  # New build job for Docker images based on Dockerfiles
-  # It uses the new CERN Kaniko infrastructure
-  # See: 
-  # - https://gitlab.cern.ch/gitlabci-examples/build_docker_image/-/blob/master/.gitlab-ci.yml#L11-27
-  build_system_docker_KANIKO:
-    stage: step-A
-    only:
-    refs:
-      - main
-      - tags
-    variables:
-      # To push to a specific docker tag other than latest(the default), amend the --destination parameter, e.g. --destination $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
-      # See https://docs.gitlab.com/ee/ci/variables/predefined_variables.html#variables-reference for available variables
-      IMAGE_DESTINATION: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-base
-      # === Git-related variables
-      # all submodules will be cloned recursively upon start of CI job
-      GIT_SUBMODULE_STRATEGY: recursive
-      GIT_SSL_NO_VERIFY: "true"
-    image: 
-        # The kaniko debug image is recommended because it has a shell, and a shell is required for an image to be used with GitLab CI/CD.
-        name: gcr.io/kaniko-project/executor:debug
-        entrypoint: [""]
-    script:
-        # Prepare Kaniko configuration file
-        - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-        # Build and push the image from the Dockerfile at the root of the project.
-        - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/CI/DockerfileBase --destination $IMAGE_DESTINATION
-        # Print the full registry path of the pushed image
-        - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
+# New build job for Docker images based on Dockerfiles
+# It uses the new CERN Kaniko infrastructure
+# See: 
+# - https://gitlab.cern.ch/gitlabci-examples/build_docker_image/-/blob/master/.gitlab-ci.yml#L11-27
+build_system_docker_KANIKO:
+  stage: step-A
+  only:
+  refs:
+    - main
+    - tags
+  variables:
+    # To push to a specific docker tag other than latest(the default), amend the --destination parameter, e.g. --destination $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+    # See https://docs.gitlab.com/ee/ci/variables/predefined_variables.html#variables-reference for available variables
+    IMAGE_DESTINATION: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-base
+    # === Git-related variables
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+  image: 
+      # The kaniko debug image is recommended because it has a shell, and a shell is required for an image to be used with GitLab CI/CD.
+      name: gcr.io/kaniko-project/executor:debug
+      entrypoint: [""]
+  script:
+      # Prepare Kaniko configuration file
+      - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+      # Build and push the image from the Dockerfile at the root of the project.
+      - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/CI/DockerfileBase --destination $IMAGE_DESTINATION
+      # Print the full registry path of the pushed image
+      - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
 
 
 

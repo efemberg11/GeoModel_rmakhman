@@ -594,28 +594,28 @@ docs-deploy:
 ## Build a 'base' Docker image
 ## containing the GeoModel base packages
 ##  Note: we build the docker image only from 'main' and tags
-build_system_docker:
-  stage: step-A
-  only:
-    refs:
-      - main
-      - tags
-  variables:
-    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
-    DOCKER_FILE: 'CI/DockerfileBase'
-    # all submodules will be cloned recursively upon start of CI job
-    GIT_SUBMODULE_STRATEGY: recursive
-    GIT_SSL_NO_VERIFY: "true"
-  tags:
-    - docker-image-build
-  script:
-    - ignore
+# build_system_docker:
+#   stage: step-A
+#   only:
+#     refs:
+#       - main
+#       - tags
+#   variables:
+#     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
+#     DOCKER_FILE: 'CI/DockerfileBase'
+#     # all submodules will be cloned recursively upon start of CI job
+#     GIT_SUBMODULE_STRATEGY: recursive
+#     GIT_SSL_NO_VERIFY: "true"
+#   tags:
+#     - docker-image-build
+#   script:
+#     - ignore
 
 # New build job for Docker images based on Dockerfiles
 # It uses the new CERN Kaniko infrastructure
 # See: 
 # - https://gitlab.cern.ch/gitlabci-examples/build_docker_image/-/blob/master/.gitlab-ci.yml#L11-27
-build_system_docker_KANIKO:
+build_system_docker:
   stage: step-A
   only:
     refs:
@@ -652,27 +652,62 @@ build_system_docker_KANIKO:
 ##  - we build the docker image only from 'main' and tags
 ##  - image's final name is, e.g., "geomodel:main-base"
 ##
-build_full_docker:
+# build_full_docker:
+#   stage: step-B
+#   allow_failure: true
+#   only:
+#     refs:
+#       - main
+#       - tags
+#   variables:
+#     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-full
+#     DOCKER_FILE: 'CI/DockerfileFull'
+#     # all submodules will be cloned recursively upon start of CI job
+#     GIT_SUBMODULE_STRATEGY: recursive
+#     GIT_SSL_NO_VERIFY: "true"
+#     BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
+#   tags:
+#     - docker-image-build
+#   script:
+#     - ignore
+#   needs:
+#     - build_system_docker
+#   timeout: 2h 0m 
+
+
+  build_full_docker:
   stage: step-B
   allow_failure: true
+  needs:
+    - build_system_docker
+  timeout: 2h 0m
   only:
     refs:
       - main
       - tags
   variables:
-    TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-full
-    DOCKER_FILE: 'CI/DockerfileFull'
+    # To push to a specific docker tag other than latest(the default), amend the --destination parameter, e.g. --destination $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+    # See https://docs.gitlab.com/ee/ci/variables/predefined_variables.html#variables-reference for available variables
+    IMAGE_DESTINATION: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-full
+    # === Git-related variables
     # all submodules will be cloned recursively upon start of CI job
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_SSL_NO_VERIFY: "true"
-    BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
-  tags:
-    - docker-image-build
+  image: 
+      # The kaniko debug image is recommended because it has a shell, and a shell is required for an image to be used with GitLab CI/CD.
+      name: gcr.io/kaniko-project/executor:debug
+      entrypoint: [""]
   script:
-    - ignore
-  needs:
-    - build_system_docker
-  timeout: 2h 0m 
+      # Prepare Kaniko configuration file
+      - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+      # Build and push the image from the Dockerfile at the root of the project.
+      - /kaniko/executor 
+            --context $CI_PROJECT_DIR 
+            --dockerfile $CI_PROJECT_DIR/CI/DockerfileBase 
+            --destination $IMAGE_DESTINATION 
+            --build-arg "BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base"
+      # Print the full registry path of the pushed image
+      - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
 
 
 ## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated

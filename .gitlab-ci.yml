@@ -589,33 +589,17 @@ docs-deploy:
 #####################
 ### Docker images ###
 #####################
+## New build jobs for Docker images based on Dockerfiles
+## It uses the new CERN Kaniko infrastructure
+## See: 
+## - https://gitlab.cern.ch/gitlabci-examples/build_docker_image/-/blob/master/.gitlab-ci.yml#L11-27
+## ---
 
-## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
-## Build a 'base' Docker image
-## containing the GeoModel base packages
-##  Note: we build the docker image only from 'main' and tags
-# build_system_docker:
-#   stage: step-A
-#   only:
-#     refs:
-#       - main
-#       - tags
-#   variables:
-#     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
-#     DOCKER_FILE: 'CI/DockerfileBase'
-#     # all submodules will be cloned recursively upon start of CI job
-#     GIT_SUBMODULE_STRATEGY: recursive
-#     GIT_SSL_NO_VERIFY: "true"
-#   tags:
-#     - docker-image-build
-#   script:
-#     - ignore
-
-# New build job for Docker images based on Dockerfiles
-# It uses the new CERN Kaniko infrastructure
-# See: 
-# - https://gitlab.cern.ch/gitlabci-examples/build_docker_image/-/blob/master/.gitlab-ci.yml#L11-27
-build_system_docker:
+# Build the 'base' image containing the system packages
+##  Note:
+##  - we build the docker image only from 'main' and tags
+##  - image's final name is, e.g., "geomodel:main-base"
+build_docker_system:
   stage: step-A
   only:
     refs:
@@ -641,45 +625,17 @@ build_system_docker:
       # Print the full registry path of the pushed image
       - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
 
-
-
-
-
-## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
-##  Construct one Docker image containing
-##  also Geant4
+## Build a Docker image containing Geant4, too 
+## (a quite large image, then!)
 ##  Note:
 ##  - we build the docker image only from 'main' and tags
-##  - image's final name is, e.g., "geomodel:main-base"
+##  - image's final name is, e.g., "geomodel:main-full"
 ##
-# build_full_docker:
-#   stage: step-B
-#   allow_failure: true
-#   only:
-#     refs:
-#       - main
-#       - tags
-#   variables:
-#     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-full
-#     DOCKER_FILE: 'CI/DockerfileFull'
-#     # all submodules will be cloned recursively upon start of CI job
-#     GIT_SUBMODULE_STRATEGY: recursive
-#     GIT_SSL_NO_VERIFY: "true"
-#     BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
-#   tags:
-#     - docker-image-build
-#   script:
-#     - ignore
-#   needs:
-#     - build_system_docker
-#   timeout: 2h 0m 
-
-
-build_full_docker:
+build_docker_full:
   stage: step-B
   allow_failure: true
   needs:
-    - build_system_docker
+    - build_docker_system
   timeout: 2h 0m
   only:
     refs:
@@ -709,40 +665,18 @@ build_full_docker:
       # Print the full registry path of the pushed image
       - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
 
-
-## TODO: This must be updated, because the CERN 'docker-image-build' runners are now deprecated
-##  Construct one Docker image only for
-##  viewer puposes
+## Build a Docker image for visualization pupose.
+## This image does not contain 
+## FullSimLight or other Geant4-related packages.
 ##  Note:
 ##  - we build the docker image only from 'main' and tags
 ##  - image's final name is, e.g., "geomodel:main-light"
 ##
-# build_light_docker:
-#   stage: step-B
-#   only:
-#     refs:
-#       - main
-#       - tags
-#   variables:
-#     TO: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-light
-#     DOCKER_FILE: 'CI/DockerfileLight'
-#     # all submodules will be cloned recursively upon start of CI job
-#     GIT_SUBMODULE_STRATEGY: recursive
-#     GIT_SSL_NO_VERIFY: "true"
-#     BUILD_ARG: BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base
-#   tags:
-#     - docker-image-build
-#   script:
-#     - ignore
-#   needs:
-#     - build_system_docker
-
-
-build_full_docker:
+build_docker_light:
   stage: step-B
   allow_failure: true
   needs:
-    - build_system_docker
+    - build_docker_system
   timeout: 2h 0m
   only:
     refs:

@@ -1,0 +1,73 @@
+/*
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+*/
+
+///////////////////////////////////////////////////////////////////
+// GeoPhysVolHelper.h, (c) ATLAS Detector software
+///////////////////////////////////////////////////////////////////
+
+#ifndef GEOPHYSVOLHELPER_H
+#define GEOPHYSVOLHELPER_H
+
+#include <GeoModelKernel/GeoDefinitions.h>
+
+class GeoMaterial;
+class GeoVPhysVol;
+class GeoPhysVol;
+class GeoVFullPhysVol;
+class GeoFullPhysVol;
+class GeoShape;
+
+namespace GeoModelTools {
+
+  /**
+    @class GeoPhysVolHelper
+    
+    A helper class that browses the GeoModel tree for validation purposes
+        
+    @author sarka.todorova@cern.ch
+    */
+    
+    class GeoPhysVolHelper {
+      
+      public:
+        /** Default constructor*/
+        GeoPhysVolHelper()
+       {}
+
+        /** Destructor*/
+        virtual ~GeoPhysVolHelper(){}
+    
+        /** Evaluate mass ( of a part of GeoModel tree ) */
+        float evaluateMass(const GeoVPhysVol* gv, bool inclusive = true) const;
+
+	/** Dump from GeoModel tree  */
+	void printInfo(const GeoVPhysVol* pv) const;
+	void printChildren(const GeoVPhysVol* pv, int level) const;
+
+	/** recursive comparison of tree objects */
+        int compareGeoVolumes( const GeoVPhysVol* gv1, const GeoVPhysVol* gv2 , int level) const;
+
+	/** save (partial) tree into sqlite database file */
+        void saveToDb( const GeoVPhysVol* gv, std::string filename); 
+	void saveFullToDb( const GeoVFullPhysVol* gv, std::string filename); 
+
+	/** retrieve (partial) tree into sqlite database file */
+        GeoPhysVol* retrieveFromDb( std::string filename); 
+
+	/** shape comparison */
+	int compareGeoVolumes( const GeoVPhysVol* gv1, const GeoVPhysVol* gv2, float tolerance, int level ) const; 
+	bool compareShapes( const GeoShape* gs1, const GeoShape* gv2, float tolerance ) const; 
+	bool identity_check(GeoTrf::RotationMatrix3D rotation, float tol) const;
+	void decodeShape(const GeoShape* sh) const;
+
+      private:
+   };
+ 
+
+
+
+} // end of namespace GeoModelTools
+
+#endif
+

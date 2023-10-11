@@ -119,17 +119,17 @@ GeoVPhysVol*  FSLDetectorConstruction::CreateTheWorld(GeoVPhysVol* world)
         // Setup the 'World' volume from which everything else will be suspended
         // Get the materials that we shall use.
         // -------------------------------------//
-        GeoMaterial* Air=new GeoMaterial("Air", 1.290*SYSTEM_OF_UNITS::mg/SYSTEM_OF_UNITS::cm3);
-        GeoElement* Oxigen = new GeoElement("Oxygen",  "O", 8.0, 16.0*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
-        GeoElement* Nitrogen = new GeoElement("Nitrogen", "N", 7., 14.0067*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
+        GeoMaterial* Air = new GeoMaterial("Air", 1.290*SYSTEM_OF_UNITS::mg/SYSTEM_OF_UNITS::cm3);
+        GeoElement* Oxygen = new GeoElement("Oxygen",  "O", 8.0, 15.9949*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
+        GeoElement* Nitrogen = new GeoElement("Nitrogen", "N", 7., 14.0031*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
+        GeoElement* Argon = new GeoElement("Argon", "Ar", 18., 39.9624*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
+        GeoElement* Hydrogen = new GeoElement("Hydrogen", "H", 1., 1.00782503081372*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
 
-//        GeoMaterial* Ether=new GeoMaterial("Ether", 1e-25*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::cm3);
-//        GeoElement* vacuum = new GeoElement("vacuum", "Mt", 1, 1);
-//        Ether->add(vacuum, 1.0);
-//        Ether->lock();
-
-        Air->add(Nitrogen, .8);
-        Air->add(Oxigen, .2);
+        Air->add(Nitrogen, 0.7494);
+        Air->add(Oxygen, 0.2369);
+        Air->add(Argon, 0.0129);
+        Air->add(Hydrogen, 0.0008);
+        
         Air->lock();
         const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 4000*SYSTEM_OF_UNITS::cm);
         const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Air);

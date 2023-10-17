@@ -1,6 +1,5 @@
-
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -20,9 +19,13 @@
  * used for caching volumes that were built already The copyNumber was wrongly
  * used together with tableID and volID For details, see:
  * https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/39
+ * - Jan 2023, R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
+ *             Added getters to get number of GeoModel nodes
+ *             restored from the * .db file
  * - 2023 Jan, R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
  *   Added method to get records out of custom tables from client code.
- *
+ * - Feb 2023, R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
+ *             Added 'setLoglevel' method, to steer output messages
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
@@ -100,11 +103,21 @@ class ReadGeoModel {
 
     GeoVPhysVol* buildGeoModel();
 
+    /// Set the 'loglevel', that is the level of output messages.
+    /// The loglevel is set to 0 by default, but it can be set
+    /// to a larger value.
+    /// Loglevel:
+    /// - 0 : Default
+    /// - 1 : Verbose
+    /// - 2 : Debug
+    void setLogLevel(unsigned loglevel) { m_loglevel = loglevel; };
+
     // NB, this template method needs only the "publisher name" to be specified
     // (i.e. the last suffix), since the first part of the table name get added
     // automatically according to the data type it is templated on
     template <typename T, class N>
-    std::map<T, N> getPublishedNodes(std::string publisherName = "",
+    std::map<T, N> getPublishedNodes(
+        std::string publisherName = "" /*optional variable*/,
                                      bool doCheckTable = false);
 
     void printDBTable(const std::string& tableName) {
@@ -112,6 +125,31 @@ class ReadGeoModel {
     }
     void printAllDBTables() { m_dbManager->printAllDBTables(); }
 
+    void loadDB();
+    
+    unsigned long getNLogVols() { return m_logVols.size(); };
+    unsigned long getNPhysVols() { return m_physVols.size(); };
+    unsigned long getNFullPhysVols() { return m_fullPhysVols.size(); };
+    unsigned long getNMaterials() { return m_materials.size(); };
+    unsigned long getNElements() { return m_elements.size(); };
+    unsigned long getNTransforms() { return m_transforms.size(); };
+    unsigned long getNAlignableTransforms() {
+        return m_alignableTransforms.size();
+    };
+    unsigned long getNSerialDenominators() {
+        return m_serialDenominators.size();
+    };
+    unsigned long getNSerialIdentifiers() {
+        return m_serialIdentifiers.size();
+    };
+    unsigned long getNIdentifierTags() { return m_identifierTags.size(); };
+    unsigned long getNSerialTransformers() {
+        return m_serialTransformers.size();
+    };
+    unsigned long getNFunctions() { return m_functions.size(); };
+    unsigned long getNNameTags() { return m_nameTags.size(); };
+    unsigned long getNShapes() { return m_shapes.size(); };
+    unsigned long getNChildrenConnections() { return m_allchildren.size(); };
     std::vector<std::vector<std::string>> getTableFromTableName(
         std::string tableName) {
         return m_dbManager->getTableRecords(tableName);
@@ -324,6 +362,9 @@ class ReadGeoModel {
 
     //! container to store unknown shapes
     std::set<std::string> m_unknown_shapes;
+
+    /// Stores the loglevel, the level of output messages
+    unsigned m_loglevel;
 };
 
 } /* namespace GeoModelIO */

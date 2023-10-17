@@ -16,6 +16,8 @@
 //              Added support for GeoSerialTransformer nodes
 // - Jun 2022 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
 //              Added support for "Verbose" output
+// - Feb 2023 - R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
+//              Added 'setLoglevel' method, to steer output messages
 
 // local includes
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -154,9 +156,10 @@ void WriteGeoModel::handleFullPhysVol(const GeoFullPhysVol* vol) {
 }
 
 void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
-    // std::cout << "WriteGeoModel::handleVPhysVolObjects() -- visiting... " <<
-    // vol << std::endl; // debug msg
-
+    if (m_loglevel >= 2) {
+        std::cout << "WriteGeoModel::handleVPhysVolObjects() -- visiting... "
+                  << vol << std::endl;
+    }
     // get the address string for the current volume
     std::string address = getAddressStringFromPointer(vol);
 
@@ -344,8 +347,10 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
     const unsigned int volCopyN = setVolumeCopyNumber(physId, volTypeStr);
 
     // debug msg
-    // std::cout << "WriteGeoModel -- physId: " << physId << "- volume copy
-    // number: " << volCopyN << std::endl;
+    if (m_loglevel >= 2) {
+        std::cout << "WriteGeoModel -- physId: " << physId
+                  << "- volume copy number : " << volCopyN << std::endl;
+    }
 
     if (isRootVolume || parentId == 0) {
         // qDebug() << "This is the RootVolume or the volume has 'NULL' parent
@@ -384,8 +389,10 @@ void WriteGeoModel::handleIdentifierTag(const GeoIdentifierTag* node) {
     int identifier = node->getIdentifier();
 
     // debug msgs
-    // std::cout << "WriteGeoModel::handleIdentifierTag()..." << std::endl;
-    // std::cout << "id: " << identifier << std::endl;
+    if (m_loglevel >= 2) {
+        std::cout << "WriteGeoModel::handleIdentifierTag()..." << std::endl;
+        std::cout << "id: " << identifier << std::endl;
+    }
 
     // variables used to persistify the object
     unsigned int itId;
@@ -418,9 +425,10 @@ void WriteGeoModel::handleSerialIdentifier(const GeoSerialIdentifier* node) {
     int baseId = node->getBaseId();
 
     // debug msgs
-    // std::cout << "WriteGeoModel::handleSerialIdentifier()..." << std::endl;
-    // std::cout << "baseId: " << baseId << std::endl;
-
+    if (m_loglevel >= 2) {
+        std::cout << "WriteGeoModel::handleSerialIdentifier()..." << std::endl;
+        std::cout << "baseId: " << baseId << std::endl;
+    }
     // variables used to persistify the object
     unsigned int siId;
 
@@ -1267,9 +1275,13 @@ WriteGeoModel::WriteGeoModel(GMDBManager& db) {
     // get a handle to the database and check it
     m_dbManager = &db;
     if (m_dbManager->checkIsDBOpen()) {
-        //    if(m_debug) std::cout << "OK! Database is open!" << std::endl;
+        if (m_loglevel >= 1) {
+            std::cout << "OK! Database is open!" << std::endl;
+        }
     } else {
-        // qDebug() << "Database is not open!";
+        if (m_loglevel >= 1) {
+            std::cout << "Database is not open!\n";
+        }
     }
     // initialize the database (create tables, ...)
     m_dbManager->initDB();
@@ -1282,11 +1294,13 @@ WriteGeoModel::WriteGeoModel(GMDBManager& db) {
     m_memMap_Tables = m_dbManager->getAll_NodeTypesTableIDs();
 
     // set verbosity level
-    m_verbose = 0;
-    if (const char* env_p = std::getenv("GEOMODEL_GEOMODELIO_VERBOSE")) {
-        std::cout << "GeoModelWrite -- You set the verbosity level to: "
-                  << env_p << '\n';
-        m_verbose = std::stoi(env_p);
+    m_loglevel = 0;
+    std::string envvar = "GEOMODEL_GEOMODELIO_VERBOSE";
+    if (const char* env_p = std::getenv(envvar.c_str())) {
+        std::cout << "GeoModelWrite -- By setting the '" << envvar
+                  << "' env var, you set the verbosity level to: " << env_p
+                  << '\n';
+        m_loglevel = std::stoi(env_p);
     }
 }
 
@@ -1616,6 +1630,283 @@ unsigned int WriteGeoModel::addSerialIdentifier(const int& baseId) {
     std::vector<std::string> values;
     values.push_back(std::to_string(baseId));
     return addRecord(container, values);
+
+/*
+<<<<<<< HEAD
+}
+
+unsigned int WriteGeoModel::addIdentifierTag(const int& identifier) {
+    std::vector<std::vector<std::string>>* container = &m_identifierTags;
+    std::vector<std::string> values;
+    values.push_back(std::to_string(identifier));
+    return addRecord(container, values);
+}
+
+unsigned int WriteGeoModel::addFunction(const std::string& expression) {
+    std::vector<std::vector<std::string>>* container = &m_functions;
+    std::vector<std::string> values;
+    values.push_back(expression);
+    return addRecord(container, values);
+}
+
+unsigned int WriteGeoModel::addAlignableTransform(
+    const std::vector<double>& params) {
+    std::vector<std::vector<std::string>>* container = &m_alignableTransforms;
+    std::vector<std::string> values;
+    for (const double& par : params) {
+        values.push_back(to_string_with_precision(par));
+    }
+    return addRecord(container, values);
+}
+
+unsigned int WriteGeoModel::addTransform(const std::vector<double>& params) {
+    std::vector<std::vector<std::string>>* container = &m_transforms;
+    std::vector<std::string> values;
+    for (const double& par : params) {
+        values.push_back(to_string_with_precision(par));
+    }
+    return addRecord(container, values);
+}
+
+unsigned int WriteGeoModel::getIdFromNodeType(const std::string& nodeType) {
+    std::unordered_map<std::string, unsigned int>::iterator it =
+        m_memMap_Tables.find(nodeType);
+    if (it != m_memMap_Tables.end()) {  // item found
+        return m_memMap_Tables.at(nodeType);
+    }
+    return 0;  // item not found
+}
+
+unsigned int WriteGeoModel::addSerialTransformer(const unsigned int& funcId,
+                                                 const unsigned int& physvolId,
+                                                 const std::string volType,
+                                                 const unsigned int& copies) {
+    std::vector<std::vector<std::string>>* container = &m_serialTransformers;
+    const unsigned int volTypeID = getIdFromNodeType(volType);
+
+    std::vector<std::string> values;
+    values.insert(values.begin(),
+                  {std::to_string(funcId), std::to_string(physvolId),
+                   std::to_string(volTypeID), std::to_string(copies)});  // INT
+
+    return addRecord(container, values);
+}
+
+unsigned int WriteGeoModel::addShape(const std::string& type,
+                                     const std::string& parameters) {
+    std::vector<std::vector<std::string>>* container = &m_shapes;
+    std::vector<std::string> values;
+    values.push_back(type);
+    values.push_back(parameters);
+    return addRecord(container, values);
+}
+
+unsigned int WriteGeoModel::addPhysVol(const unsigned int& logVolId,
+                                       const unsigned int& //parentPhysVolId
+                                       ,
+                                       const bool& isRootVolume) {
+    std::vector<std::vector<std::string>>* container = &m_physVols;
+    std::vector<std::string> values;
+    values.push_back(std::to_string(logVolId));  // INT
+    unsigned int idx = addRecord(container, values);
+
+    if (isRootVolume) {
+        std::vector<std::string> rootValues;
+        rootValues.insert(rootValues.begin(),
+                          {std::to_string(idx), "GeoPhysVol"});  // INT
+        m_rootVolume = rootValues;
+    }
+
+    return idx;
+}
+
+unsigned int WriteGeoModel::addFullPhysVol(
+    const unsigned int& logVolId, const unsigned int& //parentPhysVolId//
+,
+    const bool& isRootVolume) {
+    std::vector<std::vector<std::string>>* container = &m_fullPhysVols;
+    std::vector<std::string> values;
+    values.push_back(std::to_string(logVolId));  // INT
+    unsigned int idx = addRecord(container, values);
+
+    if (isRootVolume) {
+        std::vector<std::string> rootValues;
+        rootValues.insert(rootValues.begin(),
+                          {std::to_string(idx), "GeoFullPhysVol"});  // INT
+        m_rootVolume = rootValues;
+    }
+
+    return idx;
+}
+
+unsigned int WriteGeoModel::addLogVol(const std::string& name,
+                                      const unsigned int& shapeId,
+                                      const unsigned int& materialId) {
+    std::vector<std::vector<std::string>>* container = &m_logVols;
+    std::vector<std::string> values;
+    values.insert(values.begin(), {name, std::to_string(shapeId),
+                                   std::to_string(materialId)});  // INT
+    return addRecord(container, values);
+}
+
+void WriteGeoModel::addChildPosition(const unsigned int& parentId,
+                                     const std::string& parentType,
+                                     const unsigned int& childId,
+                                     const unsigned int& parentCopyN,
+                                     const unsigned int& childPos,
+                                     const std::string& childType,
+                                     const unsigned int& childCopyN) {
+    std::vector<std::vector<std::string>>* container = &m_childrenPositions;
+    const unsigned int parentTableID = getIdFromNodeType(parentType);
+    const unsigned int childTableID = getIdFromNodeType(childType);
+
+    std::vector<std::string> values;
+    //  values << parentId.toString() << parentTableID <<
+    //  QString::number(parentCopyN) << QString::number(childPos) <<
+    //  childTableID << childId.toString() << QString::number(childCopyN);
+    values.insert(values.begin(),
+                  {std::to_string(parentId), std::to_string(parentTableID),
+                   std::to_string(parentCopyN), std::to_string(childPos),
+                   std::to_string(childTableID), std::to_string(childId),
+                   std::to_string(childCopyN)});  // INT
+    addRecord(container, values);
+    return;
+}
+
+//
+// The 'publisher' parameter is optional, by default it is set to 'nullptr' in
+// the header.
+void WriteGeoModel::saveToDB(GeoPublisher* publisher) {
+    if (!m_inspect) {
+        std::vector<GeoPublisher*> vec;
+        if (publisher) vec.push_back(publisher);
+        saveToDB(vec);
+    } else {
+        std::cerr
+            << "\n\nWARNING! You called the 'saveToDB' method, but "
+               "WriteGeoModel has been constructed by calling the 'inspect' "
+               "contructor! Use the 'db' constructor, instead.\n\n"
+            << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+//
+// Note: The vector of GeoPublishers is completely optional, it is empty by
+// default and not handled.
+void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
+    if (!m_inspect) {
+        std::cout << "Saving the GeoModel tree to file: '" << m_dbpath << "'"
+                  << std::endl;
+
+        m_dbManager->addListOfRecords("GeoMaterial", m_materials);
+        m_dbManager->addListOfRecords("GeoElement", m_elements);
+        m_dbManager->addListOfRecords("GeoNameTag", m_nameTags);
+        m_dbManager->addListOfRecords("GeoAlignableTransform",
+                                      m_alignableTransforms);
+        m_dbManager->addListOfRecords("GeoTransform", m_transforms);
+        m_dbManager->addListOfRecords("Function", m_functions);
+        m_dbManager->addListOfRecords("GeoSerialTransformer",
+                                      m_serialTransformers);
+        m_dbManager->addListOfRecords("GeoShape", m_shapes);
+        m_dbManager->addListOfRecords("GeoSerialDenominator",
+                                      m_serialDenominators);
+        m_dbManager->addListOfRecords("GeoSerialIdentifier",
+                                      m_serialIdentifiers);
+        m_dbManager->addListOfRecords("GeoIdentifierTag", m_identifierTags);
+        m_dbManager->addListOfRecords("GeoPhysVol", m_physVols);
+        m_dbManager->addListOfRecords("GeoFullPhysVol", m_fullPhysVols);
+        m_dbManager->addListOfRecords("GeoLogVol", m_logVols);
+
+        m_dbManager->addListOfChildrenPositions(m_childrenPositions);
+        m_dbManager->addRootVolume(m_rootVolume);
+
+        // save data stored in instances of GeoPublisher
+        if (publishers.size()) {
+            std::cout
+                << "\nINFO: A pointer to a GeoPublisher instance has been "
+                   "provided, "
+                << "so we dump the published list of FullPhysVol and "
+                   "AlignableTransforms nodes and auxiliary data, if any.\n"
+                << std::endl;
+            for (GeoPublisher* publisher : publishers) {
+                storePublishedNodes(publisher);
+                storePublishedAuxiliaryData(publisher);
+            }
+        }
+
+        // save auxiliary data stored through WriteGeoModel directly
+        //if ( m_auxiliaryTablesStr.size() ) {
+        //         std::cout << "\nINFO: Custom tables to store auxiliary data
+        //have been added, "
+        //            << "so we create these custom tables in the DB:"
+        //            << std::endl;
+        //   for ( auto& tableData : m_auxiliaryTablesStr ) {
+        //        std::cout << "\tsaving table: " << tableData.first << std::endl;
+        //        m_dbManager->createCustomTable( tableData.first,
+        //(tableData.second).first, (tableData.second).second,
+        //m_auxiliaryTablesStrData[ tableData.first ] );
+        //   }
+        //}
+        if (m_auxiliaryTablesVar.size()) {
+            if (m_loglevel > 0) {
+                std::cout
+                    << "\nINFO: Custom tables to store auxiliary data have "
+                       "been added, "
+                    << "so we create these custom tables in the DB:"
+                    << std::endl;
+            }
+            for (auto& tableData : m_auxiliaryTablesVar) {
+                if (m_loglevel > 0) {
+                    std::cout << "\nsaving table: " << tableData.first
+                              << std::endl;
+                }
+                m_dbManager->createCustomTable(
+                    tableData.first, (tableData.second).first,
+                    (tableData.second).second,
+                    m_auxiliaryTablesVarData[tableData.first]);
+            }
+        }
+
+        if (!m_objectsNotPersistified.empty()) {
+            std::cout
+                << "\n\tGeoModelWrite -- WARNING!! There are shapes/nodes "
+                   "which need to be persistified! --> ";
+            printStdVectorStrings(m_objectsNotPersistified);
+            std::cout << "\n\n";
+        }
+
+        return;
+
+    } else {
+        std::cerr
+            << "\n\nWARNING! You called the 'saveToDB' method, but "
+               "WriteGeoModel has been constructed by calling the 'inspect' "
+               "contructor! Use the 'db' constructor, instead.\n\n"
+            << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+void WriteGeoModel::storePublishedAuxiliaryData(GeoPublisher* publisher) {
+    AuxTableDefs tableDefs = publisher->getPublishedAuxData().first;
+    AuxTableData tableAuxData = publisher->getPublishedAuxData().second;
+    if (tableDefs.size()) {
+        std::cout << "\nINFO: Custom tables to store auxiliary data have been "
+                     "added to an instance of GeoPublisher, "
+                  << "so we create these custom tables in the DB:" << std::endl;
+        for (auto& tableData : tableDefs) {
+            if (m_loglevel > 0) {
+                std::cout << "\nsaving table: " << tableData.first << std::endl;
+            }
+            m_dbManager->createCustomTable(
+                tableData.first, (tableData.second).first,
+                (tableData.second).second, tableAuxData[tableData.first]);
+        }
+    }
+}
+
+=======
+*/
 }
 
 unsigned int WriteGeoModel::addIdentifierTag(const int& identifier) {
@@ -1814,14 +2105,14 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
        }
     }*/
     if (m_auxiliaryTablesVar.size()) {
-        if (m_verbose > 0) {
+        if (m_loglevel >= 0) {
             std::cout << "\nINFO: Custom tables to store auxiliary data have "
                          "been added, "
                       << "so we create these custom tables in the DB:"
                       << std::endl;
         }
         for (auto& tableData : m_auxiliaryTablesVar) {
-            if (m_verbose > 0) {
+            if (m_loglevel >= 1) {
                 std::cout << "\nsaving table: " << tableData.first << std::endl;
             }
             m_dbManager->createCustomTable(
@@ -1849,7 +2140,7 @@ void WriteGeoModel::storePublishedAuxiliaryData(GeoPublisher* publisher) {
                      "added to an instance of GeoPublisher, "
                   << "so we create these custom tables in the DB:" << std::endl;
         for (auto& tableData : tableDefs) {
-            if (m_verbose > 0) {
+            if (m_loglevel >= 1) {
                 std::cout << "\nsaving table: " << tableData.first << std::endl;
             }
             m_dbManager->createCustomTable(
@@ -1858,6 +2149,9 @@ void WriteGeoModel::storePublishedAuxiliaryData(GeoPublisher* publisher) {
         }
     }
 }
+
+//>>>>>>> origin
+
 
 void WriteGeoModel::storePublishedNodes(GeoPublisher* store) {
     // loop over the published AlignableTransform nodes
@@ -1950,8 +2244,10 @@ void WriteGeoModel::storeRecordPublishedNodes(
         }
 
         // debug msg
-        // std::cout << vol << "::" << keyStr << " [" << keyTypeStr << "] --> "
-        // << volID << std::endl;
+        if (m_loglevel >= 2) {
+            std::cout << vol << "::" << keyStr << " [" << keyTypeStr << "] --> "
+                      << volID << std::endl;
+        }
 
         // prepare the vector containing the pieces of information to be stored
         // in the DB table

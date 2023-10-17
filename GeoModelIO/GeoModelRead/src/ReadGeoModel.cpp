@@ -938,6 +938,9 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id,
             vol = new GeoFullPhysVol(getBuiltFullPhysVol(id)->getLogVol());
         else
             volFound = false;
+    } else {
+        std::cerr << "ERROR!! It seems that the 'world' volume is of type other than GeoPhysVol or GeoFullPhysVol, which is forbidden! If you have questions, please send a message to <geomodel-developers@cern.ch>" << std::endl;
+        exit(EXIT_FAILURE);
     }
     if (!volFound) {
         std::cout << "ERROR! VPhysVol not found! It should be already built, "
@@ -1043,12 +1046,14 @@ GeoVPhysVol* ReadGeoModel::getRootVolume() {
     if (m_deepDebug) {
         muxCout.lock();
         std::cout << "ReadGeoModel::getRootVolume()" << std::endl;
+        std::cout << "m_root_vol_data: " << m_root_vol_data[0] << ", " << m_root_vol_data[1] << ", " << m_root_vol_data[2] << std::endl;       
         muxCout.unlock();
     }
     const unsigned int id =
         std::stoi(m_root_vol_data[1]);  // TODO: GeoModel GetRoot() should
                                         // return integers instead of strings...
-    const unsigned int tableId = std::stoi(m_root_vol_data[2]);
+    const std::string tableName = m_root_vol_data[0];
+    const unsigned int tableId = m_dbManager->getTableIdFromNodeType(tableName);
     const unsigned int copyNumber =
         1;  // the Root volume has only one copy by definition
     GeoVPhysVol* root = buildVPhysVolInstance(id, tableId, copyNumber);

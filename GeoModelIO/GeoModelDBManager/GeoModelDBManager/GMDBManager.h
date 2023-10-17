@@ -296,6 +296,9 @@ class GMDBManager {
         const std::vector<
             std::vector<std::variant<int, long, float, double, std::string>>>
             &records);
+
+
+    unsigned int getTableIdFromNodeType(const std::string &nodeType);
     // bool createCustomTable(const std::string tableName, const
     // std::vector<std::string> tableColNames, const std::vector<std::string>
     // tableColTypes, const std::vector<std::vector<std::string>> &records ); //
@@ -333,7 +336,6 @@ class GMDBManager {
 
     std::string getTableNameFromTableId(unsigned int tabId);
 
-    unsigned int getTableIdFromNodeType(const std::string &nodeType);
     void storeNodeType(std::string nodeType, std::string tableName);
 
     std::string getTableNameFromNodeType(const std::string &nodeType);

@@ -1847,8 +1847,8 @@ std::vector<std::string> GMDBManager::getRootPhysVol() {
     int rc = -1;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         // get the data
-        id = sqlite3_column_int(stmt, 0);
-        typeId = sqlite3_column_int(stmt, 1);
+        id = sqlite3_column_int(stmt, 1);
+        typeId = sqlite3_column_int(stmt, 2);
         // TODO: fill a cache
     }
     if (rc != SQLITE_DONE) {
@@ -1858,8 +1858,10 @@ std::vector<std::string> GMDBManager::getRootPhysVol() {
     }
     // finalize
     sqlite3_finalize(stmt);
-
-    return getItemAndType(typeId, id);
+    
+    std::vector<std::string> results = getItemAndType(typeId, id);
+    return results;
+    
 }
 
 std::string GMDBManager::getDBFilePath() { return m_dbpath; }

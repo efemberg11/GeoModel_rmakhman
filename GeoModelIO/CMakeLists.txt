@@ -9,6 +9,7 @@ add_subdirectory( GeoModelDBManager )
 add_subdirectory( TFPersistification )
 add_subdirectory( GeoModelRead )
 add_subdirectory( GeoModelWrite )
+add_subdirectory( GeoModelIOHelpers )
 
 # Create and install the version description of the project.
 include( CMakePackageConfigHelpers )

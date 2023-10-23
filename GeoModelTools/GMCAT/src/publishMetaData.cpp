@@ -48,13 +48,15 @@ void publishMetaData( GMDBManager & db,
     std::string geoModelDataBranch="Undefined";      // or overwritten below
     std::string gmdataIsClean     ="Not applicable"; // or overwritten below
     std::string gmdataCommitHash  ="Undefined";      // or overwritten below
+    std::string gmdataAssociatedTag = "Undefined";   // or overwritten below
   } metadata;
 
   struct XtraMetadata {
-    std::string repo        ="Undefined";      // or overwritten below
-    std::string branch      ="Undefined";      // or overwritten below
-    std::string isClean     ="Not applicable"; // or overwritten below
-    std::string commitHash  ="Undefined";      // or overwritten below
+    std::string repo          ="Undefined";      // or overwritten below
+    std::string branch        ="Undefined";      // or overwritten below
+    std::string isClean       ="Not applicable"; // or overwritten below
+    std::string commitHash    ="Undefined";      // or overwritten below
+    std::string associatedTag ="Undefined";      // or overwritten below
   } xtraMetadata;
   
 #ifdef __APPLE__
@@ -85,6 +87,7 @@ void publishMetaData( GMDBManager & db,
 	else {
 	  metadata.gmdataIsClean="yes";
 	  metadata.gmdataCommitHash=getCommandOutput("git -C " + std::string(geomodel_xml_dir) + " log -1 --format=format:\"%H\"");
+	  metadata.gmdataAssociatedTag=getCommandOutput("git -C " + std::string(geomodel_xml_dir) +  " describe --tag " + metadata.gmdataCommitHash+ "  2> /dev/null");
 	}
       }
     }
@@ -105,6 +108,7 @@ void publishMetaData( GMDBManager & db,
       else {
 	xtraMetadata.isClean="yes";
 	xtraMetadata.commitHash=getCommandOutput("git log -1 --format=format:\"%H\"");
+	xtraMetadata.associatedTag=getCommandOutput("git  describe --tag " + xtraMetadata.commitHash+ "  2> /dev/null");
       }
     }
   }
@@ -121,10 +125,12 @@ void publishMetaData( GMDBManager & db,
 											    "GeoModelVersion",
 											    "OutputFile",
 											    "GeoModelDataIsClean",
-											    "GeoModelDataCommitHash"
+											    "GeoModelDataCommitHash",
+											    "GeoModelDataAssociatedTag"
   };
   std::vector<std::string>                                                   gmcatColTypes={"STRING",
 											    "STRING" ,
+											    "STRING",
 											    "STRING",
 											    "STRING",
 											    "STRING",
@@ -138,7 +144,8 @@ void publishMetaData( GMDBManager & db,
   // Strip extraneous \n
   for (std::string * s : {
       &metadata.geoModelDataBranch,
-      &metadata.dateString }) { 
+      &metadata.dateString,
+      &metadata.gmdataAssociatedTag}) { 
     s->erase(std::remove(s->begin(), s->end(), '\n'), s->end());
     std::cout << s << std::endl;
   }
@@ -155,7 +162,8 @@ void publishMetaData( GMDBManager & db,
       metadata.gmversion,
       metadata.outputFile,
       metadata.gmdataIsClean,
-      metadata.gmdataCommitHash
+      metadata.gmdataCommitHash,
+      metadata.gmdataAssociatedTag
     }};
 
   unsigned int pcounter(0);
@@ -186,8 +194,10 @@ void publishMetaData( GMDBManager & db,
       "UserCodeGitRepository",
       "UserCodeGitBranch",
       "UserCodeRepoIsClean",
-      "UserCodeRepoCommitHash" };
+      "UserCodeRepoCommitHash",
+      "UserCodeAssociatedTag"};
     std::vector<std::string>                                                   xtraColTypes={"STRING",
+											     "STRING",
 											     "STRING",
 											     "STRING",
 											     "STRING"};
@@ -195,7 +205,8 @@ void publishMetaData( GMDBManager & db,
 	xtraMetadata.repo,
 	xtraMetadata.branch,
 	xtraMetadata.isClean,
-	xtraMetadata.commitHash
+	xtraMetadata.commitHash,
+	xtraMetadata.associatedTag
     }};    
     using std::begin, std::end;
     gmcatColNames.insert(end(gmcatColNames), begin(xtraColNames), end(xtraColNames));

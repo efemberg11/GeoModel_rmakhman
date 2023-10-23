@@ -1,6 +1,6 @@
 
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -21,49 +21,32 @@
  * GeoCountGraphAction acts on objects of the GeoModel tree
  * and count all GeoModel nodes (GeoPhysVol, ...) and objects (GeoLogVol,
  * GeoShape, ...).
+ * In this example, we build an action that count GeoPhysVol, GeoLogVol, 
+ * GeoShape, and GeoMaterial nodes.
  */
 class CountNodesGraphAction : public GeoNodeAction {
-   public:
+   
+  public:
     CountNodesGraphAction(){};
     ~CountNodesGraphAction(){};
-    //	Handles a physical volume.
+    
+    // Handles a physical volume.
     virtual void handlePhysVol(const GeoPhysVol *vol);
-    //	Handles a Serial Transformer
+    // Handles a Serial Transformer
     virtual void handleSerialTransformer(const GeoSerialTransformer *obj);
 
-    /*
-        //	Handles a full physical volume.
-        virtual void handleFullPhysVol(const GeoFullPhysVol *vol);
-        //	Handles a Serial Denominator.
-        virtual void handleSerialDenominator(const GeoSerialDenominator *sD);
-        //	Handles a  Transform.
-        virtual void handleTransform(const GeoTransform *);
-        //	Handles a Name Tag.
-        virtual void handleNameTag(const GeoNameTag *);
-        //	Handles an Identifier Tag.
-        virtual void handleIdentifierTag(const GeoIdentifierTag *);
-        //	Handles a SerialIdentifier.
-        virtual void handleSerialIdentifier(const GeoSerialIdentifier *);
-    */
-
     unsigned long countPhysVols() { return m_physvols; }
-    unsigned long countFullPhysVols() { return m_fullphysvols; }
     unsigned long countLogVols() { return m_logvols; }
+    unsigned long countMaterials() { return m_materials; }
+    unsigned long countShapes() { return m_shapes; }
 
    private:
-    void handleLogVol();
-    void handleMaterial();
-
     unsigned addPhysVol() { return ++m_physvols; };
-    unsigned addFullPhysVol() { return ++m_fullphysvols; };
     unsigned addLogVol() { return ++m_logvols; };
     unsigned addShape() { return ++m_shapes; };
     unsigned addMaterial() { return ++m_materials; };
-    // unsigned addElement();
-    // unsigned addFunction();
 
     unsigned long m_physvols{0};
-    unsigned long m_fullphysvols{0};
     unsigned long m_logvols{0};
     unsigned long m_materials{0};
     unsigned long m_shapes{0};

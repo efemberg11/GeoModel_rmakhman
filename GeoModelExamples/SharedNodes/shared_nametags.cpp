@@ -38,7 +38,7 @@
 #define SYSTEM_OF_UNITS \
     GeoModelKernelUnits  // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
-std::vector<std::string> testNTSD(const GeoPhysVol *vol, std::string volname) {
+std::vector<std::string> testNTSD(const GeoVPhysVol *vol, std::string volname) {
     std::vector<std::string> names;
     std::cout << "Child volumes of '" << volname << "':\n";
     for (size_t id = 0; id < vol->getNChildVols(); ++id) {
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     // --- Specific NameTags and SerialDenominator tests ---
     const std::string db1_name = "geometry_db_test_1.db";
     GMDBManager db1 = GeoModelIO::IO::saveToDB(world, db1_name, 0);
-    GeoPhysVol *world2 = GeoModelIO::IO::loadDB(db1_name, 0);
+    GeoVPhysVol *world2 = GeoModelIO::IO::loadDB(db1_name, 0);
     std::vector<std::string> t1 = testNTSD(world, "world");
     std::vector<std::string> t2 = testNTSD(pv1, "pv1");
     std::vector<std::string> t3 = testNTSD(world2, "world2");

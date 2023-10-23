@@ -14,7 +14,7 @@ class TestIO {
     TestIO(){};
 
     /// This function tests the number of nodes in the workflow
-    /// Write-Read-Write. In this test, a GeoPhysVol is taken as a 'world'
+    /// Write-Read-Write. In this test, a GeoVPhysVol is taken as a 'world'
     /// volume and the GeoModel tree is persistified into a DB file. Then the
     /// file is loaded and the GeoModel tree restored. Then the in-memory
     /// GeoModel tree is persistified again into a new DB file.
@@ -24,7 +24,7 @@ class TestIO {
     /// The number of nodes are taken from the DB, by using the tools offered by
     /// the DB Manager.
     static std::pair<std::string, bool> test_compareWriteReadWriteFromVol(
-        const GeoPhysVol* world, unsigned loglevel = 0) {
+        const GeoVPhysVol* world, unsigned loglevel = 0) {
         std::string testname = "compareWriteReadWriteFromVol";
         if (loglevel >= 1) {
             std::cout << "\n-- Test: '" << testname << "' -- \n";
@@ -47,7 +47,7 @@ class TestIO {
         //-----------------------------------------------//
         // 3 -- Reading back the geometry from file
         //-----------------------------------------------//
-        GeoPhysVol* world2 = GeoModelIO::IO::loadDB(db1_name, loglevel);
+        GeoVPhysVol* world2 = GeoModelIO::IO::loadDB(db1_name, loglevel);
 
         //-----------------------------------------------//
         // 4 -- Writing the geometry to file - 2nd time
@@ -100,7 +100,7 @@ class TestIO {
     /// the GeoModel tree during the I/O operation, instead of being taken from
     /// the DB.
     static std::pair<std::string, bool> test_compareMemoryVsRestoredFromVol(
-        const GeoPhysVol* world, unsigned loglevel = 0) {
+        const GeoVPhysVol* world, unsigned loglevel = 0) {
         std::string testname = "compareMemoryVsRestoredFromVol";
         if (loglevel >= 1) {
             std::cout << "\n-- Test: '" << testname << "' -- \n";
@@ -119,7 +119,7 @@ class TestIO {
         }
         std::string dbname = "test_geometry_db_memory.db";
         GMDBManager db = GeoModelIO::IO::saveToDB(world, dbname, loglevel);
-        GeoPhysVol* world2 = GeoModelIO::IO::loadDB(dbname, loglevel);
+        GeoVPhysVol* world2 = GeoModelIO::IO::loadDB(dbname, loglevel);
         if (loglevel >= 1) {
             std::cout
                 << "3 -- Objects in the restored in-memory 'world' volume..."
@@ -161,8 +161,8 @@ class TestIO {
     }
 
     /// Utility function to print the number of nodes of a GeoModel tree,
-    /// starting from a GeoPhysVol taken as a 'world' volume.
-    static void printCountWorldMemoryObjects(const GeoPhysVol* world) {
+    /// starting from a GeoVPhysVol taken as a 'world' volume.
+    static void printCountWorldMemoryObjects(const GeoVPhysVol* world) {
         std::map<std::string, unsigned long> mmap =
             GeoModelIO::IO::countTreeMemoryNodesFromVolume(world);
         for (auto& node : mmap) {
@@ -197,7 +197,7 @@ class TestIO {
             GeoModelIO::IO::countLoadedNodesFromReadAction(read);
 
         // build the GeoModel tree from the loaded nodes
-        GeoPhysVol* rootVolume = read.buildGeoModel();
+        GeoVPhysVol* rootVolume = read.buildGeoModel();
 
         // count the number of all the restored nodes;
         // i.e., the nodes of the restored in-memory GeoModel tree
@@ -230,7 +230,7 @@ class TestIO {
     }
 
     static std::pair<bool, std::map<std::string, bool>> runAllTests(
-        GeoPhysVol* world, unsigned loglevel = 0, unsigned printtests = 0) {
+        GeoVPhysVol* world, unsigned loglevel = 0, unsigned printtests = 0) {
         std::pair<bool, std::map<std::string, bool>> tests;
         bool testall = false;
         // TEST I/O: loading/restoring

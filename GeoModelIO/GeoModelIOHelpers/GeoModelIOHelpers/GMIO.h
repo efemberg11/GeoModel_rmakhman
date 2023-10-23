@@ -14,7 +14,7 @@ namespace GeoModelIO {
 class IO {
    public:
     IO(){};
-    static GMDBManager saveToDB(const GeoPhysVol* world, const std::string path,
+    static GMDBManager saveToDB(const GeoVPhysVol* world, const std::string path,
                                 unsigned loglevel = 0) {
         // check if DB file exists. If yes, delete it.
         std::ifstream infile(path.c_str());
@@ -47,7 +47,7 @@ class IO {
         return db;
     }
 
-    static GeoPhysVol* loadDB(const std::string path, unsigned loglevel = 0) {
+    static GeoVPhysVol* loadDB(const std::string path, unsigned loglevel = 0) {
         // check if DB file exists. If yes, delete it.
         std::ifstream infile2(path.c_str());
         if (!infile2.good()) {
@@ -71,7 +71,7 @@ class IO {
 
         /* build the GeoModel geometry */
         // builds the whole GeoModel tree in memory
-        GeoPhysVol* rootVolume = geoReader.buildGeoModel();
+        GeoVPhysVol* rootVolume = geoReader.buildGeoModel();
 
         delete db;
         db = nullptr;
@@ -106,7 +106,7 @@ class IO {
     }
 
     static std::map<std::string, unsigned long> countTreeMemoryNodesFromVolume(
-        const GeoPhysVol* world, unsigned loglevel = 0) {
+        const GeoVPhysVol* world, unsigned loglevel = 0) {
         std::map<std::string, unsigned long> mmap;
 
         // init the graph action to count all nodes in the in-memory tree

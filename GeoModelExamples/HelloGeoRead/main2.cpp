@@ -1,16 +1,15 @@
 // Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 
 /*
- * HelloGeoRead.cpp
+ * HelloGeoRead_2
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Nov, 2018
- *  Updated on: Jul, 2023
+ *  Updated on: Oct, 2023
  *
  */
 
 // GeoModel includes
-//#include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelIOHelpers/GMIO.h"
 
 #include "GeoModelKernel/GeoBox.h"
@@ -24,49 +23,6 @@
 #include <fstream>
 #include <iostream>
 
-// Units
-#include "GeoModelKernel/Units.h"
-#define SYSTEM_OF_UNITS \
-    GeoModelKernelUnits  // so we will get, e.g., 'GeoModelKernelUnits::cm'
-
-GeoVPhysVol* createTheWorld(GeoVPhysVol* world) {
-    if (world == nullptr) {
-        //-----------------------------------------------------------------------------------//
-// Define the materials that we shall use. //
-// ----------------------------------------------------------------------------------//
-
-// Define the units
-#define gr SYSTEM_OF_UNITS::gram
-#define mole SYSTEM_OF_UNITS::mole
-#define cm3 SYSTEM_OF_UNITS::cm3
-
-        // Define the chemical elements
-        GeoElement* Nitrogen =
-            new GeoElement("Nitrogen", "N", 7.0, 14.0067 * gr / mole);
-        GeoElement* Oxygen =
-            new GeoElement("Oxygen", "O", 8.0, 15.9995 * gr / mole);
-        GeoElement* Argon =
-            new GeoElement("Argon", "Ar", 18.0, 39.948 * gr / mole);
-        GeoElement* Hydrogen =
-            new GeoElement("Hydrogen", "H", 1.0, 1.00797 * gr / mole);
-
-        // Define the materials
-        double densityOfAir = 0.001214 * gr / cm3;
-        GeoMaterial* air = new GeoMaterial("Air", densityOfAir);
-        air->add(Nitrogen, 0.7494);
-        air->add(Oxygen, 0.2369);
-        air->add(Argon, 0.0129);
-        air->add(Hydrogen, 0.0008);
-        air->lock();
-
-        const GeoBox* worldBox =
-            new GeoBox(1000 * SYSTEM_OF_UNITS::cm, 1000 * SYSTEM_OF_UNITS::cm,
-                       1000 * SYSTEM_OF_UNITS::cm);
-        const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
-        world = new GeoPhysVol(worldLog);
-    }
-    return world;
-}
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -74,34 +30,18 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Get the input SQLite '.db' file containing the geometry
+    // Get from command-line the input SQLite '.db' file containing the geometry
     std::string line;
     std::string fileName;
     fileName = argv[1];
     std::cout << "Using this SQLite '.db' file:" << fileName << std::endl;
 
-
-
-
-    //// check if DB file exists. If not, return.
-    //std::ifstream infile(fileName.c_str());
-    //if (!infile.good()) {
-        //std::cout << "\n\tERROR!! A '" << fileName
-                  //<< "' file does not exist!! Please, check the path of the "
-                     //"input file before running this program. Exiting...";
-        //exit(EXIT_FAILURE);
-    //}
-    //infile.close();
-
-
-
     // Get a reader to explore/print the tables in the GeoModel DB
     GeoModelIO::ReadGeoModel geoReader = GeoModelIO::IO::getReaderDB(fileName);    
     std::cout << "Reading records from the imported geometry DB file..."
               << std::endl;
-    geoReader.printDBTable("SerialIdentifiers");
-    geoReader.printDBTable("IdentifierTags");
-    
+    geoReader.printDBTable("NameTags");
+    geoReader.printDBTable("Elements");
     
     
     // Get the 'world' volume from the GeoModel DB
@@ -109,44 +49,15 @@ int main(int argc, char* argv[]) {
               << std::endl;
     GeoVPhysVol *world = GeoModelIO::IO::loadDB(fileName);
     std::cout << "'World' volume loaded." << std::endl;
+    if(world == nullptr) {
+        std::cout << "---ERROR! 'World' is a 'nullptr'! exiting...\n\n";
+        exit(1);
+    } else {
+        std::cout << "'World' volume loaded." << std::endl;
+    }
 
-    //// open the DB
-    //GMDBManager* db = new GMDBManager(fileName);
-    //[> Open database <]
-    //if (db->checkIsDBOpen()) {
-        //std::cout << "OK! Database is open!\n";
-    //} else {
-        //std::cout << "Database is not open!\n";
-        //// return;
-        //throw;
-    //}
 
-    // -- testing the input database
-    //  std::cout << "Printing the list of all GeoMaterial nodes" << std::endl;
-    //  db->printAllMaterials();
-    //  std::cout << "Printing the list of all GeoElement nodes" << std::endl;
-    //  db->printAllElements();
-
-    //[> setup the GeoModel reader <]
-    //GeoModelIO::ReadGeoModel geoReader = GeoModelIO::ReadGeoModel(db);
-    //std::cout << "OK! ReadGeoModel is set." << std::endl;
-
-    //[> build the GeoModel geometry <]
-    //GeoVPhysVol* dbPhys =
-        //geoReader.buildGeoModel();  // builds the whole GeoModel tree in memory
-
-    std::cout << "Reading records from the imported geometry DB file..."
-              << std::endl;
-    geoReader.printDBTable("SerialIdentifiers");
-    geoReader.printDBTable("IdentifierTags");
-
-    //// create the world volume container and
-    //// get the 'world' volume, i.e. the root volume of the GeoModel tree
-    //std::cout << "Getting the 'world' GeoVPhysVol, i.e. the root volume of the "
-                 //"GeoModel tree, which can be either a GeoPhysVol or a "
-                 //"GeoFullPhysVol (both inherit from GeoVPhysVol)"
-              //<< std::endl;
-    //GeoVPhysVol* world = createTheWorld(dbPhys);
+    // --- Reading the properties of the 'world' volume retrieved from the .db file
     std::cout << "Getting the GeoLogVol used by the 'world' volume"
               << std::endl;
     const GeoLogVol* logVol = world->getLogVol();
@@ -154,7 +65,7 @@ int main(int argc, char* argv[]) {
     std::cout << "'world' GeoMaterial name: "
               << logVol->getMaterial()->getName() << std::endl;
 
-    // --- testing the imported Geometry
+    // --- Reading the imported Geometry
 
     // get number of children volumes
     unsigned int nChil = world->getNChildVols();

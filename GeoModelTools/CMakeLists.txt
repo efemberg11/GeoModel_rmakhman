@@ -53,6 +53,7 @@ add_subdirectory( ExpressionEvaluator )
 add_subdirectory( GMCAT )
 add_subdirectory( GMSTATISTICS )
 add_subdirectory( GDMLtoGM )
+add_subdirectory( GeoModelValidation )
 
 # Create and install the version description of the project.
 include( WriteBasicConfigVersionFile )

@@ -19,11 +19,11 @@ class IO {
     static GMDBManager saveToDB(const GeoVPhysVol* world, const std::string path,
                                 unsigned loglevel = 0) {
         // check if DB file exists. If yes, delete it.
-        std::ifstream infile(path.c_str());
-        if (infile.good()) {
+        std::ifstream inputfile(path.c_str());
+        if (inputfile.good()) {
             std::remove(path.c_str());  // delete file
         }
-        infile.close();
+        inputfile.close();
 
         // open the DB connection
         GMDBManager db(path);
@@ -49,7 +49,7 @@ class IO {
         return db;
     }
 
-    static GeoVPhysVol* loadDB(const std::string path, unsigned loglevel = 0) {
+    static const GeoVPhysVol* loadDB(const std::string path, unsigned loglevel = 0) {
         // check if DB file exists. 
         // If not, print a warning message and return a nullptr.
         std::ifstream inputfile(path.c_str());
@@ -82,7 +82,7 @@ class IO {
 
         /* build the GeoModel geometry */
         // builds the whole GeoModel tree in memory
-        GeoVPhysVol* rootVolume = geoReader.buildGeoModel();
+        const GeoVPhysVol* rootVolume = geoReader.buildGeoModel();
 
         delete db;
         db = nullptr;

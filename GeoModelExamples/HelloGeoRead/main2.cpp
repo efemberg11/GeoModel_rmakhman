@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
     // Get the 'world' volume from the GeoModel DB
     std::cout << "Picking the 'World' volume from the geometry DB file..."
               << std::endl;
-    GeoVPhysVol *world = GeoModelIO::IO::loadDB(fileName);
+    const GeoVPhysVol *world = GeoModelIO::IO::loadDB(fileName);
     std::cout << "'World' volume loaded." << std::endl;
     if(world == nullptr) {
         std::cout << "---ERROR! 'World' is a 'nullptr'! exiting...\n\n";

@@ -128,7 +128,7 @@ public:
   //Might be needed later:  std::map<GeoPVConstLink,VolumeHandle*> pv2volhandle;
 
   GeoVPhysVol* getGeometry();
-  GeoVPhysVol* createTheWorld(GeoVPhysVol* world = nullptr);
+  GeoVPhysVol* createTheWorld(const GeoVPhysVol* world = nullptr);
   GeoVPhysVol* getGeometryFromLocalDB();
 
   SoTexture2* getDummyTexture();
@@ -502,7 +502,7 @@ GeoVPhysVol* VP1GeometrySystem::Imp::getGeometry()
 }
 
 //_____________________________________________________________________________________
-GeoVPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoVPhysVol* world)
+GeoVPhysVol* VP1GeometrySystem::Imp::createTheWorld(const GeoVPhysVol* world)
 {
   if (world == nullptr)
   {
@@ -513,7 +513,7 @@ GeoVPhysVol* VP1GeometrySystem::Imp::createTheWorld(GeoVPhysVol* world)
     const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, worldMat);
     world = new GeoPhysVol(worldLog);
   }
-  return world;
+  return const_cast<GeoVPhysVol*>(world);
 }
 
 
@@ -572,7 +572,7 @@ GeoVPhysVol* VP1GeometrySystem::Imp::getGeometryFromLocalDB()
       GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
 
       /* build the GeoModel geometry */
-      GeoVPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+      const GeoVPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
 
       if (world) {
 

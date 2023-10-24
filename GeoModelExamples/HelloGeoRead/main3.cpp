@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
 
 
     /* build the GeoModel tree and load it in memory */
-    GeoVPhysVol* world = geoReader.buildGeoModel(); 
+    const GeoVPhysVol* world = geoReader.buildGeoModel(); 
 
 
     // --- Reading the properties of the 'world' volume retrieved from the .db file

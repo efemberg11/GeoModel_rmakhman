@@ -13,6 +13,9 @@
 #include "CountNodesGraphAction.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
+#include "GeoModelKernel/GeoBox.h"
+
+#include <map>
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -107,15 +110,8 @@ int main(int argc, char* argv[]) {
     world->add(toyPhys);                      //
     //------------------------------------------------------------------------------------//
 
-    std::cout << "\n*** Custom GeoNodeAction example: ***" << std::endl;
-    // instantiate a simple custom GeoVolumeAction,
-    // and run it over the whole GeoModel tree
-    // starting from the world volume
-    CountNodesGraphAction countNodesAction;
-    world->apply(&actionSimple);
-
     std::cout
-        << "\n*** Custom GeoVolumeAction example filtering out volumes: ***"
+        << "\n*** Custom GeoVolumeAction example to count given types of nodes: ***"
         << std::endl;
 
     std::map<std::string, unsigned long> mmap;
@@ -124,16 +120,18 @@ int main(int argc, char* argv[]) {
         << "Inspecting the GeoModel tree starting from the input volume..."
         << std::endl;
     // init the graph action
-    GeoModelIO::CountNodesGraphAction countNodes;
+    CountNodesGraphAction countNodes;
     world->exec(&countNodes);  // visit all GeoModel nodes
 
     // countin nodes (can be expanded to all types of nodes)
     unsigned long nphysvols = countNodes.countPhysVols();
-    unsigned long nfullphysvols = countNodes.countFullPhysVols();
     unsigned long nlogvols = countNodes.countLogVols();
+    unsigned long nshapes = countNodes.countShapes();
+    unsigned long nmaterials = countNodes.countMaterials();
     mmap["PhysVol"] = nphysvols;
-    mmap["FullPhysVol"] = nphysvols;
+    mmap["Material"] = nmaterials;
     mmap["LogVol"] = nlogvols;
+    mmap["Shapes"] = nshapes;
 
     for (auto& nodetype : mmap) {
         std::cout << nodetype.first << ": " << nodetype.second << std::endl;

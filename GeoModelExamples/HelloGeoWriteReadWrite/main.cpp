@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
   GeoModelIO::ReadGeoModel geoReader = GeoModelIO::ReadGeoModel(db2);
   std::cout << "OK! ReadGeoModel is set." << std::endl;
   /* build the GeoModel geometry */
-  GeoVPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
+  const GeoVPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
   std::cout << "ReadGeoModel::buildGeoModel() done." << std::endl;
 
 

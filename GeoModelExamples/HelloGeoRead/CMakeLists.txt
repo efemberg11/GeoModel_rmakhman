@@ -34,6 +34,6 @@ add_executable( hellogeoRead_2 ${SRCS2} )
 add_executable( hellogeoRead_3 ${SRCS3} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoRead_1 GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel)
-target_link_libraries( hellogeoRead_2 GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel)
+target_link_libraries( hellogeoRead_1 GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers GeoModelIO::GeoModelWrite)
+target_link_libraries( hellogeoRead_2 GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers GeoModelIO::GeoModelWrite)
 target_link_libraries( hellogeoRead_3 GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel)

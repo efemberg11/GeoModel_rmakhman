@@ -143,7 +143,7 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 {
     fTimer.Start();
 
-    GeoVPhysVol* world = nullptr;
+    const GeoVPhysVol* world = nullptr;
     G4LogicalVolume* envelope;
     if (fGeometryFileName.contains(".dylib") || fGeometryFileName.contains(".so"))
     {
@@ -156,8 +156,9 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 
         }
 
-        world = CreateTheWorld(nullptr);
-        factory->create(world);
+        GeoVPhysVol* worldTmp = CreateTheWorld(nullptr);
+        factory->create(worldTmp);
+        world = worldTmp;
 
         G4cout << "ReadGeoModel::buildGeoModel() done." << G4endl;
         fTimer.Stop();

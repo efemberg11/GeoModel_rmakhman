@@ -30,11 +30,9 @@
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 
-GeoVPhysVol* createTheWorld(GeoVPhysVol* world)
+GeoVPhysVol* createTheWorld()
 {
-  if (world == nullptr)
-  {
-  	//-----------------------------------------------------------------------------------//
+    //-----------------------------------------------------------------------------------//
     // Define the materials that we shall use.                                              //
     // ----------------------------------------------------------------------------------//
 
@@ -58,11 +56,9 @@ GeoVPhysVol* createTheWorld(GeoVPhysVol* world)
     air->add(Hydrogen, 0.0008);
     air->lock();
 
-  	const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
-  	const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
-  	world = new GeoPhysVol(worldLog);
-  }
-  return world;
+    const GeoBox* worldBox = new GeoBox(1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm, 1000*SYSTEM_OF_UNITS::cm);
+    const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
+    return new GeoPhysVol(worldLog);
 }
 
 
@@ -120,7 +116,7 @@ int main(int argc, char *argv[])
 
 
   /* build the GeoModel geometry */
-  GeoVPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
+  const GeoVPhysVol* dbPhys = geoReader.buildGeoModel(); // builds the whole GeoModel tree in memory
   std::cout << "ReadGeoModel::buildGeoModel() done." << std::endl;
 
   std::cout << "Reading records from the imported geometry DB file..." << std::endl;
@@ -131,7 +127,7 @@ int main(int argc, char *argv[])
   // create the world volume container and
   // get the 'world' volume, i.e. the root volume of the GeoModel tree
   std::cout << "Getting the 'world' GeoPhysVol, i.e. the root volume of the GeoModel tree" << std::endl;
-  GeoVPhysVol* world = createTheWorld(dbPhys);
+  const GeoVPhysVol* world = dbPhys ? dbPhys : createTheWorld();
   std::cout << "Getting the GeoLogVol used by the 'world' volume" << std::endl;
   const GeoLogVol* logVol = world->getLogVol();
   std::cout << "'world' GeoLogVol name: " << logVol->getName() << std::endl;

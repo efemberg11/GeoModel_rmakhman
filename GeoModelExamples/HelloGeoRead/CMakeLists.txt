@@ -7,7 +7,7 @@
 
 cmake_minimum_required(VERSION 3.16...3.26)
 
-#project(HelloGeoRead)
+project(HelloGeoRead)
 
 # Compile with C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -24,10 +24,16 @@ endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Populate a CMake variable with the sources
-set(SRCS main.cpp )
+set(SRCS1 main1.cpp )
+set(SRCS2 main2.cpp )
+set(SRCS3 main3.cpp )
 
 # Tell CMake to create the helloworld executable
-add_executable( hellogeoRead ${SRCS} )
+add_executable( hellogeoRead_1 ${SRCS1} )
+add_executable( hellogeoRead_2 ${SRCS2} )
+add_executable( hellogeoRead_3 ${SRCS3} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoRead GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel)
+target_link_libraries( hellogeoRead_1 GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers GeoModelIO::GeoModelWrite)
+target_link_libraries( hellogeoRead_2 GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers GeoModelIO::GeoModelWrite)
+target_link_libraries( hellogeoRead_3 GeoModelIO::GeoModelRead GeoModelCore::GeoModelKernel)

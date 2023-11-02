@@ -226,7 +226,7 @@ void MassCalculator::iterateFromWorldMass(G4LogicalVolume* logVolume, std::vecto
     
 }
 
-void MassCalculator::recursiveMassCalculation (G4VPhysicalVolume* worldg4, GeoVPhysVol* /*worldgeoModel*/, std::vector<json>& jlist){
+void MassCalculator::recursiveMassCalculation (G4VPhysicalVolume* worldg4, const GeoVPhysVol* /*worldgeoModel*/, std::vector<json>& jlist){
     
     masscalc::massReport singleMassReport;
     json jSingleMassReport;

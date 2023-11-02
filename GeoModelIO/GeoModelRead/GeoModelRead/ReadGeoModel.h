@@ -101,7 +101,7 @@ class ReadGeoModel {
     ReadGeoModel(GMDBManager* db, unsigned long* progress = nullptr);
     virtual ~ReadGeoModel();
 
-    GeoVPhysVol* buildGeoModel();
+    const GeoVPhysVol* buildGeoModel();
 
     /// Set the 'loglevel', that is the level of output messages.
     /// The loglevel is set to 0 by default, but it can be set

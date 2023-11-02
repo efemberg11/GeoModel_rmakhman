@@ -2,6 +2,8 @@
 #ifndef GMIO_H
 #define GMIO_H
 
+// C++ includes
+#include <cstdlib>  // EXIT_FAILURE
 #include <fstream>
 #include <string>
 
@@ -14,14 +16,14 @@ namespace GeoModelIO {
 class IO {
    public:
     IO(){};
-    static GMDBManager saveToDB(const GeoPhysVol* world, const std::string path,
+    static GMDBManager saveToDB(const GeoVPhysVol* world, const std::string path,
                                 unsigned loglevel = 0) {
         // check if DB file exists. If yes, delete it.
-        std::ifstream infile(path.c_str());
-        if (infile.good()) {
+        std::ifstream inputfile(path.c_str());
+        if (inputfile.good()) {
             std::remove(path.c_str());  // delete file
         }
-        infile.close();
+        inputfile.close();
 
         // open the DB connection
         GMDBManager db(path);
@@ -47,13 +49,22 @@ class IO {
         return db;
     }
 
-    static GeoPhysVol* loadDB(const std::string path, unsigned loglevel = 0) {
-        // check if DB file exists. If yes, delete it.
-        std::ifstream infile2(path.c_str());
-        if (!infile2.good()) {
-            std::remove(path.c_str());  // delete file
+    static const GeoVPhysVol* loadDB(const std::string path, unsigned loglevel = 0) {
+        // check if DB file exists. 
+        // If not, print a warning message and return a nullptr.
+        std::ifstream inputfile(path.c_str());
+        bool failed = false;
+        if (!inputfile.good()) {
+            std::cerr << "\n*** WARNING! The input .db file does not exist! Check the path of the input file. Returning a nullptr... ***\n{"
+                  << __func__ << " ["
+                  << __PRETTY_FUNCTION__ 
+                  << "]}\n\n";
+            failed = true;
         }
-        infile2.close();
+        inputfile.close();
+        if(failed) {
+            return nullptr;
+        }
 
         // open the DB
         GMDBManager* db = new GMDBManager(path);
@@ -71,12 +82,42 @@ class IO {
 
         /* build the GeoModel geometry */
         // builds the whole GeoModel tree in memory
-        GeoPhysVol* rootVolume = geoReader.buildGeoModel();
+        const GeoVPhysVol* rootVolume = geoReader.buildGeoModel();
 
         delete db;
         db = nullptr;
 
         return rootVolume;  // FIXME: See if you can pass a smart ptr
+    }
+
+    static GeoModelIO::ReadGeoModel getReaderDB(const std::string path, unsigned loglevel = 0) {
+        // check if DB file exists. 
+        // If not, print a warning message and exit.
+        std::ifstream inputfile(path.c_str());
+        if (!inputfile.good()) {
+            std::cerr << "\n*** ERROR! The input .db file does not exist! Check the path of the input file. Exiting...\n"
+                  << "{ " << __func__ << " "
+                  << "[" << __PRETTY_FUNCTION__ 
+                  << "]}.\n\n";
+            exit(EXIT_FAILURE);
+        }
+        inputfile.close();
+
+        // open the DB
+        GMDBManager* db = new GMDBManager(path);
+        if (!db->checkIsDBOpen()) {
+            std::cout << "ERROR!! -- Database is not open!\n";
+            throw;
+        }
+
+        /* setup the GeoModel reader */
+        GeoModelIO::ReadGeoModel geoReader = GeoModelIO::ReadGeoModel(db);
+        // set loglevel of read action, if > 0
+        if (loglevel > 0) {
+            geoReader.setLogLevel(loglevel);
+        }
+
+        return geoReader;  // FIXME: See if you can pass a smart ptr
     }
 
     static std::map<std::string, unsigned long> countNodesFromDB(
@@ -106,7 +147,7 @@ class IO {
     }
 
     static std::map<std::string, unsigned long> countTreeMemoryNodesFromVolume(
-        const GeoPhysVol* world, unsigned loglevel = 0) {
+        const GeoVPhysVol* world, unsigned loglevel = 0) {
         std::map<std::string, unsigned long> mmap;
 
         // init the graph action to count all nodes in the in-memory tree

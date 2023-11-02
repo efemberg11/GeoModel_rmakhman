@@ -210,7 +210,7 @@ std::string ReadGeoModel::getEnvVar(std::string const& key) const {
     return val == NULL ? std::string("") : std::string(val);
 }
 
-GeoVPhysVol* ReadGeoModel::buildGeoModel() {
+const GeoVPhysVol* ReadGeoModel::buildGeoModel() {
     if (m_loglevel >= 2)
         std::cout << "ReadGeoModel::buildGeoModel()" << std::endl;
 

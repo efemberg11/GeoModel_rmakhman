@@ -1093,7 +1093,9 @@ void GMDBManager::getAllDBTableColumns() {
 
     // populate the cache with tables' names, if needed
     if (!m_cache_tables.size()) {
-        std::cout << "*** ERROR! Tables' cache is empty! ***\n";
+        if (m_debug) {
+            std::cout << "*** WARNING! Tables' cache is empty! That's normal if you are saving a GeoModel tree into a new .db file. ***\n";
+        }
         return;
     }
 

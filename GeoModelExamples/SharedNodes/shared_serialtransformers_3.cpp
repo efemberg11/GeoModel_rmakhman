@@ -165,8 +165,9 @@ int main(int argc, char *argv[]) {
     std::cout << "\nAutomated tests:\n";
     unsigned loglevel = 0;
     unsigned printtests = 1;
+    const bool forceDelete = true;
     std::pair<bool, std::map<std::string, bool>> tests =
-        GeoModelIO::TestIO::runAllTests(world, loglevel, printtests);
+        GeoModelIO::TestIO::runAllTests(world, loglevel, printtests, forceDelete);
     bool testall = tests.first;
     if (testall) {
         alltests = (alltests && testall);

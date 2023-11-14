@@ -29,4 +29,4 @@ set(SRCS main.cpp )
 add_executable( hellogeoWrite ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoWrite GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite )
+target_link_libraries( hellogeoWrite GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite GeoModelIO::GeoModelIOHelpers)

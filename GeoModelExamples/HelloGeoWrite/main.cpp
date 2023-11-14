@@ -1,10 +1,11 @@
-// Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+// Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 
 /*
  * HelloGeoWrite.cpp
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Apr, 2019
+ *  Updated on: Nov, 2023 - Riccardo Maria BIANCHI - moved to I/O helpers
  *
  */
 
@@ -13,22 +14,80 @@
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
-#include "GeoModelDBManager/GMDBManager.h"
-#include "GeoModelWrite/WriteGeoModel.h"
+#include "GeoModelIOHelpers/GMIO.h"
 
 // C++ includes
 #include <iostream>
 #include <fstream>
 #include <cstdlib> // EXIT_FAILURE
+#include <getopt.h> // runtime options
 
 
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
+/* print a description of all supported options */
+void usage (FILE *fp, const char *path)
+{
+    /* take only the last portion of the path */
+    const char *basename = strrchr(path, '/');
+    basename = basename ? basename + 1 : path;
+
+    fprintf (fp, "usage: %s [OPTION]\n", basename);
+    fprintf (fp, "  -h, --help\t\t"
+                 "Print this help and exit.\n");
+    fprintf (fp, "  -d, --forceDelete\t"
+                 "Force the deletion of an existing output file with the same name (i.e., Replace the existing output file).\n");
+}
+
+
+
 
 int main(int argc, char *argv[])
 {
+    // warning message to teh user
+    std::cout << "\n*** NOTE ***\n"
+       << "Please, notice: you should use the 'forceDelete' option\n"
+       << "if you want to overwrite the existing output file."
+       << "\nRun with the '-h' otion to see the flag.\n***\n\n";
+
+    // === Command-Line OPTIONS ===
+    int flag_help = 0;
+    bool flag_forceDelete = false;
+    option longopts[] = {
+        { "help", no_argument, &flag_help, 1 },
+        {"forceDelete", no_argument, NULL, 'd'}, 
+        {0}
+    };
+    while (1) {
+        // declare options 'h' and 'd', both without arguments
+        const int opt = getopt_long(argc, argv, "hd", longopts, 0);
+        if (opt == -1) {
+            /* a return value of -1 indicates that there are no more options */
+            break;
+        }
+        switch (opt) {
+            case 'h':
+                flag_help = 1;
+                break;
+            case 'd':
+                flag_forceDelete = true;
+                break;
+            case '?':
+                usage (stderr, argv[0]);
+                return 1;
+            default:
+                break;
+        }
+    }
+    if (flag_help) {
+        usage (stdout, argv[0]);
+        return 0;
+    }
+  //====================================
+
+
   //-----------------------------------------------------------------------------------//
 	// Define the materials that we shall use.                                              //
 	// ----------------------------------------------------------------------------------//
@@ -99,49 +158,24 @@ int main(int argc, char *argv[])
 	//------------------------------------------------------------------------------------//
 	// Now insert all of this into the world...                                           //
 	GeoNameTag *tag = new GeoNameTag("Toy");
-  world->add(tag);
+    world->add(tag);
 	world->add(toyPhys);
 	//------------------------------------------------------------------------------------//
 
 
+    //------------------------------------------------------------------------------------//
+    // Writing the geometry to file
+    //------------------------------------------------------------------------------------//
+    std::string path = "geometry.db";
 
+    std::cout << "Dumping the GeoModel geometry to the DB file..." << std::endl;
+    GMDBManager db = GeoModelIO::IO::saveToDB(world, path, 0, flag_forceDelete);
+    std::cout << "DONE. Geometry saved." <<std::endl;
 
-	//------------------------------------------------------------------------------------//
-	// Writing the geometry to file
-	//------------------------------------------------------------------------------------//
-  std::string path = "geometry.db";
-
-	// check if DB file exists. If not, return.
-  // FIXME: TODO: this check should go in the 'GMDBManager' constructor.
-  std::ifstream infile(path.c_str());
-    if ( infile.good() ) {
-      std::cout << "\n\tERROR!! A '" << path << "' file exists already!! Please, remove, move, or rename it before running this program. Exiting...";
-        exit(EXIT_FAILURE);
-  }
-  infile.close();
-
-	// open the DB connection
-  GMDBManager db(path);
-
-  // check the DB connection
-  if (db.checkIsDBOpen()) {
-    std::cout << "OK! Database is open!" << std::endl;
-  } else {
-    std::cout << "Database ERROR!! Exiting..." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
-  // Dump the tree volumes to a local file
-	std::cout << "Dumping the GeoModel geometry to the DB file..." << std::endl;
-  GeoModelIO::WriteGeoModel dumpGeoModelGraph(db); // init the GeoModel node action
-  world->exec(&dumpGeoModelGraph); // visit all GeoModel nodes
-  dumpGeoModelGraph.saveToDB(); // save to the SQlite DB file
-  std::cout << "DONE. Geometry saved." <<std::endl;
-
-  std::cout << "\nTest - list of all the GeoMaterial nodes in the persistified geometry:" << std::endl;
-  db.printAllMaterials();
-  std::cout << "\nTest - list of all the GeoElement nodes in the persistified geometry:" << std::endl;
-  db.printAllElements();
+    std::cout << "\nTest - list of all the GeoMaterial nodes in the persistified geometry:" << std::endl;
+    db.printAllMaterials();
+    std::cout << "\nTest - list of all the GeoElement nodes in the persistified geometry:" << std::endl;
+    db.printAllElements();
 
 
   return 0;

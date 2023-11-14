@@ -11,7 +11,9 @@ file( GLOB HEADERS GeoModelIOHelpers/*.h )
 # Set up the library.
 add_library( GeoModelIOHelpers SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModelIOHelpers PUBLIC
-GeoModelKernel GeoModelDBManager TFPersistification )
+    GeoModelRead GeoModelWrite )
+# We link those to carry on the needed libs when including GeoModelIOHelpers,
+# even if the latter is headers only
 target_include_directories( GeoModelIOHelpers PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

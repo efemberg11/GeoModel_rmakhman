@@ -18,6 +18,10 @@
 //              Added support for "Verbose" output
 // - Feb 2023 - R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
 //              Added 'setLoglevel' method, to steer output messages
+// - Nov 2023 - R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
+//              Updated to use the AlignableTransform 'default position', 
+//              which does not include alignment constants
+//
 
 // local includes
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -796,22 +800,30 @@ unsigned int WriteGeoModel::storeTranform(const GeoTransform* node) {
          * get the 12 matrix elements
          */
         // Get the 9 rotation coefficients
-        double xx = node->getTransform()(0, 0);
-        double xy = node->getTransform()(0, 1);
-        double xz = node->getTransform()(0, 2);
+        // NOTE: we use the 'getDefTransform' method,
+        // instead of the 'getTransform' one, 
+        // because we want to get the 'default position' 
+        // for GeoAlignableTransforms.
+        // For GeoAlignableTransform, in fact, 
+        // the 'getTransform' method returns the transformation plus 
+        // the alignment constants.
+        // Both methods return the same transform for GeoTransforms.
+        double xx = node->getDefTransform()(0, 0);
+        double xy = node->getDefTransform()(0, 1);
+        double xz = node->getDefTransform()(0, 2);
 
-        double yx = node->getTransform()(1, 0);
-        double yy = node->getTransform()(1, 1);
-        double yz = node->getTransform()(1, 2);
+        double yx = node->getDefTransform()(1, 0);
+        double yy = node->getDefTransform()(1, 1);
+        double yz = node->getDefTransform()(1, 2);
 
-        double zx = node->getTransform()(2, 0);
-        double zy = node->getTransform()(2, 1);
-        double zz = node->getTransform()(2, 2);
+        double zx = node->getDefTransform()(2, 0);
+        double zy = node->getDefTransform()(2, 1);
+        double zz = node->getDefTransform()(2, 2);
 
         // Get the 3 translation coefficients
-        double dx = node->getTransform()(0, 3);
-        double dy = node->getTransform()(1, 3);
-        double dz = node->getTransform()(2, 3);
+        double dx = node->getDefTransform()(0, 3);
+        double dy = node->getDefTransform()(1, 3);
+        double dz = node->getDefTransform()(2, 3);
 
         // Instanciate an Eigen's 3D Transformation
         GeoTrf::Transform3D tr;

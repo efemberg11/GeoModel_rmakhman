@@ -7,7 +7,7 @@
 
 cmake_minimum_required(VERSION 3.16...3.26)
 
-project(HelloGeoWrite)
+#project(HelloGeoWrite)
 
 # Compile with C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -29,4 +29,4 @@ set(SRCS main.cpp )
 add_executable( hellogeoWrite ${SRCS} )
 
 # Link all needed libraries
-target_link_libraries( hellogeoWrite GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite GeoModelIO::GeoModelIOHelpers)
+target_link_libraries( hellogeoWrite GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite )

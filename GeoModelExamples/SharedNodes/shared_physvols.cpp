@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 
     // --- I/O TESTS ---
     std::cout << "\nTests:\n";
-    bool testall = GeoModelIO::TestIO::runAllTests(world, 0, 1).first;
+    bool testall = GeoModelIO::TestIO::runAllTests(world, 0, 1, true).first;
     if (testall) return 0;
     return 1;
     // ----------------

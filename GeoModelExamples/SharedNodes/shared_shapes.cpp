@@ -88,8 +88,9 @@ int main(int argc, char *argv[]) {
     std::cout << "\nTests:\n";
     unsigned loglevel = 0;
     unsigned printtests = 1;
+    bool forceDelete = true;
     std::pair<bool, std::map<std::string, bool>> tests =
-        GeoModelIO::TestIO::runAllTests(world, loglevel, printtests);
+        GeoModelIO::TestIO::runAllTests(world, loglevel, printtests, forceDelete);
     bool testall = tests.first;
     if (testall) return 0;
     return 1;

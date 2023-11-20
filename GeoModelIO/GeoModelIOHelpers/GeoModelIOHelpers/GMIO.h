@@ -1,4 +1,15 @@
 
+// Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+
+/*
+ * This header file provides helper functions to write and read a GeoModel SQLite file. 
+ *
+ *  Author:     Riccardo Maria BIANCHI @ CERN
+ *  Created on: Feb, 2023
+ *
+ */
+
+
 #ifndef GMIO_H
 #define GMIO_H
 
@@ -15,13 +26,30 @@ namespace GeoModelIO {
 
 class IO {
    public:
+
+    // dummy constructor
     IO(){};
+
     static GMDBManager saveToDB(const GeoVPhysVol* world, const std::string path,
-                                unsigned loglevel = 0) {
-        // check if DB file exists. If yes, delete it.
+                                unsigned loglevel = 0, const bool forceDelete = false ) {
+        // Check if the output DB file exists already. 
+        // - If yes and the 'forceDelete' option is set to 'true' by the user, 
+        // then delete it before trying to create the new one; that is, 
+        // the 'forceDelete' option replaces the existing '.db' file.
+        // - If yes and the 'forceDelete' option is set to 'false', then throw
+        // and error and exits. 
         std::ifstream inputfile(path.c_str());
         if (inputfile.good()) {
-            std::remove(path.c_str());  // delete file
+            if (true == forceDelete) {
+                std::cout << "GeoModelIO -- INFO: you set the 'forceDelete' option to 'true', so we replace the existing .db file: '" << path << "'." << std::endl;
+                std::remove(path.c_str());  // delete file
+            } else {
+            std::cerr << "\n*** ERROR! The output '" << path << "' file exists already! If you want to replace it, set the 'forceDelete' option to 'true'. Otherwise, rename the existing file, or move it to another place, and retry. ***\n\n{"
+                  << __func__ << " ["
+                  << __PRETTY_FUNCTION__ 
+                  << "]}\n\n";
+                throw;
+            }
         }
         inputfile.close();
 

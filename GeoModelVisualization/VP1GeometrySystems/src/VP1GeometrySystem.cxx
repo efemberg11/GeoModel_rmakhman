@@ -65,7 +65,7 @@
 #include "GeoModelKernel/GeoPrintGraphAction.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoElement.h"
-#include "GeoModelKernel/GeoPVLink.h"
+#include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
@@ -125,7 +125,7 @@ public:
   SoSeparator * sceneroot;
 
   std::map<SoSeparator*,VolumeHandle*> sonodesep2volhandle;
-  //Might be needed later:  std::map<GeoPVConstLink,VolumeHandle*> pv2volhandle;
+  //Might be needed later:  std::map<PVConstLink,VolumeHandle*> pv2volhandle;
 
   GeoPhysVol* getGeometry();
   GeoPhysVol* createTheWorld(GeoPhysVol* world = nullptr);

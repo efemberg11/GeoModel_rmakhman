@@ -17,7 +17,7 @@
 
 //typedef std::map< const GeoOpticalPhysVol*, G4VPhysicalVolume*,std::less< const GeoOpticalPhysVol*> > OpticalVolumesMap;
 
-class GeoPVConstLink;
+class PVConstLink;
 class VolumeBuilder
 {
  public:
@@ -36,7 +36,7 @@ class VolumeBuilder
   bool GetParam(){return m_paramOn;}
 
   //virtual G4LogicalVolume* Build(PVConstLink pv, OpticalVolumesMap* optical_volumes = 0) const = 0;
-  virtual G4LogicalVolume* Build(GeoPVConstLink pv) const = 0;
+  virtual G4LogicalVolume* Build(PVConstLink pv) const = 0;
 
  protected:
   bool m_paramOn;

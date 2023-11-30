@@ -8,7 +8,7 @@
 //This reference counted class keeps data (and related methods) which are common
 //for all volume handle nodes under a given top-level handle.
 
-#include "GeoModelKernel/GeoPVConstLink.h"
+#include "GeoModelKernel/GeoVPhysVol.h"
 #include "VP1GeometrySystems/VP1GeoFlags.h"
 #include <map>
 class SoNode;
@@ -26,7 +26,7 @@ class GeoSysController;
 class VolumeHandleSharedData {
 public:
   VolumeHandleSharedData(GeoSysController * controller,VP1GeoFlags::SubSystemFlag,std::map<SoSeparator*,VolumeHandle*>* sonodesep2volhandle,
-			 const GeoPVConstLink& motherpV,PhiSectorManager*,
+			 const PVConstLink& motherpV,PhiSectorManager*,
 			 SoMaterial * topMaterial,MatVisAttributes *,VolVisAttributes *,
 			 ZappedVolumeListModel *, VP1GeoTreeView *, SoSeparator*);
   ~VolumeHandleSharedData();
@@ -34,7 +34,7 @@ public:
   void unref();
 
   //Fixme: Inline?
-  GeoPVConstLink geoPVConstLinkOfTreeTopsMother() const;
+  PVConstLink geoPVConstLinkOfTreeTopsMother() const;
   PhiSectorManager* phiSectorManager() const;
   VP1GeoFlags::SubSystemFlag subSystemFlag() const;
   SoMaterial * fallBackTopLevelMaterial() const;
@@ -46,7 +46,7 @@ public:
   void addZappedVolumeToGui(VolumeHandle*);
   void removeZappedVolumesFromGui(VolumeHandle*);
 
-  SoNode * toShapeNode(const GeoPVConstLink& pV, bool *shapeIsKnown=nullptr);//Returns shape of pV->getLogVol() (uses shared instancing as appropriate)
+  SoNode * toShapeNode(const PVConstLink& pV, bool *shapeIsKnown=nullptr);//Returns shape of pV->getLogVol() (uses shared instancing as appropriate)
   SoNode * getSoCylinderOrientedLikeGeoTube(const double& radius, const double& halfLength);//(uses shared instancing as appropriate)
 
   void registerNodeSepForVolumeHandle(SoSeparator*,VolumeHandle*);

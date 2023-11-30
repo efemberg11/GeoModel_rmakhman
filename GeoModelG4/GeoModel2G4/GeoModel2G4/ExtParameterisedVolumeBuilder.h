@@ -17,9 +17,9 @@ class ExtParameterisedVolumeBuilder: public VolumeBuilder
 public:
   ExtParameterisedVolumeBuilder(std::string n);
   ///
-  G4LogicalVolume* Build(GeoPVConstLink pv) const;
+  G4LogicalVolume* Build(PVConstLink pv) const;
   ///
-  Geo2G4AssemblyVolume* BuildAssembly(GeoPVConstLink pv) const;
+  Geo2G4AssemblyVolume* BuildAssembly(PVConstLink pv) const;
  private:
   /// Prints info when some PhysVol contains both types (PV and ST) of daughters
   void PrintSTInfo(std::string volume) const;

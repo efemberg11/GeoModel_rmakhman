@@ -39,7 +39,7 @@ public:
   class SubSystem: public VolumeHandle {
   public:
     SubSystem(SectionInfo *si,VP1GeoFlags::SubSystemFlag sf)
-      : VolumeHandle(0,0, GeoPVConstLink(), -1),
+      : VolumeHandle(0,0, PVConstLink(), -1),
 	section(si), subsysflag(sf) {}
     ~SubSystem() {
       VolumeHandle::VolumeHandleListItr volItr, volItrE(volhandlelist.end());
@@ -60,7 +60,7 @@ public:
   //Class for the dynamic information about sections and their daughter subsystems:
   class SectionInfo: public VolumeHandle {
   public:
-    SectionInfo(): VolumeHandle(0,0, GeoPVConstLink(), -2) {}
+    SectionInfo(): VolumeHandle(0,0, PVConstLink(), -2) {}
     //
     QList<SubSystem*> enabledSubSystems;
     QList<SubSystem*> disabledSubSystems;

@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "VP1GeometrySystems/VP1GeoFlags.h"
-#include "GeoModelKernel/GeoPVConstLink.h"
+#include "GeoModelKernel/GeoVPhysVol.h"
 #include <QString>
 
 //Only initialises child classes on demand. And even then their SoNodes are not initialised until they must be shown.
@@ -23,7 +23,7 @@ class VolumeHandle {
 public:
 
 
-  VolumeHandle(VolumeHandleSharedData * ,VolumeHandle * parent, const GeoPVConstLink&,int childNumber,
+  VolumeHandle(VolumeHandleSharedData * ,VolumeHandle * parent, const PVConstLink&,int childNumber,
 	       const SbMatrix& accumTrans = SbMatrix() );
 
   virtual ~VolumeHandle();//lots of stuff to do here!
@@ -39,7 +39,7 @@ public:
   int copyNumber() const;//Returns -1 if doesnt have a valid copy number (because volume is not replicated), -2 in case of error.
   quint32 hashID() const;//For vp1 persistification
 
-  GeoPVConstLink geoPVConstLink() const;
+  PVConstLink geoPVConstLink() const;
   const GeoMaterial * geoMaterial() const;
   std::string getNameStdString() const;
 

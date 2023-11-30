@@ -1,13 +1,12 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEO2G4_VolumeBuilder_H
 #define GEO2G4_VolumeBuilder_H
 
 #include "G4LogicalVolume.hh"
-//#include "Geo2G4SvcAccessor.h"
-//#include "GeoModelUtilities/GeoOpticalPhysVol.h"
+#include "GeoModelKernel/GeoVPhysVol.h"
 
 #include "G4VPhysicalVolume.hh"
 
@@ -17,7 +16,6 @@
 
 //typedef std::map< const GeoOpticalPhysVol*, G4VPhysicalVolume*,std::less< const GeoOpticalPhysVol*> > OpticalVolumesMap;
 
-class PVConstLink;
 class VolumeBuilder
 {
  public:

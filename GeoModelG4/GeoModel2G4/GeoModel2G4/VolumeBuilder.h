@@ -1,13 +1,12 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEO2G4_VolumeBuilder_H
 #define GEO2G4_VolumeBuilder_H
 
 #include "G4LogicalVolume.hh"
-//#include "Geo2G4SvcAccessor.h"
-//#include "GeoModelUtilities/GeoOpticalPhysVol.h"
+#include "GeoModelKernel/GeoVPhysVol.h"
 
 #include "G4VPhysicalVolume.hh"
 
@@ -17,7 +16,6 @@
 
 //typedef std::map< const GeoOpticalPhysVol*, G4VPhysicalVolume*,std::less< const GeoOpticalPhysVol*> > OpticalVolumesMap;
 
-class GeoPVConstLink;
 class VolumeBuilder
 {
  public:
@@ -36,7 +34,7 @@ class VolumeBuilder
   bool GetParam(){return m_paramOn;}
 
   //virtual G4LogicalVolume* Build(PVConstLink pv, OpticalVolumesMap* optical_volumes = 0) const = 0;
-  virtual G4LogicalVolume* Build(GeoPVConstLink pv) const = 0;
+  virtual G4LogicalVolume* Build(PVConstLink pv) const = 0;
 
  protected:
   bool m_paramOn;

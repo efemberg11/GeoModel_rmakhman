@@ -22,9 +22,9 @@
 
 class MuonVolumeHandle : public VolumeHandle {
 public:
-  MuonVolumeHandle(VolumeHandleSharedData * shared,VolumeHandle * parent, const GeoPVConstLink& pv,int childNumber,
+  MuonVolumeHandle(VolumeHandleSharedData * shared,VolumeHandle * parent, const PVConstLink& pv,int childNumber,
 		   const MuonChamberState& mcs, const SbMatrix& accumTrans,const MuonGM::MuonStation * station, 
-		   const QList<const std::map<GeoPVConstLink, float>*>& t0s )
+		   const QList<const std::map<PVConstLink, float>*>& t0s )
   : VolumeHandle(shared, parent, pv, childNumber, mcs, accumTrans), m_station(station), m_chamberT0s(t0s)
   {}
   
@@ -41,17 +41,17 @@ public:
   virtual QString muonChamberT0(unsigned int i) const {
     if (static_cast<int>(i)>=m_chamberT0s.size())
       return "ERROR bad T0 source";
-    const std::map<GeoPVConstLink, float>* t0map = m_chamberT0s.at(i);
+    const std::map<PVConstLink, float>* t0map = m_chamberT0s.at(i);
     const QString no_info("?");
     if (!t0map)
       return no_info;
-    const std::map<GeoPVConstLink, float>::const_iterator it = t0map->find(geoPVConstLink());
+    const std::map<PVConstLink, float>::const_iterator it = t0map->find(geoPVConstLink());
     return it==t0map->end() ? no_info : QString::number(it->second);
   }
 
 private:
   const MuonGM::MuonStation * m_station;
-  const QList<const std::map<GeoPVConstLink, float>*>& m_chamberT0s;
+  const QList<const std::map<PVConstLink, float>*>& m_chamberT0s;
 };
 
 #endif

@@ -43,11 +43,11 @@
 //____________________________________________________________________
 class VolumeHandle::Imp {
 public:
-  Imp(VolumeHandleSharedData * the_cd, const GeoPVConstLink& the_pV, const SbMatrix& the_ac)
+  Imp(VolumeHandleSharedData * the_cd, const PVConstLink& the_pV, const SbMatrix& the_ac)
     : commondata(the_cd), pV(the_pV),accumTrans(the_ac),attachsepHelper(0),attachlabelSepHelper(0),nodesep(0), material(0), label_sep(0), labels(0), isattached(false) {}
 
   VolumeHandleSharedData * commondata;
-  GeoPVConstLink pV;
+  PVConstLink pV;
   const SbMatrix accumTrans;//FIXME: Use pointer - and free once children are created AND nodesep has been build. Or just construct on the fly!
 
   VP1ExtraSepLayerHelper * attachsepHelper;
@@ -90,7 +90,7 @@ QDataStream & operator>> ( QDataStream & in, VolumeHandle::Imp::VolState & vs ) 
 }
 
 //____________________________________________________________________
-VolumeHandle::VolumeHandle(VolumeHandleSharedData * cd,VolumeHandle * parent, const GeoPVConstLink& pV, int childNumber, const SbMatrix& accumTrans)
+VolumeHandle::VolumeHandle(VolumeHandleSharedData * cd,VolumeHandle * parent, const PVConstLink& pV, int childNumber, const SbMatrix& accumTrans)
   : m_d(new Imp(cd,pV,accumTrans)), m_childNumber(childNumber), m_nchildren(childNumber>=0?pV->getNChildVols():0), m_parent(parent),
     m_state(VP1GeoFlags::CONTRACTED)
 {
@@ -156,7 +156,7 @@ void VolumeHandle::initialiseChildren()
 }
 
 //____________________________________________________________________
-GeoPVConstLink VolumeHandle::geoPVConstLink() const
+PVConstLink VolumeHandle::geoPVConstLink() const
 {
   return m_d->pV;
 }
@@ -507,7 +507,7 @@ void VolumeHandle::detachAllContractedChildren() {
 //____________________________________________________________________
 int VolumeHandle::copyNumber() const
 {
-  GeoPVConstLink parent_pV;
+  PVConstLink parent_pV;
   if (m_parent) {
     parent_pV = m_parent->geoPVConstLink();
   } else {

@@ -11,7 +11,7 @@
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoElement.h"
-#include "GeoModelKernel/GeoPVLink.h"
+#include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"

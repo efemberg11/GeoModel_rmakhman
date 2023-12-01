@@ -28,7 +28,7 @@ public:
   std::map<double, SoNode *> id2shape;
   SoVisualizeAction visaction;
   std::map<SoSeparator*,VolumeHandle*>* sonodesep2volhandle;
-  GeoPVConstLink motherpV;
+  PVConstLink motherpV;
   PhiSectorManager* phisectormanager;
   VP1GeoFlags::SubSystemFlag subsysflag;
   SoMaterial * topMaterial;
@@ -42,7 +42,7 @@ public:
 VolumeHandleSharedData::VolumeHandleSharedData(GeoSysController * controller,
 					       VP1GeoFlags::SubSystemFlag flag,
                  std::map<SoSeparator*,VolumeHandle*>* sonodesep2volhandle,
-					       const GeoPVConstLink& motherpV, PhiSectorManager*psm,
+					       const PVConstLink& motherpV, PhiSectorManager*psm,
                  SoMaterial * topMaterial,
 					       MatVisAttributes *matVisAttributes,VolVisAttributes *volVisAttributes,
 					       ZappedVolumeListModel * zappedvolumelistmodel, VP1GeoTreeView * volbrowser, SoSeparator* textSep )
@@ -159,7 +159,7 @@ void VolumeHandleSharedData::setShowVolumeOutlines(SoGroup*nodegroup,bool showvo
   }
 }
 //_____________________________________________________________________________________
-SoNode * VolumeHandleSharedData::toShapeNode(const GeoPVConstLink& pV, bool * shapeIsKnown)
+SoNode * VolumeHandleSharedData::toShapeNode(const PVConstLink& pV, bool * shapeIsKnown)
 {
   const GeoLogVol * logVolume = pV->getLogVol();
   
@@ -182,7 +182,7 @@ SoNode * VolumeHandleSharedData::toShapeNode(const GeoPVConstLink& pV, bool * sh
   }
   shape = m_d->visaction.getShape();
   if (!shape) {
-    GeoPVConstLink parent=pV->getParent();
+    PVConstLink parent=pV->getParent();
     parent->getLogVol()->getShape()->exec(&(m_d->visaction));
     shape = m_d->visaction.getShape();
     if (shapeIsKnown) *shapeIsKnown=false;
@@ -219,7 +219,7 @@ SoNode * VolumeHandleSharedData::getSoCylinderOrientedLikeGeoTube(const double& 
 }
 
 //____________________________________________________________________
-GeoPVConstLink VolumeHandleSharedData::geoPVConstLinkOfTreeTopsMother() const
+PVConstLink VolumeHandleSharedData::geoPVConstLinkOfTreeTopsMother() const
 {
   return m_d->motherpV;
 }

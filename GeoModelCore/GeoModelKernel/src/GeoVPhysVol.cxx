@@ -9,17 +9,8 @@
 #include <stdexcept>
 #include <string>
 
-GeoVPhysVol::GeoVPhysVol(const GeoLogVol* LogVol)
-  : m_parentPtr(nullptr)
-  , m_logVol(LogVol)
-{
-  if(m_logVol) m_logVol->ref();
-}
-
-GeoVPhysVol::~GeoVPhysVol()
-{
-  if(m_logVol) m_logVol->unref();
-}
+GeoVPhysVol::GeoVPhysVol(const GeoLogVol* LogVol): 
+  m_logVol(LogVol) {}
 
 Query<unsigned int> GeoVPhysVol::indexOf(PVConstLink daughter) const
 {
@@ -30,19 +21,7 @@ Query<unsigned int> GeoVPhysVol::indexOf(PVConstLink daughter) const
   return Query<unsigned int >();
 }
 
-PVConstLink GeoVPhysVol::getParent() const
-{
-  if(m_parentPtr != this) return m_parentPtr;
-  return nullptr;
-}
-
-const GeoLogVol* GeoVPhysVol::getLogVol() const
-{
-  return m_logVol;
-}
-
-void GeoVPhysVol::apply(GeoVolumeAction *action) const
-{
+void GeoVPhysVol::apply(GeoVolumeAction *action) const {
   int nVols(0);
   switch(action->getType()) {
   case GeoVolumeAction::TOP_DOWN:

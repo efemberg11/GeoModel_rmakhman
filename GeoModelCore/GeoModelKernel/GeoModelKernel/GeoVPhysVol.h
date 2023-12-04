@@ -1,20 +1,17 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOVPHYSVOL_H
 #define GEOMODELKERNEL_GEOVPHYSVOL_H
 
-#include "GeoModelKernel/GeoPVLink.h"
-#define SMARTLINKS
-#ifdef  SMARTLINKS
-typedef GeoPVLink PVLink;
-typedef GeoPVConstLink PVConstLink;
-#else
+#include "GeoModelKernel/GeoIntrusivePtr.h"
 class GeoVPhysVol;
-typedef GeoVPhysVol *PVLink;
-typedef const GeoVPhysVol *PVConstLink;
-#endif
+using PVLink = GeoIntrusivePtr<GeoVPhysVol>;
+using GeoPVLink = PVLink;
+using PVConstLink = GeoIntrusivePtr<const GeoVPhysVol>;
+using GeoPVConstLink = PVConstLink;
+
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/Query.h"
 #include <string>
@@ -35,7 +32,9 @@ class GeoVPhysVol : public GeoGraphNode
 
   /// Returns true if the physical volume is accessed by more than one parent.
   /// Should check this before trusting the parent pointer.
-  bool isShared() const;
+  bool isShared() const {
+      return m_parentPtr == this;
+  }
 
   /// Returns the index of a specific daughter volume.  The Query class can be used
   /// just like an unsigned int, but it provides and isValid() method to determine
@@ -43,10 +42,14 @@ class GeoVPhysVol : public GeoGraphNode
   Query<unsigned int> indexOf(PVConstLink daughter) const;
 
   /// Gets the parent, if the parent is unique, and otherwise returns a nullptr pointer.
-  PVConstLink getParent() const;
+  PVConstLink getParent() const {
+     return PVConstLink{isShared() ? nullptr : m_parentPtr};
+  }
 
   /// Returns the logical volume.
-  const GeoLogVol* getLogVol() const;
+  const GeoLogVol* getLogVol() const {
+     return m_logVol;
+  }
 
   /// Returns the number of child physical volumes.
   virtual unsigned int getNChildVols() const = 0;
@@ -90,20 +93,16 @@ class GeoVPhysVol : public GeoGraphNode
   virtual void add(GeoGraphNode* graphNode) = 0;
 
  protected:
-  virtual ~GeoVPhysVol();
+  virtual ~GeoVPhysVol() = default;
 
  private:
   /// If one parent           ...pointer=PARENT;
   /// If no parent            ...pointer=nullptr.
   /// If more than one parent ...pointer=this;
-  const GeoVPhysVol* m_parentPtr;
+  const GeoVPhysVol* m_parentPtr{nullptr};
   
-  const GeoLogVol *m_logVol;
+  GeoIntrusivePtr<const GeoLogVol> m_logVol{};
 };
 
-inline bool GeoVPhysVol::isShared () const
-{
-  return m_parentPtr == this;
-}
 
 #endif

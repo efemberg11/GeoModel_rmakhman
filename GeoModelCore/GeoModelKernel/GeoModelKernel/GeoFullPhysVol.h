@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOFULLPHYSVOL_H
@@ -72,16 +72,14 @@ class GeoFullPhysVol final : public GeoVFullPhysVol
   virtual const GeoGraphNode * const *findChildNode(const GeoGraphNode *n) const override;
 
   protected:
-  virtual ~GeoFullPhysVol() override;
+  virtual ~GeoFullPhysVol();
 
   private:
-  GeoFullPhysVol(const GeoFullPhysVol &right);
-  GeoFullPhysVol & operator=(const GeoFullPhysVol &right);
-
+ 
   /// Hold the list of children.
-  std::vector<const GeoGraphNode *> m_daughters;
+  std::vector<GeoIntrusivePtr<GeoGraphNode>> m_daughters{};
   
-  const GeoFullPhysVol* m_cloneOrigin;
+  const GeoFullPhysVol* m_cloneOrigin{nullptr};
 };
 
 #endif

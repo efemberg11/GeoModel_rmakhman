@@ -12,14 +12,9 @@
 #include <algorithm>
 
 GeoFullPhysVol::GeoFullPhysVol (const GeoLogVol* LogVol)
-  : GeoVFullPhysVol(LogVol)
-  , m_cloneOrigin(nullptr)
-{
-}
+  : GeoVFullPhysVol(LogVol){ }
 
-GeoFullPhysVol::~GeoFullPhysVol()
-{
-  for(const GeoGraphNode* daughter : m_daughters) daughter->unref();
+GeoFullPhysVol::~GeoFullPhysVol() {
   if(m_cloneOrigin && m_cloneOrigin!=this) m_cloneOrigin->unref();
 }
 
@@ -28,7 +23,6 @@ void GeoFullPhysVol::add(GeoGraphNode* graphNode)
   if(m_cloneOrigin) throw std::runtime_error("Attempt to modify contents of a cloned FPV");
   std::scoped_lock<std::mutex> guard(m_mutex);
   m_daughters.push_back(graphNode);
-  graphNode->ref();
   graphNode->dockTo(this);
 }
 
@@ -239,19 +233,17 @@ unsigned int GeoFullPhysVol::getNChildNodes() const
   return m_daughters.size();
 }
 
-const GeoGraphNode * const * GeoFullPhysVol::getChildNode(unsigned int i) const 
-{
+const GeoGraphNode * const * GeoFullPhysVol::getChildNode(unsigned int i) const {
   std::scoped_lock<std::mutex> guard(m_mutex);
-  return &(m_daughters[i]);
+  return m_daughters[i];
 }
 const GeoGraphNode * const * GeoFullPhysVol::findChildNode(const GeoGraphNode * n) const 
 {
   std::scoped_lock<std::mutex> guard(m_mutex);
-  std::vector<const GeoGraphNode *>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
+  std::vector<GeoIntrusivePtr<GeoGraphNode>>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
   if (i==m_daughters.end()) {
     return nullptr;
   }
-  else {
-    return &*i;
-  }
+  return (*i);
+  
 }

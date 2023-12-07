@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -17,17 +17,11 @@ GeoPhysVol::GeoPhysVol(const GeoLogVol* LogVol)
 {
 }
 
-GeoPhysVol::~GeoPhysVol()
-{
-  std::scoped_lock<std::mutex> lk(m_muxVec);
-  for(const GeoGraphNode* daughter : m_daughters) daughter->unref();
-}
 
 void GeoPhysVol::add(GeoGraphNode* graphNode)
 {
   std::scoped_lock<std::mutex> lk(m_muxVec);
   m_daughters.push_back(graphNode);
-  graphNode->ref();
   graphNode->dockTo(this);
 }
 
@@ -199,20 +193,17 @@ unsigned int GeoPhysVol::getNChildNodes() const
   return m_daughters.size();
 }
 
-const GeoGraphNode * const * GeoPhysVol::getChildNode(unsigned int i) const 
-{
+const GeoGraphNode * const * GeoPhysVol::getChildNode(unsigned int i) const {
   std::scoped_lock<std::mutex> lk(m_muxVec);
-  return &(m_daughters[i]);
+  return m_daughters[i];
 }
 
-const GeoGraphNode * const * GeoPhysVol::findChildNode(const GeoGraphNode * n) const 
-{
+const GeoGraphNode * const * GeoPhysVol::findChildNode(const GeoGraphNode * n) const {
   std::scoped_lock<std::mutex> lk(m_muxVec);
-  std::vector<const GeoGraphNode *>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
+  std::vector<GeoIntrusivePtr<GeoGraphNode>>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
   if (i==m_daughters.end()) {
     return nullptr;
   }
-  else {
-    return &*i;
-  }
+  return (*i);
+ 
 }

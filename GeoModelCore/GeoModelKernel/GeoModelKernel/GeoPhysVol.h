@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOPHYSVOL_H
@@ -28,13 +28,9 @@
 #include <mutex>
 
 
-class GeoPhysVol : public GeoVPhysVol
-{
+class GeoPhysVol : public GeoVPhysVol {
  public:
   GeoPhysVol(const GeoLogVol* LogVol);
-
-  GeoPhysVol(const GeoPhysVol &right) = delete;
-  GeoPhysVol & operator=(const GeoPhysVol &right) = delete;
 
   /// Adds a Graph Node to the Geometry Graph
   virtual void add(GeoGraphNode* graphNode) override final;
@@ -72,10 +68,10 @@ class GeoPhysVol : public GeoVPhysVol
   virtual const GeoGraphNode * const *findChildNode(const GeoGraphNode *n) const override final;
 
  protected:
-  virtual ~GeoPhysVol() override;
+    virtual ~GeoPhysVol() = default;
 
  private:
-  std::vector<const GeoGraphNode*> m_daughters;
+  std::vector<GeoIntrusivePtr<GeoGraphNode>> m_daughters{};
   mutable std::mutex m_muxVec;
 };
 

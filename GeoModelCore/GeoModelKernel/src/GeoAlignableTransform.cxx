@@ -68,7 +68,7 @@ void GeoAlignableTransform::clearDelta(GeoVAlignmentStore* store) {
   
   std::set<GeoGraphNode*> uniqueParents;
   for(GeoGraphNode* parent : m_parentList) {
-    if(!uniqueParents.insert(parent).second) {
+    if(uniqueParents.insert(parent).second) {
         GeoSelClearAbsPosAction cc(this);
         parent->exec(&cc);
     }

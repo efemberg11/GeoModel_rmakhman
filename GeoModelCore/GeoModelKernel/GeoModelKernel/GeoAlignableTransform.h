@@ -39,8 +39,6 @@ class GeoAlignableTransform final : public GeoTransform
   virtual ~GeoAlignableTransform() = default;
 
  private:
-  GeoAlignableTransform(const GeoAlignableTransform &right);
-  GeoAlignableTransform & operator=(const GeoAlignableTransform &right);
 
   // Pointer to an alignment correction.  Until some
   // alignment correction is set, this pointer is nullptr and

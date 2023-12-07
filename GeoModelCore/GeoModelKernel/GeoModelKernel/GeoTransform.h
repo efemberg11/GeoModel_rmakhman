@@ -23,8 +23,6 @@ class GeoTransform : public GeoGraphNode {
  public:
     GeoTransform(const GeoTrf::Transform3D& transform);
 
-    GeoTransform(const GeoTransform &right) = delete;
-    GeoTransform & operator=(const GeoTransform &right) = delete;
 
   /// Gets the total transformation.
   virtual GeoTrf::Transform3D getTransform(const GeoVAlignmentStore* store=nullptr) const;

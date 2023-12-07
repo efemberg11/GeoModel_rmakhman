@@ -27,8 +27,6 @@ class GeoVPhysVol : public GeoGraphNode
  public:
   GeoVPhysVol(const GeoLogVol* LogVol);
   
-  GeoVPhysVol(const GeoVPhysVol &right) = delete;
-  GeoVPhysVol & operator=(const GeoVPhysVol &right) = delete;
 
   /// Returns true if the physical volume is accessed by more than one parent.
   /// Should check this before trusting the parent pointer.

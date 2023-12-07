@@ -21,30 +21,35 @@
 
 #include <atomic>
 
-class RCBase 
-{
+class RCBase {
  public:
-  RCBase();
+  RCBase() = default;
 
   //	Increase the reference count
-  void ref () const;
+  void ref() const {
+     ++m_count; 
+  }
 
   //	Decreases the reference count.  When the reference count
   //	falls to zero, the object deletes itself.
-  void unref () const;
+  void unref () const {
+     if (--m_count == 0) delete this;
+  }
 
   //	Return the reference count.
-  unsigned int refCount () const;
+  unsigned int refCount () const {
+     return m_count.load();
+  }
 
  protected:
-  virtual ~RCBase();
+    virtual ~RCBase() = default;
 
  private:
-  RCBase(const RCBase &right);
-  RCBase & operator=(const RCBase &right);
+    RCBase(const RCBase &right) = delete;
+    RCBase & operator=(const RCBase &right) = delete;
 
-  //	The reference count
-  mutable std::atomic<unsigned> m_count;
+    //	The reference count
+    mutable std::atomic<unsigned> m_count{0};
 
 };
 

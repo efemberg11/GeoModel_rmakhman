@@ -10,21 +10,15 @@ GeoTransform::GeoTransform (const GeoTrf::Transform3D& transform)
 {
 }
 
-GeoTransform::~GeoTransform()
-{
-}
 
-GeoTrf::Transform3D GeoTransform::getTransform(const GeoVAlignmentStore* /*store*/) const
-{
+GeoTrf::Transform3D GeoTransform::getTransform(const GeoVAlignmentStore* /*store*/) const {
   return m_transform;
 }
 
-GeoTrf::Transform3D GeoTransform::getDefTransform(const GeoVAlignmentStore* /*store*/) const
-{
+GeoTrf::Transform3D GeoTransform::getDefTransform(const GeoVAlignmentStore* /*store*/) const {
   return m_transform;
 }
 
-void GeoTransform::exec(GeoNodeAction *action) const
-{
+void GeoTransform::exec(GeoNodeAction *action) const {
   action->handleTransform(this);
 }

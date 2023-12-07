@@ -19,13 +19,12 @@
 
 class GeoVAlignmentStore;
 
-class GeoTransform : public GeoGraphNode
-{
+class GeoTransform : public GeoGraphNode {
  public:
-  GeoTransform(const GeoTrf::Transform3D& transform);
+    GeoTransform(const GeoTrf::Transform3D& transform);
 
-  GeoTransform(const GeoTransform &right) = delete;
-  GeoTransform & operator=(const GeoTransform &right) = delete;
+    GeoTransform(const GeoTransform &right) = delete;
+    GeoTransform & operator=(const GeoTransform &right) = delete;
 
   /// Gets the total transformation.
   virtual GeoTrf::Transform3D getTransform(const GeoVAlignmentStore* store=nullptr) const;
@@ -37,11 +36,11 @@ class GeoTransform : public GeoGraphNode
   virtual void exec(GeoNodeAction *action) const override final;
   
  protected:
-  virtual ~GeoTransform() override;
+  virtual ~GeoTransform()  = default;
 
  private:
   // The Euclidean (Rigid Body) transform.
-  GeoTrf::Transform3D m_transform;
+  GeoTrf::Transform3D m_transform{GeoTrf::Transform3D::Identity()};
 };
 
 #endif

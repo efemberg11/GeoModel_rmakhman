@@ -16,6 +16,7 @@
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoXF.h"
 
+#include <memory>
 class GeoSerialTransformer : public GeoGraphNode
 {
  public:
@@ -25,42 +26,38 @@ class GeoSerialTransformer : public GeoGraphNode
   virtual void exec (GeoNodeAction *action) const;
 
   //	Returns the transformation field itself.
-  const GeoXF::Function * getFunction () const;
+  const GeoXF::Function * getFunction () const{
+      return m_function.get();
+  }
 
   // Returns the volume:
-  PVConstLink getVolume () const
-  {
+  PVConstLink getVolume () const {
     return m_physVol;
   }
 
   // Returns the number of copies:
-  unsigned int getNCopies () const
-  {
-    return m_nCopies;
+  unsigned int getNCopies () const {
+     return m_nCopies;
   }
 
   // Returns the transformation to the ith copy:
-  GeoTrf::Transform3D getTransform (int i) const
-  {
+  GeoTrf::Transform3D getTransform (int i) const {
     return (*m_function) (i);
   }
 
  protected:
-  virtual ~GeoSerialTransformer();
+  virtual ~GeoSerialTransformer() = default;
 
  private:
-  GeoSerialTransformer(const GeoSerialTransformer &right);
-  GeoSerialTransformer & operator=(const GeoSerialTransformer &right);
-
   //	Number of copies of a physical volume to generate.
-  unsigned int m_nCopies;
+  unsigned int m_nCopies{0};
 
   //	Recipe for the transformation; specifically, a
   //	Transform-valued m_function of a single variable.
-  const GeoXF::Function *m_function;
+  std::unique_ptr<const GeoXF::Function> m_function{};
 
   //	The physical volume to be multiply placed.
-  const GeoVPhysVol *m_physVol;
+  GeoPVConstLink m_physVol{};
 };
 
 #endif

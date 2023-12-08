@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOALIGNABLETRANSFORM_H
@@ -7,6 +7,7 @@
 
 #include "GeoModelKernel/GeoTransform.h"
 #include <vector>
+#include <memory>
 #include <mutex>
 
 class GeoVAlignmentStore;
@@ -35,16 +36,14 @@ class GeoAlignableTransform final : public GeoTransform
   virtual void dockTo(GeoVPhysVol* parent) override;
 
  protected:
-  virtual ~GeoAlignableTransform() override;
+  virtual ~GeoAlignableTransform() = default;
 
  private:
-  GeoAlignableTransform(const GeoAlignableTransform &right);
-  GeoAlignableTransform & operator=(const GeoAlignableTransform &right);
 
   // Pointer to an alignment correction.  Until some
   // alignment correction is set, this pointer is nullptr and
   // the memory is unallocated.
-  GeoTrf::Transform3D* m_delta;
+  std::unique_ptr<GeoTrf::Transform3D> m_delta{};
 
   // We need to protext m_delta with a mutex in order to avoid
   // memory corruption in multithreaded applications

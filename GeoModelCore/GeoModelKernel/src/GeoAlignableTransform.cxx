@@ -9,15 +9,8 @@
 #include <set>
 
 GeoAlignableTransform::GeoAlignableTransform (const GeoTrf::Transform3D& transform)
-  : GeoTransform(transform)
-  , m_delta (nullptr)
-{
-}
+  : GeoTransform(transform){}
 
-GeoAlignableTransform::~GeoAlignableTransform()
-{
-  delete m_delta;
-}
 
 #if defined(FLATTEN) && defined(__GNUC__)
 // We compile this package with optimization, even in debug builds; otherwise,
@@ -31,64 +24,57 @@ GeoTrf::Transform3D GeoAlignableTransform::getTransform(const GeoVAlignmentStore
 {
   if(store) {
     const GeoTrf::Transform3D* delta = store->getDelta(this);
-    return GeoTransform::getTransform(nullptr) * (delta==nullptr ? GeoTrf::Transform3D(GeoTrf::Transform3D::Identity()) : *delta);
+    return GeoTransform::getTransform(nullptr) * (!delta ? GeoTrf::Transform3D::Identity() : *delta);
   }
   else {
     std::scoped_lock<std::mutex> guard(m_deltaMutex);
-    return GeoTransform::getTransform(nullptr) * (m_delta==nullptr ? GeoTrf::Transform3D(GeoTrf::Transform3D::Identity()) : *m_delta);
+    return GeoTransform::getTransform(nullptr) * (!m_delta ? GeoTrf::Transform3D::Identity() : *m_delta);
   }
 }
 
-void GeoAlignableTransform::setDelta (const GeoTrf::Transform3D& delta, GeoVAlignmentStore* store)
+void GeoAlignableTransform::setDelta(const GeoTrf::Transform3D& delta, GeoVAlignmentStore* store)
 {
-  if(store==nullptr) {
+  if(!store) {
     {
       std::scoped_lock<std::mutex> guard(m_deltaMutex);
       if(m_delta && (m_delta->isApprox(delta))) return;
       
       if(m_delta) {
-	(*m_delta) = delta;
-      }
-      else {
-	m_delta = new GeoTrf::Transform3D(delta);
+	      (*m_delta) = delta;
+      } else {
+      	m_delta = std::make_unique<GeoTrf::Transform3D>(delta);
       }
     }
 
     std::set<GeoGraphNode*> uniqueParents;
     for(GeoGraphNode* parent : m_parentList) {
-      if(uniqueParents.find(parent)==uniqueParents.end()) {
-	GeoSelClearAbsPosAction cc(this);
-	parent->exec(&cc);
-	uniqueParents.insert(parent);
+      if(uniqueParents.insert(parent).second) {
+	        GeoSelClearAbsPosAction cc(this);
+	        parent->exec(&cc);
       }
     }
-  } // if(store==nullptr)
-  else {
+  } else {
     store->setDelta(this,delta);
   }
 }
 
-void GeoAlignableTransform::clearDelta(GeoVAlignmentStore* store)
-{
+void GeoAlignableTransform::clearDelta(GeoVAlignmentStore* store) {
   // Does not make sence to clear deltas inside Alignment Store
   if(store!=nullptr) return;
   {
     std::scoped_lock<std::mutex> guard(m_deltaMutex);
-    delete m_delta;
-    m_delta = nullptr;
+    m_delta.reset();
   }
   
   std::set<GeoGraphNode*> uniqueParents;
   for(GeoGraphNode* parent : m_parentList) {
-    if(uniqueParents.find(parent)==uniqueParents.end()) {
-      GeoSelClearAbsPosAction cc(this);
-      parent->exec (&cc);
-      uniqueParents.insert(parent);
+    if(uniqueParents.insert(parent).second) {
+        GeoSelClearAbsPosAction cc(this);
+        parent->exec(&cc);
     }
   }
 }
 
-void GeoAlignableTransform::dockTo(GeoVPhysVol* parent)
-{
+void GeoAlignableTransform::dockTo(GeoVPhysVol* parent) {
   m_parentList.push_back (parent);
 }

@@ -41,8 +41,6 @@ variables:
 # general Ubuntu job template
 .ubuntu-template-job-base: &ubuntu-job-base
   image: ubuntu:22.04
-  tags:
-    - docker
   rules:
     - when: always
 
@@ -59,8 +57,6 @@ variables:
 
 # .ubuntu-template-job-registry: &ubuntu-job-registry
 #   image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:1.1
-#   tags:
-#     - docker
 #   before_script:
 #     - apt-get update -qq && apt-get install -y -qq libeigen3-dev libsqlite3-dev
 

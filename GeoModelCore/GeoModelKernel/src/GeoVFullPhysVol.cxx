@@ -7,17 +7,8 @@
 #include <string>
 
 GeoVFullPhysVol::GeoVFullPhysVol(const GeoLogVol* logVol)
-  : GeoVPhysVol(logVol)
-  , m_id(nullptr)
-  , m_absPosInfo(nullptr)
-{
-}
+  : GeoVPhysVol(logVol){}
 
-GeoVFullPhysVol::~GeoVFullPhysVol()
-{
-  delete m_absPosInfo;
-  delete m_id;
-}
 
 const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentStore* store) const
 {
@@ -33,15 +24,14 @@ const GeoTrf::Transform3D & GeoVFullPhysVol::getAbsoluteTransform(GeoVAlignmentS
 
   std::scoped_lock<std::mutex> guard(m_mutex);
   
-  if(store==nullptr && !m_absPosInfo) m_absPosInfo = new GeoAbsPositionInfo();
+  if(!store && !m_absPosInfo) m_absPosInfo = std::make_unique<GeoAbsPositionInfo>();
 
   //
   // Check the cache first. If not empty, then return the cached value
   //
-  if(store==nullptr){
+  if(!store) {
     if(m_absPosInfo->getAbsTransform()) return *m_absPosInfo->getAbsTransform();
-  }
-  else {
+  } else {
     const GeoTrf::Transform3D* storedPos = store->getAbsPosition(this);
     if(storedPos!=nullptr) return *storedPos;
   }
@@ -95,8 +85,7 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getCachedAbsoluteTransform(const Geo
 void GeoVFullPhysVol::clearPositionInfo() const
 {
   std::scoped_lock<std::mutex> guard(m_mutex);
-  delete m_absPosInfo;
-  m_absPosInfo = nullptr;
+  m_absPosInfo.reset();
 }
 
 const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmentStore* store) const
@@ -112,15 +101,14 @@ const GeoTrf::Transform3D& GeoVFullPhysVol::getDefAbsoluteTransform(GeoVAlignmen
 
   std::scoped_lock<std::mutex> guard(m_mutex);
   
-  if(store==nullptr && !m_absPosInfo) m_absPosInfo = new GeoAbsPositionInfo();
+  if(!store && !m_absPosInfo) m_absPosInfo = std::make_unique<GeoAbsPositionInfo>();
 
   //
   // Check the cache first. If not empty, then return the cached value
   //
-  if(store==nullptr){
+  if(!store){
     if(m_absPosInfo->getDefAbsTransform()) return *m_absPosInfo->getDefAbsTransform();
-  }
-  else {
+  } else {
     const GeoTrf::Transform3D* storedPos = store->getDefAbsPosition(this);
     if(storedPos!=nullptr) return *storedPos;
   }
@@ -219,7 +207,7 @@ unsigned int GeoVFullPhysVol::getId () const
   //                                                                                                //     
   //------------------------------------------------------------------------------------------------//     
 
-  if(m_id==nullptr) {
+  if(!m_id) {
     if(isShared()) throw std::runtime_error(errorMessage);
 
     //     
@@ -235,7 +223,7 @@ unsigned int GeoVFullPhysVol::getId () const
     }
 
     int index = parent->indexOf(child);
-    m_id = new Query<int>(parent->getIdOfChildVol(index));
+    m_id = std::make_unique<Query<int>>(parent->getIdOfChildVol(index));
   }
   return *m_id;
 }

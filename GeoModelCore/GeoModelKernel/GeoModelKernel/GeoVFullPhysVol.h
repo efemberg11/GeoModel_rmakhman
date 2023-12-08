@@ -8,6 +8,7 @@
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoAbsPositionInfo.h"
 #include <mutex>
+#include <memory>
 
 class GeoVAlignmentStore;
 
@@ -16,9 +17,6 @@ class GeoVFullPhysVol : public GeoVPhysVol
 {
  public:
   GeoVFullPhysVol(const GeoLogVol* logVol);
-
-  GeoVFullPhysVol(const GeoVFullPhysVol &right) = delete;
-  GeoVFullPhysVol & operator=(const GeoVFullPhysVol &right) = delete;
 
   /// Returns the (default) absolute transform of the volume.
   /// 1. When store=nullptr. This is considered a "serial case" when
@@ -50,7 +48,7 @@ class GeoVFullPhysVol : public GeoVPhysVol
   unsigned int getId() const;
 
  protected:
-  virtual ~GeoVFullPhysVol() override;
+  virtual ~GeoVFullPhysVol() = default;
 
   /// Mutex serving dual purpose:
   ///  1. To protect the absolute position info
@@ -59,13 +57,13 @@ class GeoVFullPhysVol : public GeoVPhysVol
 
  private:
   /// The absolute name of this volume.
-  mutable std::string m_absName;
+  mutable std::string m_absName{};
 
   /// An identifier. This is locally cached in a full physical volume.
-  mutable Query<int> *m_id;
+  mutable std::unique_ptr<Query<int>> m_id{nullptr};
 
   /// Information on the where this volume is, by default and after alignment corrections.      
-  mutable GeoAbsPositionInfo *m_absPosInfo;
+  mutable std::unique_ptr<GeoAbsPositionInfo> m_absPosInfo{nullptr};
 
 };
 

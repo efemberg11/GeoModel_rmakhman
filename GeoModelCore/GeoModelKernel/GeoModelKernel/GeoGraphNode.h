@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOGRAPHNODE_H
@@ -25,10 +25,9 @@
 class GeoNodeAction;
 class GeoVPhysVol;
 
-class GeoGraphNode : public RCBase
-{
+class GeoGraphNode : public RCBase {
  public:
-  GeoGraphNode ();
+  GeoGraphNode () = default;
   
   //	Executes a GeoNodeAction.
   virtual void exec (GeoNodeAction *action) const;
@@ -42,11 +41,8 @@ class GeoGraphNode : public RCBase
   virtual void dockTo (GeoVPhysVol* );
   
  protected:
-  virtual ~GeoGraphNode();
+  virtual ~GeoGraphNode() = default;
   
- private:
-  GeoGraphNode(const GeoGraphNode &right);
-  GeoGraphNode & operator=(const GeoGraphNode &right);
 };
 
 #endif

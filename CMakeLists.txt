@@ -38,6 +38,14 @@ include( SetupJSON )
 # Find the dependencies that the project always picks up from its environment.
 find_package( SQLite3 3.7.17 )
 
+
+# === Enable testing functionality
+# NOTE: this must be in the root CMakeLists.txt file
+#       even if the tests are defined in CMake files
+#       located in sub-directories.
+enable_testing()
+
+
 # === Main targets built by this project ===
 
 # switches to let users build specific packages on request

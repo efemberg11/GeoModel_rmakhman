@@ -37,3 +37,8 @@ install(TARGETS GeoModelDBManager
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelDBManager
    COMPONENT Development )
+
+add_executable(test_create_db_file tests/test_create_db_file.cpp)
+target_link_libraries( test_create_db_file GeoModelIO::GeoModelDBManager)
+add_test(NAME TestCreateDBFile
+         COMMAND test_create_db_file)

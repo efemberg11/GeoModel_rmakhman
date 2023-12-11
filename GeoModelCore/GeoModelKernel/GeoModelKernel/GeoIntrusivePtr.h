@@ -3,11 +3,15 @@
 */
 #ifndef GEOMODELKERNEL_GeoIntrusivePtr_H
 #define GEOMODELKERNEL_GeoIntrusivePtr_H
+
 #include <GeoModelKernel/RCBase.h>
 #include <type_traits>
 
-template<typename GeoType>      
-class GeoIntrusivePtr {
+#include <utility>
+
+
+template<typename GeoType> 
+class GeoIntrusivePtr{
     public:
         template <typename GeoTypeGrp> friend class GeoIntrusivePtr;
 

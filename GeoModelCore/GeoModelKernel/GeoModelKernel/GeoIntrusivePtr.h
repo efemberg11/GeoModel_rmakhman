@@ -3,7 +3,10 @@
 */
 #ifndef GEOMODELKERNEL_GeoIntrusivePtr_H
 #define GEOMODELKERNEL_GeoIntrusivePtr_H
+
 #include <GeoModelKernel/RCBase.h>
+
+#include <utility>
 
 
 template<typename GeoType> 

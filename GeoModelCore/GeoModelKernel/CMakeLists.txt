@@ -45,3 +45,10 @@ install(TARGETS GeoModelKernel
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelKernel
    COMPONENT Development )
+
+
+
+add_executable(testGeoIntrusivePtr tests/testGeoIntrusivePtr.cxx)
+target_link_libraries( testGeoIntrusivePtr GeoModelKernel)
+add_test(NAME testGeoIntrusivePtr
+         COMMAND testGeoIntrusivePtr)

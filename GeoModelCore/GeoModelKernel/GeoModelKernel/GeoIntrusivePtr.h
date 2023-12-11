@@ -5,6 +5,7 @@
 #define GEOMODELKERNEL_GeoIntrusivePtr_H
 
 #include <GeoModelKernel/RCBase.h>
+#include <type_traits>
 
 #include <utility>
 
@@ -14,41 +15,72 @@ class GeoIntrusivePtr{
     public:
         template <typename GeoTypeGrp> friend class GeoIntrusivePtr;
 
-        GeoIntrusivePtr() = default;
+        explicit GeoIntrusivePtr() noexcept = default;
         // Standard constructor taking a bare pointer
-        GeoIntrusivePtr(GeoType* obj):
+        GeoIntrusivePtr(GeoType* obj) noexcept:
             m_ptr{obj} {
              if (m_ptr) obj->ref();
         }
         /// Copy constructor 
-        template <class GeoTypeGrp>
-        GeoIntrusivePtr(const GeoIntrusivePtr<GeoTypeGrp>& other):
+        GeoIntrusivePtr(const GeoIntrusivePtr& other) noexcept:
             GeoIntrusivePtr{other.get()} {}
+
+        /// Copy constructor for derived types
+        template <typename GeoTypeGrp,
+                  typename = typename std::enable_if<!std::is_same<GeoType,GeoTypeGrp>::value, bool>>
+        GeoIntrusivePtr(const GeoIntrusivePtr<GeoTypeGrp>& other) noexcept:
+              GeoIntrusivePtr{other.get()} {}
+
+        /// Move constructor
+        explicit GeoIntrusivePtr(GeoIntrusivePtr&& other) noexcept:
+            m_ptr{other.m_ptr} { 
+                other.m_ptr = nullptr;
+        }
+        /// Move constructor for derived types
+        template <typename GeoTypeGrp,
+                  typename = typename std::enable_if<!std::is_same<GeoType,GeoTypeGrp>::value, bool>>
+        GeoIntrusivePtr(GeoIntrusivePtr<GeoTypeGrp>&& other) noexcept:
+            m_ptr{other.m_ptr} { 
+                other.m_ptr = nullptr;
+        }
+        
+        
         /// Assignment operator
-        template <class GeoTypeGrp>
-        GeoIntrusivePtr& operator=(const GeoIntrusivePtr<GeoTypeGrp>& other) {
-            if (m_ptr != other.get()) {
-                if(m_ptr) m_ptr->unref();
-                m_ptr = other.get();
-                if(m_ptr) m_ptr->ref();
-            }
+        GeoIntrusivePtr& operator=(const GeoIntrusivePtr& other) noexcept {
+            reset(other.get());
             return *this;
         }
-        /// Move constructor
-        template <class GeoTypeGrp>
-        GeoIntrusivePtr(GeoIntrusivePtr<GeoTypeGrp>&& other):
-            m_ptr{std::move(other.m_ptr)} { other.m_ptr = nullptr;}
+        GeoIntrusivePtr& operator=(GeoType* other) noexcept {
+            reset(other);
+            return *this;
+        }
         /// Move assignment operator
-        template <class GeoTypeGrp>
-        GeoIntrusivePtr& operator=(GeoIntrusivePtr<GeoTypeGrp>&& other) {
-            if (m_ptr != other.get()) {
-                if(m_ptr) m_ptr->unref();
-                m_ptr = std::move(other.m_ptr);   
-            } else if (m_ptr) {
+        GeoIntrusivePtr& operator=(GeoIntrusivePtr&& other) {            
+            if (m_ptr && m_ptr == other.get()) {
                 m_ptr->unref();
+            } else {
+                m_ptr = other.get();
             }
             other.m_ptr = nullptr;
             return *this;
+        }
+        template <typename GeoTypeGrp,
+                  typename = typename std::enable_if<!std::is_same<GeoType,GeoTypeGrp>::value, bool>>
+         GeoIntrusivePtr& operator=(GeoIntrusivePtr<GeoTypeGrp>&& other) {            
+            if (m_ptr && m_ptr == other.get()) {
+                m_ptr->unref();
+            } else {
+                m_ptr = other.get();
+            }
+            other.m_ptr = nullptr;
+            return *this;
+        }
+        /// Reset the pointer
+        void reset(GeoType* ptr = nullptr) {
+            if (m_ptr == ptr) return;
+            if (m_ptr) m_ptr->unref();
+            m_ptr = ptr;
+            if (m_ptr) m_ptr->ref();
         }
         /// Destructor
         ~GeoIntrusivePtr() {
@@ -69,10 +101,10 @@ class GeoIntrusivePtr{
         /// Invalidity operator
         bool operator!() const { return !m_ptr; }
         /// Comparison operator
-        template <class GeoTypeGrp>
-        bool operator==(const GeoIntrusivePtr<GeoTypeGrp>& other) const {
-            return m_ptr == other.m_ptr;
-        }
+        // template <class GeoTypeGrp>
+        // bool operator==(const GeoIntrusivePtr<GeoTypeGrp>& other) const {
+            // return m_ptr == other.m_ptr;
+        // }
         bool operator==(GeoType* other) const {
             return m_ptr == other;
         }

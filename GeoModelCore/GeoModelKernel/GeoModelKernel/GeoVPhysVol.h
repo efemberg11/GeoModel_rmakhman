@@ -6,12 +6,6 @@
 #define GEOMODELKERNEL_GEOVPHYSVOL_H
 
 #include "GeoModelKernel/GeoIntrusivePtr.h"
-class GeoVPhysVol;
-using PVLink = GeoIntrusivePtr<GeoVPhysVol>;
-using GeoPVLink = PVLink;
-using PVConstLink = GeoIntrusivePtr<const GeoVPhysVol>;
-using GeoPVConstLink = PVConstLink;
-
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/Query.h"
 #include <string>
@@ -22,10 +16,12 @@ using GeoPVConstLink = PVConstLink;
 class GeoVolumeAction;
 class GeoVAlignmentStore;
 
-class GeoVPhysVol : public GeoGraphNode
-{
+class GeoVPhysVol : public GeoGraphNode {
  public:
-  GeoVPhysVol(const GeoLogVol* LogVol);
+    using PVLink = GeoIntrusivePtr<GeoVPhysVol>;
+    using PVConstLink = GeoIntrusivePtr<const GeoVPhysVol>;
+
+    GeoVPhysVol(const GeoLogVol* LogVol);
   
 
   /// Returns true if the physical volume is accessed by more than one parent.
@@ -102,5 +98,10 @@ class GeoVPhysVol : public GeoGraphNode
   GeoIntrusivePtr<const GeoLogVol> m_logVol{};
 };
 
+using PVLink = GeoVPhysVol::PVLink;
+using PVConstLink = GeoVPhysVol::PVConstLink;
+
+using GeoPVLink = PVLink;
+using GeoPVConstLink = PVConstLink;
 
 #endif

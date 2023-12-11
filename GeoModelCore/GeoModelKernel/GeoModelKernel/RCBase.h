@@ -26,18 +26,20 @@ class RCBase {
   RCBase() = default;
 
   //	Increase the reference count
-  void ref() const {
+  void ref() const noexcept {
      ++m_count; 
   }
 
   //	Decreases the reference count.  When the reference count
   //	falls to zero, the object deletes itself.
-  void unref () const {
-     if (--m_count == 0) delete this;
+  void unref () const noexcept{
+     if (--m_count == 0) {
+       delete this;
+     }
   }
 
   //	Return the reference count.
-  unsigned int refCount () const {
+  unsigned int refCount () const noexcept {
      return m_count.load();
   }
 

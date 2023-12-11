@@ -59,12 +59,22 @@ class GeoIntrusivePtr{
             if (m_ptr && m_ptr == other.get()) {
                 m_ptr->unref();
             } else {
-                reset(other.get());
+                m_ptr = other.get();
             }
             other.m_ptr = nullptr;
             return *this;
         }
-        
+        template <typename GeoTypeGrp,
+                  typename = typename std::enable_if<!std::is_same<GeoType,GeoTypeGrp>::value, bool>>
+         GeoIntrusivePtr& operator=(GeoIntrusivePtr<GeoTypeGrp>&& other) {            
+            if (m_ptr && m_ptr == other.get()) {
+                m_ptr->unref();
+            } else {
+                m_ptr = other.get();
+            }
+            other.m_ptr = nullptr;
+            return *this;
+        }
         /// Reset the pointer
         void reset(GeoType* ptr = nullptr) {
             if (m_ptr == ptr) return;

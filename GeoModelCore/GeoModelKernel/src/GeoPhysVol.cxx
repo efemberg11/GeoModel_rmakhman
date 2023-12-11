@@ -13,15 +13,13 @@
 
 
 GeoPhysVol::GeoPhysVol(const GeoLogVol* LogVol)
-  : GeoVPhysVol(LogVol)
-{
-}
+  : GeoVPhysVol(LogVol) {}
 
 
-void GeoPhysVol::add(GeoGraphNode* graphNode)
-{
+void GeoPhysVol::add(GeoGraphNode* graphNode) {
   std::scoped_lock<std::mutex> lk(m_muxVec);
-  m_daughters.push_back(graphNode);
+  GeoIntrusivePtr<GeoGraphNode> nodePtr{graphNode};
+  m_daughters.emplace_back(nodePtr);
   graphNode->dockTo(this);
 }
 

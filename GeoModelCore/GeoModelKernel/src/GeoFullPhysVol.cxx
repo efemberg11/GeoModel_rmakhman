@@ -22,7 +22,8 @@ void GeoFullPhysVol::add(GeoGraphNode* graphNode)
 {
   if(m_cloneOrigin) throw std::runtime_error("Attempt to modify contents of a cloned FPV");
   std::scoped_lock<std::mutex> guard(m_mutex);
-  m_daughters.push_back(graphNode);
+  GeoIntrusivePtr<GeoGraphNode> nodePtr{graphNode};
+  m_daughters.emplace_back(nodePtr);
   graphNode->dockTo(this);
 }
 

@@ -57,7 +57,7 @@ class GeoSerialTransformer : public GeoGraphNode
   std::unique_ptr<const GeoXF::Function> m_function{};
 
   //	The physical volume to be multiply placed.
-  GeoIntrusivePtr<const GeoVPhysVol>m_physVol{};
+  GeoIntrusivePtr<const GeoVPhysVol> m_physVol{};
 };
 
 #endif

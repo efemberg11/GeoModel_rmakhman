@@ -275,6 +275,9 @@ mac-gm-all:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+  
+
+
 
 
 mac-gm-atlasextras:
@@ -390,6 +393,9 @@ ubu-gm-all:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+  artifacts:
+    - build
+    expire_in: 30 minutes
 
 
 ubu-gm-atlasextras:
@@ -752,9 +758,15 @@ persist-tag-artifacts:
     expire_in: never
 
 
-run-tests:
+tests-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-test
+  needs: ["ubu-gm-all"]
   stage: test
   script:
-    - cmake -B build -S .
+    - #cmake -B build -S .
     - cd build
-    - ctest --output-on-failure
+    - ctest #--output-on-failure
+
+

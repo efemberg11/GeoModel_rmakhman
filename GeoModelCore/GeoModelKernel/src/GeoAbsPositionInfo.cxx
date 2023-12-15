@@ -1,55 +1,31 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoAbsPositionInfo.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-#include <memory>
 
-GeoAbsPositionInfo::GeoAbsPositionInfo()
-  : m_absTransform(nullptr),
-    m_defAbsTransform(nullptr)
-{
+void GeoAbsPositionInfo::clearAbsTransform () {
+    m_absTransform.reset();
 }
 
-GeoAbsPositionInfo::~GeoAbsPositionInfo()
-{
-  delete m_absTransform;
-  delete m_defAbsTransform;
-}
-
-void GeoAbsPositionInfo::clearAbsTransform ()
-{
-  delete m_absTransform;
-  m_absTransform = nullptr;
-}
-
-void GeoAbsPositionInfo::clearDefAbsTransform ()
-{
-  delete m_defAbsTransform;
-  m_defAbsTransform = nullptr;
+void GeoAbsPositionInfo::clearDefAbsTransform () {
+    m_defAbsTransform.reset();
 }
 
 void GeoAbsPositionInfo::setAbsTransform (const GeoTrf::Transform3D &  xform)
 {
-  if (m_absTransform)
-    {
-      (*m_absTransform) = xform;
-    }
-  else
-    {
-      m_absTransform = new GeoTrf::Transform3D (xform);
-    }
+  if (m_absTransform) {
+    (*m_absTransform) = xform;
+  } else {
+    m_absTransform = std::make_unique<GeoTrf::Transform3D> (xform);
+  }
 }
 
-void GeoAbsPositionInfo::setDefAbsTransform (const GeoTrf::Transform3D &  xform)
-{
-  if (m_defAbsTransform)
-    {
+void GeoAbsPositionInfo::setDefAbsTransform (const GeoTrf::Transform3D& xform) {
+  if (m_defAbsTransform) {
       (*m_defAbsTransform) = xform;
-    }
-  else
-    {
-      m_defAbsTransform = new GeoTrf::Transform3D (xform);
-    }
+  } else  {
+    m_defAbsTransform =  std::make_unique<GeoTrf::Transform3D>(xform);
+  }
 }

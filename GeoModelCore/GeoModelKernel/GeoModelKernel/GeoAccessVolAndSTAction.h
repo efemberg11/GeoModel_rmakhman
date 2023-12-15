@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOACCESSVOLANDSTACTION_H
@@ -21,11 +21,10 @@
 class GeoVPhysVol;
 class GeoTransform;
 
-class GeoAccessVolAndSTAction final : public GeoNodeAction
-{
+class GeoAccessVolAndSTAction final : public GeoNodeAction {
  public:
   GeoAccessVolAndSTAction(unsigned int index);
-  virtual ~GeoAccessVolAndSTAction() override;
+  virtual ~GeoAccessVolAndSTAction() = default;
 
   virtual void handleTransform(const GeoTransform* xform) override;
   virtual void handlePhysVol(const GeoPhysVol* vol) override;
@@ -51,17 +50,17 @@ class GeoAccessVolAndSTAction final : public GeoNodeAction
   const GeoAccessVolAndSTAction & operator=(const GeoAccessVolAndSTAction &right);
 
   /// A pointer to the ith physical volume under this one.
-  PVConstLink m_volume;
+  PVConstLink m_volume{};
 
   /// A pointer to the Serial Transformer
-  const GeoSerialTransformer* m_serialTransformer;
+  const GeoSerialTransformer* m_serialTransformer{nullptr};
  
   /// The transformation and default transformation to the ith volume.
-  GeoTrf::Transform3D m_transform;
-  GeoTrf::Transform3D m_defTransform;
+  GeoTrf::Transform3D m_transform{GeoTrf::Transform3D::Identity()};
+  GeoTrf::Transform3D m_defTransform{GeoTrf::Transform3D::Identity()};
 
-  unsigned int m_index;
-  unsigned int m_counter;
+  unsigned int m_index{0};
+  unsigned int m_counter{0};
 
   /// The name of the volume.  From a nametag or a serial denominator
   mutable std::string m_name;
@@ -70,12 +69,12 @@ class GeoAccessVolAndSTAction final : public GeoNodeAction
   mutable Query<unsigned int> m_id;
 
   /// A pointer to a name tag.  If the volume is named.
-  const GeoNameTag *m_nameTag;
-  const GeoSerialDenominator *m_serialDenominator;
-  const GeoIdentifierTag *m_idTag;
+  const GeoNameTag *m_nameTag{nullptr};
+  const GeoSerialDenominator *m_serialDenominator{nullptr};
+  const GeoIdentifierTag *m_idTag{nullptr};
 
   std::vector<const GeoTransform *>  m_pendingTransformList;
-  unsigned int m_serialDenomPosition;
+  unsigned int m_serialDenomPosition{0};
 };
 
 #endif

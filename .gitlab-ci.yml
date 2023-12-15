@@ -530,11 +530,6 @@ ubu-single-gmfsl:
     - cmake ${CMAKE_ARGS} ../FSL # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
     - cmake --build . -- -j2
     - cmake --build . -- install
-  artifacts:
-    paths:
-      - install
-      - build
-    expire_in: 1 day
 
 
 #####################
@@ -762,16 +757,11 @@ persist-tag-artifacts:
 
 tests-ubuntu:
   <<: *ubuntu-job
+  <<: *geomodel-job
   stage: step-test
-  needs: ["ubu-single-gmfsl"]
+  needs: ["ubu-gm-all"]
   stage: test
   script:
     - cd build
     - ctest #--output-on-failure
-  artifacts:
-    untracked: false
-    when: on_success
-    # reset the expiry policy of 'install' to the default value of '1 day'
-    expire_in: 1 day
-    paths:
-      - install
+  

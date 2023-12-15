@@ -8,6 +8,7 @@ stages:
   - step-E
   - step-F
   - post-deploy
+  - test
 
 
 
@@ -750,3 +751,10 @@ persist-tag-artifacts:
       - install
     expire_in: never
 
+
+run-tests:
+  stage: test
+  script:
+    - cmake -B build -S .
+    - cd build
+    - ctest --output-on-failure

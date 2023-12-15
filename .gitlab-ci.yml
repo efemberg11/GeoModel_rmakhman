@@ -394,6 +394,7 @@ ubu-gm-all:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
   artifacts:
+    paths:
     - build
     expire_in: 30 minutes
 

@@ -533,6 +533,7 @@ ubu-single-gmfsl:
   artifacts:
     paths:
       - install
+      - build
     expire_in: 1 day
 
 
@@ -761,13 +762,17 @@ persist-tag-artifacts:
 
 tests-ubuntu:
   <<: *ubuntu-job
-  <<: *geomodel-job
   stage: step-test
-  needs: ["ubu-gm-all"]
+  needs: ["ubu-single-gmfsl"]
   stage: test
   script:
     - #cmake -B build -S .
     - cd build
     - ctest #--output-on-failure
-
-
+  artifacts:
+    untracked: false
+    when: on_success
+    # reset the expiry policy of 'install' to the default value of '1 day'
+    expire_in: 1 day
+    paths:
+      - install

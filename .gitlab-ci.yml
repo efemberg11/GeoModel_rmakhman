@@ -766,7 +766,6 @@ tests-ubuntu:
   needs: ["ubu-single-gmfsl"]
   stage: test
   script:
-    - #cmake -B build -S .
     - cd build
     - ctest #--output-on-failure
   artifacts:

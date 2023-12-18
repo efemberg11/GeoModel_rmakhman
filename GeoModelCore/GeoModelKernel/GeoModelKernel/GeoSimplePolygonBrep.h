@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOSIMPLEPOLYGONBREP_H
@@ -19,8 +19,7 @@
 #include <vector>
 #include "GeoModelKernel/GeoShape.h"
 
-class GeoSimplePolygonBrep : public GeoShape
-{
+class GeoSimplePolygonBrep : public GeoShape {
  public:
   //    Constructor for the BREP.  Note that the constructor
   //    does not fully build this object. The BREP is not valid
@@ -38,16 +37,24 @@ class GeoSimplePolygonBrep : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the BREP shape type, as a string
-  virtual const std::string& type() const;
+  virtual const std::string& type() const {
+    return getClassType();
+  }
 
   //    Returns the BREP shape type, as a coded integer
-  virtual ShapeType typeID() const;
+  virtual ShapeType typeID() const{
+    return getClassTypeID();
+  }
 
   //    For type identification
-  static const std::string& getClassType();
+  static const std::string& getClassType() {
+    return s_classType;
+  }
 
   //    For type identification
-  static ShapeType getClassTypeID();
+  static ShapeType getClassTypeID() {
+     return s_classTypeID;
+  }
 
   //    Executes a GeoShapeAction
   virtual void exec(GeoShapeAction *action) const;
@@ -57,68 +64,40 @@ class GeoSimplePolygonBrep : public GeoShape
   void addVertex(double XVertex, double YVertex);
 
   //    Returns the number of vertices in the polygon
-  unsigned int getNVertices() const;
+  unsigned int getNVertices() const {
+    return m_xVertices.size();
+  }
 
   //    True if the polygon has at least three vertices, false otherwise
-  bool isValid () const;
+  bool isValid () const {
+     return getNVertices()>=3;
+  }
 
   //    Returns X coordinate of the specified vertex
-  const double & getXVertex(unsigned int i) const;
+  double getXVertex(unsigned int i) const {
+    return m_xVertices.at(i);
+  }
 
   //    Returns Y coordinate of the specified vertex
-  const double & getYVertex(unsigned int i) const;
+  double getYVertex(unsigned int i) const {
+     return m_yVertices.at(i);
+  }
 
   //    Half-length along Z axis
-  const double& getDZ() const;
+  double getDZ() const {
+     return m_dZ;
+  }
 
  protected:
-  virtual ~GeoSimplePolygonBrep();
+  virtual ~GeoSimplePolygonBrep() = default;
 
  private:
-  GeoSimplePolygonBrep(const GeoSimplePolygonBrep &right);
-  GeoSimplePolygonBrep & operator=(const GeoSimplePolygonBrep &right);
-
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_dZ;
-  std::vector<double> m_xVertices;
-  std::vector<double> m_yVertices;
+  double m_dZ{0.};
+  std::vector<double> m_xVertices{};
+  std::vector<double> m_yVertices{};
 };
-
-inline unsigned int GeoSimplePolygonBrep::getNVertices() const
-{
-  return m_xVertices.size();
-}
-
-inline bool GeoSimplePolygonBrep::isValid() const
-{
-  return getNVertices()>=3;
-}
-
-inline const double& GeoSimplePolygonBrep::getXVertex(unsigned int i) const
-{
-  return m_xVertices[i];
-}
-
-inline const double& GeoSimplePolygonBrep::getYVertex(unsigned int i) const
-{
-  return m_yVertices[i];
-}
-
-inline const std::string& GeoSimplePolygonBrep::getClassType()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoSimplePolygonBrep::getClassTypeID()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoSimplePolygonBrep::getDZ() const
-{
-  return m_dZ;
-}
 
 #endif

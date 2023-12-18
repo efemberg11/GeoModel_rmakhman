@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOSHAPE_H
@@ -28,7 +28,7 @@
 #include <GeoModelKernel/GeoDefinitions.h>
 #include <string>
 
-typedef unsigned int ShapeType;
+using ShapeType = unsigned int;
 class GeoShapeIntersection;
 class GeoShapeUnion;
 class GeoShapeSubtraction;
@@ -39,7 +39,7 @@ class GeoShape : public RCBase
 {
  public:
   //    Constructor for shape. Must provide the name, a string to identify this shape.
-  GeoShape ();
+  GeoShape () = default;
 
   //    Returns the volume of the shape, for mass inventory.
   virtual double volume () const;
@@ -73,16 +73,14 @@ class GeoShape : public RCBase
   virtual void exec (GeoShapeAction *action) const = 0;
 
  protected:
-  virtual ~GeoShape();
+  virtual ~GeoShape() = default;
 
   //    Returns the bounding box of the specified disk. This method is used
   //    for calculation of the extend of a tube, cone, polycone, torus.
   static void diskExtent(double rmin, double rmax, double sphi, double dphi,
                          double& xmin, double& ymin, double& xmax, double& ymax);
 
- private:
-  GeoShape(const GeoShape &right);
-  GeoShape & operator=(const GeoShape &right);
+
 
 };
 

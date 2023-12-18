@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOCONS_H
@@ -7,8 +7,7 @@
 
 #include "GeoModelKernel/GeoShape.h"
 
-class GeoCons : public GeoShape
-{
+class GeoCons : public GeoShape {
  public:
   GeoCons (double RMin1, double RMin2, double RMax1, double RMax2, double DZ, double SPhi, double DPhi);
 
@@ -23,103 +22,60 @@ class GeoCons : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the CONS shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string & type () const {
+     return getClassType();
+  }
 
   //    Returns the CONS shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID () const {
+     return getClassTypeID();
+  }
 
   //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification.
-  static const std::string& getClassType ();
+  static const std::string& getClassType () {
+      return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID() {
+     return s_classTypeID;
+  }
 
   //    Inside radius at -dZ
-  const double& getRMin1 () const;
-
+  double getRMin1 () const { return m_rMin1; }
   //    Inside radius at +dZ
-  const double& getRMin2 () const;
-
+  double getRMin2 () const { return m_rMin2; }
   //    Outside radius at -dZ
-  const double& getRMax1 () const;
-
+  double getRMax1 () const { return m_rMax1; }
   //    Outside radius at +dZ
-  const double& getRMax2 () const;
-
+  double getRMax2 () const { return m_rMax2; }
   //    Half length in Z direction.
-  const double& getDZ () const;
-
+  double getDZ () const { return m_dZ; }
   //    Starting angle of the segment in radians.
-  const double& getSPhi () const;
-
+  double getSPhi () const { return m_sPhi; }
   //    Delta angle of the segment in radians.
-  const double& getDPhi () const;
+  double getDPhi () const { return m_dPhi; }
 
- protected:
-  virtual ~GeoCons();
+protected:
+  virtual ~GeoCons() = default;
 
  private:
-  GeoCons(const GeoCons &right);
-  GeoCons & operator=(const GeoCons &right);
+
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_rMin1;
-  double m_rMin2;
-  double m_rMax1;
-  double m_rMax2;
-  double m_dZ;
-  double m_sPhi;
-  double m_dPhi;
+  double m_rMin1{0.};
+  double m_rMin2{0.};
+  double m_rMax1{0.};
+  double m_rMax2{0.};
+  double m_dZ{0.};
+  double m_sPhi{0.};
+  double m_dPhi{0.};
 };
 
-inline const std::string& GeoCons::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoCons::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoCons::getRMin1 () const
-{
-  return m_rMin1;
-}
-
-inline const double& GeoCons::getRMin2 () const
-{
-  return m_rMin2;
-}
-
-inline const double& GeoCons::getRMax1 () const
-{
-  return m_rMax1;
-}
-
-inline const double& GeoCons::getRMax2 () const
-{
-  return m_rMax2;
-}
-
-inline const double& GeoCons::getDZ () const
-{
-  return m_dZ;
-}
-
-inline const double& GeoCons::getSPhi () const
-{
-  return m_sPhi;
-}
-
-inline const double& GeoCons::getDPhi () const
-{
-  return m_dPhi;
-}
 
 #endif

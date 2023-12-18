@@ -23,9 +23,6 @@ GeoTrap::GeoTrap (double ZHalfLength, double Theta, double Phi, double Dydzn, do
 {
 }
 
-GeoTrap::~GeoTrap()
-{
-}
 
 double GeoTrap::volume () const
 {
@@ -111,15 +108,6 @@ bool GeoTrap::contains (double x, double y, double z) const
   return (std::abs(x0) - dx <= 0.0);
 }
 
-const std::string & GeoTrap::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoTrap::typeID () const
-{
-  return s_classTypeID;
-}
 
 void GeoTrap::exec (GeoShapeAction *action) const
 {

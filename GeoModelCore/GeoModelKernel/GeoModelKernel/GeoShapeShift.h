@@ -1,11 +1,12 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOSHAPESHIFT_H
 #define GEOMODELKERNEL_GEOSHAPESHIFT_H
 
 #include "GeoModelKernel/GeoShape.h"
+#include "GeoModelKernel/GeoIntrusivePtr.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
 
@@ -14,14 +15,15 @@
 #endif
 
 
-class GeoShapeShift : public GeoShape
-{
+class GeoShapeShift : public GeoShape {
  public:
   //    Constructor
   GeoShapeShift (const GeoShape* A, const GeoTrf::Transform3D &X);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const;
+  virtual double volume () const {
+     return m_op->volume();
+  }
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -31,56 +33,57 @@ class GeoShapeShift : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the OR shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string & type() const {
+      return getClassType();
+  }
 
   //    Returns the OR shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID () const {
+    return getClassTypeID();
+  }
 
-  //    Returns the first operand being ORed
-  const GeoShape* getOp () const;
+  // Returns the first operand being ORed
+  const GeoShape* getOp() const {
+      return m_op;
+  }
 
   //    Returns the shift of this shape.
-  const GeoTrf::Transform3D & getX () const;
+  const GeoTrf::Transform3D & getX () const {
+     return m_shift;
+  }
 
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
-  //    For type identification.
-  static const std::string& getClassType ();
+ 
+
+  static ShapeType getClassTypeID () {
+     return s_classTypeID;
+  }
+
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static const std::string& getClassType () {
+     return s_classType;
+  }
 
  protected:
-  virtual ~GeoShapeShift();
+    virtual ~GeoShapeShift() = default;
 
  private:
-  GeoShapeShift(const GeoShapeShift &right);
-  GeoShapeShift & operator=(const GeoShapeShift &right);
+    //    The shape operand in the NOT operation.
+    GeoIntrusivePtr<const GeoShape> m_op{};
 
-  //    The shape operand in the NOT operation.
-  const GeoShape* m_op;
+    //    Gives the amount by which the volume is shifted.
+    GeoTrf::Transform3D m_shift{GeoTrf::Transform3D::Identity()};
 
-  //    Gives the amount by which the volume is shifted.
-  GeoTrf::Transform3D m_shift;
+    static const std::string s_classType;
+    static const ShapeType s_classTypeID;
 
-  static const std::string s_classType;
-  static const ShapeType s_classTypeID;
-
-    //    For I/O only!
-  GeoShapeShift(){}
-  friend Persistifier;
-
+    ///    For I/O only!
+    GeoShapeShift() = default;
+    friend Persistifier;
 };
 
-inline const std::string& GeoShapeShift::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoShapeShift::getClassTypeID ()
-{
-  return s_classTypeID;
-}
 
 #endif

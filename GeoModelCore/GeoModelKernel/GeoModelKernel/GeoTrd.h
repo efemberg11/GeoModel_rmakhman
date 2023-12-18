@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOTRD_H
@@ -23,86 +23,57 @@ class GeoTrd : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the TRD shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string & type () const{
+     return getClassType();
+  }
 
   //    Returns the TRD shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID () const {
+     return getClassTypeID();
+  }
 
   //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification.
-  static const std::string& getClassType ();
+  static const std::string& getClassType() {
+     return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID(){
+     return s_classTypeID;
+  }
 
   //    Half length in the x-direction at -dz.
-  const double& getXHalfLength1 () const;
+  double  getXHalfLength1 () const { return m_xHalfLength1; }
 
   //    Half length in the x-direction at +dz.
-  const double& getXHalfLength2 () const;
+  double  getXHalfLength2 () const { return m_xHalfLength2; }
 
   //    Half-length in the y direction at +dz.
-  const double& getYHalfLength1 () const;
+  double  getYHalfLength1 () const { return m_yHalfLength1; } 
 
   //    Half-length in the y direction at -dz.
-  const double& getYHalfLength2 () const;
+  double  getYHalfLength2 () const { return m_yHalfLength2; } 
 
   //    Half-length in the z direction.
-  const double& getZHalfLength () const;
+  double  getZHalfLength () const { return m_zHalfLength; } 
 
  protected:
-  virtual ~GeoTrd();
+  virtual ~GeoTrd() = default;
 
  private:
-  GeoTrd(const GeoTrd &right);
-  GeoTrd & operator=(const GeoTrd &right);
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_xHalfLength1;
-  double m_xHalfLength2;
-  double m_yHalfLength1;
-  double m_yHalfLength2;
-  double m_zHalfLength;
+  double m_xHalfLength1{0.};
+  double m_xHalfLength2{0.};
+  double m_yHalfLength1{0.};
+  double m_yHalfLength2{0.};
+  double m_zHalfLength{0.};
 
 };
-
-inline const std::string& GeoTrd::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoTrd::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoTrd::getXHalfLength1 () const
-{
-  return m_xHalfLength1;
-}
-
-inline const double& GeoTrd::getXHalfLength2 () const
-{
-  return m_xHalfLength2;
-}
-
-inline const double& GeoTrd::getYHalfLength1 () const
-{
-  return m_yHalfLength1;
-}
-
-inline const double& GeoTrd::getYHalfLength2 () const
-{
-  return m_yHalfLength2;
-}
-
-inline const double& GeoTrd::getZHalfLength () const
-{
-  return m_zHalfLength;
-}
 
 #endif

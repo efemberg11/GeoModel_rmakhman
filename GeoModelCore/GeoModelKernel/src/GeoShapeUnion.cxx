@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoShapeUnion.h"
@@ -11,23 +11,13 @@
 const std::string GeoShapeUnion::s_classType = "Union";
 const ShapeType GeoShapeUnion::s_classTypeID = 0x01;
 
-GeoShapeUnion::GeoShapeUnion (const GeoShape* A, const GeoShape* B)
-  : m_opA (A)
-  , m_opB (B)
-{
-  m_opA->ref ();
-  m_opB->ref ();
-}
+GeoShapeUnion::GeoShapeUnion (const GeoShape* A, const GeoShape* B): 
+   m_opA{A}, m_opB{B} {}
 
-GeoShapeUnion::~GeoShapeUnion()
-{
-  m_opA->unref ();
-  m_opB->unref ();
-}
 
 double GeoShapeUnion::volume () const
 {
-  return (fVolume < 0.0) ? (fVolume = GeoShape::volume()) : fVolume;
+  return (fVolume < 0.0) ? (fVolume = GeoShape::volume()) : fVolume.load();
 }
 
 void GeoShapeUnion::extent (double& xmin, double& ymin, double& zmin,
@@ -45,29 +35,8 @@ void GeoShapeUnion::extent (double& xmin, double& ymin, double& zmin,
   zmax = std::max(zmaxA, zmaxB);
 }
 
-bool GeoShapeUnion::contains (double x, double y, double z) const
-{
-  return (getOpA()->contains(x, y, z)) ? true : getOpB()->contains(x, y, z);
-}
-
-const std::string & GeoShapeUnion::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoShapeUnion::typeID () const
-{
-  return s_classTypeID;
-}
-
-const GeoShape* GeoShapeUnion::getOpA () const
-{
-  return m_opA;
-}
-
-const GeoShape* GeoShapeUnion::getOpB () const
-{
-  return m_opB;
+bool GeoShapeUnion::contains (double x, double y, double z) const {
+  return getOpA()->contains(x, y, z) || getOpB()->contains(x, y, z);
 }
 
 void GeoShapeUnion::exec (GeoShapeAction *action) const

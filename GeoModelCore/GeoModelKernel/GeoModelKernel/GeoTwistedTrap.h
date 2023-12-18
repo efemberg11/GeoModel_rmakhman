@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOTWISTEDTRAP_H
@@ -74,19 +74,27 @@ class GeoTwistedTrap : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the TWISTED TRAP shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string & type () const {
+      return s_classType;
+  }
 
   //    Returns the TWISTED TRAP shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID () const {
+     return getClassTypeID();
+  }
 
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification.
-  static const std::string& getClassType ();
+  static const std::string& getClassType () {
+     return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID () {
+     return s_classTypeID;
+  }
 
 
   inline double getY1HalfLength() const { return m_dy1 ; }
@@ -102,41 +110,30 @@ class GeoTwistedTrap : public GeoShape
   inline double getTiltAngleAlpha() const { return m_alph ; }
 
  protected:
-  virtual ~GeoTwistedTrap();
+  virtual ~GeoTwistedTrap() = default;
 
  private:
-  GeoTwistedTrap(const GeoTwistedTrap &right);
-  GeoTwistedTrap & operator=(const GeoTwistedTrap &right);
+
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_theta;
-  double m_phi ;
-  double m_dy1;
-  double m_dx1;
-  double m_dx2;
-  double m_dy2;
-  double m_dx3;
-  double m_dx4;
-  double m_dz;        // Half-length along the z axis
-  double m_alph ;
-  double m_phiTwist;  // twist angle ( dphi in surface equation)
+  double m_theta{0.};
+  double m_phi{0.};
+  double m_dy1{0.};
+  double m_dx1{0.};
+  double m_dx2{0.};
+  double m_dy2{0.};
+  double m_dx3{0.};
+  double m_dx4{0.};
+  double m_dz{0.};        // Half-length along the z axis
+  double m_alph{0.};
+  double m_phiTwist{0.};  // twist angle ( dphi in surface equation)
 
-  const double m_CarTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;
-  const double m_RadTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;
-  const double m_AngTolerance = 1E-9 * SYSTEM_OF_UNITS::rad;
+  static constexpr double m_CarTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;
+  static constexpr double m_RadTolerance = 1E-9 * SYSTEM_OF_UNITS::mm;
+  static constexpr double m_AngTolerance = 1E-9 * SYSTEM_OF_UNITS::rad;
 
 };
-
-inline const std::string& GeoTwistedTrap::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoTwistedTrap::getClassTypeID ()
-{
-  return s_classTypeID;
-}
 
 #endif

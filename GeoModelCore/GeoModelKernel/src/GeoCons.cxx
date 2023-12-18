@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoCons.h"
@@ -20,9 +20,6 @@ GeoCons::GeoCons (double RMin1, double RMin2, double RMax1, double RMax2, double
 {
 }
 
-GeoCons::~GeoCons()
-{
-}
 
 double GeoCons::volume () const
 {
@@ -62,17 +59,8 @@ bool GeoCons::contains (double x, double y, double z) const
   return (m_dPhi <= M_PI) ? (ds <= 0 && de <= 0) : (ds <= 0 || de <= 0);
 }
 
-const std::string & GeoCons::type () const
-{
-  return s_classType;
-}
 
-ShapeType GeoCons::typeID () const
-{
-  return s_classTypeID;
-}
 
-void GeoCons::exec (GeoShapeAction *action) const
-{
+void GeoCons::exec (GeoShapeAction *action) const {
   action->handleCons(this);
 }

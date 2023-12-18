@@ -29,138 +29,80 @@ class GeoTrap : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the TRAP shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string & type () const {
+     return getClassType();
+  }
 
   //    Returns the TRAP shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID() const {
+     return getClassTypeID();
+  }
 
   //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification.
-  static const std::string& getClassType ();
+  static const std::string& getClassType () {
+     return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID() {
+     return s_classTypeID;
+  }
 
   //    Z half length.
-  const double& getZHalfLength () const;
+  double getZHalfLength () const { return m_zHalfLength; }
 
   //    Polar (theta) angle.
-  const double& getTheta () const;
-
+  double getTheta () const { return m_theta; }
   //    Azimuthal (phi) angle.
-  const double& getPhi () const;
+  double getPhi () const { return m_phi; }
 
   //    Y half length at -z.
-  const double& getDydzn () const;
+  double getDydzn () const { return m_dydzn; }
 
   //    X half length at -z, -y.
-  const double& getDxdyndzn () const;
+double getDxdyndzn () const { return m_dxdyndzn; }
 
   //    X half length at -z, +y.
-  const double& getDxdypdzn () const;
-
-  const double& getAngleydzn () const;
+  double getDxdypdzn () const { return m_dxdypdzn; }
+  
+  double getAngleydzn () const { return m_angleydzn; }
 
   //    Y half length at +z.
-  const double& getDydzp () const;
+  double getDydzp () const { return m_dydzp; }
 
   //    X half length at +z, -y.
-  const double& getDxdyndzp () const;
+  double getDxdyndzp () const { return m_dxdyndzp; }
 
   //    X half length at +z, +y.
-  const double& getDxdypdzp () const;
-
-  const double& getAngleydzp () const;
+  double getDxdypdzp () const { return m_dxdypdzp; }
+  
+  double getAngleydzp () const { return m_angleydzp; }
 
  protected:
-  virtual ~GeoTrap();
+  virtual ~GeoTrap() = default;
 
  private:
-  GeoTrap(const GeoTrap &right);
-  GeoTrap & operator=(const GeoTrap &right);
+
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_zHalfLength;
-  double m_theta;
-  double m_phi;
-  double m_dydzn;
-  double m_dxdyndzn;
-  double m_dxdypdzn;
-  double m_angleydzn;
-  double m_dydzp;
-  double m_dxdyndzp;
-  double m_dxdypdzp;
-  double m_angleydzp;
+  double m_zHalfLength{0.};
+  double m_theta{0.};
+  double m_phi{0.};
+  double m_dydzn{0.};
+  double m_dxdyndzn{0.};
+  double m_dxdypdzn{0.};
+  double m_angleydzn{0.};
+  double m_dydzp{0.};
+  double m_dxdyndzp{0.};
+  double m_dxdypdzp{0.};
+  double m_angleydzp{0.};
 
 };
 
-inline const std::string& GeoTrap::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoTrap::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoTrap::getZHalfLength () const
-{
-  return m_zHalfLength;
-}
-
-inline const double& GeoTrap::getTheta () const
-{
-  return m_theta;
-}
-
-inline const double& GeoTrap::getPhi () const
-{
-  return m_phi;
-}
-
-inline const double& GeoTrap::getDydzn () const
-{
-  return m_dydzn;
-}
-
-inline const double& GeoTrap::getDxdyndzn () const
-{
-  return m_dxdyndzn;
-}
-
-inline const double& GeoTrap::getDxdypdzn () const
-{
-  return m_dxdypdzn;
-}
-
-inline const double& GeoTrap::getAngleydzn () const
-{
-  return m_angleydzn;
-}
-
-inline const double& GeoTrap::getDydzp () const
-{
-  return m_dydzp;
-}
-
-inline const double& GeoTrap::getDxdyndzp () const
-{
-  return m_dxdyndzp;
-}
-
-inline const double& GeoTrap::getDxdypdzp () const
-{
-  return m_dxdypdzp;
-}
-
-inline const double& GeoTrap::getAngleydzp () const
-{
-  return m_angleydzp;
-}
 
 #endif

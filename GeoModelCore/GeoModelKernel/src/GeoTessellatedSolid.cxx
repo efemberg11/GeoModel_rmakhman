@@ -73,15 +73,6 @@ bool GeoTessellatedSolid::contains (double x, double y, double z) const
   return false;
 }
 
-const std::string& GeoTessellatedSolid::type() const
-{
-  return s_classType;
-}
-
-ShapeType GeoTessellatedSolid::typeID() const
-{
-  return s_classTypeID;
-}
 
 void GeoTessellatedSolid::exec(GeoShapeAction *action) const
 {

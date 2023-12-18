@@ -10,13 +10,6 @@
 #include <cmath>
 #include <cstdint>
 
-GeoShape::GeoShape ()
-{
-}
-
-GeoShape::~GeoShape()
-{
-}
 
 double GeoShape::volume () const
 {

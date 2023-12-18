@@ -19,8 +19,7 @@ m_alpha (Alpha),
 m_phi (Phi)
 {}
 
-GeoPara::~GeoPara()
-{}
+
 
 double GeoPara::volume () const
 {
@@ -61,16 +60,6 @@ bool GeoPara::contains (double x, double y, double z) const
   double disty = std::abs(y0) - m_yHalfLength;
   double distz = std::abs(z0) - m_zHalfLength;
   return (std::max(std::max(distx, disty), distz) <= 0.0);
-}
-
-const std::string & GeoPara::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoPara::typeID () const
-{
-  return s_classTypeID;
 }
 
 void GeoPara::exec (GeoShapeAction *action) const

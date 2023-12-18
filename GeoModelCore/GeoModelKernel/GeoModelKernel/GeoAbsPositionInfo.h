@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOABSPOSITIONINFO_H
@@ -13,18 +13,23 @@
  */
 
 #include <GeoModelKernel/GeoDefinitions.h>
+#include <memory>
 
 class GeoAbsPositionInfo 
 {
  public:
-  GeoAbsPositionInfo();
-  ~GeoAbsPositionInfo();
+  GeoAbsPositionInfo() = default;
+  ~GeoAbsPositionInfo() = default;
 
   //	Returns the default absolute transform.
-  const GeoTrf::Transform3D * getAbsTransform () const;
+  const GeoTrf::Transform3D * getAbsTransform () const {
+     return m_absTransform.get();
+  }
 
   //	Returns the default absolute transform.
-  const GeoTrf::Transform3D * getDefAbsTransform () const;
+  const GeoTrf::Transform3D * getDefAbsTransform () const {
+     return m_defAbsTransform.get();
+  }
 
   
   //	Clears the absolute transform.
@@ -40,26 +45,14 @@ class GeoAbsPositionInfo
   void setDefAbsTransform (const GeoTrf::Transform3D &  xform);
 
  private:
-  GeoAbsPositionInfo(const GeoAbsPositionInfo &right);
-  GeoAbsPositionInfo & operator=(const GeoAbsPositionInfo &right);
 
   //	The absolute transform from the world coord down to this
   //	positioned object.
-  GeoTrf::Transform3D *m_absTransform;
+  std::unique_ptr<GeoTrf::Transform3D> m_absTransform{};
   
   //	The default absolute transform from the world coord down
   //	to this positioned object.
-  GeoTrf::Transform3D *m_defAbsTransform;
+  std::unique_ptr<GeoTrf::Transform3D> m_defAbsTransform{};
 };
-
-inline const GeoTrf::Transform3D * GeoAbsPositionInfo::getAbsTransform () const
-{
-  return m_absTransform;
-}
-
-inline const GeoTrf::Transform3D * GeoAbsPositionInfo::getDefAbsTransform () const
-{
-  return m_defAbsTransform;
-}
 
 #endif

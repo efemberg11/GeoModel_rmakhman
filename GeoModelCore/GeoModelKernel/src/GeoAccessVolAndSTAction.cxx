@@ -8,23 +8,9 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include <string>
 
-GeoAccessVolAndSTAction::GeoAccessVolAndSTAction(unsigned int index)
-  : m_volume(0)
-  , m_serialTransformer(0)
-  , m_transform(GeoTrf::Transform3D::Identity())
-  , m_defTransform(GeoTrf::Transform3D::Identity())
-  , m_index(index)
-  , m_counter(0)
-  , m_nameTag(0)
-  , m_serialDenominator(0)
-  , m_idTag(0)
-  , m_serialDenomPosition(0)
-{
+GeoAccessVolAndSTAction::GeoAccessVolAndSTAction(unsigned int index):
+    m_index{index} {
   setDepthLimit(1);
-}
-
-GeoAccessVolAndSTAction::~GeoAccessVolAndSTAction()
-{
 }
 
 void GeoAccessVolAndSTAction::handleTransform(const GeoTransform *xform)

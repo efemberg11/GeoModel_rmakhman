@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOGENERICTRAP_H
@@ -9,11 +9,10 @@
 #include "GeoModelKernel/GeoDefinitions.h"
 #include <vector>
 
-typedef GeoTrf::Vector2D GeoTwoVector;
-typedef std::vector<GeoTwoVector> GeoGenericTrapVertices;
+using GeoTwoVector = GeoTrf::Vector2D ;
+using GeoGenericTrapVertices = std::vector<GeoTwoVector>;
 
-class GeoGenericTrap : public GeoShape
-{
+class GeoGenericTrap : public GeoShape {
  public:
   GeoGenericTrap(double ZHalfLength, const GeoGenericTrapVertices& Vertices);
 
@@ -28,48 +27,48 @@ class GeoGenericTrap : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the GENERIC TRAP shape type, as a string.
-  virtual const std::string& type() const;
+  virtual const std::string& type() const{
+     return getClassType();
+  }
 
   //    Returns the GENERIC TRAP shape type, as a coded integer.
-  virtual ShapeType typeID() const;
+  virtual ShapeType typeID() const{
+     return getClassTypeID();
+  }
 
   //    For type identification.
-  static const std::string& getClassType();
+  static const std::string& getClassType() {
+    return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID();
+  static ShapeType getClassTypeID() {
+     return s_classTypeID;
+  }
 
   //    Executes a GeoShapeAction.
   virtual void exec(GeoShapeAction *action) const;
 
   //    Z half length.
-  double getZHalfLength() const;
+  double getZHalfLength() const{
+     return m_zHalfLength;
+  }
 
   //    Vector of vertices.
-  const GeoGenericTrapVertices& getVertices() const;
+  const GeoGenericTrapVertices& getVertices() const {
+    return m_vertices;
+  }
 
  protected:
-  virtual ~GeoGenericTrap();
+  virtual ~GeoGenericTrap() = default;
 
  private:
-  GeoGenericTrap(const GeoGenericTrap &right);
-  GeoGenericTrap& operator=(const GeoGenericTrap &right);
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_zHalfLength;
-  GeoGenericTrapVertices m_vertices;
+  double m_zHalfLength{0};
+  GeoGenericTrapVertices m_vertices{};
 };
-
-inline const std::string& GeoGenericTrap::getClassType()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoGenericTrap::getClassTypeID()
-{
-  return s_classTypeID;
-}
 
 #endif

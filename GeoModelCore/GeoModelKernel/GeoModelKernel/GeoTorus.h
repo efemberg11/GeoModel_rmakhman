@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOTORUS_H
@@ -8,8 +8,7 @@
 #include "GeoModelKernel/GeoShape.h"
 
 
-class GeoTorus : public GeoShape
-{
+class GeoTorus : public GeoShape {
  public:
   GeoTorus (double Rmin, double Rmax, double Rtor, double SPhi, double DPhi);
 
@@ -24,85 +23,67 @@ class GeoTorus : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the TORUS shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string & type () const {
+    return getClassType();
+  }
 
   //    Returns the TORUS shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID () const {
+     return getClassTypeID();
+  }
 
   //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification.
-  static const std::string& getClassType ();
+  static const std::string& getClassType () {
+     return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID () {
+     return s_classTypeID;
+  }
 
   //    Inner radius.
-  const double& getRMin () const;
+  double  getRMin () const{
+     return m_rMin;
+  }
 
   //    Outer radius.
-  const double& getRMax () const;
+  double  getRMax () const {
+     return m_rMax;
+  }
 
   //    Radius of the torus.
-  const double& getRTor () const;
+  double  getRTor () const {
+     return m_rTor;
+  }
 
   //    Starting angle of the segment in radians.
-  const double& getSPhi () const;
+  double  getSPhi () const {
+     return m_sPhi;
+  }
 
   //    Delta angle of the segment in radians.
-  const double& getDPhi () const;
+  double getDPhi () const {
+     return m_dPhi;
+  }
 
  protected:
-  virtual ~GeoTorus();
+  virtual ~GeoTorus() = default;
 
  private:
-  GeoTorus(const GeoTorus &right);
-  GeoTorus & operator=(const GeoTorus &right);
+
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_rMin;
-  double m_rMax;
-  double m_rTor;
-  double m_sPhi;
-  double m_dPhi;
+  double m_rMin{0.};
+  double m_rMax{0.};
+  double m_rTor{0.};
+  double m_sPhi{0.};
+  double m_dPhi{0.};
 };
-
-inline const std::string& GeoTorus::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoTorus::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoTorus::getRMin () const
-{
-  return m_rMin;
-}
-
-inline const double& GeoTorus::getRMax () const
-{
-  return m_rMax;
-}
-
-inline const double& GeoTorus::getRTor () const
-{
-  return m_rTor;
-}
-
-inline const double& GeoTorus::getSPhi () const
-{
-  return m_sPhi;
-}
-
-inline const double& GeoTorus::getDPhi () const
-{
-  return m_dPhi;
-}
 
 #endif

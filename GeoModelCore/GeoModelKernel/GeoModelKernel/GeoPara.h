@@ -24,95 +24,73 @@ class GeoPara : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the PARA shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string & type () const {
+    return getClassType();
+  }
 
   //    Returns the PARA shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID () const {
+    return getClassTypeID();
+  }
 
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification.
-  static const std::string& getClassType ();
+  static const std::string& getClassType (){
+     return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID () {
+    return s_classTypeID;
+  }
 
   //    Half length in the x-direction.
-  const double& getXHalfLength () const;
+  double  getXHalfLength () const {
+     return m_xHalfLength;
+  }
 
   //    Half-length in the y direction.
-  const double& getYHalfLength () const;
+  double  getYHalfLength () const {
+    return m_yHalfLength;
+  }
 
   //    Half-length in the z direction.
-  const double& getZHalfLength () const;
+  double  getZHalfLength() const {
+     return m_zHalfLength;
+  }
 
   //    Polar (theta) angle.
-  const double& getTheta () const;
+  double  getTheta() const{
+     return m_theta;
+  }
 
   //    The angle alpha...between the two sides of the top face
   //    of the parallelapiped.
-  const double& getAlpha () const;
+  double  getAlpha () const {
+     return m_alpha;
+  }
 
   //    Azimuthal (phi) angle.
-  const double& getPhi () const;
+  double  getPhi () const{
+     return m_phi;
+  }
 
  protected:
-  virtual ~GeoPara();
+  virtual ~GeoPara() = default;
 
  private:
-  GeoPara(const GeoPara &right);
-  GeoPara & operator=(const GeoPara &right);
-
+ 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_xHalfLength;
-  double m_yHalfLength;
-  double m_zHalfLength;
-  double m_theta;
-  double m_alpha;
-  double m_phi;
+  double m_xHalfLength{0.};
+  double m_yHalfLength{0.};
+  double m_zHalfLength{0.};
+  double m_theta{0.};
+  double m_alpha{0.};
+  double m_phi{0.};
 };
-
-inline const std::string& GeoPara::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoPara::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoPara::getXHalfLength () const
-{
-  return m_xHalfLength;
-}
-
-inline const double& GeoPara::getYHalfLength () const
-{
-  return m_yHalfLength;
-}
-
-inline const double& GeoPara::getZHalfLength () const
-{
-  return m_zHalfLength;
-}
-
-inline const double& GeoPara::getTheta () const
-{
-  return m_theta;
-}
-
-inline const double& GeoPara::getAlpha () const
-{
-  return m_alpha;
-}
-
-inline const double& GeoPara::getPhi () const
-{
-  return m_phi;
-}
 
 #endif

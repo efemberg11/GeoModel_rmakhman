@@ -24,66 +24,53 @@ class GeoBox : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the BOX shape type, as a string
-  virtual const std::string & type () const;
+  virtual const std::string & type () const {
+     return getClassType();
+  }
 
   //    Returns the BOX shape type, as a coded integer
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID() const {
+     return getClassTypeID();
+  }
 
   //     Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification
-  static const std::string& getClassType ();
+  static const std::string& getClassType () {
+     return s_classType;
+  }
 
   //    For type identification
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID () {
+     return s_classTypeID;
+  }
 
   //    Half length in the x-direction
-  const double& getXHalfLength () const;
+  double getXHalfLength () const {
+      return m_xHalfLength;
+  }
 
   //    Half-length in the y direction
-  const double& getYHalfLength () const;
+  double getYHalfLength () const {
+    return m_yHalfLength;
+  }
 
   //    Half-length in the z direction
-  const double& getZHalfLength () const;
+  double getZHalfLength () const {
+     return m_zHalfLength;
+  }
+
 
  protected:
-  virtual ~GeoBox();
-
-  private:
-  GeoBox(const GeoBox &right);
-  GeoBox & operator=(const GeoBox &right);
+  virtual ~GeoBox() = default;
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
-  double m_xHalfLength;
-  double m_yHalfLength;
-  double m_zHalfLength;
+  double m_xHalfLength{0.};
+  double m_yHalfLength{0.};
+  double m_zHalfLength{0.};
 };
 
-inline const std::string& GeoBox::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoBox::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoBox::getXHalfLength () const
-{
-  return m_xHalfLength;
-}
-
-inline const double& GeoBox::getYHalfLength () const
-{
-  return m_yHalfLength;
-}
-
-inline const double& GeoBox::getZHalfLength () const
-{
-  return m_zHalfLength;
-}
 
 #endif

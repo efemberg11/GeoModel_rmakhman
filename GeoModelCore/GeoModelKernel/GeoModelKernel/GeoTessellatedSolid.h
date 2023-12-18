@@ -8,8 +8,7 @@
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoFacet.h"
 
-class GeoTessellatedSolid : public GeoShape
-{
+class GeoTessellatedSolid : public GeoShape {
  public:
   //    Constructor for the TESSELLATED SOLID.  Note that the constructor
   //    does not fully build this object.  The TESSELLATED SOLID is not valid
@@ -27,10 +26,14 @@ class GeoTessellatedSolid : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the TESSELLATED SOLID shape type, as a string
-  virtual const std::string& type() const;
+  virtual const std::string& type() const{
+     return getClassType();
+  }
 
   //    Returns the TESSELLATED SOLID shape type, as a coded integer
-  virtual ShapeType typeID() const;
+  virtual ShapeType typeID() const {
+     return getClassTypeID();
+  }
 
   //    For type identification
   static const std::string& getClassType();
@@ -59,8 +62,7 @@ class GeoTessellatedSolid : public GeoShape
   virtual ~GeoTessellatedSolid();
 
  private:
-  GeoTessellatedSolid(const GeoTessellatedSolid &right);
-  GeoTessellatedSolid& operator=(const GeoTessellatedSolid &right);
+
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;

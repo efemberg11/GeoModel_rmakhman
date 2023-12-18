@@ -18,9 +18,6 @@ GeoTubs::GeoTubs (double RMin, double RMax, double ZHalfLength, double SPhi, dou
 {
 }
 
-GeoTubs::~GeoTubs()
-{
-}
 
 double GeoTubs::volume () const
 {
@@ -53,15 +50,6 @@ bool GeoTubs::contains (double x, double y, double z) const
   return (m_dPhi <= M_PI) ? (ds <= 0 && de <= 0) : (ds <= 0 || de <= 0);
 }
 
-const std::string & GeoTubs::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoTubs::typeID () const
-{
-  return s_classTypeID;
-}
 
 void GeoTubs::exec (GeoShapeAction *action) const
 {

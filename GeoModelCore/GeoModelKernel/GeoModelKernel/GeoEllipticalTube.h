@@ -14,8 +14,7 @@
 
 #include "GeoModelKernel/GeoShape.h"
 
-class GeoEllipticalTube : public GeoShape
-{
+class GeoEllipticalTube : public GeoShape {
  public:
   //    Constructor for the ELLIPTICAL TUBE
   GeoEllipticalTube(double XHalfLength, double YHalfLength, double ZHalfLength);
@@ -31,68 +30,54 @@ class GeoEllipticalTube : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the ELLIPTICAL TUBE shape type, as a string
-  virtual const std::string & type () const;
+  virtual const std::string & type () const{
+     return getClassType();
+  }
 
   //    Returns the ELLIPTICAL TUBE shape type, as a coded integer
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID () const {
+    return getClassTypeID();
+  }
 
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification
-  static const std::string& getClassType ();
+  static const std::string& getClassType() {
+     return s_classType;
+  }
 
   //    For type identification
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID () {
+    return s_classTypeID;
+  }
 
   //    X semi-axis
-  const double& getXHalfLength() const;
+  double getXHalfLength() const {
+    return m_xHalfLength;
+  }
 
   //    Y semi-axis
-  const double& getYHalfLength() const;
+  double getYHalfLength() const {
+    return m_yHalfLength;
+  }
 
   //    Elliptical tube half-length in the Z direction
-  const double& getZHalfLength() const;
+  double getZHalfLength() const {
+    return m_zHalfLength;
+  }
 
  protected:
-  virtual ~GeoEllipticalTube();
+  virtual ~GeoEllipticalTube() = default;
 
  private:
-
-  GeoEllipticalTube(const GeoEllipticalTube &right);
-  GeoEllipticalTube & operator=(const GeoEllipticalTube &right);
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_xHalfLength;
-  double m_yHalfLength;
-  double m_zHalfLength;
+  double m_xHalfLength{0.};
+  double m_yHalfLength{0.};
+  double m_zHalfLength{0.};
 };
-
-inline const std::string& GeoEllipticalTube::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoEllipticalTube::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoEllipticalTube::getXHalfLength() const
-{
-  return m_xHalfLength;
-}
-
-inline const double& GeoEllipticalTube::getYHalfLength() const
-{
-  return m_yHalfLength;
-}
-
-inline const double& GeoEllipticalTube::getZHalfLength() const
-{
-  return m_zHalfLength;
-}
 
 #endif

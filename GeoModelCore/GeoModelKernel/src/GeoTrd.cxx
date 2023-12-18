@@ -16,8 +16,6 @@ GeoTrd::GeoTrd (double XHalfLength1, double XHalfLength2, double YHalfLength1, d
   , m_zHalfLength (ZHalfLength)
 {}
 
-GeoTrd::~GeoTrd()
-{}
 
 double GeoTrd::volume () const
 {
@@ -52,15 +50,7 @@ bool GeoTrd::contains (double x, double y, double z) const
   return (std::max(distx, disty) <= 0.0);
 }
 
-const std::string & GeoTrd::type () const
-{
-  return s_classType;
-}
 
-ShapeType GeoTrd::typeID () const
-{
-  return s_classTypeID;
-}
 
 void GeoTrd::exec (GeoShapeAction *action) const
 {

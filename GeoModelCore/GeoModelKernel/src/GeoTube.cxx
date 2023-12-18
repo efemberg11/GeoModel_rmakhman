@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoTube.h"
@@ -45,16 +45,6 @@ bool GeoTube::contains (double x, double y, double z) const
   if (std::abs(z) - m_zHalfLength > 0.0) return false;
   double rr = x * x + y * y;
   return ((rr <= m_rMax * m_rMax) && (rr >= m_rMin * m_rMin));
-}
-
-const std::string & GeoTube::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoTube::typeID () const
-{
-  return s_classTypeID;
 }
 
 void GeoTube::exec (GeoShapeAction *action) const

@@ -81,14 +81,12 @@ class GeoPcon : public GeoShape
   virtual ~GeoPcon();
 
  private:
-  GeoPcon(const GeoPcon &right);
-  GeoPcon & operator=(const GeoPcon &right);
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_sPhi;
-  double m_dPhi;
+  double m_sPhi{0.};
+  double m_dPhi{0.};
 
   //    Z Position of poly-cone planes.
   std::vector<double> m_zPlane;

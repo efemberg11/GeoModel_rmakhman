@@ -8,22 +8,9 @@
 const std::string GeoShapeShift::s_classType = "Shift";
 const ShapeType GeoShapeShift::s_classTypeID = 0x03;
 
-GeoShapeShift::GeoShapeShift (const GeoShape* A, const GeoTrf::Transform3D &X)
-  : m_op (A)
-  , m_shift (X)
-{
-  m_op->ref ();
-}
+GeoShapeShift::GeoShapeShift (const GeoShape* A, const GeoTrf::Transform3D &X):   
+  m_op{A}, m_shift{X} {}
 
-GeoShapeShift::~GeoShapeShift()
-{
-  m_op->unref ();
-}
-
-double GeoShapeShift::volume () const
-{
-  return m_op->volume ();
-}
 
 void GeoShapeShift::extent (double& xmin, double& ymin, double& zmin,
                             double& xmax, double& ymax, double& zmax) const
@@ -55,36 +42,14 @@ void GeoShapeShift::extent (double& xmin, double& ymin, double& zmin,
   }
 }
 
-bool GeoShapeShift::contains (double x, double y, double z) const
-{
+bool GeoShapeShift::contains (double x, double y, double z) const {
   const GeoShape* shape = getOp();
   const GeoTrf::Transform3D& trans = getX();
   GeoTrf::Vector3D p = trans.inverse() * GeoTrf::Vector3D(x, y, z);
   return shape->contains(p.x(), p.y(), p.z());
 }
 
-const std::string & GeoShapeShift::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoShapeShift::typeID () const
-{
-  return s_classTypeID;
-}
-
-const GeoShape* GeoShapeShift::getOp () const
-{
-  return m_op;
-}
-
-const GeoTrf::Transform3D & GeoShapeShift::getX () const
-{
-  return m_shift;
-}
-
-void GeoShapeShift::exec (GeoShapeAction *action) const
-{
+void GeoShapeShift::exec (GeoShapeAction *action) const {
   action->getPath ()->push (this);
   action->handleShift (this);
   if (action->shouldTerminate ())

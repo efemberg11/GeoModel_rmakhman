@@ -18,9 +18,6 @@ GeoTorus::GeoTorus (double Rmin, double Rmax, double Rtor, double SPhi, double D
 {
 }
 
-GeoTorus::~GeoTorus()
-{
-}
 
 double GeoTorus::volume () const
 {
@@ -64,16 +61,6 @@ bool GeoTorus::contains (double x, double y, double z) const
   double ds = ns.dot(r);
   double de = ne.dot(r);
   return (m_dPhi <= M_PI) ? (ds <= 0 && de <= 0) : (ds <= 0 || de <= 0);
-}
-
-const std::string & GeoTorus::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoTorus::typeID () const
-{
-  return s_classTypeID;
 }
 
 void GeoTorus::exec (GeoShapeAction *action) const

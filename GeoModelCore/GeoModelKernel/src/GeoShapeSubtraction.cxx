@@ -11,23 +11,12 @@
 const std::string GeoShapeSubtraction::s_classType = "Subtraction";
 const ShapeType GeoShapeSubtraction::s_classTypeID = 0x02;
 
-GeoShapeSubtraction::GeoShapeSubtraction (const GeoShape* A, const GeoShape* B)
-  : m_opA (A)
-  , m_opB (B)
-{
-  m_opA->ref ();
-  m_opB->ref ();
-}
+GeoShapeSubtraction::GeoShapeSubtraction (const GeoShape* A, const GeoShape* B): 
+    m_opA {A}, m_opB {B} {}
 
-GeoShapeSubtraction::~GeoShapeSubtraction()
-{
-  m_opA->unref ();
-  m_opB->unref ();
-}
 
-double GeoShapeSubtraction::volume () const
-{
-  return (fVolume < 0.) ? (fVolume = GeoShape::volume()) : fVolume;
+double GeoShapeSubtraction::volume () const {
+  return (fVolume < 0.) ? (fVolume = GeoShape::volume()) : fVolume.load();
 }
 
 void GeoShapeSubtraction::extent (double& xmin, double& ymin, double& zmin,
@@ -41,25 +30,7 @@ bool GeoShapeSubtraction::contains (double x, double y, double z) const
   return (!getOpA()->contains(x, y, z)) ? false : !getOpB()->contains(x, y, z);
 }
 
-const std::string & GeoShapeSubtraction::type () const
-{
-  return s_classType;
-}
 
-ShapeType GeoShapeSubtraction::typeID () const
-{
-  return s_classTypeID;
-}
-
-const GeoShape* GeoShapeSubtraction::getOpA () const
-{
-  return m_opA;
-}
-
-const GeoShape* GeoShapeSubtraction::getOpB () const
-{
-  return m_opB;
-}
 
 void GeoShapeSubtraction::exec (GeoShapeAction *action) const
 {

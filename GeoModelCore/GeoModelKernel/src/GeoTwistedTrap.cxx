@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoTwistedTrap.h"
@@ -85,10 +85,6 @@ GeoTwistedTrap(double  pPhiTwist,  // twist angle
 }
 
 
-GeoTwistedTrap::~GeoTwistedTrap()
-{
-}
-
 double GeoTwistedTrap::volume () const
 {
   return m_dz * ((m_dx1 + m_dx2 + m_dx3 + m_dx4) * (m_dy1 + m_dy2) +
@@ -154,15 +150,6 @@ bool GeoTwistedTrap::contains (double x, double y, double z) const
   return (std::abs(x0) - dx <= 0.0);
 }
 
-const std::string & GeoTwistedTrap::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoTwistedTrap::typeID () const
-{
-  return s_classTypeID;
-}
 
 void GeoTwistedTrap::exec (GeoShapeAction* action) const
 {

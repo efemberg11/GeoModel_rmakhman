@@ -8,6 +8,7 @@ stages:
   - step-E
   - step-F
   - post-deploy
+  - test
 
 
 
@@ -274,6 +275,9 @@ mac-gm-all:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+  
+
+
 
 
 mac-gm-atlasextras:
@@ -389,6 +393,10 @@ ubu-gm-all:
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+  artifacts:
+    paths:
+    - build
+    expire_in: 30 minutes
 
 
 ubu-gm-atlasextras:
@@ -522,10 +530,6 @@ ubu-single-gmfsl:
     - cmake ${CMAKE_ARGS} ../FSL # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
     - cmake --build . -- -j2
     - cmake --build . -- install
-  artifacts:
-    paths:
-      - install
-    expire_in: 1 day
 
 
 #####################
@@ -750,3 +754,13 @@ persist-tag-artifacts:
       - install
     expire_in: never
 
+
+tests-ubuntu:
+  <<: *ubuntu-job
+  stage: step-test
+  needs: ["ubu-gm-all"]
+  stage: test
+  script:
+    - cd build
+    - ctest #--output-on-failure
+  

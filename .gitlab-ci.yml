@@ -757,7 +757,6 @@ persist-tag-artifacts:
 
 tests-ubuntu:
   <<: *ubuntu-job
-  <<: *geomodel-job
   stage: step-test
   needs: ["ubu-gm-all"]
   stage: test

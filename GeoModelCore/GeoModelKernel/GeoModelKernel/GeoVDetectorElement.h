@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOVDETECTORELEMENT_H
@@ -27,18 +27,18 @@ class GeoVDetectorElement
 {
  public:
   GeoVDetectorElement (const GeoVFullPhysVol* fullPhysVol);
-  virtual ~GeoVDetectorElement();
+  virtual ~GeoVDetectorElement() = default;
 
   //	Returns a pointer to a physical volume which is
   //	associated with this detector element.
   const GeoVFullPhysVol* getMaterialGeom () const;
 
  private:
-  GeoVDetectorElement(const GeoVDetectorElement &right);
-  GeoVDetectorElement & operator=(const GeoVDetectorElement &right);
+  GeoVDetectorElement(const GeoVDetectorElement &right) = delete;
+  GeoVDetectorElement & operator=(const GeoVDetectorElement &right) = delete;
 
  private:
-  const GeoVFullPhysVol *m_materialGeom;
+    GeoIntrusivePtr<const GeoVFullPhysVol> m_materialGeom{};
 
 };
 

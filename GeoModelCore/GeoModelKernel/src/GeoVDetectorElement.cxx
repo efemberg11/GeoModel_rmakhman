@@ -5,10 +5,4 @@
 #include "GeoModelKernel/GeoVDetectorElement.h"
 
 GeoVDetectorElement::GeoVDetectorElement (const GeoVFullPhysVol* fullPhysVol)
-  : m_materialGeom(fullPhysVol)
-{
-}
-
-GeoVDetectorElement::~GeoVDetectorElement()
-{
-}
+  : m_materialGeom(fullPhysVol){}

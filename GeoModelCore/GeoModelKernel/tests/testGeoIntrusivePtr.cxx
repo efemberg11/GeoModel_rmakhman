@@ -7,11 +7,13 @@
 #include <iostream>
 
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
 
-#define PRINT(OBJ)                                                                    \
+#define PRINT(OBJ)							\
     std::cout<<__FILE__<<":"<<__LINE__<<" Print reference count of "<<(RCBase*)OBJ;   \
     if (OBJ) std::cout<<" "<<typeid(*OBJ).name()<<" "<<OBJ->refCount();               \
-    std::cout<<std::endl;                                                             \
+    std::cout<<std::endl;                                                             
 
 
 #define CHECKCOUNT(OBJ, EXPECT)                                                                   \
@@ -65,3 +67,4 @@ int main(int argc, char *argv[]){
     }
     return EXIT_SUCCESS;
 }
+#pragma clang diagnostic pop

@@ -141,8 +141,6 @@ const GeoFullPhysVol* GeoFullPhysVol::cloneOrigin() const
 /// Don't call it until geometry has been completely translated to G4
 void GeoFullPhysVol::clear()
 {
-  for(size_t i=0; i<m_daughters.size(); i++)
-    m_daughters[i]->unref();
   m_daughters.clear();
 }
 

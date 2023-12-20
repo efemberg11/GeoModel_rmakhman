@@ -40,7 +40,7 @@ void publishMetaData( GMDBManager & db,
   struct Metadata {
     std::string dateString=getCommandOutput("date -Iminutes");
     std::string username{resolveVariable("USER")};
-    std::string hostname{resolveVariable("HOSTNAME")};
+    std::string hostname{};
     std::string os;
     std::string wd;
     std::string gmversion=STR_NAME(GMVERSION);
@@ -71,6 +71,12 @@ void publishMetaData( GMDBManager & db,
   uname (&uts);
   metadata.os=std::string(uts.sysname)+  "-" + std::string(uts.machine);
 
+  // Sometimes "HOSTNAME" is empty as seen from gmcat.
+  if (metadata.hostname.empty()) {
+    char hn[1024];
+    if (gethostname (hn,1024)==0) metadata.hostname=std::string(hn);
+  }
+  
   std::string geomodel_xml_dir=resolveVariable("GEOMODEL_XML_DIR");
   if (!geomodel_xml_dir.empty())  {
     {

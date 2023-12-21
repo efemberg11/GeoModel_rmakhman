@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoFullPhysVol.h"
@@ -13,10 +13,6 @@
 
 GeoFullPhysVol::GeoFullPhysVol (const GeoLogVol* LogVol)
   : GeoVFullPhysVol(LogVol){ }
-
-GeoFullPhysVol::~GeoFullPhysVol() {
-  if(m_cloneOrigin && m_cloneOrigin!=this) m_cloneOrigin->unref();
-}
 
 void GeoFullPhysVol::add(GeoGraphNode* graphNode)
 {
@@ -118,27 +114,18 @@ unsigned int GeoFullPhysVol::getNChildVolAndST() const
   return cv.getCount();
 }
 
-/// Meaning of the input parameter 'attached'
-/// TRUE: all cloned volumes are meant to stay identical to their clone origin for the lifetime
-///       further changes are permitted neither in the origin nor in the clone results
-///
-/// FALSE: use this value if you expect further changes in either clone origing or its clone results
-///        which don't need to be syncronized. The clone origin and its clone are identical ONLY by
-///        the time of cloning, further identity is not guaranteed
 GeoFullPhysVol* GeoFullPhysVol::clone(bool attached)
 {
   GeoFullPhysVol* clone = new GeoFullPhysVol(this->getLogVol());
-  for(unsigned int ind = 0; ind < this->m_daughters.size(); ind++) {
-    GeoGraphNode* daughter =(GeoGraphNode*) m_daughters[ind];
+  for(auto daughter : m_daughters) {
     clone->add(daughter);
   }
 
   if(attached) {
-    if(this->m_cloneOrigin==0) {
-      this->m_cloneOrigin = this;
+    if(!m_cloneOrigin) {
+      m_cloneOrigin = this;
     }
-    clone->m_cloneOrigin = this->m_cloneOrigin;
-    this->m_cloneOrigin->ref();
+    clone->m_cloneOrigin = m_cloneOrigin;
   }
 
   return clone;
@@ -154,8 +141,6 @@ const GeoFullPhysVol* GeoFullPhysVol::cloneOrigin() const
 /// Don't call it until geometry has been completely translated to G4
 void GeoFullPhysVol::clear()
 {
-  for(size_t i=0; i<m_daughters.size(); i++)
-    m_daughters[i]->unref();
   m_daughters.clear();
 }
 

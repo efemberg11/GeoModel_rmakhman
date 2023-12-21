@@ -59,12 +59,22 @@ class GeoFullPhysVol final : public GeoVFullPhysVol
   /// Returns the number of child physical volumes and Serial Transformers.
   virtual unsigned int getNChildVolAndST() const override;
 
+  /// Meaning of the input parameter 'attached'
+  /// TRUE: all cloned volumes are meant to stay identical to their clone origin for the lifetime
+  ///       further changes are permitted neither in the origin nor in the clone results
+  ///
+  /// FALSE: use this value if you expect further changes in either clone origing or its clone results
+  ///        which don't need to be syncronized. The clone origin and its clone are identical ONLY by
+  ///        the time of cloning, further identity is not guaranteed
   GeoFullPhysVol* clone(bool attached = true);
+
   const GeoFullPhysVol* cloneOrigin() const;
+
   /// The following method breaks consistency of cloned volumes!
   /// Use it only in Simulation jobs and
   /// don't call it until geometry has been completely translated to G4
   void clear(); // drop subtree
+
   virtual GeoTrf::Transform3D getX    (const GeoVAlignmentStore* store=nullptr) const override;
   virtual GeoTrf::Transform3D getDefX (const GeoVAlignmentStore* store=nullptr) const override;
   virtual unsigned int getNChildNodes() const override;
@@ -72,7 +82,7 @@ class GeoFullPhysVol final : public GeoVFullPhysVol
   virtual const GeoGraphNode * const *findChildNode(const GeoGraphNode *n) const override;
 
   protected:
-  virtual ~GeoFullPhysVol();
+  virtual ~GeoFullPhysVol() = default;
 
   private:
  

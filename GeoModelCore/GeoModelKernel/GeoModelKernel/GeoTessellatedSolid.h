@@ -7,6 +7,7 @@
 
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoFacet.h"
+#include "GeoModelKernel/GeoIntrusivePtr.h"
 
 class GeoTessellatedSolid : public GeoShape {
  public:
@@ -42,14 +43,14 @@ class GeoTessellatedSolid : public GeoShape {
   static ShapeType getClassTypeID();
 
   //    Executes a GeoShapeAction
-  virtual void exec(GeoShapeAction *action) const;
+  virtual void exec(GeoShapeAction* action) const;
 
   //    Add another facet to the tessellated solid. A minimum of four
   //    facets are required to create a valid tesselated solid.
-  void addFacet(GeoFacet*);
+  void addFacet(GeoFacet* facet);
 
   //    Returns specified facet
-  GeoFacet* getFacet(size_t) const;
+  GeoFacet* getFacet(size_t index) const;
 
   //    Returns the number of facets
   size_t getNumberOfFacets() const;
@@ -59,15 +60,13 @@ class GeoTessellatedSolid : public GeoShape {
   bool isValid () const;
 
  protected:
-  virtual ~GeoTessellatedSolid();
+  virtual ~GeoTessellatedSolid() = default;
 
  private:
-
-
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  std::vector<GeoFacet*> m_facets;
+  std::vector<GeoIntrusivePtr<GeoFacet>> m_facets;
 };
 
 inline const std::string& GeoTessellatedSolid::getClassType()

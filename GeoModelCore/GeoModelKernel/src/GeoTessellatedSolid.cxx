@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoTessellatedSolid.h"
@@ -11,12 +11,6 @@ const ShapeType GeoTessellatedSolid::s_classTypeID = 0x21;
 
 GeoTessellatedSolid::GeoTessellatedSolid()
 {
-}
-
-GeoTessellatedSolid::~GeoTessellatedSolid()
-{
-  for(size_t i=0; i<m_facets.size(); ++i)
-    m_facets[i]->unref();
 }
 
 double GeoTessellatedSolid::volume() const
@@ -81,13 +75,12 @@ void GeoTessellatedSolid::exec(GeoShapeAction *action) const
 
 void GeoTessellatedSolid::addFacet(GeoFacet* facet)
 {
-  facet->ref();
   m_facets.push_back(facet);
 }
 
 GeoFacet* GeoTessellatedSolid::getFacet(size_t index) const
 {
-  return (index<m_facets.size() ? m_facets[index] : 0);
+  return (index<m_facets.size() ? m_facets.at(index) : nullptr);
 }
 
 size_t GeoTessellatedSolid::getNumberOfFacets() const

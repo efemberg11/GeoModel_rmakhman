@@ -32,17 +32,14 @@
  *
  * Here is an example of GeoCutVolAction usage:
  *
- * |--------------------------------------------------------------------------|
- * | ... First construct a physical volume *origPhysVol* and add all daughter |
- * |     volumes to it                                                        |
- * |                                                                          |
- * |   GeoCutVolAction action(shape,transform);                               |
- * |   pPhysVol->apply(&action);                                              |
- * |   GeoPhysVol* cutPhysVol = action.getPV();                               |
- * |   pPhysVol->unref();                                                     |
- * |                                                                          |
- * | ... Use *cutPhysVol* afterwards (atach to the upper level volumes)       |
- * |--------------------------------------------------------------------------|
+ * |---------------------------------------------------------------------|
+ * | GeoPVLink pPhysVol;                                                 |
+ * | // ... add content to pPhysVol ...                                  |
+ * | GeoCutVolAction action(shape,transform);                            |
+ * | pPhysVol->apply(&action);                                           |
+ * | GeoPVLink cutPhysVol = action.getPV();                              |
+ * | // Use cutPhysVol afterwards (atach to the upper level volumes)     |
+ * |---------------------------------------------------------------------|
  */
 
 #include "GeoModelKernel/GeoVPhysVol.h"

@@ -1,9 +1,11 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+
+#include <array>
 
 const std::string GeoShapeShift::s_classType = "Shift";
 const ShapeType GeoShapeShift::s_classTypeID = 0x03;
@@ -17,9 +19,9 @@ void GeoShapeShift::extent (double& xmin, double& ymin, double& zmin,
 {
   const GeoShape* shape = getOp();
   const GeoTrf::Transform3D& trans = getX();
-  double x_min, y_min, z_min, x_max, y_max, z_max;
+  double x_min{0.}, y_min{0.}, z_min{0.}, x_max{0.}, y_max{0.}, z_max{0.};
   shape->extent(x_min, y_min, z_min, x_max, y_max, z_max);
-  GeoTrf::Vector3D vv[8];
+  std::array<GeoTrf::Vector3D, 8> vv{};
   vv[0] = trans * GeoTrf::Vector3D(x_min, y_min, z_min);
   vv[1] = trans * GeoTrf::Vector3D(x_max, y_min, z_min);
   vv[2] = trans * GeoTrf::Vector3D(x_min, y_max, z_min);

@@ -20,9 +20,6 @@ GeoTriangularFacet::GeoTriangularFacet(GeoFacetVertex v0
 }
 
 
-GeoTriangularFacet::~GeoTriangularFacet()
-{
-}
 
 // ___________________ Triangular Facet ________________________
 GeoQuadrangularFacet::GeoQuadrangularFacet(GeoFacetVertex v0
@@ -41,7 +38,3 @@ GeoQuadrangularFacet::GeoQuadrangularFacet(GeoFacetVertex v0
   m_vertices[3] = v3;
 }
 
-
-GeoQuadrangularFacet::~GeoQuadrangularFacet()
-{
-}

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOTRAP_H
@@ -63,7 +63,7 @@ class GeoTrap : public GeoShape
   double getDydzn () const { return m_dydzn; }
 
   //    X half length at -z, -y.
-double getDxdyndzn () const { return m_dxdyndzn; }
+  double getDxdyndzn () const { return m_dxdyndzn; }
 
   //    X half length at -z, +y.
   double getDxdypdzn () const { return m_dxdypdzn; }

@@ -16,9 +16,6 @@ GeoPcon::GeoPcon (double SPhi, double DPhi)
 {
 }
 
-GeoPcon::~GeoPcon()
-{
-}
 
 double GeoPcon::volume () const
 {
@@ -93,16 +90,6 @@ bool GeoPcon::contains (double x, double y, double z) const
     if (rr <= rmax * rmax && rr >= rmin * rmin) return true;
   }
   return false;
-}
-
-const std::string & GeoPcon::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoPcon::typeID () const
-{
-  return s_classTypeID;
 }
 
 void GeoPcon::addPlane (double ZPlane, double RMinPlane, double RMaxPlane)

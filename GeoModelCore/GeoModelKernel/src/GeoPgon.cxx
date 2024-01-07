@@ -17,10 +17,6 @@ GeoPgon::GeoPgon (double SPhi, double DPhi, unsigned int NSides)
 {
 }
 
-GeoPgon::~GeoPgon()
-{
-}
-
 double GeoPgon::volume () const
 {
 #ifndef M_PI
@@ -153,16 +149,6 @@ bool GeoPgon::contains (double x, double y, double z) const
     if (r <= rmax && r >= rmin) return true;
   }
   return false;
-}
-
-const std::string & GeoPgon::type () const
-{
-  return s_classType;
-}
-
-ShapeType GeoPgon::typeID () const
-{
-  return s_classTypeID;
 }
 
 void GeoPgon::addPlane (double ZPlane, double RMinPlane, double RMaxPlane)

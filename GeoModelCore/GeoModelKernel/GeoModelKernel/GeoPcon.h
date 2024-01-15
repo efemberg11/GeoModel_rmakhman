@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOPCON_H
@@ -17,8 +17,7 @@
 #include "GeoModelKernel/GeoShape.h"
 #include <vector>
 
-class GeoPcon : public GeoShape
-{
+class GeoPcon : public GeoShape {
  public:
   //    Constructor for the PCON.  Note that the constructor
   //    does not fully build this object.  The PCON is not valid
@@ -36,10 +35,14 @@ class GeoPcon : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the PCON shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string& type() const {
+      return getClassType();
+  }
 
   //    Returns the PCON shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID() const {
+     return getClassTypeID();
+  }
 
   //    Add another plane to the polycone  A minimum of two
   //    planes are required to create a valid polycone.
@@ -47,38 +50,56 @@ class GeoPcon : public GeoShape
 
   //    Returns the number of planes that have been created for
   //    the polycone.
-  unsigned int getNPlanes () const;
+  unsigned int getNPlanes() const {
+      return m_zPlane.size();
+  }
 
   //    True if the polycone has at least two planes. False
   //    otherwise.
-  bool isValid () const;
+  bool isValid() const {
+     return getNPlanes() >= 2;
+  }
 
   //    Get the Z Position of the specified plane.
-  const double & getZPlane (unsigned int i) const;
+  double getZPlane(unsigned int i) const {
+      return m_zPlane[i];
+  }
 
   //    Get the RMin of the specified plane.
-  const double & getRMinPlane (unsigned int i) const;
+  double getRMinPlane(unsigned int i) const {
+      return m_rMinPlane[i];
+  }
 
   //    Get the Z Position of the specified plane.
-  const double & getRMaxPlane (unsigned int i) const;
+  double getRMaxPlane(unsigned int i) const {
+      return m_rMaxPlane[i];
+  }
 
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification.
-  static const std::string& getClassType ();
+  static const std::string& getClassType() {
+      return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID() {
+     return s_classTypeID;
+  }
 
   //    Starting angle of the segment in radians.
-  const double& getSPhi () const;
+  double getSPhi() const {
+     return m_sPhi;
+  }
 
   //    Delta angle of the segment in radians.
-  const double& getDPhi () const;
+  double getDPhi() const {
+    return m_dPhi;
+  }
 
  protected:
-  virtual ~GeoPcon();
+  virtual ~GeoPcon() = default;
 
  private:
 
@@ -89,58 +110,14 @@ class GeoPcon : public GeoShape
   double m_dPhi{0.};
 
   //    Z Position of poly-cone planes.
-  std::vector<double> m_zPlane;
+  std::vector<double> m_zPlane{};
 
   //    Minimum radius of poly-cone planes.
-  std::vector<double> m_rMinPlane;
+  std::vector<double> m_rMinPlane{};
 
   //    Maximum radius of poly-cone planes.
-  std::vector<double> m_rMaxPlane;
+  std::vector<double> m_rMaxPlane{};
 };
 
-inline unsigned int GeoPcon::getNPlanes () const
-{
-  return m_zPlane.size ();
-}
-
-inline bool GeoPcon::isValid () const
-{
-  return getNPlanes () >= 2;
-}
-
-inline const double & GeoPcon::getZPlane (unsigned int i) const
-{
-  return m_zPlane[i];
-}
-
-inline const double & GeoPcon::getRMinPlane (unsigned int i) const
-{
-  return m_rMinPlane[i];
-}
-
-inline const double & GeoPcon::getRMaxPlane (unsigned int i) const
-{
-  return m_rMaxPlane[i];
-}
-
-inline const std::string& GeoPcon::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoPcon::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoPcon::getSPhi () const
-{
-  return m_sPhi;
-}
-
-inline const double& GeoPcon::getDPhi () const
-{
-  return m_dPhi;
-}
 
 #endif

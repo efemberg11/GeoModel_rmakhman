@@ -23,8 +23,8 @@ double GeoShapeUnion::volume () const
 void GeoShapeUnion::extent (double& xmin, double& ymin, double& zmin,
                             double& xmax, double& ymax, double& zmax) const
 {
-  double xminA, yminA, zminA, xmaxA, ymaxA, zmaxA;
-  double xminB, yminB, zminB, xmaxB, ymaxB, zmaxB;
+  double xminA{0.}, yminA{0.}, zminA{0.}, xmaxA{0.}, ymaxA{0.}, zmaxA{0.};
+  double xminB{0.}, yminB{0.}, zminB{0.}, xmaxB{0.}, ymaxB{0.}, zmaxB{0.};
   getOpA()->extent(xminA, yminA, zminA, xmaxA, ymaxA, zmaxA);
   getOpB()->extent(xminB, yminB, zminB, xmaxB, ymaxB, zmaxB);
   xmin = std::min(xminA, xminB);

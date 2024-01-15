@@ -27,10 +27,14 @@ class GeoPgon : public GeoShape
   virtual bool contains (double x, double y, double z) const;
 
   //    Returns the PGON shape type, as a string.
-  virtual const std::string & type () const;
+  virtual const std::string & type() const {
+     return getClassType();
+  }
 
   //    Returns the PGON shape type, as a coded integer.
-  virtual ShapeType typeID () const;
+  virtual ShapeType typeID() const {
+     return getClassTypeID();
+  }
 
   //    Add another plane to the polygon. A minimum of two
   //    planes are required to create a valid polygon.
@@ -38,111 +42,79 @@ class GeoPgon : public GeoShape
 
   //    Returns the number of planes that have been created for
   //    the polygon.
-  unsigned int getNPlanes () const;
+  unsigned int getNPlanes() const {
+    return m_zPlane.size ();
+  }
 
   //    True if the polygon has at least two planes.  False
   //    otherwise.
-  bool isValid () const;
+  bool isValid() const {
+     return m_zPlane.size () >= 2;
+  }
 
   //    Get the Z Position of the specified plane.
-  const double & getZPlane (unsigned int i) const;
+  double getZPlane (unsigned int i) const {
+    return m_zPlane[i];
+  }
 
   //    Get the RMin of the specified plane.
-  const double & getRMinPlane (unsigned int i) const;
+  double getRMinPlane (unsigned int i) const {
+     return m_rMinPlane[i];
+  }
 
   //    Get the Z Position of the specified plane.
-  const double & getRMaxPlane (unsigned int i) const;
+  double getRMaxPlane (unsigned int i) const {
+     return m_rMaxPlane[i];
+  }
 
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification.
-  static const std::string& getClassType ();
+  static const std::string& getClassType() {
+     return s_classType;
+  }
 
   //    For type identification.
-  static ShapeType getClassTypeID ();
+  static ShapeType getClassTypeID() {
+     return s_classTypeID;
+  }
 
   //    Starting angle of the segment in radians.
-  const double& getSPhi () const;
+  double getSPhi() const {
+     return m_sPhi;
+  }
 
   //    Delta angle of the segment in radians.
-  const double& getDPhi () const;
+  double getDPhi() const {
+     return m_dPhi;
+  }
 
   //    Number of sides in each polygonal segment.
-  const unsigned int& getNSides () const;
+  unsigned int getNSides () const{
+     return m_nSides;
+  }
 
  protected:
-  virtual ~GeoPgon();
+  virtual ~GeoPgon() = default;
 
  private:
-  GeoPgon(const GeoPgon &right);
-  GeoPgon & operator=(const GeoPgon &right);
-
+  
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
-  double m_sPhi;
-  double m_dPhi;
-  unsigned int m_nSides;
+  double m_sPhi{0.};
+  double m_dPhi{0.};
+  unsigned int m_nSides{0};
 
   //    Z Position of polygon planes.
-  std::vector<double> m_zPlane;
+  std::vector<double> m_zPlane{};
 
   //    Minimum radius of polygon planes.
-  std::vector<double> m_rMinPlane;
+  std::vector<double> m_rMinPlane{};
 
   //    Maximum radius of polygon planes.
-  std::vector<double> m_rMaxPlane;
+  std::vector<double> m_rMaxPlane{};
 };
-
-inline unsigned int GeoPgon::getNPlanes () const
-{
-  return m_zPlane.size ();
-}
-
-inline bool GeoPgon::isValid () const
-{
-  return m_zPlane.size () >= 2;
-}
-
-inline const double & GeoPgon::getZPlane (unsigned int i) const
-{
-  return m_zPlane[i];
-}
-
-inline const double & GeoPgon::getRMinPlane (unsigned int i) const
-{
-  return m_rMinPlane[i];
-}
-
-inline const double & GeoPgon::getRMaxPlane (unsigned int i) const
-{
-  return m_rMaxPlane[i];
-}
-
-inline const std::string& GeoPgon::getClassType ()
-{
-  return s_classType;
-}
-
-inline ShapeType GeoPgon::getClassTypeID ()
-{
-  return s_classTypeID;
-}
-
-inline const double& GeoPgon::getSPhi () const
-{
-  return m_sPhi;
-}
-
-inline const double& GeoPgon::getDPhi () const
-{
-  return m_dPhi;
-}
-
-inline const unsigned int& GeoPgon::getNSides () const
-{
-  return m_nSides;
-}
 
 #endif

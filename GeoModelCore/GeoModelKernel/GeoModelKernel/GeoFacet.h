@@ -18,31 +18,34 @@
 #include "GeoModelKernel/GeoDefinitions.h"
 #include <vector>
 
-typedef GeoTrf::Vector3D GeoFacetVertex;
+using GeoFacetVertex = GeoTrf::Vector3D;
 
 // ** Base class
 class GeoFacet : public RCBase
 {
  public:
-  enum GeoFacetVertexType
-  {
+  enum GeoFacetVertexType {
     ABSOLUTE,
     RELATIVE
   };
 
-  inline size_t getNumberOfVertices() const;
-  inline GeoFacetVertex getVertex(size_t) const;
-  inline GeoFacetVertexType getVertexType() const;
+  inline size_t getNumberOfVertices() const {
+     return m_nVertices;
+  }
+  inline GeoFacetVertex getVertex(size_t index) const {
+    return (index<m_nVertices ? m_vertices[index] : GeoFacetVertex(999999.,999999.,999999.));
+  }
+  inline GeoFacetVertexType getVertexType() const {
+     return m_vertexType;
+  }
 
  protected:
-  GeoFacet()
-    : m_nVertices(0),
-      m_vertexType(ABSOLUTE) {};
-  virtual ~GeoFacet(){};
+  GeoFacet() = default;
+  virtual ~GeoFacet() = default;
 
-  size_t m_nVertices;
-  std::vector<GeoFacetVertex> m_vertices;
-  GeoFacetVertexType m_vertexType;
+  size_t m_nVertices{0};
+  std::vector<GeoFacetVertex> m_vertices{};
+  GeoFacetVertexType m_vertexType{GeoFacetVertexType::ABSOLUTE};
 };
 
 // Triangular facet
@@ -50,40 +53,21 @@ class GeoTriangularFacet : public GeoFacet
 {
  public:
   GeoTriangularFacet(GeoFacetVertex
-		     ,GeoFacetVertex
-		     ,GeoFacetVertex
-		     ,GeoFacetVertexType);
+             ,GeoFacetVertex
+             ,GeoFacetVertex
+             ,GeoFacetVertexType);
 
-  virtual ~GeoTriangularFacet();
+  virtual ~GeoTriangularFacet() = default;
 };
 
 // Quadrangular facet
-class GeoQuadrangularFacet : public GeoFacet
-{
+class GeoQuadrangularFacet : public GeoFacet {
  public:
-  GeoQuadrangularFacet(GeoFacetVertex
-		       ,GeoFacetVertex
-		       ,GeoFacetVertex
-		       ,GeoFacetVertex
-		       ,GeoFacetVertexType);
+  GeoQuadrangularFacet(GeoFacetVertex ,GeoFacetVertex, GeoFacetVertex,
+                       GeoFacetVertex ,GeoFacetVertexType);
 
-  virtual ~GeoQuadrangularFacet();
+  virtual ~GeoQuadrangularFacet() = default;
 };
 
-// Inline methods
-inline size_t GeoFacet::getNumberOfVertices() const
-{
-  return m_nVertices;
-}
-
-inline GeoFacetVertex GeoFacet::getVertex(size_t index) const
-{
-  return (index<m_nVertices ? m_vertices[index] : GeoFacetVertex(999999.,999999.,999999.));
-}
-
-inline GeoFacet::GeoFacetVertexType GeoFacet::getVertexType() const
-{
-  return m_vertexType;
-}
 
 #endif

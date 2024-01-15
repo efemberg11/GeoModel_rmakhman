@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoMaterial.h"
@@ -213,61 +213,37 @@ const double
 
 unsigned int GeoMaterial::s_lastID = 0;
 
-GeoMaterial::GeoMaterial (const std::string &Name, double Density)
-   : m_name(Name)
-   , m_density(Density)
+GeoMaterial::GeoMaterial (const std::string& name, double density)
+   : m_name(name)
+   , m_density(density)
    , m_iD(s_lastID++)
-   , m_radLength(0)
-   , m_intLength(0)
-   , m_dedDxConst(0)
-   , m_deDxI0(0)
-   , m_locked(false)
 {
-}
-
-GeoMaterial::~GeoMaterial()
-{
-  for (size_t i = 0; i < m_element.size (); i++)
-    {
-      m_element[i]->unref ();
-    }
 }
 
 void GeoMaterial::add (const GeoElement* element, double fraction)
 {
   // You can only add materials until you call "lock"...     
-  if (!m_locked)
-    {
-      std::vector <const GeoElement *>::iterator e = std::find(m_element.begin(),m_element.end(),element);
-      if (e==m_element.end()) {
-	m_element.push_back (element);
-	m_fraction.push_back (fraction);
-	element->ref ();
-      }
-      else {
-	int n = e-m_element.begin();
-	m_fraction[n]+=fraction;
-      }
-    }
-  else
-    {
-      throw std::out_of_range ("Element added after material locked");
-    }
+  if(m_locked) throw std::out_of_range ("Element added after material locked");
+
+  auto e = std::find(m_elements.begin(),m_elements.end(),element);
+  if (e==m_elements.end()) {
+    m_elements.push_back (element);
+    m_fractions.push_back (fraction);
+    element->ref ();
+  }
+  else {
+    int n = e-m_elements.begin();
+    m_fractions[n]+=fraction;
+  }
 }
 
 void GeoMaterial::add (const GeoMaterial* material, double fraction)
 {
-  if (!m_locked)
-    {
-      for (size_t e = 0; e < material->getNumElements (); e++)
-	{
-	  add(material->m_element[e],fraction * material->m_fraction[e]);
-	}
-    }
-  else
-    {
-      throw std::out_of_range ("Material added after material locked");
-    }
+  if(m_locked) throw std::out_of_range ("Material added after material locked");
+
+  for(size_t e = 0; e < material->getNumElements (); ++e) {
+    add(material->m_elements[e],fraction * material->m_fractions[e]);
+  }
 }
 
 void GeoMaterial::lock ()
@@ -292,12 +268,7 @@ void GeoMaterial::lock ()
   //                                            //     
   //--------------------------------------------//     
 
-  if (getNumElements () == 0)
-    {
-      throw std::out_of_range ("Attempt to lock a material with no elements "+getName());
-      return;
-    }
-
+  if(getNumElements() == 0) throw std::out_of_range ("Attempt to lock a material with no elements "+getName());
 
   //--------------------------------------------//     
   //                                            //     
@@ -305,42 +276,44 @@ void GeoMaterial::lock ()
 
   double dEDxConstant = 0, dEDxI0 = 0, NILinv = 0.0, radInv = 0.0;
 
-  { // ===============Renormalization================================
-    double wSum=std::accumulate(m_fraction.begin(),m_fraction.end(),0.0);
-    if (fabs(wSum-1.0)>FLT_EPSILON) // 'FLT_EPSILON' defined in <cfloat>
-    {
-    	if(std::getenv("GEOMODELKERNEL_VERBOSE")) {
-    		std::cerr << "Warning in material "
-    				<< m_name
-					<< ". Mass fractions sum to "
-					<< wSum << "; renormalizing to 1.0" << std::endl;
-    	}
+  // ===============Renormalization================================  
+  { 
+    double wSum=std::accumulate(m_fractions.begin(),m_fractions.end(),0.0);
+    if(fabs(wSum-1.0)>FLT_EPSILON) { // 'FLT_EPSILON' defined in <cfloat>
+      if(std::getenv("GEOMODELKERNEL_VERBOSE")) {
+	std::cerr << "Warning in material "
+		  << m_name
+		  << ". Mass fractions sum to "
+		  << wSum << "; renormalizing to 1.0" << std::endl;
+      }
     }
     double inv_wSum = 1. / wSum;
-    for (size_t e=0;e<getNumElements();e++) {m_fraction[e]*=inv_wSum;}
-  } // ==============================================================
+    for(size_t e=0;e<getNumElements();++e) {
+      m_fractions[e]*=inv_wSum;
+    }
+  }
+  // ==============================================================
 
   const double inv_lambda0 = 1. / lambda0;
-  for (size_t e = 0; e < getNumElements (); e++)
-    {
-      double w = getFraction (e);	// Weight fraction.     
-      double Z = m_element[e]->getZ ();	// Atomic number     
-      double A = m_element[e]->getA ();	// Atomic mass.     
-      double N = m_element[e]->getN ();	// Number of nucleons.     
-      double dovera = m_density ? m_density / A : 0; // don't crash if both are 0
-      double n = m_fraction[e] * GeoModelKernelUnits::Avogadro * dovera;	// Number density.
-      int iZ = (int) (m_element[e]->getZ () + 0.5) - 1;	// Atomic number index     
+  for(size_t e = 0; e < getNumElements (); ++e) {
+    double w = getFraction (e);	// Weight fraction.     
+    double Z = m_elements[e]->getZ ();	// Atomic number
+    double A = m_elements[e]->getA ();	// Atomic mass.
+    double N = m_elements[e]->getN ();	// Number of nucleons.
+    double dovera = m_density ? m_density / A : 0; // don't crash if both are 0
+    double n = m_fractions[e] * GeoModelKernelUnits::Avogadro * dovera;	// Number density.
+    int iZ = (int) (m_elements[e]->getZ () + 0.5) - 1;	// Atomic number index
 
-      dEDxConstant += w * C0 * dovera * Z;
-      // Make sure we don't overflow the table:
-      // the `Ether' special `element' has Z set to 500.
-      if (iZ >= 0 && iZ < (std::end(s_ionizationPotential)-std::begin(s_ionizationPotential)))
-        dEDxI0 += w * s_ionizationPotential[iZ];
-      NILinv += n * pow (N, 2.0 / 3.0) * GeoModelKernelUnits::amu * inv_lambda0;
-
-      double nAtomsPerVolume = A ? GeoModelKernelUnits::Avogadro*m_density*m_fraction[e]/A : 0.;
-      radInv += (nAtomsPerVolume*m_element[e]->getRadTsai());
-    }
+    dEDxConstant += w * C0 * dovera * Z;
+    // Make sure we don't overflow the table:
+    // the `Ether' special `element' has Z set to 500.
+    if (iZ >= 0 && iZ < (std::end(s_ionizationPotential)-std::begin(s_ionizationPotential)))
+      dEDxI0 += w * s_ionizationPotential[iZ];
+    NILinv += n * pow (N, 2.0 / 3.0) * GeoModelKernelUnits::amu * inv_lambda0;
+    
+    double nAtomsPerVolume = A ? GeoModelKernelUnits::Avogadro*m_density*m_fractions[e]/A : 0.;
+    radInv += (nAtomsPerVolume*m_elements[e]->getRadTsai());
+  }
   m_dedDxConst = dEDxConstant;
   m_deDxI0    = dEDxI0 ;
   m_intLength = NILinv ? 1.0 / NILinv : 0;
@@ -382,7 +355,6 @@ double GeoMaterial::getDeDxMin () const
   // -----------------------------------------------------------//     
 
   return m_dedDxConst * ConstToMin;
-
 }
 
 double GeoMaterial::getRadLength () const
@@ -403,19 +375,19 @@ unsigned int GeoMaterial::getNumElements () const
 {
   if (!m_locked)
     throw std::out_of_range ("Material accessed before lock");
-  return m_element.size ();
+  return m_elements.size();
 }
 
 const GeoElement* GeoMaterial::getElement (unsigned int i) const
 {
   if (!m_locked)
     throw std::out_of_range ("Material accessed before lock");
-  return m_element[i];
+  return m_elements[i];
 }
 
 double GeoMaterial::getFraction (int i) const
 {
   if (!m_locked)
     throw std::out_of_range ("Material accessed before lock");
-  return m_fraction[i];
+  return m_fractions[i];
 }

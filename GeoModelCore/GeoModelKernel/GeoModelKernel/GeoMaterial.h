@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOMATERIAL_H
@@ -28,12 +28,13 @@
 
 #include "GeoModelKernel/RCBase.h"
 #include "GeoModelKernel/GeoElement.h"
+#include "GeoModelKernel/GeoIntrusivePtr.h"
 #include <vector>
 
 class GeoMaterial : public RCBase
 {
  public:
-  GeoMaterial (const std::string &Name, double Density);
+  GeoMaterial (const std::string& name, double density);
   
   //	Add an element to the material.
   void add (const GeoElement* element, double fraction = 1.0);
@@ -63,7 +64,8 @@ class GeoMaterial : public RCBase
   //	Return the nuclear interaction length, computed from the
   //	density, the list of constituents, and their properties.
   double getIntLength () const;
-  
+
+  //	Return the number of elements  
   unsigned int getNumElements () const;
   
   //	Gets the ith element.
@@ -83,45 +85,44 @@ class GeoMaterial : public RCBase
   const unsigned int& getID () const;
   
  protected:
-  virtual ~GeoMaterial();
+  virtual ~GeoMaterial() = default;
   
  private:
-  GeoMaterial(const GeoMaterial &right);
-  GeoMaterial & operator=(const GeoMaterial &right);
+  GeoMaterial() = delete;
+  GeoMaterial(const GeoMaterial &right) = delete;
+  GeoMaterial & operator=(const GeoMaterial &right) = delete;
   
-  std::string m_name;
-  double m_density;
-  unsigned int m_iD;
+  std::string m_name{};
+  double m_density{0.};
+  unsigned int m_iD{0};
 
   //	A list of the fractional composition of each material.
   //	Fraction is by mass.
-  std::vector<double> m_fraction;
+  std::vector<double> m_fractions;
 
   //	The radiation length of the material.
-  double m_radLength;
+  double m_radLength{0.};
   
   //	The interaction length of the material.
-  double m_intLength;
-
-  //	A static used to assign unique identifiers to new
-  //	materials.
-  static unsigned int s_lastID;
+  double m_intLength{0.};
 
   //	The constant term in the formula governing dE/dx.
-  double m_dedDxConst;
+  double m_dedDxConst{0.};
 
   //	The ionization potential in the formula governing dE/dx.
-  double m_deDxI0;
+  double m_deDxI0{0.};
 
   //	A flag used to lock the material from further addition
   //	of elements or other constituents.
-  bool m_locked;
+  bool m_locked{false};
 
-  static const double s_ionizationPotential[93];
-
- private:
   //	The list of GeoElements composing a GeoMaterial.
-  std::vector<const GeoElement *> m_element;  
+  std::vector<GeoIntrusivePtr<const GeoElement>> m_elements;
+
+  //	A static used to assign unique identifiers to new materials.
+  static unsigned int s_lastID;
+  
+  static const double s_ionizationPotential[93];
 };
 
 inline const std::string& GeoMaterial::getName () const

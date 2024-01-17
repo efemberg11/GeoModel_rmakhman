@@ -14,7 +14,7 @@ GeoShapeShift::GeoShapeShift (const GeoShape* A, const GeoTrf::Transform3D &X):
   m_op{A}, m_shift{X} {
     /// Check whether the given shape also a shape shift. If so then we can simply
     /// take the operand of the sub shift and summarize the transformations of the two into one
-    if (getOp()->typeID() == typeID()) {
+   if (A->refCount() > 1 && getOp()->typeID() == typeID()) {
        const GeoShapeShift* subShift{static_cast<const GeoShapeShift*>(getOp())};
        m_shift = subShift->getX() * getX();
        m_op.reset(subShift->getOp());

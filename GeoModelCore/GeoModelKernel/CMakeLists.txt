@@ -47,8 +47,19 @@ install( FILES ${HEADERS}
    COMPONENT Development )
 
 
+   file(GLOB_RECURSE files "tests/*.cxx")
+foreach(_exeFile ${files})
+  get_filename_component(_theExec ${_exeFile} NAME_WE)
+  get_filename_component(_theLoc ${_exeFile} DIRECTORY)
+  
+  if(${_theLoc} MATCHES "DoNotBuild")
+    continue()
+  endif() 
+  
+  add_executable(${_theExec} ${_exeFile})
+  target_link_libraries( ${_theExec} GeoModelKernel)
+  add_test(NAME ${_theExec}
+           COMMAND ${_theExec})
 
-add_executable(testGeoIntrusivePtr tests/testGeoIntrusivePtr.cxx)
-target_link_libraries( testGeoIntrusivePtr GeoModelKernel)
-add_test(NAME testGeoIntrusivePtr
-         COMMAND testGeoIntrusivePtr)
+endforeach()
+

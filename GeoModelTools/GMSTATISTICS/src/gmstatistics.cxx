@@ -11,6 +11,7 @@
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelKernel/GeoNameTag.h"
+#include "GeoModelFuncSnippets/defineWorld.h"
 #include "GeoInventoryGraphAction.h"
 #include <fstream>
 #include <iostream>
@@ -43,7 +44,6 @@ const std::string shared_obj_extension=".so";
 double factor=1000.0;
 #endif
 
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // --> 'GeoModelKernelUnits::cm'
 int  snoop() {
  
   struct rusage usage;
@@ -99,37 +99,7 @@ int main(int argc, char ** argv) {
   
   for (const std::string & plugin : inputPlugins) {
 
-
-    //
-    // Create elements and materials:
-    //
-    
-    const double  gr =   SYSTEM_OF_UNITS::gram;
-    const double  mole = SYSTEM_OF_UNITS::mole;
-    const double  cm3 =  SYSTEM_OF_UNITS::cm3;
-    
-    // Define the chemical elements
-    GeoElement*  Nitrogen = new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0067 *gr/mole);
-    GeoElement*  Oxygen   = new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9995 *gr/mole);
-    GeoElement*  Argon    = new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.948  *gr/mole);
-    GeoElement*  Hydrogen = new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00797 *gr/mole);
-    
-    double densityOfAir=0.001214 *gr/cm3;
-    GeoMaterial *air = new GeoMaterial("Air", densityOfAir);
-    air->add(Nitrogen  , 0.7494);
-    air->add(Oxygen, 0.2369);
-    air->add(Argon, 0.0129);
-    air->add(Hydrogen, 0.0008);
-    air->lock();
-    
-    //
-    // Create a huge world volume made of Air:
-    //
-    
-    const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 2500*SYSTEM_OF_UNITS::cm);
-    const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, air);
-    GeoPhysVol *world=new GeoPhysVol(worldLog);
-    world->ref();
+    GeoIntrusivePtr<GeoPhysVol> world{createGeoWorld()};
     //
     // Loop over plugins, create the geometry and put it under the world:
     //

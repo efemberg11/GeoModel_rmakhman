@@ -1,0 +1,29 @@
+/*
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+*/
+#ifndef GEOMODELFUNCSNIPPETS_STRINGUTILS_ICC
+#define GEOMODELFUNCSNIPPETS_STRINGUTILS_ICC
+
+#include <sstream>
+namespace GeoStrUtils {
+
+
+    template <class ObjType> std::string chainUp(const std::vector<ObjType>& vector,
+                                                 const std::string_view glue) {
+        return chainUp(vector.size(), [&vector](const unsigned int ele)->ObjType { 
+            return vector.at(ele);
+        }, glue);
+    }
+
+    template <class ObjType> std::string chainUp(unsigned int numEles,
+                                                 const std::function<ObjType(unsigned int)>& func,
+                                                 const std::string_view glue) {
+        std::stringstream chain{};
+        for (unsigned int k =0; k < numEles; ++k) {
+            chain<<func(k);
+            if (k + 1 < numEles)chain<<glue;
+        }
+        return chain.str();
+    }
+}
+#endif

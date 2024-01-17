@@ -22,7 +22,7 @@ class GeoIntrusivePtr{
              if (m_ptr) obj->ref();
         }
         /// Copy constructor 
-        GeoIntrusivePtr(const GeoIntrusivePtr& other) noexcept:
+        explicit GeoIntrusivePtr(const GeoIntrusivePtr& other) noexcept:
             GeoIntrusivePtr{other.get()} {}
 
         /// Copy constructor for derived types
@@ -50,6 +50,13 @@ class GeoIntrusivePtr{
             reset(other.get());
             return *this;
         }
+        template <typename GeoTypeGrp,
+                  typename = typename std::enable_if<!std::is_same<GeoType,GeoTypeGrp>::value, bool>>
+         GeoIntrusivePtr& operator=(const GeoIntrusivePtr<GeoTypeGrp>& other) {
+            reset(other.get());
+            return *this;
+        }
+
         GeoIntrusivePtr& operator=(GeoType* other) noexcept {
             reset(other);
             return *this;
@@ -66,7 +73,7 @@ class GeoIntrusivePtr{
         }
         template <typename GeoTypeGrp,
                   typename = typename std::enable_if<!std::is_same<GeoType,GeoTypeGrp>::value, bool>>
-         GeoIntrusivePtr& operator=(GeoIntrusivePtr<GeoTypeGrp>&& other) {            
+         GeoIntrusivePtr& operator=(GeoIntrusivePtr<GeoTypeGrp>&& other) {
             if (m_ptr && m_ptr == other.get()) {
                 m_ptr->unref();
             } else {

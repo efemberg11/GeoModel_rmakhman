@@ -3,8 +3,10 @@
 # Declare the package's executable.
 add_executable( gmstatistics src/gmstatistics.cxx  src/GeoInventoryGraphAction.cxx )
 target_link_libraries( gmstatistics PRIVATE GeoModelCore::GeoModelKernel
-    GeoModelIO::GeoModelRead GeoModelIO::GeoModelWrite
-    GeoModelIO::GeoModelDBManager )
+                                            GeoModelIO::GeoModelRead 
+                                            GeoModelIO::GeoModelWrite
+                                            GeoModelIO::GeoModelDBManager
+                                            GeoModelTools::GeoModelFuncSnippets )
 
 # Tweak how debug information should be attached to the executable, in Debug
 # builds.

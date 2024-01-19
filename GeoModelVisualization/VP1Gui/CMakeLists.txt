@@ -9,8 +9,8 @@ file( GLOB RCS src/*.qrc )
 # Add the library.
 add_library( GXGui SHARED ${SOURCES} ${HEADERS} ${UIS} ${RCS} )
 target_link_libraries( GXGui
-   PUBLIC Coin::Coin Qt5::Core Qt5::Gui Qt5::Widgets SoQt::SoQt GXBase
-   PRIVATE Qt5::PrintSupport Qt5::OpenGL )
+   PUBLIC Coin::Coin Qt${QT_VERSION}::Core Qt${QT_VERSION}::Gui Qt${QT_VERSION}::Widgets SoQt::SoQt GXBase
+   PRIVATE Qt${QT_VERSION}::PrintSupport Qt${QT_VERSION}::OpenGL )
 target_include_directories( GXGui PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

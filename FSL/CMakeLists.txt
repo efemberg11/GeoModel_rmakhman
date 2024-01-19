@@ -10,6 +10,18 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( GeoModel-version ) 
     # set the project, with the version taken from the GeoModel parent project
     project( "fsl" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
+
+    #Choose QT version here:
+    option (GEOMODEL_USE_QT6 "Use Qt6 for Visualization" OFF)
+
+    if (GEOMODEL_USE_QT6)
+      set (QT_VERSION 6)
+    else()
+      set (QT_VERSION 5)
+    endif()
+
+
+
     # Define color codes for CMake messages
     include( cmake_colors_defs )
     # Warn the users about what they are doing
@@ -58,9 +70,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
 # Find the dependencies of the project.
-find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )
+find_package( Qt${QT_VERSION} COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )
 
-# Qt5 settings.
+# Qt${QT_VERSION} settings.
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -76,7 +88,7 @@ set(PROJECT_SOURCES ${sources} ${headers}  ${uis} )
 
 
 add_executable(fsl ${PROJECT_SOURCES} )
-target_link_libraries(fsl PRIVATE Qt5::Widgets nlohmann_json::nlohmann_json)
+target_link_libraries(fsl PRIVATE Qt${QT_VERSION}::Widgets nlohmann_json::nlohmann_json)
 
 # Install the executable.
 install( TARGETS fsl

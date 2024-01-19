@@ -19,7 +19,6 @@
 #include "ui_gxmainwindow.h"
 
 // include VP1
-#include "VP1Gui/VP1EventDisplayEditor.h"
 
 // include Qt
 #include <QQueue>
@@ -28,7 +27,6 @@
 
 class VP1ChannelManager;
 class VP1TabManager;
-class QStringList;
 class IVP1ChannelWidget;
 class GXExecutionScheduler;
 class VP1PluginDialog;
@@ -179,8 +177,6 @@ protected:
 
   QMutex* m_mutex;
 
-  // Event display editor
-  VP1EventDisplayEditor* m_edEditor;
 };
 
 

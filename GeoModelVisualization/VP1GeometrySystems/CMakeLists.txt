@@ -9,7 +9,7 @@ file( GLOB DATA share/*.jpg share/*.json )
 # Add the library.
 add_library( GXGeometrySystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXGeometrySystems
-   PUBLIC Coin::Coin Qt5::Core Qt5::Gui Qt5::Widgets
+   PUBLIC Coin::Coin Qt${QT_VERSION}::Core Qt${QT_VERSION}::Gui Qt${QT_VERSION}::Widgets
           GeoModelCore::GeoModelKernel GXBase
    PRIVATE nlohmann_json::nlohmann_json GeoModelIO::GeoModelRead
            GeoModelIO::GeoModelWrite GeoModelIO::GeoModelDBManager GXHEPVis )

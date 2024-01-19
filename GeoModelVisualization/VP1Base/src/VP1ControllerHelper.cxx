@@ -49,10 +49,10 @@ QWidget * VP1ControllerHelper::compositionController( const QList<IVP1System*>& 
   QWidget * tab_general = new QWidget(0);
   QVBoxLayout * vboxLayout1 = new QVBoxLayout(tab_general);
   vboxLayout1->setSpacing(6);
-  vboxLayout1->setMargin(9);
+  //  vboxLayout1->setMargin(9);
   QHBoxLayout * hboxLayout = new QHBoxLayout();
   hboxLayout->setSpacing(6);
-  hboxLayout->setMargin(0);
+  //hboxLayout->setMargin(0);
   QLabel * tab_general_label = new QLabel(tab_general);
   tab_general_label->setText("No systems can be switched on/off in this channel.");
   hboxLayout->addWidget(tab_general_label);
@@ -61,12 +61,12 @@ QWidget * VP1ControllerHelper::compositionController( const QList<IVP1System*>& 
   vboxLayout1->addLayout(hboxLayout);
   QHBoxLayout * hboxLayout1 = new QHBoxLayout();
   hboxLayout1->setSpacing(0);
-  hboxLayout1->setMargin(0);
+  //hboxLayout1->setMargin(0);
   QSpacerItem * spacerItem1 = new QSpacerItem(25, 2, QSizePolicy::Fixed, QSizePolicy::Fixed);
   hboxLayout1->addItem(spacerItem1);
   QVBoxLayout *vboxLayout_checkboxes = new QVBoxLayout();
   vboxLayout_checkboxes->setSpacing(6);
-  vboxLayout_checkboxes->setMargin(0);
+  //vboxLayout_checkboxes->setMargin(0);
   hboxLayout1->addLayout(vboxLayout_checkboxes);
   QSpacerItem * spacerItem2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
   hboxLayout1->addItem(spacerItem2);
@@ -94,7 +94,7 @@ QWidget * VP1ControllerHelper::compositionController( const QList<IVP1System*>& 
     colorselectbutton = new VP1ColorSelectButton(tab_general,Qt::black);
     QHBoxLayout * hboxLayout2 = new QHBoxLayout();
     hboxLayout2->setSpacing(6);
-    hboxLayout2->setMargin(0);
+    //hboxLayout2->setMargin(0);
     hboxLayout2->addWidget(colorselectbutton);
     hboxLayout2->addWidget(new QLabel("Set background"));
     QSpacerItem * spacerItem4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -109,7 +109,7 @@ QWidget * VP1ControllerHelper::compositionController( const QList<IVP1System*>& 
     extrawidget->setParent(tab_general);
     QHBoxLayout * hboxLayout_extra = new QHBoxLayout();
     hboxLayout_extra->setSpacing(6);
-    hboxLayout_extra->setMargin(0);
+    //hboxLayout_extra->setMargin(0);
     hboxLayout_extra->addWidget(extrawidget);
     QSpacerItem * spacerItem_extra1 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     hboxLayout_extra->addItem(spacerItem_extra1);

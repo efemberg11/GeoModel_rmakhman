@@ -306,9 +306,10 @@ void IVP1ChannelWidget::setCanRegister(const bool&c,const bool&s)
 QPixmap IVP1ChannelWidget::getSnapshot(bool transp, int width, bool batch)
 {
 	VP1Msg::messageVerbose("IVP1ChannelWidget::getSnapshot() - using QPixmap::grabWidget()");
-	VP1Msg::messageVerbose("(and so, not using the values - transp: "+QString::number(transp)+" - width: "+QString::number(width)+" - batch: " + batch +")");
+	VP1Msg::messageVerbose("(and so, not using the values - transp: "+QString::number(transp)+" - width: "+QString::number(width)+" - batch: " + (char) batch +")");
 
-	return QPixmap::grabWidget( this );
+	//	return QPixmap::grabWidget( this );
+	return grab();
 }
 
 //_______________________________________________________

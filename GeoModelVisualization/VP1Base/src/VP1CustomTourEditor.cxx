@@ -192,7 +192,7 @@ void VP1CustomTourEditor::frameStepToEarlier()
   int iframe(m_d->frames.indexOf(dynamic_cast<VP1CustomTourFrameWidget*>(sender())));
   if (iframe<=0)
     return;//not found or already at start
-  m_d->frames.swap(iframe-1,iframe);
+  m_d->frames.swapItemsAt(iframe-1,iframe);
   m_d->updateFrameListVisuals();
 }
 
@@ -204,7 +204,7 @@ void VP1CustomTourEditor::frameStepToLater()
     return;
   if (iframe>=m_d->frames.count()-1)
     return;//already at end
-  m_d->frames.swap(iframe,iframe+1);
+  m_d->frames.swapItemsAt(iframe,iframe+1);
   m_d->updateFrameListVisuals();
 }
 
@@ -279,7 +279,7 @@ void VP1CustomTourEditor::swap( VP1CustomTourFrameWidget * frame1,
        ||iframe1>=m_d->frames.count()
        ||iframe2>=m_d->frames.count() )
     return;
-  m_d->frames.swap(iframe1,iframe2);
+  m_d->frames.swapItemsAt(iframe1,iframe2);
   m_d->updateFrameListVisuals();
 }
 

@@ -18,7 +18,6 @@
 #include <QtPlugin>
 
 class QString;
-class QStringList;
 class IVP1ChannelWidget;
 
 class IVP1ChannelWidgetFactory

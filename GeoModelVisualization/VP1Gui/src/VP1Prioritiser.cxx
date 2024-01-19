@@ -20,6 +20,7 @@
 #include <QSet>
 #include <map>
 #include <cassert>
+#include <unistd.h>
 
 /////////////////////////////////////////////////////////////////////
 ////////////////////  Class VP1Prioritiser::Imp  ////////////////////
@@ -59,7 +60,7 @@ public:
 
   QHash<IVP1System*,SystemInfo*> sys2info;
 
-  QTime * stopwatch;
+  QTime stopwatch;
   IVP1System* currenttimedsystem;
 
   void updateSysinfoWithVisibilityState(const QSet<IVP1ChannelWidget*>& channels,
@@ -128,7 +129,7 @@ inline void VP1Prioritiser::Imp::SystemInfo::addTimeMeasurement(const double&t)
     m_timemeasurements.dequeue();
 
   QList<double> tmplist = m_timemeasurements;
-  qSort(tmplist.begin(), tmplist.end());
+  std::sort(tmplist.begin(), tmplist.end());
 
   switch(tmplist.count()) {
   case 1: m_timing = tmplist.at(0); break;
@@ -191,7 +192,6 @@ VP1Prioritiser::VP1Prioritiser(QObject*parent)
  : QObject(parent), m_d(new Imp)
 {
   m_d->prioritiser=this;
-  m_d->stopwatch = new QTime();
   m_d->currenttimedsystem=0;
   m_d->soonvisbonus=0;
 }
@@ -199,7 +199,6 @@ VP1Prioritiser::VP1Prioritiser(QObject*parent)
 //____________________________________________________________________
 VP1Prioritiser::~VP1Prioritiser()
 {
-  delete m_d->stopwatch;
   delete m_d; m_d=0;
 }
 
@@ -236,12 +235,12 @@ double VP1Prioritiser::estimateRemainingCalcTime() const
   }
   return tmp;
 }
-
+#include <iostream>
 //___________________________________________________________________
 double VP1Prioritiser::beginTiming_Refresh(IVP1System*s)
 {
   assert(!m_d->currenttimedsystem);
-  m_d->stopwatch->start();
+  m_d->stopwatch = QTime::currentTime();
   m_d->currenttimedsystem=s;
   assert(m_d->sys2info.contains(s));
   return m_d->sys2info[s]->refreshtime();
@@ -251,14 +250,17 @@ double VP1Prioritiser::beginTiming_Refresh(IVP1System*s)
 //___________________________________________________________________
 double VP1Prioritiser::elapsedTiming_Refresh()
 {
-  return static_cast<double>(m_d->stopwatch->elapsed());
+  QTime t=QTime::currentTime();
+  double ms=static_cast<double>(m_d->stopwatch.msecsTo(t));
+  return ms;
 }
 
 //___________________________________________________________________
 double VP1Prioritiser::endTiming_Refresh()
 {
   assert(m_d->currenttimedsystem);
-  double timing = static_cast<double>(m_d->stopwatch->elapsed());
+  QTime t=QTime::currentTime();
+  double timing = static_cast<double>(m_d->stopwatch.msecsTo(t));
   if (m_d->sys2info.contains(m_d->currenttimedsystem)) {//This check, since the corresponding channel might have become uncreated in the meantime.
     m_d->sys2info[m_d->currenttimedsystem]->addTimeMeasurement(timing);
   }

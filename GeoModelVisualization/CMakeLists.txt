@@ -9,6 +9,7 @@ project( "GeoModelTools" )
 #Set up the project. Check if we build it with GeoModel or individually
 project( "GeoModelVisualization" )
 
+
 # Set the OpenGL flag requested by CMake
 set( OpenGL_GL_PREFERENCE GLVND )
 
@@ -20,6 +21,17 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     include( GeoModel-version ) 
     # set the project, with the version taken from the GeoModel parent project
     project( "GeoModelVisualization" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
+
+    #Choose QT version here:
+    option (GEOMODEL_USE_QT6 "Use Qt6 for Visualization" OFF) 
+
+    if (GEOMODEL_USE_QT6)
+      set (QT_VERSION 6)
+    else()
+      set (QT_VERSION 5)
+    endif()
+
+
     # Define color codes for CMake messages
     include( cmake_colors_defs )
     # Warn the users about what they are doing
@@ -43,7 +55,11 @@ else()
 endif()
 
 # Find the dependencies of the project.
-find_package( Qt5 COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL REQUIRED )
+if (GEOMODEL_USE_QT6) 
+  find_package( Qt${QT_VERSION} COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL Core5Compat  REQUIRED )  
+else ()
+  find_package( Qt${QT_VERSION} COMPONENTS Core Gui Widgets Sql PrintSupport OpenGL  REQUIRED )
+endif()
 find_package( OpenGL REQUIRED )
 find_package( HDF5 REQUIRED COMPONENTS CXX )
 # Set up how the project should handle some of its dependenices. Either by
@@ -51,7 +67,7 @@ find_package( HDF5 REQUIRED COMPONENTS CXX )
 include( SetupCoin3D )
 include( SetupJSON )
 
-# Qt5 settings.
+# Qt${QT_VERSION} settings.
 set( CMAKE_AUTOMOC ON )
 set( CMAKE_AUTOUIC ON )
 set( CMAKE_AUTORCC ON )

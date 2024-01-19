@@ -52,7 +52,8 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QPushButton>
-#include <QGLFormat>
+#include <QActionGroup> 
+//#include <QGLFormat>
 
 #include <map>
 #include <iostream>
@@ -563,7 +564,7 @@ VP1ExaminerViewer::VP1ExaminerViewer(QWidget * parent,
 	}
 
 	// test Ric
-	VP1Msg::messageVerbose("is stereo: " + QString(isStereoViewing()) + " - offset: " + QString::number(getStereoOffsetSlot()) + " - type: " + QString::number(getStereoType()) );
+	VP1Msg::messageVerbose("is stereo: " + QString((char) isStereoViewing()) + " - offset: " + QString::number(getStereoOffsetSlot()) + " - type: " + QString::number(getStereoType()) );
 }
 
 
@@ -1282,7 +1283,7 @@ void VP1ExaminerViewer::Imp::detectorZoomButtonClicked(std::pair<REGION,VIEW> p)
 {
 	grabFocus();
 
-	VP1Msg::messageVerbose("detectorZoomButtonClicked region = " + toString(p.first) + ", from " + QString(p.second) + " Z axis" );
+	VP1Msg::messageVerbose("detectorZoomButtonClicked region = " + toString(p.first) + ", from " + QString((char) p.second) + " Z axis" );
 
 	SoNode * rootnode = theclass->getSceneGraph();
 	if (!rootnode) {

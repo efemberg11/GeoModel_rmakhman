@@ -110,7 +110,7 @@ void VP1CollectionWidget::Imp::repopulateGUIFromCollections()
 
   QVBoxLayout * vlayout = new QVBoxLayout;
   vlayout->setSpacing(0);
-  vlayout->setMargin(0);
+  //  vlayout->setMargin(0);
   if (collections.isEmpty()) {
     QHBoxLayout * labellayout = new QHBoxLayout;
     labellayout->setSpacing(0);
@@ -122,8 +122,8 @@ void VP1CollectionWidget::Imp::repopulateGUIFromCollections()
   QSet<QString> sections;
   foreach (VP1Collection* col,collections)
     sections.insert(col->section());
-  QList<QString> sectionsSorted = sections.toList();
-  qSort(sectionsSorted);
+  QList<QString> sectionsSorted(sections.begin(),sections.end());// = sections.toList();
+  std::sort(sectionsSorted.begin(), sectionsSorted.end());
   theclass->sortSections(sectionsSorted);
 
   const bool nosectionlabels = sectionsSorted.count() == 1 && sectionsSorted.at(0).isEmpty();
@@ -149,7 +149,7 @@ void VP1CollectionWidget::Imp::repopulateGUIFromCollections()
     QGridLayout * gridLayout = new QGridLayout;
     gridLayout->setHorizontalSpacing(6);
     gridLayout->setVerticalSpacing(0);
-    gridLayout->setMargin(0);
+    //gridLayout->setMargin(0);
     if (!nosectionlabels)
       gridLayout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed),0,0);
     vlayout->addLayout(gridLayout);
@@ -207,7 +207,7 @@ void VP1CollectionWidget::Imp::repopulateGUIFromCollections()
   vlayout->addStretch(1);
 
   QHBoxLayout * hlayout = new QHBoxLayout;
-  hlayout->setMargin(0);
+  //hlayout->setMargin(0);
   hlayout->setSpacing(0);
   hlayout->addLayout(vlayout);
   hlayout->addStretch(1);
@@ -316,8 +316,8 @@ QList<qint32> VP1CollectionWidget::Imp::visibleStdCollectionTypesFromVisStdCols(
   QSet<qint32> vt;
   foreach(VP1StdCollection* stdcol,l)
     vt.insert(stdcol->collTypeID());
-  QList<qint32> vistypes = vt.toList();
-  qSort(vistypes);
+  QList<qint32> vistypes(vt.begin(),vt.end());// = vt.toList();
+  std::sort(vistypes.begin(),vistypes.end());
   return vistypes;
 
 }

@@ -31,6 +31,7 @@
 #include <QSet>
 #include <QFileInfo>
 #include <QMap>
+#include <QMultiMap>
 #include <QTimer>
 #include <QBuffer>
 #include <QByteArray>
@@ -723,9 +724,11 @@ void VP1TabManager::cloneChannelToTab(QString channeluniquename,QString tabname)
   assert(cw);
   IVP1ChannelWidget * newcw = addChannelToTab(cw->name(),tabname);
   if (newcw) {
+#ifdef SAVEANDRESTORE
     ChanState state;
     serializeChannelState(cw,state);
     unserializeChannelState(newcw,state);
+#endif
   }
 }
 
@@ -748,9 +751,11 @@ void VP1TabManager::cloneTab(QString oldtabname,QString newtabname)
   for (;it!=itE;++it) {
     IVP1ChannelWidget * newcw = addChannelToTab((*it)->name(),newtabname);
     if (newcw) {
+#ifdef SAVEANDRESTORE
       ChanState state;
       serializeChannelState(*it,state);
       unserializeChannelState(newcw,state);
+#endif
     }
   }
 
@@ -762,6 +767,8 @@ void VP1TabManager::cloneTab(QString oldtabname,QString newtabname)
 }
 
 
+
+#ifdef SAVEANDRESTORE
 
 //___________________________________________________________________________________
 void VP1TabManager::saveConfigurationToFile(QString filename,const bool& askonoverride) {
@@ -819,7 +826,6 @@ void VP1TabManager::saveConfigurationToFile(QString filename,const bool& askonov
 
 
 }
-
 //___________________________________________________________________________________
 void VP1TabManager::loadConfigurationFromFile(QString filename,const QMap<QString,QString>& availableplugins) {
   if (filename.isEmpty()) {
@@ -954,8 +960,9 @@ void VP1TabManager::loadConfigurationFromFile(QString filename,const QMap<QStrin
       return;
     lastaddedtab=newtabname;
 
-    QMapIterator<QString,ChanState> it( tab2channels.value(newtabname_infile) );
-
+    //    QMapIterator<QString,ChanState>
+    //    auto 
+    QMultiMap<QString, std::pair<QByteArray, QMultiMap<QString, QByteArray> > >it=( tab2channels.value(newtabname_infile) );
     while (it.hasNext()) {
       it.next();
       //it.key(): Channel base name.
@@ -995,6 +1002,7 @@ void VP1TabManager::loadConfigurationFromFile(QString filename,const QMap<QStrin
   if (!lastaddedtab.isEmpty())
     showTab(lastaddedtab);
 }
+#endif
 
 //___________________________________________________________________________________
 void VP1TabManager::Imp::serializeTabAndChannelConfigInfo(QMap<QString,QMultiMap<QString,ChanState> >& tab2channels,
@@ -1012,9 +1020,11 @@ void VP1TabManager::Imp::serializeTabAndChannelConfigInfo(QMap<QString,QMultiMap
     std::set<IVP1ChannelWidget*>::const_iterator it = itcws->second.begin();
     std::set<IVP1ChannelWidget*>::const_iterator itE = itcws->second.end();
     for (;it!=itE;++it) {
+#ifdef SAVEANDRESTORE
       ChanState chanstate;
       tabmanager->serializeChannelState(*it,chanstate);
       channelsinfo.insert((*it)->name(),chanstate);
+#endif
     }
     tab2channels.insert(tabname,channelsinfo);
 
@@ -1022,6 +1032,7 @@ void VP1TabManager::Imp::serializeTabAndChannelConfigInfo(QMap<QString,QMultiMap
     tab2arrangements.insert(tabname,tab->saveState(0/*version*/));
   }
 }
+
 
 //___________________________________________________________________________________
 QString VP1TabManager::suggestNewTabName(QString oldtabname) const {
@@ -1521,6 +1532,7 @@ void VP1TabManager::executePendingChannelRemoval()
   m_d->channelWithPendingRemoval="";
 }
 
+#ifdef SAVEANDRESTORE
 //___________________________________________________________________________________
 void VP1TabManager::serializeChannelState(IVP1ChannelWidget*cw,ChanState&state)
 {
@@ -1578,3 +1590,4 @@ void VP1TabManager::unserializeChannelState(IVP1ChannelWidget*cw,ChanState state
   foreach (QString name,storedSystems)
     std::cout<<"VP1TabManager::unserializeChannelState Warning: Did not use stored configuration for system "<<name.toStdString()<<std::endl;
 }
+#endif

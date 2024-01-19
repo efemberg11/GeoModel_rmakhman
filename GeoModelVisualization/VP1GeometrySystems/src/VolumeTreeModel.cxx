@@ -326,12 +326,12 @@ int VolumeTreeModel::rowCount(const QModelIndex& parent) const
 //____________________________________________________________________
 QVariant VolumeTreeModel::data(const QModelIndex& index, int role) const
 {
-  if ((role!=Qt::DisplayRole&&role!=Qt::TextColorRole)||!index.isValid())
+  if ((role!=Qt::DisplayRole&&role!=Qt::ForegroundRole)||!index.isValid())
     return QVariant();
 
   VolumeHandle *volumeHandle = Imp::handlePointer(index);
   if (Imp::isRegularVolumeHandle(volumeHandle)) {
-    if (role==Qt::TextColorRole) {
+    if (role==Qt::ForegroundRole) {
       if (volumeHandle->isAttached())
 	return QVariant();
       else
@@ -350,7 +350,7 @@ QVariant VolumeTreeModel::data(const QModelIndex& index, int role) const
       return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") ("+ volState + ")" ;
   }
 
-  if (role==Qt::TextColorRole)
+  if (role==Qt::ForegroundRole)
     return QVariant();
 
   if (Imp::isSubSystemPointer(volumeHandle))
@@ -365,7 +365,7 @@ QVariant VolumeTreeModel::data(const QModelIndex& index, int role) const
 Qt::ItemFlags VolumeTreeModel::flags(const QModelIndex &index) const
 {
   if (!index.isValid())
-    return 0;
+    return Qt::NoItemFlags;
 
   if (Imp::isRegularVolumeHandle(Imp::handlePointer(index)))
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;

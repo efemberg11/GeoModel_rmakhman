@@ -20,6 +20,7 @@
 #define VP1COLLECTIONWIDGET_H
 
 #include "VP1Base/VP1Collection.h"
+#include "VP1Base/VP1StdCollection.h"
 #include "VP1Base/VP1HelperClassBase.h"
 
 #include <QWidget>
@@ -27,7 +28,6 @@
 #include <QString>
 
 
-class VP1StdCollection;
 
 class VP1CollectionWidget : public QWidget, public VP1HelperClassBase {
 

@@ -290,7 +290,7 @@ QButtonGroup * VP1Controller::defineRadioButtonGroup( QRadioButton * rb0, QRadio
 {
   QList<QRadioButton *> l;
   l << rb0 << rb1 << rb2 << rb3 << rb4 << rb5 << rb6 << rb7 << rb8 << rb9;
-  l.removeAll(0);
+  l.removeAll(nullptr);
   return defineRadioButtonGroup(l);
 }
 

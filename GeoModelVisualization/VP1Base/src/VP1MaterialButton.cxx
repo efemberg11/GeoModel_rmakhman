@@ -327,6 +327,10 @@ void VP1MaterialButton::Imp::initEditWindow()
   editwindow_ui.label_num_simple_brightness->setNum(lastapplied_brightness);
   editwindow_ui.colbutton_simple_colour->setColor(lastapplied_diffuse);
 
+  QObject::connect(editwindow_ui.slider_shininess, SIGNAL(valueChanged (int)), editwindow_ui.label_num_shininess, SLOT(setNum(int)));
+  QObject::connect(editwindow_ui.slider_simple_brightness, SIGNAL(valueChanged(int)), editwindow_ui.label_num_simple_brightness, SLOT(setNum(int)));
+
+  
   #if defined BUILDVP1LIGHT
     bool checkDisallowMultipleChannels = VP1QtUtils::expertSettingIsOn("general","ExpertSettings/VP1_DISALLOW_MULTIPLE_CHANNELS");
   #else

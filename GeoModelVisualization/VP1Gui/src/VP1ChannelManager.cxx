@@ -63,7 +63,7 @@
 #include <QFileInfo>
 #include <QMap>
 #include <QScrollArea>
-
+#include <QLibraryInfo>
 #include <map>
 #include <set>
 #include <cassert>

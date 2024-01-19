@@ -120,9 +120,10 @@ namespace GeoStrUtils {
             convertToNumber(str.substr(1), number);
             return;
         }
-        if (std::from_chars(str.data(), str.data() + str.size(), number).ec !=  std::errc{}) {
-            THROW_EXCEPTION("convertToNumber() - The string '"<<str<<"'. Contains unallowed chars");
-        }
+	std::istringstream stream(std::string(str.data(), str.data()+str.size()));
+	stream >> number;
+	if (!stream) THROW_EXCEPTION("convertToNumber() - The string '"<<str<<"'. Contains unallowed chars");
+        
     }
     int atoi(std::string_view str) { 
         int result{std::numeric_limits<int>::max()};

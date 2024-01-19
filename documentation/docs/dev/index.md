@@ -50,6 +50,10 @@ echo 'export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"' >> ~/.zshrc
     After having installed `qt` with brew, and having run the `echo` command stated above, you should either open a new shell or run `source ~/.zshrc` in order to get the `qt` in the `PATH`.
      
 
+!!! warning 
+    If you have both Qt5 and Qt6 installed through the `brew` package managers on your macOS machine, you will probably get errors while building GeoModelVisualization. `brew` in fact installs the Qt6 and Qt5 packages as `qt` and `qt@5` respectively. When compiling GeoModelVisualization, CMake does find the correct version of Qt, while later the linker fails to do that and complain. To fix that, just remove Qt6 with `brew remove qt`. This is a temporary solution, until we move the GeoModel code to Qt6.
+
+
 !!! warning
 
     Before building the GeoModel libraries from source, please check if you have old versions of them installed on your system and remove them.

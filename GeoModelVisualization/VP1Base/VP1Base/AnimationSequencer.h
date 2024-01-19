@@ -13,7 +13,7 @@
 #include "VP1Base/AnimationSequence.h"
 
 #include <QObject>
-
+#include <QGraphicsItem> 
 class VP1ExaminerViewer;
 
 class AnimationSequencer : public QObject {

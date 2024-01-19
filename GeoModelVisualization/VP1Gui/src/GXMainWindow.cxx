@@ -81,11 +81,9 @@ GXMainWindow::GXMainWindow(GXExecutionScheduler*sched,QWidget * parent)
   m_scheduler(sched),
   m_settingsfile(QDir::homePath()+QDir::separator()+".atlasvp1"),
   m_userRequestedExit(false),
-  m_mutex(new QMutex()),
-  m_edEditor(0)
+  m_mutex(new QMutex())
 {
 	setupUi(this); // this sets up the GUI
-
 	setupStatusBar();
 	//
 
@@ -258,6 +256,7 @@ GXMainWindow::GXMainWindow(GXExecutionScheduler*sched,QWidget * parent)
   menuConfiguration->setVisible(false);
   menuConfiguration->setEnabled(false);
   menuConfiguration->setTitle("");
+
 }
 
 //_________________________________________________________________________________
@@ -346,10 +345,6 @@ void GXMainWindow::setupStatusBar()  {
 //_________________________________________________________________________________
 GXMainWindow::~GXMainWindow()
 {
-	if (m_edEditor) {
-		VP1Msg::messageDebug("deleting the editor");
-		delete m_edEditor;
-	}
 	VP1Msg::messageDebug("deleting the tab manager");
 	delete m_tabmanager;
 	VP1Msg::messageDebug("deleting the channel manager");
@@ -463,7 +458,7 @@ void GXMainWindow::request_saveasConfig() {
 	if (!filename.endsWith(".vp1"))
 		filename += ".vp1";
 
-	m_tabmanager->saveConfigurationToFile(filename,false/*Since the filedialog already asks*/);
+	//m_tabmanager->saveConfigurationToFile(filename,false/*Since the filedialog already asks*/);
 	m_currentconfigfile=filename;
 }
 
@@ -474,7 +469,7 @@ void GXMainWindow::request_saveConfig()
 		request_saveasConfig();
 		return;
 	}
-	m_tabmanager->saveConfigurationToFile(m_currentconfigfile,false);
+	//m_tabmanager->saveConfigurationToFile(m_currentconfigfile,false);
 }
 
 //_________________________________________________________________________________
@@ -485,7 +480,7 @@ void GXMainWindow::request_loadConfig()
 			"VP1 configuration files (*.vp1)",0,QFileDialog::DontResolveSymlinks);
 	if(filename.isEmpty())
 		return;
-	m_tabmanager->loadConfigurationFromFile(filename,availablePluginFiles());
+	//m_tabmanager->loadConfigurationFromFile(filename,availablePluginFiles());
 	m_currentconfigfile=filename;
 }
 
@@ -525,7 +520,7 @@ QMap<QString,QString> GXMainWindow::availableFiles(const QString& extension,
 
 	//Add directories from extradirenvvar (e.g. $GXPLUGINPATH)
     qDebug() << "GXPLUGINPATH: " << QString(::getenv(extradirenvvar.toStdString().c_str()));
-	QStringList vp1pluginpath = extradirenvvar.isEmpty() ? QStringList() : QString(::getenv(extradirenvvar.toStdString().c_str())).split(":",QString::SkipEmptyParts);
+	QStringList vp1pluginpath = extradirenvvar.isEmpty() ? QStringList() : QString(::getenv(extradirenvvar.toStdString().c_str())).split(":",Qt::SkipEmptyParts);
     if(VP1Msg::debug()){
       qDebug() << "extradirenvvar:" << extradirenvvar;
       qDebug()  << "vp1pluginpath A :" << vp1pluginpath;
@@ -554,7 +549,7 @@ QMap<QString,QString> GXMainWindow::availableFiles(const QString& extension,
 	QString path = QString(::getenv(pathvar.toStdString().c_str()));
 	if (!path.isEmpty()) {
 		//!instareasubdir.isEmpty()&&
-		QStringList tmp = path.split(":",QString::SkipEmptyParts);//This 'tmp' is for SLC3 compilation.
+		QStringList tmp = path.split(":",Qt::SkipEmptyParts);//This 'tmp' is for SLC3 compilation.
 		foreach (QString dir,tmp) {
 			vp1pluginpath << ( instareasubdir.isEmpty() ? dir : dir+QDir::separator()+QDir::separator()+instareasubdir );
 		}
@@ -765,16 +760,6 @@ void GXMainWindow::makeAllChannelsEventDisplay()
 	QList<unsigned long long> listRunEventNumberTimestamp;
 
 	getAllChannelsIntoSnapshots(list, listNames);
-
-	// create a new editor window
-	m_edEditor = new VP1EventDisplayEditor(this, listRunEventNumberTimestamp);
-
-	m_edEditor->addPixmapList(list, listNames);
-
-	// pass the lists of all tabs and their names to the editor
-	m_edEditor->setTabsList( listNames);
-
-	m_edEditor->show();
 
 }
 
@@ -1085,7 +1070,7 @@ void GXMainWindow::request_printChannel() {
 
 //_________________________________________________________________________________
 void GXMainWindow::loadConfigurationFromFile(QString file) {
-	m_tabmanager->loadConfigurationFromFile(file,availablePluginFiles());
+  //m_tabmanager->loadConfigurationFromFile(file,availablePluginFiles());
 }
 
 //_________________________________________________________________________________
@@ -1093,7 +1078,7 @@ void GXMainWindow::replaceConfigurationFile(QString file)
 {
 	VP1Msg::messageDebug("GXMainWindow::replaceConfigurationFile() : " + file);
 	m_tabmanager->removeAllTabs();
-	m_tabmanager->loadConfigurationFromFile(file,availablePluginFiles());
+	//	m_tabmanager->loadConfigurationFromFile(file,availablePluginFiles());
 }
 
 

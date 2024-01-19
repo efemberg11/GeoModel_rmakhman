@@ -834,7 +834,7 @@ void PhiSectionWidget::setAllowedNumberOfSectors(QList<int> allowedNSectors, boo
 
   m_d->allowCustomNSectors = allowCustom;
 
-  qSort(allowedNSectors);
+  std::sort(allowedNSectors.begin(), allowedNSectors.end());
   if (m_d->allowedNSectors==allowedNSectors) {
     return;
   }

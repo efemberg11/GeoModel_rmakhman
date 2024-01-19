@@ -9,7 +9,7 @@ file( GLOB UIS src/*.ui )
 add_library( GXTrackDisplaySystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXTrackDisplaySystems
    PUBLIC Coin::Coin GXBase 
-   PRIVATE Qt5::Core Qt5::Widgets ${HDF5_LIBRARIES} )
+   PRIVATE Qt${QT_VERSION}::Core Qt${QT_VERSION}::Widgets ${HDF5_LIBRARIES} )
 target_include_directories( GXTrackDisplaySystems PUBLIC
    ${HDF5_CXX_INCLUDE_DIRS} 
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

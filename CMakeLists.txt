@@ -59,13 +59,18 @@ option(GEOMODEL_BUILD_FULLSIMLIGHT "Enable the build of FullSimLight" OFF)
 option(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING "Enable FullSimLight profiling targets" OFF)
 option(GEOMODEL_BUILD_FSL "Enable the build of FSL and FullSimLight" OFF)
 option(GEOMODEL_BUILD_ATLASEXTENSIONS "Build the Custom ATLAS Extensions" OFF)
-
+option(GEOMODEL_USE_QT6 "Use QT6 for Visualization and FSL" OFF)
 
 if(GEOMODEL_BUILD_FSL AND GEOMODEL_BUILD_FULLSIMLIGHT)
   message(STATUS "==> NOTE: You enabled both BUILD_FSL and BUILD_FULLSIMLIGHT. Since BUILD_FSL triggers the build of the FullSimLight package as well, I set BUILD_FULLSIMLIGHT to FALSE to avoid errors of 'double inclusion'")
   set(GEOMODEL_BUILD_FULLSIMLIGHT FALSE)
 endif()
 
+if (GEOMODEL_USE_QT6)
+  set (QT_VERSION 6)
+else()
+  set (QT_VERSION 5)
+endif()
 
 if(GEOMODEL_BUILD_FULLSIMLIGHT_PROFILING)
   set(GEOMODEL_BUILD_FULLSIMLIGHT ON CACHE BOOL "Enable the build of FullSimLight" FORCE)

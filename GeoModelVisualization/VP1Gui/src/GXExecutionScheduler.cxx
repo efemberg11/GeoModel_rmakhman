@@ -51,7 +51,7 @@
 
 #include <QApplication>
 #include <QProgressBar>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QCursor>
@@ -60,7 +60,7 @@
 #include <QStringList>
 #include <QMessageBox>
 #include <QCommandLineParser>
-
+#include <QDebug>
 #include <Inventor/C/errors/debugerror.h>
 #include <Inventor/Qt/SoQt.h>
 
@@ -222,7 +222,7 @@ public:
 					 */
 					qDebug() << "key pressed (code):" << keyEvent->key() << "key pressed (text):" << keyEvent->text();
 					if (keyEvent->text() != "") txt = txt + "+" + keyEvent->text();
-					else txt = txt + "+" + keyEvent->key();
+					else txt = txt + "+" + (char) keyEvent->key();
 				}
 
 				// 	std::cout<<"Popup (dt="<<timediff<<") "<<txt.toStdString()<<". watched = "<<watched
@@ -611,7 +611,6 @@ bool GXExecutionScheduler::isRefreshing() const
 {
 	return m_d->currentsystemrefreshing;
 }
-
 //___________________________________________________________________
 void GXExecutionScheduler::refreshSystem(IVP1System*s)
 {
@@ -888,8 +887,8 @@ void GXExecutionScheduler::actualUncreateAndDelete(IVP1ChannelWidget*cw)
 //___________________________________________________________________
 void GXExecutionScheduler::Imp::warnIfWidgetsAlive()
 {
-	QSet<QWidget*> w_ignore, wl = QApplication::allWidgets().toSet();
-	w_ignore<<qApp->desktop();
+  QSet<QWidget*> w_ignore, wl(QApplication::allWidgets().begin(), QApplication::allWidgets().end());// = QApplication::allWidgets().toSet();
+        //w_ignore<<qApp->desktop();
 	foreach (QObject*o,qApp->children()) {
 		if (o->isWidgetType())
 			w_ignore << static_cast<QWidget*>(o);

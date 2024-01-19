@@ -71,10 +71,11 @@ public slots:
   void cloneTab(QString oldtabname,QString newtabname);
   void removeAllTabs();
 
-
+#ifdef SAVEANDRESTORE
   void saveConfigurationToFile(QString filename,const bool& askonoverride=true);
   void loadConfigurationFromFile(QString filename,const QMap<QString,QString>& availableplugins);
-
+#endif
+  
   void showChannelFullScreen(IVP1ChannelWidget*);
   void showCurrentChannelFullScreen();
   void showTabFullScreen(QString tabname);
@@ -101,9 +102,11 @@ protected:
 
   bool eventFilter ( QObject *, QEvent * );
   typedef QPair<QByteArray,QMultiMap<QString,QByteArray> > ChanState;
+#ifdef SAVEANDRESTORE
   void serializeChannelState(IVP1ChannelWidget*,ChanState&state);
   void unserializeChannelState(IVP1ChannelWidget*cw,ChanState tate);
-
+#endif
+								   
 protected slots:
   void currentVisibleChanged();
   void executePendingChannelRemoval();

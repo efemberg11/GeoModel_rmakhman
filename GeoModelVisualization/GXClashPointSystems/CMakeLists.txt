@@ -9,7 +9,7 @@ file( GLOB UIS src/*.ui )
 add_library( GXClashPointSystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXClashPointSystems
    PUBLIC Coin::Coin GXBase
-   PRIVATE Qt5::Core Qt5::Widgets nlohmann_json::nlohmann_json )
+   PRIVATE Qt${QT_VERSION}::Core Qt${QT_VERSION}::Widgets nlohmann_json::nlohmann_json )
 target_include_directories( GXClashPointSystems PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

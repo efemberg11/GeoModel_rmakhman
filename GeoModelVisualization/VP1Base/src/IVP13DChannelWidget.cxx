@@ -96,11 +96,10 @@ void IVP13DChannelWidget::setUpdatesEnabled ( bool enable )
 //void IVP13DChannelWidget::registerRenderArea(SoQtRenderArea* ra)
 void IVP13DChannelWidget::registerRenderArea(VP1ExaminerViewer* ra)
 {
-	if (!ra) {
+ 	if (!ra) {
 		message("Error - tried to register NULL render area!");
 		return;
 	}
-
 	VP1QtInventorUtils::ensureInitLineWidthAndPointSize(ra);
 
 	m_d->renderareas.push_back(ra);

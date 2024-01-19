@@ -9,7 +9,7 @@ find_package (HDF5 REQUIRED)
 add_library( GXHitDisplaySystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXHitDisplaySystems
    PUBLIC Coin::Coin GXBase 
-   PRIVATE Qt5::Core Qt5::Widgets ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES} )
+   PRIVATE Qt${QT_VERSION}::Core Qt${QT_VERSION}::Widgets ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES} )
 target_include_directories( GXHitDisplaySystems PUBLIC
    ${HDF5_CXX_INCLUDE_DIRS} 
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

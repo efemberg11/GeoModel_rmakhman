@@ -46,7 +46,7 @@
 #include <QByteArray>
 #include <QTextStream>
 #include <QSlider>
-#include <QGLFormat>
+//#include <QGLFormat>
 
 #include <iostream>
 
@@ -522,11 +522,11 @@ QImage VP1QtInventorUtils::renderToImage(VP1ExaminerViewer *ra, int pixels_x, in
 	myViewport.setWindowSize(SbVec2s(pixels_x,pixels_y));
 
 	// init the random number generator a get a random filename for the temp file
-	qsrand(QTime::currentTime().msecsTo(QTime(0,0)));
+	srand(QTime::currentTime().msecsTo(QTime(0,0)));
 	QString tmppath(QDir::tempPath());
 	if (!tmppath.endsWith(QDir::separator()))
 		tmppath+=QDir::separator();
-	QString tmpfile = tmppath+"vp1tmpfile" +QString::number(qrand())+QString::number(qrand())+".rgb";
+	QString tmpfile = tmppath+"vp1tmpfile" +QString::number(rand())+QString::number(rand())+".rgb";
 
 	// declare a new renderer with the viewport created above
 	SoOffscreenRenderer *myRenderer = new SoOffscreenRenderer(myViewport);
@@ -1434,7 +1434,7 @@ bool VP1QtInventorUtils::writeGraphToFile(SoNode*root, const QString& filename)
 	QFile data(filename);
 	if (data.open(QFile::WriteOnly | QFile::Truncate)) {
 		QTextStream out(&data);
-		out << s << endl;
+		out << s << Qt::endl;
 		return true;
 	} else {
 		return false;

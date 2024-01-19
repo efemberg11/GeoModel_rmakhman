@@ -144,9 +144,9 @@ VP1DockWidget::VP1DockWidget ( IVP1ChannelWidget * cw, VP1TabManager* tm )
   //Figure out what margin our drawn frame imposes:
   setSelected();
   int marg_left, marg_top, marg_right, marg_bottom;
-  m_d->frame->getContentsMargins ( &marg_left, &marg_top, &marg_right, &marg_bottom );
-  Q_ASSERT(marg_left==marg_top&&marg_left==marg_right&&marg_left==marg_bottom&&"Qt changed its margin behaviour for QFrame!!");
-  m_d->unselectedmargin=marg_left;
+  QMargins margins=m_d->frame->contentsMargins ();
+  Q_ASSERT(margins.left()==margins.top() &&margins.left()==margins.right()&&margins.left()==margins.bottom() &&"Qt changed its margin behaviour for QFrame!!");
+  m_d->unselectedmargin=margins.left();
 
   //Channel starts unselected:
   setUnselected();
@@ -226,7 +226,7 @@ void VP1DockWidget::setSelected()
   m_d->selected=true;
   m_d->frame->setStyleSheet(m_d->selectedstylesheet);
   assert(m_d->vboxLayout);
-  m_d->vboxLayout->setMargin(0);
+  //  m_d->vboxLayout->setMargin(0);
   m_d->frame->setFrameShape(QFrame::StyledPanel);
   updateTitle();
 }
@@ -239,7 +239,7 @@ void VP1DockWidget::setUnselected()
   m_d->selected=false;
   m_d->frame->setStyleSheet("");
   assert(m_d->vboxLayout);
-  m_d->vboxLayout->setMargin(m_d->unselectedmargin);
+  //  m_d->vboxLayout->setMargin(m_d->unselectedmargin);
   m_d->frame->setFrameShape(QFrame::NoFrame);
   updateTitle();
 }

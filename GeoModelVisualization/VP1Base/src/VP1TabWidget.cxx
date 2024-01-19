@@ -274,13 +274,13 @@ int VP1TabWidget::tabBarWidthForMaxChars( int /*maxLength*/ )
   //TK-fixme. Just use elide here?
     //TK-fixme    newTitle = KStringHandler::rsqueeze( newTitle, maxLength ).leftJustified( m_d->m_minLength, ' ' );
 
-    int lw = fm.width( newTitle );
+    int lw = fm.boundingRect( newTitle ).width();
     int iw = 0;
     if ( !tabBar()->tabIcon( i ).isNull() ){
       iw = tabBar()->tabIcon( i ).pixmap( style()->pixelMetric( QStyle::PM_SmallIconSize ), QIcon::Normal ).width() + 4;
     }
     x += ( tabBar()->style()->sizeFromContents( QStyle::CT_TabBarTab, 0L,
-      QSize( qMax( lw + hframe + iw, QApplication::globalStrut().width() ), 0 ),
+      QSize(lw + hframe + iw, 0 ),
       this ) ).width();
   }
 
@@ -346,11 +346,9 @@ void VP1TabWidget::dropEvent( QDropEvent *event )
 #ifndef QT_NO_WHEELEVENT
 void VP1TabWidget::wheelEvent( QWheelEvent *event )
 {
-  if ( event->orientation() == Qt::Horizontal )
-    return;
 
-  if ( m_d->isEmptyTabbarSpace( event->pos() ) )
-    wheelDelta( event->delta() );
+  if ( m_d->isEmptyTabbarSpace(event->position().toPoint() ) )
+    wheelDelta( event->pixelDelta().x() );
   else
     event->ignore();
 }
@@ -392,7 +390,7 @@ void VP1TabWidget::mousePressEvent( QMouseEvent *event )
       emit( contextMenu( mapToGlobal( event->pos() ) ) );
       return;
     }
-  } else if ( event->button() == Qt::MidButton ) {
+  } else if ( event->button() == Qt::MiddleButton ) {
     if ( m_d->isEmptyTabbarSpace( event->pos() ) ) {
       emit( mouseMiddleClick() );
       return;

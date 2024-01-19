@@ -266,7 +266,7 @@ void IVP1System::updateGUI() {
   //assert(m_d->allowupdategui);
   //assert(m_d->state==ERASED);
 
-  if ( m_d->allowupdategui && qApp->hasPendingEvents() ) {
+  if ( m_d->allowupdategui /*&& qApp->hasPendingEvents() deprecated in Qt6*/  ) {
     qApp->processEvents();
   }
 

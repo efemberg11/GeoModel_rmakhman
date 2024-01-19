@@ -116,7 +116,7 @@ QByteArray VP1CustomTourFrameWidget::serialise() const
   s.save(m_d->ui.doubleSpinBox_clipVolumePercentOfATLAS);
   s.save(m_d->ui.comboBox_approachMethod);
   s.save(m_d->ui.checkBox_frameEnabled);
-  s.save(m_d->ui.label_snapshot->pixmap() ? *(m_d->ui.label_snapshot->pixmap()) : QPixmap());
+  s.save(m_d->ui.label_snapshot->pixmap());
   s.warnUnsaved(this);
   return s.result();
 }
@@ -220,10 +220,15 @@ void VP1CustomTourFrameWidget::mouseMoveEvent(QMouseEvent *event)
   QMimeData *mimeData = new QMimeData;
   mimeData->setData("vp1/customtourframe", QByteArray() );
   drag->setMimeData(mimeData);//drag assumes ownership of mimeData
+
+#if QT_VERSION >= 0x060000
+  QPixmap pm =m_d->ui.label_snapshot->pixmap();
+#else
   QPixmap pm = m_d->ui.label_snapshot->pixmap() ? *(m_d->ui.label_snapshot->pixmap()) : QPixmap();
-  if (!pm.isNull())
-    drag->setPixmap(pm );
+#endif
+  if (!pm.isNull()) drag->setPixmap(pm );
   drag->exec(Qt::CopyAction | Qt::MoveAction);
+
 }
 
 //____________________________________________________________________

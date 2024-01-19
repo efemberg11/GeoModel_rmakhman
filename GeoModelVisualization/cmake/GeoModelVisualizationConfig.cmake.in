@@ -6,7 +6,7 @@ find_dependency( GeoModelCore @GeoModel_VERSION@ CONFIG EXACT )
 find_dependency( GeoModelIO @GeoModel_VERSION@ CONFIG EXACT )
 find_dependency( Coin3D )
 find_dependency( SoQt )
-find_dependency( Qt5 @Qt5_VERSION@
+find_dependency( Qt6 @Qt6_VERSION@
    COMPONENTS Core Gui Widgets Sql PrintSupport
    EXACT )
 find_dependency( OpenGL )

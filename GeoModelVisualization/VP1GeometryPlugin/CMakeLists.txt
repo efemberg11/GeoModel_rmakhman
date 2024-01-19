@@ -7,7 +7,7 @@ file( GLOB HEADERS VP1GeometryPlugin/*.h )
 # Add the library.
 add_library( GXGeometryPlugin MODULE ${SOURCES} ${HEADERS} )
 target_link_libraries( GXGeometryPlugin
-   PUBLIC Qt5::Core GXBase
+   PUBLIC Qt${QT_VERSION}::Core GXBase
    PRIVATE GXGeometrySystems GXGuideLineSystems GXClashPointSystems GXHitDisplaySystems GXTrackDisplaySystems)
 target_include_directories( GXGeometryPlugin PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

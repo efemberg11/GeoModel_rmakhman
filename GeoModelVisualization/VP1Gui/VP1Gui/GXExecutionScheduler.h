@@ -20,14 +20,16 @@
 
 // include VP1
 #include "VP1Gui/VP1QtApplication.h"
+#include "VP1Base/IVP1ChannelWidget.h"
 
 // include Qt
 #include <QObject>
 #include <QStringList>
-
+#include <QTime>
+#include <QDir> 
 
 class IVP1System;
-class IVP1ChannelWidget;
+
 
 class GXExecutionScheduler : public QObject {
 

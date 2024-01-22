@@ -24,16 +24,16 @@ GeoTrf::Transform3D GeoAlignableTransform::getTransform(const GeoVAlignmentStore
 {
   if(store) {
     const GeoTrf::Transform3D* delta = store->getDelta(this);
-    return GeoTransform::getTransform(nullptr) * (!delta ? GeoTrf::Transform3D::Identity() : *delta);
+    return getDefTransform(store) * (!delta ? GeoTrf::Transform3D::Identity() : *delta);
   }
-  else {
+  else if (m_delta) {
     std::scoped_lock<std::mutex> guard(m_deltaMutex);
-    return GeoTransform::getTransform(nullptr) * (!m_delta ? GeoTrf::Transform3D::Identity() : *m_delta);
+    return getDefTransform(store) * (*m_delta);
   }
+  return getDefTransform(store);
 }
 
-void GeoAlignableTransform::setDelta(const GeoTrf::Transform3D& delta, GeoVAlignmentStore* store)
-{
+void GeoAlignableTransform::setDelta(const GeoTrf::Transform3D& delta, GeoVAlignmentStore* store) {
   if(!store) {
     {
       std::scoped_lock<std::mutex> guard(m_deltaMutex);

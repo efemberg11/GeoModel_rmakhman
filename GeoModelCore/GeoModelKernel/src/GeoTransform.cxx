@@ -15,7 +15,7 @@ GeoTrf::Transform3D GeoTransform::getTransform(const GeoVAlignmentStore* /*store
   return m_transform;
 }
 
-GeoTrf::Transform3D GeoTransform::getDefTransform(const GeoVAlignmentStore* /*store*/) const {
+const GeoTrf::Transform3D& GeoTransform::getDefTransform(const GeoVAlignmentStore* /*store*/) const {
   return m_transform;
 }
 

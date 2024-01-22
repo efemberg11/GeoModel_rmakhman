@@ -24,21 +24,21 @@ class GeoTransform : public GeoGraphNode {
     GeoTransform(const GeoTrf::Transform3D& transform);
 
 
-  /// Gets the total transformation.
-  virtual GeoTrf::Transform3D getTransform(const GeoVAlignmentStore* store=nullptr) const;
+    /// Gets the total transformation.
+    virtual GeoTrf::Transform3D getTransform(const GeoVAlignmentStore* store=nullptr) const;
 
-  /// Gets the default transformation (no alignment correction)
-  GeoTrf::Transform3D getDefTransform(const GeoVAlignmentStore* store=nullptr) const;
+    /// Gets the default transformation (no alignment correction)
+    const GeoTrf::Transform3D& getDefTransform(const GeoVAlignmentStore* store=nullptr) const;
 
-  ///	Executes a GeoNodeAction.
-  virtual void exec(GeoNodeAction *action) const override final;
+    ///	Executes a GeoNodeAction.
+    virtual void exec(GeoNodeAction *action) const override final;
   
  protected:
-  virtual ~GeoTransform()  = default;
+    virtual ~GeoTransform()  = default;
 
  private:
-  // The Euclidean (Rigid Body) transform.
-  GeoTrf::Transform3D m_transform{GeoTrf::Transform3D::Identity()};
+    // The Euclidean (Rigid Body) transform.
+    GeoTrf::Transform3D m_transform{GeoTrf::Transform3D::Identity()};
 };
 
 #endif

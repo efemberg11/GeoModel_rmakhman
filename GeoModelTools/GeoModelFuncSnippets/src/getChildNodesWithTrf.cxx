@@ -1,0 +1,66 @@
+/*
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+*/
+#include "GeoModelFuncSnippets/getChildNodesWithTrf.h"
+
+#include "GeoModelFuncSnippets/GeoPhysVolSorter.h"
+#include "GeoModelFuncSnippets/TransformSorter.h"
+#include "GeoModelKernel/GeoVolumeCursor.h"
+#include "GeoModelKernel/GeoFullPhysVol.h"
+
+namespace {
+    constexpr std::string_view dummyNodeName{"ANON"};
+}
+
+
+ GeoChildNodeWithTrf::GeoChildNodeWithTrf(GeoVolumeCursor& curs):
+    transform{curs.getTransform()}, 
+    volume{curs.getVolume()},
+    nodeName{curs.getName()},
+    isAlignable{curs.hasAlignableTransform()},
+    isSensitive{typeid(*volume) == typeid(GeoFullPhysVol)} {
+    //// Do not specify a node name if it's a dummy one
+    if (nodeName == dummyNodeName) {
+        nodeName = volume->getLogVol()->getName();
+
+    }
+}
+
+std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink& physVol,
+                                                     bool summarizeEqualVol) {
+    std::vector<GeoChildNodeWithTrf> children{};
+ 
+    static const GeoPhysVolSorter physVolSort{};
+    static const GeoTrf::TransformSorter transSort{};
+
+    
+    GeoVolumeCursor cursor{physVol};
+    GeoTrf::Transform3D lastNodeTrf{GeoTrf::Transform3D::Identity()};
+
+    while (!cursor.atEnd()) {
+        if (children.empty() || !summarizeEqualVol) {
+            children.emplace_back(cursor);
+            cursor.next();
+            continue;
+         }
+         GeoChildNodeWithTrf& prevChild{children.back()};
+         GeoChildNodeWithTrf currentChild{cursor};
+         if (prevChild.isAlignable != currentChild.isAlignable ||
+             prevChild.isSensitive != currentChild.isSensitive ||
+             physVolSort.compare(prevChild.volume, currentChild.volume)) {
+            children.emplace_back(std::move(currentChild));
+         } else if (prevChild.nCopies == 1) {
+            ++prevChild.nCopies;
+            prevChild.inductionRule = prevChild.transform.inverse() * 
+                                      currentChild.transform;            
+         } else if (!transSort.compare(prevChild.inductionRule, 
+                                      lastNodeTrf.inverse() * currentChild.transform)) {
+            ++prevChild.nCopies;
+        } else {
+            children.emplace_back(std::move(currentChild));
+        }
+        lastNodeTrf = cursor.getTransform();   
+        cursor.next();
+    }
+    return children;
+}

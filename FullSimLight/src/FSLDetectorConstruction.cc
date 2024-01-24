@@ -31,7 +31,7 @@
 #include "G4GDMLParser.hh"
 //#include "G4LogicalVolumeStore.hh"
 
-
+#include <algorithm>
 // Geant4 steppers
 #if G4VERSION_NUMBER>=1040
 #include "G4BogackiShampine23.hh"
@@ -72,6 +72,8 @@
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 #include "GeoModelKernel/GeoVolumeCursor.h"
+#include "GeoModelKernel/GeoAlignableTransform.h"
+#include "GeoModelFuncSnippets/defineWorld.h"
 
 // For Sensitive Detector plugins:
 #include "FullSimLight/FSLSensitiveDetectorPlugin.h"
@@ -112,33 +114,6 @@ FSLDetectorConstruction::~FSLDetectorConstruction()
   delete fDetectorMessenger;
 }
 
-GeoVPhysVol*  FSLDetectorConstruction::CreateTheWorld(GeoVPhysVol* world)
-{
-    if (world == nullptr)
-    {
-        // Setup the 'World' volume from which everything else will be suspended
-        // Get the materials that we shall use.
-        // -------------------------------------//
-        GeoMaterial* Air = new GeoMaterial("Air", 1.290*SYSTEM_OF_UNITS::mg/SYSTEM_OF_UNITS::cm3);
-        GeoElement* Oxygen = new GeoElement("Oxygen",  "O", 8.0, 15.9949*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
-        GeoElement* Nitrogen = new GeoElement("Nitrogen", "N", 7., 14.0031*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
-        GeoElement* Argon = new GeoElement("Argon", "Ar", 18., 39.9624*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
-        GeoElement* Hydrogen = new GeoElement("Hydrogen", "H", 1., 1.00782503081372*SYSTEM_OF_UNITS::g/SYSTEM_OF_UNITS::mole);
-
-        Air->add(Nitrogen, 0.7494);
-        Air->add(Oxygen, 0.2369);
-        Air->add(Argon, 0.0129);
-        Air->add(Hydrogen, 0.0008);
-        
-        Air->lock();
-        const GeoBox* worldBox = new GeoBox(2000*SYSTEM_OF_UNITS::cm, 2000*SYSTEM_OF_UNITS::cm, 4000*SYSTEM_OF_UNITS::cm);
-        const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Air);
-        //const GeoLogVol* worldLog = new GeoLogVol("WorldLog", worldBox, Ether);
-        world = new GeoPhysVol(worldLog);
-    }
-    return world;
-}
-
 G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 {
     fTimer.Start();
@@ -156,10 +131,11 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 
         }
 
-        GeoVPhysVol* worldTmp = CreateTheWorld(nullptr);
+        GeoIntrusivePtr<GeoPhysVol> worldTmp{createGeoWorld()};
         factory->create(worldTmp);
-        world = worldTmp;
-
+        GeoIntrusivePtr<GeoPhysVol> world = resizeGeoWorld(worldTmp);
+        G4cout << "World resized correctly." << G4endl;
+        
         G4cout << "ReadGeoModel::buildGeoModel() done." << G4endl;
         fTimer.Stop();
         G4cout << "First step done. GeoModelTree built from the SQLite file." << G4endl;
@@ -169,7 +145,7 @@ G4VPhysicalVolume *FSLDetectorConstruction::Construct()
 
         fTimer.Start();
         // build the Geant4 geometry and get an hanlde to the world' volume
-        ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("ATLAS");
+        ExtParameterisedVolumeBuilder* builder = new ExtParameterisedVolumeBuilder("Detector");
 
         std::cout << "Building G4 geometry."<<std::endl;
         envelope = builder->Build(world);

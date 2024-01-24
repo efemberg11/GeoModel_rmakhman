@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     std::cout << "ReadGeoModel set.\n";
 
     /* build the GeoModel geometry */
-    GeoPhysVol* world =
+    const GeoVPhysVol* world =
         readInGeo.buildGeoModel();  // builds the whole GeoModel tree in memory
                                     // and get an handle to the 'world' volume
     std::cout << "ReadGeoModel::buildGeoModel() done.\n";

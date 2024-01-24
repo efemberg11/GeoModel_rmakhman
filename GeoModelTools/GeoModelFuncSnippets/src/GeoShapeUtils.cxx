@@ -22,6 +22,8 @@
 
 #include "GeoModelKernel/Units.h"
 
+#include <vector>
+
 std::pair<const GeoShape* , const GeoShape*> getOps(const GeoShape* composed) {
     if (composed->typeID() == GeoShapeUnion::getClassTypeID()) {
         const GeoShapeUnion* unionShape = dynamic_cast<const GeoShapeUnion*>(composed);

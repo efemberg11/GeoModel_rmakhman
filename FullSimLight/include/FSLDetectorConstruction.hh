@@ -89,7 +89,6 @@ public:
   static G4double GetFieldValue() { return gFieldValue; }
   G4double GetTolerance (){return fTolerance;}
 
-  GeoVPhysVol* CreateTheWorld(GeoVPhysVol* world);
 
   /// Clean the geometry  from Unidentified volumes before dumping it in GDML format
   void PullUnidentifiedVolumes( G4LogicalVolume* v );

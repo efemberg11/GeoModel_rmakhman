@@ -115,9 +115,10 @@ int main(int argc, char ** argv) {
 
 
   //
-  // Create elements and materials for the "World" volume, which is the container:
+  // Create the "GeoWorld" volume, which is the container:
   //
-  GeoIntrusivePtr<GeoVPhysVol> world{createGeoWorld()};
+  GeoIntrusivePtr<GeoPhysVol> world{createGeoWorld()};
+  
 
   //
   // Loop over plugins, create the geometry and put it under the world:
@@ -188,9 +189,12 @@ int main(int argc, char ** argv) {
     std::cerr << "gmcat -- Error opening the output file: " << outputFile << std::endl;
     return 7;
   }
+    
+  //resize the world volume to the needed one
+  GeoIntrusivePtr<GeoPhysVol> resizedWorld = resizeGeoWorld(world);
 
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
-  world->exec(&dumpGeoModelGraph);
+  resizedWorld->exec(&dumpGeoModelGraph);
 
   if (vecPluginsPublishers.size() > 0) {
     dumpGeoModelGraph.saveToDB(vecPluginsPublishers);

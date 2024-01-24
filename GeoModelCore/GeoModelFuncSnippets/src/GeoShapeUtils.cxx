@@ -4,12 +4,12 @@
 #include "GeoModelFuncSnippets/GeoShapeUtils.h"
 #include "GeoModelFuncSnippets/TransformToStringConverter.h"
 
-
 /// Boolean volume shapes
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeIntersection.h"
 #include "GeoModelKernel/GeoShapeShift.h"
+#include "GeoModelKernel/GeoShape.h"
 /// Ordinary shapes
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoTrd.h"
@@ -21,6 +21,8 @@
 #include "GeoModelKernel/GeoTorus.h"
 
 #include "GeoModelKernel/Units.h"
+
+#include <vector>
 
 std::pair<const GeoShape* , const GeoShape*> getOps(const GeoShape* composed) {
     if (composed->typeID() == GeoShapeUnion::getClassTypeID()) {

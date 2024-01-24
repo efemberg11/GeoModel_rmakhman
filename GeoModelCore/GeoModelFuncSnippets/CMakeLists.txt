@@ -21,7 +21,7 @@ set_target_properties( GeoModelFuncSnippets PROPERTIES
 
 # Set up an alias with the same name that you would get by "finding" a pre-built
 # version of the library.
-add_library( GeoModelTools::GeoModelFuncSnippets ALIAS GeoModelFuncSnippets )
+add_library( GeoModelCore::GeoModelFuncSnippets ALIAS GeoModelFuncSnippets )
 
 # Install the library.
 install(TARGETS GeoModelFuncSnippets
@@ -52,7 +52,7 @@ foreach(_exeFile ${files})
   endif() 
   
   add_executable(${_theExec} ${_exeFile})
-  target_link_libraries( ${_theExec} GeoModelTools::GeoModelFuncSnippets GeoModelCore::GeoModelKernel)
+  target_link_libraries( ${_theExec} GeoModelCore::GeoModelFuncSnippets GeoModelCore::GeoModelKernel)
   add_test(NAME ${_theExec}
            COMMAND ${_theExec})
 

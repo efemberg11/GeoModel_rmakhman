@@ -47,7 +47,6 @@ include( GNUInstallDirs )
 
 # Set up the build of the libraries of the project.
 add_subdirectory( GeoModelXML )
-add_subdirectory( GeoModelFuncSnippets )
 add_subdirectory( GeoModelXMLParser )
 add_subdirectory( GeoModelJSONParser )
 add_subdirectory( ExpressionEvaluator )

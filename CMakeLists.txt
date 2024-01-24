@@ -29,13 +29,13 @@ if( APPLE )
 endif()
 
 # === Externally provided content ===
-# Set up how the project handle some of its dependenices. Either by picking them
+# Set up how the project handle some of its dependenices. Either by ing them
 # up from the environment, or building them itself.
 include( SetupEigen3 )
 include( SetupXercesC )
 include( SetupJSON )
 
-# Find the dependencies that the project always picks up from its environment.
+# Find the dependencies that the project always s up from its environment.
 find_package( SQLite3 3.7.17 )
 
 
@@ -133,8 +133,15 @@ if(GEOMODEL_BUILD_ATLASEXTENSIONS)
     endif()
 endif()
 
-if(GEOMODEL_BUILD_GEOMODELG4 OR GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
+if(GEOMODEL_BUILD_GEOMODELG4)
   add_subdirectory(GeoModelG4)
+  if(GEOMODEL_BUILD_EXAMPLES AND GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
+  message(STATUS "==> NOTE: You enabled both GEOMODEL_BUILD_EXAMPLES and GEOMODEL_BUILD_EXAMPLES_W_GEANT4. Since GEOMODEL_BUILD_EXAMPLES triggers the build of the GEOMODEL_BUILD_EXAMPLES_W_GEANT4 as well, I set GEOMODEL_BUILD_EXAMPLES_W_GEANT4 to FALSE to avoid errors of 'double inclusion'")
+  set(GEOMODEL_BUILD_EXAMPLES_W_GEANT4 FALSE)
+  elseif (GEOMODEL_BUILD_EXAMPLES_W_GEANT4)
+     add_subdirectory(GeoModelExamples)
+     list( APPEND BUILT_PACKAGES "GeoModelExamples")
+  endif()
   list( APPEND BUILT_PACKAGES "GeoModelG4")
 endif()
 

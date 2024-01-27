@@ -108,10 +108,10 @@ class GeoIntrusivePtr{
         /// Invalidity operator
         bool operator!() const { return !m_ptr; }
         /// Comparison operator
-        // template <class GeoTypeGrp>
-        // bool operator==(const GeoIntrusivePtr<GeoTypeGrp>& other) const {
-            // return m_ptr == other.m_ptr;
-        // }
+        template <class GeoTypeGrp>
+        bool operator==(const GeoIntrusivePtr<GeoTypeGrp>& other) const {
+            return m_ptr == other.m_ptr;
+         }
         bool operator==(GeoType* other) const {
             return m_ptr == other;
         }

@@ -15,7 +15,7 @@ class GeoIntrusivePtr{
     public:
         template <typename GeoTypeGrp> friend class GeoIntrusivePtr;
 
-        explicit GeoIntrusivePtr() noexcept = default;
+         GeoIntrusivePtr() noexcept = default;
         // Standard constructor taking a bare pointer
         GeoIntrusivePtr(GeoType* obj) noexcept:
             m_ptr{obj} {

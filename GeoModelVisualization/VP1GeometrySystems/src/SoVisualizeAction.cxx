@@ -274,13 +274,13 @@ void SoVisualizeAction::handleGenericTrap(const GeoGenericTrap *gentrap)
   SoGenericBox * gb = new SoGenericBox;
   const GeoGenericTrapVertices& trapVertices = gentrap->getVertices();
   double dZ = gentrap->getZHalfLength();
-  gb->setGenericParameters(trapVertices[0].x(),trapVertices[0].y(),-dZ,
-			   trapVertices[1].x(),trapVertices[1].y(),-dZ,
-			   trapVertices[2].x(),trapVertices[2].y(),-dZ,
-			   trapVertices[3].x(),trapVertices[3].y(),-dZ,
-			   trapVertices[4].x(),trapVertices[4].y(),dZ,
-			   trapVertices[5].x(),trapVertices[5].y(),dZ,
-			   trapVertices[6].x(),trapVertices[6].y(),dZ,
-			   trapVertices[7].x(),trapVertices[7].y(),dZ);
+  gb->setGenericParameters(trapVertices[7].x(),trapVertices[7].y(),-dZ,
+			   trapVertices[6].x(),trapVertices[6].y(),-dZ,
+			   trapVertices[5].x(),trapVertices[5].y(),-dZ,
+			   trapVertices[4].x(),trapVertices[4].y(),-dZ,
+			   trapVertices[3].x(),trapVertices[3].y(),dZ,
+			   trapVertices[2].x(),trapVertices[2].y(),dZ,
+			   trapVertices[1].x(),trapVertices[1].y(),dZ,
+			   trapVertices[0].x(),trapVertices[0].y(),dZ);
   m_shape=gb;
 }

@@ -761,10 +761,18 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   //of the inventor and Qt way
 
   bool shift_isdown = (Qt::ShiftModifier & QApplication::keyboardModifiers());
-// 		       || ( m_d->kbEvent && (SO_KEY_PRESS_EVENT(m_d->kbEvent, SoKeyboardEvent::LEFT_SHIFT)||
-// 					   SO_KEY_PRESS_EVENT(m_d->kbEvent, SoKeyboardEvent::RIGHT_SHIFT)) ) );
+  bool ctrl_isdown  = (Qt::ControlModifier & QApplication::keyboardModifiers());
+  bool alt_isdown  = (Qt::AltModifier & QApplication::keyboardModifiers());
 
-  if (shift_isdown) {
+  if (ctrl_isdown && shift_isdown) {
+    //Volume should be put in ZAPPED state.
+    deselectAll();
+    volhandle->setState(VP1GeoFlags::ZAPPED);
+    message("===> Zapping Node: "+volhandle->getName());
+    return;
+  }
+
+  else if (shift_isdown) {
     //Parent of volume should be put in CONTRACTED state.
     deselectAll();
 
@@ -774,11 +782,8 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
     return;
   }
 
-  bool ctrl_isdown = (Qt::ControlModifier & QApplication::keyboardModifiers());
-// 		       || ( m_d->kbEvent && (SO_KEY_PRESS_EVENT(m_d->kbEvent, SoKeyboardEvent::LEFT_CONTROL)||
-// 					   SO_KEY_PRESS_EVENT(m_d->kbEvent, SoKeyboardEvent::RIGHT_CONTROL)) ) );
 
-  if (ctrl_isdown) {
+  else if (ctrl_isdown) {
     //Volume should be put in EXPANDED state if it has children.
     deselectAll();
     if (volhandle->nChildren()>0) {
@@ -788,17 +793,8 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
     return;
   }
 
-  bool z_isdown =  m_d->kbEvent && SO_KEY_PRESS_EVENT(m_d->kbEvent,SoKeyboardEvent::Z);
-  if (z_isdown) {
-    //Volume should be put in ZAPPED state.
-    deselectAll();
-    volhandle->setState(VP1GeoFlags::ZAPPED);
-    message("===> Zapping Node: "+volhandle->getName());
-    return;
-  }
 
-  bool s_isdown =  m_d->kbEvent && SO_KEY_PRESS_EVENT(m_d->kbEvent,SoKeyboardEvent::S);
-  if (s_isdown) {
+  else if (alt_isdown) {
     deselectAll();
 #ifdef __APPLE__
     char buffer[1024];

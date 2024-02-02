@@ -224,7 +224,7 @@
      <item>
       <widget class="QLabel" name="label_11">
        <property name="text">
-        <string>'z' + click: Iconify the volume</string>
+        <string>'Crtl/Cmd' + 'Shift' + click: Iconify the volume</string>
        </property>
       </widget>
      </item>
@@ -245,7 +245,7 @@
      <item>
       <widget class="QLabel" name="label_16">
        <property name="text">
-        <string>'s' + click: Write volume</string>
+        <string>'Alt' + click: Write volume</string>
        </property>
       </widget>
      </item>

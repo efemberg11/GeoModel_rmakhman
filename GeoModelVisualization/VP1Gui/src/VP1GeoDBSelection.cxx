@@ -47,7 +47,7 @@ VP1GeoDBSelection::VP1GeoDBSelection(QWidget *parent) : QDialog(parent)
     connect(m_cancelButton, &QPushButton::clicked, this, &VP1GeoDBSelection::reject);
 
     //Open QSettings to store path do database
-    QSettings settings("ATLAS", "VP1Light");
+    QSettings settings("ATLAS", "gmex");
     QString text;
 
     //If no db file has been provided via command line argument, the "db/path" value is ""
@@ -113,7 +113,7 @@ void VP1GeoDBSelection::on_browseButton_clicked()
 void VP1GeoDBSelection::loadDatabase(){
 
     //Save DB path to settings
-    QSettings settings("ATLAS", "VP1Light");
+    QSettings settings("ATLAS", "gmex");
     settings.setValue("db/path", m_directoryComboBox->itemText(m_directoryComboBox->currentIndex()));
 
     //If the selected DB does not exists, go back

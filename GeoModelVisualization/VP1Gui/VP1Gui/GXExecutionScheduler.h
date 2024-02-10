@@ -60,11 +60,6 @@ public:
   bool hasAllActiveSystemsRefreshed(IVP1ChannelWidget*) const;
 
 
-  QStringList userRequestedFiles();
-
-  QString saveSnaphsotToFile(IVP1System* s, bool batch = false);
-
-
 signals:
   void refreshingStatusChanged(bool);
 
@@ -79,7 +74,6 @@ private:
 
 private slots:
   void processSystemForRefresh();
-  void updateProgressBarDuringRefresh();
   void channelCreated(IVP1ChannelWidget*);
   void channelUncreated(IVP1ChannelWidget*);
   void startRefreshQueueIfAppropriate();

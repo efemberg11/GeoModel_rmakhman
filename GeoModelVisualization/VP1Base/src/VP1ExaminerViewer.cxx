@@ -52,7 +52,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QPushButton>
-#include <QActionGroup> 
+#include <QActionGroup>
 //#include <QGLFormat>
 
 #include <map>
@@ -1386,12 +1386,12 @@ void VP1ExaminerViewer::removeDecorationMenuOption()
 
 }
 
+
 //____________________________________________________________________
 SbBool VP1ExaminerViewer::processSoEvent(const SoEvent * const evt )
 {
 //    VP1Msg::messageDebug("VP1ExaminerViewer::processSoEvent()");
 //    std::cout << "event type: " << evt->getClassTypeId().getName() << " - " << evt->getTypeId().getName() << std::endl;
-
 	if (evt->getTypeId().isDerivedFrom(SoKeyboardEvent::getClassTypeId())) {
 		//We want to add a few shortcuts:
 		// "A": View all
@@ -1515,9 +1515,9 @@ void VP1ExaminerViewer::setSeekMode(SbBool enable)
 //____________________________________________________________________
 void VP1ExaminerViewer::setViewing(SbBool enable)
 {
-	VP1Msg::messageVerbose("VP1ExaminerViewer::setViewing()");
-	m_d->grabFocus();
-	SoQtExaminerViewer::setViewing(enable);
+   VP1Msg::messageVerbose("VP1ExaminerViewer::setViewing()");
+   //	m_d->grabFocus(); JFB TURNED THIS OFF, otherwise Alt key is screwy. 
+   SoQtExaminerViewer::setViewing(enable);
 }
 
 //____________________________________________________________________
@@ -1759,7 +1759,6 @@ void VP1ExaminerViewer::setAntiAlias(bool b)
 {
 	m_d->isantialias=b;
 	b ? setAntialiasing(true,4) : setAntialiasing(false,1);
-    std::cout << "antiAliasing set." << std::endl;
 }
 
 //____________________________________________________________________

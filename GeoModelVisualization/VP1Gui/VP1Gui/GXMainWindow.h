@@ -56,9 +56,6 @@ public:
 public slots:
   void loadPluginFile(QString filename);
 
-  #ifdef BUILDVP1LIGHT
-    void request_expertSettings();
-  #endif
   void request_addEmptyTab();
   void request_channelInformation();
   void request_printChannel();
@@ -154,7 +151,6 @@ protected:
   QMenu * m_menu_changeStyle;
   QMenu * m_menu_changeFontSize;
   QAction * m_actionAdd_empty_tab;
-  QAction * m_actionEnableExpertSettings;
   QAction * m_actionSave_current_tabs;
   QAction* m_action_openUsersGuide;
   QAction* m_action_openUsersSupport;

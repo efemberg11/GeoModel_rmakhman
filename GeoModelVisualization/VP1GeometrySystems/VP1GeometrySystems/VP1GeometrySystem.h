@@ -77,7 +77,6 @@ protected slots:
   void volumeStateChangeRequested(VolumeHandle*,VP1GeoFlags::VOLSTATE);
   void volumeResetRequested(VolumeHandle*);
 
-  void actionOnAllNonStandardVolumes(bool);//true: zap, false: expand.
   void actionOnAllVolumes(bool zap, bool standardVolumes = true);//true: zap, false: expand; true: standardVolumes
   void filterVolumes(QString targetname, bool bymatname, int maxDepth, bool stopAtFirst, bool visitChildren, bool reset);
 

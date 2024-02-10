@@ -153,7 +153,6 @@ void publishMetaData( GMDBManager & db,
       &metadata.dateString,
       &metadata.gmdataAssociatedTag}) { 
     s->erase(std::remove(s->begin(), s->end(), '\n'), s->end());
-    std::cout << s << std::endl;
   }
 	
 	
@@ -190,7 +189,6 @@ void publishMetaData( GMDBManager & db,
       &xtraMetadata.repo,
       &xtraMetadata.branch }) { 
     s->erase(std::remove(s->begin(), s->end(), '\n'), s->end());
-    std::cout << s << std::endl;
   }
 	
 

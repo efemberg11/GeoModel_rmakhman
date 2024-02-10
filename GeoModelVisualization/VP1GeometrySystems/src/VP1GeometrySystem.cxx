@@ -88,7 +88,6 @@
 // Qt includes
 #include <QStack>
 #include <QString>
-#include <QSettings>
 #include <QDebug>
 #include <QRegExp>
 #include <QByteArray>
@@ -306,7 +305,6 @@ QWidget * VP1GeometrySystem::buildController()
   connect (m_d->controller,SIGNAL(volumeResetRequested(VolumeHandle*)), this,SLOT(volumeResetRequested(VolumeHandle*)));
  
  
-  connect(m_d->controller,SIGNAL(actionOnAllNonStandardVolumes(bool)),this,SLOT(actionOnAllNonStandardVolumes(bool)));
   connect(m_d->controller,SIGNAL(autoExpandByVolumeOrMaterialName(bool,QString)),this,SLOT(autoExpandByVolumeOrMaterialName(bool,QString)));
   connect(m_d->controller,SIGNAL(signalFilterVolumes(QString, bool, int, bool, bool, bool)),this,SLOT(filterVolumes(QString, bool, int, bool, bool, bool)));
   
@@ -1812,13 +1810,6 @@ void VP1GeometrySystem::Imp::changeStateOfVisibleNonStandardVolumesRecursively(V
   VolumeHandle::VolumeHandleListItr it(handle->childrenBegin()), itE(handle->childrenEnd());
   for(;it!=itE;++it)
     changeStateOfVisibleNonStandardVolumesRecursively(*it, target);
-}
-
-// Not used at the moment, but useful
-//_____________________________________________________________________________________
-void VP1GeometrySystem::actionOnAllNonStandardVolumes(bool zap)
-{
-  actionOnAllVolumes(zap, false);
 }
 
 // Not used at the moment, but useful

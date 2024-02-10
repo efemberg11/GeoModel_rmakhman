@@ -219,13 +219,6 @@ GXMainWindow::GXMainWindow(GXExecutionScheduler*sched,QWidget * parent)
 	connect(m_actionAdd_empty_tab,SIGNAL(triggered(bool)),this,SLOT(request_addEmptyTab()));
 	connect(m_actionSave_current_tabs,SIGNAL(triggered(bool)),this,SLOT(request_saveasConfig()));
 
-	//ExpertSettings
-	#ifdef BUILDVP1LIGHT
-	    menuConfiguration->addSeparator();
-	    m_actionEnableExpertSettings = menuConfiguration->addAction ( "&Settings" );
-	    m_actionEnableExpertSettings->setStatusTip("Open additional settings");
-	    connect(m_actionEnableExpertSettings, &QAction::triggered, this, &GXMainWindow::request_expertSettings);
-	#endif
 
 	// Help menu
 	QMenu* menu_help = new QMenu(menubar);
@@ -526,15 +519,6 @@ QMap<QString,QString> GXMainWindow::availableFiles(const QString& extension,
       qDebug()  << "vp1pluginpath A :" << vp1pluginpath;
   	}
 
-    #ifdef BUILDVP1LIGHT
-		//Add dir from Expert Settings
-		if(VP1QtUtils::expertSettingValue("expert","ExpertSettings/GXPLUGINPATH")==""){
-			vp1pluginpath<<QCoreApplication::applicationDirPath()+"/../lib";
-		} else{
-			vp1pluginpath<<VP1QtUtils::expertSettingValue("expert","ExpertSettings/GXPLUGINPATH");
-		}
-	#endif
-
 	//Currentdir:
 	if (currentdir) {
 		vp1pluginpath<<QDir::currentPath();
@@ -645,26 +629,6 @@ void GXMainWindow::unloadPlugin_continue()
 void GXMainWindow::closeEvent(QCloseEvent * event)
 {
 	VP1Msg::messageDebug("GXMainWindow::closeEvent()");
-
-	bool checkEnableAskOnClose;
-	#if defined BUILDVP1LIGHT
-		checkEnableAskOnClose = VP1QtUtils::expertSettingIsSet("general","ExpertSettings/VP1_ENABLE_ASK_ON_CLOSE");
-	#else
-		checkEnableAskOnClose = VP1QtUtils::environmentVariableIsOn("VP1_ENABLE_ASK_ON_CLOSE");
-	#endif
-
-	if (checkEnableAskOnClose) {
-		int ret = QMessageBox::warning(this,
-				"Close VP1?",
-				"You are about to close VP1 and end the job.\nProceed?",
-				QMessageBox::Ok| QMessageBox::Cancel,
-				QMessageBox::Cancel );
-		if (ret!=QMessageBox::Ok) {
-			event->ignore();
-			return;
-		}
-		m_userRequestedExit = true;
-	}
 
 	hide();
 
@@ -1247,7 +1211,7 @@ void GXMainWindow::quickSetupTriggered()
 {
   VP1Msg::messageVerbose("GXMainWindow::quickSetupTriggered()");
 
-  QSettings settings("ATLAS", "VP1Light");
+  QSettings settings("ATLAS", "gmex");
 
   QString plugfile, channelname, tabname;
 
@@ -1359,11 +1323,3 @@ QStringList GXMainWindow::userRequestedFiles()
 	return returnval;
 }
 
-//_________________________________________________________________________________
-#ifdef BUILDVP1LIGHT
-void GXMainWindow::request_expertSettings(){
-        	VP1ExpertSettings es;
-        	es.exec();
-}
-
-#endif // BUILDVP1LIGHT

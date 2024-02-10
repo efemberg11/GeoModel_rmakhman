@@ -28,7 +28,7 @@ bool VP1QtUtils::expertSettingIsSet(const QString& type, const QString& name)
 {
   bool set;
   if(type=="general"){
-    QSettings generalSettings("ATLAS", "VP1Light");
+    QSettings generalSettings("ATLAS", "gmex");
     set = !generalSettings.value(name).toString().isEmpty();
   } else {
     QSettings expertSettings(QCoreApplication::applicationDirPath()+"/../vp1.ini", QSettings::NativeFormat);
@@ -44,7 +44,7 @@ QString VP1QtUtils::expertSettingValue(const QString& type, const QString& name)
 {
   QString env;
   if(type=="general"){
-    QSettings generalSettings("ATLAS", "VP1Light");
+    QSettings generalSettings("ATLAS", "gmex");
     env = generalSettings.value(name).toString();
   } else {
     QSettings expertSettings(QCoreApplication::applicationDirPath()+"/../vp1.ini", QSettings::NativeFormat);
@@ -61,7 +61,7 @@ bool VP1QtUtils::expertSettingIsOn(const QString& type, const QString& name)
 {
   QString env;
     if(type=="general"){
-    QSettings generalSettings("ATLAS", "VP1Light");
+    QSettings generalSettings("ATLAS", "gmex");
     env = generalSettings.value(name).toString();
   } else {
     QSettings expertSettings(QCoreApplication::applicationDirPath()+"/../vp1.ini", QSettings::NativeFormat);
@@ -94,7 +94,7 @@ void VP1QtUtils::setExpertSetting(const QString& type, const QString& name, cons
     VP1Msg::messageVerbose("VP1QtUtils::setEnvironmentVariable: Setting variable '"+name+"' to value '"+content+"'.");
 
   if(type=="general"){
-    QSettings generalSettings("ATLAS", "VP1Light");
+    QSettings generalSettings("ATLAS", "gmex");
     generalSettings.setValue(name, content);
   } else {
     QSettings expertSettings(QCoreApplication::applicationDirPath()+"/../vp1.ini", QSettings::NativeFormat);

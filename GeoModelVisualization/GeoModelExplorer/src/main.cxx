@@ -7,7 +7,6 @@
 // Update: Nov 2019
 //
 // Qt includes
-#include <QSettings>
 #include <QString>
 #include <QDir>
 #include <QDebug>
@@ -29,19 +28,15 @@
 int main(int argc, char** argv)
 {
 
-  // We don't know for sure which one of these causes the trouble..We add them all till we understand why this
-  // is happening and correct the problem where it occurs.
-
-  
-    setenv("LC_ADDRESS","en_US.UTF-8",1);
-    setenv("LC_NAME","en_US.UTF-8",1);
-    setenv("LC_MONETARY","en_US.UTF-8",1);
-    setenv("LC_PAPER","en_US.UTF-8",1);
-    setenv("LC_IDENTIFICATION","en_US.UTF-8",1);
-    setenv("LC_TELEPHONE","en_US.UTF-8",1);
-    setenv("LC_MEASUREMENT","en_US.UTF-8",1);
-    setenv("LC_TIME","en_US.UTF-8",1);
-    setenv("LC_NUMERIC","en_US.UTF-8",1);
+  setenv("LC_ADDRESS","en_US.UTF-8",1);
+  setenv("LC_NAME","en_US.UTF-8",1);
+  setenv("LC_MONETARY","en_US.UTF-8",1);
+  setenv("LC_PAPER","en_US.UTF-8",1);
+  setenv("LC_IDENTIFICATION","en_US.UTF-8",1);
+  setenv("LC_TELEPHONE","en_US.UTF-8",1);
+  setenv("LC_MEASUREMENT","en_US.UTF-8",1);
+  setenv("LC_TIME","en_US.UTF-8",1);
+  setenv("LC_NUMERIC","en_US.UTF-8",1);
     
 
   
@@ -58,7 +53,7 @@ int main(int argc, char** argv)
   
   std::string gxpluginpath= GXPLUGINDIR;
   pManip("GXPLUGINPATH",gxpluginpath.c_str());
-  std::cout << "Plugins resolved in path: " << getenv("GXPLUGINPATH") << std::endl;
+
   QStringList arguments;
   for (int i = 0; i<=argc; i++){
     arguments << argv[i];
@@ -100,22 +95,14 @@ int main(int argc, char** argv)
   }
 
 
-  //If help option is set, display help and exit VP1Light
+  //If help option is set, display help and exit gmex
   if(helpIsSet){
     qInfo() << "Usage";
     qInfo() << " ";
-    qInfo() << "  vp1light [options] [dbfile1] [dbfile2]... [sharedlib1] [sharedlib2] [sharedlib3]... [clash1.json] [clash2.json]...";
+    qInfo() << "  gmex [options] [dbfile1] [dbfile2]... [sharedlib1] [sharedlib2] [sharedlib3]... [clash1.json] [clash2.json]...";
     qInfo() << "Options:";
     qInfo() << "  -h, --help                   = Show help.";
     return 0;
-  }
-
-  // Save settings
-  QSettings settings("ATLAS", "VP1Light"); // TODO: update labels!
-  // Disable expert settings by default
-  if(settings.value("ExpertSettings/notFirstStart").toString().isEmpty()){
-    settings.setValue("ExpertSettings/notFirstStart","1");
-    settings.setValue("ExpertSettings/enableExpertSettings","");
   }
 
   GXExecutionScheduler *scheduler=GXExecutionScheduler::init();

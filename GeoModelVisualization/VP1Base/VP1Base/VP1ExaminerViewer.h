@@ -120,7 +120,6 @@ protected:
 
 
 
-
 private:
 
 	class Imp;

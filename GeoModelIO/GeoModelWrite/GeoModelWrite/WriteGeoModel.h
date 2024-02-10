@@ -363,7 +363,7 @@ class WriteGeoModel : public GeoNodeAction {
     bool m_inspect{0};
 
     /// Stores the loglevel, the verbosity of the output messages
-    unsigned m_loglevel;
+  unsigned m_loglevel{0};
 };
 
 } /* namespace GeoModelIO */

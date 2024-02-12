@@ -2,6 +2,7 @@
 
 
 #include <GeoModelKernel/GeoFullPhysVol.h>
+#include <GeoModelKernel/GeoTransform.h>
 #include <GeoModelKernel/GeoPhysVol.h>
 #include <GeoModelKernel/GeoBox.h>
 #include <iostream>
@@ -65,6 +66,39 @@ int main(int argc, char *argv[]){
         physVol4 = std::move(physVol3);
         CHECKCOUNT(physVol4, 2);
     }
+
+    GeoIntrusivePtr<GeoPhysVol> world{new GeoPhysVol(nullptr)};
+    world->add(new GeoTransform(GeoTrf::Translate3D(0.,0.,0 )));
+    {
+        GeoIntrusivePtr<GeoFullPhysVol> childVol{new GeoFullPhysVol(nullptr)};
+        world->add(childVol);
+        CHECKCOUNT(world, 1);
+        CHECKCOUNT(childVol, 2);
+        CHECKCOUNT(world, 1);
+        childVol->getAbsoluteTransform();
+        CHECKCOUNT(childVol, 2);        
+        CHECKCOUNT(world, 1);
+        childVol->getX();
+        CHECKCOUNT(world, 1);
+        childVol->getDefX();
+        CHECKCOUNT(world, 1);
+        childVol->getDefAbsoluteTransform();
+        CHECKCOUNT(world, 1);
+    }
+    {
+        GeoIntrusivePtr<GeoPhysVol> childVol{new GeoPhysVol(nullptr)};
+        world->add(childVol);
+        CHECKCOUNT(world, 1);
+        CHECKCOUNT(childVol, 2);
+        CHECKCOUNT(world, 1);
+        childVol->getX();
+        CHECKCOUNT(world, 1);
+        childVol->getDefX();
+        CHECKCOUNT(world, 1);
+    }
+    CHECKCOUNT(world, 1);
+    
+    
     return EXIT_SUCCESS;
 }
 #pragma clang diagnostic pop

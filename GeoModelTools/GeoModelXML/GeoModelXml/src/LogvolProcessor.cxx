@@ -295,7 +295,6 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
         splitString = XMLString::transcode(element->getAttribute(splitLevel_tmp));
         splitLevel = gmxUtil.evaluate(splitString);
         XMLString::release(&splitString);
-        XMLString::release(&splitLevel_tmp);
         for(int i=0;i<splitLevel;i++){
           std::string field = "eta_module";//eventually specify in Xml the field to split in?
           std::pair<std::string,int> extraIndex(field,i);
@@ -303,6 +302,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
         }
 	    }
 	    else gmxUtil.gmxInterface()->addSensor(sensitiveName, index, sensId, dynamic_cast<GeoVFullPhysVol *> (pv));
+        XMLString::release(&splitLevel_tmp);
     }
   }
   else {

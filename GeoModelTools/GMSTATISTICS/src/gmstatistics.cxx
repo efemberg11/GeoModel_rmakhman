@@ -96,69 +96,83 @@ int main(int argc, char ** argv) {
   std::streambuf *fileBuff=file.rdbuf();
   std::cout.rdbuf(fileBuff); 
 
-  
-  for (const std::string & plugin : inputPlugins) {
 
-    GeoIntrusivePtr<GeoPhysVol> world{createGeoWorld()};
-    //
-    // Loop over plugins, create the geometry and put it under the world:
-    //
-    
-    
-    
-    GeoGeometryPluginLoader loader;
-    GeoVGeometryPlugin *factory=loader.load(plugin);
-    if (!factory) {
-      std::cerr << "Could not load plugin " << plugin << std::endl;
-      std::cout.rdbuf(coutBuff);
-      return 5;
-    }
-    
-    int before=snoop();
-    factory->create(world);
-    int net=snoop()-before;
-    std::cout.rdbuf(coutBuff);
- 
-    if (printTree) {
-      GeoInventoryGraphAction action(std::cout);
-      world->exec(&action);
-    }
-
-#ifndef __APPLE__
-    unsigned int expand=heapsize();
-    world->unref();
-    unsigned int contract=expand-heapsize();
-    std::cout << basename((char *) plugin.c_str()) << " allocates " << net/factor << " MB" << " net GeoModel " << contract/1000000.0 << " MB" << std::endl;
-    delete factory;
-
-#else
-    // APPLE:  meaningless std::cout << basename((char *) plugin.c_str()) << " allocates " << net/factor << " MB" << std::endl;
-#endif
-
-    
-    std::cout.rdbuf(fileBuff);
-   }
-  std::cout.rdbuf(coutBuff);
-  
 #ifdef __APPLE__
-  //
-  // Ceci n'est pas une pipe:
-  //
-  FILE *ceci=popen(("heap --guessNonObjects " + std::to_string(getpid()) + " | grep -e GeoModelKernel -e GeoGenericFunctions " ).c_str(),"r");
-  //
-  char *line;
-  size_t linecap=0;
-  int sum=0.0;
-  while ( getline(&line, &linecap, ceci) > 0) {
-    std::istringstream stream(line);
-    unsigned int total, number;
-    double average;
-    std::string object;
-    
-    stream >> number >> total >> average >> object;
-    std::cout << std::setw(30) << object << " " << std::setw(15) << number << " instances " << std::setw(20) <<  total << " bytes" << std::endl;
-    sum +=total;
+  {
+    GeoIntrusivePtr<GeoVPhysVol> world{createGeoWorld()};
+    for (const std::string & plugin : inputPlugins) {
+      GeoGeometryPluginLoader loader;
+      GeoVGeometryPlugin *factory=loader.load(plugin);
+      if (!factory) {
+	std::cerr << "Could not load plugin " << plugin << std::endl;
+	std::cout.rdbuf(coutBuff);
+	return 5;
+      }
+      factory->create(world);
+      if (printTree) {
+	GeoInventoryGraphAction action(std::cout);
+	world->exec(&action);
+      }
+      delete factory;
+      std::cout.rdbuf(fileBuff);
+    }
+    std::cout.rdbuf(coutBuff);
+    //
+    // Ceci n'est pas une pipe:
+    //
+    FILE *ceci=popen(("heap --guessNonObjects " + std::to_string(getpid()) + " | grep -e GeoModelKernel -e GeoGenericFunctions " ).c_str(),"r");
+    //
+    char *line;
+    size_t linecap=0;
+    int sum=0.0;
+    while ( getline(&line, &linecap, ceci) > 0) {
+      std::istringstream stream(line);
+      unsigned int total, number;
+      double average;
+      std::string object;
+      
+      stream >> number >> total >> average >> object;
+      std::cout << std::setw(30) << object << " " << std::setw(15) << number << " instances " << std::setw(20) <<  total << " bytes" << std::endl;
+      sum +=total;
+    }
+    std::cout << "Total GeoModel object allocation:  " << sum/1000000.0 << "MB" << std::endl;
   }
-  std::cout << "Total GeoModel object allocation:  " << sum/1000000.0 << "MB" << std::endl;
-#endif
+    
+    
+#else
+  {
+
+    for (const std::string & plugin : inputPlugins) {
+      GeoGeometryPluginLoader loader;
+      GeoVGeometryPlugin *factory=loader.load(plugin);
+      if (!factory) {
+	std::cerr << "Could not load plugin " << plugin << std::endl;
+	std::cout.rdbuf(coutBuff);
+	return 5;
+      }
+      unsigned int expand{0};
+      unsigned int net{0};
+      {
+	GeoIntrusivePtr<GeoVPhysVol> world{createGeoWorld()};
+
+	int before=snoop();
+	factory->create(world);
+	net=snoop()-before;
+	std::cout.rdbuf(coutBuff);
+	
+	if (printTree) {
+	  GeoInventoryGraphAction action(std::cout);
+	  world->exec(&action);
+	}
+	expand=heapsize();
+      }
+      unsigned int contract=expand-heapsize();
+      std::cout << basename((char *) plugin.c_str()) << " allocates " << net/factor << " MB" << " net GeoModel " << contract/1000000.0 << " MB" << std::endl;
+      delete factory;
+      std::cout.rdbuf(fileBuff);
+    }
+    std::cout.rdbuf(coutBuff);
+    
+  }
+#endif  
 }

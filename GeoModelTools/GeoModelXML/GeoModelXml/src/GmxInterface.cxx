@@ -67,7 +67,7 @@ void GmxInterface::addSensor(const string& name, map<string, int> &index, int se
 
 void GmxInterface::addSplitSensor(const string& name, map<string, int> &index, std::pair<std::string, int> &extraIndex, int sequentialId, GeoVFullPhysVol *fpv,int splitLevel) {
     std::stringstream idString;
-    msglog << MSG::DEBUG << "GmxInterface::addSensor called for " << fpv->getLogVol()->getName() << ", type " << name << 
+    msglog << MSG::DEBUG << "GmxInterface::addSplitSensor called for " << fpv->getLogVol()->getName() << ", type " << name << 
                          ". Indices:   ";		
     for (map<string, int>::iterator i = index.begin(); i != index.end(); ++i) {
         msglog << i->second << "   ";
@@ -111,7 +111,7 @@ void GmxInterface::addSplitAlignable(int level, map<std::string, int> &index, st
     std::stringstream idString;
     // debug message
     msglog << MSG::DEBUG 
-        << "GmxInterface::addAlignable called for a physvol. Logvol name " 
+        << "GmxInterface::addSplitAlignable called for a physvol. Logvol name " 
         << fpv->getLogVol()->getName() << ". Level = " << level << ". Indices:   ";
     for (map<string, int>::iterator i = index.begin(); i != index.end(); ++i) {
         msglog << i->second << "   ";

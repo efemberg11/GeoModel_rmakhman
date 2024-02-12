@@ -81,7 +81,25 @@ char *tagName;
         //now check that the AlignableTransform is actually valid!
         GeoAlignableTransform * gat = dynamic_cast<GeoAlignableTransform *>(toAdd.back());
 
-        if(fpv && gat) gmxUtil.gmxInterface()->addAlignable(level, index,fpv,gat);
+        if(fpv && gat) {
+            //splitting sensors where we would like multiple DetectorElements per GeoVFullPhysVol (e.g.ITk Strips)
+            XMLCh * splitLevel_tmp = XMLString::transcode("splitLevel");
+            bool split = element->hasAttribute(splitLevel_tmp);
+            char* splitString;
+	        int splitLevel = 1;
+	        if (split) {
+                splitString = XMLString::transcode(element->getAttribute(splitLevel_tmp));
+                splitLevel = gmxUtil.evaluate(splitString);
+                XMLString::release(&splitString);
+                for(int i=0;i<splitLevel;i++){
+                    std::string field = "eta_module";//eventually specify in Xml the field to split in?
+                    std::pair<std::string,int> extraIndex(field,i);
+                    gmxUtil.gmxInterface()->addSplitAlignable(level, index, extraIndex,fpv,gat);
+                }
+            }
+            else gmxUtil.gmxInterface()->addAlignable(level, index,fpv,gat);
+            XMLString::release(&splitLevel_tmp);
+        }    
         else{
              std::cout<<"WARNING:";
              if(!gat) std::cout<<" No valid AlignableTransform";

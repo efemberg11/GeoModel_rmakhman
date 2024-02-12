@@ -242,10 +242,27 @@ DOMDocument *doc = element->getOwnerDocument();
 
             gmxUtil.positionIndex.incrementLevel(); // Logvol has unfortunately already decremented this; temp. restore it
             gmxUtil.positionIndex.indices(index, gmxUtil.eval);
-            gmxUtil.gmxInterface()->addAlignable(level, index, (GeoVFullPhysVol *) toAdd[lastTransform + 3],
-                                                 (GeoAlignableTransform *) toAdd[lastTransform]);
+            //splitting sensors where we would like multiple DetectorElements per GeoVFullPhysVol (e.g.ITk Strips)
+            XMLCh * splitLevel_tmp = XMLString::transcode("splitLevel");
+            bool split = element->hasAttribute(splitLevel_tmp);
+            char* splitString;
+	        int splitLevel = 1;
+	        if (split) {
+                splitString = XMLString::transcode(element->getAttribute(splitLevel_tmp));
+                splitLevel = gmxUtil.evaluate(splitString);
+                XMLString::release(&splitString);
+                for(int i=0;i<splitLevel;i++){
+                    std::string field = "eta_module";//eventually specify in Xml the field to split in?
+                    std::pair<std::string,int> extraIndex(field,i);
+                    gmxUtil.gmxInterface()->addSplitAlignable(level, index, extraIndex, (GeoVFullPhysVol *) toAdd[lastTransform + 3],
+                                                    (GeoAlignableTransform *) toAdd[lastTransform]);
+                }
+            }
+            else gmxUtil.gmxInterface()->addAlignable(level, index, (GeoVFullPhysVol *) toAdd[lastTransform + 3],
+                                                    (GeoAlignableTransform *) toAdd[lastTransform]);
             gmxUtil.positionIndex.decrementLevel(); // Put it back where it was
             index.clear();
+            XMLString::release(&splitLevel_tmp);
         }
     }
 

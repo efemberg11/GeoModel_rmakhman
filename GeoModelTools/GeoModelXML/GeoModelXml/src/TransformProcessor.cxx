@@ -17,6 +17,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <vector>
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelKernel/GeoNameTag.h"

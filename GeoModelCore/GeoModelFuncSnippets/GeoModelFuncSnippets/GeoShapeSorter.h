@@ -40,6 +40,6 @@ struct GeoComposedShapeSorter {
 /// @brief 
 /// @tparam ShapeType 
 template<class ShapeType>
-using GeoShapeSet = std::set<GeoIntrusivePtr<const ShapeType>, GeoShapeSorter>;
+using GeoShapeSet = std::set<GeoIntrusivePtr<ShapeType>, GeoShapeSorter>;
 
 #endif

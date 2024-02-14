@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEO_MODEL_XML_GMX2GEO_H
@@ -54,15 +54,15 @@ XERCES_CPP_NAMESPACE_END
 
 class IEvaluator;
 
-#define processorList std::map<std::string,ElementProcessor*> 
+using processorList = std::map<std::string,ElementProcessor*>;
 
 class Gmx2Geo {
 public:
     Gmx2Geo(const std::string& gmxFile, GeoVPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0, std::string levelMapName = "", const processorList& procs=processorList());
 private:
 // Disallow copying
-    Gmx2Geo(const Gmx2Geo &right);
-    Gmx2Geo & operator=(const Gmx2Geo &right);
+    Gmx2Geo(const Gmx2Geo &right) = delete;
+    Gmx2Geo & operator=(const Gmx2Geo &right) = delete;
 
     int doDefines(xercesc::DOMDocument *doc, GeoModelTools::IEvaluator &eval);
     int doPositionIndex(xercesc::DOMDocument *doc, GmxUtil &gmxUtil, std::string levelMapName = "");

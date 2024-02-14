@@ -11,7 +11,7 @@
 #define GEO_MODEL_XML_ELEMENT2GEO_ITEM_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelFuncSnippets/GeoDeDuplicator.h"
+#include "GeoModelHelpers/GeoDeDuplicator.h"
 #include "GeoModelKernel/RCBase.h"
 #include "GeoModelKernel/GeoIntrusivePtr.h"
 

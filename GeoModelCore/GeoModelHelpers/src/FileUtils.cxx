@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#include "GeoModelFuncSnippets/FileUtils.h"
-#include "GeoModelFuncSnippets/StringUtils.h"
+#include "GeoModelHelpers/FileUtils.h"
+#include "GeoModelHelpers/StringUtils.h"
 
 
 #include <filesystem>

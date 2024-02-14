@@ -1,10 +1,10 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#include "GeoModelFuncSnippets/getChildNodesWithTrf.h"
+#include "GeoModelHelpers/getChildNodesWithTrf.h"
 
-#include "GeoModelFuncSnippets/GeoPhysVolSorter.h"
-#include "GeoModelFuncSnippets/TransformSorter.h"
+#include "GeoModelHelpers/GeoPhysVolSorter.h"
+#include "GeoModelHelpers/TransformSorter.h"
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 

@@ -2,7 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "GeoModelFuncSnippets/MaterialManager.h"
+#include "GeoModelHelpers/MaterialManager.h"
 
 
 #include "GeoModelKernel/GeoIntrusivePtr.h"
@@ -10,8 +10,8 @@
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/Units.h"
 
-#include "GeoModelFuncSnippets/throwExcept.h"
-#include "GeoModelFuncSnippets/StringUtils.h"
+#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelHelpers/StringUtils.h"
 
 #include <cstdlib>
 #include <iomanip>

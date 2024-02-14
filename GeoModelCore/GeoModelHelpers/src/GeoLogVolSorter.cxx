@@ -1,9 +1,9 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#include "GeoModelFuncSnippets/GeoLogVolSorter.h"
-#include "GeoModelFuncSnippets/throwExcept.h"
-#include "GeoModelFuncSnippets/GeoShapeSorter.h"
+#include "GeoModelHelpers/GeoLogVolSorter.h"
+#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelHelpers/GeoShapeSorter.h"
 
 bool GeoLogVolSorter::operator()(const GeoLogVol* a, const GeoLogVol* b) const{
     return compare(a, b) < 0;

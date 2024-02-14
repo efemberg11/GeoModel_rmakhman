@@ -1,13 +1,13 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#include "GeoModelFuncSnippets/GeoPhysVolSorter.h"
+#include "GeoModelHelpers/GeoPhysVolSorter.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
 
-#include "GeoModelFuncSnippets/TransformSorter.h"
-#include "GeoModelFuncSnippets/GeoLogVolSorter.h"
+#include "GeoModelHelpers/TransformSorter.h"
+#include "GeoModelHelpers/GeoLogVolSorter.h"
 #include "GeoModelKernel/GeoVolumeCursor.h"
-#include "GeoModelFuncSnippets/getChildNodesWithTrf.h"
+#include "GeoModelHelpers/getChildNodesWithTrf.h"
 
 int GeoPhysVolSorter::compare(const GeoVPhysVol* a, const GeoVPhysVol* b) const {
     /// If one of the given volumes is a full physical volume, let's assume that they've been

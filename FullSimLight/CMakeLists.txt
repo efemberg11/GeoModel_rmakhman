@@ -100,7 +100,7 @@ target_link_libraries(FullSimLight_obj
     nlohmann_json::nlohmann_json
     GeoModel2G4
     GeoModelCore::GeoModelKernel
-    GeoModelCore::GeoModelFuncSnippets
+    GeoModelCore::GeoModelHelpers
     GeoModelIO::GeoModelRead
     GeoModelIO::GeoModelWrite
     ${HEPMC3_LIB}

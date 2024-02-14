@@ -13,7 +13,7 @@ find_package( ZLIB REQUIRED )
 # Create the library.
 add_library( GeoModelXml SHARED ${HEADERS} ${SOURCES} )
 # link libraries
-target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel GeoModelCore::GeoModelFuncSnippets GeoModelTools::ExpressionEvaluator XercesC::XercesC PRIVATE ZLIB::ZLIB  )
+target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel GeoModelCore::GeoModelHelpers GeoModelTools::ExpressionEvaluator XercesC::XercesC PRIVATE ZLIB::ZLIB  )
 target_include_directories( GeoModelXml PUBLIC 
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:include> )

@@ -1,17 +1,17 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_GEODEDUPLICATOR_H
-#define GEOMODELFUNCSNIPPETS_GEODEDUPLICATOR_H
+#ifndef GeoModelHelpers_GEODEDUPLICATOR_H
+#define GeoModelHelpers_GEODEDUPLICATOR_H
 
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoTransform.h"
 
-#include "GeoModelFuncSnippets/GeoLogVolSorter.h"
-#include "GeoModelFuncSnippets/GeoPhysVolSorter.h"
-#include "GeoModelFuncSnippets/GeoShapeSorter.h"
-#include "GeoModelFuncSnippets/TransformSorter.h"
+#include "GeoModelHelpers/GeoLogVolSorter.h"
+#include "GeoModelHelpers/GeoPhysVolSorter.h"
+#include "GeoModelHelpers/GeoShapeSorter.h"
+#include "GeoModelHelpers/TransformSorter.h"
 
 #include <set>
 /***

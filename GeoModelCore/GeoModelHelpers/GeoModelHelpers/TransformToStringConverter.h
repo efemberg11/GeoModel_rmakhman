@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_TRANSFORMTOSTRINGCONVERTER_H
-#define GEOMODELFUNCSNIPPETS_TRANSFORMTOSTRINGCONVERTER_H
+#ifndef GeoModelHelpers_TRANSFORMTOSTRINGCONVERTER_H
+#define GeoModelHelpers_TRANSFORMTOSTRINGCONVERTER_H
 #include "GeoModelKernel/GeoDefinitions.h"
 
 #include <string>

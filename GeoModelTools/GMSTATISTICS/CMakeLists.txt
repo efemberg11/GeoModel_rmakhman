@@ -6,7 +6,7 @@ target_link_libraries( gmstatistics PRIVATE GeoModelCore::GeoModelKernel
                                             GeoModelIO::GeoModelRead 
                                             GeoModelIO::GeoModelWrite
                                             GeoModelIO::GeoModelDBManager
-                                            GeoModelCore::GeoModelFuncSnippets )
+                                            GeoModelCore::GeoModelHelpers )
 
 # Tweak how debug information should be attached to the executable, in Debug
 # builds.

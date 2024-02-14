@@ -11,7 +11,7 @@
 #include "GeoModelKernel/GeoCountVolAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
 #include "GeoModelKernel/GeoNameTag.h"
-#include "GeoModelFuncSnippets/defineWorld.h"
+#include "GeoModelHelpers/defineWorld.h"
 #include "GeoInventoryGraphAction.h"
 #include <fstream>
 #include <iostream>

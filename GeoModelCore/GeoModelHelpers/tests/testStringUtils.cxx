@@ -2,8 +2,8 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "GeoModelFuncSnippets/StringUtils.h"
-#include "GeoModelFuncSnippets/throwExcept.h"
+#include "GeoModelHelpers/StringUtils.h"
+#include "GeoModelHelpers/throwExcept.h"
 #include <iostream>
 #include <stdlib.h>
 using namespace GeoStrUtils;

@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#include "GeoModelFuncSnippets/TransformToStringConverter.h"
+#include "GeoModelHelpers/TransformToStringConverter.h"
 #include "GeoModelKernel/Units.h"
 
 namespace{

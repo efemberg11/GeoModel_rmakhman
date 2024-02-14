@@ -73,7 +73,7 @@
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
-#include "GeoModelFuncSnippets/defineWorld.h"
+#include "GeoModelHelpers/defineWorld.h"
 
 // For Sensitive Detector plugins:
 #include "FullSimLight/FSLSensitiveDetectorPlugin.h"

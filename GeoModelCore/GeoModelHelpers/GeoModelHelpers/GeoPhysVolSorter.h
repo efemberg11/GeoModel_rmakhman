@@ -2,8 +2,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_GEOPHYSVOLSORTER_H
-#define GEOMODELFUNCSNIPPETS_GEOPHYSVOLSORTER_H
+#ifndef GeoModelHelpers_GEOPHYSVOLSORTER_H
+#define GeoModelHelpers_GEOPHYSVOLSORTER_H
 
 #include "GeoModelKernel/GeoVPhysVol.h"
 

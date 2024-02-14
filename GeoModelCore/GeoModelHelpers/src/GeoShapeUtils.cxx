@@ -1,9 +1,9 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#include "GeoModelFuncSnippets/GeoShapeUtils.h"
-#include "GeoModelFuncSnippets/TransformToStringConverter.h"
-#include "GeoModelFuncSnippets/throwExcept.h"
+#include "GeoModelHelpers/GeoShapeUtils.h"
+#include "GeoModelHelpers/TransformToStringConverter.h"
+#include "GeoModelHelpers/throwExcept.h"
 
 /// Boolean volume shapes
 #include "GeoModelKernel/GeoShapeUnion.h"

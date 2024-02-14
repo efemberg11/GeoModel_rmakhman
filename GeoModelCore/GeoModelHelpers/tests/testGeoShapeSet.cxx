@@ -3,8 +3,8 @@
 */
 #include "GeoModelKernel/Units.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-#include "GeoModelFuncSnippets/GeoShapeSorter.h"
-#include "GeoModelFuncSnippets/GeoShapeUtils.h"
+#include "GeoModelHelpers/GeoShapeSorter.h"
+#include "GeoModelHelpers/GeoShapeUtils.h"
 
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoTube.h"

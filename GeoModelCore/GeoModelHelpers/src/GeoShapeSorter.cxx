@@ -1,11 +1,11 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#include "GeoModelFuncSnippets/GeoShapeSorter.h"
-#include "GeoModelFuncSnippets/TransformSorter.h"
-#include "GeoModelFuncSnippets/TransformToStringConverter.h"
-#include "GeoModelFuncSnippets/GeoShapeUtils.h"
-#include "GeoModelFuncSnippets/throwExcept.h"
+#include "GeoModelHelpers/GeoShapeSorter.h"
+#include "GeoModelHelpers/TransformSorter.h"
+#include "GeoModelHelpers/TransformToStringConverter.h"
+#include "GeoModelHelpers/GeoShapeUtils.h"
+#include "GeoModelHelpers/throwExcept.h"
 
 #include "GeoModelKernel/Units.h"
 

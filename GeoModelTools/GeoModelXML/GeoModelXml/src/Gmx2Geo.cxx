@@ -28,7 +28,7 @@
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GmxInterface.h"
 #include "GeoModelXml/createdomdocument.h"
-#include "GeoModelFuncSnippets/MaterialManager.h"
+#include "GeoModelHelpers/MaterialManager.h"
 
 using namespace std;
 using namespace xercesc;

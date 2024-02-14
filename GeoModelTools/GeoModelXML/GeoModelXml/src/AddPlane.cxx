@@ -6,6 +6,7 @@
 #include "GeoModelXml/GmxUtil.h"
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include <xercesc/dom/DOM.hpp>
 #include "xercesc/util/XMLString.hpp"

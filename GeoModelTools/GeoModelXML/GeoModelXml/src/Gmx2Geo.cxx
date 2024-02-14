@@ -28,7 +28,7 @@
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GmxInterface.h"
 #include "GeoModelXml/createdomdocument.h"
-#include "GeoModelXml/MaterialManager.h"
+#include "GeoModelFuncSnippets/MaterialManager.h"
 
 using namespace std;
 using namespace xercesc;
@@ -81,7 +81,7 @@ Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoVPhysVol *addHere, GmxInterface &gmxI
 // if the material manager is set, create a namespace
 // 
 
-    if (gmxUtil.matManager) gmxUtil.matManager->addNamespace(XMLString::transcode(attribute));
+    if (gmxUtil.matManager) gmxUtil.matManager->setMaterialNamespace(XMLString::transcode(attribute));
 
 //
 //    Add all constant definitions to the evaluator, so they are ready if needed.

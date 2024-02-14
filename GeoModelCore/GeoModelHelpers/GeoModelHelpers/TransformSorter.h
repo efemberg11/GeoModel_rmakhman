@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_TRANSFORMSORTER_H
-#define GEOMODELFUNCSNIPPETS_TRANSFORMSORTER_H
+#ifndef GeoModelHelpers_TRANSFORMSORTER_H
+#define GeoModelHelpers_TRANSFORMSORTER_H
 
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/GeoTransform.h"

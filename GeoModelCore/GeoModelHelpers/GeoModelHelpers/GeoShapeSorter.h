@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_GeoShapeSorter_H
-#define GEOMODELFUNCSNIPPETS_GeoShapeSorter_H
+#ifndef GeoModelHelpers_GeoShapeSorter_H
+#define GeoModelHelpers_GeoShapeSorter_H
 
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoIntrusivePtr.h"

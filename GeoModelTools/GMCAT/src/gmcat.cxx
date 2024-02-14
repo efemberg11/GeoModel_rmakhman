@@ -6,7 +6,7 @@
 #include "GeoModelDBManager/GMDBManager.h"
 #include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModelWrite/WriteGeoModel.h"
-#include "GeoModelFuncSnippets/defineWorld.h"
+#include "GeoModelHelpers/defineWorld.h"
 
 #include "GeoModelKernel/GeoGeometryPluginLoader.h"
 #include "GeoModelKernel/GeoVolumeCursor.h"

@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_GEOLOGVOLSORTER_H
-#define GEOMODELFUNCSNIPPETS_GEOLOGVOLSORTER_H
+#ifndef GeoModelHelpers_GEOLOGVOLSORTER_H
+#define GeoModelHelpers_GEOLOGVOLSORTER_H
 
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoIntrusivePtr.h"

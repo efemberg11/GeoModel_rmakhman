@@ -10,7 +10,7 @@
 //
 #include <string>
 #include "ExpressionEvaluator/Evaluator.h"
-#include "GeoModelFuncSnippets/MaterialManager.h"
+#include "GeoModelHelpers/MaterialManager.h"
 #include "GeoModelXml/ProcessorRegistry.h"
 #include "GeoModelXml/Element2GeoItemRegistry.h"
 

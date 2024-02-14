@@ -12,7 +12,7 @@
 #include <xercesc/util/XercesDefs.hpp>
 
 #include "GeoModelXml/GeoNodeList.h"
-#include "GeoModelFuncSnippets/GeoDeDuplicator.h"
+#include "GeoModelHelpers/GeoDeDuplicator.h"
 XERCES_CPP_NAMESPACE_BEGIN
 class DOMElement;
 XERCES_CPP_NAMESPACE_END

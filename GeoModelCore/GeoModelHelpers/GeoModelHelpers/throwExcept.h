@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_THROWEXCEPT_H
-#define GEOMODELFUNCSNIPPETS_THROWEXCEPT_H
+#ifndef GeoModelHelpers_THROWEXCEPT_H
+#define GeoModelHelpers_THROWEXCEPT_H
 
 #include <exception>
 #include <sstream>

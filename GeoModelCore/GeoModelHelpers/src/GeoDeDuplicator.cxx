@@ -3,7 +3,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "GeoModelFuncSnippets/GeoDeDuplicator.h"
+#include "GeoModelHelpers/GeoDeDuplicator.h"
 
 GeoDeDuplicator::TrfSet GeoDeDuplicator::s_trfStore{};
 GeoDeDuplicator::ShapeSet GeoDeDuplicator::s_shapeStore{};

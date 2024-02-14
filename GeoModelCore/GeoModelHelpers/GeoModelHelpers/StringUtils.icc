@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_STRINGUTILS_ICC
-#define GEOMODELFUNCSNIPPETS_STRINGUTILS_ICC
+#ifndef GeoModelHelpers_STRINGUTILS_ICC
+#define GeoModelHelpers_STRINGUTILS_ICC
 
 #include <sstream>
 namespace GeoStrUtils {

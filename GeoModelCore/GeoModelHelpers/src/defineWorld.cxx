@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#include "GeoModelFuncSnippets/defineWorld.h"
+#include "GeoModelHelpers/defineWorld.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"

@@ -8,7 +8,7 @@ project( "GeoModelCore" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 # Set up the build of the two libraries of the (sub-)project.
 add_subdirectory( GeoGenericFunctions )
 add_subdirectory( GeoModelKernel )
-add_subdirectory( GeoModelFuncSnippets )
+add_subdirectory( GeoModelHelpers )
 
 # Create and install the version description of the project.
 include( WriteBasicConfigVersionFile )

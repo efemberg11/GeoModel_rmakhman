@@ -2,8 +2,8 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "GeoModelFuncSnippets/TransformSorter.h"
-#include "GeoModelFuncSnippets/TransformToStringConverter.h"
+#include "GeoModelHelpers/TransformSorter.h"
+#include "GeoModelHelpers/TransformToStringConverter.h"
 #include "GeoModelKernel/Units.h"
 #include <stdlib.h>
 #include <iostream>

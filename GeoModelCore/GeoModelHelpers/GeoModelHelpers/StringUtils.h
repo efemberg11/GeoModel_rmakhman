@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_STRINGUTILS_H
-#define GEOMODELFUNCSNIPPETS_STRINGUTILS_H
+#ifndef GeoModelHelpers_STRINGUTILS_H
+#define GeoModelHelpers_STRINGUTILS_H
 
 #include <string>
 #include <string_view>
@@ -62,5 +62,5 @@ namespace GeoStrUtils{
                                                  const std::string_view glue =";");
 
 }
-#include "GeoModelFuncSnippets/StringUtils.icc"
+#include "GeoModelHelpers/StringUtils.icc"
 #endif

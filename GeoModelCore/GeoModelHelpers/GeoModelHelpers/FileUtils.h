@@ -1,8 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-#ifndef GEOMODELFUNCSNIPPETS_FILEUTILS_H
-#define GEOMODELFUNCSNIPPETS_FILEUTILS_H
+#ifndef GeoModelHelpers_FILEUTILS_H
+#define GeoModelHelpers_FILEUTILS_H
 
 #include <string>
 #include <string_view>

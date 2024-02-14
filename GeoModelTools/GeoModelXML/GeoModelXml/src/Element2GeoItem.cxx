@@ -12,13 +12,11 @@
 
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelKernel/RCBase.h"
+#include "GeoModelFuncSnippets/throwExcept.h"
 
 using namespace std;
 using namespace xercesc;
 
-Element2GeoItem::Element2GeoItem() {}
-
-Element2GeoItem::~Element2GeoItem() {}
 
 RCBase * Element2GeoItem::process(const xercesc::DOMElement *element, GmxUtil &gmxUtil) {
 
@@ -30,12 +28,11 @@ RCBase * Element2GeoItem::process(const xercesc::DOMElement *element, GmxUtil &g
     XMLString::release(&name2release);
     XMLString::release(&name_tmp);
 
-    RCBase *item;
-    map<string, RCBase *>::iterator entry;
-    if (name == "") { // Unnamed item; cannot store in the map; make a new one 
+    RCBase *item{nullptr};
+    EntryMap::iterator entry;
+    if (name.empty()) { // Unnamed item; cannot store in the map; make a new one 
         item = make(element, gmxUtil);
-    }
-    else if ((entry = m_map.find(name)) == m_map.end()) { // Not in; make a new one
+    } else if ((entry = m_map.find(name)) == m_map.end()) { // Not in; make a new one
         item = make(element, gmxUtil);
         m_map[name] = item; // And put it in the map
     }
@@ -48,8 +45,7 @@ RCBase * Element2GeoItem::process(const xercesc::DOMElement *element, GmxUtil &g
 
 RCBase * Element2GeoItem::make(const xercesc::DOMElement *element, GmxUtil & /* gmxUtil */) const {
     char *name2release = XMLString::transcode(element->getNodeName());
-    msglog << MSG::FATAL << "Oh oh: called base class make() method of Element2GeoType object; tag " << name2release << endmsg;
+    std::string nodeName{name2release};
     XMLString::release(&name2release);
-
-    std::abort();
+    THROW_EXCEPTION("Oh oh: called base class make() method of Element2GeoType object; tag " << nodeName);
 }

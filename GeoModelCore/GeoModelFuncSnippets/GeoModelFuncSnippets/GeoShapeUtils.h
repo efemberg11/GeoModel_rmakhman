@@ -25,6 +25,8 @@ GeoIntrusivePtr<const GeoShape> compressShift(const GeoShape* shift);
 ///        In the case of the GeoSubtraction all subtracting shapes
 std::vector<const GeoShape*> getBooleanComponents(const GeoShape* booleanShape);
 
-
+/// @brief Returns the edge points surrounding a shape
+std::vector<GeoTrf::Vector3D> getPolyShapeEdges(const GeoShape* shape,
+                                                const GeoTrf::Transform3D& refTrf);
 
 #endif

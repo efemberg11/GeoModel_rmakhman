@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -12,13 +12,13 @@
 #include <xercesc/util/XercesDefs.hpp>
 
 #include "GeoModelXml/GeoNodeList.h"
-
+#include "GeoModelFuncSnippets/GeoDeDuplicator.h"
 XERCES_CPP_NAMESPACE_BEGIN
 class DOMElement;
 XERCES_CPP_NAMESPACE_END
 class GmxUtil;
 
-class ElementProcessor {
+class ElementProcessor: public GeoDeDuplicator {
 
 public:
     ElementProcessor();

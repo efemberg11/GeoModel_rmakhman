@@ -3,6 +3,7 @@
 */
 #include "GeoModelFuncSnippets/GeoShapeUtils.h"
 #include "GeoModelFuncSnippets/TransformToStringConverter.h"
+#include "GeoModelFuncSnippets/throwExcept.h"
 
 /// Boolean volume shapes
 #include "GeoModelKernel/GeoShapeUnion.h"
@@ -19,6 +20,7 @@
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoPara.h"
 #include "GeoModelKernel/GeoTorus.h"
+#include "GeoModelKernel/GeoSimplePolygonBrep.h"
 
 #include "GeoModelKernel/Units.h"
 
@@ -138,4 +140,73 @@ std::string printGeoShape(const GeoShape* shape) {
       ostr<<"dPhi="<<torus->getDPhi()*toDeg;
    }
     return ostr.str();
+}
+
+std::vector<GeoTrf::Vector3D> getPolyShapeEdges(const GeoShape* shape,
+                                                const GeoTrf::Transform3D& refTrf) {
+
+    if (!shape) {
+        THROW_EXCEPTION("Nullptr was given ");
+    }
+    constexpr double boundary = 0.;
+    std::vector<GeoTrf::Vector3D> edgePoints{};
+    std::pair<const GeoShape*, const GeoShape*> ops = getOps(shape);
+    if (shape->typeID() == GeoShapeUnion::getClassTypeID()){
+        edgePoints = getPolyShapeEdges(ops.first, refTrf);
+        std::vector<GeoTrf::Vector3D> edgePoints2{getPolyShapeEdges(ops.second, refTrf)};
+        edgePoints.insert(edgePoints.end(),
+                          std::make_move_iterator(edgePoints2.begin()),
+                          std::make_move_iterator(edgePoints2.end()));
+    } else if (shape->typeID() == GeoShapeSubtraction::getClassTypeID()) {
+        return getPolyShapeEdges(ops.first, refTrf);
+    } else if (shape->typeID() == GeoBox::getClassTypeID()) {
+        edgePoints.reserve(6);
+        const GeoBox* box = static_cast<const GeoBox*>(shape);
+        for (double sX :{-1., 1.}) {
+            for (double sY :{-1., 1.}) {
+                for (double sZ: {-1., 1.}) {
+                    edgePoints.emplace_back(refTrf * GeoTrf::Vector3D{sX* (box->getXHalfLength() - boundary),
+                                                                      sY* (box->getYHalfLength() - boundary),
+                                                                      sZ* (box->getZHalfLength() - boundary)});
+                }
+            }
+        }
+    } else if (shape->typeID() == GeoShapeShift::getClassTypeID()) {
+        GeoIntrusivePtr<const GeoShape> shift = compressShift(shape);
+        const GeoShapeShift* shiftPtr = static_cast<const GeoShapeShift*>(shift.get());
+        std::vector<GeoTrf::Vector3D> shiftedEdges = getPolyShapeEdges(ops.first, shiftPtr->getX());
+        std::transform(shiftedEdges.begin(), shiftedEdges.end(), std::back_inserter(edgePoints),
+                    [&refTrf](const GeoTrf::Vector3D& shift){
+                            return refTrf * shift;
+                    });
+    } else if (shape->typeID() == GeoTrd::getClassTypeID()) {
+        const GeoTrd* trd = static_cast<const GeoTrd*>(shape);
+        edgePoints.reserve(6);
+        for (double sZ : {-1., 1.}){
+            double dX = (sZ < 0 ? trd->getXHalfLength1() : trd->getXHalfLength2()) - boundary;
+            double dY = (sZ < 0 ? trd->getYHalfLength1() : trd->getYHalfLength2()) - boundary;
+            for (double sX: {-1., 1.}) {
+                for (double sY: {-1., 1.}) {
+                    edgePoints.emplace_back(refTrf * GeoTrf::Vector3D{sX* dX, sY* dY,
+                                                                      sZ* (trd->getZHalfLength()- boundary)});
+
+                }
+            }
+            
+        }
+    } else if (shape->typeID() == GeoSimplePolygonBrep::getClassTypeID()) {
+        const GeoSimplePolygonBrep* brep = static_cast<const GeoSimplePolygonBrep*>(shape);
+        edgePoints.reserve(2* brep->getNVertices());
+        for (double sZ: {-1., 1.}) {
+            for (unsigned int vtx = 0 ; vtx < brep->getNVertices(); ++vtx){
+                edgePoints.emplace_back(brep->getXVertex(vtx),
+                                        brep->getYVertex(vtx),
+                                        sZ * brep->getDZ());
+            
+            }
+        }
+    } else {
+        THROW_EXCEPTION("The shape "<<shape->type()<<" is not supported. Please add it to the list");
+    }
+    return edgePoints;
 }

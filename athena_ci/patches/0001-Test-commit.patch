@@ -1,0 +1,27 @@
+From 5b5dbeb5c76eb3b5e631d399858cd5a4d065547d Mon Sep 17 00:00:00 2001
+From: Paul Gessinger <paul.gessinger@cern.ch>
+Date: Wed, 31 Jan 2024 15:37:47 +0100
+Subject: [PATCH] Test commit
+
+---
+ TileCalorimeter/TileGeoModel/src/TileDetectorFactory.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/TileCalorimeter/TileGeoModel/src/TileDetectorFactory.h b/TileCalorimeter/TileGeoModel/src/TileDetectorFactory.h
+index 6c83ed20dae..18da249e4d1 100755
+--- a/TileCalorimeter/TileGeoModel/src/TileDetectorFactory.h
++++ b/TileCalorimeter/TileGeoModel/src/TileDetectorFactory.h
+@@ -20,6 +20,10 @@
+ class MsgStream;
+ class StoreGateSvc;
+ 
++/*
++ * I am a useless change for testing
++ */
++
+ 
+ class TileDetectorFactory : public GeoVDetectorFactory
+ {
+-- 
+2.39.3
+

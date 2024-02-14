@@ -1,0 +1,103 @@
+build_geomodel_athena:
+  image: gitlab-registry.cern.ch/atlas-sit/docker/alma9-atlasos-dev
+
+  stage: step-A
+
+  variables:
+    CCACHE_KEY_SUFFIX: r1
+    CCACHE_DIR: ${CI_PROJECT_DIR}/ccache_${CCACHE_KEY_SUFFIX}
+    CCACHE_MAXSIZE: 10G
+
+    ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+    LCG_PLATFORM: x86_64-el9-gcc13-opt
+    ATHENA_GIT_REPO: https://gitlab.cern.ch/atlas/athena.git
+    ATHENA_RELEASE: main
+    ATHENA_REF: main
+
+
+  cache:
+    key: ccache-geomodel-$CI_COMMIT_REF_SLUG
+    when: always
+    paths:
+      - ${CCACHE_DIR}
+
+  tags:
+    - cvmfs
+
+  artifacts:
+    paths:
+      - geomodel-install
+      # - athena-build
+      - athena-install
+      - .asetup.save
+    expire_in: 4 hours
+
+  before_script:
+    - sudo dnf install -y jq
+
+  script:
+    - git config --global user.name gitlab
+    - git config --global user.email cijob@example.com
+    - echo $CI_MERGE_REQUEST_PROJECT_ID
+    - echo $CI_MERGE_REQUEST_IID
+    - export HEADERS_CHANGED=$(curl -s https://gitlab.cern.ch/api/v4/projects/${CI_MERGE_REQUEST_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}/changes | jq -r .changes[].new_path | grep -e "\.h$" > /dev/null ; printf $?)
+    - export IS_MERGE_REQUEST=$([ $CI_PIPELINE_SOURCE = "merge_request_event" ]; printf $?)
+    - athena_ci/athena_build.sh
+
+
+.run_base:
+  stage: step-A
+
+  # This image sould work, but it seems it doesn't. Using my derivative until 
+  # I figure out what the difference is.
+  # image: gitlab-registry.cern.ch/atlas-sit/docker/alma9-atlasos-dev
+  image: gitlab-registry.cern.ch/acts/acts-athena-ci/alma9-atlasos-dev:v2
+
+  needs: 
+    - build_geomodel_athena
+
+  variables:
+    USER: nobody # the run workflow tests need this set
+
+    ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+    LCG_PLATFORM: x86_64-el9-gcc13-opt
+    ATHENA_GIT_REPO: https://gitlab.cern.ch/atlas/athena.git
+    ATHENA_RELEASE: main
+    ATHENA_REF: main
+
+  tags:
+    - cvmfs
+
+  artifacts:
+    paths:
+      - run
+    when: always
+    expire_in: 1 week
+
+  before_script:
+    - git config --global user.name gitlab
+    - git config --global user.email cijob@example.com
+
+
+    - sudo dnf install -y which
+
+    - source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh || true
+    - asetup --restore || true
+    - lsetup git || true
+
+    - echo "Cloning ${ATHENA_GIT_REPO} @ ${ATHENA_REF}"
+    - git clone ${ATHENA_GIT_REPO} -b ${ATHENA_REF}
+    - | 
+        pushd athena 
+        ../athena_ci/apply_patches.sh
+        popd
+
+    - source athena-install/setup.sh
+    - export LD_LIBRARY_PATH=$PWD/geomodel-install/lib64:$LD_LIBRARY_PATH
+    - mkdir run
+
+run_workflow_tests_run2_mc:
+  extends: .run_base
+  script:
+    - cd run
+    - RunWorkflowTests_Run2.py --CI -r -w MCReco --threads 0 -e '--CA "all:True" "RDOtoRDOTrigger:False" --conditionsTag "default:OFLCOND-MC16-SDR-RUN2-11" "RDOtoRDOTrigger:OFLCOND-MC16-SDR-RUN2-08-02" --maxEvents 25'

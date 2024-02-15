@@ -35,14 +35,11 @@
 #include "GeoModelXml/GeoNodeList.h"
 #include "xercesc/util/XMLString.hpp"
 
+#include "GeoModelHelpers/throwExcept.h"
 // using namespace CLHEP;
 
 using namespace std;
 using namespace xercesc;
-
-//class GeoSerialDenominator;
-//class GeoSerialTransformer;
-//class GeoSerialIdentifier;
 
 std::string getNodeType(const GeoGraphNode* node) {
     if ( dynamic_cast<const GeoPhysVol*>(node) )
@@ -59,19 +56,13 @@ std::string getNodeType(const GeoGraphNode* node) {
         return "GeoShape";
     if ( dynamic_cast<const GeoMaterial*>(node) )
         return "GeoMaterial";
-    //if ( dynamic_cast<const GeoSerialDenominator*>(node) )
-        //return "GeoSerialDenominator";
-    //if ( dynamic_cast<const GeoSerialIdentifier*>(node) )
-        //return "GeoSerialIdentifier";
-    //if ( dynamic_cast<const GeoSerialTransformer*>(node) )
-        //return "GeoSerialTransformer";
     if ( dynamic_cast<const GeoTransform*>(node) )
         return "GeoTransform";
     return "UnidentifiedNode";
 }
 
 void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
-  GeoLogVol *lv;
+  GeoLogVolPtr lv{};
   GeoNameTag *nameTag_physChildVolName;//USed for "sensitive" PhysVols 
   GeoNameTag *nameTag_physVolName;//Actually the logVol name, which gets used for the PhysVols if they have "named" attribute (and aren't sensitive)
 
@@ -167,30 +158,30 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     XMLCh * materials_tmp = XMLString::transcode("materials");
     if (XMLString::compareIString(parent->getNodeName(), materials_tmp) != 0) {
         char* material_s = XMLString::transcode (material);
-        msglog << MSG::FATAL << "Processing logvol " << name <<
-            ". Error in gmx file. An IDREF for a logvol material did not refer to a material.\n" <<
-            "Material ref was " << material_s << "; exiting" << endmsg;
+        std::string materialName{material_s};
         XMLString::release (&material_s);
-        std::abort();
+        THROW_EXCEPTION("Processing logvol " << name <<
+            ". Error in gmx file. An IDREF for a logvol material did not refer to a material.\n" <<
+            "Material ref was " << materialName << "; exiting");
     }
-    std::string nam_mat=XMLString::transcode(material);
+    std::string nam_mat= XMLString::transcode(material);
 
     const GeoMaterial* matGeo = nullptr;
 
-    if (gmxUtil.matManager)
-    {
-        if (!gmxUtil.matManager->isMaterialDefined(nam_mat))
-        {
-            GeoMaterial* tempMat=static_cast<GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
+    if (gmxUtil.matManager) {
+        if (!gmxUtil.matManager->isMaterialDefined(nam_mat)) {
+            GeoMaterial* tempMat=dynamic_cast<GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
             // we let GMX create the material and store it in the MM
-
             gmxUtil.matManager->addMaterial(tempMat);
         }
         matGeo = gmxUtil.matManager->getMaterial(nam_mat);
+    } else {
+        matGeo = dynamic_cast<const GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
     }
-    else {
-        matGeo = static_cast<const GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
-    }
+
+    if (!matGeo) {
+        THROW_EXCEPTION("Cannot process "<<nam_mat);
+    }    
 //
 //    Make the LogVol and add it to the map ready for next time
 //
@@ -271,10 +262,10 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
 
   if (sensitive || (alignable.compare(string("true")) == 0)) {
     //msglog << MSG::DEBUG << "Handling a FullPhysVol (i.e., an 'alignable' or 'sensitive' volume) ..." << endmsg;
-    GeoFullPhysVol *pv = new GeoFullPhysVol(lv);
+    GeoFullPhysVol *pv = new GeoFullPhysVol(cacheVolume(lv));
     if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
-    for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
-	     pv->add(*node);
+    for (const auto& node : childrenAdd) {
+	     pv->add(node);
     }
     toAdd.push_back(pv); // NB: the *PV is third item added, so reference as toAdd[2].
     //
@@ -307,15 +298,15 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   }
   else {
     //msglog << MSG::DEBUG << "Handling a standard PhysVol..." << endmsg;
-    GeoPhysVol *pv = new GeoPhysVol(lv);
+    GeoPhysVol *pv = new GeoPhysVol(cacheVolume(lv));
     if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
     //msglog << MSG::DEBUG << "Now, looping over all the children of the LogVol (in the GMX meaning)..." << endmsg; 
-    for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
-      pv->add(*node);
+    for (const auto & node : childrenAdd) {
+      pv->add(node);
       //msglog << MSG::DEBUG << "LVProc, PV child: " << *node << " -- " << getNodeType(*node) << endmsg;
     }
     //msglog << MSG::DEBUG << "End of loop over children." << endmsg;
-    toAdd.push_back(pv);
+    toAdd.push_back(cacheVolume(pv).get());
   }
 
   gmxUtil.positionIndex.decrementLevel();

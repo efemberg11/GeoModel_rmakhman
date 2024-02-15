@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <cstdio>
+#include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -40,7 +41,7 @@ void publishMetaData( GMDBManager & db,
 
 int main(int argc, char ** argv) {
 
-
+  bool verbose{false};
 
   //
   // Usage message:
@@ -77,7 +78,7 @@ int main(int argc, char ** argv) {
       }
       else if (argument.find("-v")!=std::string::npos) {
           setenv("GEOMODEL_GEOMODELIO_VERBOSE", "1", 1); // does overwrite
-          std::cout << "You set the verbosity level to 1" << std::endl;
+          verbose=true;
       }
       else if (argument.find(shared_obj_extension)!=std::string::npos) {
           inputPlugins.push_back(argument);
@@ -123,6 +124,14 @@ int main(int argc, char ** argv) {
   //
   // Loop over plugins, create the geometry and put it under the world:
   //
+  std::ofstream file;
+  std::streambuf *coutBuff=std::cout.rdbuf();
+  std::streambuf *fileBuff=file.rdbuf();
+  if (!verbose) {
+    file.open(("/tmp/gmcat-"+std::to_string(getpid())).c_str());
+    std::cout.rdbuf(fileBuff); 
+  }
+  
   std::vector<GeoPublisher*> vecPluginsPublishers; // caches the stores from all plugins
   for (const std::string & plugin : inputPlugins) {
     GeoGeometryPluginLoader loader;
@@ -196,6 +205,10 @@ int main(int argc, char ** argv) {
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   resizedWorld->exec(&dumpGeoModelGraph);
 
+
+
+
+  
   if (vecPluginsPublishers.size() > 0) {
     dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
   } else {
@@ -204,6 +217,6 @@ int main(int argc, char ** argv) {
 
 
   publishMetaData(db,inputFiles,inputPlugins,outputFile);
-  
+  std::cout.rdbuf(coutBuff);
   return 0;
 }

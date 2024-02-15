@@ -12,10 +12,12 @@
 
 #include "GeoModelXml/Element2GeoItem.h"
 
+
 class MakeSubtraction: public Element2GeoItem {
 public:
-    MakeSubtraction();
+    MakeSubtraction() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+
 };
 
 #endif // GEO_MODEL_XML_MAKE_SUBTRACTION_H

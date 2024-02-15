@@ -10,21 +10,22 @@
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 
+#include <array>
+
 using namespace xercesc;
 
-MakeCons::MakeCons() {}
 
 RCBase * MakeCons::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-const int nParams = 7; 
-char const *parName[nParams] = {"rmin1", "rmin2", "rmax1", "rmax2", "dz", "sphi", "dphi"};
-double p[nParams];
-char *toRelease;
+    constexpr int nParams = 7; 
+    static const std::array<std::string, nParams> parName{"rmin1", "rmin2", "rmax1", "rmax2", "dz", "sphi", "dphi"};
+    std::array<double, nParams> p{};
+    char *toRelease;
 
     for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i])));
+        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i].data())));
         p[i] = gmxUtil.evaluate(toRelease);
         XMLString::release(&toRelease);
     }
 
-    return new GeoCons(p[0], p[1], p[2], p[3], p[4], p[5], p[6]);
+    return const_cast<GeoShape*>(cacheShape(new GeoCons(p[0], p[1], p[2], p[3], p[4], p[5], p[6])).get());
 }

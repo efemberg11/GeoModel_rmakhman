@@ -14,7 +14,7 @@
 
 class MakeTrap: public Element2GeoItem {
 public:
-    MakeTrap();
+    MakeTrap() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 };
 

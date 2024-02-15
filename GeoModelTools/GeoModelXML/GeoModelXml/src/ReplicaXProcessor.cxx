@@ -141,12 +141,12 @@ DOMDocument *doc = element->getOwnerDocument();
                 hepXf0 = geoAXf->getTransform();
             }
             else {
-                geoXf = new GeoTransform (hepXf0);
+                geoXf = makeTransform (hepXf0);
                 hepXf0 = geoXf->getTransform();
             }
             GeoTrf::Transform3D hepXf=hepXf0; 
             for (int i = 0; i < nCopies; ++i) {
-                xfList->push_back((GeoGraphNode *) new GeoTransform(hepXf));
+                xfList->push_back(makeTransform(hepXf));
                 hepXf = hepXf * GeoTrf::TranslateX3D(stepX) ;
             }
     }

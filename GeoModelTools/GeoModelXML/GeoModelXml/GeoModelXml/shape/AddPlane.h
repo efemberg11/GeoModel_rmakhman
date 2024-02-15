@@ -14,8 +14,8 @@ class GmxUtil;
 
 class AddPlane {
 public:
-    AddPlane() {};
-    ~AddPlane() {};
+    AddPlane() = default;
+    ~AddPlane() = default;
     void process(const xercesc::DOMElement *element, double &zPlane, double &rMinPlane, double &rMaxPlane);
     GmxUtil* gmxUtil=nullptr;
 };

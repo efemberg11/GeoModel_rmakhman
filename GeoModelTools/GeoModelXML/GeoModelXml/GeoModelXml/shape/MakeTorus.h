@@ -9,10 +9,12 @@
 
 #include "GeoModelXml/Element2GeoItem.h"
 
+
 class MakeTorus: public Element2GeoItem {
 public:
-    MakeTorus();
+    MakeTorus() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+
 };
 
 #endif // GEO_MODEL_XML_MAKE_TORUS_H

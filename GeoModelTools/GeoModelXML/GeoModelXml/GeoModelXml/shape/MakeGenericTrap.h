@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -12,9 +12,10 @@
 
 #include "GeoModelXml/Element2GeoItem.h"
 
+
 class MakeGenericTrap: public Element2GeoItem {
 public:
-    MakeGenericTrap();
+    MakeGenericTrap() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 };
 

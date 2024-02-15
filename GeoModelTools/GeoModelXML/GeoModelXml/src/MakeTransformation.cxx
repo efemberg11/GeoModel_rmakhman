@@ -55,7 +55,7 @@ char *name2release;
     if (alignable.compare(string("true")) == 0) {
         return (RCBase *) new GeoAlignableTransform(hepTransform);
     }
-    else {
-        return (RCBase *) new GeoTransform(hepTransform);
-    }
+    
+    return makeTransform(hepTransform);
+    
 }

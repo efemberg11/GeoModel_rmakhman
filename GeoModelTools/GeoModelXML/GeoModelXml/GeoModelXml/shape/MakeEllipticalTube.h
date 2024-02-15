@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEO_MODEL_XML_MAKE_ELLIPTICAL_TUBE_H
@@ -10,8 +10,9 @@
 
 class MakeEllipticalTube: public Element2GeoItem {
 public:
-    MakeEllipticalTube();
+    MakeEllipticalTube() = default;;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+
 };
 
 #endif // GEO_MODEL_XML_MAKE_ELLIPTICAL_TUBE_H

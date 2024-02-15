@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 #include <string>
 #include <vector>
@@ -7,37 +7,35 @@
 #include <stdexcept>
 
 #include "GeoModelXml/shape/MakeSimplePolygonBrep.h"
-#include <xercesc/dom/DOM.hpp>
-#include "GeoModelKernel/RCBase.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
+#include <xercesc/dom/DOM.hpp>
+#include "GeoModelHelpers/throwExcept.h"
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 using namespace xercesc;
 
-MakeSimplePolygonBrep::MakeSimplePolygonBrep() {}
 
 RCBase * MakeSimplePolygonBrep::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-const int nParams = 3; 
-char const *parName[nParams] = {"xpoints", "ypoints", "zhalflength"};
-double z;
-std::vector <double> x;
-std::vector <double> y;
+    constexpr int nParams = 3; 
+    static const std::array<std::string, nParams> parName {"xpoints", "ypoints", "zhalflength"};
+    double z{0.};
+    std::vector <double> x{}, y{};
 
-char *toRelease;
+    char *toRelease;
 
-    toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[0])));
+    toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[0].data())));
     std::string xPoints(toRelease);
     XMLString::release(&toRelease);
 
-    toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[1])));
+    toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[1].data())));
     std::string yPoints(toRelease);
     XMLString::release(&toRelease);
 
-    toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[2])));
+    toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[2].data())));
     z = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
 
-    GeoSimplePolygonBrep * poly = new GeoSimplePolygonBrep(z);
+    GeoIntrusivePtr<GeoSimplePolygonBrep> poly{new GeoSimplePolygonBrep(z)};
 
     std::istringstream xSS(xPoints);
     while (!xSS.eof()) {
@@ -57,7 +55,7 @@ char *toRelease;
     int ny = y.size();
   
     if (nx < 3 || ny < 3 || nx != ny) {
-        throw std::runtime_error(std::string("MakeSimplePolygonBrep: Unequal number of x and y points, or less than 3\n\n") +
+        THROW_EXCEPTION("Unequal number of x and y points, or less than 3\n\n"<<
          "xpoints was:\n" + xPoints + "\nypoints was:\n" + yPoints + "\n\n");
     }
 
@@ -65,6 +63,6 @@ char *toRelease;
         poly->addVertex(x[i], y[i]);
     }
 
-    return poly;
+    return const_cast<GeoShape*>(cacheShape(poly).get());
 
 }

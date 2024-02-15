@@ -5,35 +5,32 @@
 // Automatically generated code from /home/hessey/prog/gmx2geo/makeshape
 // But then edited for AddPlane stuff
 #include "GeoModelXml/shape/MakePgon.h"
-#include <xercesc/dom/DOM.hpp>
-#include "GeoModelKernel/RCBase.h"
 #include "GeoModelKernel/GeoPgon.h"
+#include <xercesc/dom/DOM.hpp>
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 
+#include <array>
 using namespace xercesc;
 
-MakePgon::MakePgon() {}
 
 RCBase * MakePgon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-const int nParams = 3; 
-char const *parName[nParams] = {"sphi", "dphi", "nsides"};
-double p[nParams];
-char *toRelease;
+    constexpr int nParams = 3; 
+    static const std::array<std::string, nParams> parName {"sphi", "dphi", "nsides"};
+    std::array<double, nParams> p{};
+    char *toRelease;
 
     for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i])));
+        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i].data())));
         p[i] = gmxUtil.evaluate(toRelease);
         XMLString::release(&toRelease);
     }
 
-    GeoPgon *pgon = new GeoPgon(p[0], p[1], p[2]);
+    GeoIntrusivePtr<GeoPgon> pgon{new GeoPgon(p[0], p[1], p[2])};
 //
 //    Add planes
 //
-    double zPlane = 0.;
-    double rMinPlane = 0.;
-    double rMaxPlane = 0.;
+    double zPlane{0.}, rMinPlane{0.}, rMaxPlane{0.};
     for (DOMNode *child = element->getFirstChild(); child != 0; child = child->getNextSibling()) {
         if (child->getNodeType() == DOMNode::ELEMENT_NODE) {
             toRelease = XMLString::transcode(child->getNodeName());
@@ -45,6 +42,5 @@ char *toRelease;
             }
         }
     }
-
-    return pgon;
+    return const_cast<GeoShape*>(cacheShape(pgon).get());
 }

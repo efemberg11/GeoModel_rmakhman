@@ -151,7 +151,7 @@ DOMDocument *doc = element->getOwnerDocument();
             }
             GeoTrf::Transform3D hepXf=GeoTrf::Transform3D::Identity(); // Identity initially
             for (int i = 0; i < nCopies; ++i) {
-                xfList->push_back((GeoGraphNode *) new GeoTransform(hepXf));
+                xfList->push_back(makeTransform(hepXf));
                 hepXf = hepXf0 * hepXf;
             }
         }

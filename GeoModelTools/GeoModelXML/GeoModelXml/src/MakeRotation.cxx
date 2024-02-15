@@ -18,12 +18,12 @@ using namespace xercesc;
 GeoTrf::Rotation3D MakeRotation::getTransform(const DOMElement *rotation, GmxUtil &gmxUtil) {
 
 const int nParams = 4; 
-char const *parName[nParams] = {"angle", "xcos", "ycos", "zcos"};
-double p[nParams];
+static const std::array<std::string, nParams> parName {"angle", "xcos", "ycos", "zcos"};
+std::array<double, nParams> p{};
 char *toRelease;
 
     for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(rotation->getAttribute(XMLString::transcode(parName[i])));
+        toRelease = XMLString::transcode(rotation->getAttribute(XMLString::transcode(parName[i].data())));
         p[i] = gmxUtil.evaluate(toRelease);
         XMLString::release(&toRelease);
     }

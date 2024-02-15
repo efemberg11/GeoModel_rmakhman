@@ -28,15 +28,6 @@ struct GeoShapeSorter {
 
 };
 
-struct GeoComposedShapeSorter {
-    template<class ShapeType1, class ShapeType2>
-    bool operator()(const GeoIntrusivePtr<ShapeType1>& a, 
-                    const GeoIntrusivePtr<ShapeType2>& b) const {
-            return (*this)(a.get(), b.get());
-    }
-    bool operator()(const GeoShape* a, const GeoShape* b) const;
-
-};
 /// @brief 
 /// @tparam ShapeType 
 template<class ShapeType>

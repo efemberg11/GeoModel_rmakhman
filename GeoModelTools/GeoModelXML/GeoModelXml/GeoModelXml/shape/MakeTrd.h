@@ -14,7 +14,7 @@
 
 class MakeTrd: public Element2GeoItem {
 public:
-    MakeTrd();
+    MakeTrd() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 };
 

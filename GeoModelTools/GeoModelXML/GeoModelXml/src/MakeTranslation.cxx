@@ -19,12 +19,12 @@ using namespace xercesc;
 GeoTrf::Translate3D MakeTranslation::getTransform(const DOMElement *translation, GmxUtil &gmxUtil) {
 
 const int nParams = 3; 
-char const *parName[nParams] = {"x", "y", "z"};
-double p[nParams];
+static const std::array<std::string, nParams> parName {"x", "y", "z"};
+std::array<double, nParams> p{};
 char *toRelease;
 
     for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(translation->getAttribute(XMLString::transcode(parName[i])));
+        toRelease = XMLString::transcode(translation->getAttribute(XMLString::transcode(parName[i].data())));
         p[i] = gmxUtil.evaluate(toRelease);
         XMLString::release(&toRelease);
     }

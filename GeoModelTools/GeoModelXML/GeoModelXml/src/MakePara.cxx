@@ -10,21 +10,21 @@
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 
+#include <array>
 using namespace xercesc;
 
-MakePara::MakePara() {}
 
 RCBase * MakePara::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-const int nParams = 6; 
-char const *parName[nParams] = {"xhalflength", "yhalflength", "zhalflength", "alpha", "theta", "phi"};
-double p[nParams];
-char *toRelease;
+    constexpr int nParams = 6; 
+    static const std::array<std::string, nParams> parName{"xhalflength", "yhalflength", "zhalflength", "alpha", "theta", "phi"};
+    std::array<double, nParams> p{};
+    char *toRelease;
 
     for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i])));
+        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i].data())));
         p[i] = gmxUtil.evaluate(toRelease);
         XMLString::release(&toRelease);
     }
 
-    return new GeoPara(p[0], p[1], p[2], p[3], p[4], p[5]);
+    return const_cast<GeoShape*>(cacheShape(new GeoPara(p[0], p[1], p[2], p[3], p[4], p[5])).get());
 }

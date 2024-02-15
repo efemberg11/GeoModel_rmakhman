@@ -162,14 +162,14 @@ DOMDocument *doc = element->getOwnerDocument();
                 hepXf0 = geoAXf->getTransform();
             }
             else {
-                geoXf = new GeoTransform (hepXf0);
+                geoXf = makeTransform (hepXf0);
                 hepXf0 = geoXf->getTransform();
             }
 	    double angle=offsetPhi;
             GeoTrf::Transform3D hepXf=hepXf0; 
             for (int i = 0; i < nCopies; ++i) {
 	    	hepXf=hepXf0*GeoTrf::TranslateX3D(radius*cos(angle))*GeoTrf::TranslateY3D(radius*sin(angle))*GeoTrf::RotateZ3D(angle);
-                xfList->push_back((GeoGraphNode *) new GeoTransform(hepXf));
+                xfList->push_back(makeTransform(hepXf));
                 // hepXf = hepXf * GeoTrf::RotateZ3D(stepPhi) ;
 		angle+=stepPhi;
             }

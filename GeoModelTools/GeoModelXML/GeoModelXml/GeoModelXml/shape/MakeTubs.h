@@ -12,9 +12,10 @@
 
 #include "GeoModelXml/Element2GeoItem.h"
 
+
 class MakeTubs: public Element2GeoItem {
 public:
-    MakeTubs();
+    MakeTubs() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 };
 

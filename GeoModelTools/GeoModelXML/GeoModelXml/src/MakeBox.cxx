@@ -10,21 +10,20 @@
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 
+#include <array>
 using namespace xercesc;
 
-MakeBox::MakeBox() {}
-
 RCBase * MakeBox::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-const int nParams = 3; 
-char const *parName[nParams] = {"xhalflength", "yhalflength", "zhalflength"};
-double p[nParams];
-char *toRelease;
+  constexpr int nParams = 3; 
+  static const std::array<std::string, nParams> parName{"xhalflength", "yhalflength", "zhalflength"};
+  std::array<double, nParams> p{};
+  char *toRelease;
 
-    for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i])));
-        p[i] = gmxUtil.evaluate(toRelease);
-        XMLString::release(&toRelease);
-    }
+  for (int i = 0; i < nParams; ++i) {
+      toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i].data())));
+      p[i] = gmxUtil.evaluate(toRelease);
+      XMLString::release(&toRelease);
+  }
 
-    return new GeoBox(p[0], p[1], p[2]);
+  return const_cast<GeoShape*>(cacheShape(new GeoBox(p[0], p[1], p[2])).get());
 }

@@ -13,19 +13,18 @@
 
 using namespace xercesc;
 
-MakeTorus::MakeTorus() {}
 
 RCBase * MakeTorus::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-const int nParams = 5; 
-char const *parName[nParams] = {"rmin", "rmax", "rtor", "sphi", "dphi"};
-double p[nParams];
-char *toRelease;
+  constexpr int nParams = 5; 
+  static const std::array<std::string, nParams> parName {"rmin", "rmax", "rtor", "sphi", "dphi"};
+  std::array<double, nParams> p{};
+  char *toRelease;
 
-    for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i])));
-        p[i] = gmxUtil.evaluate(toRelease);
-        XMLString::release(&toRelease);
-    }
+  for (int i = 0; i < nParams; ++i) {
+      toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i].data())));
+      p[i] = gmxUtil.evaluate(toRelease);
+      XMLString::release(&toRelease);
+  }
 
-    return new GeoTorus(p[0], p[1], p[2], p[3], p[4]);
+  return  const_cast<GeoShape*>(cacheShape(new GeoTorus(p[0], p[1], p[2], p[3], p[4])).get());
 }

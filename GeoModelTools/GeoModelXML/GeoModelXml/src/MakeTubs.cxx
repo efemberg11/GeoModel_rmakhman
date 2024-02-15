@@ -12,19 +12,18 @@
 
 using namespace xercesc;
 
-MakeTubs::MakeTubs() {}
 
 RCBase * MakeTubs::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-const int nParams = 5; 
-char const *parName[nParams] = {"rmin", "rmax", "zhalflength", "sphi", "dphi"};
-double p[nParams];
-char *toRelease;
+    constexpr int nParams = 5; 
+    static const std::array<std::string, nParams> parName {"rmin", "rmax", "zhalflength", "sphi", "dphi"};
+    std::array<double, nParams> p{};
+    char *toRelease;
 
     for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i])));
+        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i].data())));
         p[i] = gmxUtil.evaluate(toRelease);
         XMLString::release(&toRelease);
     }
 
-    return new GeoTubs(p[0], p[1], p[2], p[3], p[4]);
+    return  const_cast<GeoShape*>(cacheShape(new GeoTubs(p[0], p[1], p[2], p[3], p[4])).get());
 }

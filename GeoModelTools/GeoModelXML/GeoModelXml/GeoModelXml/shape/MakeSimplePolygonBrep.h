@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 #include <xercesc/util/XercesDefs.hpp>
 //
@@ -13,7 +13,7 @@
 
 class MakeSimplePolygonBrep: public Element2GeoItem {
 public:
-    MakeSimplePolygonBrep();
+    MakeSimplePolygonBrep() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 };
 

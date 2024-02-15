@@ -21,6 +21,7 @@
 #include "GeoModelKernel/GeoPara.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
+#include "GeoModelKernel/GeoGenericTrap.h"
 
 #include "GeoModelKernel/Units.h"
 
@@ -33,7 +34,7 @@ std::pair<const GeoShape* , const GeoShape*> getOps(const GeoShape* composed) {
     } else if (composed->typeID() == GeoShapeSubtraction::getClassTypeID()) {
         const GeoShapeSubtraction* shapeSubtract = dynamic_cast<const GeoShapeSubtraction*>(composed);
         return std::make_pair(shapeSubtract->getOpA(), shapeSubtract->getOpB());
-    } else if (composed->typeID() == GeoShapeUnion::getClassTypeID()) {
+    } else if (composed->typeID() == GeoShapeIntersection::getClassTypeID()) {
         const GeoShapeIntersection* shapeIntersect = dynamic_cast<const GeoShapeIntersection*>(composed);
         return std::make_pair(shapeIntersect->getOpA(), shapeIntersect->getOpB());
     } else if (composed->typeID() == GeoShapeShift::getClassTypeID()) {
@@ -82,7 +83,7 @@ std::vector<const GeoShape*> getBooleanComponents(const GeoShape* booleanShape) 
 std::string printGeoShape(const GeoShape* shape) {
     std::stringstream ostr{};
     constexpr double toDeg{1./GeoModelKernelUnits::deg};
-    ostr<<shape->type()<<" ("<<shape<<") ";
+    ostr<<shape->type()<<" ("<<shape<<"/"<<shape->refCount()<<") ";
     const int typeID = shape->typeID();
     if (typeID == GeoShapeUnion::getClassTypeID()) {
         const GeoShapeUnion* shapeUnion = dynamic_cast<const GeoShapeUnion*>(shape);
@@ -138,6 +139,12 @@ std::string printGeoShape(const GeoShape* shape) {
       ostr<<"Torus R="<<torus->getRTor()<<", ";
       ostr<<"sPhi="<<torus->getSPhi()*toDeg<<", ";
       ostr<<"dPhi="<<torus->getDPhi()*toDeg;
+   } else if (typeID == GeoGenericTrap::getClassTypeID()) {
+        const GeoGenericTrap* trap = dynamic_cast<const GeoGenericTrap*>(shape);
+        ostr<<"half Z: "<<trap->getZHalfLength()<<" n Vertices: "<<trap->getVertices().size()<<std::endl;
+        for ( const GeoTrf::Vector2D& vec : trap->getVertices()) {
+            ostr<<"  **** "<<GeoTrf::toString(vec)<<std::endl;
+        }
    }
     return ostr.str();
 }

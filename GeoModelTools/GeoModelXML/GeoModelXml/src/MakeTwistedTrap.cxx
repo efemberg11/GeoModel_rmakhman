@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -31,19 +31,20 @@
 
 using namespace xercesc;
 
-MakeTwistedTrap::MakeTwistedTrap() {}
 
 RCBase * MakeTwistedTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-const int nParams = 11; 
-char const *parName[nParams] = {"twist", "dz", "theta","phi","dy1","dx1","dx2","dy2","dx3","dx4","alpha"};
-double p[nParams];
-char *toRelease;
+  constexpr int nParams = 11; 
+  static const std::array<std::string, nParams> parName {"twist", "dz", "theta","phi","dy1","dx1","dx2","dy2","dx3","dx4","alpha"};
+  std::array<double, nParams> p{};
+  char *toRelease;
 
-    for (int i = 0; i < nParams; ++i) {
-        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i])));
+  for (int i = 0; i < nParams; ++i) {
+        toRelease = XMLString::transcode(element->getAttribute(XMLString::transcode(parName[i].data())));
         p[i] = gmxUtil.evaluate(toRelease);
         XMLString::release(&toRelease);
     }
 
-    return new GeoTwistedTrap(p[0], p[1], p[2],p[3], p[4], p[5],p[6], p[7], p[8],p[9], p[10]);
+    return const_cast<GeoShape*>(cacheShape(new GeoTwistedTrap(p[0], p[1], p[2], p[3], 
+                                                               p[4], p[5], p[6], p[7], 
+                                                               p[8], p[9], p[10])).get());
 }

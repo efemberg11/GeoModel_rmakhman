@@ -83,6 +83,7 @@ int GeoShapeSorter::compare(const GeoShape* objA, const GeoShape* objB) const {
     
     std::pair<const GeoShape*, const GeoShape*> shapeOpsA{getOps(objA)};
     std::pair<const GeoShape*, const GeoShape*> shapeOpsB{getOps(objB)};
+    
     CALL_SORTER(shapeOpsA.first, shapeOpsB.first);
     CALL_SORTER(shapeOpsA.second, shapeOpsB.second);
   } 
@@ -156,7 +157,8 @@ int GeoShapeSorter::compare(const GeoShape* objA, const GeoShape* objB) const {
       CHECK_PROPERTY(trapA, trapB, getZHalfLength);
       CHECK_PROPERTY(trapA, trapB, getVertices().size);
       for (size_t v = 0; v < trapA->getVertices().size(); ++v) {
-          if (transCmp(trapA->getVertices()[v], trapB->getVertices()[v])) return true;
+          const int compare = transCmp.compare(trapA->getVertices()[v], trapB->getVertices()[v]);
+          if (compare) return compare;
       }
    } else if (typeID == GeoPcon::getClassTypeID()) {
      const GeoPcon* pconA = dynamic_cast<const GeoPcon*>(objA);
@@ -226,12 +228,6 @@ int GeoShapeSorter::compare(const GeoShape* objA, const GeoShape* objB) const {
   return 0;
 }
 
-bool GeoComposedShapeSorter::operator()(const GeoShape* a, const GeoShape* b) const {
-    const unsigned int  aComposed{countComposedShapes(a)};
-    const unsigned int  bComposed{countComposedShapes(b)};
-    if (aComposed != bComposed) return aComposed < bComposed;
-    return a->typeID() < b->typeID();
-}
 #undef CHECK_PROPERTY
 #undef CHECK_VEC_PROPERTY
 #undef COMPARE_GEOVEC

@@ -30,7 +30,7 @@ bool StrictErrorHandler::handleError(const xercesc::DOMError &domError) {
         msglog << "\nFatal Error at file \n";
     }
     msglog << XMLString::transcode(domError.getLocation()->getURI())
-         << ", line " << domError.getLocation()->getLineNumber()
+         << " - line " << domError.getLocation()->getLineNumber()
          << ", char " << domError.getLocation()->getColumnNumber()
          << "\n  Message: " << XMLString::transcode(domError.getMessage()) << endmsg;
 

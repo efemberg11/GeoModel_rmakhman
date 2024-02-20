@@ -201,12 +201,12 @@ void MaterialManager::buildSpecialMaterials() {
   // Ether  
   GeoIntrusivePtr<GeoElement> ethElement{new GeoElement("Ether","ET",500.0,0.0)};
   m_elements.insert(std::make_pair("Ether",ethElement));
-  GeoIntrusivePtr<GeoMaterial> ether{new GeoMaterial("Ether",0.0)};
+  GeoIntrusivePtr<GeoMaterial> ether{new GeoMaterial("special::Ether",0.0)};
   ether->add(ethElement,1.);
   ether->lock();
   m_materials.insert(std::make_pair("special::Ether", ether));
   // HyperUranium
-  GeoIntrusivePtr<GeoMaterial> hu{new GeoMaterial("HyperUranium",0.0)};
+  GeoIntrusivePtr<GeoMaterial> hu{new GeoMaterial("special::HyperUranium",0.0)};
   hu->add(ethElement,1.);
   hu->lock();
   m_materials.insert(std::make_pair("special::HyperUranium", hu));

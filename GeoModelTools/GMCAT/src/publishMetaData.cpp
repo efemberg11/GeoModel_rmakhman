@@ -33,6 +33,7 @@ std::string getCommandOutput(const std::string & cmd, bool firstLineOnly=false)
 }
 
 void publishMetaData( GMDBManager & db,
+		      const std::string& repoPath,
 		      std::vector<std::string> &inputFiles,
 		      std::vector<std::string> &inputPlugins,
 		      std::string              &outputFile) {
@@ -98,25 +99,29 @@ void publishMetaData( GMDBManager & db,
       }
     }
   }
-  std::string isGitManaged=getCommandOutput("git rev-parse --is-inside-work-tree");
+  std::string isGitManaged=getCommandOutput("git -C " + repoPath + " rev-parse --is-inside-work-tree");
   if (isGitManaged=="true\n") {
-    xtraMetadata.repo=getCommandOutput("git remote get-url origin");
-    xtraMetadata.branch=getCommandOutput("git rev-parse --abbrev-ref HEAD");
-    std::string status=getCommandOutput("git status --porcelain");
+    xtraMetadata.repo=getCommandOutput("git -C " + repoPath + " remote get-url origin");
+    xtraMetadata.branch=getCommandOutput("git -C " + repoPath + " rev-parse --abbrev-ref HEAD");
+    std::string status=getCommandOutput("git -C " + repoPath + " status --porcelain");
     if (status.find(" M ")!=std::string::npos) {
       xtraMetadata.isClean="no";
     }
     else {
-      std::string synchedToOrigin=getCommandOutput("git diff origin/"+xtraMetadata.branch,true);
+      std::string synchedToOrigin=getCommandOutput("git -C " + repoPath + " diff origin/"+xtraMetadata.branch,true);
       if (synchedToOrigin!="") {
 	xtraMetadata.isClean="no";
       }
       else {
 	xtraMetadata.isClean="yes";
-	xtraMetadata.commitHash=getCommandOutput("git log -1 --format=format:\"%H\"");
-	xtraMetadata.associatedTag=getCommandOutput("git  describe --tag " + xtraMetadata.commitHash+ "  2> /dev/null");
+	xtraMetadata.commitHash=getCommandOutput("git -C " + repoPath + " log -1 --format=format:\"%H\"");
+	xtraMetadata.associatedTag=getCommandOutput("git -C " + repoPath + " describe --tag " + xtraMetadata.commitHash+ "  2> /dev/null");
       }
     }
+  }
+  else {
+    std::cerr << std::endl << "ERROR: provided directory " << repoPath << " is NOT inside a local git reporistory!" << std::endl;
+    throw std::runtime_error("Metadata not written!");
   }
 
   //

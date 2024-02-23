@@ -35,6 +35,7 @@ const std::string shared_obj_extension=".so";
 
 
 void publishMetaData( GMDBManager & db,
+		      const std::string& repoPath,
 		      std::vector<std::string> &inputFiles,
 		      std::vector<std::string> &inputPlugins,
 		      std::string              &outputFile);
@@ -48,9 +49,12 @@ int main(int argc, char ** argv) {
   //
 
   std::string gmcat= argv[0];
-  std::string usage= "usage: " + gmcat + " [plugin1"+shared_obj_extension
+  std::string usage= "usage: " + gmcat + " [OPTIONS] [plugin1"+shared_obj_extension
     + "] [plugin2" + shared_obj_extension
-    + "] ...[file1.db] [file2.db].. -o outputFile]";
+    + "] ...[file1.db] [file2.db].. -o outputFile]\n"
+    + "Options:\n"
+    + "\t-v Print verbose output to the screen (default: direct verbose output to /tmp)\n"
+    + "\t-g Path to the local GeoModelATLAS repository (default: .)";
   //
   // Print usage message if no args given:
   //
@@ -64,6 +68,7 @@ int main(int argc, char ** argv) {
   std::vector<std::string> inputFiles;
   std::vector<std::string> inputPlugins;
   std::string outputFile;
+  std::string gmAtlasDir{"."};
   bool outputFileSet = false;
   for (int argi=1;argi<argc;argi++) {
       std::string argument=argv[argi];
@@ -79,6 +84,9 @@ int main(int argc, char ** argv) {
       else if (argument.find("-v")!=std::string::npos) {
           setenv("GEOMODEL_GEOMODELIO_VERBOSE", "1", 1); // does overwrite
           verbose=true;
+      }
+      else if (argument.find("-g")!=std::string::npos) {
+	gmAtlasDir = std::string(argv[++argi]);
       }
       else if (argument.find(shared_obj_extension)!=std::string::npos) {
           inputPlugins.push_back(argument);
@@ -125,16 +133,24 @@ int main(int argc, char ** argv) {
   // Loop over plugins, create the geometry and put it under the world:
   //
   std::ofstream file;
+  std::string verboseOutput{"/tmp/gmcat-"+std::to_string(getpid())};
   std::streambuf *coutBuff=std::cout.rdbuf();
   std::streambuf *fileBuff=file.rdbuf();
   if (!verbose) {
-    file.open(("/tmp/gmcat-"+std::to_string(getpid())).c_str());
+    file.open(verboseOutput.c_str());
     std::cout.rdbuf(fileBuff); 
   }
   
   std::vector<GeoPublisher*> vecPluginsPublishers; // caches the stores from all plugins
   for (const std::string & plugin : inputPlugins) {
     GeoGeometryPluginLoader loader;
+
+    if(!verbose) {
+      std::cout.rdbuf(coutBuff);
+      std::cout << "Building geometry using the plugin " << plugin << " ..." << std::endl;
+      std::cout.rdbuf(fileBuff);
+    }
+
     GeoVGeometryPlugin *factory=loader.load(plugin);
     if (!factory) {
       std::cerr << "gmcat -- Could not load plugin " << plugin << std::endl;
@@ -151,12 +167,23 @@ int main(int argc, char ** argv) {
     if( nullptr != factory->getPublisher() ) {
         vecPluginsPublishers.push_back( factory->getPublisher() ); // cache the publisher, if any, for later
     }
+    if(!verbose) {
+      std::cout.rdbuf(coutBuff);
+      std::cout << "\t ... DONE!" << std::endl;
+      std::cout.rdbuf(fileBuff);
+    }
   }
 
   //
   // Loop over files, create the geometry and put it under the world:
   //
   for (const std::string & file : inputFiles) {
+    if(!verbose) {
+      std::cout.rdbuf(coutBuff);
+      std::cout << "Reading geometry from the file " << file << " ..." << std::endl;
+      std::cout.rdbuf(fileBuff);
+    }
+
     GMDBManager* db = new GMDBManager(file);
     if (!db->checkIsDBOpen()){
       std::cerr << "gmcat -- Error opening the input file: " << file << std::endl;
@@ -186,6 +213,12 @@ int main(int argc, char ** argv) {
     }
 
     delete db;
+    if(!verbose) {
+      std::cout.rdbuf(coutBuff);
+      std::cout << "\t ... DONE!" << std::endl;
+      std::cout.rdbuf(fileBuff);
+    }
+
   }
   //
   // Open a new database:
@@ -205,18 +238,42 @@ int main(int argc, char ** argv) {
   GeoModelIO::WriteGeoModel dumpGeoModelGraph(db);
   resizedWorld->exec(&dumpGeoModelGraph);
 
-
-
-
-  
+  if(!verbose) {
+    std::cout.rdbuf(coutBuff);
+    std::cout << "Writing auxiliary tables to the output database ..." << std::endl;
+    std::cout.rdbuf(fileBuff);
+  }
   if (vecPluginsPublishers.size() > 0) {
     dumpGeoModelGraph.saveToDB(vecPluginsPublishers);
   } else {
     dumpGeoModelGraph.saveToDB();
   }
+  if(!verbose) {
+    std::cout.rdbuf(coutBuff);
+    std::cout << "\t ... DONE!" << std::endl;
+    std::cout.rdbuf(fileBuff);
+  }
 
+  if(!verbose) {
+    std::cout.rdbuf(coutBuff);
+    std::cout << "Writing metadata to the output database ..." << std::endl;
+    std::cout.rdbuf(fileBuff);
+  }
+  try {
+    publishMetaData(db,gmAtlasDir,inputFiles,inputPlugins,outputFile);
+  }
+  catch(std::runtime_error& e) {
+    std::cerr << "ERROR: " << e.what() << std::endl;
+    return 1;
+  }
+  if(!verbose) {
+    std::cout.rdbuf(coutBuff);
+    std::cout << "\t ... DONE!" << std::endl;
+    std::cout.rdbuf(fileBuff);
+  }
 
-  publishMetaData(db,inputFiles,inputPlugins,outputFile);
   std::cout.rdbuf(coutBuff);
+  std::cout << "SUCCESS!" << std::endl;
+  std::cout << "(verbose output at " << verboseOutput << ")" << std::endl;
   return 0;
 }

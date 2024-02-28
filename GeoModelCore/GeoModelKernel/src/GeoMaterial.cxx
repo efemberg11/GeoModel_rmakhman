@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+#include <array>
 
 // These constants are the ionization potentials, indexed by atomic     
 // number.  They have been obtained from      
@@ -21,8 +22,7 @@
 // tabular values. These are in electron-volts.     
 
 
-const double
-  GeoMaterial::s_ionizationPotential[93] = {
+constexpr std::array<double, 93> s_ionizationPotential{
   0.0 *
     GeoModelKernelUnits::eV,
   19.2 *
@@ -211,7 +211,7 @@ const double
   GeoModelKernelUnits::eV
 };
 
-unsigned int GeoMaterial::s_lastID = 0;
+std::atomic<unsigned int> GeoMaterial::s_lastID = 0;
 
 GeoMaterial::GeoMaterial (const std::string& name, double density)
    : m_name(name)
@@ -225,11 +225,11 @@ void GeoMaterial::add (const GeoElement* element, double fraction)
   // You can only add materials until you call "lock"...     
   if(m_locked) throw std::out_of_range ("Element added after material locked");
 
+  GeoIntrusivePtr<const GeoElement> elementPtr{element};
   auto e = std::find(m_elements.begin(),m_elements.end(),element);
   if (e==m_elements.end()) {
-    m_elements.push_back (element);
+    m_elements.push_back (elementPtr);
     m_fractions.push_back (fraction);
-    element->ref ();
   }
   else {
     int n = e-m_elements.begin();

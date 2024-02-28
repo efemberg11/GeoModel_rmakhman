@@ -120,9 +120,8 @@ class GeoMaterial : public RCBase
   std::vector<GeoIntrusivePtr<const GeoElement>> m_elements;
 
   //	A static used to assign unique identifiers to new materials.
-  static unsigned int s_lastID;
+  static std::atomic<unsigned int> s_lastID;
   
-  static const double s_ionizationPotential[93];
 };
 
 inline const std::string& GeoMaterial::getName () const

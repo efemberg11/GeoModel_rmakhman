@@ -206,9 +206,9 @@ std::vector<GeoTrf::Vector3D> getPolyShapeEdges(const GeoShape* shape,
         edgePoints.reserve(2* brep->getNVertices());
         for (double sZ: {-1., 1.}) {
             for (unsigned int vtx = 0 ; vtx < brep->getNVertices(); ++vtx){
-                edgePoints.emplace_back(brep->getXVertex(vtx),
-                                        brep->getYVertex(vtx),
-                                        sZ * brep->getDZ());
+                edgePoints.emplace_back(refTrf * GeoTrf::Vector3D{brep->getXVertex(vtx),
+                                                                  brep->getYVertex(vtx),
+                                                                  sZ * brep->getDZ()});
             
             }
         }

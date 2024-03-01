@@ -11,6 +11,8 @@
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 
+#include <array>
+
 using namespace xercesc;
 
 

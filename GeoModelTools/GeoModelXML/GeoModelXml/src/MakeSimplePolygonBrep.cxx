@@ -5,6 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <stdexcept>
+#include <array>
 
 #include "GeoModelXml/shape/MakeSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
@@ -12,6 +13,8 @@
 #include "GeoModelHelpers/throwExcept.h"
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
+
+
 using namespace xercesc;
 
 

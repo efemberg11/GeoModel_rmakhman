@@ -10,6 +10,8 @@
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 
+#include <array>
+
 MakeRotation::MakeRotation() {}
 
 using namespace xercesc;

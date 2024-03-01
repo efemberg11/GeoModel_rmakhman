@@ -9,6 +9,9 @@
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelKernel/GeoTrap.h"
+
+#include <array>
+
 using namespace xercesc;
 
 

@@ -9,6 +9,8 @@
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 
+#include <array>
+
 #include "GeoModelKernel/GeoDefinitions.h"
 
 MakeTranslation::MakeTranslation() {}

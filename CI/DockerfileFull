@@ -1,23 +1,6 @@
 # Setup the most basic image
-ARG BASEIMAGE=gitlab-registry.cern.ch/geomodeldev/geomodel:main-base
+ARG BASEIMAGE=gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
 FROM ${BASEIMAGE}
-
-
-### First install Geant4 as we want to have the full functionallity
-RUN git clone https://gitlab.cern.ch/geant4/geant4.git --branch 'v10.6.0' && \
-    mkdir build_geant4 && \
-    cd build_geant4 && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local/geant4 -DCMAKE_BUILD_TYPE=Release -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON ../geant4/ &&\
-    make -j3 > /dev/null && \
-    sudo make install > /dev/null && \
-    cd .. && \
-    rm -rf build_geant4 geant4 && \
-    echo "#!/bin/bash" > ~/setup_docker.sh && \
-    echo "cd /usr/local/geant4/bin" >> ~/setup_docker.sh && \
-    echo "source geant4.sh" >> ~/setup_docker.sh && \
-    echo "cd -" >> ~/setup_docker.sh && \
-    sudo mv ~/setup_docker.sh  /usr/local/geant4/setup_docker.sh && \
-    echo "source /usr/local/geant4/setup_docker.sh" >> ~/.bashrc
 
 ### Compile then geo model
 COPY . /workdir/GeoModel_src/ 

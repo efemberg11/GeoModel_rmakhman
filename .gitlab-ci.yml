@@ -1,6 +1,5 @@
 # List of the CI build stages.
 stages:
-  - step-pre
   - step-A
   - step-B
   - step-C
@@ -47,7 +46,7 @@ workflow:
 
 # general Ubuntu job template
 .ubuntu-template-job-base: &ubuntu-job-base
-  image: ubuntu:22.04
+  image: gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
   rules:
     - when: always
 
@@ -58,85 +57,9 @@ workflow:
 # of the build, by using the 'standalone' job only
 .ubuntu-template-job-default: &ubuntu-job
   <<: *ubuntu-job-base
-  before_script:
-    - apt-get update -qq && apt-get install -y -qq apt-utils git wget unzip build-essential freeglut3-dev libboost-all-dev qtbase5-dev libqt5opengl5-dev mercurial libeigen3-dev libsqlite3-dev nlohmann-json3-dev libexpat1-dev libxerces-c-dev libhdf5-dev libhepmc3-dev cmake
-
-
-# .ubuntu-template-job-registry: &ubuntu-job-registry
-#   image: gitlab-registry.cern.ch/mbandier/geant4-ubuntu/base-image:1.1
-#   before_script:
-#     - apt-get update -qq && apt-get install -y -qq libeigen3-dev libsqlite3-dev
 
 
 # TEMPLATES FOR BUILDING PACKAGES
-
-.coin-build-template: &coin-job
-  variables:
-    CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
-  script:
-    - pwd; ls
-    - wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/coin-4.0.0-src.zip
-    - unzip coin-4.0.0-src.zip -d coin-sources
-    - mv coin-sources/* coin
-    - mkdir build_coin
-    - cd build_coin
-    - cmake ${CMAKE_ARGS} ../coin
-    - make -j2
-    - make install
-  artifacts:
-    paths:
-      - install
-    expire_in: 1 day
-
-.soqt-build-template: &soqt-job
-  variables:
-    CMAKE_ARGS: ${CMAKE_DEPS_BASE_ARGS}
-  script:
-    - pwd; ls
-    - wget https://atlas-vp1.web.cern.ch/atlas-vp1/sources/soqt.zip
-    - unzip soqt.zip
-    - mkdir build_soqt
-    - cd build_soqt
-    - echo "CMAKE_ARGS - ${CMAKE_ARGS}"
-    - cmake ${CMAKE_ARGS} ../soqt
-    - make -j2
-    - make install
-    - pwd; ls # CI debug only
-    - ls ../ # CI debug only
-    - ls ../../ # CI debug only
-  artifacts:
-    paths:
-      - install
-    expire_in: 1 day
-
-
-
-
-.geant4-build-template-job: &geant4-job
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-  script:
-    - pwd; ls
-    - git clone https://gitlab.cern.ch/geant4/geant4.git
-    - cd geant4
-    - git checkout tags/v11.0.2
-    - cd ../
-    - mkdir Geant4-build
-    - cd Geant4-build
-    - ls;
-    - ls ../
-    - if [ -d "../install" ]; then ls ../install; fi
-    - cmake ${CMAKE_ARGS} -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON  ../geant4 
-    - make -j4
-    - make install
-  artifacts:
-    paths:
-      - install
-    expire_in: 1 day
-
-
-
-
 .geomodel-build-template: &geomodel-job
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
@@ -286,17 +209,6 @@ debug-job:
 ### These jobs build the various GeoModel sub-packages with the use of the CMake
 ### build options.
 
-ubu-coin:
-  <<: *ubuntu-job
-  <<: *coin-job
-  stage: step-A
-
-ubu-soqt:
-  <<: *ubuntu-job
-  <<: *soqt-job
-  stage: step-B
-  needs: ["ubu-coin"]
-
 ubu-gm-base:
   <<: *ubuntu-job
   <<: *geomodel-job
@@ -316,7 +228,6 @@ ubu-gm-tools:
 ubu-gm-visualization:
   <<: *ubuntu-job
   <<: *geomodel-job
-  needs: ["ubu-coin", "ubu-soqt"]
   stage: step-C
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
@@ -331,18 +242,10 @@ ubu-gm-examples:
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
 
 
-
-ubu-geant4:
-  <<: *ubuntu-job
-  <<: *geant4-job
-  stage: step-A
-
-
 ubu-gm-examples-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-B
-  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
@@ -351,7 +254,6 @@ ubu-gm-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-B
-  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
@@ -361,7 +263,6 @@ ubu-gm-fullsimlight:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-B
-  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
@@ -371,7 +272,6 @@ ubu-gm-fsl:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-B
-  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FSL=TRUE
@@ -381,7 +281,6 @@ ubu-gm-all:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-C
-  needs: ["ubu-coin", "ubu-soqt", "ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
@@ -395,7 +294,6 @@ ubu-gm-atlasextras:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-B
-  needs: ["ubu-geant4"]
   variables:
     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
@@ -405,7 +303,6 @@ ubu-gm-atlasextras:
 #   <<: *ubuntu-job
 #   <<: *geomodel-job
 #   stage: step-C
-#   needs: ["ubu-geant4"]
 #   variables:
 #     XERCESC_VERSION: 3.2.3
 #     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
@@ -462,7 +359,7 @@ ubu-single-gmtools:
 ubu-single-gmviz:
   <<: *ubuntu-job
   stage: step-C
-  needs: ["ubu-single-gmbase", "ubu-soqt"]
+  needs: ["ubu-single-gmbase"]
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
@@ -479,7 +376,7 @@ ubu-single-gmviz:
 ubu-single-gmg4:
   <<: *ubuntu-job
   stage: step-C
-  needs: ["ubu-single-gmbase", "ubu-geant4"]
+  needs: ["ubu-single-gmbase"]
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
@@ -496,7 +393,7 @@ ubu-single-gmg4:
 ubu-single-gmfullsimlight:
   <<: *ubuntu-job
   stage: step-D
-  needs: ["ubu-single-gmg4", "ubu-geant4"]
+  needs: ["ubu-single-gmg4"]
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
@@ -589,52 +486,19 @@ docs-deploy:
 ## - https://gitlab.cern.ch/gitlabci-examples/build_docker_image/-/blob/master/.gitlab-ci.yml#L11-27
 ## ---
 
-# Build the 'base' image containing the system packages
+# Build the 'full' docker image containing the system packages
 ##  Note:
 ##  - we build the docker image only from 'main' and tags
-##  - image's final name is, e.g., "geomodel:main-base"
+##  - image's final name is, e.g., "gitlab-registry.cern.ch/geomodeldev/geomodel:ci-with-docker-g4-ubuntu-full"
 build_docker_system:
   stage: step-A
   only:
     refs:
       - main
       - tags
-  variables:
-    # To push to a specific docker tag other than latest(the default), amend the --destination parameter, e.g. --destination $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
-    # See https://docs.gitlab.com/ee/ci/variables/predefined_variables.html#variables-reference for available variables
-    IMAGE_DESTINATION: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-base
-    # === Git-related variables
-    # all submodules will be cloned recursively upon start of CI job
-    GIT_SUBMODULE_STRATEGY: recursive
-    GIT_SSL_NO_VERIFY: "true"
-  image: 
-      # The kaniko debug image is recommended because it has a shell, and a shell is required for an image to be used with GitLab CI/CD.
-      name: gcr.io/kaniko-project/executor:debug
-      entrypoint: [""]
-  script:
-      # Prepare Kaniko configuration file
-      - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-      # Build and push the image from the Dockerfile at the root of the project.
-      - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/CI/DockerfileBase --destination $IMAGE_DESTINATION
-      # Print the full registry path of the pushed image
-      - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
 
-## Build a Docker image containing Geant4, too 
-## (a quite large image, then!)
-##  Note:
-##  - we build the docker image only from 'main' and tags
-##  - image's final name is, e.g., "geomodel:main-full"
-##
-build_docker_full:
-  stage: step-B
-  allow_failure: true
-  needs:
-    - build_docker_system
-  timeout: 2h 0m
-  only:
-    refs:
-      - main
-      - tags
+#  rules:
+#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   variables:
     # To push to a specific docker tag other than latest(the default), amend the --destination parameter, e.g. --destination $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
     # See https://docs.gitlab.com/ee/ci/variables/predefined_variables.html#variables-reference for available variables
@@ -651,57 +515,9 @@ build_docker_full:
       # Prepare Kaniko configuration file
       - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
       # Build and push the image from the Dockerfile at the root of the project.
-      - /kaniko/executor 
-            --context $CI_PROJECT_DIR 
-            --dockerfile $CI_PROJECT_DIR/CI/DockerfileFull 
-            --destination $IMAGE_DESTINATION 
-            --build-arg "BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base"
+      - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/CI/DockerfileFull --destination $IMAGE_DESTINATION
       # Print the full registry path of the pushed image
       - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
-
-## Build a Docker image for visualization pupose.
-## This image does not contain 
-## FullSimLight or other Geant4-related packages.
-##  Note:
-##  - we build the docker image only from 'main' and tags
-##  - image's final name is, e.g., "geomodel:main-light"
-##
-build_docker_light:
-  stage: step-B
-  allow_failure: true
-  needs:
-    - build_docker_system
-  timeout: 2h 0m
-  only:
-    refs:
-      - main
-      - tags
-  variables:
-    # To push to a specific docker tag other than latest(the default), amend the --destination parameter, e.g. --destination $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
-    # See https://docs.gitlab.com/ee/ci/variables/predefined_variables.html#variables-reference for available variables
-    IMAGE_DESTINATION: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-light
-    # === Git-related variables
-    # all submodules will be cloned recursively upon start of CI job
-    GIT_SUBMODULE_STRATEGY: recursive
-    GIT_SSL_NO_VERIFY: "true"
-  image: 
-      # The kaniko debug image is recommended because it has a shell, and a shell is required for an image to be used with GitLab CI/CD.
-      name: gcr.io/kaniko-project/executor:debug
-      entrypoint: [""]
-  script:
-      # Prepare Kaniko configuration file
-      - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-      # Build and push the image from the Dockerfile at the root of the project.
-      - /kaniko/executor 
-            --context $CI_PROJECT_DIR 
-            --dockerfile $CI_PROJECT_DIR/CI/DockerfileLight 
-            --destination $IMAGE_DESTINATION 
-            --build-arg "BASEIMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_NAME}-base"
-      # Print the full registry path of the pushed image
-      - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
-
-
-
 
 
 ##########

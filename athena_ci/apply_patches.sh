@@ -31,3 +31,5 @@ for p in "$SCRIPT_DIR"/patches/*.patch; do
     git --no-pager log -1 $sha
     fill_line "-"
 done
+
+git diff HEAD ${NIGHTLY_COMMIT}

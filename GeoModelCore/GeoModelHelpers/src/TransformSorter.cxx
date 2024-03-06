@@ -2,6 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 #include "GeoModelHelpers/TransformSorter.h"
+#include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelHelpers/throwExcept.h"
 
 namespace GeoTrf {
@@ -40,6 +41,10 @@ namespace GeoTrf {
                                      const ::GeoTransform* b) const {
         if (!a || !b) {
             THROW_EXCEPTION("Nullptr given to comparator");
+        }
+        if (typeid(*a) == typeid(GeoAlignableTransform) ||
+            typeid(*b) == typeid(GeoAlignableTransform)) {
+            return a < b;
         }
         return (*this)(a->getTransform(), b->getTransform());
     }

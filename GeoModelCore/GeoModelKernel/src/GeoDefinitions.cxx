@@ -23,7 +23,7 @@ namespace GeoTrf {
 
   GeoRotation::GeoRotation(double phi, double theta, double psi):
       GeoRotation{EulerAngles{phi, theta, psi}} {}
- 
+
   GeoRotation::GeoRotation(const EulerAngles& angles):
       RotationMatrix3D{get3DRotMatZ(angles.phi) * 
                        get3DRotMatX(angles.theta) *

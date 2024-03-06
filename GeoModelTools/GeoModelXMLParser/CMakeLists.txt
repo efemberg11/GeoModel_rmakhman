@@ -21,6 +21,8 @@ set_target_properties( GeoModelXMLParser PROPERTIES
 # version of the library.
 add_library( GeoModelTools::GeoModelXMLParser ALIAS GeoModelXMLParser )
 
+target_link_libraries( GeoModelXMLParser PRIVATE GeoModelCore::GeoModelHelpers  )
+
 # Install the library.
 install(TARGETS GeoModelXMLParser
     EXPORT ${PROJECT_NAME}-export

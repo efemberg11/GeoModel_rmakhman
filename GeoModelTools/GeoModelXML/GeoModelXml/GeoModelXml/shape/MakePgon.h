@@ -10,10 +10,10 @@
 #define GEO_MODEL_XML_MAKE_PGON_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2GeoItem.h"
+#include "GeoModelXml/Element2ShapeItem.h"
 
 
-class MakePgon: public Element2GeoItem {
+class MakePgon: public Element2ShapeItem {
   public:
       MakePgon() = default;
       virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;

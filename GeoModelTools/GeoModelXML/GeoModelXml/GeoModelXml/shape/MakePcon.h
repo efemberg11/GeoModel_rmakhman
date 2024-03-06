@@ -10,11 +10,10 @@
 #define GEO_MODEL_XML_MAKE_PCON_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2GeoItem.h"
+#include "GeoModelXml/Element2ShapeItem.h"
 
 
-
-class MakePcon: public Element2GeoItem {
+class MakePcon: public Element2ShapeItem {
 public:
     MakePcon() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;

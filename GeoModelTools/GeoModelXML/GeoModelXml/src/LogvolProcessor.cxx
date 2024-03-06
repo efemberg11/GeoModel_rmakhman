@@ -60,7 +60,11 @@ std::string getNodeType(const GeoGraphNode* node) {
         return "GeoTransform";
     return "UnidentifiedNode";
 }
-
+LogvolProcessor::LogvolProcessor() {
+    setLogVolDeDuplication(false);
+    setPhysVolDeDuplication(false);
+      
+}
 void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
   GeoLogVolPtr lv{};
   GeoNameTag *nameTag_physChildVolName;//USed for "sensitive" PhysVols 

@@ -139,18 +139,30 @@ export CMAKE_PREFIX_PATH="${gm_install_dir}:$CMAKE_PREFIX_PATH"
 
 heading "Configure Athena"
 
-package_filters=$SCRIPT_DIR/package_filters.txt
+full_package_filters=$SCRIPT_DIR/package_filters.txt
+patch_package_filters=$SCRIPT_DIR/patch_package_filters.txt
+
+package_filters=$(mktemp)
+
 
 echo "IS_MERGE_REQUEST = $IS_MERGE_REQUEST"
 echo "HEADERS_CHANGED = $HEADERS_CHANGED"
 
 if [ "$IS_MERGE_REQUEST" = "0" ] && [ "$HEADERS_CHANGED" = "1" ]; then
     echo "Is MR and header files have NOT changed"
-    package_filters=$(mktemp)
-    echo "- .*" >> "$package_filters"
+else
+    echo "Is NOT MR OR header files HAVE changed"
+    cat "$full_package_filters" > "$package_filters"
 fi
 
-echo $package_filters
+cat "$patch_package_filters" >> "$package_filters"
+
+echo "- .*" >> "$package_filters"
+
+echo "$package_filters"
+fill_line "-"
+cat "$package_filters"
+fill_line "-"
 
 mkdir athena-build
 install_dir=$PWD/athena-install

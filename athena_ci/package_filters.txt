@@ -140,4 +140,3 @@
 + graphics/VP1/VP1Systems/VP1TrackSystems
 + graphics/VP1/VP1Systems/VP1TrackingGeometrySystems
 + graphics/VP1/VP1Utils
-- .*

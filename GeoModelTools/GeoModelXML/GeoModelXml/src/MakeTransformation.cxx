@@ -16,7 +16,9 @@
 using namespace xercesc;
 using namespace std;
 
-MakeTransformation::MakeTransformation() {}
+MakeTransformation::MakeTransformation() {
+    setTransformDeDuplication(false);
+}
 
 RCBase * MakeTransformation::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
 char *name2release;

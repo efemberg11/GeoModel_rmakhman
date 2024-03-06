@@ -78,13 +78,23 @@ class GeoDeDuplicator {
         GeoLogVolPtr cacheVolume(GeoLogVolPtr vol) const;
         GeoShapePtr cacheShape(GeoShapePtr shape) const;
 
+        void setShapeDeduplication(bool enable);
+        void setLogVolDeDuplication(bool enable);
+        void setTransformDeDuplication(bool enable);
+        void setPhysVolDeDuplication(bool enable);
+
     private:
+        bool m_deDuplicateLogVol{true};
+        bool m_deDuplicatePhysVol{true};
+        bool m_deDuplicateTransform{true};
+        bool m_deDuplicateShape{true};
         using PhysVolSet = std::set<GeoIntrusivePtr<GeoPhysVol>, GeoPhysVolSorter>;
         using LogVolSet = std::set<GeoLogVolPtr, GeoLogVolSorter>;
         using TrfSet = std::set<GeoTrfPtr, GeoTrf::TransformSorter>;
         using ShapeSet = std::set<GeoShapePtr, GeoShapeSorter>;
         mutable PhysVolSet m_physVolStore{};
         mutable LogVolSet m_logVolStore{};
+        mutable std::vector<GeoIntrusivePtr<const RCBase>> m_genericCache{};
 
         static TrfSet s_trfStore;
         static ShapeSet s_shapeStore;

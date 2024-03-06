@@ -1,0 +1,6 @@
+# These Athena packages need to be rebuilt 
+# due to patches in the `patches` directory
+
++ InnerDetector/InDetDetDescr/InDetServMatGeoModel
++ InnerDetector/InDetDetDescr/PixelGeoModel
++ DetectorDescription/GeoModel/GeoModelStandalone/GeoExporter

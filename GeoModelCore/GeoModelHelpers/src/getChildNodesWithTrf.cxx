@@ -26,7 +26,7 @@ namespace {
     }
 }
 
-std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink& physVol,
+std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink physVol,
                                                      bool summarizeEqualVol) {
     std::vector<GeoChildNodeWithTrf> children{};
  
@@ -63,4 +63,15 @@ std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink& physVol,
         cursor.next();
     }
     return children;
+}
+bool hasFullPhysVolInTree(PVConstLink physVol) {
+    if (typeid(*physVol) == typeid(GeoFullPhysVol) ||
+        typeid(*physVol) == typeid(GeoVFullPhysVol)){
+        return true;
+    }
+    for (unsigned int ch = 0; ch < physVol->getNChildVols(); ++ch) {
+        if (hasFullPhysVolInTree(physVol->getChildVol(ch))) return true;
+    }
+
+    return false;
 }

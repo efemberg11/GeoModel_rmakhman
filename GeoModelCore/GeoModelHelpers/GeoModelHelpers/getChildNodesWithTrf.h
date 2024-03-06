@@ -32,8 +32,15 @@ struct GeoChildNodeWithTrf {
         GeoChildNodeWithTrf(GeoVolumeCursor& curs);
 };
 
-std::vector <GeoChildNodeWithTrf> getChildrenWithRef (PVConstLink& physVol,
+std::vector <GeoChildNodeWithTrf> getChildrenWithRef (PVConstLink physVol,
                                                       bool summarizeEqualVol = true);
+
+/**
+ *  Returns whether a volume has fullPhysical volume nodes in 
+ *  it's children and grand children tree
+*/
+bool hasFullPhysVolInTree(PVConstLink physVol);
+
 
 
 #endif

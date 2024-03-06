@@ -28,6 +28,9 @@
 using namespace xercesc;
 using namespace std;
 
+ReplicaXYarraysProcessor::ReplicaXYarraysProcessor(){
+    setTransformDeDuplication(false);
+}
 void ReplicaXYarraysProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
 char *toRelease;
 XMLCh *ref = XMLString::transcode("ref");

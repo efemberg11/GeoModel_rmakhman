@@ -23,23 +23,14 @@
 #include "GeoModelXml/GeoNodeList.h"
 #include "GeoModelXml/ProcessorRegistry.h"
 #include "GeoModelXml/GmxUtil.h"
+#include "GeoModelHelpers/StringUtils.h"
 
 
 using namespace xercesc;
 using namespace std;
-
-void ReplicaXProcessor::tokenize(string &str, char delim, vector<string> &out) const
-{
-        size_t start;
-        size_t end = 0;
-
-        while ((start = str.find_first_not_of(delim, end)) != string::npos)
-        {
-                end = str.find(delim, start);
-                out.push_back(str.substr(start, end - start));
-        }
+ReplicaXProcessor::ReplicaXProcessor() {
+    setTransformDeDuplication(false);
 }
-
 void ReplicaXProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
 char *toRelease;
 XMLCh *ref = XMLString::transcode("ref");
@@ -86,18 +77,15 @@ DOMDocument *doc = element->getOwnerDocument();
         toRelease = XMLString::transcode(element->getAttribute(skip_tmp));
         std::string skip_str(toRelease);
         //std::cout << "skip string "<<skip_str<<std::endl;
-        std::vector<std::string> parsed;
-        tokenize(skip_str,' ',parsed);
-        for (auto k : parsed)
-        {
-                std::vector<std::string> tmp_parsed;
+        std::vector<std::string> parsed = GeoStrUtils::tokenize(skip_str," ");
+        for (const std::string&  k : parsed) {
+                std::vector<std::string> tmp_parsed = GeoStrUtils::tokenize(k, "-");
                 //std::cout<<" parsed "<<k<<std::endl;
-                tokenize(k,'-',tmp_parsed);
-                if (tmp_parsed.size()==1) elementsToSkip.push_back(std::stoi(tmp_parsed[0]));
+                if (tmp_parsed.size()==1) elementsToSkip.push_back(GeoStrUtils::atoi(tmp_parsed[0]));
                 else if (tmp_parsed.size()==2)
                 {
-                        int i1=std::stoi(tmp_parsed[0]);
-                        int i2=std::stoi(tmp_parsed[1]);
+                        int i1=GeoStrUtils::atoi(tmp_parsed[0]);
+                        int i2=GeoStrUtils::atoi(tmp_parsed[1]);
                         //std::cout<<" indices "<<i1<<" "<<i2<<std::endl;
                         assert(i1<i2);
                         for (int l=i1;l<i2+1;l++) elementsToSkip.push_back(l);
@@ -139,8 +127,7 @@ DOMDocument *doc = element->getOwnerDocument();
             if (alignable) {
                 geoAXf = new GeoAlignableTransform (hepXf0) ;
                 hepXf0 = geoAXf->getTransform();
-            }
-            else {
+            } else {
                 geoXf = makeTransform (hepXf0);
                 hepXf0 = geoXf->getTransform();
             }

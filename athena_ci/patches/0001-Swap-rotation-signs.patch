@@ -1,0 +1,144 @@
+From 2b0f4de6ceabe19d8a2fa84b9130c277b1e21436 Mon Sep 17 00:00:00 2001
+From: Johannes Junggeburth <johannes.josef.junggeburth@cern.ch>
+Date: Mon, 26 Feb 2024 17:57:04 +0100
+Subject: [PATCH] Swap rotation signs
+
+Fix typo
+---
+ .../src/EndPlateFactory.cxx                    | 18 +++++++++---------
+ .../src/SCT_ServMatFactory.cxx                 |  4 ++--
+ .../src/SquirrelCageFactory.cxx                |  2 +-
+ .../src/GeoPixelDetailedStaveSupport.cxx       |  6 +++---
+ 4 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/EndPlateFactory.cxx b/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/EndPlateFactory.cxx
+index 4a91ebacb15..31f02babc9a 100755
+--- a/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/EndPlateFactory.cxx
++++ b/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/EndPlateFactory.cxx
+@@ -95,7 +95,7 @@ void EndPlateFactory::create(GeoPhysVol *mother)
+     GeoTrf::Translate3D servpos1(0.,0., zposEP);
+     GeoTrf::Vector3D servpos2(0.,0.,-zposEP);
+     GeoTransform* xform1 = new GeoTransform(servpos1);
+-    GeoTransform* xform2 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0,M_PI,0),servpos2));
++    GeoTransform* xform2 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0,-M_PI,0),servpos2)); 
+     mother->add(xform1);
+     mother->add(shellPhysInt);
+     mother->add(xform2);
+@@ -120,7 +120,7 @@ void EndPlateFactory::create(GeoPhysVol *mother)
+     GeoTrf::Translate3D servpos3(0.,0., zposEP+zleng+thickShell+zgap+thickShell/2.);
+     GeoTrf::Vector3D servpos4(0.,0.,-zposEP-zleng-thickShell-zgap-thickShell/2.);
+     GeoTransform *xform3 = new GeoTransform(servpos3);
+-    GeoTransform* xform4 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0,M_PI,0),servpos4));
++    GeoTransform* xform4 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0,-M_PI,0),servpos4));
+ 
+     mother->add(xform3);
+     mother->add(shellPhysExt);
+@@ -160,7 +160,7 @@ void EndPlateFactory::create(GeoPhysVol *mother)
+     GeoTrf::Translate3D servpos5(0.,0., zinsert);
+     GeoTrf::Vector3D servpos6(0.,0.,-zinsert);
+     GeoTransform *xform5 = new GeoTransform(servpos5);
+-    GeoTransform* xform6 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0,M_PI,0),servpos6));
++    GeoTransform* xform6 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0,-M_PI,0),servpos6));
+ 
+     mother->add(xform5);
+     mother->add(InsertPhys);
+@@ -200,10 +200,10 @@ void EndPlateFactory::create(GeoPhysVol *mother)
+       double angl= ip*M_PI/6.;
+       GeoTrf::Vector3D ribpos_pos( posX*cos(angl), posX*sin(angl), zposEP+zleng+thickShell+zgap/2.);
+       GeoTrf::Vector3D ribpos_neg( posX*cos(angl), posX*sin(angl),-zposEP-zleng-thickShell-zgap/2.);
+-      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(-angl,0,0),ribpos_pos));
++      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(angl,0,0),ribpos_pos));
+       mother->add(xrib);
+       mother->add(ribShortPhys);
+-      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(-angl,0,0),ribpos_neg));
++      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(angl,0,0),ribpos_neg));
+       mother->add(xrib);
+       mother->add(ribShortPhys);
+     }
+@@ -247,19 +247,19 @@ void EndPlateFactory::create(GeoPhysVol *mother)
+ // 1st part
+       GeoTrf::Vector3D ribpos_pos1( posX1*cos(angl), posX1*sin(angl), zposEP+zleng+thickShell+zgap/2.);
+       GeoTrf::Vector3D ribpos_neg1( posX1*cos(angl), posX1*sin(angl),-zposEP-zleng-thickShell-zgap/2.);
+-      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(-angl,0,0),ribpos_pos1));      
++      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(angl,0,0),ribpos_pos1));      
+       mother->add(xrib);
+       mother->add(ribLong1Phys);
+-      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(-angl,0,0),ribpos_neg1));      
++      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(angl,0,0),ribpos_neg1));      
+       mother->add(xrib);
+       mother->add(ribLong1Phys);
+ // 2nd part
+       GeoTrf::Vector3D ribpos_pos2( posX2*cos(angl), posX2*sin(angl), zposEP+zleng+thickShell+zgap/2.);
+       GeoTrf::Vector3D ribpos_neg2( posX2*cos(angl), posX2*sin(angl),-zposEP-zleng-thickShell-zgap/2.);
+-      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(-angl,0,0),ribpos_pos2));      
++      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(angl,0,0),ribpos_pos2));      
+       mother->add(xrib);
+       mother->add(ribLong2Phys);
+-      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(-angl,0,0),ribpos_neg2));      
++      xrib = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(angl,0,0),ribpos_neg2));      
+       mother->add(xrib);
+       mother->add(ribLong2Phys);
+     }
+diff --git a/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/SCT_ServMatFactory.cxx b/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/SCT_ServMatFactory.cxx
+index d85833983b2..61b92c63352 100755
+--- a/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/SCT_ServMatFactory.cxx
++++ b/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/SCT_ServMatFactory.cxx
+@@ -255,9 +255,9 @@ void SCT_ServMatFactory::create(GeoPhysVol *mother)
+       const GeoLogVol* wingLog = new GeoLogVol(logName,wing,wingMat);
+       GeoVPhysVol* wingPhys    = new GeoPhysVol(wingLog);
+       GeoTransform* wPos1 = new GeoTransform(GeoTrf::Translate3D(0.,0., ZStartW+ZHalfLengthW));
+-      GeoTransform* wPos2 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(M_PI,0,0),GeoTrf::Vector3D(0.,0., ZStartW+ZHalfLengthW)));
++      GeoTransform* wPos2 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(-M_PI,0,0),GeoTrf::Vector3D(0.,0., ZStartW+ZHalfLengthW)));
+       GeoTransform* wPos3 = new GeoTransform(GeoTrf::Translate3D(0.,0.,-ZStartW-ZHalfLengthW));
+-      GeoTransform* wPos4 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(M_PI,0,0),GeoTrf::Vector3D(0.,0.,-ZStartW-ZHalfLengthW)));
++      GeoTransform* wPos4 = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(-M_PI,0,0),GeoTrf::Vector3D(0.,0.,-ZStartW-ZHalfLengthW)));
+       mother->add(wPos1);
+       mother->add(wingPhys);
+       mother->add(wPos2);
+diff --git a/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/SquirrelCageFactory.cxx b/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/SquirrelCageFactory.cxx
+index e01d8bd49a9..ef4a4455adb 100755
+--- a/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/SquirrelCageFactory.cxx
++++ b/InnerDetector/InDetDetDescr/InDetServMatGeoModel/src/SquirrelCageFactory.cxx
+@@ -342,7 +342,7 @@ void SquirrelCageFactory::create(GeoPhysVol *mother)
+     GeoTrf::Translate3D  suppos1(0.,0., zposSupRing+supWid/2.);
+     GeoTrf::Vector3D  suppos2(0.,0.,-zposSupRing-supWid/2.);
+     GeoTransform *sform1  = new GeoTransform(suppos1);
+-    GeoTransform *sform2  = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0,M_PI,0),suppos2));
++    GeoTransform *sform2  = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0,-M_PI,0),suppos2));
+     mother->add(sform1);
+     mother->add(ringPhysSup);
+     mother->add(sform2);
+diff --git a/InnerDetector/InDetDetDescr/PixelGeoModel/src/GeoPixelDetailedStaveSupport.cxx b/InnerDetector/InDetDetDescr/PixelGeoModel/src/GeoPixelDetailedStaveSupport.cxx
+index 8783665d493..ddc30bf9dd4 100644
+--- a/InnerDetector/InDetDetDescr/PixelGeoModel/src/GeoPixelDetailedStaveSupport.cxx
++++ b/InnerDetector/InDetDetDescr/PixelGeoModel/src/GeoPixelDetailedStaveSupport.cxx
+@@ -809,7 +809,7 @@ GeoVPhysVol* GeoPixelDetailedStaveSupport::Build ( ) {
+       
+       // Add flex in 3D model : A component
+       GeoTrf::Vector3D wingflex_posA((flex1x+flex2x+flex3x+flex4x)*0.25,(flex1y+flex2y+flex3y+flex4y)*0.25,(wingZmax-wingZmin)*.5+FlexStaveMiddleGap);
+-      GeoTransform* wingflex_xformA = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0.0,0.0,-fabs(flex_angle)),wingflex_posA));
++      GeoTransform* wingflex_xformA = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0.0,0.0,std::abs(flex_angle)),wingflex_posA));
+       
+       const GeoMaterial* wingflex_material= m_mat_mgr->getMaterial("pix::WingFlexA");
+       GeoLogVol * wingflex_logVol = new GeoLogVol(wingName.str(),wingflex_shape,wingflex_material);
+@@ -821,7 +821,7 @@ GeoVPhysVol* GeoPixelDetailedStaveSupport::Build ( ) {
+       logVolPV->add(wingflex_logVolPV);
+       
+       GeoTrf::Vector3D wingflex_posC((flex1x+flex2x+flex3x+flex4x)*0.25,(flex1y+flex2y+flex3y+flex4y)*0.25,-((wingZmax-wingZmin)*.5+FlexStaveMiddleGap));
+-      GeoTransform* wingflex_xformC = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0.0,0.0,-fabs(flex_angle)),wingflex_posC));
++      GeoTransform* wingflex_xformC = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0.0,0.0,std::abs(flex_angle)),wingflex_posC));
+       logVolPV->add(wingflex_tag);
+       logVolPV->add(wingflex_xformC);
+       logVolPV->add(wingflex_logVolPV);
+@@ -1038,7 +1038,7 @@ GeoVPhysVol* GeoPixelDetailedStaveSupport::Build ( ) {
+   // Add flex in 3D model : A component
+   //  GeoNameTag* cableflex_tag = new GeoNameTag(lname.str());
+   GeoTrf::Vector3D cableflex_pos(EndblockFlexXpos,EndblockFlexYpos,0.);
+-  m_endblockFlexTrf = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0.0,0.0,-fabs(flex_angle)),cableflex_pos));
++  m_endblockFlexTrf = new GeoTransform(GeoTrf::GeoTransformRT(GeoTrf::GeoRotation(0.0,0.0, std::abs(flex_angle)),cableflex_pos));
+   GeoLogVol * cableflex_logVol = new GeoLogVol(lname.str(),cableflex_shape,scaledFlexMaterial);
+   m_endblockFlexPhysVol = new GeoPhysVol(cableflex_logVol);
+ 
+-- 
+2.39.3
+

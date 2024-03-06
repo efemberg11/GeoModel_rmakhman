@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -10,10 +10,10 @@
 #define GEO_MODEL_XML_MAKE_TUBS_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2GeoItem.h"
+#include "GeoModelXml/Element2ShapeItem.h"
 
 
-class MakeTubs: public Element2GeoItem {
+class MakeTubs: public Element2ShapeItem {
 public:
     MakeTubs() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;

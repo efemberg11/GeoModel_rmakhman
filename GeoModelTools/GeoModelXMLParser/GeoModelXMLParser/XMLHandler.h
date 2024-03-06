@@ -68,7 +68,6 @@ protected:
 		static ExpressionEvaluator* eval=ExpressionEvaluator::GetEvaluator();
 		return eval;
 	}
-	static std::vector<std::string>& tokenize(const std::string&,const std::string&);
 private:
 	void RegisterToStore();
 };

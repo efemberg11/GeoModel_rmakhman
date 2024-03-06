@@ -41,6 +41,9 @@
 using namespace xercesc;
 using namespace std;
 
+MulticopyProcessor::MulticopyProcessor(){
+    setTransformDeDuplication(false);
+}
 void MulticopyProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
 char *toRelease;
 XMLCh *ref = XMLString::transcode("ref");

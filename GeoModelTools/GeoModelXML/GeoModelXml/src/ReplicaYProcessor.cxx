@@ -1,16 +1,10 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-
-//
-//   replicaY element processor.
-//
 
 #include "GeoModelXml/ReplicaYProcessor.h"
 
 #include "OutputDirector.h"
-#include <sstream>
-#include <string>
 #include <cstdlib>
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelKernel/GeoTransform.h"
@@ -18,6 +12,7 @@
 #include "GeoModelKernel/GeoVFullPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoDefinitions.h"
+#include "GeoModelHelpers/StringUtils.h"
 
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GeoNodeList.h"
@@ -28,16 +23,8 @@
 using namespace xercesc;
 using namespace std;
 
-void ReplicaYProcessor::tokenize(string &str, char delim, vector<string> &out) const
-{
-        size_t start;
-        size_t end = 0;
-
-        while ((start = str.find_first_not_of(delim, end)) != string::npos)
-        {
-                end = str.find(delim, start);
-                out.push_back(str.substr(start, end - start));
-        }
+ReplicaYProcessor::ReplicaYProcessor(){
+    setTransformDeDuplication(false);
 }
 
 
@@ -87,18 +74,14 @@ DOMDocument *doc = element->getOwnerDocument();
         toRelease = XMLString::transcode(element->getAttribute(skip_tmp));
         std::string skip_str(toRelease);
         //std::cout << "skip string "<<skip_str<<std::endl;
-        std::vector<std::string> parsed;
-        tokenize(skip_str,' ',parsed);
-        for (auto k : parsed)
-        {       
-                std::vector<std::string> tmp_parsed;
-                //std::cout<<" parsed "<<k<<std::endl;
-                tokenize(k,'-',tmp_parsed);
-                if (tmp_parsed.size()==1) elementsToSkip.push_back(std::stoi(tmp_parsed[0]));
+        std::vector<std::string> parsed = GeoStrUtils::tokenize(skip_str," ");
+        for (const std::string& k : parsed) {       
+                std::vector<std::string> tmp_parsed = GeoStrUtils::tokenize(k,"-");
+                if (tmp_parsed.size()==1) elementsToSkip.push_back(GeoStrUtils::atoi(tmp_parsed[0]));
                 else if (tmp_parsed.size()==2)
                 {       
-                        int i1=std::stoi(tmp_parsed[0]);
-                        int i2=std::stoi(tmp_parsed[1]);
+                        int i1=GeoStrUtils::atoi(tmp_parsed[0]);
+                        int i2=GeoStrUtils::atoi(tmp_parsed[1]);
                         //std::cout<<" indices "<<i1<<" "<<i2<<std::endl;
                         assert(i1<i2);
                         for (int l=i1;l<i2+1;l++) elementsToSkip.push_back(l);

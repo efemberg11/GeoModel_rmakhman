@@ -8,13 +8,15 @@
 #include "GeoModelHelpers/GeoLogVolSorter.h"
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelHelpers/getChildNodesWithTrf.h"
+#include "GeoModelHelpers/throwExcept.h"
+
 
 int GeoPhysVolSorter::compare(const GeoVPhysVol* a, const GeoVPhysVol* b) const {
     /// If one of the given volumes is a full physical volume, let's assume that they've been
     /// put on purpose into the node. Ensure that they're added to the set eventhough they
     /// are equivalent in the terms of this sorter.
     if (typeid(*a) == typeid(GeoFullPhysVol) || typeid(*b) == typeid(GeoFullPhysVol)) {
-        return a < b;
+        return a == b ? 0 : (a < b ? -1 : 1);
     }
     
     /// A check on different logical volumes is already a good start
@@ -35,11 +37,11 @@ int GeoPhysVolSorter::compare(const GeoVPhysVol* a, const GeoVPhysVol* b) const 
         cursB.next();
         /// Check whether there's an alignable transform somewhere
         if (childA.isAlignable != childB.isAlignable) {
-            return childA.isAlignable;
+            return childA.isAlignable ? -1 : 1;
         }
         /// Check whether the voumes are full physical volumes
         if (childA.isSensitive != childB.isSensitive) {
-            return childA.isSensitive;
+            return childA.isSensitive ? -1 : 1;
         }
         /// Check equivalance of the transformations
         const int transCmp = sorter.compare(childA.transform,

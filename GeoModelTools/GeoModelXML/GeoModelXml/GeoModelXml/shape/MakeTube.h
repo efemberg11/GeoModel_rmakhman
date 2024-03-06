@@ -10,10 +10,10 @@
 #define GEO_MODEL_XML_MAKE_TUBE_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2GeoItem.h"
+#include "GeoModelXml/Element2ShapeItem.h"
 
 
-class MakeTube: public Element2GeoItem {
+class MakeTube: public Element2ShapeItem {
 public:
     MakeTube() = default;
     virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;

@@ -18,6 +18,7 @@
 #include "GeoModelKernel/GeoVFullPhysVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoDefinitions.h"
+#include "GeoModelHelpers/StringUtils.h"
 
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GeoNodeList.h"
@@ -28,17 +29,8 @@
 using namespace xercesc;
 using namespace std;
 
-
-void ReplicaRPhiProcessor::tokenize(string &str, char delim, vector<string> &out) const
-{
-	size_t start;
-	size_t end = 0;
-
-	while ((start = str.find_first_not_of(delim, end)) != string::npos)
-	{
-		end = str.find(delim, start);
-		out.push_back(str.substr(start, end - start));
-	}
+ReplicaRPhiProcessor::ReplicaRPhiProcessor(){
+    setTransformDeDuplication(false);
 }
 
 void ReplicaRPhiProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
@@ -107,18 +99,15 @@ DOMDocument *doc = element->getOwnerDocument();
     	toRelease = XMLString::transcode(element->getAttribute(skip_tmp));
 	std::string skip_str(toRelease);
 	//std::cout << "skip string "<<skip_str<<std::endl;
-	std::vector<std::string> parsed;
-	tokenize(skip_str,' ',parsed);
+	std::vector<std::string> parsed = GeoStrUtils::tokenize(skip_str," ");
 	for (auto k : parsed) 
 	{
-		std::vector<std::string> tmp_parsed;
-		//std::cout<<" parsed "<<k<<std::endl;
-		tokenize(k,'-',tmp_parsed);
-		if (tmp_parsed.size()==1) elementsToSkip.push_back(std::stoi(tmp_parsed[0]));
+		std::vector<std::string> tmp_parsed = GeoStrUtils::tokenize(k, "-");
+		if (tmp_parsed.size()==1) elementsToSkip.push_back(GeoStrUtils::atoi(tmp_parsed[0]));
 		else if (tmp_parsed.size()==2)
 		{
-			int i1=std::stoi(tmp_parsed[0]);
-			int i2=std::stoi(tmp_parsed[1]);
+			int i1=GeoStrUtils::atoi(tmp_parsed[0]);
+			int i2=GeoStrUtils::atoi(tmp_parsed[1]);
 			//std::cout<<" indices "<<i1<<" "<<i2<<std::endl;
 			assert(i1<i2);
 			for (int l=i1;l<i2+1;l++) elementsToSkip.push_back(l);
@@ -168,7 +157,9 @@ DOMDocument *doc = element->getOwnerDocument();
 	    double angle=offsetPhi;
             GeoTrf::Transform3D hepXf=hepXf0; 
             for (int i = 0; i < nCopies; ++i) {
-	    	hepXf=hepXf0*GeoTrf::TranslateX3D(radius*cos(angle))*GeoTrf::TranslateY3D(radius*sin(angle))*GeoTrf::RotateZ3D(angle);
+	    	    hepXf=hepXf0*GeoTrf::TranslateX3D(radius*std::cos(angle))*
+                             GeoTrf::TranslateY3D(radius*std::sin(angle))*
+                             GeoTrf::RotateZ3D(angle);
                 xfList->push_back(makeTransform(hepXf));
                 // hepXf = hepXf * GeoTrf::RotateZ3D(stepPhi) ;
 		angle+=stepPhi;

@@ -46,7 +46,7 @@ build_geomodel_athena:
 
 
 .run_base:
-  stage: step-A
+  stage: step-B
 
   # This image sould work, but it seems it doesn't. Using my derivative until 
   # I figure out what the difference is.
@@ -94,10 +94,106 @@ build_geomodel_athena:
 
     - source athena-install/setup.sh
     - export LD_LIBRARY_PATH=$PWD/geomodel-install/lib64:$LD_LIBRARY_PATH
-    - mkdir run
+    - mkdir -p run
 
+
+################################################
+###       Simulation_tf tests
+################################################
+simulation_tests_run2:
+  extends: .run_base
+  script:
+    - cd run
+    - RunWorkflowTests_Run2.py --CI -s -w FullSim --threads 4 -e '--maxEvents 10' --detailed-comparison
+    - mv run_s4005/log.EVNTtoHITS ./
+    - mv run_s4005/myHITS.pool.root ./
+  artifacts:
+    paths:
+      - Run2Tests.log
+      - myHITS.pool.root
+      - log.EVNTtoHITS
+
+    expire_in: 1 day
+
+simulation_tests_run3:
+  extends: .run_base
+  script:
+    - cd run
+    - RunWorkflowTests_Run3.py --CI -s -w FullSim --threads 4 -e '--maxEvents 50' --detailed-comparison
+    - mv run_s4006/log.EVNTtoHITS ./
+    - mv run_s4006/myHITS.pool.root ./
+  artifacts:
+    paths:
+      - Run3Tests.log
+      - myHITS.pool.root
+      - log.EVNTtoHITS
+
+simulation_tests_run4:
+  extends: .run_base
+  script:
+    - cd run
+    - RunWorkflowTests_Run4.py --CI -s -w FullSim --threads 4 -e '--maxEvents 10' --detailed-comparison
+    - mv run_s3761/myHITS.pool.root ../
+    - mv run_s3761/log.EVNTtoHITS ./
+  artifacts:
+    paths:
+      - myHITS.pool.root
+      - RunUpgradeTests.log
+      - log.EVNTtoHITS
+    expire_in: 1 day
+
+
+###################################################
+###         Reco_tf.py tests
+###################################################
 run_workflow_tests_run2_mc:
   extends: .run_base
   script:
     - cd run
-    - RunWorkflowTests_Run2.py --CI -r -w MCReco --threads 0 -e '--CA "all:True" "RDOtoRDOTrigger:False" --conditionsTag "default:OFLCOND-MC16-SDR-RUN2-11" "RDOtoRDOTrigger:OFLCOND-MC16-SDR-RUN2-08-02" --maxEvents 25'
+    - RunWorkflowTests_Run2.py --CI -r -w MCReco --threads 0 -e '--CA "all:True" "RDOtoRDOTrigger:False" --conditionsTag "default:OFLCOND-MC16-SDR-RUN2-11" "RDOtoRDOTrigger:OFLCOND-MC16-SDR-RUN2-08-02" --maxEvents 25' --detailed-comparison
+
+run_workflow_tests_run3_mc:
+  extends: .run_base
+  script:
+    - cd run
+    - RunWorkflowTests_Run3.py --CI -r -w MCReco -e '--maxEvents 25' --detailed-comparison
+
+run_workflow_tests_run4_reco:
+  extends: .run_base
+  needs: 
+      - simulation_tests_run4
+      - build_geomodel_athena
+  script:
+      - cd run
+      - RunWorkflowTests_Run4.py --CI -r -w MCReco -e '--maxEvents 5 --inputHITSFile=../../myHITS.pool.root' --no-output-checks
+
+
+###################################################
+###      Geometry dump for debugging
+###################################################
+dumpGeoTest_run2:
+  extends: .run_base
+  script:
+      - python -m DumpGeo.DumpGeoConfig --detDescr ATLAS-R2-2016-01-02-01
+  artifacts:
+    paths:
+      - geometry-ATLAS-R2-2016-01-02-01.db
+    expire_in: 1 day
+
+dumpGeoTest_run3:
+  extends: .run_base
+  script:
+      - python -m DumpGeo.DumpGeoConfig --detDescr ATLAS-R3S-2021-03-02-00
+  artifacts:
+    paths:
+      - geometry-ATLAS-R3S-2021-03-02-00.db
+    expire_in: 1 day
+
+dumpGeoTest_run4:
+  extends: .run_base
+  script:
+      - python -m DumpGeo.DumpGeoConfig --detDescr ATLAS-P2-RUN4-03-00-00
+  artifacts:
+    paths:
+      - geometry-ATLAS-P2-RUN4-03-00-00.db
+    expire_in: 1 day

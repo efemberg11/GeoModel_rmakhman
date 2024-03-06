@@ -2,6 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 #include "GeoModelHelpers/defineWorld.h"
+#include "GeoModelHelpers/cloneVolume.h"
 #include "GeoModelKernel/GeoElement.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
@@ -42,97 +43,52 @@ GeoIntrusivePtr<GeoPhysVol> createGeoWorld(const double worldBoxX,
     return world;    
 }
 
-GeoIntrusivePtr<GeoPhysVol> resizeGeoWorld(GeoIntrusivePtr<GeoPhysVol> world)
-{
-    if (world)
-    {
-        //resize the world volume to the real needed volume
+GeoIntrusivePtr<GeoPhysVol> resizeGeoWorld(GeoIntrusivePtr<GeoPhysVol> world) {
+    if (!world) return world;
+
+    //resize the world volume to the real needed volume
+    
+    // get number of children volumes
+    unsigned int nChild=world->getNChildVols();
+    
+    //Dimensions of the bounding boxes
+    double xmin=0.,ymin=0.,zmin=0.,xmax=0.,ymax=0.,zmax=0.;
+    double xworld=0.,yworld=0.,zworld=0.;
         
-        // get number of children volumes
-        unsigned int nChild=world->getNChildVols();
-        
-        //Dimensions of the bounding boxes
-        double xmin=0.,ymin=0.,zmin=0.,xmax=0.,ymax=0.,zmax=0.;
-        double xworld=0.,yworld=0.,zworld=0.;
-        
-        // loop over all children volumes
-        for (unsigned int i=0; i<nChild; i++)
+    // loop over all children volumes
+    for (unsigned int i=0; i<nChild; i++) {
+        PVConstLink nodeLink = world->getChildVol(i);
+        if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) )
         {
-            PVConstLink nodeLink = world->getChildVol(i);
-            if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) )
-            {
-                const GeoVPhysVol *childVolV = &(*( nodeLink ));
-                
-                if ( dynamic_cast<const GeoPhysVol*>(childVolV) ) {
-                    const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
-                    childVol->getLogVol()->getShape()->extent(xmin, ymin, zmin, xmax, ymax, zmax);
-                }
-                else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
-                    const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
-                    childVol->getLogVol()->getShape()->extent(xmin, ymin, zmin, xmax, ymax, zmax);
-                   
-                }
-                xworld=std::max({xworld,std::abs(xmin),std::abs(xmax)});
-                yworld=std::max({yworld,std::abs(ymin),std::abs(ymax)});
-                zworld=std::max({zworld,std::abs(zmin),std::abs(zmax)});
+            const GeoVPhysVol *childVolV = &(*( nodeLink ));
+            
+            if ( dynamic_cast<const GeoPhysVol*>(childVolV) ) {
+                const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
+                childVol->getLogVol()->getShape()->extent(xmin, ymin, zmin, xmax, ymax, zmax);
             }
+            else if ( dynamic_cast<const GeoFullPhysVol*>(childVolV) ) {
+                const GeoFullPhysVol* childVol = dynamic_cast<const GeoFullPhysVol*>(childVolV);
+                childVol->getLogVol()->getShape()->extent(xmin, ymin, zmin, xmax, ymax, zmax);
+                
+            }
+            xworld=std::max({xworld,std::abs(xmin),std::abs(xmax)});
+            yworld=std::max({yworld,std::abs(ymin),std::abs(ymax)});
+            zworld=std::max({zworld,std::abs(zmin),std::abs(zmax)});
         }
-
-        GeoIntrusivePtr<GeoPhysVol> resizedWorld{createGeoWorld(xworld, yworld, zworld)};
-       
-        for (unsigned int i=0; i< world->getNChildNodes(); i++){
-            const GeoGraphNode * node = *(world->getChildNode(i));
-            
-            
-            if (dynamic_cast<const GeoVPhysVol*>( node ))
-            {
-                if ( dynamic_cast<const GeoFullPhysVol*>(node) ){
-                    const GeoFullPhysVol* nodeFullPhysVol = dynamic_cast<const GeoFullPhysVol*>(node);
-                    resizedWorld->add((GeoGraphNode *)nodeFullPhysVol);
-                    
-                }
-                else  if ( dynamic_cast<const GeoPhysVol*>(node) ){
-                    const GeoPhysVol* nodePhysVol = dynamic_cast<const GeoPhysVol*>(node);
-                    resizedWorld->add((GeoGraphNode *)nodePhysVol);
-                    
-                }
-            }
-            else if (dynamic_cast<const GeoNameTag*>( node )){
-                const GeoNameTag* nodeTag = dynamic_cast<const GeoNameTag*>(node);
-                resizedWorld->add((GeoGraphNode *)nodeTag);
-                
-            }
-            
-            else if (dynamic_cast<const GeoAlignableTransform*>( node )){
-                const GeoAlignableTransform* nodeAT = dynamic_cast<const GeoAlignableTransform*>(node);
-                resizedWorld->add((GeoGraphNode *)nodeAT);
-                
-            }
-            
-            else if (dynamic_cast<const GeoSerialTransformer*>( node )){
-                const GeoSerialTransformer* nodeST = dynamic_cast<const GeoSerialTransformer*>(node);
-                resizedWorld->add((GeoGraphNode *)nodeST);
-                
-            }
-            
-            else if (dynamic_cast<const GeoSerialDenominator*>( node )){
-                const GeoSerialDenominator* nodeSD = dynamic_cast<const GeoSerialDenominator*>(node);
-                resizedWorld->add((GeoGraphNode *)nodeSD);
-                
-            }
-            else if (dynamic_cast<const GeoTransform*>( node )){
-                const GeoTransform* nodeTransform = dynamic_cast<const GeoTransform*>(node);
-                resizedWorld->add((GeoGraphNode *)nodeTransform);
-                
-            }else if (dynamic_cast<const GeoIdentifierTag*>( node )){
-                const GeoIdentifierTag* nodeIT = dynamic_cast<const GeoIdentifierTag*>(node);
-                resizedWorld->add((GeoGraphNode *)nodeIT);
-                
-            }
-        }
-
-        return resizedWorld;
-        
     }
-    return world;
+
+    GeoIntrusivePtr<GeoPhysVol> resizedWorld{createGeoWorld(xworld, yworld, zworld)};
+    for (unsigned int ch = 0; ch < world->getNChildNodes(); ++ch) {
+        const GeoGraphNode * node = *(world->getChildNode(ch));
+        if (typeid(*node) == typeid(GeoFullPhysVol) ||
+            typeid(*node) == typeid(GeoPhysVol)) {
+            const GeoVPhysVol* subVol{dynamic_cast<const GeoVPhysVol*>(node)};
+            GeoVPhysVol* nonConstVol{const_cast<GeoVPhysVol*>(subVol)};
+            resizedWorld->add(cloneVolume(nonConstVol));
+        } else {
+            resizedWorld->add(const_cast<GeoGraphNode*>(node));
+        }
+    }  
+ 
+    return resizedWorld;
 }

@@ -7,13 +7,13 @@
 #define GEO_MODEL_XML_MAKE_TORUS_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2ShapeItem.h"
+#include "GeoModelXml/Element2GeoItem.h"
 
 
-class MakeTorus: public Element2ShapeItem {
+class MakeTorus: public Element2GeoItem {
 public:
     MakeTorus() = default;
-    virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+    virtual GeoIntrusivePtr<RCBase> make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 
 };
 

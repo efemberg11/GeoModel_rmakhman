@@ -13,7 +13,7 @@
 
 class MakeTransformationref: public Element2GeoItem {
 public:
-    virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+    virtual GeoIntrusivePtr<RCBase> make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 };
 
 #endif // MAKE_TRANSFORMATIONREF_H

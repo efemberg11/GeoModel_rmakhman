@@ -12,6 +12,7 @@
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GeoNodeList.h"
 #include "xercesc/util/XMLString.hpp"
+#include "GeoModelHelpers/throwExcept.h"
 
 using namespace std;
 using namespace xercesc;
@@ -33,9 +34,8 @@ char *toRelease;
     string nodeName(toRelease);
     XMLString::release(&toRelease);
     if (nodeName != "transform") {
-        msglog << MSG::FATAL<< "Error in xml/gmx file: transformref " << XMLString::transcode(idref) << " referenced a " << nodeName << 
-                " instead of a logvol." << endmsg;
-	std::abort();
+        THROW_EXCEPTION( "Error in xml/gmx file: transformref " << XMLString::transcode(idref) 
+                    << " referenced a " << nodeName << " instead of a transform.");
     }
 //
 //    Process it

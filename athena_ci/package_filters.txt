@@ -43,6 +43,7 @@
 + InnerDetector/InDetDetDescr/InDetServMatGeoModel
 + InnerDetector/InDetDetDescr/InDetTrackingGeometry
 + InnerDetector/InDetDetDescr/PixelGeoModel
++ InnerDetector/InDetDetDescr/PixelGeoModelXml
 + InnerDetector/InDetDetDescr/PixelReadoutGeometry
 + InnerDetector/InDetDetDescr/SCT_GeoModel
 + InnerDetector/InDetDetDescr/SCT_ReadoutGeometry
@@ -50,6 +51,7 @@
 + InnerDetector/InDetDetDescr/StripGeoModelXml
 + InnerDetector/InDetDetDescr/TRT_GeoModel
 + InnerDetector/InDetDetDescr/TRT_ReadoutGeometry
++ InnerDetector/InDetDetDescr/PLRGeoModelXml
 + InnerDetector/InDetDigitization/TRT_Digitization
 + InnerDetector/InDetExample/InDetDetDescrExample
 + InnerDetector/InDetG4/PixelG4_SD

@@ -10,12 +10,12 @@
 #define GEO_MODEL_XML_MAKE_CONS_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2ShapeItem.h"
+#include "GeoModelXml/Element2GeoItem.h"
 
-class MakeCons: public Element2ShapeItem {
+class MakeCons: public Element2GeoItem {
   public:
       MakeCons() = default;
-      virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+      virtual GeoIntrusivePtr<RCBase> make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 
 };
 

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -7,7 +7,7 @@
 //
 #include "OutputDirector.h"
 #include "GeoModelXml/AssemblyrefProcessor.h"
-#include <string>
+#include "GeoModelHelpers/throwExcept.h"
 
 #include "xercesc/util/XercesDefs.hpp"
 #include <xercesc/dom/DOM.hpp>
@@ -36,9 +36,8 @@ char *toRelease;
     string nodeName(toRelease);
     XMLString::release(&toRelease);
     if (nodeName != string("assembly") && nodeName != string("set")) {
-        msglog << MSG::FATAL << "Error in xml/gmx file: assemblyref " << XMLString::transcode(idref) << " referenced a " << 
-                              nodeName << " instead of an assembly.\n";
-	std::abort();
+        THROW_EXCEPTION("Error in xml/gmx file: assemblyref " << XMLString::transcode(idref) << " referenced a " << 
+                              nodeName << " instead of an assembly.\n");
     }
 //
 //    Process it

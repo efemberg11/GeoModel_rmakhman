@@ -14,7 +14,7 @@
 using namespace xercesc;
 
 
-RCBase * MakePara::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase>MakePara::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
     constexpr int nParams = 6; 
     static const std::array<std::string, nParams> parName{"xhalflength", "yhalflength", "zhalflength", "alpha", "theta", "phi"};
     std::array<double, nParams> p{};
@@ -26,5 +26,5 @@ RCBase * MakePara::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) co
         XMLString::release(&toRelease);
     }
 
-    return const_cast<GeoShape*>(cacheShape(new GeoPara(p[0], p[1], p[2], p[3], p[4], p[5])).get());
+    return const_pointer_cast(cacheShape(make_intrusive<GeoPara>(p[0], p[1], p[2], p[3], p[4], p[5])));
 }

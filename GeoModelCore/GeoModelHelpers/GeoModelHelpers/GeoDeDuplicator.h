@@ -78,7 +78,7 @@ class GeoDeDuplicator {
         GeoLogVolPtr cacheVolume(GeoLogVolPtr vol) const;
         GeoShapePtr cacheShape(GeoShapePtr shape) const;
 
-        void setShapeDeduplication(bool enable);
+        void setShapeDeDuplication(bool enable);
         void setLogVolDeDuplication(bool enable);
         void setTransformDeDuplication(bool enable);
         void setPhysVolDeDuplication(bool enable);

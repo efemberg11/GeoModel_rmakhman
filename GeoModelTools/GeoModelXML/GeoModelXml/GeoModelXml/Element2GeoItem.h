@@ -31,9 +31,9 @@ class Element2GeoItem: public GeoDeDuplicator {
 
 public:
     Element2GeoItem() = default;
-    virtual ~Element2GeoItem() = default;;
-    RCBase * process(const xercesc::DOMElement *element, GmxUtil &gmxUtil);
-    virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const;
+    virtual ~Element2GeoItem() = default;
+    GeoIntrusivePtr<RCBase> process(const xercesc::DOMElement *element, GmxUtil &gmxUtil);
+    virtual GeoIntrusivePtr<RCBase> make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const;
 protected:
     using EntryMap = std::map<std::string, GeoIntrusivePtr<RCBase>>;
     EntryMap m_map{};  

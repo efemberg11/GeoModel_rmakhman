@@ -13,7 +13,7 @@
 #include <array>
 using namespace xercesc;
 
-RCBase * MakeBox::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase> MakeBox::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
   constexpr int nParams = 3; 
   static const std::array<std::string, nParams> parName{"xhalflength", "yhalflength", "zhalflength"};
   std::array<double, nParams> p{};
@@ -24,6 +24,5 @@ RCBase * MakeBox::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) con
       p[i] = gmxUtil.evaluate(toRelease);
       XMLString::release(&toRelease);
   }
-
-  return const_cast<GeoShape*>(cacheShape(new GeoBox(p[0], p[1], p[2])).get());
+  return const_pointer_cast(cacheShape(make_intrusive<GeoBox>(p[0], p[1], p[2])));
 }

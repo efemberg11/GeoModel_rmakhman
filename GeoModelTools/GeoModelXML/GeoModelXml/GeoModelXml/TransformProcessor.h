@@ -14,6 +14,7 @@ class GmxUtil;
 
 class TransformProcessor: public ElementProcessor {
 public:
+    TransformProcessor() = default;
     void process(const xercesc::DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd);
 };
 

@@ -14,7 +14,7 @@ template<typename GeoType>
 class GeoIntrusivePtr{
     public:
         template <typename GeoTypeGrp> friend class GeoIntrusivePtr;
-
+        /// Default constructor
         GeoIntrusivePtr() noexcept = default;
         // Standard constructor taking a bare pointer
         GeoIntrusivePtr(GeoType* obj) noexcept:
@@ -116,9 +116,26 @@ class GeoIntrusivePtr{
         /// Odering operator
         bool operator<(const GeoIntrusivePtr& other) const {
             return m_ptr < other.m_ptr;
-        }
+        }       
     private:
         GeoType* m_ptr{nullptr};
 };
 
+/// Function to perform an easy pointer cast from one GeoIntrusivePtr type to another
+template <class ToCast, class FromCast>
+    GeoIntrusivePtr<ToCast> dynamic_pointer_cast(const GeoIntrusivePtr<FromCast>& from) {
+        ToCast* raw_ptr = dynamic_cast<ToCast*>(from.get());
+        return GeoIntrusivePtr<ToCast>(raw_ptr);
+    }
+/// Function to perform an easy pointer const_cast from one GeoIntrusivePtr type to another
+template <class CastType>
+    GeoIntrusivePtr<CastType> const_pointer_cast(const GeoIntrusivePtr<const CastType>& from) {
+        CastType* raw_ptr = const_cast<CastType*>(from.get());
+        return GeoIntrusivePtr<CastType>(raw_ptr);
+    }
+/// Create a GeoModel object and pipe it directly into the GeoIntrusivePtr
+template <class GeoObjType, class... Args> 
+    GeoIntrusivePtr<GeoObjType> make_intrusive(Args... args) {
+    return GeoIntrusivePtr<GeoObjType>{new GeoObjType(args...)};
+}
 #endif

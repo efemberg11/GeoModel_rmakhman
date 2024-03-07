@@ -16,16 +16,13 @@
 using namespace xercesc;
 using namespace std;
 
-MakeTransformation::MakeTransformation() {
-    setTransformDeDuplication(false);
-}
 
-RCBase * MakeTransformation::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
-char *name2release;
- GeoTrf::Transform3D hepTransform=GeoTrf::Transform3D::Identity(); // Starts as Identity transform
-//
-//   Add my element contents
-//
+GeoIntrusivePtr<RCBase> MakeTransformation::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+    char *name2release;
+     GeoTrf::Transform3D hepTransform=GeoTrf::Transform3D::Identity(); // Starts as Identity transform
+    //
+    //   Add my element contents
+    //
     for (DOMNode *child = element->getFirstChild(); child != 0; child = child->getNextSibling()) {
         if (child->getNodeType() == DOMNode::ELEMENT_NODE) {
             name2release = XMLString::transcode(child->getNodeName());
@@ -37,17 +34,16 @@ char *name2release;
             else if (name == "rotation") {
                 hepTransform = hepTransform * gmxUtil.tagHandler.rotation.getTransform(el, gmxUtil); 
             }
-            else if (name == "scaling") {
-	    
-// TODO: figure out what to do in this case 	    
-//                hepTransform = hepTransform * gmxUtil.tagHandler.scaling.getTransform(el, gmxUtil); 
+            else if (name == "scaling") {	    
+                // TODO: figure out what to do in this case 	    
+                //                hepTransform = hepTransform * gmxUtil.tagHandler.scaling.getTransform(el, gmxUtil); 
             }
             XMLString::release(&name2release);
         }
     }
-//
-//    Create and return GeoModel transform
-//
+    //
+    //    Create and return GeoModel transform
+    //
 
     XMLCh * alignable_tmp = XMLString::transcode("alignable");
     char *toRelease = XMLString::transcode(element->getAttribute(alignable_tmp));
@@ -55,9 +51,7 @@ char *name2release;
     XMLString::release(&toRelease);
     XMLString::release(&alignable_tmp);
     if (alignable.compare(string("true")) == 0) {
-        return (RCBase *) new GeoAlignableTransform(hepTransform);
-    }
-    
-    return makeTransform(hepTransform);
-    
+        return make_intrusive<GeoAlignableTransform>(hepTransform);
+    }    
+    return makeTransform(hepTransform);    
 }

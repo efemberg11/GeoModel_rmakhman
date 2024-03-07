@@ -17,11 +17,11 @@ class GeoNameTag;
 
 class AssemblyProcessor: public ElementProcessor {
 public:
-    typedef struct {
-        GeoNameTag *name;
-        int id;
-        bool alignable;
-    } AssemblyStore; 
+    struct AssemblyStore {
+        GeoIntrusivePtr<GeoNameTag> name{};
+        int id{0};
+        bool alignable{false};
+    }; 
     void process(const xercesc::DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd);
     void zeroId(const xercesc::DOMElement *element);
 private:

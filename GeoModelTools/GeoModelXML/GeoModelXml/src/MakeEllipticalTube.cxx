@@ -13,7 +13,7 @@
 using namespace xercesc;
 
 
-RCBase * MakeEllipticalTube::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase>MakeEllipticalTube::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
     constexpr int nParams = 3; 
     static const std::array<std::string, nParams> parName{"xhalflength", "yhalflength", "zhalflength"};
     std::array<double, nParams> p{};
@@ -24,6 +24,5 @@ RCBase * MakeEllipticalTube::make(const xercesc::DOMElement *element, GmxUtil &g
         p[i] = gmxUtil.evaluate(toRelease);
         XMLString::release(&toRelease);
     }
-
-    return  const_cast<GeoShape*>(cacheShape(new GeoEllipticalTube(p[0], p[1], p[2])).get());
+    return  const_pointer_cast(cacheShape(make_intrusive<GeoEllipticalTube>(p[0], p[1], p[2])));
 }

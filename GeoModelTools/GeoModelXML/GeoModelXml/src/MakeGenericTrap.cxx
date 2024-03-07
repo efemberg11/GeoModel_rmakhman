@@ -19,7 +19,7 @@
 using namespace xercesc;
 
 
-RCBase * MakeGenericTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase>MakeGenericTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
     constexpr int nParams = 17; 
     std::array<std::string, 17> parName{"x0", "y0", "x1", "y1", "x2", "y2", "x3", "y3", 
                                         "x4", "y4", "x5", "y5", "x6", "y6", "x7", "y7", "zhalflength"};
@@ -43,5 +43,5 @@ RCBase * MakeGenericTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxU
     p = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
 
-    return const_cast<GeoShape*>(cacheShape(new GeoGenericTrap(p, vertices)).get());
+    return const_pointer_cast(cacheShape(make_intrusive<GeoGenericTrap>(p, vertices)));
 }

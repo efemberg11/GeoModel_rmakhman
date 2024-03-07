@@ -1,18 +1,17 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-
 
 #include "GeoModelKernel/GeoVGeometryPlugin.h"
 
-
+#include "GeoModelHelpers/StringUtils.h"
+#include "GeoModelHelpers/FileUtils.h"
+#include "GeoModelHelpers/throwExcept.h"
 #include "GeoModelKernel/GeoPhysVol.h"
-#include "GeoModelKernel/GeoNameTag.h"
-#include "GeoModelKernel/Units.h"
-#define SYSTEM_OF_UNITS GeoModelKernelUnits // so we will get, e.g., 'GeoModelKernelUnits::cm'
 
 #include "GeoModelXml/GmxInterface.h"
 #include "GeoModelXml/Gmx2Geo.h"
+
 
 #include <iostream>
 #include <fstream>
@@ -23,13 +22,13 @@ class GMXPlugin : public GeoVGeometryPlugin  {
  public:
 
   // Constructor:
-  GMXPlugin();
+  GMXPlugin() = default;
 
   // Constructor with name to provide to publisher  
   GMXPlugin(std::string name):GeoVGeometryPlugin(name){}
 
   // Destructor:
-  ~GMXPlugin();
+  ~GMXPlugin() = default;
 
   // Creation of geometry:
   virtual void create(GeoVPhysVol *world, bool publish) override;
@@ -40,92 +39,60 @@ class GMXPlugin : public GeoVGeometryPlugin  {
   const GMXPlugin & operator=(const GMXPlugin &right)=delete;
   GMXPlugin(const GMXPlugin &right) = delete;
 
-  bool exists (const std::string& name)
-  {
-    std::ifstream f(name.c_str());
-    return f.good();
-  }
-
-  std::vector<std::string> parseFiles(const std::string s, std::string delimiter=";")
-  {
-    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-    std::string token;
-    std::vector<std::string> res;
-
-    while ((pos_end = s.find (delimiter, pos_start)) != std::string::npos) {
-        token = s.substr (pos_start, pos_end - pos_start);
-        pos_start = pos_end + delim_len;
-        res.push_back (token);
-    }
-
-    res.push_back (s.substr (pos_start));
-    return res;
-  }
-
 };
 
 
 
 
-
-GMXPlugin::GMXPlugin()
-{
-}
-
-
-GMXPlugin::~GMXPlugin()
-{
-}
-
-
 //## Other Operations (implementation)
-void GMXPlugin::create(GeoVPhysVol *world, bool publish)
-{  
+void GMXPlugin::create(GeoVPhysVol *world, bool publish) {  
   std::cout<< "This is GMXPlugin: creating a GeoModelXml detector "<<std::endl;
-  std::vector<std::string> filesToParse;
-  char* fPath=getenv("GMX_FILES");
-  std::string fileName;
-  if (fPath!=NULL) {
-    std::cout<<" Environment variable GMX_FILES set to "<<fPath<<std::endl;
-    fileName=std::string(fPath);
-    filesToParse=parseFiles(fileName,":");
+  std::vector<std::string> filesToParse = GeoStrUtils::tokenize(GeoStrUtils::resolveEnviromentVariables("${GMX_FILES}"), ":");
+  
+  if (filesToParse.empty()) {
+    filesToParse.push_back("gmx.xml");
   }
-  else {
-  	fileName="gmx.xml";
-	filesToParse.push_back(fileName);
-  }
-
-  char* matManager=getenv("GMX_USE_MATMANAGER");
-  bool matman=0;
-  if (matManager!=nullptr)
-  {
+  
+  
+  bool matman{false};  
+  const std::string matManager = GeoStrUtils::resolveEnviromentVariables("${GMX_USE_MATMANAGER}");
+  /// Flags to perform the deduplication
+  const bool deDuplicateShapes = GeoStrUtils::atoi(GeoStrUtils::resolveEnviromentVariables("${GMX_USE_SHAPEDEDUPL}"));
+  const bool deDuplicateLogVol = GeoStrUtils::atoi(GeoStrUtils::resolveEnviromentVariables("${GMX_USE_LOGVOLDEDUPL}"));
+  const bool deDuplicatePhysVol = GeoStrUtils::atoi(GeoStrUtils::resolveEnviromentVariables("${GMX_USE_PHYSVOLDEDUPL}"));
+  const bool deDuplicateTrfVol = GeoStrUtils::atoi(GeoStrUtils::resolveEnviromentVariables("${GMX_USE_TRANSFDEDUPL}"));
+  
+  
+  
+  if (matManager.size()){
   	std::cout<<" Environment variable GMX_USE_MATMANAGER set to "<<matManager<<std::endl;
-	std::istringstream ss(matManager);
-	ss>>matman;
-	std::cout<<"matman set to "<<matman<<std::endl;
+    matman = GeoStrUtils::atoi(matManager);
+    std::cout<<"matman set to "<<matman<<std::endl;
   }
 
-  char* levelmaps=getenv("GMX_DUMP_LEVEL_MAPS");
+  std::string levelMaps= GeoStrUtils::resolveEnviromentVariables("${GMX_DUMP_LEVEL_MAPS}");
 
-  for (auto f: filesToParse)
-  {
-    if (!exists(f)) {
-    	std::cout <<"GDMLtoGeo: input file "<<f<<
-      	" does not exist. quitting and returning nicely! "<<std::endl;
-   	return;
+  for (auto f: filesToParse) {
+    if (!GeoFileUtils::doesFileExist(f)) {
+    	THROW_EXCEPTION("GDMLtoGeo: input file "<<f<<" does not exist.");   	  
     }
+    
     GmxInterface gmxInterface;
+    gmxInterface.enableMaterialManager(matman);
+    gmxInterface.enableShapeDeDuplication(deDuplicateShapes);
+    gmxInterface.enableLogVolDeDuplication(deDuplicateLogVol);
+    gmxInterface.enablePhysVolDeDuplication(deDuplicatePhysVol);
+    gmxInterface.enableTransformDeDuplication(deDuplicateTrfVol);
     //If we want to write the SQLite, pass a publisher through to fill Aux tables
     //(needed for ReadoutGeometry)
     if(publish) gmxInterface.setPublisher(getPublisher());
 
-    if (levelmaps!=nullptr){
+    if (levelMaps.size()){
         std::string mapname = f.substr(0, f.length() - 4);
         mapname+="_levelMap.txt";
         std::cout<<"Dumping Copy Number Level Map to "<<mapname<<std::endl;
-        Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , matman, mapname);
-    }
-    else Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , matman);
+        Gmx2Geo gmx2Geo(f, world, gmxInterface, 0 , mapname);
+    } else Gmx2Geo gmx2Geo(f, world, gmxInterface, 0);
   }
 
   if (matman) MaterialManager::getManager()->printAll();

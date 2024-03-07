@@ -26,7 +26,7 @@ public:
     void process(const xercesc::DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd);
     void zeroId(const xercesc::DOMElement *element);
 
-    LogvolProcessor();
+    LogvolProcessor() = default;
 private:
     std::map<std::string, LogVolStore> m_map; 
 };

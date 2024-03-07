@@ -9,7 +9,7 @@ GeoDeDuplicator::TrfSet GeoDeDuplicator::s_trfStore{};
 GeoDeDuplicator::ShapeSet GeoDeDuplicator::s_shapeStore{};
 
 
-void GeoDeDuplicator::setShapeDeduplication(bool enable){
+void GeoDeDuplicator::setShapeDeDuplication(bool enable){
     m_deDuplicateShape = enable;
 }
 void GeoDeDuplicator::setLogVolDeDuplication(bool enable) {

@@ -15,7 +15,7 @@
 using namespace xercesc;
 
 
-RCBase * MakeTrd::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase>MakeTrd::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
     constexpr int nParams = 5; 
     static const std::array<std::string, nParams> parName {"xhalflength1", "xhalflength2", "yhalflength1", "yhalflength2", "zhalflength"};
     std::array<double, nParams> p{};
@@ -27,5 +27,5 @@ RCBase * MakeTrd::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) con
         XMLString::release(&toRelease);
     }
 
-    return  const_cast<GeoShape*>(cacheShape(new GeoTrd(p[0], p[1], p[2], p[3], p[4])).get());
+    return const_pointer_cast(cacheShape(make_intrusive<GeoTrd>(p[0], p[1], p[2], p[3], p[4])));
 }

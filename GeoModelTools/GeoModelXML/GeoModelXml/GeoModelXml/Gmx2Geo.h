@@ -58,9 +58,13 @@ using processorList = std::map<std::string,ElementProcessor*>;
 
 class Gmx2Geo {
 public:
-    Gmx2Geo(const std::string& gmxFile, GeoVPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags = 0, bool useMatManager = 0, std::string levelMapName = "", const processorList& procs=processorList());
+    Gmx2Geo(const std::string& gmxFile, 
+            GeoVPhysVol *addHere, 
+            GmxInterface &gmxInterface, 
+            unsigned int flags = 0, 
+            std::string levelMapName = "", const processorList& procs=processorList());
 private:
-// Disallow copying
+    // Disallow copying
     Gmx2Geo(const Gmx2Geo &right) = delete;
     Gmx2Geo & operator=(const Gmx2Geo &right) = delete;
 

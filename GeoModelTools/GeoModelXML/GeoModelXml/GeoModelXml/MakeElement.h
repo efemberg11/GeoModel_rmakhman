@@ -14,7 +14,7 @@
 class MakeElement: public Element2GeoItem {
 public:
     MakeElement();
-    virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+    virtual GeoIntrusivePtr<RCBase> make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 };
 
 #endif // MAKE_ELEMENT_H

@@ -18,7 +18,7 @@
 using namespace xercesc;
 
 
-RCBase * MakeSimplePolygonBrep::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase> MakeSimplePolygonBrep::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
     constexpr int nParams = 3; 
     static const std::array<std::string, nParams> parName {"xpoints", "ypoints", "zhalflength"};
     double z{0.};
@@ -38,7 +38,7 @@ RCBase * MakeSimplePolygonBrep::make(const xercesc::DOMElement *element, GmxUtil
     z = gmxUtil.evaluate(toRelease);
     XMLString::release(&toRelease);
 
-    GeoIntrusivePtr<GeoSimplePolygonBrep> poly{new GeoSimplePolygonBrep(z)};
+    GeoIntrusivePtr<GeoSimplePolygonBrep> poly = make_intrusive<GeoSimplePolygonBrep>(z);
 
     std::istringstream xSS(xPoints);
     while (!xSS.eof()) {
@@ -66,6 +66,6 @@ RCBase * MakeSimplePolygonBrep::make(const xercesc::DOMElement *element, GmxUtil
         poly->addVertex(x[i], y[i]);
     }
 
-    return const_cast<GeoShape*>(cacheShape(poly).get());
+    return const_pointer_cast(cacheShape(poly));
 
 }

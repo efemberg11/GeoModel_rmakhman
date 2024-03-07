@@ -29,11 +29,17 @@
 #include "GeoModelXml/GmxInterface.h"
 #include "GeoModelXml/createdomdocument.h"
 #include "GeoModelHelpers/MaterialManager.h"
+#include "GeoModelHelpers/throwExcept.h"
 
 using namespace std;
 using namespace xercesc;
 
-Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoVPhysVol *addHere, GmxInterface &gmxInterface, unsigned int flags, bool useMatManager, std::string levelMapName, const processorList& procs) {
+Gmx2Geo::Gmx2Geo(const string& xmlFile, 
+                 GeoVPhysVol *addHere, 
+                 GmxInterface &gmxInterface, 
+                 unsigned int flags,                  
+                 std::string levelMapName, 
+                 const processorList& procs) {
 //
 //    Create the xml tree (DOMDocument)
 //
@@ -45,23 +51,22 @@ Gmx2Geo::Gmx2Geo(const string& xmlFile, GeoVPhysVol *addHere, GmxInterface &gmxI
     DOMDocument *doc = createDOMDocument(xmlFile, parser, flags);
     if (!doc) {// Parsed badly
         XMLPlatformUtils::Terminate();
-        msglog << MSG::FATAL << "Error in xml file " << xmlFile << ". Exiting program." << endmsg;
-	std::abort();
+       THROW_EXCEPTION("Error in xml file " << xmlFile << ". Exiting program." );
     }
 
 //
 //    Set up the CLHEP evaluator and the xml-tag processors, and store the GmxInterface:
 //
     GmxUtil gmxUtil(gmxInterface); 
-    if (useMatManager) gmxUtil.matManager=MaterialManager::getManager();
+    if (gmxInterface.useMaterialManager()) gmxUtil.matManager=MaterialManager::getManager();
 
-// add any additional ElementProcessor
+    // add any additional ElementProcessor
     for (auto pr: procs)
         gmxUtil.processorRegistry.enregister(pr.first,pr.second);
 
-//
-//    Process the xml tree, creating all the GeoModel items and adding to the GeoModel tree.
-//
+    //
+    //    Process the xml tree, creating all the GeoModel items and adding to the GeoModel tree.
+    //
     const DOMElement *root = doc->getDocumentElement();
 //
 //    info message: name of detector
@@ -380,14 +385,14 @@ DOMNodeList *rgs = doc->getElementsByTagName(readoutgeometry_tmp);
 //    Call the user's call back routine to add this sensor type with its specific parameters
 //
                         tableData.push_back(data);
-                        gmxUtil.gmxInterface()->addSensorType(clas, name, stParams);
+                        gmxUtil.gmxInterface().addSensorType(clas, name, stParams);
 
                     //finished loop over first sensorType, so we now should have all the columns for this type
                     columsDefined = true;
                     }
 
                 }
-                gmxUtil.gmxInterface()->publish(clas,colNames,colTypes,tableData);
+                gmxUtil.gmxInterface().publish(clas,colNames,colTypes,tableData);
             }
         }
 

@@ -10,12 +10,12 @@
 #define GEO_MODEL_XML_MAKE_UNION_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2ShapeItem.h"
+#include "GeoModelXml/Element2GeoItem.h"
 
-class MakeUnion: public Element2ShapeItem {
+class MakeUnion: public Element2GeoItem {
 public:
     MakeUnion() = default;
-    virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+    virtual GeoIntrusivePtr<RCBase> make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 
 };
 

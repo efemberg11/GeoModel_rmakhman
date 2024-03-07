@@ -18,7 +18,7 @@ using namespace std;
 using namespace xercesc;
 
 
-RCBase * Element2GeoItem::process(const xercesc::DOMElement *element, GmxUtil &gmxUtil) {
+GeoIntrusivePtr<RCBase> Element2GeoItem::process(const xercesc::DOMElement *element, GmxUtil &gmxUtil) {
 
     char *name2release;
     XMLCh * name_tmp = XMLString::transcode("name");
@@ -28,7 +28,7 @@ RCBase * Element2GeoItem::process(const xercesc::DOMElement *element, GmxUtil &g
     XMLString::release(&name2release);
     XMLString::release(&name_tmp);
 
-    RCBase *item{nullptr};
+    GeoIntrusivePtr<RCBase> item{nullptr};
     EntryMap::iterator entry;
     if (name.empty()) { // Unnamed item; cannot store in the map; make a new one 
         item = make(element, gmxUtil);
@@ -43,7 +43,7 @@ RCBase * Element2GeoItem::process(const xercesc::DOMElement *element, GmxUtil &g
     return item;
 }
 
-RCBase * Element2GeoItem::make(const xercesc::DOMElement *element, GmxUtil & /* gmxUtil */) const {
+GeoIntrusivePtr<RCBase> Element2GeoItem::make(const xercesc::DOMElement *element, GmxUtil & /* gmxUtil */) const {
     char *name2release = XMLString::transcode(element->getNodeName());
     std::string nodeName{name2release};
     XMLString::release(&name2release);

@@ -34,7 +34,7 @@
 using namespace xercesc;
 
 
-RCBase * MakeTwistedTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase>MakeTwistedTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
   constexpr int nParams = 11; 
   static const std::array<std::string, nParams> parName {"twist", "dz", "theta","phi","dy1","dx1","dx2","dy2","dx3","dx4","alpha"};
   std::array<double, nParams> p{};
@@ -46,7 +46,7 @@ RCBase * MakeTwistedTrap::make(const xercesc::DOMElement *element, GmxUtil &gmxU
         XMLString::release(&toRelease);
     }
 
-    return const_cast<GeoShape*>(cacheShape(new GeoTwistedTrap(p[0], p[1], p[2], p[3], 
-                                                               p[4], p[5], p[6], p[7], 
-                                                               p[8], p[9], p[10])).get());
+    return const_pointer_cast(cacheShape(make_intrusive<GeoTwistedTrap>(p[0], p[1], p[2], p[3], 
+                                                                        p[4], p[5], p[6], p[7], 
+                                                                        p[8], p[9], p[10])));
 }

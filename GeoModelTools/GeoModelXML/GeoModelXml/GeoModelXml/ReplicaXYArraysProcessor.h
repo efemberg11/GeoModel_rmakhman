@@ -16,7 +16,7 @@ class GmxUtil;
 
 class ReplicaXYarraysProcessor: public ElementProcessor {
 public:
-    ReplicaXYarraysProcessor();
+    ReplicaXYarraysProcessor() = default;
     void process(const xercesc::DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd);
 private:
     std::map <std::string, GeoNodeList> m_map; 

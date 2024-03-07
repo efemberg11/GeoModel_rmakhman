@@ -31,8 +31,8 @@ using namespace std;
 using namespace xercesc;
 
 void AssemblyProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
-GeoLogVol *lv;
-GeoNameTag *physVolName;
+    GeoIntrusivePtr<GeoLogVol> lv{};
+    GeoIntrusivePtr<GeoNameTag> physVolName{};
 
     gmxUtil.positionIndex.incrementLevel();
 
@@ -47,22 +47,18 @@ GeoNameTag *physVolName;
 //
     map<string, AssemblyStore>::iterator entry;
     if ((entry = m_map.find(name)) == m_map.end()) { // Not in registry; make a new item
-//
-//    Name
-//
-        m_map[name] = AssemblyStore();
-        AssemblyStore *store = &m_map[name];
-        physVolName = new GeoNameTag(name); 
-        store->name = physVolName;
-        store->id = 0;
-    }
-    else { // Already in the registry; use it.
+        //
+        //    Name
+        AssemblyStore& store {m_map[name]};
+        physVolName = make_intrusive<GeoNameTag>(name); 
+        store.name = physVolName;
+    } else { // Already in the registry; use it.
         physVolName = entry->second.name;
     }
     lv = gmxUtil.getAssemblyLV();
     toAdd.push_back(physVolName);
     gmxUtil.positionIndex.setCopyNo(m_map[name].id);
-    toAdd.push_back(new GeoIdentifierTag(m_map[name].id++)); 
+    toAdd.push_back(make_intrusive<GeoIdentifierTag>(m_map[name].id++)); 
 //
 //    Process the assembly's children
 //
@@ -85,18 +81,18 @@ GeoNameTag *physVolName;
     XMLString::release(&toRelease);
     XMLString::release(&alignable_tmp);
     if (alignable.compare(string("true")) == 0) {
-        GeoFullPhysVol *pv = new GeoFullPhysVol(lv);
+        GeoIntrusivePtr<GeoFullPhysVol> pv = make_intrusive<GeoFullPhysVol>(cacheVolume(lv));
         for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
             pv->add(*node);
         }
         toAdd.push_back(pv); // NB: the *PV is third item added, so reference as toAdd[2].
     }
     else {
-        GeoPhysVol *pv = new GeoPhysVol(lv);
+        GeoIntrusivePtr<GeoPhysVol> pv = make_intrusive<GeoPhysVol>(cacheVolume(lv));
         for (GeoNodeList::iterator node = childrenAdd.begin(); node != childrenAdd.end(); ++node) {
             pv->add(*node);
         }
-        toAdd.push_back(pv);
+        toAdd.push_back(cacheVolume(pv));
     }
 
     gmxUtil.positionIndex.decrementLevel();

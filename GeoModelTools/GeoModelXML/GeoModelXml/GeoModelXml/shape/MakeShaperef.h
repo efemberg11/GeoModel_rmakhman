@@ -10,11 +10,11 @@
 #define GEO_MODEL_XML_MAKE_SHAPEREF_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2ShapeItem.h"
+#include "GeoModelXml/Element2GeoItem.h"
 
-class MakeShaperef: public Element2ShapeItem {
+class MakeShaperef: public Element2GeoItem {
 public:
-  RCBase * process(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const;
+  GeoIntrusivePtr<RCBase>process(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const;
 };
 
 #endif // GEO_MODEL_XML_MAKE_SHAPEREF_H

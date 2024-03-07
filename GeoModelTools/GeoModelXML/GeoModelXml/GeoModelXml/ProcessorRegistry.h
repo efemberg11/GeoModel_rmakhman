@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 //
@@ -11,22 +11,40 @@
 #ifndef GEO_MODEL_XML_PROCESSOR_REGISTRY_H
 #define GEO_MODEL_XML_PROCESSOR_REGISTRY_H
 
+
+#include "GeoModelXml/ElementProcessor.h"
 #include <string>
 #include <map>
 
-class ElementProcessor;
 
 class ProcessorRegistry {
 public:
-    ProcessorRegistry();
-    ProcessorRegistry(const ProcessorRegistry&) = delete;
-    ProcessorRegistry& operator=(const ProcessorRegistry&) = delete;
+    ProcessorRegistry() = default;
+    
     void enregister(const std::string& tagName, ElementProcessor *processor);
     ElementProcessor *find(const std::string& name);
 
+    /** Switches whether the log vol shall be shared across multiple physVols. 
+     *  Propagates the flag to all registered ElementProcessors */
+    void enableLogVolDeDuplication(bool enable);
+    /** Switches whether the shapes shall be shared across the Geometry
+     *  Propagates the flag to all regsitered ElementProcessors */
+    void enableShapeDeDuplication(bool enable);
+    /** Switches whether the non-alignable transform nodes shall be shared across the Geometry tree
+     *  Propagtes the flag to all registered ElementProcessors */
+    void enableTransformDeDuplication(bool enable);
+    /** Switches whether the equivalent ordinary phyiscal volumes shall be shared across the Geometry tree
+     *  Propagtes the flag to all registered ElementProcessors */
+    void enablePhysVolDeDuplication(bool enable);
+
 private:
-    ElementProcessor *m_defaultProcessor;
+    bool m_deDuplicateLogVols{false};
+    bool m_deDuplicateShapes{false};
+    bool m_deDuplicateTransforms{false};
+    bool m_deDuplicatePhysVols{false};
+    std::unique_ptr<ElementProcessor> m_defaultProcessor{std::make_unique<ElementProcessor>()};
     std::map<std::string, ElementProcessor *> m_processor;
+
 };
 
 #endif // PROCESSOR_REGISTRY_H

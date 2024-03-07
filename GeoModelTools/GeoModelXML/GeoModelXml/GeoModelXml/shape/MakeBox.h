@@ -10,13 +10,13 @@
 #define GEO_MODEL_XML_MAKE_BOX_H
 #include <xercesc/util/XercesDefs.hpp>
 
-#include "GeoModelXml/Element2ShapeItem.h"
+#include "GeoModelXml/Element2GeoItem.h"
 
 #include "GeoModelKernel/GeoBox.h"
-class MakeBox: public Element2ShapeItem {
+class MakeBox: public Element2GeoItem {
 public:
     MakeBox() = default;
-    virtual RCBase * make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
+    virtual GeoIntrusivePtr<RCBase> make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const override;
 
 };
 

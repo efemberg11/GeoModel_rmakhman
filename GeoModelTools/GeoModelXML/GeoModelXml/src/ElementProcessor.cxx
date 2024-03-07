@@ -28,7 +28,6 @@
 
 using namespace xercesc;
 
-ElementProcessor::ElementProcessor() {}
 
 void ElementProcessor::process(const DOMElement *element, GmxUtil & /* gmxUtil*/, GeoNodeList & /* toAdd */) {
 

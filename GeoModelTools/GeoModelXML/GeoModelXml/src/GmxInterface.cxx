@@ -105,15 +105,18 @@ void GmxInterface::addAlignable(int level, map<std::string, int> &index, GeoVFul
     if (m_publisher) m_publisher->publishNode<GeoAlignableTransform *,std::string>(transform,idString.str());
 }
 
-void GmxInterface::addSplitAlignable(int level, map<std::string, int> &index, std::pair<std::string, int> &extraIndex, GeoVFullPhysVol *fpv, 
-                                GeoAlignableTransform * transform) {
+void GmxInterface::addSplitAlignable(int level, 
+                                     std::map<std::string, int> &index, 
+                                     std::pair<std::string, int> &extraIndex, 
+                                     GeoVFullPhysVol* fpv, 
+                                     GeoAlignableTransform* transform) {
    
     std::stringstream idString;
     // debug message
     msglog << MSG::DEBUG 
         << "GmxInterface::addSplitAlignable called for a physvol. Logvol name " 
         << fpv->getLogVol()->getName() << ". Level = " << level << ". Indices:   ";
-    for (map<string, int>::iterator i = index.begin(); i != index.end(); ++i) {
+    for ( map<string, int>::iterator i = index.begin(); i != index.end(); ++i) {
         msglog << i->second << "   ";
         if(i!=index.begin()) idString <<"_";
         idString << i->first <<"_"<<i->second;
@@ -125,6 +128,26 @@ void GmxInterface::addSplitAlignable(int level, map<std::string, int> &index, st
     //--------------
 
     //publish
-    if (m_publisher) m_publisher->publishNode<GeoAlignableTransform *,std::string>(transform,idString.str());
+    if (m_publisher) m_publisher->publishNode<GeoAlignableTransform *,std::string>(transform, idString.str());
 }
+bool GmxInterface::doPhysVolDeDpulication () const{ return m_deDuplicatePhysVols; }
+bool GmxInterface::doLogVolDeDuplication() const{ return m_deDuplicateLogVols; }
+bool GmxInterface::doShapeDeDuplication() const{ return m_deDuplicateShapes; }
+bool GmxInterface::doTransformDeDuplication() const{ return m_deDuplicateTransforms; }
+bool GmxInterface::useMaterialManager() const{ return m_useMatManger; }
 
+void GmxInterface::enableLogVolDeDuplication(bool enable){
+    m_deDuplicateLogVols = enable;
+}
+void GmxInterface::enableShapeDeDuplication(bool enable){
+    m_deDuplicateShapes = enable;
+}
+void GmxInterface::enableTransformDeDuplication(bool enable){
+    m_deDuplicateTransforms = enable;
+}
+void GmxInterface::enablePhysVolDeDuplication(bool enable){
+    m_deDuplicatePhysVols = enable;
+}
+void GmxInterface::enableMaterialManager(bool enable){
+    m_useMatManger = enable;
+}

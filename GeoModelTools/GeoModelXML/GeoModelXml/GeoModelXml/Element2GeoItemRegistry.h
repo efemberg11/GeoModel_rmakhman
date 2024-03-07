@@ -13,20 +13,35 @@
 #include <string>
 #include <map>
 
-class Element2GeoItem;
+#include "GeoModelXml/Element2GeoItem.h"
 
 class Element2GeoItemRegistry {
 public:
-    Element2GeoItemRegistry();
-    ~Element2GeoItemRegistry();
-    Element2GeoItemRegistry(const Element2GeoItemRegistry&) = delete;
-    Element2GeoItemRegistry& operator=(const Element2GeoItemRegistry&) = delete;
+    Element2GeoItemRegistry() = default;
+    ~Element2GeoItemRegistry() = default;
     void enregister(const std::string& tagName,  Element2GeoItem *processor); // register = keyword
     Element2GeoItem *find(const std::string& tagName);
 
+    /** Switches whether the log vol shall be shared across multiple physVols. 
+     *  Propagates the flag to all registered Element2GeoItem objects */
+    void enableLogVolDeDuplication(bool enable);
+    /** Switches whether the shapes shall be shared across the Geometry
+     *  Propagates the flag to all regsitered Element2GeoItem objects */
+    void enableShapeDeDuplication(bool enable);
+    /** Switches whether the non-alignable transform nodes shall be shared across the Geometry tree
+     *  Propagtes the flag to all registered Element2GeoItem objects */
+    void enableTransformDeDuplication(bool enable);
+    /** Switches whether the equivalent ordinary phyiscal volumes shall be shared across the Geometry tree
+     *  Propagtes the flag to all registered Element2GeoItem objects */
+    void enablePhysVolDeDuplication(bool enable);
 private:
-    Element2GeoItem *m_defaultProcessor;
-    std::map<std::string,  Element2GeoItem *> m_processor;
+    std::unique_ptr<Element2GeoItem> m_defaultProcessor{std::make_unique<Element2GeoItem>()};
+    std::map<std::string, Element2GeoItem *> m_processor{};
+
+    bool m_deDuplicateLogVols{false};
+    bool m_deDuplicateShapes{false};
+    bool m_deDuplicateTransforms{false};
+    bool m_deDuplicatePhysVols{false};
 };
 
 #endif // ELEMENT2GEO_ITEM_REGISTRY_H

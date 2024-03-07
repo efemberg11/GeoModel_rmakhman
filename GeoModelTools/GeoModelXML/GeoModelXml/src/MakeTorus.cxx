@@ -16,7 +16,7 @@
 using namespace xercesc;
 
 
-RCBase * MakeTorus::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase> MakeTorus::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
   constexpr int nParams = 5; 
   static const std::array<std::string, nParams> parName {"rmin", "rmax", "rtor", "sphi", "dphi"};
   std::array<double, nParams> p{};
@@ -28,5 +28,5 @@ RCBase * MakeTorus::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) c
       XMLString::release(&toRelease);
   }
 
-  return  const_cast<GeoShape*>(cacheShape(new GeoTorus(p[0], p[1], p[2], p[3], p[4])).get());
+  return const_pointer_cast(cacheShape(make_intrusive<GeoTorus>(p[0], p[1], p[2], p[3], p[4])));
 }

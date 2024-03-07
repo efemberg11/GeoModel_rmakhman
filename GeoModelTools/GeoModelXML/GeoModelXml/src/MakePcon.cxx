@@ -16,7 +16,7 @@
 using namespace xercesc;
 
 
-RCBase * MakePcon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase>MakePcon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
     constexpr int nParams = 2; 
     static const std::array<std::string, nParams> parName{"sphi", "dphi"};
     std::array<double, nParams> p{};
@@ -27,7 +27,7 @@ RCBase * MakePcon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) co
         XMLString::release(&toRelease);
     }
 
-    GeoIntrusivePtr<GeoPcon> pcon{new GeoPcon(p[0], p[1])};
+    GeoIntrusivePtr<GeoPcon> pcon = make_intrusive<GeoPcon>(p[0], p[1]);
     //
     //    Add planes
     //
@@ -46,5 +46,5 @@ RCBase * MakePcon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) co
     if (!pcon->isValid()) {
         THROW_EXCEPTION("Invalid Pcon defined "<<printGeoShape(pcon));
     }
-    return const_cast<GeoShape*>(cacheShape(pcon).get());
+    return const_pointer_cast(cacheShape(pcon));
 }

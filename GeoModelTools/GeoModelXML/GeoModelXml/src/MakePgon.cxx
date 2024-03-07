@@ -14,7 +14,7 @@
 using namespace xercesc;
 
 
-RCBase * MakePgon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
+GeoIntrusivePtr<RCBase>MakePgon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) const {
     constexpr int nParams = 3; 
     static const std::array<std::string, nParams> parName {"sphi", "dphi", "nsides"};
     std::array<double, nParams> p{};
@@ -26,10 +26,10 @@ RCBase * MakePgon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) co
         XMLString::release(&toRelease);
     }
 
-    GeoIntrusivePtr<GeoPgon> pgon{new GeoPgon(p[0], p[1], p[2])};
-//
-//    Add planes
-//
+    GeoIntrusivePtr<GeoPgon> pgon = make_intrusive<GeoPgon>(p[0], p[1], p[2]);
+    //
+    //    Add planes
+    //
     double zPlane{0.}, rMinPlane{0.}, rMaxPlane{0.};
     for (DOMNode *child = element->getFirstChild(); child != 0; child = child->getNextSibling()) {
         if (child->getNodeType() == DOMNode::ELEMENT_NODE) {
@@ -42,5 +42,5 @@ RCBase * MakePgon::make(const xercesc::DOMElement *element, GmxUtil &gmxUtil) co
             }
         }
     }
-    return const_cast<GeoShape*>(cacheShape(pgon).get());
+    return const_pointer_cast(cacheShape(pgon));
 }

@@ -62,21 +62,22 @@
 class GmxUtil {
 public:
     GmxUtil(GmxInterface &gmxInterface);
-    ~GmxUtil();
-    GmxInterface *gmxInterface();
+    virtual ~GmxUtil() = default;
+    GmxInterface& gmxInterface();
     double evaluate(char const *expression);
     std::string debracket(std::string expression);
     GeoModelTools::Evaluator eval;
     PositionIndex positionIndex;
-    MaterialManager* matManager=0;
+    MaterialManager* matManager{nullptr};
     ProcessorRegistry processorRegistry;
     Element2GeoItemRegistry geoItemRegistry;
     GeoLogVol * getAssemblyLV() {return m_assemblyLV;};
+    
+    
     struct TagHandler {
-//
-//    Things creating a vector of nodes to be added to the tree
-//
-	std::map<std::string, ElementProcessor&, std::less<std::string> > processor;
+        //
+        //    Things creating a vector of nodes to be added to the tree
+        //
         AddbranchProcessor addbranch;
         LogvolProcessor logvol;
         LogvolrefProcessor logvolref;
@@ -84,11 +85,11 @@ public:
         AssemblyrefProcessor assemblyref;
         TransformProcessor transform;
         MulticopyProcessor multicopy;
-	ReplicaXProcessor replicaX;
-	ReplicaYProcessor replicaY;
-	ReplicaZProcessor replicaZ;
-	ReplicaRPhiProcessor replicaRPhi;
-	ReplicaXYarraysProcessor replicaXYArrays;
+        ReplicaXProcessor replicaX;
+        ReplicaYProcessor replicaY;
+        ReplicaZProcessor replicaZ;
+        ReplicaRPhiProcessor replicaRPhi;
+        ReplicaXYarraysProcessor replicaXYArrays;
         IndexProcessor index;
 //
 //    Things creating an RCBase *
@@ -127,10 +128,11 @@ public:
     } tagHandler;
 //    SensitiveId sensitiveId;
 private:
-    GeoLogVol *makeAssemblyLV();
-    GeoLogVol *m_assemblyLV; // Special logvol to be turned into an assembly-physical-volume. 
+    GeoIntrusivePtr<GeoLogVol> makeAssemblyLV();
+    GeoIntrusivePtr<GeoLogVol> m_assemblyLV{}; // Special logvol to be turned into an assembly-physical-volume. 
                              // Achieved by filling it with special::ether material.
-    GmxInterface *m_gmxInterface; 
+    GmxInterface& m_gmxInterface; 
+
 };
 
 #endif // GMXUTIL_H

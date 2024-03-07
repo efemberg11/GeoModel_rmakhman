@@ -18,7 +18,7 @@ class GmxUtil;
 
 class MakeTranslation {
 public:
-    MakeTranslation();
+    MakeTranslation() = default;
     GeoTrf::Translate3D getTransform(const xercesc::DOMElement *rotation, GmxUtil &gmxUtil);
 };
 #endif // MAKE_TRANSLATION_H

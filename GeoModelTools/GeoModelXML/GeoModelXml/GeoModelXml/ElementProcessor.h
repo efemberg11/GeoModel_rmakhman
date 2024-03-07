@@ -21,7 +21,7 @@ class GmxUtil;
 class ElementProcessor: public GeoDeDuplicator {
 
 public:
-    ElementProcessor();
+    ElementProcessor() = default;
     virtual void process(const xercesc::DOMElement *element, GmxUtil &gmxUtil, 
                          GeoNodeList &toBeAdded);
 };

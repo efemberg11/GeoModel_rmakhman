@@ -60,15 +60,10 @@ std::string getNodeType(const GeoGraphNode* node) {
         return "GeoTransform";
     return "UnidentifiedNode";
 }
-LogvolProcessor::LogvolProcessor() {
-    setLogVolDeDuplication(false);
-    setPhysVolDeDuplication(false);
-      
-}
 void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNodeList &toAdd) {
   GeoLogVolPtr lv{};
-  GeoNameTag *nameTag_physChildVolName;//USed for "sensitive" PhysVols 
-  GeoNameTag *nameTag_physVolName;//Actually the logVol name, which gets used for the PhysVols if they have "named" attribute (and aren't sensitive)
+  GeoIntrusivePtr<GeoNameTag> nameTag_physChildVolName{};//USed for "sensitive" PhysVols 
+  GeoIntrusivePtr<GeoNameTag> nameTag_physVolName{};//Actually the logVol name, which gets used for the PhysVols if they have "named" attribute (and aren't sensitive)
 
   gmxUtil.positionIndex.incrementLevel();
 
@@ -115,19 +110,17 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
 //
   map<string, LogVolStore>::iterator entry;
   if ((entry = m_map.find(name)) == m_map.end()) { // Not in registry; make a new item
-//
-//    Name
-//
-    m_map[name] = LogVolStore();
-    LogVolStore *store = &m_map[name];
+    //
+    //    Name
+    //   
+    LogVolStore* store{&m_map[name]};
     if(isNamed) {
-        nameTag_physVolName = new GeoNameTag(name);
+        nameTag_physVolName = make_intrusive<GeoNameTag>(name);
         store->name = nameTag_physVolName;
-    }
-    store->id = 0;
-//
-//    Get the shape.
-//
+    }   
+    //
+    //    Get the shape.
+    //
     DOMDocument *doc = element->getOwnerDocument();
     XMLCh * shape_tmp = XMLString::transcode("shape");
     const XMLCh *shape = element->getAttribute(shape_tmp);
@@ -136,24 +129,23 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     DOMNode *parent = refShape->getParentNode();
     if (XMLString::compareIString(parent->getNodeName(), XMLString::transcode("shapes")) != 0) {
         char* shape_s = XMLString::transcode (shape);
-        msglog << MSG::FATAL << "Processing logvol " << name <<
+        THROW_EXCEPTION("Processing logvol " << name <<
             ". Error in gmx file. An IDREF for a logvol shape did not refer to a shape.\n" <<
-            "Shape ref was " << shape_s << "; exiting" << endmsg;
+            "Shape ref was " << shape_s << "; exiting");
         XMLString::release (&shape_s);
-        std::abort();
     }
-//
-//    What sort of shape?
-//
+    //
+    //    What sort of shape?
+    //
     name2release = XMLString::transcode(refShape->getNodeName());
     string shapeType(name2release);
     XMLString::release(&name2release);
     XMLString::release(&shape_tmp);
 
-    const GeoShape *shGeo = static_cast<const GeoShape *>(gmxUtil.geoItemRegistry.find(shapeType)->process(refShape, gmxUtil));
-//
-//    Get the material
-//
+    GeoIntrusivePtr<const GeoShape> shGeo = dynamic_pointer_cast<const GeoShape>(gmxUtil.geoItemRegistry.find(shapeType)->process(refShape, gmxUtil));
+    //
+    //    Get the material
+    //
     XMLCh * material_tmp = XMLString::transcode("material");
     const XMLCh *material = element->getAttribute(material_tmp);
     DOMElement *refMaterial = doc->getElementById(material);
@@ -170,26 +162,25 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     }
     std::string nam_mat= XMLString::transcode(material);
 
-    const GeoMaterial* matGeo = nullptr;
+    GeoIntrusivePtr<const GeoMaterial> matGeo{};
 
     if (gmxUtil.matManager) {
         if (!gmxUtil.matManager->isMaterialDefined(nam_mat)) {
-            GeoMaterial* tempMat=dynamic_cast<GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
+            GeoIntrusivePtr<GeoMaterial> tempMat=dynamic_pointer_cast<GeoMaterial>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
             // we let GMX create the material and store it in the MM
             gmxUtil.matManager->addMaterial(tempMat);
-        }
-        matGeo = gmxUtil.matManager->getMaterial(nam_mat);
+        } matGeo = gmxUtil.matManager->getMaterial(nam_mat);
     } else {
-        matGeo = dynamic_cast<const GeoMaterial *>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
+        matGeo = dynamic_pointer_cast<const GeoMaterial>(gmxUtil.tagHandler.material.process(refMaterial, gmxUtil));
     }
 
     if (!matGeo) {
         THROW_EXCEPTION("Cannot process "<<nam_mat);
     }    
-//
-//    Make the LogVol and add it to the map ready for next time
-//
-    lv = new GeoLogVol(name, shGeo, matGeo);
+    //
+    //    Make the LogVol and add it to the map ready for next time
+    //
+    lv = make_intrusive<GeoLogVol>(name, shGeo, matGeo);
     store->logVol = lv;
 
     XMLString::release(&material_tmp);
@@ -203,24 +194,23 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     lv = entry->second.logVol;
   }
 
-
-//
-//    Process the logvol children (side effect: sets formulae for indexes before calculating them)
-//
-// RMB: Note -- here the code looks for "children of the LogVol" but this is not true: they are PhysVol children. In fact, they are later added to the newly created PhysVol... needs to be clearified/updated
+  //
+  //    Process the logvol children (side effect: sets formulae for indexes before calculating them)
+  //
+  // RMB: Note -- here the code looks for "children of the LogVol" but this is not true: they are PhysVol children. In fact, they are later added to the newly created PhysVol... needs to be clearified/updated
   GeoNodeList childrenAdd;
   for (DOMNode *child = element->getFirstChild(); child != 0; child = child->getNextSibling()) {
-    if (child->getNodeType() == DOMNode::ELEMENT_NODE) {
-      DOMElement *el = dynamic_cast<DOMElement *> (child);
-      name2release = XMLString::transcode(el->getNodeName());
-      string name(name2release);
-      XMLString::release(&name2release);
-      gmxUtil.processorRegistry.find(name)->process(el, gmxUtil, childrenAdd);
-    }
+      if (child->getNodeType() == DOMNode::ELEMENT_NODE) {
+        DOMElement *el = dynamic_cast<DOMElement *> (child);
+        name2release = XMLString::transcode(el->getNodeName());
+        string name(name2release);
+        XMLString::release(&name2release);
+        gmxUtil.processorRegistry.find(name)->process(el, gmxUtil, childrenAdd);
+      }
   }
-//
-//   Make a list of things to be added
-//
+  //
+  //   Make a list of things to be added
+  //
   if(isNamed) {
       if(!sensitive) toAdd.push_back(nameTag_physVolName);//If sensitive, it gets a different name in a moment...
   }
@@ -230,7 +220,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
   if (sensitive) {
     gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
     gmxUtil.positionIndex.indices(index, gmxUtil.eval);
-    sensId = gmxUtil.gmxInterface()->sensorId(index);
+    sensId = gmxUtil.gmxInterface().sensorId(index);
     std::string newName = name;
     for(auto index_i:index){
             newName.append("_");
@@ -238,16 +228,15 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
             newName.append("_");
             newName.append(std::to_string(index_i.second));
     }
-    nameTag_physChildVolName = new GeoNameTag(newName);//Make sensitive always have a name, to extra Id information from
+    nameTag_physChildVolName = make_intrusive<GeoNameTag>(newName);//Make sensitive always have a name, to extra Id information from
     toAdd.push_back(nameTag_physChildVolName);
     if(hasIdentifier) { //TODO: check if all "sensitive" volumes must have an identifier. If that's the case, then we can remove this "if" here
-        //        toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
-        toAdd.push_back(new GeoIdentifierTag(sensId));
+        toAdd.push_back(make_intrusive<GeoIdentifierTag>(sensId));
     }
   }
   else {
       if(hasIdentifier) {
-          toAdd.push_back(new GeoIdentifierTag(m_map[name].id)); // Normal copy number
+          toAdd.push_back(make_intrusive<GeoIdentifierTag>(m_map[name].id)); // Normal copy number
           gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
       }
   }
@@ -266,7 +255,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
 
   if (sensitive || (alignable.compare(string("true")) == 0)) {
     //msglog << MSG::DEBUG << "Handling a FullPhysVol (i.e., an 'alignable' or 'sensitive' volume) ..." << endmsg;
-    GeoFullPhysVol *pv = new GeoFullPhysVol(cacheVolume(lv));
+    GeoIntrusivePtr<GeoFullPhysVol> pv = make_intrusive<GeoFullPhysVol>(cacheVolume(lv));
     if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
     for (const auto& node : childrenAdd) {
 	     pv->add(node);
@@ -293,26 +282,27 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
         for(int i=0;i<splitLevel;i++){
           std::string field = "eta_module";//eventually specify in Xml the field to split in?
           std::pair<std::string,int> extraIndex(field,i);
-          gmxUtil.gmxInterface()->addSplitSensor(sensitiveName, index,extraIndex, sensId, dynamic_cast<GeoVFullPhysVol *> (pv),splitLevel);
+          gmxUtil.gmxInterface().addSplitSensor(sensitiveName, index,extraIndex, sensId, 
+                                                dynamic_pointer_cast<GeoVFullPhysVol> (pv),splitLevel);
         }
 	    }
-	    else gmxUtil.gmxInterface()->addSensor(sensitiveName, index, sensId, dynamic_cast<GeoVFullPhysVol *> (pv));
+	    else gmxUtil.gmxInterface().addSensor(sensitiveName, index, sensId, 
+                                             dynamic_pointer_cast<GeoVFullPhysVol>(pv));
         XMLString::release(&splitLevel_tmp);
     }
   }
   else {
-    //msglog << MSG::DEBUG << "Handling a standard PhysVol..." << endmsg;
-    GeoPhysVol *pv = new GeoPhysVol(cacheVolume(lv));
-    if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
-    //msglog << MSG::DEBUG << "Now, looping over all the children of the LogVol (in the GMX meaning)..." << endmsg; 
-    for (const auto & node : childrenAdd) {
-      pv->add(node);
-      //msglog << MSG::DEBUG << "LVProc, PV child: " << *node << " -- " << getNodeType(*node) << endmsg;
-    }
-    //msglog << MSG::DEBUG << "End of loop over children." << endmsg;
-    toAdd.push_back(cacheVolume(pv).get());
+      //msglog << MSG::DEBUG << "Handling a standard PhysVol..." << endmsg;
+      GeoIntrusivePtr<GeoPhysVol> pv = make_intrusive<GeoPhysVol>(cacheVolume(lv));
+      if (is_envelope) GeoVolumeTagCatalog::VolumeTagCatalog()->addTaggedVolume("Envelope",name,pv);
+      //msglog << MSG::DEBUG << "Now, looping over all the children of the LogVol (in the GMX meaning)..." << endmsg; 
+      for (const auto & node : childrenAdd) {
+        pv->add(node);
+        //msglog << MSG::DEBUG << "LVProc, PV child: " << *node << " -- " << getNodeType(*node) << endmsg;
+      }
+      //msglog << MSG::DEBUG << "End of loop over children." << endmsg;
+      toAdd.push_back(cacheVolume(pv));
   }
-
   gmxUtil.positionIndex.decrementLevel();
   if(gmxUtil.positionIndex.level()==-1){ //should mean that we are at the end of processing the geometry
     gmxUtil.positionIndex.printLevelMap();

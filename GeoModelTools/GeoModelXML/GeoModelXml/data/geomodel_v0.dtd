@@ -65,7 +65,7 @@
     <!ELEMENT addindex EMPTY>
         <!ATTLIST addindex name ID #REQUIRED>
 
-  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep|ellipticaltube|twistedtrap|torus)+)>
+  <!ELEMENT shapes ((box|cons|generictrap|para|pcon|pgon|trap|tube|tubs|trd|intersection|subtraction|union|simplepolygonbrep|ellipticaltube|twistedtrap|torus|shapeshift)+)>
     <!-- All shapes allowed in GeoModel manual. Same name, parameters, parameter order, but always lower case -->
 
     <!ELEMENT box EMPTY>
@@ -168,6 +168,9 @@
     <!ELEMENT intersection (shaperef, (transformation|transformationref), shaperef)>
       <!ATTLIST intersection name ID #REQUIRED>
 
+    <!ELEMENT shapeshift ( (shaperef|transformation|transformationref)+)>
+      <!ATTLIST shapeshift name ID #REQUIRED>
+
     <!ELEMENT subtraction (shaperef, (transformation|transformationref), shaperef)>
       <!ATTLIST subtraction name ID #REQUIRED>
 
@@ -268,7 +271,7 @@
     <!ATTLIST assemblyref ref    IDREF        #REQUIRED
                           zeroid (true|false) "false">
 
-  <!ELEMENT multicopy (transformation, (transform|logvolref|assemblyref))>
+  <!ELEMENT multicopy ( (transformation|transformationref), (transform|logvolref|assemblyref))>
     <!-- Removed logvol and assembly from multicopy content. There is no particular reason
          why they shouldn't be allowed there. But in practice one uses refs, and forbidding them simplifies coding
          the index stuff. If you need them, put them back. Got rid of transformref; never used. -->

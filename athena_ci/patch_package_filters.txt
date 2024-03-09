@@ -10,4 +10,5 @@
 + InnerDetector/InDetDetDescr/ServiceExtensionGeoModelXml	
 + InnerDetector/InDetDetDescr/StripGeoModelXml	
 + InnerDetector/InDetDetDescr/PLRGeoModelXml
++ InnerDetector/InDetDetDescr/PixelGeoModel
  

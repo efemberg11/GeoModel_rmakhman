@@ -34,6 +34,8 @@ function heading() {
 
 set -e
 
+BUILD_DIR=${PWD}
+
 heading "Preliminary setup"
 
 if [ -z "${ATHENA_SOURCE}" ]; then
@@ -94,10 +96,25 @@ lsetup "views ${LCG_RELEASE} ${LCG_PLATFORM}" || true
 CCACHE=$(command -v ccache)
 $CCACHE -z
 
+heading "Rebase the GeoModel code base w.r.t. main"
+
+cd ${CI_PROJECT_DIR}
+git fetch origin
+
+fill_line "Changes w.r.t to main before rebase"
+
+git diff HEAD origin/main
+git rebase origin/main
+fill_line "Changes w.r.t to main after rebase"
+
+git diff HEAD origin/main
+
+
+cd ${BUILD_DIR}
+
 heading "Configure GeoModel"
 
 gm_install_dir=$PWD/geomodel-install
-
 cmake -S "${SCRIPT_DIR}/.." -B geomodel-build \
   -GNinja \
   -DCMAKE_MAKE_PROGRAM="$NINJA" \

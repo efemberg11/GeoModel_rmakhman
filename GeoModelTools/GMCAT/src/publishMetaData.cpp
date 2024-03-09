@@ -120,8 +120,7 @@ void publishMetaData( GMDBManager & db,
     }
   }
   else {
-    std::cerr << std::endl << "ERROR: provided directory " << repoPath << " is NOT inside a local git reporistory!" << std::endl;
-    throw std::runtime_error("Metadata not written!");
+    std::cerr << std::endl << "WARNING: no information on User repository will be written to metadata. " << std::endl;
   }
 
   //

@@ -21,5 +21,6 @@ GeoIntrusivePtr<GeoPhysVol> createGeoWorld(const double worldBoxX = GeoWorldDim:
                                            const double worldBoxZ = GeoWorldDim::worldBoxZ);
 
 /// Resize the world volume to be the needed size
-GeoIntrusivePtr<GeoPhysVol> resizeGeoWorld(GeoIntrusivePtr<GeoPhysVol> world);
+GeoIntrusivePtr<GeoPhysVol> resizeGeoWorld(GeoIntrusivePtr<GeoPhysVol> world,
+                                           bool cloneNodes = false);
 #endif

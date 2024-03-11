@@ -40,8 +40,8 @@ GeoIntrusivePtr<RCBase> MakeShapeShift::make(const xercesc::DOMElement *element,
             std::string nodeName{toRelease};
             XMLString::release(&toRelease);
             const GeoTransform *geoXf = (nodeName == "transformation")
-              ? static_cast<const GeoTransform *>( gmxUtil.tagHandler.transformation.process(dynamic_cast<DOMElement *>(child), gmxUtil))
-              : static_cast<const GeoTransform *>( gmxUtil.tagHandler.transformationref.process(dynamic_cast<DOMElement *>(child), gmxUtil));
+              ? dynamic_pointer_cast<const GeoTransform>( gmxUtil.tagHandler.transformation.process(dynamic_cast<DOMElement *>(child), gmxUtil))
+              : dynamic_pointer_cast<const GeoTransform>( gmxUtil.tagHandler.transformationref.process(dynamic_cast<DOMElement *>(child), gmxUtil));
             hepXf = geoXf->getTransform();
             break;
         } default: // More than 3 elements?

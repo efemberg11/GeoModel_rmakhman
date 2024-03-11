@@ -57,6 +57,6 @@ GeoIntrusivePtr<RCBase> MakeShapeShift::make(const xercesc::DOMElement *element,
     if (!sorter.compare(GeoTrf::Transform3D::Identity(), hepXf)) {
         return shape;
     }    
-    return cacheShape(make_intrusive<GeoShapeShift>(shape, hepXf));
+    return const_cast(cacheShape(make_intrusive<GeoShapeShift>(shape, hepXf)));
 }
 

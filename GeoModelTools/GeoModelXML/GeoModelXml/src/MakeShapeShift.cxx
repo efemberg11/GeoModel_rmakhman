@@ -33,7 +33,7 @@ GeoIntrusivePtr<RCBase> MakeShapeShift::make(const xercesc::DOMElement *element,
        }
       switch (elementIndex) {
         case 0: { // First element is first shaperef
-            shape = static_cast<GeoShape*>(gmxUtil.tagHandler.shaperef.process(dynamic_cast<DOMElement*> (child), gmxUtil));
+            shape = dynamic_pointer_cast<GeoShape>(gmxUtil.tagHandler.shaperef.process(dynamic_cast<DOMElement*> (child), gmxUtil));
             break;
         } case 1: { // Second element is transformation or transformationref
             char *toRelease = XMLString::transcode(child->getNodeName());
@@ -57,6 +57,6 @@ GeoIntrusivePtr<RCBase> MakeShapeShift::make(const xercesc::DOMElement *element,
     if (!sorter.compare(GeoTrf::Transform3D::Identity(), hepXf)) {
         return shape;
     }    
-    return const_cast(cacheShape(make_intrusive<GeoShapeShift>(shape, hepXf)));
+    return const_pointer_cast(cacheShape(make_intrusive<GeoShapeShift>(shape, hepXf)));
 }
 

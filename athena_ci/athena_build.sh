@@ -36,6 +36,8 @@ set -e
 
 BUILD_DIR=${PWD}
 
+
+
 heading "Preliminary setup"
 
 if [ -z "${ATHENA_SOURCE}" ]; then

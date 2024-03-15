@@ -45,8 +45,8 @@ typedef std::unordered_map<std::string, std::vector<std::vector<std::variant<int
 class GeoPublisher
 {
  public:
-  GeoPublisher() {}
-  virtual ~GeoPublisher() {}
+  GeoPublisher() = default;
+  virtual ~GeoPublisher() = default;
 
   template<class N, typename T> void publishNode(N node,T keyT);
 

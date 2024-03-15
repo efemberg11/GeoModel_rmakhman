@@ -22,6 +22,9 @@ namespace GeoModelIO {
         std::string keyType = "";
 
         std::vector<std::vector<std::string>> vecRecords;
+        static_assert(std::is_same_v<GeoFullPhysVol*, N> || std::is_same_v<GeoAlignableTransform*, N> ,
+                    "ERROR! The node type is not currently supported. If in doubt, please ask to 'geomodel-developers@cern.ch'.\n");
+
         if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
             if(doCheckTable){ 
                 bool tableExists = m_dbManager->checkTable("PublishedFullPhysVols_"+publisherName);
@@ -34,12 +37,6 @@ namespace GeoModelIO {
                 if(!tableExists) return mapNodes;
             }
             vecRecords = m_dbManager->getPublishedAXFTable( publisherName );
-        } else {
-            std::cout << "ERROR! The node type '" << typeid(N).name() 
-                << "' is not currently supported.\n"
-                << "If in doubt, please ask to 'geomodel-developers@cern.ch'.\n"
-                << "Exiting...\n";
-            exit(EXIT_FAILURE);
         }
         unsigned ii = 0;
         for( auto const &record : vecRecords ) {

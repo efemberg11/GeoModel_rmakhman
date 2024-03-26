@@ -100,7 +100,8 @@ void GmxInterface::addAlignable(int level, map<std::string, int> &index, GeoVFul
     }
     msglog << endmsg;
     //--------------
-
+    if(!fpv) msglog << MSG::WARNING << "Could not find a FullPhysVol when adding alignable"<<endmsg;
+    if(!transform) msglog << MSG::WARNING << "Could not find an alignable transform when adding alignable"<<endmsg;
     //publish
     if (m_publisher) m_publisher->publishNode<GeoAlignableTransform *,std::string>(transform,idString.str());
 }
@@ -126,7 +127,8 @@ void GmxInterface::addSplitAlignable(int level,
     idString<<"_split_"<<extraIndex.first<<"_"<<extraIndex.second;
     msglog << endmsg;
     //--------------
-
+    if(!fpv) msglog << MSG::WARNING << "Could not find a FullPhysVol when adding split alignable"<<endmsg;
+    if(!transform) msglog << MSG::WARNING << "Could not find an alignable transform when adding split alignable"<<endmsg;
     //publish
     if (m_publisher) m_publisher->publishNode<GeoAlignableTransform *,std::string>(transform, idString.str());
 }

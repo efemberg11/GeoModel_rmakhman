@@ -20,6 +20,29 @@ The Coin3D community is aware of the problem but there are no fixes, yet.
 
 Therefore, we strongly suggest to use the alternative X11 window manager when running GEMX (or all other SoQt/Coin3D-based applications) on Ubuntu, for the time being.
 
+### "Fatal Application Error" message when starting GMEX remotely
+
+If you are starting `gmex` from your local machine on a remote machine, and you get an error message like this: 
+
+```
+Fatal Application Error. Can't setup a valid OpenGL canvas, something is seriously wrong with the system! Application will exit!
+```
+
+![](screenshot_gmex_error_remoterendering.png)
+
+Then, your local machine probably has the **indirect rendering of OpenGL** content **disabled**.
+
+In the case of macOS, Apple has disabled the remote indirect rendering of OpenGL by default for a few years, so running remote OpenGL applications (any OpenGL applications) does not work out of the box.
+
+**Re-enabling the indirect rendering solves the problem. **
+
+You can see a few instructions on the VP1 pages here:
+https://atlas-vp1.web.cern.ch/atlas-vp1/home/documentation/how-to-run-vp1/tutorial/0-pre-requisites/#Mac_OS_X
+
+You get a similar situation if you run from a recent Fedora or an Alma9 machine. In that case, you can find instructions here: 
+
+https://askubuntu.com/questions/1100451/how-to-enable-allowindirectglx-on-ubuntu-18-04-with-nvidia-1050ti 
+
 
 
 ## Packages

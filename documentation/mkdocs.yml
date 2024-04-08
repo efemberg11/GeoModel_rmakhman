@@ -28,6 +28,17 @@ nav:
             - 'Class Reference': 'components/kernel/reference/index.md'
         - GeoModelTools:
             - 'GDML2GeoModel': 'components/geomodeltools/gdml2gm/index.md'
+        - GeoModelXML:
+            - 'GeoModelXML Overview' : 'components/geomodelxml/index.md'
+            - 'Building a geometry' : 'components/geomodelxml/buildinggeometry.md'
+            - 'Defining detector readout' : 'components/geomodelxml/readout.md'
+            - 'Setting alignment properties' : 'components/geomodelxml/alignment.md'
+            - Components:
+              - 'Gmx2Geo': 'components/geomodelxml/components/gmx2geo.md'
+              - 'GmxInterface' : 'components/geomodelxml/components/gmxinterface.md'
+              - 'Processors' : 'components/geomodelxml/components/processors.md'
+            - 'Troubleshooting' : 'components/geomodelxml/troubleshooting.md'    
+            - 'User Guide (old, ATLAS specific)' : 'components/geomodelxml/old.md'
         - GeoModelVisualization:
             - 'GeoModelExplorer': 'components/geomodelvisualization/gmex/index.md'
     - FullSimLight tools:

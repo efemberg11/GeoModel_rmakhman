@@ -5,7 +5,7 @@
 #include <typeinfo>
 #include <sstream>
 #include <memory>
-
+#include <deque>
 //
 // Forward definition of "Genfunction"
 //
@@ -35,8 +35,11 @@ class GenFunctionInterpreter {
 
   // Interprets a string.  
   GFPTR interpret(std::string::const_iterator begin,
-		  std::string::const_iterator end  ) const;
+		  std::string::const_iterator end,
+		  std::deque<double> *fpData=nullptr) const;
 
+
+  
  private:
 
   // Store the actual interpreters, map them into the type name

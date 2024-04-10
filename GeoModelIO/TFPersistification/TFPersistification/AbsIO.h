@@ -10,7 +10,7 @@ class AbsReader: public GenFunctionReader {
  public:
   
   AbsReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *) const;
   
 };
 

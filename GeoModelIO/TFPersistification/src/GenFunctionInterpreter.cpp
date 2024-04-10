@@ -59,7 +59,8 @@ void GenFunctionInterpreter::add(const std::string & str, const GenFunctionReade
 }
 
 
-GFPTR GenFunctionInterpreter::interpret(std::string::const_iterator sBegin, std::string::const_iterator sEnd) const {
+GFPTR GenFunctionInterpreter::interpret(std::string::const_iterator sBegin, std::string::const_iterator sEnd,
+					std::deque<double> * fpData) const {
 
   auto begin=std::find(sBegin, sEnd, '(');
   std::reverse_iterator<std::string::const_iterator> rBegin(sEnd);
@@ -77,7 +78,7 @@ GFPTR GenFunctionInterpreter::interpret(std::string::const_iterator sBegin, std:
       throw std::runtime_error (stream.str());
     }
     const GenFunctionReader *reader = (*rIter).second;
-    return reader->execute(begin,begin);//exec w/null expression
+    return reader->execute(begin,begin,fpData);//exec w/null expression
   }
   std::string op(sBegin,begin);
   auto argBegin=begin+1, argEnd=end-1;
@@ -88,5 +89,5 @@ GFPTR GenFunctionInterpreter::interpret(std::string::const_iterator sBegin, std:
     throw std::runtime_error (stream.str());
   }
   const GenFunctionReader *reader = (*rIter).second;
-  return reader->execute(argBegin,argEnd);
+  return reader->execute(argBegin,argEnd,fpData);
 }

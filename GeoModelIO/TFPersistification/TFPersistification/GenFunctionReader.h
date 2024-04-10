@@ -26,7 +26,7 @@ class GenFunctionReader {
   virtual ~GenFunctionReader();
 
   // Execute
-  virtual GFPTR execute(std::string::const_iterator , std::string::const_iterator) const=0;
+  virtual GFPTR execute(std::string::const_iterator , std::string::const_iterator, std::deque<double> *fpData=nullptr) const=0;
 
   // Access to the interpreter:
   const GenFunctionInterpreter *getInterpreter() const;

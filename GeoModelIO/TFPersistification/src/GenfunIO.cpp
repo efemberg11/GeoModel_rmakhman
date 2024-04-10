@@ -2,27 +2,20 @@
 #include "TFPersistification/GenFunctionInterpreter.h"
 #include "TFPersistification/GenFunctionPersistifier.h"
 #include "TFPersistification/GenfunIO.h"
-
 #include "GeoGenericFunctions/Variable.h"
-
+#include <stdexcept>
 #include <sstream>
 
 ConstTimesFunctionReader::ConstTimesFunctionReader(GenFunctionInterpreter *interpreter):GenFunctionReader("ConstTimesFunction", interpreter) {}
 
-inline double atof(std::string::const_iterator begin, std::string::const_iterator end) {
-
-  std::string atom(begin,end);
-  std::istringstream stream(atom);
-  double x=0;
-  stream >> x;
-  return x;
+GFPTR  ConstTimesFunctionReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData) const {
+  std::string::const_iterator sep=split(begin,end);
+  double c=fpData->back(); fpData->pop_back(); //Was: atof(begin,sep);
+  if (std::string(begin,sep)!="REAL") {
+    throw std::runtime_error ("Parse error in ConstTimesFunctionReader");
+  }
   
-}
-
-GFPTR  ConstTimesFunctionReader::execute(std::string::const_iterator begin, std::string::const_iterator end) const {
-  auto sep=split(begin,end);
-  double c=atof(begin,sep);
-  return GFPTR(new GeoGenfun::ConstTimesFunction(c,getInterpreter()->interpret(sep+1,end).get()));
+  return GFPTR(new GeoGenfun::ConstTimesFunction(c,getInterpreter()->interpret(sep+1,end,fpData).get()));
 }
 
 
@@ -34,8 +27,9 @@ void ConstTimesFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const
   if (!ptr) throw std::runtime_error("Error in ConstTimesFunctionRecorder:: wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   double c1=ptr->_constant;
+  getPersistifier()->getFloatingPointData().push_front(c1);
   stream << "ConstTimesFunction" << "(";
-  stream << c1;
+  stream << "REAL";
   stream << ",";
   getPersistifier()->persistify(*ptr->_arg);
   stream << ")";
@@ -44,10 +38,13 @@ void ConstTimesFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const
 ConstPlusFunctionReader::ConstPlusFunctionReader(GenFunctionInterpreter *interpreter):GenFunctionReader("ConstPlusFunction", interpreter) {}
 
 
-GFPTR  ConstPlusFunctionReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
+GFPTR  ConstPlusFunctionReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
   auto sep=split(begin, end);
-  double c=atof(begin,sep);
-  return GFPTR(new GeoGenfun::ConstPlusFunction(c,getInterpreter()->interpret(sep+1,end).get()));
+  double c=fpData->back(); fpData->pop_back(); //Was: atof(begin,sep);
+  if (std::string(begin,sep)!="REAL") {
+    throw std::runtime_error ("Parse error in ConstPlusFunctionReader");
+  }
+  return GFPTR(new GeoGenfun::ConstPlusFunction(c,getInterpreter()->interpret(sep+1,end,fpData).get()));
 }
 
 ConstPlusFunctionRecorder::ConstPlusFunctionRecorder(GenFunctionPersistifier *persistifier):
@@ -58,8 +55,9 @@ void ConstPlusFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const 
   if (!ptr) throw std::runtime_error("Error in ConstPlusFunctionRecorder:: wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   double c1=ptr->_constant;
+  getPersistifier()->getFloatingPointData().push_front(c1);
   stream << "ConstPlusFunction" << "(";
-  stream << c1;
+  stream << "REAL";
   stream << ",";
   getPersistifier()->persistify(*ptr->_arg);
   stream << ")";
@@ -68,10 +66,13 @@ void ConstPlusFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const 
 ConstMinusFunctionReader::ConstMinusFunctionReader(GenFunctionInterpreter *interpreter):GenFunctionReader("ConstMinusFunction", interpreter) {}
 
 
-GFPTR  ConstMinusFunctionReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
+GFPTR  ConstMinusFunctionReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
   auto sep=split(begin,end);
-  double c=atof(begin,sep);
-  return GFPTR(new GeoGenfun::ConstMinusFunction(c,getInterpreter()->interpret(sep+1,end).get()));
+  double c=fpData->back(); fpData->pop_back(); //Was: atof(begin,sep);
+  if (std::string(begin,sep)!="REAL") {
+    throw std::runtime_error ("Parse error in ConstMinusFunctionReader");
+  }
+  return GFPTR(new GeoGenfun::ConstMinusFunction(c,getInterpreter()->interpret(sep+1,end,fpData).get()));
 }
 
 ConstMinusFunctionRecorder::ConstMinusFunctionRecorder(GenFunctionPersistifier *persistifier):
@@ -82,8 +83,9 @@ void ConstMinusFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const
   if (!ptr) throw std::runtime_error("Error in ConstMinusFunctionRecorder:: wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   double c1=ptr->_constant;
+  getPersistifier()->getFloatingPointData().push_front(c1);
   stream << "ConstMinusFunction" << "(";
-  stream << c1;
+  stream << "REAL";
   stream << ",";
   getPersistifier()->persistify(*ptr->_arg);
   stream << ")";
@@ -92,10 +94,13 @@ void ConstMinusFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const
 ConstOverFunctionReader::ConstOverFunctionReader(GenFunctionInterpreter *interpreter):GenFunctionReader("ConstOverFunction", interpreter) {}
 
 
-GFPTR  ConstOverFunctionReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
+GFPTR  ConstOverFunctionReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
   auto sep=split(begin,end);
-  double c=atof(begin,sep);
-  return GFPTR(new GeoGenfun::ConstOverFunction(c,getInterpreter()->interpret(sep+1,end).get()));
+  double c=fpData->back(); fpData->pop_back(); //Was: atof(begin,sep);
+  if (std::string(begin,sep)!="REAL") {
+    throw std::runtime_error ("Parse error in ConstOverFunctionReader");
+  }
+  return GFPTR(new GeoGenfun::ConstOverFunction(c,getInterpreter()->interpret(sep+1,end,fpData).get()));
 }
 
 ConstOverFunctionRecorder::ConstOverFunctionRecorder(GenFunctionPersistifier *persistifier):
@@ -106,8 +111,9 @@ void ConstOverFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const 
   if (!ptr) throw std::runtime_error("Error in ConstOverFunctionRecorder:: wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   double c1=ptr->_constant;
+  getPersistifier()->getFloatingPointData().push_front(c1);
   stream << "ConstOverFunction" << "(";
-  stream << c1;
+  stream << "REAL";
   stream << ",";
   getPersistifier()->persistify(*ptr->_arg);
   stream << ")";
@@ -116,9 +122,12 @@ void ConstOverFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const 
 FunctionCompositionReader::FunctionCompositionReader(GenFunctionInterpreter *interpreter):GenFunctionReader("FunctionComposition", interpreter) {}
 
 
-GFPTR  FunctionCompositionReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
+GFPTR  FunctionCompositionReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
   auto sep=split(begin,end);
-  return GFPTR(new GeoGenfun::FunctionComposition(getInterpreter()->interpret(begin,sep).get(),getInterpreter()->interpret(sep+1,end).get()));
+  GFPTR  f1=getInterpreter()->interpret(begin,sep,fpData);
+  GFPTR  f2=getInterpreter()->interpret(sep+1,end,fpData);
+	     
+  return GFPTR(new GeoGenfun::FunctionComposition(f1.get(),f2.get()));
 }
 
 FunctionCompositionRecorder::FunctionCompositionRecorder(GenFunctionPersistifier *persistifier):
@@ -138,8 +147,8 @@ void FunctionCompositionRecorder::execute(const GeoGenfun::AbsFunction & F) cons
 FunctionNegationReader::FunctionNegationReader(GenFunctionInterpreter *interpreter):GenFunctionReader("FunctionNegation",interpreter) {}
 
 
-GFPTR  FunctionNegationReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
-  return GFPTR(new GeoGenfun::FunctionNegation(getInterpreter()->interpret(begin,end).get()));
+GFPTR  FunctionNegationReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
+  return GFPTR(new GeoGenfun::FunctionNegation(getInterpreter()->interpret(begin,end,fpData).get()));
 }
 
 FunctionNegationRecorder::FunctionNegationRecorder(GenFunctionPersistifier *persistifier):
@@ -157,8 +166,8 @@ void FunctionNegationRecorder::execute(const GeoGenfun::AbsFunction & F) const {
 FunctionNoopReader::FunctionNoopReader(GenFunctionInterpreter *interpreter):GenFunctionReader("FunctionNoop",interpreter) {}
 
 
-GFPTR  FunctionNoopReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
-  return GFPTR(new GeoGenfun::FunctionNoop(getInterpreter()->interpret(begin,end).get()));
+GFPTR  FunctionNoopReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
+  return GFPTR(new GeoGenfun::FunctionNoop(getInterpreter()->interpret(begin,end,fpData).get()));
 }
 
 FunctionNoopRecorder::FunctionNoopRecorder(GenFunctionPersistifier *persistifier):
@@ -176,9 +185,11 @@ void FunctionNoopRecorder::execute(const GeoGenfun::AbsFunction & F) const {
 FunctionProductReader::FunctionProductReader(GenFunctionInterpreter *interpreter):GenFunctionReader("FunctionProduct",interpreter) {}
 
 
-GFPTR  FunctionProductReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
+GFPTR  FunctionProductReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
   auto sep=split(begin,end);
-  return GFPTR(new GeoGenfun::FunctionProduct(getInterpreter()->interpret(begin,sep).get(),getInterpreter()->interpret(sep+1,end).get()));
+  GFPTR  f1=getInterpreter()->interpret(begin,sep,fpData);
+  GFPTR  f2=getInterpreter()->interpret(sep+1,end,fpData);
+  return GFPTR(new GeoGenfun::FunctionProduct(f1.get(),f2.get()));
 }
 
 FunctionProductRecorder::FunctionProductRecorder(GenFunctionPersistifier *persistifier):
@@ -198,9 +209,11 @@ void FunctionProductRecorder::execute(const GeoGenfun::AbsFunction & F) const {
 FunctionSumReader::FunctionSumReader(GenFunctionInterpreter *interpreter):GenFunctionReader("FunctionSum",interpreter) {}
 
 
-GFPTR  FunctionSumReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
+GFPTR  FunctionSumReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
   auto sep=split(begin,end);
-  return GFPTR(new GeoGenfun::FunctionSum(getInterpreter()->interpret(begin,sep).get(),getInterpreter()->interpret(sep+1,end).get()));
+  GFPTR  f1=getInterpreter()->interpret(begin,sep,fpData);
+  GFPTR  f2=getInterpreter()->interpret(sep+1,end,fpData);
+  return GFPTR(new GeoGenfun::FunctionSum(f1.get(),f2.get()));
 }
 
 FunctionSumRecorder::FunctionSumRecorder(GenFunctionPersistifier *persistifier):
@@ -225,9 +238,11 @@ void FunctionSumRecorder::execute(const GeoGenfun::AbsFunction & F) const {
 FunctionQuotientReader::FunctionQuotientReader(GenFunctionInterpreter *interpreter):GenFunctionReader("FunctionQuotient",interpreter) {}
 
 
-GFPTR  FunctionQuotientReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
+GFPTR  FunctionQuotientReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
   auto sep=split(begin,end);
-  return GFPTR(new GeoGenfun::FunctionQuotient(getInterpreter()->interpret(begin,sep).get(),getInterpreter()->interpret(sep+1,end).get()));
+  GFPTR  f1=getInterpreter()->interpret(begin,sep,fpData);
+  GFPTR  f2=getInterpreter()->interpret(sep+1,end,fpData);
+  return GFPTR(new GeoGenfun::FunctionQuotient(f1.get(),f2.get()));
 }
 
 FunctionQuotientRecorder::FunctionQuotientRecorder(GenFunctionPersistifier *persistifier):
@@ -247,9 +262,12 @@ void FunctionQuotientRecorder::execute(const GeoGenfun::AbsFunction & F) const {
 FunctionDifferenceReader::FunctionDifferenceReader(GenFunctionInterpreter *interpreter):GenFunctionReader("FunctionDifference",interpreter) {}
 
 
-GFPTR  FunctionDifferenceReader::execute(std::string::const_iterator begin, std::string::const_iterator end ) const {
+GFPTR  FunctionDifferenceReader::execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> * fpData ) const {
   auto sep=split(begin,end);
-  return GFPTR(new GeoGenfun::FunctionDifference(getInterpreter()->interpret(begin,sep).get(),getInterpreter()->interpret(sep+1,end).get()));
+
+  GFPTR  f1=getInterpreter()->interpret(begin,sep,fpData);
+  GFPTR  f2=getInterpreter()->interpret(sep+1,end,fpData);
+  return GFPTR(new GeoGenfun::FunctionDifference(f1.get(),f2.get()));
 }
 
 FunctionDifferenceRecorder::FunctionDifferenceRecorder(GenFunctionPersistifier *persistifier):
@@ -273,7 +291,7 @@ void FunctionDifferenceRecorder::execute(const GeoGenfun::AbsFunction & F) const
 VariableReader::VariableReader(GenFunctionInterpreter *interpreter):GenFunctionReader("X",interpreter) {}
 
 
-GFPTR  VariableReader::execute(std::string::const_iterator, std::string::const_iterator) const {
+GFPTR  VariableReader::execute(std::string::const_iterator, std::string::const_iterator, std::deque<double> *) const {
   return GFPTR(new GeoGenfun::Variable());
 }
 

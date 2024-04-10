@@ -12,7 +12,7 @@ class SinReader: public GenFunctionReader {
  public:
   
   SinReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData=nullptr) const;
   
 };
 

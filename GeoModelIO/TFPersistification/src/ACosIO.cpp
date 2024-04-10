@@ -7,7 +7,7 @@
 ACosReader::ACosReader(GenFunctionInterpreter *interpreter):GenFunctionReader("ACos", interpreter) {}
 
 
-GFPTR  ACosReader::execute(std::string::const_iterator, std::string::const_iterator ) const {
+GFPTR  ACosReader::execute(std::string::const_iterator, std::string::const_iterator, std::deque<double> * ) const {
   return GFPTR(new GeoGenfun::ACos());
 }
 

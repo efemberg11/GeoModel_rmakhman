@@ -7,7 +7,7 @@
 SquareReader::SquareReader(GenFunctionInterpreter *interpreter):GenFunctionReader("Square", interpreter) {}
 
 
-GFPTR  SquareReader::execute(std::string::const_iterator, std::string::const_iterator ) const {
+GFPTR  SquareReader::execute(std::string::const_iterator, std::string::const_iterator, std::deque<double> * ) const {
   return GFPTR(new GeoGenfun::Square());
 }
 

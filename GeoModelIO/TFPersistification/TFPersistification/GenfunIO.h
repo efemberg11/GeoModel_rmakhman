@@ -10,7 +10,7 @@ class ConstTimesFunctionReader: public GenFunctionReader {
  public:
   
   ConstTimesFunctionReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData=nullptr ) const;
   
 };
 
@@ -29,7 +29,7 @@ class ConstPlusFunctionReader: public GenFunctionReader {
  public:
   
   ConstPlusFunctionReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData=nullptr ) const;
   
 };
 
@@ -48,7 +48,7 @@ class ConstMinusFunctionReader: public GenFunctionReader {
  public:
   
   ConstMinusFunctionReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData=nullptr ) const;
   
 };
 
@@ -67,7 +67,7 @@ class ConstOverFunctionReader: public GenFunctionReader {
  public:
   
   ConstOverFunctionReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData=nullptr ) const;
   
 };
 
@@ -87,7 +87,7 @@ class FunctionCompositionReader: public GenFunctionReader {
  public:
   
   FunctionCompositionReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData ) const;
   
 };
 
@@ -107,7 +107,7 @@ class FunctionNegationReader: public GenFunctionReader {
  public:
   
   FunctionNegationReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData ) const;
   
 };
 
@@ -126,7 +126,7 @@ class FunctionNoopReader: public GenFunctionReader {
  public:
   
   FunctionNoopReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData ) const;
   
 };
 
@@ -145,7 +145,7 @@ class FunctionProductReader: public GenFunctionReader {
  public:
   
   FunctionProductReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData ) const;
   
 };
 
@@ -164,7 +164,7 @@ class FunctionQuotientReader: public GenFunctionReader {
  public:
   
   FunctionQuotientReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData ) const;
   
 };
 
@@ -184,7 +184,7 @@ class FunctionSumReader: public GenFunctionReader {
  public:
   
   FunctionSumReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData ) const;
   
 };
 
@@ -203,7 +203,7 @@ class FunctionDifferenceReader: public GenFunctionReader {
  public:
   
   FunctionDifferenceReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end ) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData ) const;
   
 };
 
@@ -223,7 +223,7 @@ class VariableReader: public GenFunctionReader {
  public:
   
   VariableReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData=nullptr) const;
   
 };
 

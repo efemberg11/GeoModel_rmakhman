@@ -7,7 +7,7 @@
 SinReader::SinReader(GenFunctionInterpreter *interpreter):GenFunctionReader("Sin", interpreter) {}
 
 
-GFPTR  SinReader::execute(std::string::const_iterator, std::string::const_iterator ) const {
+GFPTR  SinReader::execute(std::string::const_iterator, std::string::const_iterator, std::deque<double> * ) const {
   return GFPTR(new GeoGenfun::Sin());
 }
 

@@ -7,7 +7,7 @@
 AbsReader::AbsReader(GenFunctionInterpreter *interpreter):GenFunctionReader("Abs", interpreter) {}
 
 
-GFPTR  AbsReader::execute(std::string::const_iterator, std::string::const_iterator) const {
+GFPTR  AbsReader::execute(std::string::const_iterator, std::string::const_iterator, std::deque<double> *fpData=nullptr) const {
   return GFPTR(new GeoGenfun::Abs());
 }
 

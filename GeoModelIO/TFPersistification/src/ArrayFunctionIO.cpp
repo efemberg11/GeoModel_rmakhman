@@ -2,27 +2,23 @@
 #include "TFPersistification/GenFunctionPersistifier.h"
 #include "TFPersistification/GenFunctionInterpreter.h"
 #include "TFPersistification/ArrayFunctionIO.h"
+#include <algorithm> 
 ArrayFunctionReader::ArrayFunctionReader(GenFunctionInterpreter *interpreter):GenFunctionReader("ArrayFunction", interpreter) {}
 
 
-GFPTR  ArrayFunctionReader::execute(std::string::const_iterator cStart, std::string::const_iterator cEnd) const {
-  std::vector<double> elements;
-  auto cNext=std::find(cStart, cEnd,',');
-  while (cNext!=cEnd) {
-    std::string aNumberStr(cStart,cNext);
-    std::istringstream stream(aNumberStr);
-    double d;
-    stream >> d;
-    elements.push_back(d);
-    cStart=cNext+1;
-    cNext=std::find(cStart, cEnd,',');
-  }
-
-  std::string aNumberStr(cStart,cNext);
+GFPTR  ArrayFunctionReader::execute(std::string::const_iterator cStart, std::string::const_iterator cEnd, std::deque<double> *fpData) const {
+  std::string aNumberStr(cStart,cEnd);
   std::istringstream stream(aNumberStr);
-  double d;
-  stream >> d;
-  elements.push_back(d);
+  std::string real;
+  unsigned int len;
+  stream >> real >> len;
+  if (real != "REAL" || !stream) {
+    throw std::runtime_error ("Parse error in ArrayFunctionReader");
+  }
+  std::vector<double> elements;
+  for (int i=0;i<len;i++) {
+    elements.push_back(fpData->back()); fpData->pop_back();
+  }
   
   return GFPTR(new GeoGenfun::ArrayFunction(&elements.front(), &elements.back() + 1));
 }
@@ -36,10 +32,8 @@ void ArrayFunctionRecorder::execute(const GeoGenfun::AbsFunction & F) const {
   if (!ptr) throw std::runtime_error("Error in ArrayFunctionRecorder:: wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "ArrayFunction";
-  stream << "(";
-  for (size_t i=0;i<ptr->values().size();i++){
-    stream<<ptr->values()[i];
-    if (i!=ptr->values().size()-1) stream << ",";
-  }
+  stream << "(REAL ";
+  stream << ptr->values().size();
   stream << ")";
+  std::copy(ptr->values().begin(), ptr->values().end(), std::front_inserter(getPersistifier()->getFloatingPointData()));
 }

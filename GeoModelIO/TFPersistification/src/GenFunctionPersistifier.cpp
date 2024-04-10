@@ -20,11 +20,16 @@
 
 #include <sstream>
 #include <iomanip>
+
 const std::string & GenFunctionPersistifier::getCodedString() const {
   codedString=getStream().str();
   delete stream;
   stream=NULL;
   return codedString;
+}
+
+std::deque<double> & GenFunctionPersistifier::getFloatingPointData() const {
+  return floatingPointData;
 }
 
 

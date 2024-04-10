@@ -7,7 +7,7 @@
 ATanReader::ATanReader(GenFunctionInterpreter *interpreter):GenFunctionReader("ATan", interpreter) {}
 
 
-GFPTR  ATanReader::execute(std::string::const_iterator, std::string::const_iterator ) const {
+GFPTR  ATanReader::execute(std::string::const_iterator, std::string::const_iterator, std::deque<double> * ) const {
   return GFPTR(new GeoGenfun::ATan());
 }
 

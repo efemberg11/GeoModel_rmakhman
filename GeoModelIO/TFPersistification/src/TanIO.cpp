@@ -7,7 +7,7 @@
 TanReader::TanReader(GenFunctionInterpreter *interpreter):GenFunctionReader("Tan", interpreter) {}
 
 
-GFPTR  TanReader::execute(std::string::const_iterator, std::string::const_iterator) const {
+GFPTR  TanReader::execute(std::string::const_iterator, std::string::const_iterator, std::deque<double> *) const {
   return GFPTR(new GeoGenfun::Tan());
 }
 

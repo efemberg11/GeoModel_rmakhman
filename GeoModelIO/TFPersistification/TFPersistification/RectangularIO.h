@@ -11,7 +11,7 @@ class RectangularReader: public GenFunctionReader {
  public:
   
   RectangularReader(GenFunctionInterpreter * interpreter);
-  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end) const;
+  virtual GFPTR execute(std::string::const_iterator begin, std::string::const_iterator end, std::deque<double> *fpData) const;
   
 };
 

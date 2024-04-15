@@ -34,7 +34,7 @@ class TransFunctionInterpreter {
   void add(const std::string &str, const TransFunctionReader * reader); 
 
   // Interprets a string.  
-  TFPTR interpret(const std::string & str) const;
+  TFPTR interpret(const std::string & str, std::deque<double> *fpData) const;
 
   // Retrieves the genfunction persistitier:
   const GenFunctionInterpreter * getGenFunctionInterpreter() const;

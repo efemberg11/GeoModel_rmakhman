@@ -39,6 +39,9 @@ class TransFunctionPersistifier {
   // Retrieves the coded string after the persistify operation:
   const std::string & getCodedString() const;
 
+  // Retreive floating point data
+  std::deque<double> & getFloatingPointData() const;
+
   // Retrieves the stream used to build the expression:
   std::ostringstream & getStream() const;
 
@@ -50,8 +53,11 @@ class TransFunctionPersistifier {
   // Store the actual recorders, map them into the type name
   std::map<std::string, const TransFunctionRecorder *> recorderMap;
 
-  // Here is the result:
+  // Here is the result (character string data)
   mutable std::string codedString;
+
+  // Here is the result (floating point data)
+  mutable std::deque<double>  floatingPointData;
 
   // An ostringstream is used to build the coded string:
   mutable std::ostringstream *stream;

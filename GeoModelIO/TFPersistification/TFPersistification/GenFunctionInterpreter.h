@@ -36,7 +36,7 @@ class GenFunctionInterpreter {
   // Interprets a string.  
   GFPTR interpret(std::string::const_iterator begin,
 		  std::string::const_iterator end,
-		  std::deque<double> *fpData=nullptr) const;
+		  std::deque<double> *fpData) const;
 
 
   

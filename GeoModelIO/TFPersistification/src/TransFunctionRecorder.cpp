@@ -52,11 +52,12 @@ void PreMultRecorder::execute( const GeoXF::Function & function) const {
   if (!ptr) throw std::runtime_error("Error in PreMultRecorder:  wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "GeoXF::PreMult" << "{";
-  stream << "Transform["
-	 << ptr->arg1()(0,0) << ";" << ptr->arg1()(0,1) << ";" << ptr->arg1()(0,2) << ";"
-	 << ptr->arg1()(1,0) << ";" << ptr->arg1()(1,1) << ";" << ptr->arg1()(1,2) << ";"
-	 << ptr->arg1()(2,0) << ";" << ptr->arg1()(2,1) << ";" << ptr->arg1()(2,2) << ";"
-	 << ptr->arg1()(0,3) << ";" << ptr->arg1()(1,3) << ";" << ptr->arg1()(2,3) << "]";
+  stream << "Transform[XF]";
+  for (int i=0;i<3;i++) {
+    for (int j=0;j<4;j++) {
+      getPersistifier()->getFloatingPointData().push_front(ptr->arg1()(i,j));
+    }
+  }
   stream << "|";
   getPersistifier()->persistify(*ptr->arg2());
   stream << "}";
@@ -71,11 +72,12 @@ void PostMultRecorder::execute( const GeoXF::Function & function) const {
   stream << "GeoXF::PostMult" << "{";
   getPersistifier()->persistify(*ptr->arg1());
   stream << "|";
-  stream << "Transform["
-	 << ptr->arg2()(0,0) << ";" << ptr->arg2()(0,1) << ";" << ptr->arg2()(0,2) << ";"
-	 << ptr->arg2()(1,0) << ";" << ptr->arg2()(1,1) << ";" << ptr->arg2()(1,2) << ";"
-	 << ptr->arg2()(2,0) << ";" << ptr->arg2()(2,1) << ";" << ptr->arg2()(2,2) << ";"
-	 << ptr->arg2()(0,3) << ";" << ptr->arg2()(1,3) << ";" << ptr->arg2()(2,3) << "]";
+  stream << "Transform[XF]";
+  for (int i=0;i<3;i++) {
+    for (int j=0;j<4;j++) {
+      getPersistifier()->getFloatingPointData().push_front(ptr->arg2()(i,j));
+    }
+  }
   stream << "}";
   return;
 }
@@ -87,14 +89,23 @@ void PowRecorder::execute( const GeoXF::Function & function) const {
   if (!ptr) throw std::runtime_error("Error in PowRecorder:  wrong function type");
   std::ostringstream & stream = getPersistifier()->getStream();
   stream << "GeoXF::Pow" << "{";
-  stream << "Transform["
-	 << ptr->transform()(0,0) << ";" << ptr->transform()(0,1) << ";" << ptr->transform()(0,2) << ";"
-	 << ptr->transform()(1,0) << ";" << ptr->transform()(1,1) << ";" << ptr->transform()(1,2) << ";"
-	 << ptr->transform()(2,0) << ";" << ptr->transform()(2,1) << ";" << ptr->transform()(2,2) << ";"
-	 << ptr->transform()(0,3) << ";" << ptr->transform()(1,3) << ";" << ptr->transform()(2,3) << "]";
+  stream << "Transform[XF]";
+  for (int i=0;i<3;i++) {
+    for (int j=0;j<4;j++) {
+      getPersistifier()->getFloatingPointData().push_front(ptr->transform()(i,j));
+    }
+  }
   stream << "|";
   getPersistifier()->getGenFunctionPersistifier()->persistify(*ptr->function());
   stream << getPersistifier()->getGenFunctionPersistifier()->getCodedString();
   stream << "}";
+
+  std::deque<double> & floatingPointData=getPersistifier()->getGenFunctionPersistifier()->getFloatingPointData();
+  while (!floatingPointData.empty()) {
+    getPersistifier()->getFloatingPointData().push_front(floatingPointData.back());
+    floatingPointData.pop_back();
+  }
+
+
   return;
 }

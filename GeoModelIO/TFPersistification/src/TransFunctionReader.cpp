@@ -51,63 +51,51 @@ PostMultReader::PostMultReader(TransFunctionInterpreter *interpreter):TransFunct
 PowReader::PowReader(TransFunctionInterpreter *interpreter):TransFunctionReader("GeoXF::Pow", interpreter) {}
 
 
-TFPTR  ProductReader::execute(const std::string & arg) const {
+TFPTR  ProductReader::execute(const std::string & arg,  std::deque<double> *fpData) const {
   auto pair=split(arg);
-  return TFPTR(GeoXF::Product(getInterpreter()->interpret(pair.first).get(), getInterpreter()->interpret(pair.second).get()).clone());
+  TFPTR t1=getInterpreter()->interpret(pair.first,fpData);
+  TFPTR t2= getInterpreter()->interpret(pair.second,fpData);
+    
+  return TFPTR(GeoXF::Product(t1.get(), t2.get()).clone());
 }
 
 
-TFPTR  PreMultReader::execute(const std::string & arg ) const {
+TFPTR  PreMultReader::execute(const std::string & arg,  std::deque<double> *fpData) const {
   auto pair=split(arg);
-  TFPTR p2=getInterpreter()->interpret(pair.second);
-  GeoTrf::Transform3D t1 = scanT(pair.first);
+  GeoTrf::Transform3D t1 = scanT(pair.first,fpData);
+  TFPTR p2=getInterpreter()->interpret(pair.second,fpData);
   return TFPTR(GeoXF::PreMult(t1, p2.get()).clone());
 }
 
 
-TFPTR  PostMultReader::execute(const std::string & arg) const {
+TFPTR  PostMultReader::execute(const std::string & arg,  std::deque<double> *fpData) const {
   auto pair=split(arg);
-  TFPTR p1=getInterpreter()->interpret(pair.first);
-  GeoTrf::Transform3D t2=scanT(pair.second);
+  TFPTR p1=getInterpreter()->interpret(pair.first,fpData);
+  GeoTrf::Transform3D t2=scanT(pair.second,fpData);
   return TFPTR(GeoXF::PostMult(p1.get(), t2).clone());
 }
 
-TFPTR  PowReader::execute(const std::string & arg) const {
+TFPTR  PowReader::execute(const std::string & arg, std::deque<double> *fpData) const {
   auto pair=split(arg);
-  return TFPTR(GeoXF::Pow((scanT(pair.first)),*getInterpreter()->getGenFunctionInterpreter()->interpret(pair.second.begin(), pair.second.end())).clone());
+  GeoTrf::Transform3D t1=scanT(pair.first,fpData);
+  GFPTR f1 = getInterpreter()->getGenFunctionInterpreter()->interpret(pair.second.begin(), pair.second.end(),fpData);
+  
+  return TFPTR(GeoXF::Pow(t1,*f1).clone());
 }
 
 GeoTrf::Transform3D
-TransFunctionReader::scanT(const std::string & exprString) const {
-  size_t start = exprString.find_first_of("[");
-  double x[12];
-  int i=0;
-  while (1) {
-    size_t end   = exprString.find_first_of(";",start+1);
-    std::string atomic=exprString.substr(start+1,end-start);
-    std::istringstream stream(atomic.substr(0,atomic.size()-1));
-    stream >> x[i];
-    start=end;
-    if (atomic.find("]")!=std::string::npos) break;
-    i++;
-  }
-  double & xx=x[0], & xy=x[1], & xz=x[2];
-  double & yx=x[3], & yy=x[4], & yz=x[5];
-  double & zx=x[6], & zy=x[7], & zz=x[8];
-  double & dx=x[9], & dy=x[10], & dz=x[11];
+TransFunctionReader::scanT(const std::string & exprString, std::deque<double> *fpData) const {
 
+  if (exprString!="Transform[XF]") {
+    throw std::runtime_error("Error in restoration of a TransFunction");
+  }
+  
   GeoTrf::Transform3D t;
-  t(0, 0) = xx; //xf(0, 0);
-  t(0, 1) = xy; //xf(0, 1);
-  t(0, 2) = xz; //xf(0, 2);
-  t(1, 0) = yx; //xf(1, 0);
-  t(1, 1) = yy; //xf(1, 1);
-  t(1, 2) = yz; //xf(1, 2);
-  t(2, 0) = zx; //xf(2, 0);
-  t(2, 1) = zy; //xf(2, 1);
-  t(2, 2) = zz; //xf(2, 2);
-  t(0, 3) = dx; //xf(0, 3);
-  t(1, 3) = dy; //xf(1, 3);
-  t(2, 3) = dz; //xf(2, 3);
+  for (int i=0;i<3;i++) {
+    for (int j=0;j<4;j++) {
+      t(i,j) = (*fpData).back();
+      fpData->pop_back();
+    }
+  }
   return t;
 }

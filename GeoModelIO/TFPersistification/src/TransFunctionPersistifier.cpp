@@ -15,6 +15,11 @@ const std::string & TransFunctionPersistifier::getCodedString() const {
 }
 
 
+std::deque<double> & TransFunctionPersistifier::getFloatingPointData() const {
+  return floatingPointData;
+}
+
+
 TransFunctionPersistifier::~TransFunctionPersistifier() {
   delete stream;
   for (auto i=recorderMap.begin(); i!=recorderMap.end();i++) {

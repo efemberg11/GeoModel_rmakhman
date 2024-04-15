@@ -4,6 +4,7 @@
 #include "GeoModelKernel/GeoXF.h"
 
 #include <memory>
+#include <deque>
 //
 
 
@@ -32,7 +33,7 @@ class TransFunctionReader {
   virtual ~TransFunctionReader();
 
   // Execute
-  virtual TFPTR execute(const std::string & arg) const=0;
+  virtual TFPTR execute(const std::string & arg,  std::deque<double> *fpData) const=0;
 
   // Access to the interpreter:
   const TransFunctionInterpreter *getInterpreter() const;
@@ -44,7 +45,7 @@ class TransFunctionReader {
   std::pair<std::string, std::string> split(const std::string & arg) const;
   
   // Help scan transforms
-  GeoTrf::Transform3D scanT(const std::string & exprString) const;
+  GeoTrf::Transform3D scanT(const std::string & exprString, std::deque<double> * fpData) const;
 
   private:
 
@@ -67,7 +68,7 @@ class ProductReader: public TransFunctionReader {
  public:
   
   ProductReader(TransFunctionInterpreter * interpreter);
-  virtual TFPTR execute(const std::string & arg) const;
+  virtual TFPTR execute(const std::string & arg,  std::deque<double> *fpData) const;
   
 };
 
@@ -77,7 +78,7 @@ class PreMultReader: public TransFunctionReader {
  public:
   
   PreMultReader(TransFunctionInterpreter * interpreter);
-  virtual TFPTR execute(const std::string & arg) const;
+  virtual TFPTR execute(const std::string & arg, std::deque<double> *fpData) const;
   
 };
 
@@ -86,7 +87,7 @@ class PostMultReader: public TransFunctionReader {
  public:
   
   PostMultReader(TransFunctionInterpreter * interpreter);
-  virtual TFPTR  execute(const std::string & arg) const;
+  virtual TFPTR  execute(const std::string & arg, std::deque<double> *fpData) const;
   
 };
 
@@ -96,7 +97,7 @@ class PowReader: public TransFunctionReader {
  public:
   
   PowReader(TransFunctionInterpreter * interpreter);
-  virtual TFPTR execute(const std::string & arg) const;
+  virtual TFPTR execute(const std::string & arg,  std::deque<double> *fpData) const;
   
 };
 

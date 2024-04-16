@@ -135,21 +135,22 @@ void MulticopyProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, Ge
             }
         } else {
             //
-            //    If varname not given, we get the CLHEP xForm and raise it to the power i, so NOT applied to first object.
-            //    No transform (i.e. identity) for the first; so one less transform than objects
+            //    If varname not given, we get the CLHEP xForm and apply it (n-1) times sequentially to place the copies
+            //    First copy gets the Identity transform (i.e. placed in "default position" for object)
             //
-            GeoTrf::Transform3D hepXf0=GeoTrf::Transform3D::Identity();
-            if (alignable) {
-                geoAXf = dynamic_pointer_cast<GeoAlignableTransform>(xFormProcessor->make(elXf, gmxUtil));
-                hepXf0 = geoAXf->getTransform();
-            } else {
-                geoXf = dynamic_pointer_cast<GeoTransform>( xFormProcessor->make(elXf, gmxUtil));
-                hepXf0 = geoXf->getTransform();
-            }
-            GeoTrf::Transform3D hepXf=GeoTrf::Transform3D::Identity(); // Identity initially
+            //Is there a better way to just get the Transform3D?
+            GeoTrf::Transform3D hepXf0  = dynamic_pointer_cast<GeoTransform>(xFormProcessor->make(elXf, gmxUtil))->getTransform();
+            GeoTrf::Transform3D hepXf=GeoTrf::Transform3D::Identity(); // Identity initially for the first copy
             for (int i = 0; i < nCopies; ++i) {
-                xfList->push_back(makeTransform(hepXf));
-                hepXf = hepXf0 * hepXf; //Is this location correct?
+                if (alignable){
+                   geoAXf = make_intrusive<GeoAlignableTransform>(hepXf) ; 
+                   xfList->push_back(geoAXf);
+                }
+                else{
+                   geoXf = make_intrusive<GeoTransform>(hepXf) ; 
+                   xfList->push_back(geoXf);
+                }
+                hepXf = hepXf0 * hepXf; //multiply by hepXf0 again for each copy
             }
         }
     } else {

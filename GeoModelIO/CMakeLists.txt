@@ -7,9 +7,10 @@ project( "GeoModelIO" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 # add_subdirectory( GeoModelErrorHandler ) // unused at the moment.
 add_subdirectory( GeoModelDBManager )
 add_subdirectory( TFPersistification )
-#add_subdirectory( GeoModelRead )
-#add_subdirectory( GeoModelWrite )
-#add_subdirectory( GeoModelIOHelpers )
+# add_subdirectory( GeoModelRead )
+add_subdirectory( GeoModelWrite )
+# add_subdirectory( GeoModelIOHelpers )
+add_subdirectory( GeoModelCppHelpers )
 
 # Create and install the version description of the project.
 include( CMakePackageConfigHelpers )

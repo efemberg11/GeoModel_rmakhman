@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -14,6 +14,9 @@
  * - Jul 2023 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
  *              Populate the caches in the constructor, so all print methods are
  *              available as soon as the input file is opened by the GMDBManager
+ * - Apr 2024 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+ *              New DB format to extend the storage of numbers as REAL instead of TEXT,
+ *              New methods to handle vector<variants> as input of records
  */
 
 #include <GeoModelDBManager/GMDBManager.h>
@@ -437,7 +440,7 @@ bool GMDBManager::addListOfRecordsToTable(
                        // do for the std::variant version!
         }
         std::string values = GeoModelIO::CppHelper::joinVectorStrings(items, ",");
-        sql += " (" + std::to_string(id) + "," + values + ")";
+        sql += " (" + std::to_string(id) + "," + values + ")"; // INT
         if (id != nRecords) {
             sql += ",";
         } else {
@@ -484,15 +487,13 @@ bool GMDBManager::addListOfRecordsToTable(
         for (const std::variant<int, long, float, double, std::string>& item :
              rec) {
             if (std::holds_alternative<int>(item))
-                items.push_back(std::to_string(std::get<int>(
-                    item)));  // we need to encapsulate records' values into
-                              // quotes for the SQL query string
+                items.push_back(std::to_string(std::get<int>(item))); // INT
             else if (std::holds_alternative<long>(item))
-                items.push_back(std::to_string(std::get<long>(item)));
+                items.push_back(std::to_string(std::get<long>(item))); // INT
             else if (std::holds_alternative<float>(item))
-                items.push_back(std::to_string(std::get<float>(item)));
+                items.push_back(GeoModelIO::CppHelper::to_string_with_precision(std::get<float>(item)));
             else if (std::holds_alternative<double>(item))
-                items.push_back(std::to_string(std::get<double>(item)));
+                items.push_back(GeoModelIO::CppHelper::to_string_with_precision(std::get<double>(item)));
             else if (std::holds_alternative<std::string>(item)) {
                 std::string str = std::get<std::string>(item);
                 // NOTE: if item is a "NULL" string, we don't encapsulate it
@@ -509,7 +510,7 @@ bool GMDBManager::addListOfRecordsToTable(
         }
         // we build the long string containing all values
         std::string values = GeoModelIO::CppHelper::joinVectorStrings(items, ",");
-        sql += " (" + std::to_string(id) + "," + values + ")";
+        sql += " (" + std::to_string(id) + "," + values + ")"; // INT
         if (id != nRecords) {
             sql += ",";
         } else {
@@ -555,19 +556,17 @@ bool GMDBManager::addRecordsToTable(
     {
         ++id;
 
-        std::string startRow = "(" + std::to_string(id) + ", ";
+        std::string startRow = "(" + std::to_string(id) + ", "; // INT
         items.push_back(startRow);
 
         if (std::holds_alternative<int>(item))
-            items.push_back(std::to_string(std::get<int>(
-                item))); // we need to encapsulate records' values into
-                         // quotes for the SQL query string
+            items.push_back(std::to_string(std::get<int>(item))); // INT
         else if (std::holds_alternative<long>(item))
-            items.push_back(std::to_string(std::get<long>(item)));
+            items.push_back(std::to_string(std::get<long>(item))); // INT
         else if (std::holds_alternative<float>(item))
-            items.push_back(std::to_string(std::get<float>(item)));
+            items.push_back(GeoModelIO::CppHelper::to_string_with_precision(std::get<float>(item)));
         else if (std::holds_alternative<double>(item))
-            items.push_back(std::to_string(std::get<double>(item)));
+            items.push_back(GeoModelIO::CppHelper::to_string_with_precision(std::get<double>(item)));
         else if (std::holds_alternative<std::string>(item))
         {
             std::string str = std::get<std::string>(item);

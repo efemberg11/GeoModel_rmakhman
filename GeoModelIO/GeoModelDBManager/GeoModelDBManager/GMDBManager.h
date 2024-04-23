@@ -205,6 +205,13 @@ class GMDBManager {
 
     bool addListOfRecords(const std::string geoType,
                           const std::vector<std::vector<std::string>> records);
+    bool addListOfRecords(const std::string geoType,
+                          const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> records);
+
+    bool addRecordsToTable(
+        const std::string tableName,
+        const std::vector<std::variant<int, long, float, double, std::string>>
+            records);
 
     bool addListOfChildrenPositions(
         const std::vector<std::vector<std::string>> &records);

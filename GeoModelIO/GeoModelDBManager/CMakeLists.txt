@@ -5,6 +5,7 @@
 # major updates:
 # - R.M.Bianchi, 2018
 # - R.M.Bianvhi, Nov 2020
+# - R.M.Bianvhi, Apr 2024
 ################################################################################
 
 # Find the header and source files.
@@ -13,7 +14,7 @@ file( GLOB HEADERS GeoModelDBManager/*.h )
 
 # Set up the library.
 add_library( GeoModelDBManager SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoModelDBManager PRIVATE SQLite::SQLite3 )
+target_link_libraries( GeoModelDBManager PRIVATE SQLite::SQLite3 GeoModelCppHelpers )
 target_include_directories( GeoModelDBManager PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )

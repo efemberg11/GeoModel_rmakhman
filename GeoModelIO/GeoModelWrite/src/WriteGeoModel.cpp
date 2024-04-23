@@ -57,6 +57,8 @@
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
+#include "GeoModelCppHelpers/GMCppHelpers.h"
+
 // C++ includes
 #include <sstream>
 
@@ -79,23 +81,7 @@ std::string joinVectorStrings(std::vector<std::string> vec,
     return s;
 }
 
-// TODO: move this to utility class/file
-void printStdVectorStrings(std::vector<std::string> vec) {
-    for (const auto& str : vec) {
-        std::cout << str << " ";
-    }
-    std::cout << std::endl;
-    return;
-}
 
-// Function to increase the precision of the conversion from double to string -
-// used in the write operation
-std::string to_string_with_precision(const double a_value, const int n = 16) {
-    std::ostringstream out;
-    out.precision(n);
-    out << std::fixed << a_value;
-    return out.str();
-}
 
 /// Get next child position available, given the parent type, id and copy number
 unsigned int WriteGeoModel::getChildPosition(const unsigned int& parentId,
@@ -494,12 +480,18 @@ void WriteGeoModel::handleSerialDenominator(const GeoSerialDenominator* node) {
 void WriteGeoModel::handleSerialTransformer(const GeoSerialTransformer* node) {
     std::string address = getAddressStringFromPointer(node);
 
-    // variables used to persistify the object
+    //============================
+    //==== variables used to persistify the object
+    // ID of the function used in the SerialTransformator 
+    // when stored in the Functions table
     unsigned int functionId;
+    // ID of the PhysVol used in the SerialTransformator 
+    // as stored in the PhysVols table
     unsigned int physvolId;
     //  unsigned int physvolTable;
     unsigned int nCopies;
     unsigned int stId;
+    //============================
 
     // get the parent volume
     const std::vector<std::string> parentList = getParentNode();
@@ -536,30 +528,11 @@ void WriteGeoModel::handleSerialTransformer(const GeoSerialTransformer* node) {
         }
 
         /*
-         * Persistify the Function
-         */
-        TransFunctionPersistifier persistifier;
-        try {
-            persistifier.persistify(*func);
-        } catch (const std::runtime_error& error) {
-            std::cout << "GeoModelWrite -- SEVERE WARNING!! Handling "
-                         "std::runtime_error! -->"
-                      << error.what() << std::endl;
-        }
-        std::string expression = persistifier.getCodedString();
-
-        if (expression.size() == 0) {
-            std::cout
-                << "FATAL ERROR!! Function expression is empty!! Aborting...\n";
-            exit(EXIT_FAILURE);
-        }
-
-        /*
          * STORE/GET THE INNER OBJECTS IN THE DB
          */
-
-        // store/get the Function object in the DB
-        functionId = storeObj(func, expression);
+   
+        // store/get the Function's text expression in the DB
+        functionId = storeObj(func);
 
         // store/get the PhysVol volume in the DB
 
@@ -753,7 +726,7 @@ unsigned int WriteGeoModel::storeMaterial(const GeoMaterial* mat) {
 
         // Gets the fraction by weight of the i-th element
         const std::string elementFraction =
-            to_string_with_precision(mat->getFraction(i));
+            CppHelper::to_string_with_precision(mat->getFraction(i));
 
         matElementsList.push_back(std::to_string(elementId) + ":" +
                                   elementFraction);  // INT+string
@@ -962,25 +935,25 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     if (shapeType == "Box") {
         const GeoBox* box = dynamic_cast<const GeoBox*>(shape);
         pars.push_back("XHalfLength=" +
-                       to_string_with_precision(box->getXHalfLength()));
+                       CppHelper::to_string_with_precision(box->getXHalfLength()));
         pars.push_back("YHalfLength=" +
-                       to_string_with_precision(box->getYHalfLength()));
+                       CppHelper::to_string_with_precision(box->getYHalfLength()));
         pars.push_back("ZHalfLength=" +
-                       to_string_with_precision(box->getZHalfLength()));
+                       CppHelper::to_string_with_precision(box->getZHalfLength()));
         shapePars = joinVectorStrings(pars, ";");
     } else if (shapeType == "Cons") {
         const GeoCons* shapeIn = dynamic_cast<const GeoCons*>(shape);
         pars.push_back("RMin1=" +
-                       to_string_with_precision(shapeIn->getRMin1()));
+                       CppHelper::to_string_with_precision(shapeIn->getRMin1()));
         pars.push_back("RMin2=" +
-                       to_string_with_precision(shapeIn->getRMin2()));
+                       CppHelper::to_string_with_precision(shapeIn->getRMin2()));
         pars.push_back("RMax1=" +
-                       to_string_with_precision(shapeIn->getRMax1()));
+                       CppHelper::to_string_with_precision(shapeIn->getRMax1()));
         pars.push_back("RMax2=" +
-                       to_string_with_precision(shapeIn->getRMax2()));
-        pars.push_back("DZ=" + to_string_with_precision(shapeIn->getDZ()));
-        pars.push_back("SPhi=" + to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + to_string_with_precision(shapeIn->getDPhi()));
+                       CppHelper::to_string_with_precision(shapeIn->getRMax2()));
+        pars.push_back("DZ=" + CppHelper::to_string_with_precision(shapeIn->getDZ()));
+        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
     } else if (shapeType == "Torus") {
         // Member Data:
         // * Rmax - outside radius of the torus tube
@@ -991,43 +964,43 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
         // * DPhi - delta angle of the segment in radians
         //
         const GeoTorus* shapeIn = dynamic_cast<const GeoTorus*>(shape);
-        pars.push_back("Rmin=" + to_string_with_precision(shapeIn->getRMin()));
-        pars.push_back("Rmax=" + to_string_with_precision(shapeIn->getRMax()));
-        pars.push_back("Rtor=" + to_string_with_precision(shapeIn->getRTor()));
-        pars.push_back("SPhi=" + to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + to_string_with_precision(shapeIn->getDPhi()));
+        pars.push_back("Rmin=" + CppHelper::to_string_with_precision(shapeIn->getRMin()));
+        pars.push_back("Rmax=" + CppHelper::to_string_with_precision(shapeIn->getRMax()));
+        pars.push_back("Rtor=" + CppHelper::to_string_with_precision(shapeIn->getRTor()));
+        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
     } else if (shapeType == "Para") {
         const GeoPara* shapeIn = dynamic_cast<const GeoPara*>(shape);
         pars.push_back("XHalfLength=" +
-                       to_string_with_precision(shapeIn->getXHalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getXHalfLength()));
         pars.push_back("YHalfLength=" +
-                       to_string_with_precision(shapeIn->getYHalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getYHalfLength()));
         pars.push_back("ZHalfLength=" +
-                       to_string_with_precision(shapeIn->getZHalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
         pars.push_back("Alpha=" +
-                       to_string_with_precision(shapeIn->getAlpha()));
+                       CppHelper::to_string_with_precision(shapeIn->getAlpha()));
         pars.push_back("Theta=" +
-                       to_string_with_precision(shapeIn->getTheta()));
-        pars.push_back("Phi=" + to_string_with_precision(shapeIn->getPhi()));
+                       CppHelper::to_string_with_precision(shapeIn->getTheta()));
+        pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
     } else if (shapeType == "Pcon") {
         const GeoPcon* shapeIn = dynamic_cast<const GeoPcon*>(shape);
-        pars.push_back("SPhi=" + to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + to_string_with_precision(shapeIn->getDPhi()));
+        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
         // get number of Z planes and loop over them
         const int nZplanes = shapeIn->getNPlanes();
         pars.push_back("NZPlanes=" + std::to_string(nZplanes));  // INT
         for (int i = 0; i < nZplanes; ++i) {
             pars.push_back("ZPos=" +
-                           to_string_with_precision(shapeIn->getZPlane(i)));
+                           CppHelper::to_string_with_precision(shapeIn->getZPlane(i)));
             pars.push_back("ZRmin=" +
-                           to_string_with_precision(shapeIn->getRMinPlane(i)));
+                           CppHelper::to_string_with_precision(shapeIn->getRMinPlane(i)));
             pars.push_back("ZRmax=" +
-                           to_string_with_precision(shapeIn->getRMaxPlane(i)));
+                           CppHelper::to_string_with_precision(shapeIn->getRMaxPlane(i)));
         }
     } else if (shapeType == "Pgon") {
         const GeoPgon* shapeIn = dynamic_cast<const GeoPgon*>(shape);
-        pars.push_back("SPhi=" + to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + to_string_with_precision(shapeIn->getDPhi()));
+        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
         pars.push_back("NSides=" +
                        std::to_string(shapeIn->getNSides()));  // INT
         // get number of Z planes and loop over them
@@ -1035,99 +1008,99 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
         pars.push_back("NZPlanes=" + std::to_string(nZplanes));  // INT
         for (int i = 0; i < nZplanes; ++i) {
             pars.push_back("ZPos=" +
-                           to_string_with_precision(shapeIn->getZPlane(i)));
+                           CppHelper::to_string_with_precision(shapeIn->getZPlane(i)));
             pars.push_back("ZRmin=" +
-                           to_string_with_precision(shapeIn->getRMinPlane(i)));
+                           CppHelper::to_string_with_precision(shapeIn->getRMinPlane(i)));
             pars.push_back("ZRmax=" +
-                           to_string_with_precision(shapeIn->getRMaxPlane(i)));
+                           CppHelper::to_string_with_precision(shapeIn->getRMaxPlane(i)));
         }
     } else if (shapeType == "SimplePolygonBrep") {
         const GeoSimplePolygonBrep* shapeIn =
             dynamic_cast<const GeoSimplePolygonBrep*>(shape);
-        pars.push_back("DZ=" + to_string_with_precision(shapeIn->getDZ()));
+        pars.push_back("DZ=" + CppHelper::to_string_with_precision(shapeIn->getDZ()));
         // get number of vertices and loop over them
         const int nVertices = shapeIn->getNVertices();
         pars.push_back("NVertices=" + std::to_string(nVertices));  // INT
         for (int i = 0; i < nVertices; ++i) {
             pars.push_back("xV=" +
-                           to_string_with_precision(shapeIn->getXVertex(i)));
+                           CppHelper::to_string_with_precision(shapeIn->getXVertex(i)));
             pars.push_back("yV=" +
-                           to_string_with_precision(shapeIn->getYVertex(i)));
+                           CppHelper::to_string_with_precision(shapeIn->getYVertex(i)));
         }
     } else if (shapeType == "Trap") {
         const GeoTrap* shapeIn = dynamic_cast<const GeoTrap*>(shape);
         pars.push_back("ZHalfLength=" +
-                       to_string_with_precision(shapeIn->getZHalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
         pars.push_back("Theta=" +
-                       to_string_with_precision(shapeIn->getTheta()));
-        pars.push_back("Phi=" + to_string_with_precision(shapeIn->getPhi()));
+                       CppHelper::to_string_with_precision(shapeIn->getTheta()));
+        pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
         pars.push_back("Dydzn=" +
-                       to_string_with_precision(shapeIn->getDydzn()));
+                       CppHelper::to_string_with_precision(shapeIn->getDydzn()));
         pars.push_back("Dxdyndzn=" +
-                       to_string_with_precision(shapeIn->getDxdyndzn()));
+                       CppHelper::to_string_with_precision(shapeIn->getDxdyndzn()));
         pars.push_back("Dxdypdzn=" +
-                       to_string_with_precision(shapeIn->getDxdypdzn()));
+                       CppHelper::to_string_with_precision(shapeIn->getDxdypdzn()));
         pars.push_back("Angleydzn=" +
-                       to_string_with_precision(shapeIn->getAngleydzn()));
+                       CppHelper::to_string_with_precision(shapeIn->getAngleydzn()));
         pars.push_back("Dydzp=" +
-                       to_string_with_precision(shapeIn->getDydzp()));
+                       CppHelper::to_string_with_precision(shapeIn->getDydzp()));
         pars.push_back("Dxdyndzp=" +
-                       to_string_with_precision(shapeIn->getDxdyndzp()));
+                       CppHelper::to_string_with_precision(shapeIn->getDxdyndzp()));
         pars.push_back("Dxdypdzp=" +
-                       to_string_with_precision(shapeIn->getDxdypdzp()));
+                       CppHelper::to_string_with_precision(shapeIn->getDxdypdzp()));
         pars.push_back("Angleydzp=" +
-                       to_string_with_precision(shapeIn->getAngleydzp()));
+                       CppHelper::to_string_with_precision(shapeIn->getAngleydzp()));
     } else if (shapeType == "TwistedTrap") {
         const GeoTwistedTrap* shapeIn =
             dynamic_cast<const GeoTwistedTrap*>(shape);
         pars.push_back("PhiTwist=" +
-                       to_string_with_precision(shapeIn->getPhiTwist()));
+                       CppHelper::to_string_with_precision(shapeIn->getPhiTwist()));
         pars.push_back("ZHalfLength=" +
-                       to_string_with_precision(shapeIn->getZHalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
         pars.push_back("Theta=" +
-                       to_string_with_precision(shapeIn->getTheta()));
-        pars.push_back("Phi=" + to_string_with_precision(shapeIn->getPhi()));
+                       CppHelper::to_string_with_precision(shapeIn->getTheta()));
+        pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
         pars.push_back("DY1HalfLength=" +
-                       to_string_with_precision(shapeIn->getY1HalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getY1HalfLength()));
         pars.push_back("DX1HalfLength=" +
-                       to_string_with_precision(shapeIn->getX1HalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getX1HalfLength()));
         pars.push_back("DX2HalfLength=" +
-                       to_string_with_precision(shapeIn->getX2HalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getX2HalfLength()));
         pars.push_back("DY2HalfLength=" +
-                       to_string_with_precision(shapeIn->getY2HalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getY2HalfLength()));
         pars.push_back("DX3HalfLength=" +
-                       to_string_with_precision(shapeIn->getX3HalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getX3HalfLength()));
         pars.push_back("DX4HalfLength=" +
-                       to_string_with_precision(shapeIn->getX4HalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getX4HalfLength()));
         pars.push_back("DTiltAngleAlpha=" +
-                       to_string_with_precision(shapeIn->getTiltAngleAlpha()));
+                       CppHelper::to_string_with_precision(shapeIn->getTiltAngleAlpha()));
 
     } else if (shapeType == "Trd") {
         const GeoTrd* shapeIn = dynamic_cast<const GeoTrd*>(shape);
         pars.push_back("XHalfLength1=" +
-                       to_string_with_precision(shapeIn->getXHalfLength1()));
+                       CppHelper::to_string_with_precision(shapeIn->getXHalfLength1()));
         pars.push_back("XHalfLength2=" +
-                       to_string_with_precision(shapeIn->getXHalfLength2()));
+                       CppHelper::to_string_with_precision(shapeIn->getXHalfLength2()));
         pars.push_back("YHalfLength1=" +
-                       to_string_with_precision(shapeIn->getYHalfLength1()));
+                       CppHelper::to_string_with_precision(shapeIn->getYHalfLength1()));
         pars.push_back("YHalfLength2=" +
-                       to_string_with_precision(shapeIn->getYHalfLength2()));
+                       CppHelper::to_string_with_precision(shapeIn->getYHalfLength2()));
         pars.push_back("ZHalfLength=" +
-                       to_string_with_precision(shapeIn->getZHalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
     } else if (shapeType == "Tube") {
         const GeoTube* tube = dynamic_cast<const GeoTube*>(shape);
-        pars.push_back("RMin=" + to_string_with_precision(tube->getRMin()));
-        pars.push_back("RMax=" + to_string_with_precision(tube->getRMax()));
+        pars.push_back("RMin=" + CppHelper::to_string_with_precision(tube->getRMin()));
+        pars.push_back("RMax=" + CppHelper::to_string_with_precision(tube->getRMax()));
         pars.push_back("ZHalfLength=" +
-                       to_string_with_precision(tube->getZHalfLength()));
+                       CppHelper::to_string_with_precision(tube->getZHalfLength()));
     } else if (shapeType == "Tubs") {
         const GeoTubs* shapeIn = dynamic_cast<const GeoTubs*>(shape);
-        pars.push_back("RMin=" + to_string_with_precision(shapeIn->getRMin()));
-        pars.push_back("RMax=" + to_string_with_precision(shapeIn->getRMax()));
+        pars.push_back("RMin=" + CppHelper::to_string_with_precision(shapeIn->getRMin()));
+        pars.push_back("RMax=" + CppHelper::to_string_with_precision(shapeIn->getRMax()));
         pars.push_back("ZHalfLength=" +
-                       to_string_with_precision(shapeIn->getZHalfLength()));
-        pars.push_back("SPhi=" + to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + to_string_with_precision(shapeIn->getDPhi()));
+                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
+        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
     } else if (shapeType == "TessellatedSolid") {
         const GeoTessellatedSolid* shapeIn =
             dynamic_cast<const GeoTessellatedSolid*>(shape);
@@ -1155,11 +1128,11 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
             for (size_t i = 0; i < nVertices; ++i) {
                 GeoFacetVertex facetVertex = facet->getVertex(i);
                 pars.push_back("xV=" +
-                               to_string_with_precision(facetVertex[0]));
+                               CppHelper::to_string_with_precision(facetVertex[0]));
                 pars.push_back("yV=" +
-                               to_string_with_precision(facetVertex[1]));
+                               CppHelper::to_string_with_precision(facetVertex[1]));
                 pars.push_back("zV=" +
-                               to_string_with_precision(facetVertex[2]));
+                               CppHelper::to_string_with_precision(facetVertex[2]));
             }
         }
     } else if (shapeType == "Intersection") {
@@ -1216,14 +1189,14 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
         const GeoGenericTrap* shapeIn =
             dynamic_cast<const GeoGenericTrap*>(shape);
         pars.push_back("ZHalfLength=" +
-                       to_string_with_precision(shapeIn->getZHalfLength()));
+                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
         pars.push_back("NVertices=" +
-                       to_string_with_precision(shapeIn->getVertices().size()));
+                       CppHelper::to_string_with_precision(shapeIn->getVertices().size()));
         for (unsigned long i = 0; i < shapeIn->getVertices().size(); ++i) {
             pars.push_back(
-                "X=" + to_string_with_precision(shapeIn->getVertices()[i](0)));
+                "X=" + CppHelper::to_string_with_precision(shapeIn->getVertices()[i](0)));
             pars.push_back(
-                "Y=" + to_string_with_precision(shapeIn->getVertices()[i](1)));
+                "Y=" + CppHelper::to_string_with_precision(shapeIn->getVertices()[i](1)));
         }
     } else if (shapeType == "UnidentifiedShape") {
         const GeoUnidentifiedShape* shapeIn =
@@ -1244,7 +1217,7 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     else {
         std::cout << "\n\tGeoModelWrite -- WARNING!!! - Shape '" << shapeType
                   << "' needs to be persistified!!\n\n";
-        printStdVectorStrings(m_objectsNotPersistified);
+        CppHelper::printStdVectorStrings(m_objectsNotPersistified);
     }
 
     shapePars = joinVectorStrings(pars, ";");
@@ -1494,13 +1467,39 @@ unsigned int WriteGeoModel::storeObj(const GeoSerialTransformer* pointer,
     return id;
 }
 
-unsigned int WriteGeoModel::storeObj(const GeoXF::Function* pointer,
-                                     const std::string& expression) {
+unsigned int WriteGeoModel::storeObj(const GeoXF::Function* pointer) {
+                                    //  const std::string& expression,
+                                    //  const std::deque<double>& exprData) {
     const std::string address = getAddressStringFromPointer(pointer);
     unsigned int id = 0;
 
     if (!isAddressStored(address)) {
-        id = addFunction(expression);
+        /*
+         * Persistify the Function
+         */
+        TransFunctionPersistifier persistifier;
+        try {
+            persistifier.persistify(*pointer);
+        } catch (const std::runtime_error& error) {
+            std::cout << "GeoModelWrite -- SEVERE WARNING!! Handling "
+                         "std::runtime_error! -->"
+                      << error.what() << std::endl;
+        }
+        std::string expression      = persistifier.getCodedString();
+        std::deque<double> exprData = persistifier.getFloatingPointData();
+        
+        if (expression.size() == 0) {
+            std::cout
+                << "FATAL ERROR!! Function expression is empty!! Aborting...\n";
+            exit(EXIT_FAILURE);
+        }
+        // Store the Function's numbers
+        std::vector<unsigned> dataRows = addExprData(exprData);
+        unsigned dataStart = dataRows[0];
+        unsigned dataEnd = dataRows[1];
+
+        // store the Function
+        id = addFunction(expression, dataStart, dataEnd);
 
         storeAddress(address, id);
     } else {
@@ -1513,6 +1512,24 @@ unsigned int WriteGeoModel::storeObj(const GeoXF::Function* pointer,
     }
     return id;
 }
+
+// unsigned int WriteGeoModel::storeExprData(const unsigned funcId, std::deque exprData) {
+//     // store/get the Function's data numbers in the DB
+//     std::cout << "\n\n********** storing Func's data...\n";
+//     // start and end row numbers for the Function's data
+//     // as stored in the ExpData tables
+//     unsigned dataStartRow = 0;
+//     unsigned dataEndRow = 0;
+//     unsigned ii = 0;
+//     unsigned nNums = exprData.size();
+//     for (const auto &num : exprData)
+//     {
+//         std::cout << "num: " << num << std::endl;
+//         unsigned row = storeExprData(num);
+//         if (0 == ii) dataStartRow = row;
+//         else if ( (nNums - 1) == ii ) dataEndRow = row;
+//         }
+// }
 
 unsigned int WriteGeoModel::storeObj(const GeoTransform* pointer,
                                      const std::vector<double>& parameters) {
@@ -1602,24 +1619,56 @@ unsigned int WriteGeoModel::addRecord(
     return idx;
 }
 
+unsigned int WriteGeoModel::addRecord(
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>>* container,
+    const std::vector<std::variant<int, long, float, double, std::string>> values) const {
+    container->push_back(values);
+    unsigned int idx =
+        container->size();  // index of pushed element = size after pushing, to
+                            // match ID starting at 1 in the DB
+    return idx;
+}
+
+
+std::vector<unsigned> WriteGeoModel::addExprData(
+    const std::deque<double>& exprData) 
+{
+    std::vector<std::variant<int, long, float, double, std::string>> *container = &m_exprData;
+    const unsigned dataStart = container->size();
+    for (const auto& num : exprData) {
+        std::cout << "num: " << num << std::endl;
+        container->push_back(num);
+    }
+    unsigned dataEnd =
+        container->size(); // index of pushed element = size after pushing, to
+                           // match ID starting at 1 in the DB
+
+    std::vector<unsigned> dataRows;
+    dataRows.push_back(dataStart);
+    dataRows.push_back(dataEnd);
+    return dataRows;
+}
+
 unsigned int WriteGeoModel::addMaterial(const std::string& name,
                                         const double& density,
                                         const std::string& elements) {
     std::vector<std::vector<std::string>>* container = &m_materials;
     std::vector<std::string> values;
     values.push_back(name);
-    values.push_back(to_string_with_precision(density));
+    values.push_back(CppHelper::to_string_with_precision(density));
     values.push_back(elements);
     return addRecord(container, values);
 }
+
+
 
 unsigned int WriteGeoModel::addElement(const std::string& name,
                                        const std::string& symbol,
                                        const double& elZ, const double& elA) {
     std::vector<std::vector<std::string>>* container = &m_elements;
     std::vector<std::string> values;
-    values.insert(values.begin(), {name, symbol, to_string_with_precision(elZ),
-                                   to_string_with_precision(elA)});
+    values.insert(values.begin(), {name, symbol, CppHelper::to_string_with_precision(elZ),
+                                   CppHelper::to_string_with_precision(elA)});
     return addRecord(container, values);
 }
 
@@ -1666,7 +1715,7 @@ unsigned int WriteGeoModel::addAlignableTransform(
     std::vector<std::vector<std::string>>* container = &m_alignableTransforms;
     std::vector<std::string> values;
     for (const double& par : params) {
-        values.push_back(to_string_with_precision(par));
+        values.push_back(CppHelper::to_string_with_precision(par));
     }
     return addRecord(container, values);
 }
@@ -1675,7 +1724,7 @@ unsigned int WriteGeoModel::addTransform(const std::vector<double>& params) {
     std::vector<std::vector<std::string>>* container = &m_transforms;
     std::vector<std::string> values;
     for (const double& par : params) {
-        values.push_back(to_string_with_precision(par));
+        values.push_back(CppHelper::to_string_with_precision(par));
     }
     return addRecord(container, values);
 }
@@ -1928,10 +1977,13 @@ unsigned int WriteGeoModel::addIdentifierTag(const int& identifier) {
     return addRecord(container, values);
 }
 
-unsigned int WriteGeoModel::addFunction(const std::string& expression) {
-    std::vector<std::vector<std::string>>* container = &m_functions;
-    std::vector<std::string> values;
+unsigned int WriteGeoModel::addFunction(const std::string& expression, const unsigned &dataStart, const unsigned &dataEnd) {
+    // std::vector<std::vector<std::string>>* container = &m_functions;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>>* container = &m_functions;
+    std::vector<std::variant<int, long, float, double, std::string>> values;
     values.push_back(expression);
+    values.push_back(dataStart);
+    values.push_back(dataEnd);
     return addRecord(container, values);
 }
 
@@ -1940,7 +1992,7 @@ unsigned int WriteGeoModel::addAlignableTransform(
     std::vector<std::vector<std::string>>* container = &m_alignableTransforms;
     std::vector<std::string> values;
     for (const double& par : params) {
-        values.push_back(to_string_with_precision(par));
+        values.push_back(CppHelper::to_string_with_precision(par));
     }
     return addRecord(container, values);
 }
@@ -1949,7 +2001,7 @@ unsigned int WriteGeoModel::addTransform(const std::vector<double>& params) {
     std::vector<std::vector<std::string>>* container = &m_transforms;
     std::vector<std::string> values;
     for (const double& par : params) {
-        values.push_back(to_string_with_precision(par));
+        values.push_back(CppHelper::to_string_with_precision(par));
     }
     return addRecord(container, values);
 }
@@ -2085,6 +2137,8 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecords("GeoPhysVol", m_physVols);
     m_dbManager->addListOfRecords("GeoFullPhysVol", m_fullPhysVols);
     m_dbManager->addListOfRecords("GeoLogVol", m_logVols);
+    
+    m_dbManager->addRecordsToTable("FuncExprData", m_exprData);
 
     m_dbManager->addListOfChildrenPositions(m_childrenPositions);
     m_dbManager->addRootVolume(m_rootVolume);
@@ -2137,7 +2191,7 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     if (!m_objectsNotPersistified.empty()) {
         std::cout << "\n\tGeoModelWrite -- WARNING!! There are shapes/nodes "
                      "which need to be persistified! --> ";
-        printStdVectorStrings(m_objectsNotPersistified);
+        CppHelper::printStdVectorStrings(m_objectsNotPersistified);
         std::cout << "\n\n";
     }
 

@@ -41,6 +41,7 @@
 
 // C++ includes
 #include <set>
+#include <deque>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -198,16 +199,22 @@ class WriteGeoModel : public GeoNodeAction {
                           const unsigned int &functionId,
                           const unsigned int &volId, const std::string &volType,
                           const unsigned int &copies);
-    unsigned int storeObj(const GeoXF::Function *pointer,
-                          const std::string &expression);
+    unsigned int storeObj(const GeoXF::Function *pointer);
+                        //   const std::string &expression,
+                        //   const std::deque<double> &exprData);
     unsigned int storeObj(const GeoTransform *pointer,
                           const std::vector<double> &parameters);
     unsigned int storeObj(const GeoAlignableTransform *pointer,
                           const std::vector<double> &parameters);
     unsigned int storeObj(const GeoNameTag *pointer, const std::string &name);
 
+    // void storeExprData(const unsigned funcId, std::deque<double> exprData);
+    std::vector<unsigned> addExprData(const std::deque<double> &exprData) ;
+
     unsigned int addRecord(std::vector<std::vector<std::string>> *container,
                            const std::vector<std::string> values) const;
+    unsigned int addRecord(std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container,
+                           const std::vector<std::variant<int, long, float, double, std::string>> values) const;
 
     unsigned int addMaterial(const std::string &name, const double &density,
                              const std::string &elements);
@@ -216,7 +223,7 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned int addNameTag(const std::string &name);
     unsigned int addAlignableTransform(const std::vector<double> &params);
     unsigned int addTransform(const std::vector<double> &params);
-    unsigned int addFunction(const std::string &expression);
+    unsigned int addFunction(const std::string &expression, const unsigned &dataStart, const unsigned &dataEnd);
     unsigned int addSerialTransformer(const unsigned int &funcId,
                                       const unsigned int &physvolId,
                                       const std::string volType,
@@ -333,9 +340,14 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<std::vector<std::string>> m_serialIdentifiers;
     std::vector<std::vector<std::string>> m_identifierTags;
     std::vector<std::vector<std::string>> m_serialTransformers;
-    std::vector<std::vector<std::string>> m_functions;
     std::vector<std::vector<std::string>> m_nameTags;
     std::vector<std::vector<std::string>> m_shapes;
+
+    // std::vector<std::vector<std::string>> m_functions;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_functions; // operators used in Function's expression
+
+    // caches for additional data to be saved into the DB
+    std::vector<std::variant<int, long, float, double, std::string>> m_exprData; // numbers used in Function's expression
 
     // caches for Metadata to be saved into the DB
     std::vector<std::string> m_rootVolume;

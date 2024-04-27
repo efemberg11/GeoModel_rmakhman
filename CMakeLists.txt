@@ -29,15 +29,14 @@ if( APPLE )
 endif()
 
 # === Externally provided content ===
-# Set up how the project handle some of its dependenices. Either by ing them
+# Set up how the project handle some of its dependenices. Either by picking them
 # up from the environment, or building them itself.
 include( SetupEigen3 )
 include( SetupXercesC )
 include( SetupJSON )
 
-# Find the dependencies that the project always s up from its environment.
+# Find the dependencies that the project always picks up from its environment.
 find_package( SQLite3 3.7.17 )
-
 
 # === Enable testing functionality
 # NOTE: this must be in the root CMakeLists.txt file

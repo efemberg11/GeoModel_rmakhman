@@ -3,5 +3,6 @@
 *.swp
 *.swo
 
-# VSCode default build directory
-build/
+# VSCode-related files and folders
+build
+.vscode

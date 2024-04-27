@@ -3226,7 +3226,8 @@ TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int id) {
     std::string expr = std::get<std::string>(m_functions[id - 1][1]);  // nodes' IDs start from 1
     unsigned dataStart = std::get<int>(m_functions[id - 1][2]);
     unsigned dataEnd = std::get<int>(m_functions[id - 1][3]);
-    std::cout << "expr:" << expr << " -- dataStart,End: " << dataStart << ", " << dataEnd << std::endl;
+    // debug msg
+    // std::cout << "expr:" << expr << " -- dataStart,End: " << dataStart << ", " << dataEnd << std::endl;
 
     if (0 == expr.size()) {
         muxCout.lock();

@@ -313,7 +313,8 @@ std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GM
                        - 5 NULL
                     */
                     int datacode = sqlite3_column_type(stmt, i);
-                    std::cout << "table: " << tableName << ", col " << i << "/" << ctotal << " -- typecode: " << datacode << std::endl;
+                    // debug msg
+                    // std::cout << "table: " << tableName << ", col " << i << "/" << ctotal << " -- typecode: " << datacode << std::endl;
 
                     int valI;
                     double valD;
@@ -425,7 +426,8 @@ std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::ge
                        - 5 NULL
                     */
                     int datacode = sqlite3_column_type(stmt, 1);
-                    std::cout << "table: " << tableName << ", col " << colData << "/" << ctotal << " -- typecode: " << datacode << std::endl;
+                    // debug msg
+                    // std::cout << "table: " << tableName << ", col " << colData << "/" << ctotal << " -- typecode: " << datacode << std::endl;
 
                     int valI;
                     double valD;

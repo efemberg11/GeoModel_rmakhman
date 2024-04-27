@@ -41,5 +41,5 @@ install( FILES ${HEADERS}
 
 add_executable(test_create_db_file tests/test_create_db_file.cpp)
 target_link_libraries( test_create_db_file GeoModelIO::GeoModelDBManager)
-add_test(NAME TestCreateDBFile
+add_test(NAME testCreateDBFile
          COMMAND test_create_db_file)

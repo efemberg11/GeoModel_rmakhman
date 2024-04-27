@@ -9,7 +9,7 @@ add_subdirectory( GeoModelDBManager )
 add_subdirectory( TFPersistification )
 add_subdirectory( GeoModelRead )
 add_subdirectory( GeoModelWrite )
-# add_subdirectory( GeoModelIOHelpers )
+add_subdirectory( GeoModelIOHelpers )
 add_subdirectory( GeoModelCppHelpers )
 
 # Create and install the version description of the project.
@@ -47,3 +47,10 @@ install(
 # Set up the packaging of the project using CPack.
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 include( GeoModelIOPackaging )
+
+# global I/O tests
+add_executable(test_io_shared_serialtransformers tests/test_io_shared_serialtransformers.cpp)
+target_link_libraries( test_io_shared_serialtransformers GeoModelIO::GeoModelDBManager GeoModelCore::GeoModelHelpers GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers)
+add_test(NAME testIOSharedSerialTransformers
+         COMMAND test_io_shared_serialtransformers)
+

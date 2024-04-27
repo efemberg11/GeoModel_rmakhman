@@ -1,12 +1,12 @@
-// Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+// Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 /*
  * This example tests shared GeoSerialTransformer nodes.
  *
  * It creates one single LogVol, with one Material and one Shape.
  * Then it creates one single PhysVol volumes using the above LogVol.
- * Then it creates three SerialTrasnformers with different placing formulas,
- * but which share the same PhisVol defined above.
+ * Then it creates two SerialTrasnformers with two different placing formulas,
+ * but which share the same PhysVol defined above.
  *
  * It is meant to how how to share GeoModel nodes to reduce the memory footprint
  * and to test the GeoModel I/O packages and methods.

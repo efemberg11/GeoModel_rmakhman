@@ -4,7 +4,9 @@
  * This example tests shared GeoSerialTransformer nodes.
  *
  * In particular, it tests three serialtransformers that share a single PhysVol
- * volume and a single Function.
+ * volume and:
+ * - two of them share the same placing formula
+ * - one of them has its own placing formula
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
  *  Created on: Feb, 2023

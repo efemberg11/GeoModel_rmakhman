@@ -1636,7 +1636,7 @@ std::vector<unsigned> WriteGeoModel::addExprData(
     std::vector<std::variant<int, long, float, double, std::string>> *container = &m_exprData;
     const unsigned dataStart = container->size();
     for (const auto& num : exprData) {
-        std::cout << "num: " << num << std::endl;
+        // std::cout << "num: " << GeoModelIO::CppHelper::to_string_with_precision(num) << std::endl; // DEBUG MSG
         container->push_back(num);
     }
     unsigned dataEnd =
@@ -2280,10 +2280,10 @@ void WriteGeoModel::storeRecordPublishedNodes(
             keyStr = std::any_cast<std::string>(key);
         } else if (typeid(int) == keyType) {
             keyTypeStr = "int";
-            keyStr = std::to_string(std::any_cast<int>(key));
+            keyStr = std::to_string(std::any_cast<int>(key)); // INT
         } else if (typeid(unsigned) == keyType) {
             keyTypeStr = "uint";
-            keyStr = std::to_string(std::any_cast<unsigned>(key));
+            keyStr = std::to_string(std::any_cast<unsigned>(key)); // INT
         } else {
             std::cout
                 << "ERROR! The type of the key used to publish FPV and AXF "
@@ -2319,7 +2319,7 @@ void WriteGeoModel::storeRecordPublishedNodes(
         // in the DB table
         std::vector<std::string> values;
         values.push_back(keyStr);
-        values.push_back(std::to_string(volID));
+        values.push_back(std::to_string(volID)); // INT
         values.push_back(keyTypeStr);  // TODO: store the key type in a metadata
                                        // table, not in the records' table; so
                                        // it can be stored once only.

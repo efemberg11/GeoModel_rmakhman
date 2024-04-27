@@ -149,9 +149,7 @@ int main(int argc, char *argv[])
     std::string keyStr = "HelloToy-AXF-" + std::to_string(i+1);
     publisher->publishNode<GeoAlignableTransform*,std::string>(xform, keyStr);
     
-    std::cout << "step1 - FPV, key: " << keyInt 
-              << " - xf: "; 
-    GeoUtilFunctions::printTrf(ringPhys->getAbsoluteTransform());
+    std::cout << "step1 - FPV, key: " << keyInt << std::endl;
 
   }
 

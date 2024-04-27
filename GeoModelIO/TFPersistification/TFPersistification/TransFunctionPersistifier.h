@@ -39,7 +39,7 @@ class TransFunctionPersistifier {
   // Retrieves the coded string after the persistify operation:
   const std::string & getCodedString() const;
 
-  // Retreive floating point data
+  // Retrieves floating point data
   std::deque<double> & getFloatingPointData() const;
 
   // Retrieves the stream used to build the expression:

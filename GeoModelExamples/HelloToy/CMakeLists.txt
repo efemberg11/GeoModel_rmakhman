@@ -28,9 +28,9 @@ set(SRCS step1_create_store_geo_and_publish_nodes.cpp )
 set(SRCS_READ step2_read_geo_and_published_nodes.cpp )
 
 # Tell CMake to create the 'helloToy' executable
-add_executable( helloToy ${SRCS} )
-add_executable( read_helloToy_and_publishedNodes ${SRCS_READ} )
+add_executable( helloToy_step1_write ${SRCS} )
+add_executable( helloToy_step2_read ${SRCS_READ} )
 
 # Link all needed libraries
-target_link_libraries( helloToy GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite )
-target_link_libraries( read_helloToy_and_publishedNodes GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead )
+target_link_libraries( helloToy_step1_write GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite )
+target_link_libraries( helloToy_step2_read  GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead )

@@ -328,8 +328,12 @@ class ReadGeoModel {
     std::vector<std::vector<std::string>> m_materials;
     std::vector<std::vector<std::string>> m_elements;
     std::vector<std::vector<std::string>> m_shapes;
-    std::vector<std::vector<std::string>> m_functions;
     std::vector<std::vector<std::string>> m_allchildren;
+
+    // std::vector<std::vector<std::string>> m_functions;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_functions;
+    std::deque<double> m_funcExprData;
+
 
     std::unordered_map<unsigned int, std::string>
         m_tableID_toTableName;  // to look for node's type name starting from a

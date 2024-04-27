@@ -16,7 +16,8 @@
  *              available as soon as the input file is opened by the GMDBManager
  * - Apr 2024 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
  *              New DB format to extend the storage of numbers as REAL instead of TEXT,
- *              New methods to handle vector<variants> as input of records
+ *              New methods to handle vector<variants> as input of records,
+ *              Set precision to all conversions Double --> String
  */
 
 #include <GeoModelDBManager/GMDBManager.h>
@@ -270,11 +271,228 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(
     return records;
 }
 
+// New version with variant
+std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GMDBManager::getTableRecords_VecVecData(
+    std::string tableName) const
+{
+    // container to be returned
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> records;
+    // get the query statetement ready to be executed
+    sqlite3_stmt *stmt = nullptr;
+
+    if ("ChildrenPositions" == tableName)
+    {
+        stmt = m_d->selectAllFromTableChildrenPositions();
+    }
+    else
+    {
+        stmt = m_d->selectAllFromTable(tableName);
+    }
+    // execute the query and loop over all rows and all columuns
+    if (stmt)
+    {
+        int ctotal = sqlite3_column_count(
+            stmt); // Count the Number of Columns in the Table
+        int res = 0;
+        while (1)
+        {
+            res = sqlite3_step(stmt); // Execute SQL Statement.
+            if (res == SQLITE_ROW)
+            {
+                std::vector<std::variant<int, long, float, double, std::string>>
+                    nodeParams; // stores the data items contained in a
+                                // single row
+                for (int i = 0; i < ctotal;
+                     i++) // Loop times the number of columns in the table
+                {
+                    /* NOTE: 'sqlite3_column_type' return codes:
+                       - 1 INT
+                       - 2 FLOAT
+                       - 3 TEXT
+                       - 4 BLOB
+                       - 5 NULL
+                    */
+                    int datacode = sqlite3_column_type(stmt, i);
+                    std::cout << "table: " << tableName << ", col " << i << "/" << ctotal << " -- typecode: " << datacode << std::endl;
+
+                    int valI;
+                    double valD;
+                    std::string valS;
+                    if (1 == datacode)
+                    {
+                        valI = sqlite3_column_int(stmt, i);
+                        nodeParams.push_back(valI);
+                    }
+                    else if (2 == datacode)
+                    {
+                        valD = sqlite3_column_double(stmt, i);
+                        nodeParams.push_back(valD);
+                    }
+                    else if (3 == datacode)
+                    {
+                        const char *cc = (char *)sqlite3_column_text(stmt, i);
+                        if (cc == NULL)
+                        {
+                            valS = "NULL";
+                        }
+                        else
+                        {
+                            valS = cc;
+                        }
+                        nodeParams.push_back(valS);
+                    }
+                    else if (4 == datacode)
+                    {
+                        std::cout << "ERROR!!! The 'BLOB' data format is not supported yet!!" << std::endl;
+                    }
+                    else if (5 == datacode)
+                    {
+                        std::cout << "WARNING! 'NULL' format detected. Check that!" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "ERROR!!! You should NOT get here!! Unsupport SQLite data typecode: " << datacode << " -- Check this!!" << std::endl;
+                    }
+                }
+                records.push_back(nodeParams);
+            }
+
+            if (res == SQLITE_DONE || res == SQLITE_ERROR)
+            {
+                if (res == SQLITE_ERROR)
+                {
+                    std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
+                    sqlite3_finalize(stmt);
+                    throw errmsg;
+                }
+                break;
+            }
+        }
+    }
+    // finalize
+    sqlite3_finalize(stmt);
+    return records;
+}
+// New version with variant
+std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::getTableRecords_VecData(
+    std::string tableName) const
+{
+    // container to be returned
+    std::vector<std::variant<int, long, float, double, std::string>> records;
+    // get the query statetement ready to be executed
+    sqlite3_stmt *stmt = nullptr;
+
+    if ("ChildrenPositions" == tableName)
+    {
+        stmt = m_d->selectAllFromTableChildrenPositions();
+    }
+    else
+    {
+        stmt = m_d->selectAllFromTable(tableName);
+    }
+    // execute the query and loop over all rows and all columuns
+    if (stmt)
+    {
+        // Count the Number of Columns in the Table
+        int ctotal = sqlite3_column_count(stmt);
+        // for this case, we should have only one column
+        if (ctotal > 2)
+        {
+            std::cout << "ERROR! Table '" << tableName << "' is supposed to have two columns only, one for the ID and one for actual data; but it has '"
+                      << ctotal << "' columns! Check that!!" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        int res = 0;
+        while (1)
+        {
+            res = sqlite3_step(stmt); // Execute SQL Statement.
+            if (res == SQLITE_ROW)
+            {
+                // stores the value contained in a single row
+                // std::variant<int, long, float, double, std::string> rowValue;
+
+                // we are only interested in returning the 'data' column, that is column '1'
+                // (column '0' contains the ID)
+                int colData = 1;
+                // for (int i = 0; i < ctotal;
+                    //  i++) // Loop times the number of columns in the table
+                // {
+                    /* NOTE: 'sqlite3_column_type' return codes:
+                       - 1 INT
+                       - 2 FLOAT
+                       - 3 TEXT
+                       - 4 BLOB
+                       - 5 NULL
+                    */
+                    int datacode = sqlite3_column_type(stmt, 1);
+                    std::cout << "table: " << tableName << ", col " << colData << "/" << ctotal << " -- typecode: " << datacode << std::endl;
+
+                    int valI;
+                    double valD;
+                    std::string valS;
+                    if (1 == datacode)
+                    {
+                        valI = sqlite3_column_int(stmt, colData);
+                        records.push_back(valI);
+                    }
+                    else if (2 == datacode)
+                    {
+                        valD = sqlite3_column_double(stmt, colData);
+                        records.push_back(valD);
+                    }
+                    else if (3 == datacode)
+                    {
+                        const char *cc = (char *)sqlite3_column_text(stmt, colData);
+                        if (cc == NULL)
+                        {
+                            valS = "NULL";
+                        }
+                        else
+                        {
+                            valS = cc;
+                        }
+                        records.push_back(valS);
+                    }
+                    else if (4 == datacode)
+                    {
+                        std::cout << "ERROR!!! The 'BLOB' data format is not supported yet!!" << std::endl;
+                    }
+                    else if (5 == datacode)
+                    {
+                        std::cout << "WARNING! 'NULL' format detected. Check that!" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "ERROR!!! You should NOT get here!! Unsupport SQLite data typecode: " << datacode << " -- Check this!!" << std::endl;
+                    }
+                // }
+                // records.push_back(rowValue);
+            }
+
+            if (res == SQLITE_DONE || res == SQLITE_ERROR)
+            {
+                if (res == SQLITE_ERROR)
+                {
+                    std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
+                    sqlite3_finalize(stmt);
+                    throw errmsg;
+                }
+                break;
+            }
+        }
+    }
+    // finalize
+    sqlite3_finalize(stmt);
+    return records;
+}
+
 std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType(
-    std::string nodeType) {
+    std::string nodeType)
+{
     std::vector<std::vector<std::string>> out;
     std::string tableName = getTableNameFromNodeType(nodeType);
-    if (tableName.empty()) {
+    if (tableName.empty())
+    {
         std::mutex coutMutex;
         coutMutex.lock();
         printf(
@@ -287,10 +505,117 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType(
             "expect to see incomplete geometries or crashes.\n",
             nodeType.c_str());
         coutMutex.unlock();
-    } else {
+    }
+    else
+    {
         out = getTableRecords(tableName);
     }
     return out;
+}
+
+std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GMDBManager::getTableFromNodeType_VecVecData(
+    std::string nodeType)
+{
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> out;
+    std::string tableName = getTableNameFromNodeType(nodeType);
+    if (tableName.empty())
+    {
+        std::mutex coutMutex;
+        coutMutex.lock();
+        printf(
+            "\t ===> WARNING! The geometry input file does not contain a "
+            "table "
+            "for the %s nodes. That means that you are probably using an "
+            "old "
+            "geometry file. Unless you know exactly what you are doing, "
+            "please "
+            "expect to see incomplete geometries or crashes.\n",
+            nodeType.c_str());
+        coutMutex.unlock();
+    }
+    else
+    {
+        out = getTableRecords_VecVecData(tableName);
+    }
+    return out;
+}
+std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GMDBManager::getTableFromTableName_VecVecData(
+    std::string tableNameInp)
+{
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> out;
+    std::string tableName = tableNameInp;
+    if (tableName.empty())
+    {
+        std::mutex coutMutex;
+        coutMutex.lock();
+        printf(
+            "\t ===> WARNING! The geometry input file does not contain a "
+            "table "
+            "for the %s nodes. That means that you are probably using an "
+            "old "
+            "geometry file. Unless you know exactly what you are doing, "
+            "please "
+            "expect to see incomplete geometries or crashes.\n",
+            tableNameInp.c_str());
+        coutMutex.unlock();
+    }
+    else
+    {
+        out = getTableRecords_VecVecData(tableName);
+    }
+    return out;
+}
+std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::getTableFromTableName_VecData(
+    std::string tableNameInp)
+{
+    std::vector<std::variant<int, long, float, double, std::string>> out;
+    std::string tableName = tableNameInp;
+    if (tableName.empty())
+    {
+        std::mutex coutMutex;
+        coutMutex.lock();
+        printf(
+            "\t ===> WARNING! The geometry input file does not contain a "
+            "table "
+            "for the %s nodes. That means that you are probably using an "
+            "old "
+            "geometry file. Unless you know exactly what you are doing, "
+            "please "
+            "expect to see incomplete geometries or crashes.\n",
+            tableNameInp.c_str());
+        coutMutex.unlock();
+    }
+    else
+    {
+        out = getTableRecords_VecData(tableName);
+    }
+    return out;
+}
+
+std::vector<double> GMDBManager::getTableFromTableName_VectorDouble(std::string tableName)
+{
+    std::vector<std::variant<int, long, float, double, std::string>> inputRecords = getTableFromTableName_VecData(tableName);
+    std::vector<double> outRecords;
+    for (const auto &rec : inputRecords)
+    {
+        try
+        {
+            // std::cout << "variant data: " << GeoModelIO::CppHelper::to_string_with_precision(std::get<double>(rec)) << '\n';
+            outRecords.push_back(std::get<double>(rec));
+        }
+        catch (std::bad_variant_access const &ex)
+        {
+            std::cout << ex.what() << ": w contained int, not float\n";
+        }
+    }
+    return outRecords;
+}
+std::deque<double> GMDBManager::getTableFromTableName_DequeDouble(std::string tableName)
+{
+    std::vector<double> inputRecords = getTableFromTableName_VectorDouble(tableName);
+    // Initialize a deque from vector using range constructor
+    std::deque<double> outRecords(inputRecords.begin(), inputRecords.end());
+    return outRecords;
 }
 
 // TODO: simplify error reporting for SQLite

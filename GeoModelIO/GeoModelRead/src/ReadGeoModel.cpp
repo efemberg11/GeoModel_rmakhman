@@ -240,7 +240,7 @@ void ReadGeoModel::loadDB() {
     m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
     m_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
     m_elements = m_dbManager->getTableFromNodeType("GeoElement");
-    m_functions = m_dbManager->getTableFromNodeType("Function");
+    m_functions = m_dbManager->getTableFromNodeType_VecVecData("Function");
     m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
     m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
     m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
@@ -254,6 +254,9 @@ void ReadGeoModel::loadDB() {
     m_serialTransformers =
         m_dbManager->getTableFromNodeType("GeoSerialTransformer");
     m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
+    // get the Function's expression data
+    // m_funcExprData = m_dbManager->getTableFromTableNameVecVecData("FuncExprData");
+    m_funcExprData = m_dbManager->getTableFromTableName_DequeDouble("FuncExprData");
     // get the children table from DB
     m_allchildren = m_dbManager->getChildrenTable();
     // get the root volume data
@@ -3220,7 +3223,10 @@ TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int id) {
     }
      */
 
-    std::string expr = m_functions[id - 1][1];  // nodes' IDs start from 1
+    std::string expr = std::get<std::string>(m_functions[id - 1][1]);  // nodes' IDs start from 1
+    unsigned dataStart = std::get<int>(m_functions[id - 1][2]);
+    unsigned dataEnd = std::get<int>(m_functions[id - 1][3]);
+    std::cout << "expr:" << expr << " -- dataStart,End: " << dataStart << ", " << dataEnd << std::endl;
 
     if (0 == expr.size()) {
         muxCout.lock();
@@ -3230,8 +3236,12 @@ TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int id) {
         exit(EXIT_FAILURE);
     }
 
+    // get exprData, extract subvector
+    std::deque<double> sub_vector(m_funcExprData.begin() + dataStart,
+                           m_funcExprData.begin() + dataEnd);
+
     TransFunctionInterpreter interpreter;
-    TFPTR func = interpreter.interpret(expr);
+    TFPTR func = interpreter.interpret(expr, &sub_vector);
     TRANSFUNCTION tf =
         *(func.release());  // make func returns a pointer to the managed
                             // object and releases the ownership, then get

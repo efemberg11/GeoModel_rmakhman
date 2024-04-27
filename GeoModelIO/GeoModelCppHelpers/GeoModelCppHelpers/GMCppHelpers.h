@@ -1,11 +1,11 @@
 
-// Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+// Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 /*
- * This header file provides helper functions to write and read a GeoModel SQLite file. 
+ * This header file provides helper C++ functions used in GeoModel IO code. 
  *
  *  Author:     Riccardo Maria BIANCHI @ CERN
- *  Created on: Feb, 2023
+ *  Created on: Apr, 2024
  *
  */
 

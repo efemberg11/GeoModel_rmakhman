@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <variant>
 #include <vector>
+#include <deque>
 
 /**
  * \class GMDBManager
@@ -275,12 +276,26 @@ class GMDBManager {
 
     std::vector<std::vector<std::string>> getTableFromNodeType(
         std::string nodeType);
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableFromNodeType_VecVecData(
+        std::string nodeType);
+    
+    std::vector<std::variant<int, long, float, double, std::string>> getTableFromTableName_VecData(
+        std::string tableName);
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableFromTableName_VecVecData(
+        std::string tableName);
+    // specializations
+    std::vector<double> getTableFromTableName_VectorDouble(std::string tableName);
+    std::deque<double> getTableFromTableName_DequeDouble(std::string tableName);
 
     std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
     std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDs();
 
     std::vector<std::vector<std::string>> getTableRecords(
         std::string tableName) const;  // TODO: should be private?
+    std::vector<std::variant<int, long, float, double, std::string>> getTableRecords_VecData(
+        std::string tableName) const; // TODO: should be private?
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableRecords_VecVecData(
+        std::string tableName) const; // TODO: should be private?
 
     // Test if a given table exists
     // This requires the *full* table name (i.e. prefix_suffix)

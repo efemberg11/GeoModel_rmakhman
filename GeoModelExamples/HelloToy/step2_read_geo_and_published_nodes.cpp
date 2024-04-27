@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 
 
   /* build the GeoModel tree */
-  GeoPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+  const GeoVPhysVol* world = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
   std::cout << "ReadGeoModel::buildGeoModel() done." << std::endl;
 
   
@@ -115,15 +115,17 @@ int main(int argc, char *argv[])
   unsigned int nChil = world->getNChildVols();
   std:: cout << "world's number of children: " << nChil << std::endl;
 
+/*
   // loop over all children nodes
   std::cout << "Looping over all 'volume' children (i.e., GeoPhysVol and GeoFullPhysVol)..." << std::endl;
   for (unsigned int idx=0; idx<nChil; ++idx) {
-	  PVConstLink nodeLink = world->getChildVol(idx);
+	  // PVConstLink nodeLink = world->getChildVol(idx);
+	  const GeoVPhysVol* childVolV = world->getChildVol(idx);
 
-	  if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) ) {
+	  // if ( dynamic_cast<const GeoVPhysVol*>( &(*( nodeLink ))) ) {
 
 		  std::cout << "\t" << "the child n. " << idx << " ";
-		  const GeoVPhysVol *childVolV = &(*( nodeLink ));
+		  // const GeoVPhysVol *childVolV = &(*( nodeLink ));
 
 		  if ( dynamic_cast<const GeoPhysVol*>(childVolV) ) {
 			  const GeoPhysVol* childVol = dynamic_cast<const GeoPhysVol*>(childVolV);
@@ -136,8 +138,9 @@ int main(int argc, char *argv[])
 			  std::cout << " and it has  "<<childVol->getNChildVols()<<" child volumes" << std::endl;
               std::cout << "\txf:"; GeoUtilFunctions::printTrf(childVol->getAbsoluteTransform());
 		  }
-	  }
+	  // }
   }
+  */
 
   std::cout << "We now read back from the DB the lists of published FullPhysVol and AlignableTransform nodes...\n";
   
@@ -180,13 +183,13 @@ int main(int argc, char *argv[])
   std::cout << "['xf' is the output of 'getAbsoluteTransform()']\n";
   for ( auto const& [key, vol] : mapFPV ) 
   {
-      GeoTrf::Transform3D xf = vol->getAbsoluteTransform();
+      // GeoTrf::Transform3D xf = vol->getAbsoluteTransform(); // crashes
 
       if(0==ii) std::cout << "[key type (compiler's code): '" << typeid(key).name() << "']\n";
       std::cout << "\n\t--> key: " << key 
                 << " - GeoFullPhysVol*: " << vol 
                 << std::endl;
-      std::cout << "\txf:"; GeoUtilFunctions::printTrf(vol->getAbsoluteTransform());
+      // std::cout << "\txf:"; GeoUtilFunctions::printTrf(vol->getAbsoluteTransform()); // crashes
       ++ii;
   }
   

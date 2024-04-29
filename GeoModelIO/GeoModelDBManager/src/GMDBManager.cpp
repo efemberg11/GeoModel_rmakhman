@@ -743,6 +743,7 @@ bool GMDBManager::addListOfRecords(
 bool GMDBManager::addListOfRecordsToTable(
     const std::string tableName,
     const std::vector<std::vector<std::string>> records) {
+    
     // get table columns and format them for query
     std::string tableColString =
         "(" + GeoModelIO::CppHelper::joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
@@ -791,6 +792,7 @@ bool GMDBManager::addListOfRecordsToTable(
     const std::vector<
         std::vector<std::variant<int, long, float, double, std::string>>>
         records) {
+    if (records.size() > 0) {
     // get table columns and format them for query
     std::string tableColString =
         "(" + GeoModelIO::CppHelper::joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
@@ -798,7 +800,8 @@ bool GMDBManager::addListOfRecordsToTable(
 
     unsigned int nRecords = records.size();
     std::cout << "Info: number of " << tableName
-              << " records to dump into the DB:" << nRecords << std::endl;
+              << " records to dump into the DB: " << nRecords << std::endl;
+
 
     // preparing the SQL query
     std::string sql =
@@ -851,6 +854,8 @@ bool GMDBManager::addListOfRecordsToTable(
         return false;
     }
     return true;
+    } 
+    return false;
 }
 
 
@@ -860,6 +865,7 @@ bool GMDBManager::addRecordsToTable(
     const std::vector<std::variant<int, long, float, double, std::string>>
         records)
 {
+    if (records.size() > 0) {
     // get table columns and format them for query
     std::string tableColString =
         "(" + GeoModelIO::CppHelper::joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
@@ -867,8 +873,9 @@ bool GMDBManager::addRecordsToTable(
         std::cout << "tableColString:" << tableColString << std::endl;
 
     unsigned int nRecords = records.size();
+
     std::cout << "Info: number of " << tableName
-              << " records to dump into the DB:" << nRecords << std::endl;
+              << " records to dump into the DB: " << nRecords << std::endl;
 
     // preparing the SQL query
     std::string sql =
@@ -939,6 +946,8 @@ bool GMDBManager::addRecordsToTable(
         return false;
     }
     return true;
+    } 
+    return false;
 }
 
 
@@ -1540,8 +1549,7 @@ bool GMDBManager::createTables() {
     tab.clear();
 
 
-    // create a table to store information about the 'root' volume (also
-    // known as the 'world' volume)
+    // create a table to store the numeric data used in Functions
     tableName = "FuncExprData";
     tab.push_back(tableName);
     tab.push_back("id");
@@ -1550,6 +1558,20 @@ bool GMDBManager::createTables() {
     queryStr = fmt::format(
         "create table {0}({1} integer primary key, {2} real not null)",
         tab[0], tab[1], tab[2]);
+    rc = execQuery(queryStr);
+    tab.clear();
+    
+    // create a table to store the numeric data used in GeoPcon shapes
+    tableName = "Shapes_Pcon_Data";
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("ZPos");
+    tab.push_back("ZRmin");
+    tab.push_back("ZRmax");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real )",
+        tab[0], tab[1], tab[2], tab[3], tab[4]);
     rc = execQuery(queryStr);
     tab.clear();
 
@@ -1676,6 +1698,68 @@ bool GMDBManager::createTables() {
         "create table {0}({1} integer primary key, {2} varchar, {3} "
         "varchar)",
         tab[0], tab[1], tab[2], tab[3]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+
+    // Shapes-Box table
+    // ID, 'Box', XHalfLength, YHalfLength, ZHalfLength
+    geoNode = "GeoBox";
+    tableName = "Shapes_Box";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("XHalfLength");
+    tab.push_back("YHalfLength");
+    tab.push_back("ZHalfLength");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} varchar, {3} real, {4} real, {5} real "
+        "varchar)",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+    
+    // Shapes-Box table
+    // ID, 'Box', XHalfLength, YHalfLength, ZHalfLength
+    geoNode = "GeoTube";
+    tableName = "Shapes_Tube";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("RMin");
+    tab.push_back("RMax");
+    tab.push_back("ZHalfLength");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} varchar, {3} real, {4} real, {5} real "
+        "varchar)",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+    
+    // Shapes-Box table
+    // ID, 'Box', XHalfLength, YHalfLength, ZHalfLength
+    geoNode = "GeoPcon";
+    tableName = "Shapes_Pcon";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("SPhi");
+    tab.push_back("DPhi");
+    tab.push_back("NZPlanes");
+    tab.push_back("dataStart");
+    tab.push_back("dataEnd");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} varchar, {3} real, {4} real, {5} integer, {6} integer, {7} integer "
+        "varchar)",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
     }

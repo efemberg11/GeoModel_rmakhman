@@ -178,6 +178,8 @@ class WriteGeoModel : public GeoNodeAction {
                           const double &elA);
     unsigned int storeObj(const GeoShape *pointer, const std::string &type,
                           const std::string &parameters);
+    unsigned int storeObj(const GeoShape *pointer, const std::string &type,
+                          const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
     unsigned int storeObj(const GeoLogVol *pointer, const std::string &name,
                           const unsigned int &shapeId,
                           const unsigned int &materialId);
@@ -230,6 +232,10 @@ class WriteGeoModel : public GeoNodeAction {
                                       const unsigned int &copies);
     unsigned int addShape(const std::string &type,
                           const std::string &parameters);
+    unsigned int addShape(const std::string &type,
+                          const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
+    std::vector<unsigned> addShapeData(const std::string type,
+                                       const std::vector<std::variant<int, long, float, double, std::string>> &shapeData);
     unsigned int addSerialDenominator(const std::string &baseName);
     unsigned int addSerialIdentifier(const int &baseId);
     unsigned int addIdentifierTag(const int &identifier);
@@ -294,6 +300,9 @@ class WriteGeoModel : public GeoNodeAction {
                                // moved to an Utility class, so we can use it
                                // from TransFunctionRecorder as well.
     std::string getShapeParameters(const GeoShape *);
+    std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
+              std::vector<std::variant<int, long, float, double, std::string>>>
+    getShapeParametersV(const GeoShape *, const bool data = false);
 
     std::string getGeoTypeFromVPhysVol(const GeoVPhysVol *vol);
 
@@ -342,6 +351,10 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<std::vector<std::string>> m_serialTransformers;
     std::vector<std::vector<std::string>> m_nameTags;
     std::vector<std::vector<std::string>> m_shapes;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Box;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Tube;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon_Data;
 
     // std::vector<std::vector<std::string>> m_functions;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_functions; // operators used in Function's expression

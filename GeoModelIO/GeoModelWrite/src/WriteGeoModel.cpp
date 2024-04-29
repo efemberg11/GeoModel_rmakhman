@@ -699,11 +699,43 @@ unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType == "CustomShape") shapeType = "UnidentifiedShape";
 
-    // get shape parameters
-    std::string shapePars = getShapeParameters(shape);
+    const std::set<std::string> shapesNewDB{"Box", "Tube"};
 
+    // get shape parameters
+    if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
+    {
+        std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
+                  std::vector<std::variant<int, long, float, double, std::string>>>
+            shapePair = getShapeParametersV(shape);
+        
+        std::vector<std::variant<int, long, float, double, std::string>> shapePars = shapePair.first;
+        std::vector<std::variant<int, long, float, double, std::string>> shapeData = shapePair.second;
+
+        if (shapeData.size() > 0)
+        {
+            // Store the Function's numbers
+            std::vector<unsigned> dataRows = addShapeData(shapeType, shapeData);
+            unsigned dataStart = dataRows[0];
+            unsigned dataEnd = dataRows[1];
+            shapePars.push_back(dataStart);
+            shapePars.push_back(dataEnd);
+        }
+        // DEBUG MSGS
+        // std::cout << "shape: " << shapeType << std::endl;
+        // GeoModelIO::CppHelper::printStdVectorVariants(shapePars);
+        // std::cout << std::endl;
+
+        // store the shape in the DB and returns the ID
+        return storeObj(shape, shapeType, shapePars);
+
+    }
+    else
+    {
+        std::string shapePars = getShapeParameters(shape);
     // store the shape in the DB and returns the ID
     return storeObj(shape, shapeType, shapePars);
+    }
+    return 1; // we should not be here
 }
 
 //______________________________________________________________________
@@ -926,22 +958,73 @@ void WriteGeoModel::handleReferencedVPhysVol(const GeoVPhysVol* vol) {
 }
 
 // Get shape parameters
+std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
+          std::vector<std::variant<int, long, float, double, std::string>>>
+WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
+{
+    const std::string shapeType = shape->type();
+
+    std::vector<std::variant<int, long, float, double, std::string>> shapePars;
+    std::vector<std::variant<int, long, float, double, std::string>> shapeData;
+    std::pair<std::vector<std::variant<int, long, float, double, std::string>>, std::vector<std::variant<int, long, float, double, std::string>>> shapePair;
+
+    if ("Box" == shapeType)
+    {
+        const GeoBox *box = dynamic_cast<const GeoBox *>(shape);
+        shapePars.push_back(box->getXHalfLength());
+        shapePars.push_back(box->getYHalfLength());
+        shapePars.push_back(box->getZHalfLength());
+    }
+    else if ("Tube" == shapeType)
+    {
+        const GeoTube *tube = dynamic_cast<const GeoTube *>(shape);
+        shapePars.push_back(tube->getRMin());
+        shapePars.push_back(tube->getRMax());
+        shapePars.push_back(tube->getZHalfLength());
+    }
+    else if (shapeType == "Pcon")
+    {
+        const GeoPcon* shapeIn = dynamic_cast<const GeoPcon*>(shape);
+        shapePars.push_back(shapeIn->getSPhi());
+        shapePars.push_back(shapeIn->getDPhi());
+        // get number of Z planes and loop over them
+        const int nZplanes = shapeIn->getNPlanes();
+        shapePars.push_back(nZplanes); 
+        for (int i = 0; i < nZplanes; ++i) {
+            shapeData.push_back(shapeIn->getZPlane(i));
+            shapeData.push_back(shapeIn->getRMinPlane(i));
+            shapeData.push_back(shapeIn->getRMaxPlane(i));
+        }
+    }
+    else
+    {
+        std::cout << "\n\tGeoModelWrite -- WARNING!!! - Shape '" << shapeType
+                  << "' is not supported in the new DB format, yet.\n\n";
+        // CppHelper::printStdVectorStrings(m_objectsNotPersistified);
+    }
+
+    shapePair.first = shapePars;
+    shapePair.second = shapeData;
+    return shapePair;
+}
+// Get shape parameters
 std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     const std::string shapeType = shape->type();
 
     std::string shapePars = "";
     std::vector<std::string> pars;
 
-    if (shapeType == "Box") {
-        const GeoBox* box = dynamic_cast<const GeoBox*>(shape);
-        pars.push_back("XHalfLength=" +
-                       CppHelper::to_string_with_precision(box->getXHalfLength()));
-        pars.push_back("YHalfLength=" +
-                       CppHelper::to_string_with_precision(box->getYHalfLength()));
-        pars.push_back("ZHalfLength=" +
-                       CppHelper::to_string_with_precision(box->getZHalfLength()));
-        shapePars = joinVectorStrings(pars, ";");
-    } else if (shapeType == "Cons") {
+    if (false) {}
+    // if (shapeType == "Box") {
+    //     const GeoBox* box = dynamic_cast<const GeoBox*>(shape);
+    //     pars.push_back("XHalfLength=" +
+    //                    CppHelper::to_string_with_precision(box->getXHalfLength()));
+    //     pars.push_back("YHalfLength=" +
+    //                    CppHelper::to_string_with_precision(box->getYHalfLength()));
+    //     pars.push_back("ZHalfLength=" +
+    //                    CppHelper::to_string_with_precision(box->getZHalfLength()));
+    // } 
+    else if (shapeType == "Cons") {
         const GeoCons* shapeIn = dynamic_cast<const GeoCons*>(shape);
         pars.push_back("RMin1=" +
                        CppHelper::to_string_with_precision(shapeIn->getRMin1()));
@@ -982,22 +1065,24 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
         pars.push_back("Theta=" +
                        CppHelper::to_string_with_precision(shapeIn->getTheta()));
         pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
-    } else if (shapeType == "Pcon") {
-        const GeoPcon* shapeIn = dynamic_cast<const GeoPcon*>(shape);
-        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
-        // get number of Z planes and loop over them
-        const int nZplanes = shapeIn->getNPlanes();
-        pars.push_back("NZPlanes=" + std::to_string(nZplanes));  // INT
-        for (int i = 0; i < nZplanes; ++i) {
-            pars.push_back("ZPos=" +
-                           CppHelper::to_string_with_precision(shapeIn->getZPlane(i)));
-            pars.push_back("ZRmin=" +
-                           CppHelper::to_string_with_precision(shapeIn->getRMinPlane(i)));
-            pars.push_back("ZRmax=" +
-                           CppHelper::to_string_with_precision(shapeIn->getRMaxPlane(i)));
-        }
-    } else if (shapeType == "Pgon") {
+    } 
+    // else if (shapeType == "Pcon") {
+    //     const GeoPcon* shapeIn = dynamic_cast<const GeoPcon*>(shape);
+    //     pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+    //     pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
+    //     // get number of Z planes and loop over them
+    //     const int nZplanes = shapeIn->getNPlanes();
+    //     pars.push_back("NZPlanes=" + std::to_string(nZplanes));  // INT
+    //     for (int i = 0; i < nZplanes; ++i) {
+    //         pars.push_back("ZPos=" +
+    //                        CppHelper::to_string_with_precision(shapeIn->getZPlane(i)));
+    //         pars.push_back("ZRmin=" +
+    //                        CppHelper::to_string_with_precision(shapeIn->getRMinPlane(i)));
+    //         pars.push_back("ZRmax=" +
+    //                        CppHelper::to_string_with_precision(shapeIn->getRMaxPlane(i)));
+    //     }
+    // } 
+    else if (shapeType == "Pgon") {
         const GeoPgon* shapeIn = dynamic_cast<const GeoPgon*>(shape);
         pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
         pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
@@ -1335,13 +1420,27 @@ unsigned int WriteGeoModel::storeObj(const GeoElement* pointer,
 }
 
 unsigned int WriteGeoModel::storeObj(const GeoShape* pointer,
-                                     const std::string& name,
+                                     const std::string& shapeName,
                                      const std::string& parameters) {
     std::string address = getAddressStringFromPointer(pointer);
 
     unsigned int shapeId;
     if (!isAddressStored(address)) {
-        shapeId = addShape(name, parameters);
+        shapeId = addShape(shapeName, parameters);
+        storeAddress(address, shapeId);
+    } else {
+        shapeId = getStoredIdFromAddress(address);
+    }
+    return shapeId;
+}
+unsigned int WriteGeoModel::storeObj(const GeoShape* pointer,
+                                     const std::string& shapeName,
+                                     const std::vector<std::variant<int, long, float, double, std::string>>& parameters) {
+    std::string address = getAddressStringFromPointer(pointer);
+
+    unsigned int shapeId;
+    if (!isAddressStored(address)) {
+        shapeId = addShape(shapeName, parameters);
         storeAddress(address, shapeId);
     } else {
         shapeId = getStoredIdFromAddress(address);
@@ -1648,6 +1747,29 @@ std::vector<unsigned> WriteGeoModel::addExprData(
     dataRows.push_back(dataEnd);
     return dataRows;
 }
+
+std::vector<unsigned> WriteGeoModel::addShapeData(const std::string type,
+    const std::vector<std::variant<int, long, float, double, std::string>>& shapeData) 
+{
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container = nullptr;
+
+    if ("Pcon" == type) {
+        container = &m_shapes_Pcon_Data;
+    }
+
+    const unsigned dataStart = container->size();
+    
+    unsigned dataEnd = addRecord(container, shapeData);
+    // ^ index of pushed element = size after pushing, to
+    // match ID starting at 1 in the DB
+
+    std::vector<unsigned> dataRows;
+    dataRows.push_back(dataStart);
+    dataRows.push_back(dataEnd);
+    return dataRows;
+}
+
+
 
 unsigned int WriteGeoModel::addMaterial(const std::string& name,
                                         const double& density,
@@ -2038,6 +2160,31 @@ unsigned int WriteGeoModel::addShape(const std::string& type,
     values.push_back(parameters);
     return addRecord(container, values);
 }
+unsigned int WriteGeoModel::addShape(const std::string &type,
+                                     const std::vector<std::variant<int, long, float, double, std::string>> &parameters)
+{
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container = nullptr;
+    if ("Box" == type)
+    {
+        container = &m_shapes_Box;
+    }
+    else if ("Tube" == type)
+    {
+        container = &m_shapes_Tube;
+    }
+    else if ("Pcon" == type)
+    {
+        container = &m_shapes_Pcon;
+    }
+    else
+    {
+        std::cout << "ERROR! Shape type '" << type
+                  << "' still needs to be ported to the new DB schema. Ask to 'geomodel-developers@cern.ch."
+                  << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    return addRecord(container, parameters);
+}
 
 unsigned int WriteGeoModel::addPhysVol(const unsigned int& logVolId,
                                        const unsigned int& /*parentPhysVolId*/,
@@ -2130,7 +2277,6 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecords("GeoTransform", m_transforms);
     m_dbManager->addListOfRecords("Function", m_functions);
     m_dbManager->addListOfRecords("GeoSerialTransformer", m_serialTransformers);
-    m_dbManager->addListOfRecords("GeoShape", m_shapes);
     m_dbManager->addListOfRecords("GeoSerialDenominator", m_serialDenominators);
     m_dbManager->addListOfRecords("GeoSerialIdentifier", m_serialIdentifiers);
     m_dbManager->addListOfRecords("GeoIdentifierTag", m_identifierTags);
@@ -2139,6 +2285,16 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecords("GeoLogVol", m_logVols);
     
     m_dbManager->addRecordsToTable("FuncExprData", m_exprData);
+
+    m_dbManager->addListOfRecords("GeoShape", m_shapes); // old version, with shape's parameters as trings
+    m_dbManager->addListOfRecords("GeoBox", m_shapes_Box); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoTube", m_shapes_Tube); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoPcon", m_shapes_Pcon); // new version, with shape's parameters as numbers
+    
+    // store shapes' data // TODO: maybe this should be encapsulated with shapes? 
+    // To do this, I moved addListOfRecordsToTable() from private to public, maybe I could add a method to store shapes with data and put back that into private
+    
+    m_dbManager->addListOfRecordsToTable("Shapes_Pcon_Data", m_shapes_Pcon_Data); // new version, with shape's parameters as numbers
 
     m_dbManager->addListOfChildrenPositions(m_childrenPositions);
     m_dbManager->addRootVolume(m_rootVolume);

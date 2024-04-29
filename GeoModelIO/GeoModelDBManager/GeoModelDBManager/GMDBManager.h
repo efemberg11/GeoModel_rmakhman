@@ -326,6 +326,18 @@ class GMDBManager {
     // tableColTypes, const std::vector<std::vector<std::string>> &records ); //
     // not used anymore!!
 
+    bool addListOfRecordsToTable(
+        const std::string tableName,
+        const std::vector<std::vector<std::string>> records);
+    bool addListOfRecordsToTable(
+        const std::string tableName,
+        const std::vector<
+            std::vector<std::variant<int, long, float, double, std::string>>>
+            records);
+    //  bool addListOfRecordsToTableOld(const QString tableName, const
+    //  std::vector<QStringList> records); // for the old SQlite only
+
+
    private:
     /**
      * @brief Create all the default DB tables.
@@ -340,17 +352,6 @@ class GMDBManager {
     bool createTableCustomPublishedNodes(const std::string tableName,
                                          const std::string nodeType,
                                          const std::type_info *keyType);
-
-    bool addListOfRecordsToTable(
-        const std::string tableName,
-        const std::vector<std::vector<std::string>> records);
-    bool addListOfRecordsToTable(
-        const std::string tableName,
-        const std::vector<
-            std::vector<std::variant<int, long, float, double, std::string>>>
-            records);
-    //  bool addListOfRecordsToTableOld(const QString tableName, const
-    //  std::vector<QStringList> records); // for the old SQlite only
 
     void addDBversion(std::string version);
 

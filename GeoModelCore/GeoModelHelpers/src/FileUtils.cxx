@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <iostream>
 #include <functional>
+#include <algorithm>
 using namespace GeoStrUtils;
 
 namespace GeoFileUtils {

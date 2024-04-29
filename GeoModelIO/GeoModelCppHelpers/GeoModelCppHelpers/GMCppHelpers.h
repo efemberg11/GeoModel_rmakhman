@@ -73,6 +73,26 @@ namespace GeoModelIO {
             char *val = std::getenv(key.c_str());
             return val == NULL ? std::string("") : std::string(val);
         }
+
+        static void printStdVectorVariants(const std::vector<std::variant<int, long, float, double, std::string>> vec)
+        {
+            for (const auto &item : vec)
+            {
+                if (std::holds_alternative<int>(item))
+                    std::cout << std::get<int>(item); // INT
+                else if (std::holds_alternative<long>(item))
+                    std::cout << std::get<long>(item);
+                else if (std::holds_alternative<float>(item))
+                    std::cout << std::get<float>(item);
+                else if (std::holds_alternative<double>(item))
+                    std::cout << std::get<double>(item);
+                else if (std::holds_alternative<std::string>(item))
+                    std::cout << std::get<std::string>(item);
+
+                std::cout << ", ";
+            }
+                std::cout << std::endl;
+        }
     };
 } // namespace GeoModelIO
 

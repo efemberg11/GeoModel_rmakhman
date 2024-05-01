@@ -217,6 +217,10 @@ class WriteGeoModel : public GeoNodeAction {
                            const std::vector<std::string> values) const;
     unsigned int addRecord(std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container,
                            const std::vector<std::variant<int, long, float, double, std::string>> values) const;
+    
+    std::pair<unsigned, unsigned> addRecordData(
+        std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container,
+        const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> values) const;
 
     unsigned int addMaterial(const std::string &name, const double &density,
                              const std::string &elements);
@@ -234,8 +238,8 @@ class WriteGeoModel : public GeoNodeAction {
                           const std::string &parameters);
     unsigned int addShape(const std::string &type,
                           const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
-    std::vector<unsigned> addShapeData(const std::string type,
-                                       const std::vector<std::variant<int, long, float, double, std::string>> &shapeData);
+    std::pair<unsigned, unsigned> addShapeData(const std::string type,
+                                       const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> &shapeData);
     unsigned int addSerialDenominator(const std::string &baseName);
     unsigned int addSerialIdentifier(const int &baseId);
     unsigned int addIdentifierTag(const int &identifier);
@@ -301,7 +305,7 @@ class WriteGeoModel : public GeoNodeAction {
                                // from TransFunctionRecorder as well.
     std::string getShapeParameters(const GeoShape *);
     std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
-              std::vector<std::variant<int, long, float, double, std::string>>>
+              std::vector<std::vector<std::variant<int, long, float, double, std::string>>>>
     getShapeParametersV(const GeoShape *, const bool data = false);
 
     std::string getGeoTypeFromVPhysVol(const GeoVPhysVol *vol);

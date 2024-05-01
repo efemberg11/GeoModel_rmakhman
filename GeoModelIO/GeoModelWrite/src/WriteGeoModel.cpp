@@ -699,24 +699,24 @@ unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType == "CustomShape") shapeType = "UnidentifiedShape";
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube"};
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon"};
 
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
     {
         std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
-                  std::vector<std::variant<int, long, float, double, std::string>>>
+                  std::vector<std::vector<std::variant<int, long, float, double, std::string>>>>
             shapePair = getShapeParametersV(shape);
         
         std::vector<std::variant<int, long, float, double, std::string>> shapePars = shapePair.first;
-        std::vector<std::variant<int, long, float, double, std::string>> shapeData = shapePair.second;
+        std::vector<std::vector<std::variant<int, long, float, double, std::string>>> shapeData = shapePair.second;
 
         if (shapeData.size() > 0)
         {
             // Store the Function's numbers
-            std::vector<unsigned> dataRows = addShapeData(shapeType, shapeData);
-            unsigned dataStart = dataRows[0];
-            unsigned dataEnd = dataRows[1];
+            std::pair<unsigned, unsigned> dataRows = addShapeData(shapeType, shapeData);
+            unsigned dataStart = dataRows.first;
+            unsigned dataEnd = dataRows.second;
             shapePars.push_back(dataStart);
             shapePars.push_back(dataEnd);
         }
@@ -731,11 +731,14 @@ unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
     }
     else
     {
+        std::cout << "WARNING! The shape '" << shapeType
+                  << "' has not been ported to the new DB schema yet, so the old schema will be used to dump it."
+                  << std::endl;
         std::string shapePars = getShapeParameters(shape);
-    // store the shape in the DB and returns the ID
-    return storeObj(shape, shapeType, shapePars);
+        // store the shape in the DB and returns the ID
+        return storeObj(shape, shapeType, shapePars);
     }
-    return 1; // we should not be here
+    return 1; // you should not get here
 }
 
 //______________________________________________________________________
@@ -959,14 +962,20 @@ void WriteGeoModel::handleReferencedVPhysVol(const GeoVPhysVol* vol) {
 
 // Get shape parameters
 std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
-          std::vector<std::variant<int, long, float, double, std::string>>>
+          std::vector<std::vector<std::variant<int, long, float, double, std::string>>>>
 WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
 {
     const std::string shapeType = shape->type();
 
     std::vector<std::variant<int, long, float, double, std::string>> shapePars;
-    std::vector<std::variant<int, long, float, double, std::string>> shapeData;
-    std::pair<std::vector<std::variant<int, long, float, double, std::string>>, std::vector<std::variant<int, long, float, double, std::string>>> shapePair;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> shapeData;
+    std::pair<std::vector<std::variant<int, long, float, double, std::string>>, std::vector<std::vector<std::variant<int, long, float, double, std::string>>>> shapePair;
+    std::vector<std::variant<int, long, float, double, std::string>> dataRow;
+    // init the 'computedVolume' column with a dummy value: '-1'
+    // the real value will be added later, when the DB will be passed throug
+    // the tool to compute the volume for the shapes and store them
+    double computedVolumeDummy = -1;
+    shapePars.push_back(computedVolumeDummy);
 
     if ("Box" == shapeType)
     {
@@ -989,11 +998,14 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
         shapePars.push_back(shapeIn->getDPhi());
         // get number of Z planes and loop over them
         const int nZplanes = shapeIn->getNPlanes();
-        shapePars.push_back(nZplanes); 
+        shapePars.push_back(nZplanes);
+        std::cout << "get Zplanes parameters:" << std::endl;
         for (int i = 0; i < nZplanes; ++i) {
-            shapeData.push_back(shapeIn->getZPlane(i));
-            shapeData.push_back(shapeIn->getRMinPlane(i));
-            shapeData.push_back(shapeIn->getRMaxPlane(i));
+            dataRow.push_back(shapeIn->getZPlane(i));
+            dataRow.push_back(shapeIn->getRMinPlane(i));
+            dataRow.push_back(shapeIn->getRMaxPlane(i));
+            shapeData.push_back(dataRow);
+            dataRow.clear();
         }
     }
     else
@@ -1172,13 +1184,15 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
                        CppHelper::to_string_with_precision(shapeIn->getYHalfLength2()));
         pars.push_back("ZHalfLength=" +
                        CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
-    } else if (shapeType == "Tube") {
-        const GeoTube* tube = dynamic_cast<const GeoTube*>(shape);
-        pars.push_back("RMin=" + CppHelper::to_string_with_precision(tube->getRMin()));
-        pars.push_back("RMax=" + CppHelper::to_string_with_precision(tube->getRMax()));
-        pars.push_back("ZHalfLength=" +
-                       CppHelper::to_string_with_precision(tube->getZHalfLength()));
-    } else if (shapeType == "Tubs") {
+    } 
+    // else if (shapeType == "Tube") {
+    //     const GeoTube* tube = dynamic_cast<const GeoTube*>(shape);
+    //     pars.push_back("RMin=" + CppHelper::to_string_with_precision(tube->getRMin()));
+    //     pars.push_back("RMax=" + CppHelper::to_string_with_precision(tube->getRMax()));
+    //     pars.push_back("ZHalfLength=" +
+    //                    CppHelper::to_string_with_precision(tube->getZHalfLength()));
+    // } 
+    else if (shapeType == "Tubs") {
         const GeoTubs* shapeIn = dynamic_cast<const GeoTubs*>(shape);
         pars.push_back("RMin=" + CppHelper::to_string_with_precision(shapeIn->getRMin()));
         pars.push_back("RMax=" + CppHelper::to_string_with_precision(shapeIn->getRMax()));
@@ -1728,12 +1742,33 @@ unsigned int WriteGeoModel::addRecord(
     return idx;
 }
 
+std::pair<unsigned, unsigned> WriteGeoModel::addRecordData(
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container,
+    const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> values) const
+{
+    const unsigned dataStart = container->size() + 1;
+    // Note: ^ we add +1 because start filling the table 
+    // from a new row with respect to what we currently have
+
+    for (const auto &val : values)
+    {
+        container->push_back(val);
+    }
+    unsigned dataEnd =
+        container->size(); // index of pushed element = size after pushing, to
+                           // match ID starting at 1 in the DB
+    std::pair<unsigned, unsigned> ret{dataStart, dataEnd};
+    return ret;
+}
 
 std::vector<unsigned> WriteGeoModel::addExprData(
     const std::deque<double>& exprData) 
 {
     std::vector<std::variant<int, long, float, double, std::string>> *container = &m_exprData;
-    const unsigned dataStart = container->size();
+    const unsigned dataStart = container->size() + 1; 
+    // Note: ^ we add +1 because start filling the table 
+    // from a new row with respect to what we currently have
+    
     for (const auto& num : exprData) {
         // std::cout << "num: " << GeoModelIO::CppHelper::to_string_with_precision(num) << std::endl; // DEBUG MSG
         container->push_back(num);
@@ -1748,25 +1783,17 @@ std::vector<unsigned> WriteGeoModel::addExprData(
     return dataRows;
 }
 
-std::vector<unsigned> WriteGeoModel::addShapeData(const std::string type,
-    const std::vector<std::variant<int, long, float, double, std::string>>& shapeData) 
+std::pair<unsigned, unsigned> WriteGeoModel::addShapeData(const std::string type,
+    const std::vector<std::vector<std::variant<int, long, float, double, std::string>>>& shapeData) 
 {
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container = nullptr;
 
     if ("Pcon" == type) {
         container = &m_shapes_Pcon_Data;
     }
-
-    const unsigned dataStart = container->size();
     
-    unsigned dataEnd = addRecord(container, shapeData);
-    // ^ index of pushed element = size after pushing, to
-    // match ID starting at 1 in the DB
-
-    std::vector<unsigned> dataRows;
-    dataRows.push_back(dataStart);
-    dataRows.push_back(dataEnd);
-    return dataRows;
+    std::pair<unsigned, unsigned> dataPair = addRecordData(container, shapeData);
+    return dataPair;
 }
 
 

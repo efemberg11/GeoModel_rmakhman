@@ -1710,12 +1710,13 @@ bool GMDBManager::createTables() {
     m_childType_tableName[geoNode] = tableName;
     tab.push_back(tableName);
     tab.push_back("id");
+    tab.push_back("computedVolume");
     tab.push_back("XHalfLength");
     tab.push_back("YHalfLength");
     tab.push_back("ZHalfLength");
     storeTableColumnNames(tab);
     queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} varchar, {3} real, {4} real, {5} real "
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real "
         "varchar)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1730,12 +1731,13 @@ bool GMDBManager::createTables() {
     m_childType_tableName[geoNode] = tableName;
     tab.push_back(tableName);
     tab.push_back("id");
+    tab.push_back("computedVolume");
     tab.push_back("RMin");
     tab.push_back("RMax");
     tab.push_back("ZHalfLength");
     storeTableColumnNames(tab);
     queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} varchar, {3} real, {4} real, {5} real "
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real "
         "varchar)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1750,6 +1752,7 @@ bool GMDBManager::createTables() {
     m_childType_tableName[geoNode] = tableName;
     tab.push_back(tableName);
     tab.push_back("id");
+    tab.push_back("computedVolume");
     tab.push_back("SPhi");
     tab.push_back("DPhi");
     tab.push_back("NZPlanes");
@@ -1757,7 +1760,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dataEnd");
     storeTableColumnNames(tab);
     queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} varchar, {3} real, {4} real, {5} integer, {6} integer, {7} integer "
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} integer, {6} integer, {7} integer "
         "varchar)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7]);
     if (0 == (rc = execQuery(queryStr))) {

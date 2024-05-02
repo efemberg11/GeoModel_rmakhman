@@ -1,11 +1,55 @@
-# How to build FullSimLight
+# How to build FullSimLight and FSL
 
 # Prerequisites
-FullSimLight depends on Geant4, Xerces-C and HDF5. Additionally, the user might want to install [Pythia8] (http://home.thep.lu.se/Pythia/ ) and [HepMC3](https://gitlab.cern.ch/hepmc/HepMC3) as optional dependencies.
+FullSimLight depends on Geant4, Xerces-C and HDF5. Additionally, the user might want to install [Pythia8] (http://home.thep.lu.se/Pythia/) and [HepMC3](https://gitlab.cern.ch/hepmc/HepMC3) as optional dependencies.
+
+## Geant4
+There is no specific requirement for the version of Geant4 to use with FullSimLight. Our team try to keep FullSimLight compatible with the most recent Geant4 versions. If you have any issues with a specific Geant4 version please open a ticket at the following [link](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues). 
+
+Before installing Geant4, check at the Geant4 website the pre-requisites needed [here](http://geant4-userdoc.web.cern.ch/geant4-userdoc/UsersGuides/InstallationGuide/html/gettingstarted.html)
+An installation of Geant4 including the GDML extension (which requires the XercesC version >=3 package installed in the system) is required, i.e. the Geant4 toolkit must be built with the -DGEANT4_USE_GDML=ON CMake option.
+
+###Xerces-C installation
+Please choose the Xerces-C installation that is required by the Geant4 version that you are installing. As an example here we show how to install xerces-c 3.2.2.
+
+```bash
+wget https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.2.tar.gz
+tar -xf xerces-c-3.2.2.tar.gz
+cd xerces-c-3.2.2 ; mkdir build  ; cd build
+cmake -DCMAKE_INSTALL_PREFIX=../../install ../
+make -j8 ; make install
+```
+
+Now that you have installed xerces-c, clone the [Geant4 repository](https://gitlab.cern.ch/geant4/geant4.git), then:
+
+```bash
+git clone https://gitlab.cern.ch/geant4/geant4.git
+cd geant4
+git tag
+```
+Choose the release you want to use, i.e. Geant4-11.2.1, and checkout the corresponding tag:
+```bash
+git checkout tags/v11.2.1
+mkdir build ; cd build
+cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_BUILD_TYPE=Release ../  -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DGEANT4_BUILD_MULTITHREADED=ON
+make -j8 ; make install
+```
+We suggest to build Geant4 with the multithreading support on, so that you can take advantage it and run your simulation in multithreaded mode.
+
+Before running ./fullSimLight and all the tools that depend on Geant4 make sure to source the geant4.sh file to set correctly all the Geant4 environment variables.
+
+##Pythia installation
+If you wish to run FullSimLight with Pythia events you will need to install Pythia in your system. Follow the instructions at the [official website](http://home.thep.lu.se/Pythia/) for that. 
+In order to build FullSimLight and FSL with Pythia you should then use the following flag: `-DGEOMODEL_USE_PYTHIA=ON` (see the following section for more details).
+
+##HepMC3 installation
+If you wish to run FullSimLight with HepMC3 events you will need to install HepMC3 in your system. Follow the instructions at the [official repository](https://gitlab.cern.ch/hepmc/HepMC3) for that. 
+In order to build FullSimLight and FSL with HepMC3 you should then use the following flag: `-DGEOMODEL_USE_HEPCM3=ON`(see the following section for more details).
+
 
 # Standard build
 
-FullSimLight can be built as part of the GeoModel build, by enabling the related configuration flag `GEOMODEL_BUILD_FULLSIMLIGHT`:
+FullSimLight can be built as part of the GeoModel build, by enabling the related configuration flag `GEOMODEL_BUILD_FULLSIMLIGHT`. 
 
 ```bash
 cmake -DGEOMODEL_BUILD_FULLSIMLIGHT=1 ../GeoModel
@@ -17,11 +61,12 @@ That will compile the base GeoModel packages (*i.e.*, `GeoModelCore`, `GeoModelI
 
 This will install all the base libraries and the `fullSimLight` executable in the standard installation path (*e.g.*, `/usr/local` on macOS). If you want to have a local installation, see below.
 
+
 # Local installation
 
 You can install FullSimLight in a local folder as well. This let you remove everything by simply deleting the local folder, and lets you have multiple versions of the packages installed.
 
-You can install iFullSimLight locally by using the `CMAKE_INSTALL_PREFIX` option. In the example below, we instruct CMake to install everything inside a local folder named `install` besides the `build` folder where we are launching CMake from:
+You can install FullSimLight locally by using the `CMAKE_INSTALL_PREFIX` option. In the example below, we instruct CMake to install everything inside a local folder named `install` besides the `build` folder where we are launching CMake from:
 
 ```bash
 cmake -DGEOMODEL_BUILD_FULLSIMLIGHT=1 -DCMAKE_INSTALL_PREFIX=../install ../GeoModel
@@ -33,6 +78,48 @@ At the end, you will find all the libraries and executables installed in:
 
 ```bash
 ls ../install
+```
+
+# Build FSL
+
+FSL is the graphical user interface to FullSimLight. It allows you to configure your simulation and run it by using a json configuration file. Similarly to what said above, if you want to build FSL, you will have to enable the related configuration flag `GEOMODEL_BUILD_FSL`. If you enable the build of FSL automatically also FullSimLight will be built. 
+
+```bash
+cmake -DGEOMODEL_BUILD_FSL=1 ../GeoModel
+make -j
+make install
+```
+
+## How to build FullSimLight and FSL with Pythia
+In order to build FullSimLight and FSL with Pythia you will need to activate the appropriate flag:
+```bash
+cmake -DGEOMODEL_BUILD_FULLSIMLIGHT=1 -DGEOMODEL_USE_PYTHIA=ON -DCMAKE_INSTALL_PREFIX=../install ../GeoModel
+make -j
+make install
+```
+
+If you installed Pythia in a local folder, CMake might not be able to find it. In this case you should specify manually the path to the include directory and to the library. 
+
+```bash
+cmake -DGEOMODEL_BUILD_FULLSIMLIGHT=1 -DGEOMODEL_USE_PYTHIA=ON - DPythia_INCLUDE_DIR=<path_to_your_Pythia_install_dir>/include -DPythia_LIBRARY=<path_to_your_Pythia_install_dir>/lib/<library name, i.e. libPythia.so/dylib> -DCMAKE_INSTALL_PREFIX=../install ../GeoModel
+make -j
+make install
+```
+
+## How to build FullSimLight and FSL with HepMC3
+In order to build FullSimLight and FSL with HepMC3 you will need to activate the appropriate flag:
+```bash
+cmake -DGEOMODEL_BUILD_FULLSIMLIGHT=1 -DGEOMODEL_USE_HEPMC3 =ON -DCMAKE_INSTALL_PREFIX=../install ../GeoModel
+make -j
+make install
+```
+
+If you installed HepMC3 in a local folder, CMake might not be able to find it. In this case you should specify manually the path to the include directory and to the library. 
+
+```bash
+cmake -DGEOMODEL_BUILD_FULLSIMLIGHT=1 -DGEOMODEL_USE_HEPMC3=ON  -DHEPMC3_LIB=<path_to_your_HepMC3_install_dir>/lib/<library name, i.e. libHepMC3.so/dylib> -DCMAKE_INSTALL_PREFIX=../install ../GeoModel
+make -j
+make install
 ```
 
 ## How to use a custom version of Xerces-C

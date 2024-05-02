@@ -33,7 +33,8 @@ FSLEventAction::FSLEventAction() : G4UserEventAction(), fIsSpecialScoring(false)
 FSLEventAction::~FSLEventAction() { }
 
 
-void FSLEventAction::BeginOfEventAction(const G4Event*) {
+void FSLEventAction::BeginOfEventAction(const G4Event* evt) {
+  G4cout<<"FullSimLight, processing event: "<<evt->GetEventID()<<G4endl;
   fEventData.Clear();
   if (fIsSpecialScoring) {
     fEventDataSpecialRegion.Clear();

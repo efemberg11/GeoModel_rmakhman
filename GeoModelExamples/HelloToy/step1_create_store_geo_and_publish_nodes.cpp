@@ -16,6 +16,7 @@
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoTube.h"
+#include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -200,6 +201,23 @@ int main(int argc, char *argv[])
   toyPhys->add(pass2Name);
   toyPhys->add(s2);
 
+
+  // GeoPcon* pcon 
+  GeoPcon* sPcon =  new GeoPcon(0, 360*SYSTEM_OF_UNITS::deg);
+     sPcon->addPlane(1*SYSTEM_OF_UNITS::m,1,5);
+     sPcon->addPlane(2*SYSTEM_OF_UNITS::m,2,3);
+    //  for (unsigned int i=0; i<fwdEntry.size(); i++) {  
+    //    double z = fwdEntry[i].z();
+    //    double r = fwdEntry[i].r();
+    //    pcone->addPlane(z,0,r);
+    //  }
+  GeoLogVol* lPcon = new GeoLogVol("pcon", sPcon, steel);
+  GeoPhysVol* pPcon = new GeoPhysVol(lPcon);
+
+GeoNameTag* nPcon = new GeoNameTag("PCON");
+
+toyPhys->add(nPcon);
+toyPhys->add(pPcon);
 
 
    //------------------------------------------------------------------------------------//

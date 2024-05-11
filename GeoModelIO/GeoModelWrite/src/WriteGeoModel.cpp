@@ -300,11 +300,12 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
         // store/get the Shape object into/from the DB
         unsigned int shapeId;
         shapeId = storeShape(shape);
+        std::string_view shapeType = shape->type();
         // shapeId = storeObj(shape, shapeType, shapePars);
 
         // store/get the LogVol object into/from the DB
         unsigned int logvolId;
-        logvolId = storeObj(logVol, logName, shapeId, matId);
+        logvolId = storeObj(logVol, logName, shapeId, shapeType, matId);
 
         if (dynamic_cast<const GeoPhysVol*>(vol)) {
             const GeoPhysVol* physVol = dynamic_cast<const GeoPhysVol*>(vol);
@@ -699,7 +700,7 @@ unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType == "CustomShape") shapeType = "UnidentifiedShape";
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon"};
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "TwistedTrap", "Pcon", "Pgon"};
 
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
@@ -731,8 +732,8 @@ unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
     }
     else
     {
-        std::cout << "WARNING! The shape '" << shapeType
-                  << "' has not been ported to the new DB schema yet, so the old schema will be used to dump it."
+        std::cout << "\nWARNING! The shape '" << shapeType
+                  << "' has not been ported to the new DB schema yet, so the old schema will be used to dump it.\n"
                   << std::endl;
         std::string shapePars = getShapeParameters(shape);
         // store the shape in the DB and returns the ID
@@ -991,6 +992,76 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
         shapePars.push_back(tube->getRMax());
         shapePars.push_back(tube->getZHalfLength());
     }
+    else if (shapeType == "Cons")
+    {
+        const GeoCons* shapeIn = dynamic_cast<const GeoCons*>(shape);
+        shapePars.push_back(shapeIn->getRMin1());
+        shapePars.push_back(shapeIn->getRMin2());
+        shapePars.push_back(shapeIn->getRMax1());
+        shapePars.push_back(shapeIn->getRMax2());
+        shapePars.push_back(shapeIn->getDZ());
+        shapePars.push_back(shapeIn->getSPhi());
+        shapePars.push_back(shapeIn->getDPhi());
+    }
+    else if (shapeType == "Para")
+    {
+        const GeoPara* shapeIn = dynamic_cast<const GeoPara*>(shape);
+        shapePars.push_back(shapeIn->getXHalfLength());
+        shapePars.push_back(shapeIn->getYHalfLength());
+        shapePars.push_back(shapeIn->getZHalfLength());
+        shapePars.push_back(shapeIn->getAlpha());
+        shapePars.push_back(shapeIn->getTheta());
+        shapePars.push_back(shapeIn->getPhi());
+    }
+    else if (shapeType == "Trap")
+    {
+        const GeoTrap* shapeIn = dynamic_cast<const GeoTrap*>(shape);
+        shapePars.push_back(shapeIn->getZHalfLength());
+        shapePars.push_back(shapeIn->getTheta());
+        shapePars.push_back(shapeIn->getPhi());
+        shapePars.push_back(shapeIn->getDydzn());
+        shapePars.push_back(shapeIn->getDxdyndzn());
+        shapePars.push_back(shapeIn->getDxdypdzn());
+        shapePars.push_back(shapeIn->getAngleydzn());
+        shapePars.push_back(shapeIn->getDydzp());
+        shapePars.push_back(shapeIn->getDxdyndzp());
+        shapePars.push_back(shapeIn->getDxdypdzp());
+        shapePars.push_back(shapeIn->getAngleydzp());
+    }
+    else if (shapeType == "Trd")
+    {
+        const GeoTrd* shapeIn = dynamic_cast<const GeoTrd*>(shape);
+        shapePars.push_back(shapeIn->getXHalfLength1());
+        shapePars.push_back(shapeIn->getXHalfLength2());
+        shapePars.push_back(shapeIn->getYHalfLength1());
+        shapePars.push_back(shapeIn->getYHalfLength2());
+        shapePars.push_back(shapeIn->getZHalfLength());
+    }
+    else if (shapeType == "TwistedTrap")
+    {
+        const GeoTwistedTrap *shapeIn =
+            dynamic_cast<const GeoTwistedTrap *>(shape);
+        shapePars.push_back(shapeIn->getPhiTwist());
+        shapePars.push_back(shapeIn->getZHalfLength());
+        shapePars.push_back(shapeIn->getTheta());
+        shapePars.push_back(shapeIn->getPhi());
+        shapePars.push_back(shapeIn->getY1HalfLength());
+        shapePars.push_back(shapeIn->getX1HalfLength());
+        shapePars.push_back(shapeIn->getX2HalfLength());
+        shapePars.push_back(shapeIn->getY2HalfLength());
+        shapePars.push_back(shapeIn->getX3HalfLength());
+        shapePars.push_back(shapeIn->getX4HalfLength());
+        shapePars.push_back(shapeIn->getTiltAngleAlpha());
+    }
+    else if (shapeType == "Tubs")
+    {
+        const GeoTubs *shapeIn = dynamic_cast<const GeoTubs *>(shape);
+        shapePars.push_back(shapeIn->getRMin());
+        shapePars.push_back(shapeIn->getRMax());
+        shapePars.push_back(shapeIn->getZHalfLength());
+        shapePars.push_back(shapeIn->getSPhi());
+        shapePars.push_back(shapeIn->getDPhi());
+    }
     else if (shapeType == "Pcon")
     {
         const GeoPcon* shapeIn = dynamic_cast<const GeoPcon*>(shape);
@@ -999,7 +1070,22 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
         // get number of Z planes and loop over them
         const int nZplanes = shapeIn->getNPlanes();
         shapePars.push_back(nZplanes);
-        std::cout << "get Zplanes parameters:" << std::endl;
+        for (int i = 0; i < nZplanes; ++i) {
+            dataRow.push_back(shapeIn->getZPlane(i));
+            dataRow.push_back(shapeIn->getRMinPlane(i));
+            dataRow.push_back(shapeIn->getRMaxPlane(i));
+            shapeData.push_back(dataRow);
+            dataRow.clear();
+        }
+    }
+    else if (shapeType == "Pgon")
+    {
+        const GeoPgon* shapeIn = dynamic_cast<const GeoPgon*>(shape);
+        shapePars.push_back(shapeIn->getSPhi());
+        shapePars.push_back(shapeIn->getDPhi());
+        // get number of Z planes and loop over them
+        const int nZplanes = shapeIn->getNPlanes();
+        shapePars.push_back(nZplanes);
         for (int i = 0; i < nZplanes; ++i) {
             dataRow.push_back(shapeIn->getZPlane(i));
             dataRow.push_back(shapeIn->getRMinPlane(i));
@@ -1036,20 +1122,21 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     //     pars.push_back("ZHalfLength=" +
     //                    CppHelper::to_string_with_precision(box->getZHalfLength()));
     // } 
-    else if (shapeType == "Cons") {
-        const GeoCons* shapeIn = dynamic_cast<const GeoCons*>(shape);
-        pars.push_back("RMin1=" +
-                       CppHelper::to_string_with_precision(shapeIn->getRMin1()));
-        pars.push_back("RMin2=" +
-                       CppHelper::to_string_with_precision(shapeIn->getRMin2()));
-        pars.push_back("RMax1=" +
-                       CppHelper::to_string_with_precision(shapeIn->getRMax1()));
-        pars.push_back("RMax2=" +
-                       CppHelper::to_string_with_precision(shapeIn->getRMax2()));
-        pars.push_back("DZ=" + CppHelper::to_string_with_precision(shapeIn->getDZ()));
-        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
-    } else if (shapeType == "Torus") {
+    // else if (shapeType == "Cons") {
+    //     const GeoCons* shapeIn = dynamic_cast<const GeoCons*>(shape);
+    //     pars.push_back("RMin1=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getRMin1()));
+    //     pars.push_back("RMin2=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getRMin2()));
+    //     pars.push_back("RMax1=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getRMax1()));
+    //     pars.push_back("RMax2=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getRMax2()));
+    //     pars.push_back("DZ=" + CppHelper::to_string_with_precision(shapeIn->getDZ()));
+    //     pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+    //     pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
+    // } 
+    else if (shapeType == "Torus") {
         // Member Data:
         // * Rmax - outside radius of the torus tube
         // * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
@@ -1064,20 +1151,21 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
         pars.push_back("Rtor=" + CppHelper::to_string_with_precision(shapeIn->getRTor()));
         pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
         pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
-    } else if (shapeType == "Para") {
-        const GeoPara* shapeIn = dynamic_cast<const GeoPara*>(shape);
-        pars.push_back("XHalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getXHalfLength()));
-        pars.push_back("YHalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getYHalfLength()));
-        pars.push_back("ZHalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
-        pars.push_back("Alpha=" +
-                       CppHelper::to_string_with_precision(shapeIn->getAlpha()));
-        pars.push_back("Theta=" +
-                       CppHelper::to_string_with_precision(shapeIn->getTheta()));
-        pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
     } 
+    // else if (shapeType == "Para") {
+    //     const GeoPara* shapeIn = dynamic_cast<const GeoPara*>(shape);
+    //     pars.push_back("XHalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getXHalfLength()));
+    //     pars.push_back("YHalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getYHalfLength()));
+    //     pars.push_back("ZHalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
+    //     pars.push_back("Alpha=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getAlpha()));
+    //     pars.push_back("Theta=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getTheta()));
+    //     pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
+    // } 
     // else if (shapeType == "Pcon") {
     //     const GeoPcon* shapeIn = dynamic_cast<const GeoPcon*>(shape);
     //     pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
@@ -1094,24 +1182,25 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     //                        CppHelper::to_string_with_precision(shapeIn->getRMaxPlane(i)));
     //     }
     // } 
-    else if (shapeType == "Pgon") {
-        const GeoPgon* shapeIn = dynamic_cast<const GeoPgon*>(shape);
-        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
-        pars.push_back("NSides=" +
-                       std::to_string(shapeIn->getNSides()));  // INT
-        // get number of Z planes and loop over them
-        const int nZplanes = shapeIn->getNPlanes();
-        pars.push_back("NZPlanes=" + std::to_string(nZplanes));  // INT
-        for (int i = 0; i < nZplanes; ++i) {
-            pars.push_back("ZPos=" +
-                           CppHelper::to_string_with_precision(shapeIn->getZPlane(i)));
-            pars.push_back("ZRmin=" +
-                           CppHelper::to_string_with_precision(shapeIn->getRMinPlane(i)));
-            pars.push_back("ZRmax=" +
-                           CppHelper::to_string_with_precision(shapeIn->getRMaxPlane(i)));
-        }
-    } else if (shapeType == "SimplePolygonBrep") {
+    // else if (shapeType == "Pgon") {
+    //     const GeoPgon* shapeIn = dynamic_cast<const GeoPgon*>(shape);
+    //     pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+    //     pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
+    //     pars.push_back("NSides=" +
+    //                    std::to_string(shapeIn->getNSides()));  // INT
+    //     // get number of Z planes and loop over them
+    //     const int nZplanes = shapeIn->getNPlanes();
+    //     pars.push_back("NZPlanes=" + std::to_string(nZplanes));  // INT
+    //     for (int i = 0; i < nZplanes; ++i) {
+    //         pars.push_back("ZPos=" +
+    //                        CppHelper::to_string_with_precision(shapeIn->getZPlane(i)));
+    //         pars.push_back("ZRmin=" +
+    //                        CppHelper::to_string_with_precision(shapeIn->getRMinPlane(i)));
+    //         pars.push_back("ZRmax=" +
+    //                        CppHelper::to_string_with_precision(shapeIn->getRMaxPlane(i)));
+    //     }
+    // } 
+    else if (shapeType == "SimplePolygonBrep") {
         const GeoSimplePolygonBrep* shapeIn =
             dynamic_cast<const GeoSimplePolygonBrep*>(shape);
         pars.push_back("DZ=" + CppHelper::to_string_with_precision(shapeIn->getDZ()));
@@ -1124,67 +1213,70 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
             pars.push_back("yV=" +
                            CppHelper::to_string_with_precision(shapeIn->getYVertex(i)));
         }
-    } else if (shapeType == "Trap") {
-        const GeoTrap* shapeIn = dynamic_cast<const GeoTrap*>(shape);
-        pars.push_back("ZHalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
-        pars.push_back("Theta=" +
-                       CppHelper::to_string_with_precision(shapeIn->getTheta()));
-        pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
-        pars.push_back("Dydzn=" +
-                       CppHelper::to_string_with_precision(shapeIn->getDydzn()));
-        pars.push_back("Dxdyndzn=" +
-                       CppHelper::to_string_with_precision(shapeIn->getDxdyndzn()));
-        pars.push_back("Dxdypdzn=" +
-                       CppHelper::to_string_with_precision(shapeIn->getDxdypdzn()));
-        pars.push_back("Angleydzn=" +
-                       CppHelper::to_string_with_precision(shapeIn->getAngleydzn()));
-        pars.push_back("Dydzp=" +
-                       CppHelper::to_string_with_precision(shapeIn->getDydzp()));
-        pars.push_back("Dxdyndzp=" +
-                       CppHelper::to_string_with_precision(shapeIn->getDxdyndzp()));
-        pars.push_back("Dxdypdzp=" +
-                       CppHelper::to_string_with_precision(shapeIn->getDxdypdzp()));
-        pars.push_back("Angleydzp=" +
-                       CppHelper::to_string_with_precision(shapeIn->getAngleydzp()));
-    } else if (shapeType == "TwistedTrap") {
-        const GeoTwistedTrap* shapeIn =
-            dynamic_cast<const GeoTwistedTrap*>(shape);
-        pars.push_back("PhiTwist=" +
-                       CppHelper::to_string_with_precision(shapeIn->getPhiTwist()));
-        pars.push_back("ZHalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
-        pars.push_back("Theta=" +
-                       CppHelper::to_string_with_precision(shapeIn->getTheta()));
-        pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
-        pars.push_back("DY1HalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getY1HalfLength()));
-        pars.push_back("DX1HalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getX1HalfLength()));
-        pars.push_back("DX2HalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getX2HalfLength()));
-        pars.push_back("DY2HalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getY2HalfLength()));
-        pars.push_back("DX3HalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getX3HalfLength()));
-        pars.push_back("DX4HalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getX4HalfLength()));
-        pars.push_back("DTiltAngleAlpha=" +
-                       CppHelper::to_string_with_precision(shapeIn->getTiltAngleAlpha()));
-
-    } else if (shapeType == "Trd") {
-        const GeoTrd* shapeIn = dynamic_cast<const GeoTrd*>(shape);
-        pars.push_back("XHalfLength1=" +
-                       CppHelper::to_string_with_precision(shapeIn->getXHalfLength1()));
-        pars.push_back("XHalfLength2=" +
-                       CppHelper::to_string_with_precision(shapeIn->getXHalfLength2()));
-        pars.push_back("YHalfLength1=" +
-                       CppHelper::to_string_with_precision(shapeIn->getYHalfLength1()));
-        pars.push_back("YHalfLength2=" +
-                       CppHelper::to_string_with_precision(shapeIn->getYHalfLength2()));
-        pars.push_back("ZHalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
     } 
+    // else if (shapeType == "Trap") {
+    //     const GeoTrap* shapeIn = dynamic_cast<const GeoTrap*>(shape);
+    //     pars.push_back("ZHalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
+    //     pars.push_back("Theta=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getTheta()));
+    //     pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
+    //     pars.push_back("Dydzn=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getDydzn()));
+    //     pars.push_back("Dxdyndzn=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getDxdyndzn()));
+    //     pars.push_back("Dxdypdzn=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getDxdypdzn()));
+    //     pars.push_back("Angleydzn=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getAngleydzn()));
+    //     pars.push_back("Dydzp=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getDydzp()));
+    //     pars.push_back("Dxdyndzp=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getDxdyndzp()));
+    //     pars.push_back("Dxdypdzp=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getDxdypdzp()));
+    //     pars.push_back("Angleydzp=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getAngleydzp()));
+    // } 
+    // else if (shapeType == "TwistedTrap") {
+    //     const GeoTwistedTrap* shapeIn =
+    //         dynamic_cast<const GeoTwistedTrap*>(shape);
+    //     pars.push_back("PhiTwist=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getPhiTwist()));
+    //     pars.push_back("ZHalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
+    //     pars.push_back("Theta=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getTheta()));
+    //     pars.push_back("Phi=" + CppHelper::to_string_with_precision(shapeIn->getPhi()));
+    //     pars.push_back("DY1HalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getY1HalfLength()));
+    //     pars.push_back("DX1HalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getX1HalfLength()));
+    //     pars.push_back("DX2HalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getX2HalfLength()));
+    //     pars.push_back("DY2HalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getY2HalfLength()));
+    //     pars.push_back("DX3HalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getX3HalfLength()));
+    //     pars.push_back("DX4HalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getX4HalfLength()));
+    //     pars.push_back("DTiltAngleAlpha=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getTiltAngleAlpha()));
+
+    // } 
+    // else if (shapeType == "Trd") {
+    //     const GeoTrd* shapeIn = dynamic_cast<const GeoTrd*>(shape);
+    //     pars.push_back("XHalfLength1=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getXHalfLength1()));
+    //     pars.push_back("XHalfLength2=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getXHalfLength2()));
+    //     pars.push_back("YHalfLength1=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getYHalfLength1()));
+    //     pars.push_back("YHalfLength2=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getYHalfLength2()));
+    //     pars.push_back("ZHalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
+    // } 
     // else if (shapeType == "Tube") {
     //     const GeoTube* tube = dynamic_cast<const GeoTube*>(shape);
     //     pars.push_back("RMin=" + CppHelper::to_string_with_precision(tube->getRMin()));
@@ -1192,15 +1284,16 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     //     pars.push_back("ZHalfLength=" +
     //                    CppHelper::to_string_with_precision(tube->getZHalfLength()));
     // } 
-    else if (shapeType == "Tubs") {
-        const GeoTubs* shapeIn = dynamic_cast<const GeoTubs*>(shape);
-        pars.push_back("RMin=" + CppHelper::to_string_with_precision(shapeIn->getRMin()));
-        pars.push_back("RMax=" + CppHelper::to_string_with_precision(shapeIn->getRMax()));
-        pars.push_back("ZHalfLength=" +
-                       CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
-        pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
-    } else if (shapeType == "TessellatedSolid") {
+    // else if (shapeType == "Tubs") {
+    //     const GeoTubs* shapeIn = dynamic_cast<const GeoTubs*>(shape);
+    //     pars.push_back("RMin=" + CppHelper::to_string_with_precision(shapeIn->getRMin()));
+    //     pars.push_back("RMax=" + CppHelper::to_string_with_precision(shapeIn->getRMax()));
+    //     pars.push_back("ZHalfLength=" +
+    //                    CppHelper::to_string_with_precision(shapeIn->getZHalfLength()));
+    //     pars.push_back("SPhi=" + CppHelper::to_string_with_precision(shapeIn->getSPhi()));
+    //     pars.push_back("DPhi=" + CppHelper::to_string_with_precision(shapeIn->getDPhi()));
+    // } 
+    else if (shapeType == "TessellatedSolid") {
         const GeoTessellatedSolid* shapeIn =
             dynamic_cast<const GeoTessellatedSolid*>(shape);
         // get number of facets
@@ -1314,7 +1407,7 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     //    shapePars=pars.join(";");
     //  }
     else {
-        std::cout << "\n\tGeoModelWrite -- WARNING!!! - Shape '" << shapeType
+        std::cout << "\n\tGeoModelWrite -- ERROR!!! - Shape '" << shapeType
                   << "' needs to be persistified!!\n\n";
         CppHelper::printStdVectorStrings(m_objectsNotPersistified);
     }
@@ -1465,12 +1558,13 @@ unsigned int WriteGeoModel::storeObj(const GeoShape* pointer,
 unsigned int WriteGeoModel::storeObj(const GeoLogVol* pointer,
                                      const std::string& name,
                                      const unsigned int& shapeId,
+                                     std::string_view shapeType,
                                      const unsigned int& materialId) {
     std::string address = getAddressStringFromPointer(pointer);
 
     unsigned int logvolId;
     if (!isAddressStored(address)) {
-        logvolId = addLogVol(name, shapeId, materialId);
+        logvolId = addLogVol(name, shapeId, shapeType, materialId);
         storeAddress(address, logvolId);
     } else {
         logvolId = getStoredIdFromAddress(address);
@@ -1790,6 +1884,11 @@ std::pair<unsigned, unsigned> WriteGeoModel::addShapeData(const std::string type
 
     if ("Pcon" == type) {
         container = &m_shapes_Pcon_Data;
+    }
+    else if ("Pgon" == type) {
+        container = &m_shapes_Pgon_Data;
+    } else {
+        std::cout << "\nERROR!!! Shape data for shape '" << type << "' have not been set, yet!\n" << std::endl;
     }
     
     std::pair<unsigned, unsigned> dataPair = addRecordData(container, shapeData);
@@ -2199,14 +2298,42 @@ unsigned int WriteGeoModel::addShape(const std::string &type,
     {
         container = &m_shapes_Tube;
     }
+    else if ("Cons" == type)
+    {
+        container = &m_shapes_Cons;
+    }
+    else if ("Para" == type)
+    {
+        container = &m_shapes_Para;
+    }
+    else if ("Trap" == type)
+    {
+        container = &m_shapes_Trap;
+    }
+    else if ("Trd" == type)
+    {
+        container = &m_shapes_Trd;
+    }
+    else if ("Tubs" == type)
+    {
+        container = &m_shapes_Tubs;
+    }
+    else if ("TwistedTrap" == type)
+    {
+        container = &m_shapes_TwistedTrap;
+    }
     else if ("Pcon" == type)
     {
         container = &m_shapes_Pcon;
     }
+    else if ("Pgon" == type)
+    {
+        container = &m_shapes_Pgon;
+    }
     else
     {
-        std::cout << "ERROR! Shape type '" << type
-                  << "' still needs to be ported to the new DB schema. Ask to 'geomodel-developers@cern.ch."
+        std::cout << "\nERROR! Shape type '" << type
+                  << "' still needs to be ported to the new DB schema. Ask to 'geomodel-developers@cern.ch.\n"
                   << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -2247,11 +2374,14 @@ unsigned int WriteGeoModel::addFullPhysVol(
 
 unsigned int WriteGeoModel::addLogVol(const std::string& name,
                                       const unsigned int& shapeId,
+                                      std::string_view shapeType,
                                       const unsigned int& materialId) {
-    std::vector<std::vector<std::string>>* container = &m_logVols;
-    std::vector<std::string> values;
-    values.insert(values.begin(), {name, std::to_string(shapeId),
-                                   std::to_string(materialId)});  // INT
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>>* container = &m_logVols;
+    std::vector<std::variant<int, long, float, double, std::string>> values;
+    values.push_back(name);
+    values.push_back(shapeId);
+    values.push_back(std::string(shapeType));
+    values.push_back(materialId);
     return addRecord(container, values);
 }
 
@@ -2316,12 +2446,19 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecords("GeoShape", m_shapes); // old version, with shape's parameters as trings
     m_dbManager->addListOfRecords("GeoBox", m_shapes_Box); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoTube", m_shapes_Tube); // new version, with shape's parameters as numbers
-    m_dbManager->addListOfRecords("GeoPcon", m_shapes_Pcon); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoCons", m_shapes_Cons); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoPara", m_shapes_Para); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoTrap", m_shapes_Trap); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoTrd", m_shapes_Trd); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoTubs", m_shapes_Tubs); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoTwistedTrap", m_shapes_TwistedTrap); // new version, with shape's parameters as numbers
     
     // store shapes' data // TODO: maybe this should be encapsulated with shapes? 
-    // To do this, I moved addListOfRecordsToTable() from private to public, maybe I could add a method to store shapes with data and put back that into private
-    
+    // FIXME: To do this, I moved addListOfRecordsToTable() from private to public, maybe I could add a method to store shapes with data and put back that into private
+    m_dbManager->addListOfRecords("GeoPcon", m_shapes_Pcon); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoPgon", m_shapes_Pgon); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecordsToTable("Shapes_Pcon_Data", m_shapes_Pcon_Data); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecordsToTable("Shapes_Pgon_Data", m_shapes_Pgon_Data); // new version, with shape's parameters as numbers
 
     m_dbManager->addListOfChildrenPositions(m_childrenPositions);
     m_dbManager->addRootVolume(m_rootVolume);

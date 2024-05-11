@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -16,7 +16,14 @@
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoTube.h"
+#include "GeoModelKernel/GeoCons.h"
+#include "GeoModelKernel/GeoPara.h"
+#include "GeoModelKernel/GeoTrap.h"
+#include "GeoModelKernel/GeoTrd.h"
+#include "GeoModelKernel/GeoTubs.h"
+#include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoPcon.h"
+#include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -201,28 +208,114 @@ int main(int argc, char *argv[])
   toyPhys->add(pass2Name);
   toyPhys->add(s2);
 
+  // Add a test GeoPcon shape
+  GeoPcon *sPcon = new GeoPcon(0, 360 * SYSTEM_OF_UNITS::deg);
+  sPcon->addPlane(1 * SYSTEM_OF_UNITS::m, 1, 5);
+  sPcon->addPlane(2 * SYSTEM_OF_UNITS::m, 2, 3);
+  GeoLogVol *lPcon = new GeoLogVol("pcon", sPcon, steel);
+  GeoPhysVol *pPcon = new GeoPhysVol(lPcon);
+  GeoNameTag *nPcon = new GeoNameTag("Shape-Pcon");
+  toyPhys->add(nPcon);
+  toyPhys->add(pPcon);
 
-  // GeoPcon* pcon 
-  GeoPcon* sPcon =  new GeoPcon(0, 360*SYSTEM_OF_UNITS::deg);
-     sPcon->addPlane(1*SYSTEM_OF_UNITS::m,1,5);
-     sPcon->addPlane(2*SYSTEM_OF_UNITS::m,2,3);
-    //  for (unsigned int i=0; i<fwdEntry.size(); i++) {  
-    //    double z = fwdEntry[i].z();
-    //    double r = fwdEntry[i].r();
-    //    pcone->addPlane(z,0,r);
-    //  }
-  GeoLogVol* lPcon = new GeoLogVol("pcon", sPcon, steel);
-  GeoPhysVol* pPcon = new GeoPhysVol(lPcon);
+  // Add a test GeoCons shape
+  double rMin1 = 1 * SYSTEM_OF_UNITS::m;
+  double rMin2 = 1.5 * SYSTEM_OF_UNITS::m;
+  double rMax1 = 3 * SYSTEM_OF_UNITS::m;
+  double rMax2 = 3.5 * SYSTEM_OF_UNITS::m;
+  double zmin = 1 * SYSTEM_OF_UNITS::m;
+  double zmax = 10 * SYSTEM_OF_UNITS::m;
+  double dZnew = 0.5 * (zmax - zmin);
+  GeoCons *sCons = new GeoCons(rMin1, rMin2,
+                               rMax1, rMax2,
+                               dZnew,
+                               0 * SYSTEM_OF_UNITS::deg, 360 * SYSTEM_OF_UNITS::deg);
+  GeoLogVol *lCons = new GeoLogVol("cons", sCons, steel);
+  GeoPhysVol *pCons = new GeoPhysVol(lCons);
+  GeoNameTag *nCons = new GeoNameTag("Shape-Cons");
+  toyPhys->add(nCons);
+  toyPhys->add(pCons);
 
-GeoNameTag* nPcon = new GeoNameTag("PCON");
+  // Add a test GeoPara shape
+  double Rmax = 335. * SYSTEM_OF_UNITS::mm;
+  double bepo_Beta = 4.668 * SYSTEM_OF_UNITS::degree; 
+  double Zall = (912. / 2.) * SYSTEM_OF_UNITS::mm;
+  double Xall = (171. / 2.) * SYSTEM_OF_UNITS::mm;
+  double Yall = (300. / 2.) * SYSTEM_OF_UNITS::mm;
+  double Rmax_1 = Rmax - 2. * Zall * tan(bepo_Beta);
+  GeoPara *sPara = new GeoPara(Zall, Yall, Xall, 0 * SYSTEM_OF_UNITS::degree, bepo_Beta, 0. * SYSTEM_OF_UNITS::degree);
+  GeoLogVol *lPara = new GeoLogVol("para", sPara, steel);
+  GeoPhysVol *pPara = new GeoPhysVol(lPara);
+  GeoNameTag *nPara = new GeoNameTag("Shape-Para");
+  toyPhys->add(nPara);
+  toyPhys->add(pPara);
 
-toyPhys->add(nPcon);
-toyPhys->add(pPcon);
+  // Add a test GeoPara shape
+  GeoPgon *sPgon = new GeoPgon(0., 360 * SYSTEM_OF_UNITS::degree, 6);
+  sPgon->addPlane(2 * SYSTEM_OF_UNITS::m, 0.2*SYSTEM_OF_UNITS::m, 0.5 * SYSTEM_OF_UNITS::m);
+  sPgon->addPlane(3 * SYSTEM_OF_UNITS::m, 0, 0.5 * SYSTEM_OF_UNITS::m);
+  GeoLogVol *lPgon = new GeoLogVol("pgon", sPgon, steel);
+  GeoPhysVol *pPgon = new GeoPhysVol(lPgon);
+  GeoNameTag *nPgon = new GeoNameTag("Shape-Pgon");
+  toyPhys->add(nPgon);
+  toyPhys->add(pPgon);
 
+  // Add a test GeoTrap shape
+  double length = 5 * SYSTEM_OF_UNITS::m;
+  double halflength = 0.5 * length;
+  double rmax = 2 * SYSTEM_OF_UNITS::m;
+  double rmin = 1 * SYSTEM_OF_UNITS::m;
+  double phiWidth = 30 * SYSTEM_OF_UNITS::degree;
+  double thickness = 0.5 * (rmax - rmin);
+  double averad = 0.5 * (rmin + rmax);
+  double w1 = 0.5 * phiWidth * rmin / averad;
+  double w2 = 0.5 * phiWidth * rmax / averad;
+  GeoTrap *sTrap = new GeoTrap(halflength, 0, 0, thickness, w1, w2, 0, thickness, w1, w2, 0);
+  GeoLogVol *lTrap = new GeoLogVol("trap", sTrap, steel);
+  GeoPhysVol *pTrap = new GeoPhysVol(lTrap);
+  GeoNameTag *nTrap = new GeoNameTag("Shape-Trap");
+  toyPhys->add(nTrap);
+  toyPhys->add(pTrap);
+  
+  // Add a test GeoTrd shape
+  GeoTrd *sTrd = new GeoTrd(2*SYSTEM_OF_UNITS::m, 2*SYSTEM_OF_UNITS::m, 1*SYSTEM_OF_UNITS::m, 1*SYSTEM_OF_UNITS::m, 1*SYSTEM_OF_UNITS::m);
+  GeoLogVol *lTrd = new GeoLogVol("trd", sTrd, steel);
+  GeoPhysVol *pTrd = new GeoPhysVol(lTrd);
+  GeoNameTag *nTrd = new GeoNameTag("Shape-Trd");
+  toyPhys->add(nTrd);
+  toyPhys->add(pTrd);
 
-   //------------------------------------------------------------------------------------//
-   // Writing the geometry to file
-   //------------------------------------------------------------------------------------//
+  // Add a test GeoTubs shape
+  GeoTubs *sTubs = new GeoTubs(1 * SYSTEM_OF_UNITS::m, 2 * SYSTEM_OF_UNITS::m, 4 * SYSTEM_OF_UNITS::m, 0 * SYSTEM_OF_UNITS::degree, 270 * SYSTEM_OF_UNITS::degree);
+  GeoLogVol *lTubs = new GeoLogVol("tubs", sTubs, steel);
+  GeoPhysVol *pTubs = new GeoPhysVol(lTubs);
+  GeoNameTag *nTubs = new GeoNameTag("Shape-Tubs");
+  toyPhys->add(nTubs);
+  toyPhys->add(pTubs);
+
+  // Add a test GeoTwistedTrap shape
+  double tw_PhiTwist = 30 * SYSTEM_OF_UNITS::deg; // twist angle
+  double tw_Dz = 5 * SYSTEM_OF_UNITS::m;          // half z length
+  double tw_Theta = 30 * SYSTEM_OF_UNITS::deg;    // direction between end planes
+  double tw_Phi = 30 * SYSTEM_OF_UNITS::deg;      // defined by polar and azim. angles
+  double tw_Dy1 = 1 * SYSTEM_OF_UNITS::m;         // half y length at -pDz
+  double tw_Dx1 = 1 * SYSTEM_OF_UNITS::m;         // half x length at -pDz,-pDy
+  double tw_Dx2 = 1 * SYSTEM_OF_UNITS::m;         // half x length at -pDz,+pDy
+  double tw_Dy2 = 1 * SYSTEM_OF_UNITS::m;         // half y length at +pDz
+  double tw_Dx3 = 1 * SYSTEM_OF_UNITS::m;         // half x length at +pDz,-pDy
+  double tw_Dx4 = 1 * SYSTEM_OF_UNITS::m;         // half x length at +pDz,+pDy
+  double tw_Alph = 30 * SYSTEM_OF_UNITS::deg;     // tilt angle
+  GeoTwistedTrap *sTwist = new GeoTwistedTrap(tw_PhiTwist, tw_Dz, tw_Theta, tw_Phi,
+                                              tw_Dy1, tw_Dx1, tw_Dx2, tw_Dy2, tw_Dx3, tw_Dx4, tw_Alph);
+  GeoLogVol *lTwist = new GeoLogVol("twistedtrap", sTwist, steel);
+  GeoPhysVol *pTwist = new GeoPhysVol(lTwist);
+  GeoNameTag *nTwist = new GeoNameTag("Shape-TwistedTrap");
+  toyPhys->add(nTwist);
+  toyPhys->add(pTwist);
+
+  //------------------------------------------------------------------------------------//
+  // Writing the geometry to file
+  //------------------------------------------------------------------------------------//
   std::string path = "geometry.db";
 
   // check if DB file exists. If yes, delete it.

@@ -181,7 +181,7 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned int storeObj(const GeoShape *pointer, const std::string &type,
                           const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
     unsigned int storeObj(const GeoLogVol *pointer, const std::string &name,
-                          const unsigned int &shapeId,
+                          const unsigned int &shapeId, std::string_view shapeType,
                           const unsigned int &materialId);
     unsigned int storeObj(const GeoPhysVol *pointer,
                           const unsigned int &logvolId,
@@ -250,7 +250,7 @@ class WriteGeoModel : public GeoNodeAction {
                                 const unsigned int &parentPhysVolId,
                                 const bool &isRootVolume);
     unsigned int addLogVol(const std::string &name, const unsigned int &shapeId,
-                           const unsigned int &materialId);
+                           std::string_view shapeType, const unsigned int &materialId);
     void addChildPosition(const unsigned int &parentId,
                           const std::string &parentType,
                           const unsigned int &childId,
@@ -341,8 +341,11 @@ class WriteGeoModel : public GeoNodeAction {
     // (for example, one used in a GeoSerialTransformer)
     bool m_unconnectedTree;
 
+    // chaches in the new DB schema
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_logVols;
+
     // caches for GeoModel nodes to be saved into the DB
-    std::vector<std::vector<std::string>> m_logVols;
+    // std::vector<std::vector<std::string>> m_logVols;
     std::vector<std::vector<std::string>> m_physVols;
     std::vector<std::vector<std::string>> m_fullPhysVols;
     std::vector<std::vector<std::string>> m_materials;
@@ -357,8 +360,16 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<std::vector<std::string>> m_shapes;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Box;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Tube;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Cons;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Para;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pgon;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Trap;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Trd;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Tubs;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_TwistedTrap;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon_Data;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pgon_Data;
 
     // std::vector<std::vector<std::string>> m_functions;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_functions; // operators used in Function's expression

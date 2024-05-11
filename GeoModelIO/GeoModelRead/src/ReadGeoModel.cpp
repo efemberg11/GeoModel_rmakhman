@@ -26,6 +26,11 @@
  */
 
 // local includes
+#include "BuildGeoShapes_Box.h"
+#include "BuildGeoShapes_Tube.h"
+#include "BuildGeoShapes_Pcon.h"
+#include "BuildGeoShapes_Cons.h"
+
 #include "GeoModelRead/ReadGeoModel.h"
 
 // TFPersistification includes
@@ -70,6 +75,9 @@
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
+#include "GeoModelHelpers/variantHelpers.h"
+#include "GeoModelHelpers/throwExcept.h"
+
 // Units
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS \
@@ -94,6 +102,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <variant>
+#include <memory>
 
 // mutexes for synchronized access to containers and output streams in
 // multi-threading mode
@@ -162,6 +172,9 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress)
     m_dbManager->loadGeoNodeTypesAndBuildCache();
     m_dbManager->createTableDataCaches();
 
+    // prepare builders
+    // m_builderShape_Box = std::make_unique<BuildGeoShapes_Box>();
+
     // Check if the user asked for running in serial or multi-threading mode
     if ("" != getEnvVar("GEOMODEL_ENV_IO_NTHREADS")) {
         int nThreads = std::stoi(getEnvVar("GEOMODEL_ENV_IO_NTHREADS"));
@@ -201,7 +214,14 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress)
 }
 
 ReadGeoModel::~ReadGeoModel() {
-    // FIXME: some cleaning...??
+    delete m_builderShape_Box;
+    delete m_builderShape_Tube;
+    delete m_builderShape_Pcon;
+    delete m_builderShape_Cons;
+    m_builderShape_Box = nullptr;
+    m_builderShape_Tube = nullptr;
+    m_builderShape_Pcon = nullptr;
+    m_builderShape_Cons = nullptr;
 }
 
 // FIXME: TODO: move to an utility class
@@ -236,11 +256,9 @@ void ReadGeoModel::loadDB() {
     std::chrono::system_clock::time_point start =
         std::chrono::system_clock::now();  // timing: get start time
     // get all GeoModel nodes from the DB
-    m_logVols = m_dbManager->getTableFromNodeType("GeoLogVol");
     m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
     m_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
     m_elements = m_dbManager->getTableFromNodeType("GeoElement");
-    m_functions = m_dbManager->getTableFromNodeType_VecVecData("Function");
     m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
     m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
     m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
@@ -254,9 +272,25 @@ void ReadGeoModel::loadDB() {
     m_serialTransformers =
         m_dbManager->getTableFromNodeType("GeoSerialTransformer");
     m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
+
+    // containers to store data that have been moved to the new DB schema
+    m_functions = m_dbManager->getTableFromNodeType_VecVecData("Function");
+    m_logVols = m_dbManager->getTableFromNodeType_VecVecData("GeoLogVol");
+
+    // shapes from the new DB schema
+    m_shapes_Box = m_dbManager->getTableFromNodeType_VecVecData("GeoBox");
+    m_shapes_Tube = m_dbManager->getTableFromNodeType_VecVecData("GeoTube");
+    m_shapes_Pcon = m_dbManager->getTableFromNodeType_VecVecData("GeoPcon");
+    m_shapes_Cons = m_dbManager->getTableFromNodeType_VecVecData("GeoCons");
+    
+    // shapes' data, when needed by shapes that have variable numbers of build parameters
+    m_shapes_Pcon_data = m_dbManager->getTableFromTableName_VecVecData("Shapes_Pcon_Data");
+
     // get the Function's expression data
     // m_funcExprData = m_dbManager->getTableFromTableNameVecVecData("FuncExprData");
     m_funcExprData = m_dbManager->getTableFromTableName_DequeDouble("FuncExprData");
+    
+
     // get the children table from DB
     m_allchildren = m_dbManager->getChildrenTable();
     // get the root volume data
@@ -295,14 +329,21 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
 
         t8.join();  // ok, all Transforms have been built
         t9.join();  // ok, all AlignableTransforms have been built
+        
         // needs Transforms and AlignableTransforms for Shift boolean shapes
         std::thread t1(&ReadGeoModel::buildAllShapes, this);
+        std::thread t15(&ReadGeoModel::buildAllShapes_Box, this);
+        std::thread t16(&ReadGeoModel::buildAllShapes_Tube, this);
+        std::thread t17(&ReadGeoModel::buildAllShapes_Pcon, this);
+        std::thread t18(&ReadGeoModel::buildAllShapes_Cons, this);
 
         t2.join();  // ok, all Elements have been built
         // needs Elements
         std::thread t3(&ReadGeoModel::buildAllMaterials, this);
 
         t1.join();  // ok, all Shapes have been built
+        t15.join();  // ok, all Shapes-Box have been built
+        t16.join();  // ok, all Shapes-Tube have been built
         t3.join();  // ok, all Materials have been built
         // needs Shapes and Materials
         std::thread t4(&ReadGeoModel::buildAllLogVols, this);
@@ -337,6 +378,10 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         buildAllIdentifierTags();
         buildAllNameTags();
         buildAllShapes();
+        buildAllShapes_Box();
+        buildAllShapes_Tube();
+        buildAllShapes_Pcon();
+        buildAllShapes_Cons();
         buildAllMaterials();
         buildAllLogVols();
         buildAllPhysVols();
@@ -419,6 +464,84 @@ void ReadGeoModel::buildAllShapes() {
     if (nSize > 0) std::cout << "All " << nSize << " Shapes have been built!\n";
 }
 
+//! Iterate over the list of shapes, build them all, and store their
+//! pointers
+void ReadGeoModel::buildAllShapes_Box()
+{
+    if (m_loglevel >= 1) {
+        std::cout << "Building all shapes -- Box ...\n";
+    }
+
+    // create a builder and reserve size of memory map
+    size_t nSize = m_shapes_Box.size();
+    m_builderShape_Box = new BuildGeoShapes_Box(nSize);
+
+    // loop over the DB rows and build the shapes
+    for (const auto &row : m_shapes_Box)
+    {
+        // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
+        m_builderShape_Box->buildShape(row);
+    }
+    m_builderShape_Box->printBuiltShapes(); // DEBUG MSG
+    if (nSize > 0) {
+        std::cout << "All " << nSize << " Shapes-Box have been built!\n";
+    }
+}
+//! Iterate over the list of shapes, build them all, and store their
+//! pointers
+void ReadGeoModel::buildAllShapes_Tube()
+{
+    // create a builder and reserve size of memory map
+    size_t nSize = m_shapes_Tube.size();
+    m_builderShape_Tube = new BuildGeoShapes_Tube(nSize);
+    // loop over the DB rows and build the shapes
+    for (const auto &row : m_shapes_Tube)
+    {
+        // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
+        m_builderShape_Tube->buildShape(row);
+    }
+    m_builderShape_Tube->printBuiltShapes(); // DEBUG MSG
+    if (nSize > 0) {
+        std::cout << "All " << nSize << " Shapes-Tube have been built!\n";
+    }
+}
+//! Iterate over the list of shapes, build them all, and store their
+//! pointers
+void ReadGeoModel::buildAllShapes_Pcon()
+{
+    // create a builder and reserve size of memory map
+    size_t nSize = m_shapes_Pcon.size();
+    m_builderShape_Pcon = new BuildGeoShapes_Pcon(nSize, m_shapes_Pcon_data);
+    // loop over the DB rows and build the shapes
+    for (const auto &row : m_shapes_Pcon)
+    {
+        // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
+        m_builderShape_Pcon->buildShape(row);
+    }
+    m_builderShape_Pcon->printBuiltShapes(); // DEBUG MSG
+    if (nSize > 0) {
+        std::cout << "All " << nSize << " Shapes-Pcon have been built!\n";
+    }
+}
+//! Iterate over the list of shapes, build them all, and store their
+//! pointers
+void ReadGeoModel::buildAllShapes_Cons()
+{
+    // create a builder and reserve size of memory map
+    size_t nSize = m_shapes_Cons.size();
+    m_builderShape_Cons = new BuildGeoShapes_Cons(nSize);
+    // loop over the DB rows and build the shapes
+    for (const auto &row : m_shapes_Cons)
+    {
+        // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
+        m_builderShape_Cons->buildShape(row);
+    }
+    m_builderShape_Cons->printBuiltShapes(); // DEBUG MSG
+    if (nSize > 0) {
+        std::cout << "All " << nSize << " Shapes-Cons have been built!\n";
+    }
+}
+
 //! Iterate over the list of GeoSerialDenominator nodes, build them all, and
 //! store their pointers
 void ReadGeoModel::buildAllSerialDenominators() {
@@ -446,8 +569,7 @@ void ReadGeoModel::buildAllSerialIdentifiers() {
     if (m_loglevel >= 1)
         std::cout << "Building all SerialIdentifier nodes...\n";
     size_t nSize = m_serialIdentifiers.size();
-    m_memMapSerialIdentifiers.reserve(
-        nSize * 2);  // TODO: check if *2 is good or redundant...
+    m_memMapSerialIdentifiers.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         // const unsigned int nodeID = std::stoi(m_seriaIdentifiers[ii][0]);
         // // RMB: not used at the moment, commented to avoid warnings
@@ -464,8 +586,7 @@ void ReadGeoModel::buildAllSerialIdentifiers() {
 void ReadGeoModel::buildAllIdentifierTags() {
     if (m_loglevel >= 1) std::cout << "Building all IdentifierTag nodes...\n";
     size_t nSize = m_identifierTags.size();
-    m_memMapIdentifierTags.reserve(
-        nSize * 2);  // TODO: check if *2 is good or redundant...
+    m_memMapIdentifierTags.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         // const unsigned int nodeID = std::stoi(m_identifierTags[ii][0]);
         // // RMB: not used at the moment, commented to avoid warnings
@@ -482,8 +603,7 @@ void ReadGeoModel::buildAllIdentifierTags() {
 void ReadGeoModel::buildAllNameTags() {
     if (m_loglevel >= 1) std::cout << "Building all NameTag nodes...\n";
     size_t nSize = m_nameTags.size();
-    m_memMapNameTags.reserve(nSize *
-                             2);  // TODO: check if *2 is good or redundant...
+    m_memMapNameTags.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         // const unsigned int nodeID = std::stoi(m_nameTags[ii][0]); // RMB:
         // not used at teh moment, commented to avoid warnings
@@ -499,8 +619,7 @@ void ReadGeoModel::buildAllNameTags() {
 void ReadGeoModel::buildAllElements() {
     if (m_loglevel >= 1) std::cout << "Building all Elements...\n";
     size_t nSize = m_elements.size();
-    m_memMapElements.reserve(nSize *
-                             2);  // TODO: check if *2 is good or redundant...
+    m_memMapElements.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         const unsigned int nodeID = std::stoi(m_elements[ii][0]);
         buildElement(nodeID);  // nodes' IDs start from 1
@@ -513,8 +632,7 @@ void ReadGeoModel::buildAllElements() {
 void ReadGeoModel::buildAllMaterials() {
     if (m_loglevel >= 1) std::cout << "Building all Materials...\n";
     size_t nSize = m_materials.size();
-    m_memMapMaterials.reserve(nSize *
-                              2);  // TODO: check if *2 is good or redundant...
+    m_memMapMaterials.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         const unsigned int nodeID = std::stoi(m_materials[ii][0]);
         buildMaterial(nodeID);  // nodes' IDs start from 1
@@ -524,14 +642,23 @@ void ReadGeoModel::buildAllMaterials() {
 }
 
 //! Iterate over the list of nodes, build them all, and store their pointers
-void ReadGeoModel::buildAllLogVols() {
-    if (m_loglevel >= 1) std::cout << "Building all LogVols...\n";
+void ReadGeoModel::buildAllLogVols()
+{
+    if (m_loglevel >= 1)
+        std::cout << "Building all LogVols...\n";
     size_t nSize = m_logVols.size();
-    m_memMapLogVols.reserve(nSize *
-                            2);  // TODO: check if *2 is good or redundant...
-    for (unsigned int ii = 0; ii < nSize; ++ii) {
-        const unsigned int nodeID = std::stoi(m_logVols[ii][0]);
-        buildLogVol(nodeID);
+    m_memMapLogVols.reserve(nSize);
+    for (unsigned int ii = 0; ii < nSize; ++ii)
+    {
+        try
+        {
+            const unsigned int nodeID = std::get<int>(m_logVols[ii][0]);
+            buildLogVol(nodeID);
+        }
+        catch (std::bad_variant_access const &ex)
+        {
+            std::cout << ex.what() << ": logVol 'ID' is not an 'int' value!\n";
+        }
     }
     if (nSize > 0)
         std::cout << "All " << nSize << " LogVols have been built!\n";
@@ -555,8 +682,7 @@ void ReadGeoModel::buildAllPhysVols() {
     }
     const unsigned int tableID = m_tableName_toTableID["GeoPhysVol"];
     size_t nSize = m_physVols.size();
-    m_memMapPhysVols.reserve(nSize *
-                             2);  // TODO: check if *2 is good or redundant...
+    m_memMapPhysVols.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         const unsigned int volID = std::stoi(m_physVols[ii][0]);
         const unsigned int logVolID = std::stoi(m_physVols[ii][1]);
@@ -573,8 +699,7 @@ void ReadGeoModel::buildAllFullPhysVols() {
     if (m_debug) std::cout << "Building all FullPhysVols...\n";
     const unsigned int tableID = m_tableName_toTableID["GeoFullPhysVol"];
     size_t nSize = m_fullPhysVols.size();
-    m_memMapFullPhysVols.reserve(
-        nSize * 2);  // TODO: check if *2 is good or redundant...
+    m_memMapFullPhysVols.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         const unsigned int volID = std::stoi(m_fullPhysVols[ii][0]);
         const unsigned int logVolID = std::stoi(m_fullPhysVols[ii][1]);
@@ -591,8 +716,7 @@ void ReadGeoModel::buildAllFullPhysVols() {
 void ReadGeoModel::buildAllAlignableTransforms() {
     if (m_debug) std::cout << "Building all AlignableTransforms...\n";
     size_t nSize = m_alignableTransforms.size();
-    m_memMapAlignableTransforms.reserve(
-        nSize * 2);  // TODO: check if *2 is good or redundant...
+    m_memMapAlignableTransforms.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         const unsigned int volID = std::stoi(m_alignableTransforms[ii][0]);
         buildAlignableTransform(volID);
@@ -607,8 +731,7 @@ void ReadGeoModel::buildAllAlignableTransforms() {
 void ReadGeoModel::buildAllTransforms() {
     if (m_debug) std::cout << "Building all Transforms...\n";
     size_t nSize = m_transforms.size();
-    m_memMapTransforms.reserve(nSize *
-                               2);  // TODO: check if *2 is good or redundant...
+    m_memMapTransforms.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         const unsigned int volID = std::stoi(m_transforms[ii][0]);
         buildTransform(volID);
@@ -622,8 +745,7 @@ void ReadGeoModel::buildAllTransforms() {
 void ReadGeoModel::buildAllSerialTransformers() {
     if (m_debug) std::cout << "Building all SerialTransformers...\n";
     size_t nSize = m_serialTransformers.size();
-    m_memMapSerialTransformers.reserve(
-        nSize * 2);  // TODO: check if 2 is good or redundant...
+    m_memMapSerialTransformers.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
         const unsigned int volID = std::stoi(m_serialTransformers[ii][0]);
         buildSerialTransformer(volID);
@@ -1301,6 +1423,7 @@ std::string ReadGeoModel::getShapeType(const unsigned int shapeId) {
     return type;
 }
 
+
 // TODO: move shapes in different files, so code here is more managable
 /// Recursive function, to build GeoShape nodes
 GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
@@ -1330,7 +1453,9 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
 
     GeoShape* shape = nullptr;
 
-    if (type == "Box") {
+    if (false) {
+    } 
+    else if (type == "Box") {
         // shape parameters
         double XHalfLength = 0.;
         double YHalfLength = 0.;
@@ -1348,38 +1473,40 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
                 ZHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
         }
         shape = new GeoBox(XHalfLength, YHalfLength, ZHalfLength);
-    } else if (type == "Cons") {
-        // shape parameters
-        double RMin1 = 0.;
-        double RMin2 = 0.;
-        double RMax1 = 0.;
-        double RMax2 = 0.;
-        double DZ = 0.;
-        double SPhi = 0.;
-        double DPhi = 0.;
-        // get parameters from DB string
-        for (auto& par : shapePars) {
-            std::vector<std::string> vars = splitString(par, '=');
-            std::string varName = vars[0];
-            std::string varValue = vars[1];
-            // std::cout << "varValue Cons:" << varValue;
-            if (varName == "RMin1")
-                RMin1 = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "RMin2")
-                RMin2 = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "RMax1")
-                RMax1 = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "RMax2")
-                RMax2 = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "DZ")
-                DZ = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "SPhi")
-                SPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "DPhi")
-                DPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-        }
-        shape = new GeoCons(RMin1, RMin2, RMax1, RMax2, DZ, SPhi, DPhi);
-    } else if (type == "Torus") {
+    } 
+    // else if (type == "Cons") {
+    //     // shape parameters
+    //     double RMin1 = 0.;
+    //     double RMin2 = 0.;
+    //     double RMax1 = 0.;
+    //     double RMax2 = 0.;
+    //     double DZ = 0.;
+    //     double SPhi = 0.;
+    //     double DPhi = 0.;
+    //     // get parameters from DB string
+    //     for (auto& par : shapePars) {
+    //         std::vector<std::string> vars = splitString(par, '=');
+    //         std::string varName = vars[0];
+    //         std::string varValue = vars[1];
+    //         // std::cout << "varValue Cons:" << varValue;
+    //         if (varName == "RMin1")
+    //             RMin1 = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "RMin2")
+    //             RMin2 = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "RMax1")
+    //             RMax1 = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "RMax2")
+    //             RMax2 = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "DZ")
+    //             DZ = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "SPhi")
+    //             SPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "DPhi")
+    //             DPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //     }
+    //     shape = new GeoCons(RMin1, RMin2, RMax1, RMax2, DZ, SPhi, DPhi);
+    // } 
+    else if (type == "Torus") {
         // Member Data:
         // * Rmax - outside radius of the torus tube
         // * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
@@ -1439,127 +1566,129 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
         }
         shape = new GeoPara(XHalfLength, YHalfLength, ZHalfLength, Alpha, Theta,
                             Phi);
-    } else if (type == "Pcon") {
-        // shape parameters
-        double SPhi = 0.;
-        double DPhi = 0.;
-        unsigned int NZPlanes = 0;
+    } 
+    // else if (type == "Pcon") {
+        // // shape parameters
+        // double SPhi = 0.;
+        // double DPhi = 0.;
+        // unsigned int NZPlanes = 0;
 
-        bool error = 0;
-        std::string par;
-        std::vector<std::string> vars;
-        std::string varName;
-        std::string varValue;
+        // bool error = 0;
+        // std::string par;
+        // std::vector<std::string> vars;
+        // std::string varName;
+        // std::string varValue;
 
-        GeoPcon* pcon = nullptr;
+        // GeoPcon* pcon = nullptr;
 
-        int sizePars = shapePars.size();
-        // check if we have more than 3 parameters
-        if (sizePars > 3) {
-            // get the three first GeoPcon parameters: the SPhi and DPhi angles,
-            // plus the number of Z planes
-            for (int it = 0; it < 3; it++) {
-                par = shapePars[it];
-                vars = splitString(par, '=');
-                varName = vars[0];
-                varValue = vars[1];
-                if (varName == "SPhi") SPhi = std::stod(varValue);
-                if (varName == "DPhi") DPhi = std::stod(varValue);
-                if (varName == "NZPlanes") NZPlanes = std::stoi(varValue);
-            }
-            // build the basic GeoPcon shape
-            pcon = new GeoPcon(SPhi, DPhi);
+        // int sizePars = shapePars.size();
+        // // check if we have more than 3 parameters
+        // if (sizePars > 3) {
+        //     // get the three first GeoPcon parameters: the SPhi and DPhi angles,
+        //     // plus the number of Z planes
+        //     for (int it = 0; it < 3; it++) {
+        //         par = shapePars[it];
+        //         vars = splitString(par, '=');
+        //         varName = vars[0];
+        //         varValue = vars[1];
+        //         if (varName == "SPhi") SPhi = std::stod(varValue);
+        //         if (varName == "DPhi") DPhi = std::stod(varValue);
+        //         if (varName == "NZPlanes") NZPlanes = std::stoi(varValue);
+        //     }
+        //     // build the basic GeoPcon shape
+        //     pcon = new GeoPcon(SPhi, DPhi);
 
-            // and now loop over the rest of the list, to get the parameters of
-            // all Z planes
-            for (int it = 3; it < sizePars; it++) {
-                par = shapePars[it];
-                vars = splitString(par, '=');
-                varName = vars[0];
-                varValue = vars[1];
+        //     // and now loop over the rest of the list, to get the parameters of
+        //     // all Z planes
+        //     for (int it = 3; it < sizePars; it++) {
+        //         par = shapePars[it];
+        //         vars = splitString(par, '=');
+        //         varName = vars[0];
+        //         varValue = vars[1];
 
-                if (varName == "ZPos") {
-                    double zpos = std::stod(varValue);
-                    double rmin = 0., rmax = 0.;
+        //         if (varName == "ZPos") {
+        //             double zpos = std::stod(varValue);
+        //             double rmin = 0., rmax = 0.;
 
-                    it++;  // go to next variable
+        //             it++;  // go to next variable
 
-                    par = shapePars[it];
-                    vars = splitString(par, '=');
-                    varName = vars[0];
-                    varValue = vars[1];
-                    if (varName == "ZRmin")
-                        rmin = std::stod(varValue);
-                    else
-                        error = 1;
-                    it++;  // go to next variable
+        //             par = shapePars[it];
+        //             vars = splitString(par, '=');
+        //             varName = vars[0];
+        //             varValue = vars[1];
+        //             if (varName == "ZRmin")
+        //                 rmin = std::stod(varValue);
+        //             else
+        //                 error = 1;
+        //             it++;  // go to next variable
 
-                    par = shapePars[it];
-                    vars = splitString(par, '=');
-                    varName = vars[0];
-                    varValue = vars[1];
-                    if (varName == "ZRmax")
-                        rmax = std::stod(varValue);
-                    else
-                        error = 1;
+        //             par = shapePars[it];
+        //             vars = splitString(par, '=');
+        //             varName = vars[0];
+        //             varValue = vars[1];
+        //             if (varName == "ZRmax")
+        //                 rmax = std::stod(varValue);
+        //             else
+        //                 error = 1;
 
-                    if (error) {
-                        muxCout.lock();
-                        std::cout << "ERROR! GeoPcon 'ZRmin' and 'ZRmax' "
-                                     "values are not at the right place! --> ";
-                        printStdVectorStrings(shapePars);
-                        muxCout.unlock();
-                    }
+        //             if (error) {
+        //                 muxCout.lock();
+        //                 std::cout << "ERROR! GeoPcon 'ZRmin' and 'ZRmax' "
+        //                              "values are not at the right place! --> ";
+        //                 printStdVectorStrings(shapePars);
+        //                 muxCout.unlock();
+        //             }
 
-                    // add a Z plane to the GeoPcon
-                    pcon->addPlane(zpos, rmin, rmax);
-                } else {
-                    error = 1;
-                    muxCout.lock();
-                    std::cout << "ERROR! GeoPcon 'ZPos' value is not at the "
-                                 "right place! --> ";
-                    printStdVectorStrings(shapePars);
-                    muxCout.unlock();
-                }
-            }
+        //             // add a Z plane to the GeoPcon
+        //             pcon->addPlane(zpos, rmin, rmax);
+        //         } else {
+        //             error = 1;
+        //             muxCout.lock();
+        //             std::cout << "ERROR! GeoPcon 'ZPos' value is not at the "
+        //                          "right place! --> ";
+        //             printStdVectorStrings(shapePars);
+        //             muxCout.unlock();
+        //         }
+        //     }
 
-            // sanity check on the resulting Pcon shape
-            if (pcon->getNPlanes() != NZPlanes) {
-                error = 1;
-                muxCout.lock();
-                std::cout << "ERROR! GeoPcon number of planes: "
-                          << pcon->getNPlanes()
-                          << " is not equal to the original size! --> ";
-                printStdVectorStrings(shapePars);
-                muxCout.unlock();
-            }
-            if (!pcon->isValid()) {
-                error = 1;
-                muxCout.lock();
-                std::cout << "ERROR! GeoPcon shape is not valid!! -- input: ";
-                printStdVectorStrings(shapePars);
-                muxCout.unlock();
-            }
-        }  // end if (size>3)
-        else {
-            muxCout.lock();
-            std::cout << "ERROR!! GeoPcon has no Z planes!! --> shape input "
-                         "parameters: ";
-            printStdVectorStrings(shapePars);
-            muxCout.unlock();
-            error = 1;
-        }
+        //     // sanity check on the resulting Pcon shape
+        //     if (pcon->getNPlanes() != NZPlanes) {
+        //         error = 1;
+        //         muxCout.lock();
+        //         std::cout << "ERROR! GeoPcon number of planes: "
+        //                   << pcon->getNPlanes()
+        //                   << " is not equal to the original size! --> ";
+        //         printStdVectorStrings(shapePars);
+        //         muxCout.unlock();
+        //     }
+        //     if (!pcon->isValid()) {
+        //         error = 1;
+        //         muxCout.lock();
+        //         std::cout << "ERROR! GeoPcon shape is not valid!! -- input: ";
+        //         printStdVectorStrings(shapePars);
+        //         muxCout.unlock();
+        //     }
+        // }  // end if (size>3)
+        // else {
+        //     muxCout.lock();
+        //     std::cout << "ERROR!! GeoPcon has no Z planes!! --> shape input "
+        //                  "parameters: ";
+        //     printStdVectorStrings(shapePars);
+        //     muxCout.unlock();
+        //     error = 1;
+        // }
 
-        if (error) {
-            muxCout.lock();
-            std::cout << "FATAL ERROR!!! - GeoPcon shape error!!! Aborting..."
-                      << std::endl;
-            muxCout.unlock();
-            exit(EXIT_FAILURE);
-        }
+        // if (error) {
+        //     muxCout.lock();
+        //     std::cout << "FATAL ERROR!!! - GeoPcon shape error!!! Aborting..."
+        //               << std::endl;
+        //     muxCout.unlock();
+        //     exit(EXIT_FAILURE);
+        // }
 
-        shape = pcon;
-    } else if (type == "Pgon") {
+        // shape = pcon;
+    // } 
+    else if (type == "Pgon") {
         // shape parameters
         double SPhi = 0.;
         double DPhi = 0.;
@@ -3005,23 +3134,24 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
     }
 
     // get logVol properties from the DB
-    std::vector<std::string> values = m_logVols[id - 1];
+    // std::vector<std::string> values = m_logVols[id - 1];
+    DBRowEntry values = m_logVols[id - 1];
 
-    // get the parameters to build the GeoLogVol node
-    std::string logVolName = values[1];
-
-    // build the referenced GeoShape node
-    const unsigned int shapeId = std::stoi(values[2]);
-    GeoShape* shape = getBuiltShape(shapeId);
+    // --- get the parameters to build the GeoLogVol node
+    // get the name of the LogVol
+    const std::string logVolName = GeoModelHelpers::variantHelper::getFromVariant_String(values[1], "LogVol_name");
+    // get the ID and the type of the referenced GeoShape node
+    const int shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[2], "LogVol_shapeID");
+    const std::string shapeType = GeoModelHelpers::variantHelper::getFromVariant_String(values[3], "LogVol_shapeType");
+    GeoShape* shape = getBuiltShape(shapeId, shapeType);
     if (!shape) {
-        std::cout
-            << "ERROR!! While building a LogVol, Shape is NULL! Exiting..."
-            << std::endl;
-        exit(EXIT_FAILURE);
+            THROW_EXCEPTION("ERROR!! While building a LogVol, Shape of type '" + shapeType + "' is NULL! Exiting...");
     }
 
     // build the referenced GeoMaterial node
-    const unsigned int matId = std::stoi(values[3]);
+    // const unsigned int matId = std::stoi(values[3]);
+    const int matId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[4], "LogVol_MaterialID");
+
     if (m_loglevel >= 2) {
         muxCout.lock();
         std::cout << "buildLogVol() - material Id:" << matId << std::endl;
@@ -3029,10 +3159,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
     }
     GeoMaterial* mat = getBuiltMaterial(matId);
     if (!mat) {
-        std::cout
-            << "ERROR!! While building a LogVol, Material is NULL! Exiting..."
-            << std::endl;
-        exit(EXIT_FAILURE);
+            THROW_EXCEPTION("ERROR!! While building a LogVol, Material of ID '" + std::to_string(matId) + "' is NULL! Exiting...");
     }
 
     GeoLogVol* logPtr = new GeoLogVol(logVolName, shape, mat);
@@ -3045,6 +3172,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
     }
     return logPtr;
 }
+
 
 //// TODO: should go in a QtUtils header-only class, to be used in other
 /// packages
@@ -3231,15 +3359,17 @@ TRANSFUNCTION ReadGeoModel::buildFunction(const unsigned int id) {
 
     if (0 == expr.size()) {
         muxCout.lock();
-        std::cout << "FATAL ERROR!! Function expression is empty!! Aborting..."
-                  << std::endl;
+        THROW_EXCEPTION("FATAL ERROR!! Function expression is empty!! Aborting...");
         muxCout.unlock();
-        exit(EXIT_FAILURE);
     }
 
     // get exprData, extract subvector
-    std::deque<double> sub_vector(m_funcExprData.begin() + dataStart,
-                           m_funcExprData.begin() + dataEnd);
+    // NOTE: we use (dataStart-1) to cope with the difference between the DB rows starting from '1', 
+    //       which is what the 'dataStart' stores, and the vector items, which start '0'; 
+    //       also, the constructor of the sub-vector takes the element from 'begin+dataStart-1' included
+    //       and 'begin+dataEnd' excluded.
+    std::deque<double> sub_vector(m_funcExprData.begin() + (dataStart-1),
+                           m_funcExprData.begin() + (dataEnd) );
 
     TransFunctionInterpreter interpreter;
     TFPTR func = interpreter.interpret(expr, &sub_vector);
@@ -3269,8 +3399,35 @@ bool ReadGeoModel::isBuiltShape(const unsigned int id) {
 void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* nodePtr) {
     m_memMapShapes[id] = nodePtr;
 }
-GeoShape* ReadGeoModel::getBuiltShape(const unsigned int id) {
-    return m_memMapShapes[id];  // this is a map, and 'id' is the key
+GeoShape *ReadGeoModel::getBuiltShape(const unsigned int shapeId, std::string_view shapeType)
+{
+
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons"};
+    // get shape parameters
+    if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
+    {
+        if ("Box" == shapeType)
+        {
+            return m_builderShape_Box->getBuiltShape(shapeId);
+        }
+        else if ("Tube" == shapeType)
+        {
+            return m_builderShape_Tube->getBuiltShape(shapeId);
+        }
+        else if ("Pcon" == shapeType)
+        {
+            return m_builderShape_Pcon->getBuiltShape(shapeId);
+        } 
+        else if ("Cons" == shapeType)
+        {
+            return m_builderShape_Cons->getBuiltShape(shapeId);
+        } 
+        else {
+            THROW_EXCEPTION("ERROR!!! Shape '" + std::string(shapeType) + "' is not handled correctly!");
+        }
+    }
+    std::cout << "WARNING! For the shape '" << shapeType << "' we're using the old DB schema..." << std::endl;
+    return m_memMapShapes[shapeId]; // this is a map, and 'id' is the key
 }
 
 // --- methods for caching GeoLogVol nodes ---

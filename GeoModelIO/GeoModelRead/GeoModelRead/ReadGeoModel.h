@@ -53,8 +53,10 @@ typedef GeoModelIO::ReadGeoModel Persistifier;
 // ****************************************************************
 // ****************************************************************
 
-// local includes
+// GeoModel includes
 #include "GeoModelDBManager/GMDBManager.h"
+#include "GeoModelDBManager/definitions.h"
+
 #include "GeoModelKernel/GeoXF.h"
 
 // C++ includes
@@ -86,6 +88,11 @@ class GeoGraphNode;
 class GeoShapeSubtraction;
 class GeoBox;
 
+class BuildGeoShapes_Box;
+class BuildGeoShapes_Tube;
+class BuildGeoShapes_Pcon;
+class BuildGeoShapes_Cons;
+
 // type definitions
 typedef const GeoXF::Function& TRANSFUNCTION;
 // containers for boolean shapes' information
@@ -93,6 +100,8 @@ typedef std::tuple<unsigned int /*shape ID*/, GeoShape*,
                    unsigned int /*opA ID*/, unsigned int /*opB ID*/>
     tuple_shapes_boolean_info;
 typedef std::vector<tuple_shapes_boolean_info> type_shapes_boolean_info;
+
+
 
 namespace GeoModelIO {
 
@@ -156,6 +165,11 @@ class ReadGeoModel {
     };
 
    private:
+    void buildAllShapes_Box();
+    void buildAllShapes_Tube();
+    void buildAllShapes_Pcon();
+    void buildAllShapes_Cons();
+
     void buildAllShapes();
     void buildAllElements();
     void buildAllMaterials();
@@ -224,7 +238,7 @@ class ReadGeoModel {
     // one, with the GeoModel class as a second argument ? (RMB)
     bool isBuiltShape(const unsigned int id);
     void storeBuiltShape(const unsigned int, GeoShape* node);
-    GeoShape* getBuiltShape(const unsigned int id);
+    GeoShape* getBuiltShape(const unsigned int shapeId, std::string_view shapeType = "");
 
     bool isBuiltTransform(const unsigned int id);
     void storeBuiltTransform(GeoTransform* node);
@@ -314,6 +328,14 @@ class ReadGeoModel {
     // callback handles
     unsigned long* m_progress;
 
+    //! builders
+    // std::unique_ptr<BuildGeoShapes_Box> m_builderShape_Box;
+    BuildGeoShapes_Box* m_builderShape_Box;
+    BuildGeoShapes_Tube* m_builderShape_Tube;
+    BuildGeoShapes_Pcon* m_builderShape_Pcon;
+    BuildGeoShapes_Cons* m_builderShape_Cons;
+
+
     //! containers to store the list of GeoModel nodes coming from the DB
     std::vector<std::vector<std::string>> m_physVols;
     std::vector<std::vector<std::string>> m_fullPhysVols;
@@ -324,11 +346,22 @@ class ReadGeoModel {
     std::vector<std::vector<std::string>> m_identifierTags;
     std::vector<std::vector<std::string>> m_serialTransformers;
     std::vector<std::vector<std::string>> m_nameTags;
-    std::vector<std::vector<std::string>> m_logVols;
     std::vector<std::vector<std::string>> m_materials;
     std::vector<std::vector<std::string>> m_elements;
     std::vector<std::vector<std::string>> m_shapes;
     std::vector<std::vector<std::string>> m_allchildren;
+
+    // std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_logVols;
+    DBRowsList m_logVols;
+
+    // containers to store shapes' parameters
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Box;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Tube;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Cons;
+
+    // containers to store shapes' data, for shapes with a variable number of build parameters
+    DBRowsList m_shapes_Pcon_data;
 
     // std::vector<std::vector<std::string>> m_functions;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_functions;

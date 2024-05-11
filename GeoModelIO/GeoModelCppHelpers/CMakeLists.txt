@@ -11,7 +11,7 @@ file( GLOB HEADERS GeoModelCppHelpers/*.h )
 # Set up the library.
 add_library( GeoModelCppHelpers SHARED ${HEADERS} ${SOURCES} )
 # target_link_libraries( GeoModelCppHelpers PUBLIC
-#     GeoModelRead GeoModelWrite )
+#      GeoModelHelpers )
 
 # We link those to carry on the needed libs when including GeoModelCppHelpers,
 # even if the latter is headers only

@@ -13,8 +13,6 @@ stages:
 
 # List global variables
 variables:
-  CMAKE_DEPS_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
-  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
   # also, 'CMAKE_EXTRA_FLAGS' will be specified by specific jobs when needed, and used by job templates like 'geomodel-job'
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -43,43 +41,20 @@ workflow:
     - export CPPFLAGS="-I/usr/local/opt/expat/include"
     - export PATH="/usr/local/opt/qt5/bin:$PATH" # to make Qt5 discoverable by CMake
 
-
-# general Ubuntu job template
-.ubuntu-template-job-base: &ubuntu-job-base
-  image: gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
-  rules:
-    - when: always
-
-
 # NOTE
 # The Ubuntu package 'nlohmann-json-dev' is version 2.x, too old for us.
 # Thus, for GeoModelVisualization (GMEX), we now build nlohmann_json as part
 # of the build, by using the 'standalone' job only
 .ubuntu-template-job-default: &ubuntu-job
-  <<: *ubuntu-job-base
+  image: gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
+  rules:
+    - when: always
 
 
 # TEMPLATES FOR BUILDING PACKAGES
 .geomodel-build-template: &geomodel-job
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
-    - echo "PWD; LS" # CI debug only
-    - pwd; ls # CI debug only
-    - ls ../ # CI debug only
-    - ls ../../ # CI debug only
-    - cmake --version # CI debug only
-    - mkdir build
-    - cd build
-    - echo "CMAKE_ARGS -- ${CMAKE_ARGS}"
-    - echo "CMAKE_CONFIG_FLAGS -- ${CMAKE_CONFIG_FLAGS}"
-    - echo "CMAKE_EXTRA_FLAGS -- ${CMAKE_EXTRA_FLAGS}"
-    - cmake ${CMAKE_ARGS} ${CMAKE_CONFIG_FLAGS} ${CMAKE_EXTRA_FLAGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-    - cmake --build . -- -j2
-    - cmake --build . -- install
-    - pwd; ls # CI debug only
-    - ls ../ # CI debug only
-    - ls ../../ # CI debug only
+    - CI/compile_GeoModel.sh
   artifacts:
     paths:
       - install
@@ -133,8 +108,7 @@ debug-job:
 #   <<: *geomodel-job
 #   stage: step-A
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
 
 # mac-gm-visualization:
 #   <<: *macos-job
@@ -142,8 +116,7 @@ debug-job:
 #   stage: step-C
 #   needs: ["mac-coin", "mac-soqt"]
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
 
 # mac-gm-examples:
 #   <<: *macos-job
@@ -151,7 +124,6 @@ debug-job:
 #   stage: step-A
 #   # needs: ["mac-config"]
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 #     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
 
 # mac-gm-gmg4:
@@ -159,7 +131,6 @@ debug-job:
 #   <<: *geomodel-job
 #   stage: step-A
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 #     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
 
 # mac-gm-examples-gmg4:
@@ -167,7 +138,6 @@ debug-job:
 #   <<: *geomodel-job
 #   stage: step-A
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 #     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
 
 # mac-gm-fullsimlight:
@@ -175,7 +145,6 @@ debug-job:
 #   <<: *geomodel-job
 #   stage: step-A
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 #     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
 
 # mac-gm-fsl:
@@ -183,8 +152,7 @@ debug-job:
 #   <<: *geomodel-job
 #   stage: step-A
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_FSL=TRUE
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FSL=TRUE
 
 # mac-gm-all:
 #   <<: *macos-job
@@ -192,15 +160,13 @@ debug-job:
 #   stage: step-C
 #   needs: ["mac-coin", "mac-soqt"]
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
   
 # mac-gm-atlasextras:
 #   <<: *macos-job
 #   <<: *geomodel-job
 #   stage: step-A
 #   variables:
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 #     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
 
 
@@ -213,15 +179,12 @@ ubu-gm-base:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
-  variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
 
 ubu-gm-tools:
   <<: *ubuntu-job
   <<: *geomodel-job
   stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
 
 
@@ -230,7 +193,6 @@ ubu-gm-visualization:
   <<: *geomodel-job
   stage: step-C
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
 
 ubu-gm-examples:
@@ -238,64 +200,61 @@ ubu-gm-examples:
   <<: *geomodel-job
   stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
 
 
 ubu-gm-examples-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-B
+  stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
 
 ubu-gm-gmg4:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-B
+  stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
 
 
 ubu-gm-fullsimlight:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-B
+  stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
 
 
 ubu-gm-fsl:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-B
+  stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FSL=TRUE
 
 
 ubu-gm-all:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
+  stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+  script: 
+     - CI/compile_GeoModel.sh
+     - mv ${CI_PROJECT_DIR}/../build ./
   artifacts:
     paths:
-    - build
+      - build
+      - install
     expire_in: 30 minutes
 
 
 ubu-gm-atlasextras:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-B
+  stage: step-A
   variables:
-    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
 
 #TODO: this does not work properly. Needs some work...
@@ -305,9 +264,7 @@ ubu-gm-atlasextras:
 #   stage: step-C
 #   variables:
 #     XERCESC_VERSION: 3.2.3
-#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
-#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
-#     CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib
 #   rules:
 #     - when: manual
 
@@ -329,11 +286,7 @@ ubu-single-gmbase:
   variables:
       CMAKE_ARGS: ${CMAKE_BASE_ARGS}
   script:
-    - mkdir build
-    - cd build
-    - cmake ${CMAKE_ARGS} .. # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-    - cmake --build . -- -j2
-    - cmake --build . -- install
+    - CI/compile_GeoModel.sh
   artifacts:
     paths:
       - install
@@ -344,13 +297,10 @@ ubu-single-gmtools:
   stage: step-B
   needs: ["ubu-single-gmbase"]
   variables:
-      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+      SOURCE_DIR: "${CI_PROJECT_DIR}/GeoModelTools"
   script:
-    - mkdir build
-    - cd build
-    - cmake ${CMAKE_ARGS} ../GeoModelTools # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-    - cmake --build . -- -j2
-    - cmake --build . -- install
+    - CI/compile_GeoModel.sh
+
   artifacts:
     paths:
       - install
@@ -361,13 +311,9 @@ ubu-single-gmviz:
   stage: step-C
   needs: ["ubu-single-gmbase"]
   variables:
-      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+      SOURCE_DIR: "${CI_PROJECT_DIR}/GeoModelVisualization"
   script:
-    - mkdir build
-    - cd build
-    - cmake ${CMAKE_ARGS} ../GeoModelVisualization # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-    - cmake --build . -- -j2
-    - cmake --build . -- install
+    - CI/compile_GeoModel.sh
   artifacts:
     paths:
       - install
@@ -378,13 +324,9 @@ ubu-single-gmg4:
   stage: step-C
   needs: ["ubu-single-gmbase"]
   variables:
-      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+      SOURCE_DIR: "${CI_PROJECT_DIR}/GeoModelG4"
   script:
-    - mkdir build
-    - cd build
-    - cmake ${CMAKE_ARGS} ../GeoModelG4 # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-    - cmake --build . -- -j2
-    - cmake --build . -- install
+    - CI/compile_GeoModel.sh
   artifacts:
     paths:
       - install
@@ -395,13 +337,9 @@ ubu-single-gmfullsimlight:
   stage: step-D
   needs: ["ubu-single-gmg4"]
   variables:
-      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+      SOURCE_DIR: "${CI_PROJECT_DIR}/FullSimLight"
   script:
-    - mkdir build
-    - cd build
-    - cmake ${CMAKE_ARGS} ../FullSimLight # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-    - cmake --build . -- -j2
-    - cmake --build . -- install
+    - CI/compile_GeoModel.sh
   artifacts:
     paths:
       - install
@@ -412,15 +350,20 @@ ubu-single-gmfsl:
   stage: step-E
   needs: ["ubu-single-gmfullsimlight"]
   variables:
-      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+      SOURCE_DIR: ${CMAKE_PROJECT_DIR}/FSL
   script:
-    - mkdir build
-    - cd build
-    - cmake ${CMAKE_ARGS} ../FSL # the CMAKE_EXTRA_FLAGS are set by specific jobs when needed
-    - cmake --build . -- -j2
-    - cmake --build . -- install
+    - CI/compile_GeoModel.sh
 
-
+ubu-geomodelatlas:
+  <<: *ubuntu-job
+  stage: step-B
+  needs : ["ubu-gm-all"]
+  variables:
+      SOURCE_DIR: ${CMAKE_PROJECT_DIR}/GeoModelATLAS
+  script:
+    - git clone https://${EOS_ACCOUNT_USERNAME}:${GEOMODEL_READ_ACCESS}@gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS.git
+    - ls -lh
+    - CI/compile_GeoModel.sh
 #####################
 ### Documentation ###
 #####################
@@ -569,7 +512,8 @@ tests-ubuntu:
   needs: ["ubu-gm-all"]
   stage: test
   script:
-    - cd build
+    - mv build ../
+    - cd ../build
     - ctest #--output-on-failure
   
 include:

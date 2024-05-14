@@ -90,8 +90,11 @@ class GeoBox;
 
 class BuildGeoShapes_Box;
 class BuildGeoShapes_Tube;
-class BuildGeoShapes_Pcon;
 class BuildGeoShapes_Cons;
+class BuildGeoShapes_Para;
+
+class BuildGeoShapes_Pcon;
+class BuildGeoShapes_Pgon;
 
 // type definitions
 typedef const GeoXF::Function& TRANSFUNCTION;
@@ -167,8 +170,11 @@ class ReadGeoModel {
    private:
     void buildAllShapes_Box();
     void buildAllShapes_Tube();
-    void buildAllShapes_Pcon();
     void buildAllShapes_Cons();
+    void buildAllShapes_Para();
+    
+    void buildAllShapes_Pcon();
+    void buildAllShapes_Pgon();
 
     void buildAllShapes();
     void buildAllElements();
@@ -332,8 +338,11 @@ class ReadGeoModel {
     // std::unique_ptr<BuildGeoShapes_Box> m_builderShape_Box;
     BuildGeoShapes_Box* m_builderShape_Box;
     BuildGeoShapes_Tube* m_builderShape_Tube;
-    BuildGeoShapes_Pcon* m_builderShape_Pcon;
     BuildGeoShapes_Cons* m_builderShape_Cons;
+    BuildGeoShapes_Para* m_builderShape_Para;
+
+    BuildGeoShapes_Pcon* m_builderShape_Pcon;
+    BuildGeoShapes_Pgon* m_builderShape_Pgon;
 
 
     //! containers to store the list of GeoModel nodes coming from the DB
@@ -357,11 +366,15 @@ class ReadGeoModel {
     // containers to store shapes' parameters
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Box;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Tube;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Cons;
+    DBRowsList m_shapes_Para;
 
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pgon;
+    
     // containers to store shapes' data, for shapes with a variable number of build parameters
     DBRowsList m_shapes_Pcon_data;
+    DBRowsList m_shapes_Pgon_data;
 
     // std::vector<std::vector<std::string>> m_functions;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_functions;

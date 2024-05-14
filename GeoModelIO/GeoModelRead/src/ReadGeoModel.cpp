@@ -28,8 +28,10 @@
 // local includes
 #include "BuildGeoShapes_Box.h"
 #include "BuildGeoShapes_Tube.h"
-#include "BuildGeoShapes_Pcon.h"
 #include "BuildGeoShapes_Cons.h"
+#include "BuildGeoShapes_Para.h"
+#include "BuildGeoShapes_Pcon.h"
+#include "BuildGeoShapes_Pgon.h"
 
 #include "GeoModelRead/ReadGeoModel.h"
 
@@ -280,11 +282,15 @@ void ReadGeoModel::loadDB() {
     // shapes from the new DB schema
     m_shapes_Box = m_dbManager->getTableFromNodeType_VecVecData("GeoBox");
     m_shapes_Tube = m_dbManager->getTableFromNodeType_VecVecData("GeoTube");
-    m_shapes_Pcon = m_dbManager->getTableFromNodeType_VecVecData("GeoPcon");
     m_shapes_Cons = m_dbManager->getTableFromNodeType_VecVecData("GeoCons");
+    m_shapes_Para = m_dbManager->getTableFromNodeType_VecVecData("GeoPara");
     
+    m_shapes_Pcon = m_dbManager->getTableFromNodeType_VecVecData("GeoPcon");
+    m_shapes_Pgon = m_dbManager->getTableFromNodeType_VecVecData("GeoPgon");
+
     // shapes' data, when needed by shapes that have variable numbers of build parameters
     m_shapes_Pcon_data = m_dbManager->getTableFromTableName_VecVecData("Shapes_Pcon_Data");
+    m_shapes_Pgon_data = m_dbManager->getTableFromTableName_VecVecData("Shapes_Pgon_Data");
 
     // get the Function's expression data
     // m_funcExprData = m_dbManager->getTableFromTableNameVecVecData("FuncExprData");
@@ -336,6 +342,8 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         std::thread t16(&ReadGeoModel::buildAllShapes_Tube, this);
         std::thread t17(&ReadGeoModel::buildAllShapes_Pcon, this);
         std::thread t18(&ReadGeoModel::buildAllShapes_Cons, this);
+        std::thread t19(&ReadGeoModel::buildAllShapes_Para, this);
+        std::thread t20(&ReadGeoModel::buildAllShapes_Pgon, this);
 
         t2.join();  // ok, all Elements have been built
         // needs Elements
@@ -344,6 +352,9 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         t1.join();  // ok, all Shapes have been built
         t15.join();  // ok, all Shapes-Box have been built
         t16.join();  // ok, all Shapes-Tube have been built
+        t17.join();  // ok, all Shapes-Tube have been built
+        t18.join();  // ok, all Shapes-Tube have been built
+        t19.join();  // ok, all Shapes-Tube have been built
         t3.join();  // ok, all Materials have been built
         // needs Shapes and Materials
         std::thread t4(&ReadGeoModel::buildAllLogVols, this);
@@ -381,7 +392,9 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         buildAllShapes_Box();
         buildAllShapes_Tube();
         buildAllShapes_Pcon();
+        buildAllShapes_Pgon();
         buildAllShapes_Cons();
+        buildAllShapes_Para();
         buildAllMaterials();
         buildAllLogVols();
         buildAllPhysVols();
@@ -505,6 +518,44 @@ void ReadGeoModel::buildAllShapes_Tube()
         std::cout << "All " << nSize << " Shapes-Tube have been built!\n";
     }
 }
+
+//! Iterate over the list of shapes, build them all, and store their
+//! pointers
+void ReadGeoModel::buildAllShapes_Cons()
+{
+    // create a builder and reserve size of memory map
+    size_t nSize = m_shapes_Cons.size();
+    m_builderShape_Cons = new BuildGeoShapes_Cons(nSize);
+    // loop over the DB rows and build the shapes
+    for (const auto &row : m_shapes_Cons)
+    {
+        // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
+        m_builderShape_Cons->buildShape(row);
+    }
+    m_builderShape_Cons->printBuiltShapes(); // DEBUG MSG
+    if (nSize > 0) {
+        std::cout << "All " << nSize << " Shapes-Cons have been built!\n";
+    }
+}
+//! Iterate over the list of GeoPara shapes, build them all, and store their
+//! pointers
+void ReadGeoModel::buildAllShapes_Para()
+{
+    // create a builder and reserve size of memory map
+    size_t nSize = m_shapes_Para.size();
+    m_builderShape_Para = new BuildGeoShapes_Para(nSize);
+    // loop over the DB rows and build the shapes
+    for (const auto &row : m_shapes_Para)
+    {
+        // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
+        m_builderShape_Para->buildShape(row);
+    }
+    m_builderShape_Para->printBuiltShapes(); // DEBUG MSG
+    if (nSize > 0) {
+        std::cout << "All " << nSize << " Shapes-Para have been built!\n";
+    }
+}
+
 //! Iterate over the list of shapes, build them all, and store their
 //! pointers
 void ReadGeoModel::buildAllShapes_Pcon()
@@ -523,22 +574,22 @@ void ReadGeoModel::buildAllShapes_Pcon()
         std::cout << "All " << nSize << " Shapes-Pcon have been built!\n";
     }
 }
-//! Iterate over the list of shapes, build them all, and store their
+//! Iterate over the list of GeoPgon shapes, build them all, and store their
 //! pointers
-void ReadGeoModel::buildAllShapes_Cons()
+void ReadGeoModel::buildAllShapes_Pgon()
 {
     // create a builder and reserve size of memory map
-    size_t nSize = m_shapes_Cons.size();
-    m_builderShape_Cons = new BuildGeoShapes_Cons(nSize);
+    size_t nSize = m_shapes_Pgon.size();
+    m_builderShape_Pgon = new BuildGeoShapes_Pgon(nSize, m_shapes_Pgon_data);
     // loop over the DB rows and build the shapes
-    for (const auto &row : m_shapes_Cons)
+    for (const auto &row : m_shapes_Pgon)
     {
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
-        m_builderShape_Cons->buildShape(row);
+        m_builderShape_Pgon->buildShape(row);
     }
-    m_builderShape_Cons->printBuiltShapes(); // DEBUG MSG
+    m_builderShape_Pgon->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
-        std::cout << "All " << nSize << " Shapes-Cons have been built!\n";
+        std::cout << "All " << nSize << " Shapes-Pgon have been built!\n";
     }
 }
 
@@ -1455,25 +1506,25 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
 
     if (false) {
     } 
-    else if (type == "Box") {
-        // shape parameters
-        double XHalfLength = 0.;
-        double YHalfLength = 0.;
-        double ZHalfLength = 0.;
-        // get parameters from DB string
-        for (auto& par : shapePars) {
-            std::vector<std::string> vars = splitString(par, '=');
-            std::string varName = vars[0];
-            std::string varValue = vars[1];
-            if (varName == "XHalfLength")
-                XHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "YHalfLength")
-                YHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "ZHalfLength")
-                ZHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-        }
-        shape = new GeoBox(XHalfLength, YHalfLength, ZHalfLength);
-    } 
+    // else if (type == "Box") {
+    //     // shape parameters
+    //     double XHalfLength = 0.;
+    //     double YHalfLength = 0.;
+    //     double ZHalfLength = 0.;
+    //     // get parameters from DB string
+    //     for (auto& par : shapePars) {
+    //         std::vector<std::string> vars = splitString(par, '=');
+    //         std::string varName = vars[0];
+    //         std::string varValue = vars[1];
+    //         if (varName == "XHalfLength")
+    //             XHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "YHalfLength")
+    //             YHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "ZHalfLength")
+    //             ZHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //     }
+    //     shape = new GeoBox(XHalfLength, YHalfLength, ZHalfLength);
+    // } 
     // else if (type == "Cons") {
     //     // shape parameters
     //     double RMin1 = 0.;
@@ -1538,35 +1589,36 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
                 DPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
         }
         shape = new GeoTorus(Rmin, Rmax, Rtor, SPhi, DPhi);
-    } else if (type == "Para") {
-        // shape parameters
-        double XHalfLength = 0.;
-        double YHalfLength = 0.;
-        double ZHalfLength = 0.;
-        double Alpha = 0.;
-        double Theta = 0.;
-        double Phi = 0.;
-        // get parameters from DB string
-        for (auto& par : shapePars) {
-            std::vector<std::string> vars = splitString(par, '=');
-            std::string varName = vars[0];
-            std::string varValue = vars[1];
-            if (varName == "XHalfLength")
-                XHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "YHalfLength")
-                YHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "ZHalfLength")
-                ZHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "Alpha")
-                Alpha = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "Theta")
-                Theta = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "Phi")
-                Phi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-        }
-        shape = new GeoPara(XHalfLength, YHalfLength, ZHalfLength, Alpha, Theta,
-                            Phi);
     } 
+    // else if (type == "Para") {
+    //     // shape parameters
+    //     double XHalfLength = 0.;
+    //     double YHalfLength = 0.;
+    //     double ZHalfLength = 0.;
+    //     double Alpha = 0.;
+    //     double Theta = 0.;
+    //     double Phi = 0.;
+    //     // get parameters from DB string
+    //     for (auto& par : shapePars) {
+    //         std::vector<std::string> vars = splitString(par, '=');
+    //         std::string varName = vars[0];
+    //         std::string varValue = vars[1];
+    //         if (varName == "XHalfLength")
+    //             XHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "YHalfLength")
+    //             YHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "ZHalfLength")
+    //             ZHalfLength = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "Alpha")
+    //             Alpha = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "Theta")
+    //             Theta = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "Phi")
+    //             Phi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //     }
+    //     shape = new GeoPara(XHalfLength, YHalfLength, ZHalfLength, Alpha, Theta,
+    //                         Phi);
+    // } 
     // else if (type == "Pcon") {
         // // shape parameters
         // double SPhi = 0.;
@@ -1809,7 +1861,8 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
             exit(EXIT_FAILURE);
         }
         shape = pgon;
-    } else if (type == "GenericTrap") {
+    } 
+    else if (type == "GenericTrap") {
         // shape parameters
         double ZHalfLength = 0.;
         unsigned int NVertices = 0;
@@ -3402,7 +3455,7 @@ void ReadGeoModel::storeBuiltShape(const unsigned int id, GeoShape* nodePtr) {
 GeoShape *ReadGeoModel::getBuiltShape(const unsigned int shapeId, std::string_view shapeType)
 {
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons"};
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "Pgon"};
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
     {
@@ -3421,6 +3474,14 @@ GeoShape *ReadGeoModel::getBuiltShape(const unsigned int shapeId, std::string_vi
         else if ("Cons" == shapeType)
         {
             return m_builderShape_Cons->getBuiltShape(shapeId);
+        } 
+        else if ("Para" == shapeType)
+        {
+            return m_builderShape_Para->getBuiltShape(shapeId);
+        } 
+        else if ("Pgon" == shapeType)
+        {
+            return m_builderShape_Pgon->getBuiltShape(shapeId);
         } 
         else {
             THROW_EXCEPTION("ERROR!!! Shape '" + std::string(shapeType) + "' is not handled correctly!");

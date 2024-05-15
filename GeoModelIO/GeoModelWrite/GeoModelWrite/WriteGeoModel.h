@@ -27,6 +27,8 @@
 
 // local includes
 #include "GeoModelDBManager/GMDBManager.h"
+#include "GeoModelDBManager/definitions.h"
+
 
 // GeoModel includes
 #include "GeoModelKernel/GeoAlignableTransform.h"
@@ -215,12 +217,12 @@ class WriteGeoModel : public GeoNodeAction {
 
     unsigned int addRecord(std::vector<std::vector<std::string>> *container,
                            const std::vector<std::string> values) const;
-    unsigned int addRecord(std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container,
+    unsigned int addRecord(DBRowsList *container,
                            const std::vector<std::variant<int, long, float, double, std::string>> values) const;
     
     std::pair<unsigned, unsigned> addRecordData(
-        std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container,
-        const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> values) const;
+        DBRowsList *container,
+        const DBRowsList values) const;
 
     unsigned int addMaterial(const std::string &name, const double &density,
                              const std::string &elements);
@@ -239,7 +241,7 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned int addShape(const std::string &type,
                           const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
     std::pair<unsigned, unsigned> addShapeData(const std::string type,
-                                       const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> &shapeData);
+                                       const DBRowsList &shapeData);
     unsigned int addSerialDenominator(const std::string &baseName);
     unsigned int addSerialIdentifier(const int &baseId);
     unsigned int addIdentifierTag(const int &identifier);
@@ -305,7 +307,7 @@ class WriteGeoModel : public GeoNodeAction {
                                // from TransFunctionRecorder as well.
     std::string getShapeParameters(const GeoShape *);
     std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
-              std::vector<std::vector<std::variant<int, long, float, double, std::string>>>>
+              DBRowsList>
     getShapeParametersV(const GeoShape *, const bool data = false);
 
     std::string getGeoTypeFromVPhysVol(const GeoVPhysVol *vol);
@@ -342,7 +344,7 @@ class WriteGeoModel : public GeoNodeAction {
     bool m_unconnectedTree;
 
     // chaches in the new DB schema
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_logVols;
+    DBRowsList m_logVols;
 
     // caches for GeoModel nodes to be saved into the DB
     // std::vector<std::vector<std::string>> m_logVols;
@@ -358,21 +360,25 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<std::vector<std::string>> m_serialTransformers;
     std::vector<std::vector<std::string>> m_nameTags;
     std::vector<std::vector<std::string>> m_shapes;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Box;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Tube;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Cons;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Para;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pgon;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Trap;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Trd;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Tubs;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_TwistedTrap;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon_Data;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pgon_Data;
+
+    DBRowsList m_shapes_Box;
+    DBRowsList m_shapes_Tube;
+    DBRowsList m_shapes_Cons;
+    DBRowsList m_shapes_Para;
+    DBRowsList m_shapes_Trap;
+    DBRowsList m_shapes_Trd;
+    DBRowsList m_shapes_Tubs;
+    DBRowsList m_shapes_TwistedTrap;
+
+    DBRowsList m_shapes_Pcon;
+    DBRowsList m_shapes_Pgon;
+    DBRowsList m_shapes_SimplePolygonBrep;
+    DBRowsList m_shapes_Pcon_Data;
+    DBRowsList m_shapes_Pgon_Data;
+    DBRowsList m_shapes_SimplePolygonBrep_Data;
 
     // std::vector<std::vector<std::string>> m_functions;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_functions; // operators used in Function's expression
+    DBRowsList m_functions; // operators used in Function's expression
 
     // caches for additional data to be saved into the DB
     std::vector<std::variant<int, long, float, double, std::string>> m_exprData; // numbers used in Function's expression

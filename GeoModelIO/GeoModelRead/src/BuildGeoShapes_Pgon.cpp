@@ -23,20 +23,18 @@ void BuildGeoShapes_Pgon::buildShape(const std::vector<std::variant<int, long, f
     }
 
     // === get shape numeric data from the DB row
-
     // shape ID
     const int shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Pgon:shapeID");
     // shape volume
     const double shapeVolume = GeoModelHelpers::variantHelper::getFromVariant_Double(row[1], "Pgon:shapeVolume");
-
     // shape parameters
     const double SPhi = GeoModelHelpers::variantHelper::getFromVariant_Double(row[2], "Pgon:SPhi");
     const double DPhi = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Pgon:DPhi");
     const int NSides = GeoModelHelpers::variantHelper::getFromVariant_Int(row[4], "Pgon:NSides");
-    const int NZPlanes = GeoModelHelpers::variantHelper::getFromVariant_Int(row[4], "Pgon:NZPlanes");
+    const int NZPlanes = GeoModelHelpers::variantHelper::getFromVariant_Int(row[5], "Pgon:NZPlanes");
     // pointers to variable shape data stored in a separate table
-    const int dataStart = GeoModelHelpers::variantHelper::getFromVariant_Int(row[5], "Pgon:dataStart");
-    const int dataEnd = GeoModelHelpers::variantHelper::getFromVariant_Int(row[6], "Pgon:dataEnd");
+    const int dataStart = GeoModelHelpers::variantHelper::getFromVariant_Int(row[6], "Pgon:dataStart");
+    const int dataEnd = GeoModelHelpers::variantHelper::getFromVariant_Int(row[7], "Pgon:dataEnd");
 
     // build the basic GeoPgon shape
     GeoPgon *shape = new GeoPgon(SPhi, DPhi, NSides);
@@ -44,7 +42,7 @@ void BuildGeoShapes_Pgon::buildShape(const std::vector<std::variant<int, long, f
     // and now loop over the additional shape's data, 
     // to get the parameters of all Z planes
 
-    // get ZPlanes' data, extract subvector
+    // extract subvector
     // NOTE: we use (dataStart-1) to cope with the difference between the DB rows starting from '1', 
     //       which is what the 'dataStart' stores, and the vector items, which start '0'; 
     //       also, the constructor of the sub-vector takes the element from 'begin+dataStart-1' included

@@ -25,7 +25,7 @@ class GeoShape;
 class BuildGeoShapes
 {
 protected:
-  std::unordered_map<unsigned, GeoShape *> m_memMapShapes;
+  std::unordered_map<unsigned, GeoShape *> m_memMapShapes{};
   std::string m_shapeType;
   DBRowsList m_shape_data;
 

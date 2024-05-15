@@ -26,10 +26,10 @@ void BuildGeoShapes_Para::buildShape(const std::vector<std::variant<int, long, f
   // shape parameters
   double XHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[2], "Para:XHalfLength");
   double YHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Para:YHalfLength");
-  double ZHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Para:ZHalfLength");
-  double Alpha = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Para:Alpha");
-  double Theta = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Para:Theta");
-  double Phi = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Para:Phi");
+  double ZHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[4], "Para:ZHalfLength");
+  double Alpha = GeoModelHelpers::variantHelper::getFromVariant_Double(row[5], "Para:Alpha");
+  double Theta = GeoModelHelpers::variantHelper::getFromVariant_Double(row[6], "Para:Theta");
+  double Phi = GeoModelHelpers::variantHelper::getFromVariant_Double(row[7], "Para:Phi");
 
   GeoPara *shape = new GeoPara(XHalfLength, YHalfLength, ZHalfLength, Alpha, Theta,
                                Phi);

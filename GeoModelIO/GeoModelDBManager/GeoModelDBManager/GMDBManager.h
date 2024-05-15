@@ -23,6 +23,7 @@
 #include <variant>
 #include <vector>
 #include <deque>
+#include <set>
 
 /**
  * \class GMDBManager
@@ -294,9 +295,12 @@ class GMDBManager {
     std::vector<std::variant<int, long, float, double, std::string>> getTableRecords_VecData(std::string tableName) const;
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableRecords_VecVecData(std::string tableName) const;
 
-    // Test if a given table exists
-    // This requires the *full* table name (i.e. prefix_suffix)
+    //! Test if a given table exists
+    //! This requires the *full* table name (i.e. prefix_suffix)
     bool checkTable(std::string tableName) const;
+
+    //! Test if a table has been loaded from a DB, that is it exists in the cache
+    bool checkTableFromCache(const std::string_view tableName) const;
 
     /**
      * @brief Create a custom DB table to store auxiliary data.
@@ -384,7 +388,8 @@ class GMDBManager {
     std::unordered_map<std::string, std::string> m_childType_tableName;
 
     /// cache for the list of tables in the DB
-    std::vector<std::string> m_cache_tables;
+    // std::vector<std::string> m_cache_tables;
+    std::set<std::string> m_cache_tables;
 
     std::unordered_map<unsigned int, std::string>
         m_cache_tableId_tableName;  /// cache for tableID-->tableName

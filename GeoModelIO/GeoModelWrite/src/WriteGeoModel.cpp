@@ -700,7 +700,7 @@ unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType == "CustomShape") shapeType = "UnidentifiedShape";
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "TwistedTrap", "Pcon", "Pgon"};
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep"};
 
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
@@ -1083,6 +1083,7 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
         const GeoPgon* shapeIn = dynamic_cast<const GeoPgon*>(shape);
         shapePars.push_back(shapeIn->getSPhi());
         shapePars.push_back(shapeIn->getDPhi());
+        shapePars.push_back(shapeIn->getNSides());
         // get number of Z planes and loop over them
         const int nZplanes = shapeIn->getNPlanes();
         shapePars.push_back(nZplanes);
@@ -1090,6 +1091,20 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
             dataRow.push_back(shapeIn->getZPlane(i));
             dataRow.push_back(shapeIn->getRMinPlane(i));
             dataRow.push_back(shapeIn->getRMaxPlane(i));
+            shapeData.push_back(dataRow);
+            dataRow.clear();
+        }
+    }
+    else if (shapeType == "SimplePolygonBrep")
+    {
+        const GeoSimplePolygonBrep* shapeIn = dynamic_cast<const GeoSimplePolygonBrep*>(shape);
+        shapePars.push_back(shapeIn->getDZ());
+        // get number of Z planes and loop over them
+        const int nVertices = shapeIn->getNVertices();
+        shapePars.push_back(nVertices);
+        for (int i = 0; i < nVertices; ++i) {
+            dataRow.push_back(shapeIn->getXVertex(i));
+            dataRow.push_back(shapeIn->getYVertex(i));
             shapeData.push_back(dataRow);
             dataRow.clear();
         }
@@ -1200,20 +1215,20 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     //                        CppHelper::to_string_with_precision(shapeIn->getRMaxPlane(i)));
     //     }
     // } 
-    else if (shapeType == "SimplePolygonBrep") {
-        const GeoSimplePolygonBrep* shapeIn =
-            dynamic_cast<const GeoSimplePolygonBrep*>(shape);
-        pars.push_back("DZ=" + CppHelper::to_string_with_precision(shapeIn->getDZ()));
-        // get number of vertices and loop over them
-        const int nVertices = shapeIn->getNVertices();
-        pars.push_back("NVertices=" + std::to_string(nVertices));  // INT
-        for (int i = 0; i < nVertices; ++i) {
-            pars.push_back("xV=" +
-                           CppHelper::to_string_with_precision(shapeIn->getXVertex(i)));
-            pars.push_back("yV=" +
-                           CppHelper::to_string_with_precision(shapeIn->getYVertex(i)));
-        }
-    } 
+    // else if (shapeType == "SimplePolygonBrep") {
+    //     const GeoSimplePolygonBrep* shapeIn =
+    //         dynamic_cast<const GeoSimplePolygonBrep*>(shape);
+    //     pars.push_back("DZ=" + CppHelper::to_string_with_precision(shapeIn->getDZ()));
+    //     // get number of vertices and loop over them
+    //     const int nVertices = shapeIn->getNVertices();
+    //     pars.push_back("NVertices=" + std::to_string(nVertices));  // INT
+    //     for (int i = 0; i < nVertices; ++i) {
+    //         pars.push_back("xV=" +
+    //                        CppHelper::to_string_with_precision(shapeIn->getXVertex(i)));
+    //         pars.push_back("yV=" +
+    //                        CppHelper::to_string_with_precision(shapeIn->getYVertex(i)));
+    //     }
+    // } 
     // else if (shapeType == "Trap") {
     //     const GeoTrap* shapeIn = dynamic_cast<const GeoTrap*>(shape);
     //     pars.push_back("ZHalfLength=" +
@@ -1878,16 +1893,20 @@ std::vector<unsigned> WriteGeoModel::addExprData(
 }
 
 std::pair<unsigned, unsigned> WriteGeoModel::addShapeData(const std::string type,
-    const std::vector<std::vector<std::variant<int, long, float, double, std::string>>>& shapeData) 
+    const DBRowsList& shapeData) 
 {
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container = nullptr;
+    DBRowsList *container = nullptr;
 
     if ("Pcon" == type) {
         container = &m_shapes_Pcon_Data;
     }
     else if ("Pgon" == type) {
         container = &m_shapes_Pgon_Data;
-    } else {
+    } 
+    else if ("SimplePolygonBrep" == type) {
+        container = &m_shapes_SimplePolygonBrep_Data;
+    } 
+    else {
         std::cout << "\nERROR!!! Shape data for shape '" << type << "' have not been set, yet!\n" << std::endl;
     }
     
@@ -2330,6 +2349,10 @@ unsigned int WriteGeoModel::addShape(const std::string &type,
     {
         container = &m_shapes_Pgon;
     }
+    else if ("SimplePolygonBrep" == type)
+    {
+        container = &m_shapes_SimplePolygonBrep;
+    }
     else
     {
         std::cout << "\nERROR! Shape type '" << type
@@ -2457,8 +2480,10 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     // FIXME: To do this, I moved addListOfRecordsToTable() from private to public, maybe I could add a method to store shapes with data and put back that into private
     m_dbManager->addListOfRecords("GeoPcon", m_shapes_Pcon); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoPgon", m_shapes_Pgon); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoSimplePolygonBrep", m_shapes_SimplePolygonBrep); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecordsToTable("Shapes_Pcon_Data", m_shapes_Pcon_Data); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecordsToTable("Shapes_Pgon_Data", m_shapes_Pgon_Data); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecordsToTable("Shapes_SimplePolygonBrep_Data", m_shapes_SimplePolygonBrep_Data); // new version, with shape's parameters as numbers
 
     m_dbManager->addListOfChildrenPositions(m_childrenPositions);
     m_dbManager->addRootVolume(m_rootVolume);

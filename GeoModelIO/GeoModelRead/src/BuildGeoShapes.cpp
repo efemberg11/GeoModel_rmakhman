@@ -34,6 +34,7 @@ void BuildGeoShapes::storeBuiltShape(const unsigned id, GeoShape* nodePtr) {
     m_memMapShapes[id] = nodePtr;
 }
 GeoShape* BuildGeoShapes::getBuiltShape(const unsigned id) {
+    if (!m_memMapShapes.size()) return nullptr;
     return m_memMapShapes[id];  // this is a map, and 'id' is the key
 }
 

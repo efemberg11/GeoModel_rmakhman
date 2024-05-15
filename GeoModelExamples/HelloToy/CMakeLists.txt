@@ -32,5 +32,5 @@ add_executable( helloToy_step1_write ${SRCS} )
 add_executable( helloToy_step2_read ${SRCS_READ} )
 
 # Link all needed libraries
-target_link_libraries( helloToy_step1_write GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite )
+target_link_libraries( helloToy_step1_write GeoModelCore::GeoModelKernel GeoModelIO::GeoModelWrite GeoModelHelpers )
 target_link_libraries( helloToy_step2_read  GeoModelCore::GeoModelKernel GeoModelIO::GeoModelRead )

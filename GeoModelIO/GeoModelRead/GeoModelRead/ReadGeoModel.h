@@ -92,9 +92,14 @@ class BuildGeoShapes_Box;
 class BuildGeoShapes_Tube;
 class BuildGeoShapes_Cons;
 class BuildGeoShapes_Para;
+class BuildGeoShapes_Trap;
+class BuildGeoShapes_Trd;
+class BuildGeoShapes_Tubs;
+class BuildGeoShapes_TwistedTrap;
 
 class BuildGeoShapes_Pcon;
 class BuildGeoShapes_Pgon;
+class BuildGeoShapes_SimplePolygonBrep;
 
 // type definitions
 typedef const GeoXF::Function& TRANSFUNCTION;
@@ -172,9 +177,14 @@ class ReadGeoModel {
     void buildAllShapes_Tube();
     void buildAllShapes_Cons();
     void buildAllShapes_Para();
-    
+    void buildAllShapes_Trap();
+    void buildAllShapes_Trd();
+    void buildAllShapes_Tubs();
+    void buildAllShapes_TwistedTrap();
+
     void buildAllShapes_Pcon();
     void buildAllShapes_Pgon();
+    void buildAllShapes_SimplePolygonBrep();
 
     void buildAllShapes();
     void buildAllElements();
@@ -340,9 +350,14 @@ class ReadGeoModel {
     BuildGeoShapes_Tube* m_builderShape_Tube;
     BuildGeoShapes_Cons* m_builderShape_Cons;
     BuildGeoShapes_Para* m_builderShape_Para;
+    BuildGeoShapes_Trap* m_builderShape_Trap;
+    BuildGeoShapes_Trd* m_builderShape_Trd;
+    BuildGeoShapes_Tubs* m_builderShape_Tubs;
+    BuildGeoShapes_TwistedTrap* m_builderShape_TwistedTrap;
 
     BuildGeoShapes_Pcon* m_builderShape_Pcon;
     BuildGeoShapes_Pgon* m_builderShape_Pgon;
+    BuildGeoShapes_SimplePolygonBrep* m_builderShape_SimplePolygonBrep;
 
 
     //! containers to store the list of GeoModel nodes coming from the DB
@@ -360,24 +375,30 @@ class ReadGeoModel {
     std::vector<std::vector<std::string>> m_shapes;
     std::vector<std::vector<std::string>> m_allchildren;
 
-    // std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_logVols;
     DBRowsList m_logVols;
 
     // containers to store shapes' parameters
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Box;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Tube;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Cons;
+    DBRowsList m_shapes_Box;
+    DBRowsList m_shapes_Tube;
+    DBRowsList m_shapes_Cons;
     DBRowsList m_shapes_Para;
+    DBRowsList m_shapes_Trap;
+    DBRowsList m_shapes_Trd;
+    DBRowsList m_shapes_Tubs;
+    DBRowsList m_shapes_TwistedTrap;
 
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pcon;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_shapes_Pgon;
+    DBRowsList m_shapes_Pcon;
+    DBRowsList m_shapes_Pgon;
+    DBRowsList m_shapes_SimplePolygonBrep;
     
-    // containers to store shapes' data, for shapes with a variable number of build parameters
+    // containers to store shapes' data, 
+    // for those shapes with a variable number of build parameters
     DBRowsList m_shapes_Pcon_data;
     DBRowsList m_shapes_Pgon_data;
+    DBRowsList m_shapes_SimplePolygonBrep_data;
 
-    // std::vector<std::vector<std::string>> m_functions;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> m_functions;
+    // containers to store Functions and their related data
+    DBRowsList m_functions;
     std::deque<double> m_funcExprData;
 
 

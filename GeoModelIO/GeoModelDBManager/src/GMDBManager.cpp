@@ -25,6 +25,10 @@
 
 #include "GeoModelCppHelpers/GMCppHelpers.h"
 
+#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelHelpers/StringUtils.h"
+
+
 // include the 'fmt' library, which is hosted locally as header-only
 #define FMT_HEADER_ONLY 1  // to use 'fmt' header-only
 #include "fmt/format.h"
@@ -67,7 +71,7 @@ class GMDBManager::Imp {
 GMDBManager::GMDBManager(const std::string& path)
     : m_dbpath(path), m_dbIsOK(false), m_debug(false), m_d(new Imp(this)) {
     // Check if the user asked for running in serial or multi-threading mode
-    if ("" != GeoModelIO::CppHelper::getEnvVar("GEOMODEL_ENV_IO_DBMANAGER_DEBUG")) {
+    if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_DBMANAGER_DEBUG")) {
         m_debug = true;
         std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will "
                      "see a verbose output."
@@ -218,6 +222,7 @@ void GMDBManager::printAllRecords(const std::string& tableName) const {
 // TODO: fill a cache and returns that if asked a second time
 std::vector<std::vector<std::string>> GMDBManager::getTableRecords(
     std::string tableName) const {
+
     // container to be returned
     std::vector<std::vector<std::string>> records;
     // get the query statetement ready to be executed
@@ -276,6 +281,7 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(
 std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GMDBManager::getTableRecords_VecVecData(
     std::string tableName) const
 {
+    
     // container to be returned
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> records;
     // get the query statetement ready to be executed
@@ -390,6 +396,9 @@ std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GM
 std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::getTableRecords_VecData(
     std::string tableName) const
 {
+    if (!checkTableFromCache(tableName)) {
+        THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+    }
     // container to be returned
     std::vector<std::variant<int, long, float, double, std::string>> records;
     // get the query statetement ready to be executed
@@ -522,6 +531,10 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType(
     }
     else
     {
+        if (!checkTable(tableName))
+        {
+            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+        }
         out = getTableRecords(tableName);
     }
     return out;
@@ -532,6 +545,7 @@ std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GM
 {
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> out;
     std::string tableName = getTableNameFromNodeType(nodeType);
+    
     if (tableName.empty())
     {
         std::mutex coutMutex;
@@ -549,15 +563,18 @@ std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GM
     }
     else
     {
+        if (!checkTableFromCache(tableName))
+        {
+            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+        }
         out = getTableRecords_VecVecData(tableName);
     }
     return out;
 }
 DBRowsList GMDBManager::getTableFromTableName_VecVecData(
-    std::string tableNameInp)
+    std::string tableName)
 {
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> out;
-    std::string tableName = tableNameInp;
     if (tableName.empty())
     {
         std::mutex coutMutex;
@@ -570,20 +587,23 @@ DBRowsList GMDBManager::getTableFromTableName_VecVecData(
             "geometry file. Unless you know exactly what you are doing, "
             "please "
             "expect to see incomplete geometries or crashes.\n",
-            tableNameInp.c_str());
+            tableName.c_str());
         coutMutex.unlock();
     }
     else
     {
+        if (!checkTableFromCache(tableName))
+        {
+            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+        }
         out = getTableRecords_VecVecData(tableName);
     }
     return out;
 }
 std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::getTableFromTableName_VecData(
-    std::string tableNameInp)
+    std::string tableName)
 {
     std::vector<std::variant<int, long, float, double, std::string>> out;
-    std::string tableName = tableNameInp;
     if (tableName.empty())
     {
         std::mutex coutMutex;
@@ -596,11 +616,15 @@ std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::ge
             "geometry file. Unless you know exactly what you are doing, "
             "please "
             "expect to see incomplete geometries or crashes.\n",
-            tableNameInp.c_str());
+            tableName.c_str());
         coutMutex.unlock();
     }
     else
     {
+        if (!checkTableFromCache(tableName))
+        {
+            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+        }
         out = getTableRecords_VecData(tableName);
     }
     return out;
@@ -1252,6 +1276,20 @@ bool GMDBManager::initDB() {
     return tablesOK;
 }
 
+bool GMDBManager::checkTableFromCache(const std::string_view tableName) const
+{
+    std::string tableNameStr{tableName};
+    if (m_cache_tables.size() == 0)
+    {
+        return false;
+    }
+    else if (m_cache_tables.find(tableNameStr) != m_cache_tables.end())
+    {
+        return true;
+    }
+    return false;
+}
+
 void GMDBManager::printAllDBTables() {
     if (m_cache_tables.size() == 0) {
         getAllDBTables();  // load tables and build the cache
@@ -1261,7 +1299,7 @@ void GMDBManager::printAllDBTables() {
 
 void GMDBManager::getAllDBTables() {
     std::string tableName;
-    std::vector<std::string> tables;
+    std::set<std::string> tables;
     // define a query string containing the necessary SQL instructions
     std::string queryStr =
         "SELECT name FROM sqlite_master WHERE type ='table' AND name NOT "
@@ -1279,7 +1317,7 @@ void GMDBManager::getAllDBTables() {
         tableName = std::string(
             reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
         // std::cout << "tableName: " << tableName << std::endl; // debug
-        tables.push_back(tableName);
+        tables.insert(tableName);
     }
     if (rc != SQLITE_DONE) {
         std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
@@ -1338,7 +1376,10 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable(
         tableName += "_";
         tableName += suffix;
     }
-
+    if (!checkTableFromCache(tableName))
+    {
+        THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+    }
     return getTableRecords(tableName);
 }
 // TODO: currently, we retrieve published data as strings, but we want to
@@ -1351,7 +1392,10 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable(
         tableName += "_";
         tableName += suffix;
     }
-
+    if (!checkTableFromCache(tableName))
+    {
+        THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+    }
     return getTableRecords(tableName);
 }
 
@@ -1598,6 +1642,19 @@ bool GMDBManager::createTables() {
     queryStr = fmt::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4]);
+    rc = execQuery(queryStr);
+    tab.clear();
+    
+    // create a table to store the numeric data used in GeoPcon shapes
+    tableName = "Shapes_SimplePolygonBrep_Data";
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("XVertex");
+    tab.push_back("YVertex");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real )",
+        tab[0], tab[1], tab[2], tab[3]);
     rc = execQuery(queryStr);
     tab.clear();
 
@@ -1940,13 +1997,33 @@ bool GMDBManager::createTables() {
     tab.push_back("computedVolume");
     tab.push_back("SPhi");
     tab.push_back("DPhi");
+    tab.push_back("NSides");
     tab.push_back("NZPlanes");
     tab.push_back("dataStart");
     tab.push_back("dataEnd");
     storeTableColumnNames(tab);
     queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} integer, {6} integer, {7} integer )",
-        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7]);
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} integer, {6} integer, {7} integer, {8} integer )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+    // Shapes-SimplePolygonBrep table
+    geoNode = "GeoSimplePolygonBrep";
+    tableName = "Shapes_SimplePolygonBrep";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("DZ");
+    tab.push_back("NVertices");
+    tab.push_back("dataStart");
+    tab.push_back("dataEnd");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} integer, {5} integer, {6} integer )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
     }

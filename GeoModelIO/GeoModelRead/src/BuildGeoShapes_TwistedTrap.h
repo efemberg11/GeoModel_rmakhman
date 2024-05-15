@@ -3,25 +3,25 @@
 */
 
 /*
- * BuildGeoShapes_Tube.h
+ * BuildGeoShapes_TwistedTrap.h
  *
  * Created on: May, 2024
  * Author: Riccardo Maria BIANCHI <riccardo.maria.bianchi@cern.ch>
  *
  */
 
-#ifndef GEOMODELREAD_BuildGeoShapes_Tube_H
-#define GEOMODELREAD_BuildGeoShapes_Tube_H
+#ifndef GEOMODELREAD_BuildGeoShapes_TwistedTrap_H
+#define GEOMODELREAD_BuildGeoShapes_TwistedTrap_H
 
 #include "BuildGeoShapes.h"
 
 #include <vector>
 #include <variant>
 
-class BuildGeoShapes_Tube : public BuildGeoShapes
+class BuildGeoShapes_TwistedTrap : public BuildGeoShapes
 {
 public:
-  BuildGeoShapes_Tube(const unsigned size):BuildGeoShapes("Tube", size){};
+  BuildGeoShapes_TwistedTrap(const unsigned size):BuildGeoShapes("TwistedTrap", size){};
   void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
 };
 

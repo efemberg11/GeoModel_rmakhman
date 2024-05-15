@@ -22,6 +22,7 @@
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTubs.h"
 #include "GeoModelKernel/GeoTwistedTrap.h"
+#include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoLogVol.h"
@@ -43,6 +44,9 @@
 #include "GeoModelDBManager/GMDBManager.h"
 
 #include "GeoModelWrite/WriteGeoModel.h"
+
+#include "GeoModelHelpers/throwExcept.h"
+
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -312,6 +316,31 @@ int main(int argc, char *argv[])
   GeoNameTag *nTwist = new GeoNameTag("Shape-TwistedTrap");
   toyPhys->add(nTwist);
   toyPhys->add(pTwist);
+
+  // Add a test GeoSimplePolygonBrep shape
+   const double DZ = 1 * SYSTEM_OF_UNITS::m;
+   const double xV1 = 1.5 * SYSTEM_OF_UNITS::m;
+   const double yV1 = 1.5 * SYSTEM_OF_UNITS::m;
+   const double xV2 = 3 * SYSTEM_OF_UNITS::m;
+   const double yV2 = 3 * SYSTEM_OF_UNITS::m;
+   const double xV3 = 4 * SYSTEM_OF_UNITS::m;
+   const double yV3 = 4 * SYSTEM_OF_UNITS::m;
+   GeoSimplePolygonBrep* sSimplePolygonBrep = new GeoSimplePolygonBrep(DZ);
+   sSimplePolygonBrep->addVertex(xV1, yV1);
+   sSimplePolygonBrep->addVertex(xV2, yV2);
+   sSimplePolygonBrep->addVertex(xV3, yV3);
+   if (!sSimplePolygonBrep->isValid())
+    {
+        THROW_EXCEPTION("ERROR! GeoSimplePolygonBrep shape is not valid!!");
+    }
+  GeoLogVol *lSimplePolygonBrep = new GeoLogVol("SimplePolygonBrep", sSimplePolygonBrep, steel);
+  GeoPhysVol *pSimplePolygonBrep = new GeoPhysVol(lSimplePolygonBrep);
+  GeoNameTag *nSimplePolygonBrep = new GeoNameTag("Shape-SimplePolygonBrep");
+  toyPhys->add(nSimplePolygonBrep);
+  toyPhys->add(pSimplePolygonBrep);
+
+
+
 
   //------------------------------------------------------------------------------------//
   // Writing the geometry to file

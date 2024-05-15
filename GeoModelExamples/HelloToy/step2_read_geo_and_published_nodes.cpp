@@ -168,31 +168,43 @@ int main(int argc, char *argv[])
   unsigned int ii=0;
   std::cout << "\n\nPublished AlignableTransforms from the DB...\n";
   std::cout << "['xf' is the output of 'getTransform()']\n";
+  std::cout << "(Printing the first 3 only)" << std::endl;
   for ( auto const& [key, xf] : mapAXF ) 
   {
-      if(0==ii) std::cout << "[key type (compiler's code): '" << typeid(key).name() << "']\n";
-      std::cout << "\n\t--> key: " << key 
-                << " - AlignableTransform*: " << xf 
+    if (0 == ii)
+      std::cout << "[key type (compiler's code): '" << typeid(key).name() << "']\n";
+    if (ii < 3)
+    {
+
+      std::cout << "\n\t--> key: " << key
+                << " - AlignableTransform*: " << xf
                 << std::endl;
-      std::cout << "\txf:: "; GeoUtilFunctions::printTrf( xf->getTransform() );
-      ++ii;
-   }
-  
+      std::cout << "\txf:: ";
+      GeoUtilFunctions::printTrf(xf->getTransform());
+    }
+    ++ii;
+  }
+
   ii=0; // reset the counter
   std::cout << "\n\nPublished FullPhysVols from the DB...\n";
   std::cout << "['xf' is the output of 'getAbsoluteTransform()']\n";
+  std::cout << "(Printing the first 3 only)" << std::endl;
   for ( auto const& [key, vol] : mapFPV ) 
   {
       // GeoTrf::Transform3D xf = vol->getAbsoluteTransform(); // crashes
 
-      if(0==ii) std::cout << "[key type (compiler's code): '" << typeid(key).name() << "']\n";
-      std::cout << "\n\t--> key: " << key 
-                << " - GeoFullPhysVol*: " << vol 
-                << std::endl;
-      // std::cout << "\txf:"; GeoUtilFunctions::printTrf(vol->getAbsoluteTransform()); // crashes
+      if (0 == ii)
+        std::cout << "[key type (compiler's code): '" << typeid(key).name() << "']\n";
+      if (ii < 3)
+      {
+        std::cout << "\n\t--> key: " << key
+                  << " - GeoFullPhysVol*: " << vol
+                  << std::endl;
+        // std::cout << "\txf:"; GeoUtilFunctions::printTrf(vol->getAbsoluteTransform()); // crashes
+      }
       ++ii;
   }
-  
+
   std::cout << "Everything done." << std::endl;
 
   return 0;

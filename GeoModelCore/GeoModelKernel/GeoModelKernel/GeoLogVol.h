@@ -4,7 +4,6 @@
 
 #ifndef GEOMODELKERNEL_GEOLOGVOL_H
 #define GEOMODELKERNEL_GEOLOGVOL_H
-
 /**
  * @class GeoLogVol
  * 
@@ -17,7 +16,9 @@
 #include "GeoModelKernel/GeoIntrusivePtr.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include <vector>
-
+#include <thread>
+#include <shared_mutex>
+#include <mutex>
 class GeoLogVol : public RCBase
 {
  public:
@@ -35,7 +36,14 @@ class GeoLogVol : public RCBase
   
   //	Returns the material of the logical volume.
   const GeoMaterial* getMaterial () const {
-     return m_material;
+    std::shared_lock lock{m_mutex};
+    return m_material;
+  }
+  
+  //    In some cases (gases, liquids) materials be updated?
+  void setMaterial (const GeoMaterial *newMaterial) const {
+    std::unique_lock guards{m_mutex};
+    m_material = newMaterial;
   }
   
  protected:
@@ -47,7 +55,8 @@ class GeoLogVol : public RCBase
   std::string m_name{};
 
   //	Material composition of this volume.
-  GeoIntrusivePtr<const GeoMaterial> m_material{};
+  mutable GeoIntrusivePtr<const GeoMaterial> m_material{};
+  mutable std::shared_mutex m_mutex{};
 
   //	Shape of this volume.
   GeoIntrusivePtr<const GeoShape> m_shape{};

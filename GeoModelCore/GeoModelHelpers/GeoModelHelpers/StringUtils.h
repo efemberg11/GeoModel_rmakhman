@@ -28,6 +28,8 @@ namespace GeoStrUtils{
     /// @return 
     std::string resolveEnviromentVariables(const std::string_view str);
 
+    std::string getEnvVar(const std::string_view key);
+
     /// @brief returns the longest substring that's common between the
     ///        two given strings starting from character 0
     std::string_view longestCommonString(const std::string_view firstStr,

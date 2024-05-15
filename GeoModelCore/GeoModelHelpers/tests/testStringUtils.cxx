@@ -8,11 +8,11 @@
 #include <stdlib.h>
 using namespace GeoStrUtils;
 
-namespace {
-    std::string getEnvVar(const std::string& varName){
-       return std::getenv(varName.c_str()) ? std::string{std::getenv(varName.c_str())} : std::string{};
-    }
-}
+// namespace {
+//     std::string getEnvVar(const std::string& varName){
+//        return std::getenv(varName.c_str()) ? std::string{std::getenv(varName.c_str())} : std::string{};
+//     }
+// }
 
 int main() {
    if (resolveEnviromentVariables("${PWD}") != getEnvVar("PWD")) {

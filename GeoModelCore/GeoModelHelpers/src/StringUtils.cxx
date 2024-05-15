@@ -51,7 +51,14 @@ namespace GeoStrUtils {
         }
         return str;
     }
-   
+
+    std::string getEnvVar(const std::string_view key)
+    {
+        std::string keyStr{key};
+        char *val = std::getenv(keyStr.c_str());
+        return val == NULL ? std::string{} : std::string(val);
+    }
+
    std::vector<std::string> tokenize(const std::string& str,
                                       std::string_view delimiters) {
                                     

@@ -298,8 +298,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
         matId = storeMaterial(mat);
 
         // store/get the Shape object into/from the DB
-        unsigned int shapeId;
-        shapeId = storeShape(shape);
+        const unsigned shapeId = storeShape(shape).second;
         std::string_view shapeType = shape->type();
         // shapeId = storeObj(shape, shapeType, shapePars);
 
@@ -672,7 +671,7 @@ std::vector<std::string> WriteGeoModel::getParentNode() {
                 parentId = getStoredIdFromAddress(parentAddress);
             } else {
                 std::cout
-                    << "The parent node of this child node seems to not having "
+                    << "The parent node of this child node seems not to having "
                        "be stored in the DB yet! [It is normal if it is the "
                        "root volume or a transformation node used for example "
                        "only in the definition of a 'GeoShapeShift' instance]"
@@ -693,14 +692,14 @@ std::vector<std::string> WriteGeoModel::getParentNode() {
 }
 
 //__________________________________________________________________
-unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
+std::pair<std::string, unsigned> WriteGeoModel::storeShape(const GeoShape* shape) {
     //  QString shapeType = QString::fromStdString(shape->type());
     std::string shapeType = shape->type();
 
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType == "CustomShape") shapeType = "UnidentifiedShape";
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep"};
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep", "Intersection", "Shift", "Subtraction", "Union"};
 
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
@@ -714,7 +713,8 @@ unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
 
         if (shapeData.size() > 0)
         {
-            // Store the Function's numbers
+            // Store the node's additional data 
+            // (e.g., the numeric values of a Function, or the ZPlanes of a GeoPcon shape node)
             std::pair<unsigned, unsigned> dataRows = addShapeData(shapeType, shapeData);
             unsigned dataStart = dataRows.first;
             unsigned dataEnd = dataRows.second;
@@ -737,9 +737,10 @@ unsigned int WriteGeoModel::storeShape(const GeoShape* shape) {
                   << std::endl;
         std::string shapePars = getShapeParameters(shape);
         // store the shape in the DB and returns the ID
-        return storeObj(shape, shapeType, shapePars);
+        unsigned shapeID = storeObj(shape, shapeType, shapePars);
+        return std::pair<std::string, unsigned>{shapeType, shapeID};
     }
-    return 1; // you should not get here
+    return std::pair<std::string, unsigned>{}; // you should not get here
 }
 
 //______________________________________________________________________
@@ -1109,6 +1110,93 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
             dataRow.clear();
         }
     }
+    else if (shapeType == "Intersection")
+    {
+        const GeoShapeIntersection* shapeIn =
+            dynamic_cast<const GeoShapeIntersection*>(shape);
+        
+        // get the two referenced Shape nodes used in the 'Intersection' operation, 
+        // then store them in the DB
+        const GeoShape* shapeOpA = shapeIn->getOpA();
+        const std::pair<std::string, unsigned> shapeStoredA = storeShape(shapeOpA);
+        const std::string shapeTypeA = shapeStoredA.first;
+        const unsigned int shapeIdA = shapeStoredA.second;
+
+        const GeoShape* shapeOpB = shapeIn->getOpB();
+        const std::pair<std::string, unsigned> shapeStoredB = storeShape(shapeOpB);
+        const std::string shapeTypeB = shapeStoredB.first;
+        const unsigned int shapeIdB = shapeStoredB.second;
+
+        shapePars.push_back(shapeTypeA);
+        shapePars.push_back(shapeIdA);
+        shapePars.push_back(shapeTypeB);
+        shapePars.push_back(shapeIdB);
+    }
+    else if (shapeType == "Shift")
+    {
+        const GeoShapeShift* shapeIn =
+            dynamic_cast<const GeoShapeShift*>(shape);
+
+        // get the referenced Shape used in the 'shift' operation, 
+        // then store it in the DB
+        const GeoShape* shapeOp = shapeIn->getOp();
+        const std::pair<std::string, unsigned> shapeStored = storeShape(shapeOp);
+        const std::string shapeType = shapeStored.first;
+        const unsigned int shapeId = shapeStored.second;
+        // get the Transformation, then store it in the DB
+        GeoTransform* transf = new GeoTransform(shapeIn->getX());
+        const unsigned int transfId = storeTranform(transf);
+
+        shapePars.push_back(shapeType);
+        shapePars.push_back(shapeId);
+        shapePars.push_back(transfId);
+    }
+    else if (shapeType == "Subtraction")
+    {
+        const GeoShapeSubtraction* shapeIn =
+            dynamic_cast<const GeoShapeSubtraction*>(shape);
+        
+         // get the two referenced Shape nodes used in the 'Subtraction' operation, 
+        // then store them in the DB
+        const GeoShape* shapeOpA = shapeIn->getOpA();
+        const std::pair<std::string, unsigned> shapeStoredA = storeShape(shapeOpA);
+        const std::string shapeTypeA = shapeStoredA.first;
+        const unsigned int shapeIdA = shapeStoredA.second;
+
+        const GeoShape* shapeOpB = shapeIn->getOpB();
+        const std::pair<std::string, unsigned> shapeStoredB = storeShape(shapeOpB);
+        const std::string shapeTypeB = shapeStoredB.first;
+        const unsigned int shapeIdB = shapeStoredB.second;
+
+        shapePars.push_back(shapeTypeA);
+        shapePars.push_back(shapeIdA);
+        shapePars.push_back(shapeTypeB);
+        shapePars.push_back(shapeIdB);
+
+    }
+    else if (shapeType == "Union")
+    {
+        const GeoShapeUnion* shapeIn =
+            dynamic_cast<const GeoShapeUnion*>(shape);
+        
+         // get the two referenced Shape nodes used in the 'Subtraction' operation, 
+        // then store them in the DB
+        const GeoShape* shapeOpA = shapeIn->getOpA();
+        const std::pair<std::string, unsigned> shapeStoredA = storeShape(shapeOpA);
+        const std::string shapeTypeA = shapeStoredA.first;
+        const unsigned int shapeIdA = shapeStoredA.second;
+
+        const GeoShape* shapeOpB = shapeIn->getOpB();
+        const std::pair<std::string, unsigned> shapeStoredB = storeShape(shapeOpB);
+        const std::string shapeTypeB = shapeStoredB.first;
+        const unsigned int shapeIdB = shapeStoredB.second;
+
+        shapePars.push_back(shapeTypeA);
+        shapePars.push_back(shapeIdA);
+        shapePars.push_back(shapeTypeB);
+        shapePars.push_back(shapeIdB);
+
+    }
     else
     {
         std::cout << "\n\tGeoModelWrite -- WARNING!!! - Shape '" << shapeType
@@ -1342,57 +1430,62 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
                                CppHelper::to_string_with_precision(facetVertex[2]));
             }
         }
-    } else if (shapeType == "Intersection") {
-        const GeoShapeIntersection* shapeIn =
-            dynamic_cast<const GeoShapeIntersection*>(shape);
-        // get the referenced Shape used in the 'union' operation, store it in
-        // the DB
-        const GeoShape* shapeOpA = shapeIn->getOpA();
-        const unsigned int shapeIdA = storeShape(shapeOpA);
-        const GeoShape* shapeOpB = shapeIn->getOpB();
-        const unsigned int shapeIdB = storeShape(shapeOpB);
-        pars.push_back("opA=" + std::to_string(shapeIdA));  // INT
-        pars.push_back("opB=" + std::to_string(shapeIdB));  // INT
-    } else if (shapeType == "Shift") {
-        const GeoShapeShift* shapeIn =
-            dynamic_cast<const GeoShapeShift*>(shape);
+    } 
+    // else if (shapeType == "Intersection") {
+    //     const GeoShapeIntersection* shapeIn =
+    //         dynamic_cast<const GeoShapeIntersection*>(shape);
+    //     // get the referenced Shape used in the 'union' operation, store it in
+    //     // the DB
+    //     const GeoShape* shapeOpA = shapeIn->getOpA();
+    //     const unsigned int shapeIdA = storeShape(shapeOpA);
+    //     const GeoShape* shapeOpB = shapeIn->getOpB();
+    //     const unsigned int shapeIdB = storeShape(shapeOpB);
+    //     pars.push_back("opA=" + std::to_string(shapeIdA));  // INT
+    //     pars.push_back("opB=" + std::to_string(shapeIdB));  // INT
+    // } 
+    // else if (shapeType == "Shift") {
+    //     const GeoShapeShift* shapeIn =
+    //         dynamic_cast<const GeoShapeShift*>(shape);
 
-        // get the referenced Shape used in the 'shift' operation, store it in
-        // the DB
-        const GeoShape* shapeOp = shapeIn->getOp();
-        const unsigned int shapeId = storeShape(shapeOp);
+    //     // get the referenced Shape used in the 'shift' operation, store it in
+    //     // the DB
+    //     const GeoShape* shapeOp = shapeIn->getOp();
+    //     const unsigned int shapeId = storeShape(shapeOp).second;
 
-        // get the Transformation, store it in the DB
-        GeoTransform* transf = new GeoTransform(shapeIn->getX());
-        const unsigned int trId = storeTranform(transf);
+    //     // get the Transformation, store it in the DB
+    //     GeoTransform* transf = new GeoTransform(shapeIn->getX());
+    //     const unsigned int trId = storeTranform(transf);
 
-        pars.push_back("A=" + std::to_string(shapeId));  // INT
-        pars.push_back("X=" + std::to_string(trId));     // INT
-    } else if (shapeType == "Subtraction") {
-        const GeoShapeSubtraction* shapeIn =
-            dynamic_cast<const GeoShapeSubtraction*>(shape);
-        // get the referenced Shape used in the 'union' operation, store it in
-        // the DB
-        const GeoShape* shapeOpA = shapeIn->getOpA();
-        const unsigned int shapeIdA = storeShape(shapeOpA);
-        const GeoShape* shapeOpB = shapeIn->getOpB();
-        const unsigned int shapeIdB = storeShape(shapeOpB);
-        pars.push_back("opA=" + std::to_string(shapeIdA));  // INT
-        pars.push_back("opB=" + std::to_string(shapeIdB));  // INT
-    } else if (shapeType == "Union") {
-        const GeoShapeUnion* shapeIn =
-            dynamic_cast<const GeoShapeUnion*>(shape);
+    //     pars.push_back("A=" + std::to_string(shapeId));  // INT
+    //     pars.push_back("X=" + std::to_string(trId));     // INT
+    // } 
+    // else if (shapeType == "Subtraction") {
+    //     const GeoShapeSubtraction* shapeIn =
+    //         dynamic_cast<const GeoShapeSubtraction*>(shape);
+    //     // get the referenced Shape used in the 'union' operation, store it in
+    //     // the DB
+    //     const GeoShape* shapeOpA = shapeIn->getOpA();
+    //     const unsigned int shapeIdA = storeShape(shapeOpA).second;
+    //     const GeoShape* shapeOpB = shapeIn->getOpB();
+    //     const unsigned int shapeIdB = storeShape(shapeOpB).second;
+    //     pars.push_back("opA=" + std::to_string(shapeIdA));  // INT
+    //     pars.push_back("opB=" + std::to_string(shapeIdB));  // INT
+    // } 
+    // else if (shapeType == "Union") {
+    //     const GeoShapeUnion* shapeIn =
+    //         dynamic_cast<const GeoShapeUnion*>(shape);
 
-        // get the referenced Shape used in the 'union' operation, store it in
-        // the DB
-        const GeoShape* shapeOpA = shapeIn->getOpA();
-        unsigned int shapeIdA = storeShape(shapeOpA);
-        const GeoShape* shapeOpB = shapeIn->getOpB();
-        unsigned int shapeIdB = storeShape(shapeOpB);
+    //     // get the referenced Shape used in the 'union' operation, store it in
+    //     // the DB
+    //     const GeoShape* shapeOpA = shapeIn->getOpA();
+    //     unsigned int shapeIdA = storeShape(shapeOpA).second;
+    //     const GeoShape* shapeOpB = shapeIn->getOpB();
+    //     unsigned int shapeIdB = storeShape(shapeOpB).second;
 
-        pars.push_back("opA=" + std::to_string(shapeIdA));  // INT
-        pars.push_back("opB=" + std::to_string(shapeIdB));  // INT
-    } else if (shapeType == "GenericTrap") {
+    //     pars.push_back("opA=" + std::to_string(shapeIdA));  // INT
+    //     pars.push_back("opB=" + std::to_string(shapeIdB));  // INT
+    // } 
+    else if (shapeType == "GenericTrap") {
         const GeoGenericTrap* shapeIn =
             dynamic_cast<const GeoGenericTrap*>(shape);
         pars.push_back("ZHalfLength=" +
@@ -1555,7 +1648,7 @@ unsigned int WriteGeoModel::storeObj(const GeoShape* pointer,
     }
     return shapeId;
 }
-unsigned int WriteGeoModel::storeObj(const GeoShape* pointer,
+std::pair<std::string, unsigned> WriteGeoModel::storeObj(const GeoShape* pointer,
                                      const std::string& shapeName,
                                      const std::vector<std::variant<int, long, float, double, std::string>>& parameters) {
     std::string address = getAddressStringFromPointer(pointer);
@@ -1563,11 +1656,13 @@ unsigned int WriteGeoModel::storeObj(const GeoShape* pointer,
     unsigned int shapeId;
     if (!isAddressStored(address)) {
         shapeId = addShape(shapeName, parameters);
-        storeAddress(address, shapeId);
+        storeAddress(address, shapeId); // TODO: check if this step of storing the address and the ID is still used/needed.
     } else {
-        shapeId = getStoredIdFromAddress(address);
+        // TODO: check if that is still needed/used! And if it's consistent with the new DB schema.
+        shapeId = getStoredIdFromAddress(address); // TODO: check if this step of getting the ID from the address is still used/needed.
     }
-    return shapeId;
+    std::pair<std::string, unsigned> ret{shapeName, shapeId};
+    return ret;
 }
 
 unsigned int WriteGeoModel::storeObj(const GeoLogVol* pointer,
@@ -2353,6 +2448,22 @@ unsigned int WriteGeoModel::addShape(const std::string &type,
     {
         container = &m_shapes_SimplePolygonBrep;
     }
+    else if ("Intersection" == type)
+    {
+        container = &m_shapes_Intersection;
+    }
+    else if ("Subtraction" == type)
+    {
+        container = &m_shapes_Subtraction;
+    }
+    else if ("Union" == type)
+    {
+        container = &m_shapes_Union;
+    }
+    else if ("Shift" == type)
+    {
+        container = &m_shapes_Shift;
+    }
     else
     {
         std::cout << "\nERROR! Shape type '" << type
@@ -2484,6 +2595,11 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecordsToTable("Shapes_Pcon_Data", m_shapes_Pcon_Data); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecordsToTable("Shapes_Pgon_Data", m_shapes_Pgon_Data); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecordsToTable("Shapes_SimplePolygonBrep_Data", m_shapes_SimplePolygonBrep_Data); // new version, with shape's parameters as numbers
+
+    m_dbManager->addListOfRecords("GeoShapeShift", m_shapes_Shift); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoShapeIntersection", m_shapes_Intersection); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoShapeSubtraction", m_shapes_Subtraction); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoShapeUnion", m_shapes_Union); // new version, with shape's parameters as numbers
 
     m_dbManager->addListOfChildrenPositions(m_childrenPositions);
     m_dbManager->addRootVolume(m_rootVolume);
@@ -2702,12 +2818,14 @@ void WriteGeoModel::storeAddress(const std::string& address,
 
 bool WriteGeoModel::isAddressStored(const std::string& address) {
     // showMemoryMap(); // only for Debug
+    // std::cout << "DEBUG: calling isAddressStored()..." << std::endl;
     std::unordered_map<std::string, unsigned int>::iterator it =
         m_memMap.find(address);
     return (it != m_memMap.end());
 }
 
 unsigned int WriteGeoModel::getStoredIdFromAddress(const std::string& address) {
+    // std::cout << "DEBUG: calling getStoredIdFromAddress()..." << std::endl;
     return m_memMap.at(address);
 }
 

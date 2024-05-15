@@ -25,6 +25,12 @@
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
+
+#include "GeoModelKernel/GeoShapeShift.h"
+#include "GeoModelKernel/GeoShapeIntersection.h"
+#include "GeoModelKernel/GeoShapeSubtraction.h"
+#include "GeoModelKernel/GeoShapeUnion.h"
+
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -338,6 +344,38 @@ int main(int argc, char *argv[])
   GeoNameTag *nSimplePolygonBrep = new GeoNameTag("Shape-SimplePolygonBrep");
   toyPhys->add(nSimplePolygonBrep);
   toyPhys->add(pSimplePolygonBrep);
+
+  // Add a test GeoShift boolean shape
+  GeoShapeShift* sShift = new GeoShapeShift(sPass, GeoTrf::TranslateZ3D(50*SYSTEM_OF_UNITS::cm));
+  GeoLogVol *lShift = new GeoLogVol("Shift", sShift, steel);
+  GeoPhysVol *pShift = new GeoPhysVol(lShift);
+  GeoNameTag *nShift = new GeoNameTag("Shape-Shift");
+  toyPhys->add(nShift);
+  toyPhys->add(pShift);
+
+  // Add a test GeoIntersection boolean shape
+  GeoShapeIntersection* sIntersection = new GeoShapeIntersection(sPass, sIPass);
+  GeoLogVol *lIntersection = new GeoLogVol("Intersection", sIntersection, steel);
+  GeoPhysVol *pIntersection = new GeoPhysVol(lIntersection);
+  GeoNameTag *nIntersection = new GeoNameTag("Shape-Intersection");
+  toyPhys->add(nIntersection);
+  toyPhys->add(pIntersection);
+
+// Add a test GeoSubtraction boolean shape
+  GeoShapeSubtraction* sSubtraction = new GeoShapeSubtraction(sPass, sIPass);
+  GeoLogVol *lSubtraction = new GeoLogVol("Subtraction", sSubtraction, steel);
+  GeoPhysVol *pSubtraction = new GeoPhysVol(lSubtraction);
+  GeoNameTag *nSubtraction = new GeoNameTag("Shape-Subtraction");
+  toyPhys->add(nSubtraction);
+  toyPhys->add(pSubtraction);
+
+// Add a test GeoSubtraction boolean shape
+  GeoShapeUnion* sUnion = new GeoShapeUnion(sPass, sIPass);
+  GeoLogVol *lUnion = new GeoLogVol("Union", sUnion, steel);
+  GeoPhysVol *pUnion = new GeoPhysVol(lUnion);
+  GeoNameTag *nUnion = new GeoNameTag("Shape-Union");
+  toyPhys->add(nUnion);
+  toyPhys->add(pUnion);
 
 
 

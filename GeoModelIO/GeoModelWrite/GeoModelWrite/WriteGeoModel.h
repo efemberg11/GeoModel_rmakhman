@@ -168,7 +168,7 @@ class WriteGeoModel : public GeoNodeAction {
 
     std::vector<std::string> getParentNode();
 
-    unsigned int storeShape(const GeoShape *shape);
+    std::pair<std::string, unsigned> storeShape(const GeoShape *shape);
     unsigned int storeMaterial(const GeoMaterial *mat);
     unsigned int storeElement(const GeoElement *el);
     unsigned int storeTranform(const GeoTransform *node);
@@ -180,7 +180,7 @@ class WriteGeoModel : public GeoNodeAction {
                           const double &elA);
     unsigned int storeObj(const GeoShape *pointer, const std::string &type,
                           const std::string &parameters);
-    unsigned int storeObj(const GeoShape *pointer, const std::string &type,
+    std::pair<std::string, unsigned> storeObj(const GeoShape *pointer, const std::string &type,
                           const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
     unsigned int storeObj(const GeoLogVol *pointer, const std::string &name,
                           const unsigned int &shapeId, std::string_view shapeType,
@@ -369,13 +369,18 @@ class WriteGeoModel : public GeoNodeAction {
     DBRowsList m_shapes_Trd;
     DBRowsList m_shapes_Tubs;
     DBRowsList m_shapes_TwistedTrap;
-
+    
     DBRowsList m_shapes_Pcon;
     DBRowsList m_shapes_Pgon;
     DBRowsList m_shapes_SimplePolygonBrep;
     DBRowsList m_shapes_Pcon_Data;
     DBRowsList m_shapes_Pgon_Data;
     DBRowsList m_shapes_SimplePolygonBrep_Data;
+
+    DBRowsList m_shapes_Shift;
+    DBRowsList m_shapes_Intersection;
+    DBRowsList m_shapes_Subtraction;
+    DBRowsList m_shapes_Union;
 
     // std::vector<std::vector<std::string>> m_functions;
     DBRowsList m_functions; // operators used in Function's expression

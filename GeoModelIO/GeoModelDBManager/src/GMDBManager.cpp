@@ -725,10 +725,7 @@ bool GMDBManager::addListOfRecords(
     std::string tableName = m_childType_tableName[geoType];
 
     if (tableName.size() == 0) {
-        // qWarning() << "m_childType_tableName:" << m_childType_tableName;
-        std::cout << "\nERROR!! could not retrieve tableName for node type '"
-                  << geoType << "'!! Aborting...\n" << std::endl;
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("ERROR!! could not retrieve tableName for node type '" + geoType + "'!! Aborting...\n");
     }
 
     if (records.size() > 0) {
@@ -751,10 +748,7 @@ bool GMDBManager::addListOfRecords(
     std::string tableName = m_childType_tableName[geoType];
 
     if (tableName.size() == 0) {
-        // qWarning() << "m_childType_tableName:" << m_childType_tableName;
-        std::cout << "\nERROR!! could not retrieve tableName for node type '"
-                  << geoType << "'!! Aborting...\n" << std::endl;
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("ERROR!! could not retrieve tableName for node type '" + geoType + "'!! Aborting...\n");
     }
 
     if (records.size() > 0) {
@@ -2009,6 +2003,7 @@ bool GMDBManager::createTables() {
         storeNodeType(geoNode, tableName);
     }
     tab.clear();
+
     // Shapes-SimplePolygonBrep table
     geoNode = "GeoSimplePolygonBrep";
     tableName = "Shapes_SimplePolygonBrep";
@@ -2024,6 +2019,85 @@ bool GMDBManager::createTables() {
     queryStr = fmt::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} integer, {5} integer, {6} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+
+    // Shapes-Intersection table
+    geoNode = "GeoShapeIntersection";
+    tableName = "Shapes_Intersection";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("shapeAType");
+    tab.push_back("shapeAId");
+    tab.push_back("shapeBType");
+    tab.push_back("shapeBId");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} integer, {5} varchar, {6} integer )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6] );
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+
+    // Shapes-Shift table
+    geoNode = "GeoShapeShift";
+    tableName = "Shapes_Shift";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("shapeType");
+    tab.push_back("shapeId");
+    tab.push_back("transformId");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} integer, {5} integer )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5] );
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+
+    // Shapes-Subtraction table
+    geoNode = "GeoShapeSubtraction";
+    tableName = "Shapes_Subtraction";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("shapeAType");
+    tab.push_back("shapeAId");
+    tab.push_back("shapeBType");
+    tab.push_back("shapeBId");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} integer, {5} varchar, {6} integer )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6] );
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+    
+    // Shapes-Union table
+    geoNode = "GeoShapeUnion";
+    tableName = "Shapes_Union";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("shapeAType");
+    tab.push_back("shapeAId");
+    tab.push_back("shapeBType");
+    tab.push_back("shapeBId");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} integer, {5} varchar, {6} integer )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6] );
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
     }

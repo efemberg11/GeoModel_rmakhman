@@ -301,6 +301,9 @@ void KitchenSinkPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
 							 );
     world->add(wTransform);
     world->add(wPhys);
+    wLog->setMaterial(Stainless);
+
+    
   }
   
   //--------------------------------------//

@@ -19,15 +19,7 @@ Use the -g flag to specify the name of the input geometry file.
 
 ### ATLAS Geometry Files:
 
-At installation time an ATLAS geometry file and the ATLAS Magnetic field map file will be automatically downloaded and installed under *< path-to-install >/share/FullSimLight/ATLAS* if the user will activate the `GEOMODEL_INSTALL_FSLDATA` flag at compile time. 
-
-Additional .gdml and .SQLite files of ATLAS geometry tag ATLAS-R2-2016-01-00-01 are available at: 
-s
-```bash
-wget https://gitlab.cern.ch/GeoModelATLAS/geometry-data/raw/master/geometry/geometry-ATLAS-R2-2016-01-00-01.gdml  
-wget https://geomodel.web.cern.ch/atlas-geometry-data/geometry-ATLAS-R2-2016-01-00-01.db 
-```
-For instructions on how to produce your own SQLite dump of your preferred ATLAS geometry tag, please refet to the [ATLAS Extensions](https://geomodel.web.cern.ch/home/fullsimlight/atlas-extensions/) page.
+If you are interested in running with the ATLAS geometry files, please refer to the [ATLAS Extensions](https://geomodel.web.cern.ch/home/fullsimlight/atlas-extensions/) page. 
 
 
 ## FullSimLight: run and options
@@ -38,24 +30,6 @@ NB: Before running fullSimLight make sure to source the *geant4.sh* file to set 
 
 ```bash
 source <path_to_geant4_install_dir>/bin/geant4.sh
-```
-
-Alternatively, you can modifiy the .bash_profile file in the following way:
-
-```bash
-#GEANT4
-export G4INSTALL=<full_path_to_Geant4_install_dir>
-export G4NEUTRONHPDATA=$G4INSTALL/data/G4NDL4.6
-export G4LEDATA=$G4INSTALL/data/G4EMLOW7.9.1
-export G4LEVELGAMMADATA=$G4INSTALL/data/PhotonEvaporation5.5
-export G4RADIOACTIVEDATA=$G4INSTALL/data/RadioactiveDecay5.4
-export G4PARTICLEXSDATA=$G4INSTALL/data/G4PARTICLEXS2.1
-export G4PIIDATA=$G4INSTALL/data/G4PII1.3
-export G4REALSURFACEDATA=$G4INSTALL/data/RealSurface2.1.1
-export G4SAIDXSDATA=$G4INSTALL/data/G4SAIDDATA2.0
-export G4ABLADATA=$G4INSTALL/data/G4ABLA3.1
-export G4INCLDATA=$G4INSTALL/data/G4INCL1.0
-export G4ENSDFSTATEDATA=$G4INSTALL/data/G4ENSDFSTATE2.2
 ```
 
 To run FullSimLight you can specify a json configuration file (generated with fsl) with the -c flag or use the following command line parameters. Run the executable with the --help option to see the available options:
@@ -72,12 +46,13 @@ To run FullSimLight you can specify a json configuration file (generated with fs
 ``` 
 
 FullSimLight uses by default the Geant4 particle gun as primary generator, but it supports also
-input events from the Pythia generator (see the Primary generator section for more details), HepMC3 formats or custom generators plugins.
-A minimal set of "observable" is collected during the simulation per-primary
+input events from the Pythia generator (see the Primary generator section below for more details), HepMC3 formats or custom generators plugins.
+
+A minimal set of "observables" is collected during the simulation per-primary
 particle type: mean energy deposit, mean charged and neutral step lengths,
 mean number of steps made by charged and neutral particles, mean number of
 secondary e-, e+ and gamma particles. The result is reported at the end of
-each event for each primary particle that were transported in the given event.
+each event for each primary particle that was transported in the given event.
 At the end of the simulation a final report is printed showing the run time,
 the primary generator and magnetic field settings used during the run, the
 total number of events and primary particles transported and the per-primary
@@ -92,19 +67,16 @@ in this case.
 
 ## Examples
 
-FullSimLight can be very easily configured and run via fsl, both from within the GUI or from the command-line, passing the configuration file with the -c flag. Alternatively FullSimLight can be executed via command line using the basic available flags. The only mandatory parameter necessary for starting a simulation is the geometry file (can be specified inside the config file or with the -g flag). Following are some examples that illustrates the different possibilities. 
+`FullSimLight` can be very easily configured and run via `fsl`, both from within the GUI or from the command-line, passing the configuration file with the -c flag. Alternatively, `FullSimLight` can be executed via command line using the basic available flags. The only mandatory parameter necessary for starting a simulation is the geometry file (can be specified inside the config file or with the -g flag). Following are some examples that illustrates the different possibilities. 
 
 If you have created your custom configuration file <myconfig.json> with fsl, you can simply run fullSimLight as follows:
 
 ``` bash
 ./fullSimLight -c myconfig.json  
 ``` 
+This is the best and more complete way of configuring FullSimLight because it allows you to customize also the use of plugins and to use all the different primary particles generation methods.
 
-To run fullSimLight with the ATLAS configuration file you only need to run fullSimLight using the custom **atlas-config.json** file and passing the desired geometry file via command line, as follows: 
-
-``` bash
-./fullSimLight -c atlas-config.json -g geometry-ATLAS-R2-2016-01-00-01.db 
-``` 
+As an alternative to using the json configuration file, one can use the available command line options and a classical geant4 macro to configure fullsimlight. 
 
 During the installation a default macro file *<macro.g4>* will be installed in your *< install-path >/share/FullSimLight* directory. So the macro file doesn't need to be specified if you intend to use the default one.
 
@@ -115,10 +87,10 @@ Physics List, not in performance mode and building the detector from < mygeometr
 ./fullSimLight -g mygeometry.db
 ```
 
-To execute the application using the default <  macro.g4 >  macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  *HGTDPlugin* :
+To execute the application using the default <  macro.g4 >  macro file and building the detector with a geometry described in one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS/-/tree/master/GeoModelPlugins?ref_type=heads), i.e.  *PixelPlugin* :
 
 ``` bash
-./fullSimLight  -g libHGTDPlugin.1.0.0.dylib
+./fullSimLight  -g libPixePlugin.1.0.0.dylib/.so
 ```
 
 To execute the application using a custom <mymacro.g4> macro file, with the ATLAS FTFP_BERT_ATL Physics List, in performance mode and building the detector from the geometry-ATLAS-R2-2016-01-00-01.db  file :
@@ -127,7 +99,7 @@ To execute the application using a custom <mymacro.g4> macro file, with the ATLA
 ./fullSimLight -m mymacro.g4 -f FTFP_BERT_ATL -p -g geometry-ATLAS-R2-2016-01-00-01.db 
 ``` 
 
-Please note that the last option is deprecated, as it doesn't allow full flexibility, and we suggest to configure your simulation via fsl.
+Please note that the last option is deprecated, as it doesn't allow full flexibility, and we suggest to configure your simulation via `fsl`.
 
 
 ## Parameters configuration via fsl (suggested) 
@@ -185,7 +157,7 @@ Use the -t to set the Toroids off, and test the *solenoid_bfieldmap_7730_0_14m_v
 
 ## Primary Generators
 
-The primary generator used by default is the Geant4 particle gun, but FullSimLight also supports the  [Pythia generator](http://home.thep.lu.se/Pythia/)
+The primary generator used by default is the Geant4 particle gun, but FullSimLight also supports the [Pythia generator](http://home.thep.lu.se/Pythia/) and HepMC3 format. 
 
 ## Particle gun
  
@@ -243,6 +215,10 @@ By default, i.e. if it is not specified by the above command, the type will be r
  ``` 
  
  The number of events that the user wants to simulate must be specified in the Geant4 macro file. A specific *pythia.g4* macro file can be found in the *<  path-to-install >/share/FullSimLight* directory, that should be used when simulating Pythia events and can be edited according to the user needs. 
+ 
+## HepMC3 events input
+
+FullSimLight supports reading events in HepMC3 format both the standard Asciiv3 format (introduced in HepMC3) as well as the old Ascii format (used in HepMC and HepMC2). This option is only available when configuring fullSimLight with FSL and the json configuration file. Please refer to the [FSL section](https://geomodel.web.cern.ch/home/fullsimlight/fsl/) for more info. 
 
 ## Physics List
 

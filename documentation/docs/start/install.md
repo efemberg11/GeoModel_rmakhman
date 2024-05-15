@@ -1,13 +1,13 @@
 # Install the GeoModel Applications and Development kits
 
-In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel applications and development kits on different platforms.  
+In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel applications and development kits on different platforms.  If you are a developer and would like to install the GeoModel toolkit from source, please refer to the [Developers installation instructions](../dev/index.md).
 
 The GeoModel applications include:
 
 * **gmex**, the geometry explorer, an interactive 3d geometry visualizer
 * **gmstatistics**, tool to monitor the memory consumption
 * **fullsimlight**, a command-line tool to run Geant4 simulation, and its graphical user interface, *fsl*.
-* **gmclash**, a Geant4 based command-line tool too perform clash detection
+* **gmclash**, a Geant4 based command-line tool to perform clash detection
 * **gmgeantino**, a Geant4 based command-line tool to generate geantino maps
 * **gmmasscalc**, a Geant4 based command-line tool to compute the mass of a given piece of detector geometry
 * **gm2gdml** and **gdml2gm**, command line tools to convert GeoModel to and from GDML
@@ -16,8 +16,9 @@ The GeoModel applications include:
 The development kits include header files and precompiled libraries for the development of detector description code. On some platforms (macOS) the development environment is installed together with the prebuild applications and libraries.  
 
 
-## Ubuntu 20.0.4 (focal, LTS) or 21.0.10 (impish) or 22.0.4 (jammy, LTS)
+## How to install GeoModel on Ubuntu
 
+The following instructions have been tested for Ubuntu 20.0.4 (focal, LTS) or 21.0.10 (impish) or 22.0.4 (jammy, LTS).
 Add the geomodel repository to your source list: 
 
 ```
@@ -49,7 +50,7 @@ If you have outdated packages, these commands will replace those packages with t
     We strongly suggest to use the alternative X11 window manager when running GEMX (or all other SoQt/Coin3D-based applications) on Ubuntu, for the time being.
 
 
-## macOS
+## How to install GeoModel on macOS
 
 On macOS, we use the [Homebrew package manager](http://brew.sh) to handle and install the GeoModel packages. If you don't have Homebrew installed on your machine, you should first install it by following the instructions on the Homebrew website: <http://brew.sh>.  Please be attentive to any instructions printed after the installation procedure; there might be environment variables to set.
 
@@ -172,7 +173,7 @@ On any other platform (such as Centos or Fedora), you can build GeoModel from so
 
 ## Visualize geometry data
 
-After installinmg the tools, you can test your installation on an example ATLAS geometry file. 
+After installing the tools, you can test your installation on an example ATLAS geometry file. Please note that in order to run GeoModel on the full ATLAS geometry you will need to install the **geomodel-extensions-atlas** package.
 
 First, download the geometry data file:
 

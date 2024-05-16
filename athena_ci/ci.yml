@@ -4,7 +4,7 @@ build_geomodel_athena:
   stage: step-A
 
   variables:
-    CCACHE_KEY_SUFFIX: r1
+    CCACHE_KEY_SUFFIX: r2
     CCACHE_DIR: ${CI_PROJECT_DIR}/ccache_${CCACHE_KEY_SUFFIX}
     CCACHE_MAXSIZE: 10G
 

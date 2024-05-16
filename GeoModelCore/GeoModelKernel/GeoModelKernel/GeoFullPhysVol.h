@@ -27,38 +27,16 @@ class GeoVAlignmentStore;
  * ReadoutElement.
  */
 
-class GeoFullPhysVol final : public GeoVFullPhysVol
-{
- public:
-  GeoFullPhysVol (const GeoLogVol* LogVol);
+class GeoFullPhysVol final : public GeoVFullPhysVol {
+ 
+  public:
+    GeoFullPhysVol (const GeoLogVol* LogVol);
 
-    /// Adds a Graph Node to the Geometry Graph
-  virtual void add(GeoGraphNode* graphNode) override final;
-
-  /// Returns the number of child physical volumes.
-  virtual unsigned int getNChildVols() const override;
-
-  /// Returns the ith child volume
-  virtual PVConstLink  getChildVol(unsigned int index) const override;
-
-  /// Returns the transform to the ith volume.
-  virtual GeoTrf::Transform3D getXToChildVol(unsigned int index, const GeoVAlignmentStore* store=nullptr) const override;
-  
-  /// Returns the default transform to the ith volume.
-  virtual GeoTrf::Transform3D getDefXToChildVol(unsigned int index, const GeoVAlignmentStore* store=nullptr) const override;
-
+ 
   /// Executes a GeoNodeAction.
-  virtual void exec(GeoNodeAction *action) const override;
+  virtual void exec(GeoNodeAction *action) const override final;
 
-  /// Returns the name of the child.
-  virtual std::string getNameOfChildVol(unsigned int i) const override;
-
-  /// Returns the id of the child.
-  virtual Query<int> getIdOfChildVol(unsigned int i) const override;
-
-  /// Returns the number of child physical volumes and Serial Transformers.
-  virtual unsigned int getNChildVolAndST() const override;
-
+ 
   /// Meaning of the input parameter 'attached'
   /// TRUE: all cloned volumes are meant to stay identical to their clone origin for the lifetime
   ///       further changes are permitted neither in the origin nor in the clone results
@@ -75,21 +53,10 @@ class GeoFullPhysVol final : public GeoVFullPhysVol
   /// don't call it until geometry has been completely translated to G4
   void clear(); // drop subtree
 
-  virtual GeoTrf::Transform3D getX    (const GeoVAlignmentStore* store=nullptr) const override;
-  virtual GeoTrf::Transform3D getDefX (const GeoVAlignmentStore* store=nullptr) const override;
-  virtual unsigned int getNChildNodes() const override;
-  virtual const GeoGraphNode * const *getChildNode (unsigned int i) const override;
-  virtual const GeoGraphNode * const *findChildNode(const GeoGraphNode *n) const override;
-
-  protected:
-  virtual ~GeoFullPhysVol() = default;
 
   private:
- 
-  /// Hold the list of children.
-  std::vector<GeoIntrusivePtr<GeoGraphNode>> m_daughters{};
-  
-  const GeoFullPhysVol* m_cloneOrigin{nullptr};
+    virtual ~GeoFullPhysVol() = default;
+    const GeoFullPhysVol* m_cloneOrigin{nullptr};
 };
 
 #endif

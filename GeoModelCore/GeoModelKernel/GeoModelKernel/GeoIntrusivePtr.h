@@ -113,6 +113,11 @@ class GeoIntrusivePtr{
         bool operator==(GeoType* other) const {
             return m_ptr == other;
         }
+        template <typename AnyObj>
+        bool operator !=(const AnyObj & other) const {
+            return !( (*this) == other );
+        }
+
         /// Odering operator
         bool operator<(const GeoIntrusivePtr& other) const {
             return m_ptr < other.m_ptr;

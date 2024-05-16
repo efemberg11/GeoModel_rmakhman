@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOVPHYSVOL_H
@@ -8,15 +8,19 @@
 #include "GeoModelKernel/GeoIntrusivePtr.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/Query.h"
-#include <string>
+
 
 #include "GeoModelKernel/GeoLogVol.h"
+#include "GeoModelKernel/GeoPlacement.h"
 #include "GeoModelKernel/GeoGraphNode.h"
 
+
+#include <string>
+#include <shared_mutex>
 class GeoVolumeAction;
 class GeoVAlignmentStore;
 
-class GeoVPhysVol : public GeoGraphNode {
+class GeoVPhysVol: public GeoPlacement {
  public:
     using PVLink = GeoIntrusivePtr<GeoVPhysVol>;
     using PVConstLink = GeoIntrusivePtr<const GeoVPhysVol>;
@@ -24,78 +28,61 @@ class GeoVPhysVol : public GeoGraphNode {
     GeoVPhysVol(const GeoLogVol* LogVol);
   
 
-  /// Returns true if the physical volume is accessed by more than one parent.
-  /// Should check this before trusting the parent pointer.
-  bool isShared() const {
-      return m_parentPtr == this;
-  }
 
-  /// Returns the index of a specific daughter volume.  The Query class can be used
-  /// just like an unsigned int, but it provides and isValid() method to determine
-  /// whether it is valid and throws an exception if an invalid value is blithely used.
-  Query<unsigned int> indexOf(PVConstLink daughter) const;
+    /// Returns the index of a specific daughter volume.  The Query class can be used
+    /// just like an unsigned int, but it provides and isValid() method to determine
+    /// whether it is valid and throws an exception if an invalid value is blithely used.
+    Query<unsigned int> indexOf(PVConstLink daughter) const;
 
-  /// Gets the parent, if the parent is unique, and otherwise returns a nullptr pointer.
-  PVConstLink getParent() const {
-     return PVConstLink{isShared() ? nullptr : m_parentPtr};
-  }
+    /// Returns the logical volume.
+    const GeoLogVol* getLogVol() const {
+       return m_logVol;
+    }
 
-  /// Returns the logical volume.
-  const GeoLogVol* getLogVol() const {
-     return m_logVol;
-  }
+    /// Returns the number of child physical volumes.
+    unsigned int getNChildVols() const;
 
-  /// Returns the number of child physical volumes.
-  virtual unsigned int getNChildVols() const = 0;
+    /// Returns the ith child volume
+    PVConstLink  getChildVol(unsigned int index) const;
 
-  /// Returns the ith child volume
-  virtual PVConstLink  getChildVol(unsigned int index) const = 0;
+    /// Returns the transform to the ith volume.
+    GeoTrf::Transform3D getXToChildVol(unsigned int index, const GeoVAlignmentStore* store=nullptr) const;
 
-  /// Returns the transform to the ith volume.
-  virtual GeoTrf::Transform3D getXToChildVol(unsigned int index, const GeoVAlignmentStore* store=nullptr) const = 0;
+    /// Returns the default transform to the ith volume.
+    GeoTrf::Transform3D getDefXToChildVol(unsigned int index, const GeoVAlignmentStore* store=nullptr) const;
 
-  /// Returns the default transform to the ith volume.
-  virtual GeoTrf::Transform3D getDefXToChildVol(unsigned int index, const GeoVAlignmentStore* store=nullptr) const = 0;
+    /// Returns the name of the child.
+    std::string getNameOfChildVol(unsigned int i) const;
 
-  /// Returns the name of the child.
-  virtual std::string getNameOfChildVol(unsigned int i) const = 0;
+    /// Applies an action to the volume. The volume executes the action and the applies
+    /// it to the children, either from the top down or the bottom up, depending upon
+    /// the configuration of the action.
+    void apply(GeoVolumeAction* action) const;
 
-  /// Applies an action to the volume. The volume executes the action and the applies
-  /// it to the children, either from the top down or the bottom up, depending upon
-  /// the configuration of the action.
-  void apply(GeoVolumeAction* action) const;
+ 
+    /// Returns the id of the child.
+    Query<int> getIdOfChildVol(unsigned int i) const;
 
-  /// When a node is added to a parent in the graph, the node is always notified.
-  /// What happens at that time is up to the node.  Most nodes do not need to do
-  /// anything. Some--the alignable transforms in particular--need to take some
-  /// actions, such as adding the parent volume to a list.
-  virtual void dockTo(GeoVPhysVol* parent);
+    /// Returns the number of child physical volumes and Serial Transformers.
+    unsigned int getNChildVolAndST() const;
 
-  /// Returns the id of the child.
-  virtual Query<int> getIdOfChildVol(unsigned int i) const = 0;
+    /// Returns the number of child nodes
+    unsigned int getNChildNodes() const;
+    
+    const GeoGraphNode* const* getChildNode (unsigned int i) const;
+    const GeoGraphNode* const* findChildNode(const GeoGraphNode *n) const;
 
-  /// Returns the number of child physical volumes and Serial Transformers.
-  virtual unsigned int getNChildVolAndST() const = 0;
-
-  virtual GeoTrf::Transform3D getX    (const GeoVAlignmentStore* store=nullptr) const = 0;
-  virtual GeoTrf::Transform3D getDefX (const GeoVAlignmentStore* store=nullptr) const = 0;
-  virtual unsigned int getNChildNodes() const=0;
-  virtual const GeoGraphNode * const *getChildNode (unsigned int i) const=0;
-  virtual const GeoGraphNode * const *findChildNode(const GeoGraphNode *n) const=0;
-
-  /// Adds a Graph Node to the Geometry Graph
-  virtual void add(GeoGraphNode* graphNode) = 0;
-
- protected:
-  virtual ~GeoVPhysVol() = default;
+    /// Adds a Graph Node to the Geometry Graph
+    void add(GeoIntrusivePtr<GeoGraphNode> graphNode);
+  protected:
+    virtual ~GeoVPhysVol() = default;
 
  private:
-  /// If one parent           ...pointer=PARENT;
-  /// If no parent            ...pointer=nullptr.
-  /// If more than one parent ...pointer=this;
-  const GeoVPhysVol* m_parentPtr{nullptr};
-  
-  GeoIntrusivePtr<const GeoLogVol> m_logVol{};
+    GeoIntrusivePtr<const GeoLogVol> m_logVol{};
+  protected:
+    std::vector<GeoIntrusivePtr<GeoGraphNode>> m_daughters{};
+    mutable std::shared_mutex m_muxVec{};
+
 };
 
 using PVLink = GeoVPhysVol::PVLink;

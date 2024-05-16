@@ -1,0 +1,80 @@
+From 2404442b4ba8f6dbc92f0b0f25e201317ec2c141 Mon Sep 17 00:00:00 2001
+From: Johannes Josef Junggeburth <johannes.josef.junggeburth@cern.ch>
+Date: Tue, 30 Apr 2024 09:41:11 +0200
+Subject: [PATCH] Adapt to interface change using GeoPositioning objects
+
+---
+ .../GeoModelUtilities/GeoAlignmentStore.h          | 14 +++++++-------
+ .../GeoModelUtilities/src/GeoAlignmentStore.cxx    |  4 ++--
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/DetectorDescription/GeoModel/GeoModelUtilities/GeoModelUtilities/GeoAlignmentStore.h b/DetectorDescription/GeoModel/GeoModelUtilities/GeoModelUtilities/GeoAlignmentStore.h
+index 4756f948abc..da2b126bd4b 100755
+--- a/DetectorDescription/GeoModel/GeoModelUtilities/GeoModelUtilities/GeoAlignmentStore.h
++++ b/DetectorDescription/GeoModel/GeoModelUtilities/GeoModelUtilities/GeoAlignmentStore.h
+@@ -49,19 +49,19 @@ public:
+     ///         full physical volume.
+     /// @param fullPhysVol: Full physical volume in the GeoModel tree to which the transforms belongs to
+     /// @param physVolTrf:  Aligned placement of the physical volume in space
+-    virtual void setAbsPosition(const GeoVFullPhysVol* fullPhysVol, 
++    virtual void setAbsPosition(const GeoNodePositioning* fullPhysVol, 
+                                 const GeoTrf::Transform3D& physVolTrf) override final;
+     /// @brief: Returns the aligned transform associated with the full physical volume. Returns a 
+     ///         nullptr if the physical volume has not been added before
+-    virtual const GeoTrf::Transform3D* getAbsPosition(const GeoVFullPhysVol* fullPhysVol) const override final;
++    virtual const GeoTrf::Transform3D* getAbsPosition(const GeoNodePositioning* fullPhysVol) const override final;
+     /// @brief: Caches the aboslute transform of the perfectly aligned physical volume.
+     /// @param fullPhysVol: Full physical volume in the GeoModel tree to which the transforms belongs to
+     /// @param unAlignedTrf: Nominal placement of the full physical volume.
+-    virtual void setDefAbsPosition(const GeoVFullPhysVol* fullPhysVol, 
++    virtual void setDefAbsPosition(const GeoNodePositioning* fullPhysVol, 
+                                   const GeoTrf::Transform3D& unAlignedTrf) override final;
+     /// @brief: Returns the nominal position of the full phyiscal volume. Returns a nullptr if the
+     ///         nominal position of the full physical volume has not been added before to the map
+-    virtual const GeoTrf::Transform3D* getDefAbsPosition(const GeoVFullPhysVol* fullPhysVol) const override final;
++    virtual const GeoTrf::Transform3D* getDefAbsPosition(const GeoNodePositioning* fullPhysVol) const override final;
+ 
+     /// @brief: Copies, the deltas, the absolute and the nominal positions of the other map
+     ///         to this object. Returns false if the two maps partially overlap.
+@@ -76,7 +76,7 @@ public:
+     using DeltaMap = TransformMap<GeoAlignableTransform, GeoTrf::Transform3D>;
+     using DeltaMapPtr = GeoModel::TransientConstSharedPtr<DeltaMap>;
+ 
+-    using PositioningMap = TransformMap<GeoVFullPhysVol, GeoTrf::Transform3D>;
++    using PositioningMap = TransformMap<GeoNodePositioning, GeoTrf::Transform3D>;
+     using PositioningMapPtr = GeoModel::TransientConstSharedPtr<PositioningMap>;
+ private:    
+     DeltaMapPtr m_deltas{std::make_unique<DeltaMap>()};
+@@ -92,10 +92,10 @@ public:
+ inline const GeoTrf::Transform3D* GeoAlignmentStore::getDelta(const GeoAlignableTransform* axf) const { 
+     return m_deltas->getTransform(axf); 
+ }
+-inline const GeoTrf::Transform3D* GeoAlignmentStore::getAbsPosition(const GeoVFullPhysVol* fpv) const {
++inline const GeoTrf::Transform3D* GeoAlignmentStore::getAbsPosition(const GeoNodePositioning* fpv) const {
+     return m_absPositions->getTransform(fpv); 
+ }
+-inline const GeoTrf::Transform3D* GeoAlignmentStore::getDefAbsPosition(const GeoVFullPhysVol* fpv) const {
++inline const GeoTrf::Transform3D* GeoAlignmentStore::getDefAbsPosition(const GeoNodePositioning* fpv) const {
+     return m_defAbsPositions->getTransform(fpv);
+ }
+ 
+diff --git a/DetectorDescription/GeoModel/GeoModelUtilities/src/GeoAlignmentStore.cxx b/DetectorDescription/GeoModel/GeoModelUtilities/src/GeoAlignmentStore.cxx
+index f0865e42b55..b9282562062 100644
+--- a/DetectorDescription/GeoModel/GeoModelUtilities/src/GeoAlignmentStore.cxx
++++ b/DetectorDescription/GeoModel/GeoModelUtilities/src/GeoAlignmentStore.cxx
+@@ -11,10 +11,10 @@ void GeoAlignmentStore::setDelta(const GeoAlignableTransform* axf, const GeoTrf:
+ void GeoAlignmentStore::setDelta(const GeoAlignableTransform* axf, std::shared_ptr<const GeoTrf::Transform3D> trans) {
+     m_deltas->setTransform(axf, std::move(trans));
+ }
+-void GeoAlignmentStore::setAbsPosition(const GeoVFullPhysVol* fpv, const GeoTrf::Transform3D& xf) { 
++void GeoAlignmentStore::setAbsPosition(const GeoNodePositioning* fpv, const GeoTrf::Transform3D& xf) { 
+     m_absPositions->setTransform(fpv, xf); 
+ }
+-void GeoAlignmentStore::setDefAbsPosition(const GeoVFullPhysVol* fpv, const GeoTrf::Transform3D& xf) {
++void GeoAlignmentStore::setDefAbsPosition(const GeoNodePositioning* fpv, const GeoTrf::Transform3D& xf) {
+     m_defAbsPositions->setTransform(fpv, xf);
+ }
+ void GeoAlignmentStore::lockDelta() {
+-- 
+2.34.1
+

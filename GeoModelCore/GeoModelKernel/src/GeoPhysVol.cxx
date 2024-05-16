@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoPhysVol.h"
@@ -12,49 +12,11 @@
 #include <algorithm>
 
 
-GeoPhysVol::GeoPhysVol(const GeoLogVol* LogVol)
-  : GeoVPhysVol(LogVol) {}
+GeoPhysVol::GeoPhysVol(const GeoLogVol* LogVol):
+      GeoVPhysVol{LogVol}{}
 
 
-void GeoPhysVol::add(GeoGraphNode* graphNode) {
-  std::scoped_lock<std::mutex> lk(m_muxVec);
-  GeoIntrusivePtr<GeoGraphNode> nodePtr{graphNode};
-  m_daughters.emplace_back(nodePtr);
-  graphNode->dockTo(this);
-}
-
-unsigned int GeoPhysVol::getNChildVols() const
-{
-  GeoCountVolAction cv;
-  exec(&cv);
-  return cv.getCount ();
-}
-
-PVConstLink GeoPhysVol::getChildVol(unsigned int index) const
-{
-  GeoAccessVolumeAction av(index,nullptr);
-  exec(&av);
-  return av.getVolume();
-}
-
-GeoTrf::Transform3D GeoPhysVol::getXToChildVol(unsigned int index
-				       ,const GeoVAlignmentStore* store) const
-{
-  GeoAccessVolumeAction av(index,store);
-  exec(&av);
-  return av.getTransform();
-}
-
-GeoTrf::Transform3D GeoPhysVol::getDefXToChildVol(unsigned int index
-					  ,const GeoVAlignmentStore* store) const
-{
-  GeoAccessVolumeAction av(index,store);
-  exec(&av);
-  return av.getDefTransform();
-}
-
-void GeoPhysVol::exec(GeoNodeAction *action) const
-{
+void GeoPhysVol::exec(GeoNodeAction *action) const {
   //    
   // Put this node on the head of the path:    
   //    
@@ -80,13 +42,13 @@ void GeoPhysVol::exec(GeoNodeAction *action) const
   }
   else {
     // FIXME: m_daughters access is now protected in other methods, but having the lock here makes a deadlock
-    // std::scoped_lock<std::mutex> lk(m_muxVec);
+    // std::scoped_lock lk(m_muxVec);
     // TODO: Think more thouroughly about thread-safe of this class...!!
-    for(size_t c = 0; c < m_daughters.size (); c++) {
-      m_daughters[c]->exec(action);
+    for(const GeoIntrusivePtr<GeoGraphNode>& child : m_daughters) {
+      child->exec(action);
       if(action->shouldTerminate()) {
-	action->getPath()->pop();
-	return;
+          action->getPath()->pop();
+          return;
       }
     }
   }
@@ -94,114 +56,4 @@ void GeoPhysVol::exec(GeoNodeAction *action) const
   // Take this node back off the head of the path:    
   //    
   action->getPath()->pop();
-}
-
-std::string GeoPhysVol::getNameOfChildVol(unsigned int i) const
-{
-  GeoAccessVolumeAction av(i,nullptr);
-  exec(&av);
-  return av.getName();
-}
-
-Query<int> GeoPhysVol::getIdOfChildVol(unsigned int i) const
-{
-  GeoAccessVolumeAction	av(i,nullptr);
-  exec(&av);
-  return av.getId();
-}
-
-unsigned int GeoPhysVol::getNChildVolAndST() const
-{
-  GeoCountVolAndSTAction cv;
-  exec(&cv);
-  return cv.getCount();
-}
-
-GeoTrf::Transform3D GeoPhysVol::getX(const GeoVAlignmentStore* store) const {
-  //
-  // Check we are not shared:
-  //
-  if (isShared()) throw std::runtime_error("Transform requested from shared volume");
-  GeoTrf::Transform3D xform(GeoTrf::Transform3D::Identity());
-  //
-  // Get the address of the first graph node, from the parent:
-  //
-  const GeoGraphNode * const * fence =  getParent()->getChildNode(0);
-  const GeoGraphNode * const * node1 =  getParent()->findChildNode(this);
-  
-  for(const GeoGraphNode * const * current = node1 - 1; current>=fence; current--) {
-
-    // If this happens, we are done, compute & return--------------------//
-    //                                                                   //
-    if(dynamic_cast<const GeoVPhysVol *>(*current)) break;               //
-    //-------------------------------------------------------------------//
-
-    // If this happens, we are done, compute & return--------------------//
-    //                                                                   //
-    if(dynamic_cast<const GeoSerialTransformer *>(*current)) break;      //
-    //-------------------------------------------------------------------//
-
-    const GeoTransform *xf = dynamic_cast<const GeoTransform *> (*current);
-    
-    //-------------------------------------------------------------------//
-    // If this happens, accumulate into transform                        //
-    if (xf) xform  = xf->getTransform(store)*xform;                      //
-    //-------------------------------------------------------------------//
-  }
-  return xform;  
-}
-
-GeoTrf::Transform3D GeoPhysVol::getDefX(const GeoVAlignmentStore* store) const {
-  //
-  // Check we are not shared:
-  //
-  if (isShared()) throw std::runtime_error("Transform requested from shared volume");
-  GeoTrf::Transform3D xform(GeoTrf::Transform3D::Identity());
-  //
-  // Get the address of the first graph node, from the parent:
-  //
-  const GeoGraphNode * const * fence =  getParent()->getChildNode(0);
-  const GeoGraphNode * const * node1 =  getParent()->findChildNode(this);
-  
-  for(const GeoGraphNode * const * current = node1 - 1; current>=fence; current--) {
-
-    // If this happens, we are done, compute & return--------------------//
-    //                                                                   //
-    if (dynamic_cast<const GeoVPhysVol *>(*current)) break;              //
-    //-------------------------------------------------------------------//
-
-    // If this happens, we are done, compute & return--------------------//
-    //                                                                   //
-    if (dynamic_cast<const GeoSerialTransformer *>(*current)) break;     //
-    //-------------------------------------------------------------------//
-
-    const GeoTransform *xf = dynamic_cast<const GeoTransform *> (*current);
-    
-    //-------------------------------------------------------------------//
-    // If this happens, accumulate into transform                        //
-    if (xf) xform  = xf->getDefTransform(store)*xform;                   //
-    //-------------------------------------------------------------------//
-  }
-  return xform;  
-}
-
-unsigned int GeoPhysVol::getNChildNodes() const 
-{
-  std::scoped_lock<std::mutex> lk(m_muxVec);
-  return m_daughters.size();
-}
-
-const GeoGraphNode * const * GeoPhysVol::getChildNode(unsigned int i) const {
-  std::scoped_lock<std::mutex> lk(m_muxVec);
-  return m_daughters[i];
-}
-
-const GeoGraphNode * const * GeoPhysVol::findChildNode(const GeoGraphNode * n) const {
-  std::scoped_lock<std::mutex> lk(m_muxVec);
-  std::vector<GeoIntrusivePtr<GeoGraphNode>>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
-  if (i==m_daughters.end()) {
-    return nullptr;
-  }
-  return (*i);
- 
 }

@@ -12,6 +12,7 @@ project( "GeoModelExamples" VERSION 4.1.0 LANGUAGES CXX )
 # Getting-started examples
 add_subdirectory( KitchenSinkPlugin )
 add_subdirectory( MinimalPlugin )
+add_subdirectory( SurfaceTestPlugin )
 
 add_subdirectory( HelloGeo )
 add_subdirectory( HelloGeoWrite )

@@ -2,7 +2,7 @@
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
-file( GLOB HEADERS GeoModelKernel/*.h GeoModelKernel/*.tpp )
+file( GLOB HEADERS GeoModelKernel/*.h GeoModelKernel/*.tpp GeoModelKernel/*.icc )
 
 # Create the library.
 add_library( GeoModelKernel SHARED ${HEADERS} ${SOURCES} )

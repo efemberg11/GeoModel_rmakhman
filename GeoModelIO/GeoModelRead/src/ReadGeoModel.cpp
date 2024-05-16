@@ -1029,14 +1029,19 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id,
             // Returning: [" << getVPhysVol(id, tableId, copyN) << "] --
             // logvol: " << ((GeoVPhysVol*)getVPhysVol(id, tableId,
             // copyN))->getLogVol()->getName() << std::endl;
-            std::cout
+	    const GeoPhysVol *pv=dynamic_cast<const GeoPhysVol *> (getVPhysVol(id,tableId));
+	    if (pv) {
+	      std::cout
                 << "getting the instance volume from memory... Returning: ["
                 << getVPhysVol(id, tableId) << "] -- logvol: "
-                << ((GeoVPhysVol*)getVPhysVol(id, tableId))
-                       ->getLogVol()
-                       ->getName()
+                << pv
+		->getLogVol()
+		->getName()
                 << std::endl;
-            muxCout.unlock();
+	      muxCout.unlock();
+	    }
+	    else {
+	    }
         }
         // return dynamic_cast<GeoVPhysVol*>(getVPhysVol(id, tableId,
         // copyN));

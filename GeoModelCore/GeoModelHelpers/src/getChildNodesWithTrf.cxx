@@ -64,6 +64,24 @@ std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink physVol,
     }
     return children;
 }
+
+std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol) {
+    std::vector<GeoChildNodeWithTrf> children{getChildrenWithRef(physVol, false)}, subVolumes{};
+    subVolumes.reserve(children.size());
+    for (const GeoChildNodeWithTrf& child : children) {
+        subVolumes.push_back(child);
+        std::vector<GeoChildNodeWithTrf> grandChildren = getAllSubVolumes(child.volume);
+        subVolumes.reserve(grandChildren.size() + subVolumes.size());
+        std::transform(std::make_move_iterator(grandChildren.begin()),
+                       std::make_move_iterator(grandChildren.end()),
+                       std::back_inserter(subVolumes), [&child](GeoChildNodeWithTrf&& grandChild){
+                            grandChild.transform = child.transform * grandChild.transform;
+                            return grandChild;
+                       });
+    }
+    return subVolumes;
+}
+
 bool hasFullPhysVolInTree(PVConstLink physVol) {
     if (typeid(*physVol) == typeid(GeoFullPhysVol) ||
         typeid(*physVol) == typeid(GeoVFullPhysVol)){

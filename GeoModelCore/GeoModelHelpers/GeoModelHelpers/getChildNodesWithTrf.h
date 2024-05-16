@@ -32,8 +32,15 @@ struct GeoChildNodeWithTrf {
         GeoChildNodeWithTrf(GeoVolumeCursor& curs);
 };
 
+/*** @brief Returns all direct children of a volume with their transform. Equicalent volumes can be summarized.
+ *          In this case, the inductionRule transform to move from one copy to the next, is non-trivial
+*/
 std::vector <GeoChildNodeWithTrf> getChildrenWithRef (PVConstLink physVol,
                                                       bool summarizeEqualVol = true);
+/**** @brief Traverses through the GeoVPhysVol tree and returns all sub volumes of this tree.*/
+std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol);
+
+
 
 /**
  *  Returns whether a volume has fullPhysical volume nodes in 

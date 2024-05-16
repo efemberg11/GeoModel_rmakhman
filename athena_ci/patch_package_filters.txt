@@ -1,14 +1,3 @@
 # These Athena packages need to be rebuilt 
 # due to patches in the `patches` directory
 
-+ InnerDetector/InDetDetDescr/InDetServMatGeoModel
-
-+ HighGranularityTimingDetector/HGTD_DetDescr/HGTD_GeoModelXml
-+ InnerDetector/InDetDetDescr/BCMPrimeGeoModelXml
-+ InnerDetector/InDetDetDescr/InDetGeoModelUtils
-+ InnerDetector/InDetDetDescr/PixelGeoModelXml	
-+ InnerDetector/InDetDetDescr/ServiceExtensionGeoModelXml	
-+ InnerDetector/InDetDetDescr/StripGeoModelXml	
-+ InnerDetector/InDetDetDescr/PLRGeoModelXml
-+ InnerDetector/InDetDetDescr/PixelGeoModel
- 

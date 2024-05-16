@@ -25,54 +25,17 @@
  * memory cost.
  */
 
-#include <mutex>
 
+class GeoPhysVol : public GeoVPhysVol{
+  public:
+      GeoPhysVol(const GeoLogVol* LogVol);
 
-class GeoPhysVol : public GeoVPhysVol {
- public:
-  GeoPhysVol(const GeoLogVol* LogVol);
+      /// Executes a GeoNodeAction.
+      void exec(GeoNodeAction *action) const override final;
+  protected:
+      virtual ~GeoPhysVol() = default;
 
-  /// Adds a Graph Node to the Geometry Graph
-  virtual void add(GeoGraphNode* graphNode) override final;
-
-  /// Returns the number of child physical volumes.
-  virtual unsigned int getNChildVols() const override final;
-
-  /// Returns the ith child volume
-  virtual PVConstLink  getChildVol(unsigned int index) const override final;
-
-  /// Returns the transform to the ith volume.
-  virtual GeoTrf::Transform3D getXToChildVol(unsigned int index
-					      ,const GeoVAlignmentStore* store=nullptr) const override final;
-
-  /// Returns the default transform to the ith volume.
-  virtual GeoTrf::Transform3D getDefXToChildVol(unsigned int index
-						 ,const GeoVAlignmentStore* store=nullptr) const override final;
-
-  /// Executes a GeoNodeAction.
-  virtual void exec(GeoNodeAction *action) const override final;
-
-  /// Returns the name of the child.
-  virtual std::string getNameOfChildVol(unsigned int i) const override final;
-
-  /// Returns the id of the child.
-  virtual Query<int> getIdOfChildVol(unsigned int i) const override final;
-
-  /// Returns the number of child physical volumes and Serial Transformers.
-  virtual unsigned int getNChildVolAndST() const override final;
-
-  virtual GeoTrf::Transform3D getX    (const GeoVAlignmentStore* store=nullptr) const override final;
-  virtual GeoTrf::Transform3D getDefX (const GeoVAlignmentStore* store=nullptr) const override final;
-  virtual unsigned int getNChildNodes() const override final;
-  virtual const GeoGraphNode * const *getChildNode (unsigned int i) const override final;
-  virtual const GeoGraphNode * const *findChildNode(const GeoGraphNode *n) const override final;
-
- protected:
-    virtual ~GeoPhysVol() = default;
-
- private:
-  std::vector<GeoIntrusivePtr<GeoGraphNode>> m_daughters{};
-  mutable std::mutex m_muxVec;
 };
+
 
 #endif

@@ -8,13 +8,13 @@
 + Calorimeter/CaloDetDescr
 + Calorimeter/CaloDetDescrUtils
 + Calorimeter/CaloRec
-+ Database/IOVDbSvc
 + DetectorDescription/AGDD/AGDDControl
 + DetectorDescription/AGDD/AGDDHandlers
 + DetectorDescription/AGDD/AGDDKernel
++ DetectorDescription/AGDD/AGDD2GeoSvc
++ DetectorDescription/AGDD/AGDDModel
 + DetectorDescription/GeoModel/GeoModelExamples
 + DetectorDescription/GeoModel/GeoModelInterfaces
-+ DetectorDescription/GeoModel/GeoModelStandalone/GeoExporter
 + DetectorDescription/GeoModel/GeoModelSvc
 + DetectorDescription/GeoModel/GeoModelUtilities
 + DetectorDescription/GeoModel/GeoSpecialShapes
@@ -96,7 +96,9 @@
 + MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg
 + MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData
 + MuonSpectrometer/MuonDetDescr/MuonAGDD
++ MuonSpectrometer/MuonDetDescr/MuonDetDescrUtils
 + MuonSpectrometer/MuonDetDescr/MuonAGDDBase
++ MuonSpectrometer/MuonDetDescr/MuonAGDDDescription
 + MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry
 + MuonSpectrometer/MuonDetDescr/MuonTrackingGeometry
 + MuonSpectrometer/MuonDigitization/RPC_Digitization

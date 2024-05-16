@@ -1,19 +1,21 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoVolumeAction.h"
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
+#include "GeoModelKernel/GeoCountVolAction.h"
+#include "GeoModelKernel/GeoCountVolAndSTAction.h"
 
 #include <stdexcept>
 #include <string>
+#include <mutex>
 
 GeoVPhysVol::GeoVPhysVol(const GeoLogVol* LogVol): 
-  m_logVol(LogVol) {}
+    m_logVol(LogVol) {}
 
-Query<unsigned int> GeoVPhysVol::indexOf(PVConstLink daughter) const
-{
+Query<unsigned int> GeoVPhysVol::indexOf(PVConstLink daughter) const {
   unsigned int nChildVols{getNChildVols()};
   for(unsigned int i=0; i<nChildVols; i++) { // To Do: replace this with Volume Iterator!
     if(getChildVol(i) == daughter) return i;
@@ -69,12 +71,74 @@ void GeoVPhysVol::apply(GeoVolumeAction *action) const {
   }
 }
 
-void GeoVPhysVol::dockTo(GeoVPhysVol* parent)
+void GeoVPhysVol::add(GeoIntrusivePtr<GeoGraphNode> graphNode) {
+  std::unique_lock lk{m_muxVec};
+  m_daughters.emplace_back(graphNode);
+  graphNode->dockTo(this);
+}
+
+unsigned int GeoVPhysVol::getNChildVols() const {
+  GeoCountVolAction cv;
+  exec(&cv);
+  return cv.getCount();
+}
+
+PVConstLink GeoVPhysVol::getChildVol(unsigned int index) const {
+  GeoAccessVolumeAction av(index,nullptr);
+  exec(&av);
+  return av.getVolume();
+}
+
+GeoTrf::Transform3D GeoVPhysVol::getXToChildVol(unsigned int index, 
+                                                const GeoVAlignmentStore* store) const {
+  GeoAccessVolumeAction av(index,store);
+  exec(&av);
+  return av.getTransform();
+}
+
+GeoTrf::Transform3D GeoVPhysVol::getDefXToChildVol(unsigned int index,
+                                                   const GeoVAlignmentStore* store) const
 {
-  if(m_parentPtr) {
-    m_parentPtr = this;
+  GeoAccessVolumeAction av(index,store);
+  exec(&av);
+  return av.getDefTransform();
+}
+
+
+std::string GeoVPhysVol::getNameOfChildVol(unsigned int i) const {
+  GeoAccessVolumeAction av(i,nullptr);
+  exec(&av);
+  return av.getName();
+}
+
+Query<int> GeoVPhysVol::getIdOfChildVol(unsigned int i) const {
+  GeoAccessVolumeAction    av(i,nullptr);
+  exec(&av);
+  return av.getId();
+}
+
+unsigned int GeoVPhysVol::getNChildVolAndST() const {
+  GeoCountVolAndSTAction cv;
+  exec(&cv);
+  return cv.getCount();
+}
+
+unsigned int GeoVPhysVol::getNChildNodes() const {
+  std::shared_lock lk{m_muxVec};
+  return m_daughters.size();
+}
+
+const GeoGraphNode * const * GeoVPhysVol::getChildNode(unsigned int i) const {
+  std::shared_lock lk{m_muxVec};
+  return m_daughters[i];
+}
+
+const GeoGraphNode * const * GeoVPhysVol::findChildNode(const GeoGraphNode * n) const {
+  std::shared_lock lk{m_muxVec};
+  std::vector<GeoIntrusivePtr<GeoGraphNode>>::const_iterator i = std::find(m_daughters.begin(),m_daughters.end(),n);
+  if (i==m_daughters.end()) {
+    return nullptr;
   }
-  else {
-    m_parentPtr = parent;
-  }
+  return (*i);
+ 
 }

@@ -27,9 +27,13 @@ git checkout $NIGHTLY_COMMIT
 
 for p in "$SCRIPT_DIR"/patches/*.patch; do
     echo "---- Applying ${p} ----"
-    cat "${p}" | git am -3
-    git --no-pager log -1 $sha
+    patch -p1 < ${p}
+    #cat "${p}" | git am -3
+    #git --no-pager log -1 $sha
+    
     fill_line "-"
 done
 
-git diff HEAD ${NIGHTLY_COMMIT}
+
+#git diff HEAD ${NIGHTLY_COMMIT}
+git diff

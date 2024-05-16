@@ -47,15 +47,16 @@ fi
 echo "ATHENA_SOURCE: ${ATHENA_SOURCE}"
 
 source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh || true
-asetup none,gcc11 || true
-lsetup cmake || true
+asetup none,gcc13,cmakesetup || true
 lsetup git || true
+
 NINJA=/cvmfs/sft.cern.ch/lcg/releases/ninja/1.10.0-d608d/x86_64-el9-gcc13-opt/bin/ninja
 
 EXTRA_FLAGS=""
 if [ -t 1  ]; then
     EXTRA_FLAGS="-fdiagnostics-color=always"
 fi
+EXTRA_FLAGS="${EXTRA_FLAGS}"
 
 heading "Athena setup"
 
@@ -98,14 +99,13 @@ lsetup "views ${LCG_RELEASE} ${LCG_PLATFORM}" || true
 CCACHE=$(command -v ccache)
 $CCACHE -z
 
-heading "Rebase the GeoModel code base w.r.t. main"
-
-cd ${CI_PROJECT_DIR}
-git fetch origin
 
 export 
 
 if [ "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" == "main" ];then
+    heading "Rebase the GeoModel code base w.r.t. main"
+    cd ${CI_PROJECT_DIR}
+
     fill_line "Changes w.r.t to main before rebase"
     git fetch origin
     git diff HEAD origin/main
@@ -155,8 +155,11 @@ popd > /dev/null
 echo
 fill_line "="
 
+echo "$CCACHE -z"
 $CCACHE -z
 
+echo "$CCACHE -C"
+$CCACHE -C
 export CMAKE_PREFIX_PATH="${gm_install_dir}:$CMAKE_PREFIX_PATH"
 
 
@@ -166,6 +169,7 @@ full_package_filters=$SCRIPT_DIR/package_filters.txt
 patch_package_filters=$SCRIPT_DIR/patch_package_filters.txt
 
 package_filters=$(mktemp)
+echo "package_filters=${package_filters}"
 
 
 echo "IS_MERGE_REQUEST = $IS_MERGE_REQUEST"
@@ -187,23 +191,38 @@ fill_line "-"
 cat "$package_filters"
 fill_line "-"
 
+
+heading "Start athena build"
+
+
 mkdir athena-build
+
+
 install_dir=$PWD/athena-install
 pushd athena-build
+
+export ROOT_INCLUDE_PATH="${gm_install_dir}/include:${ROOT_INCLUDE_PATH}"
+
 cmake "$ATHENA_SOURCE/Projects/WorkDir" \
   -GNinja \
   -DCMAKE_MAKE_PROGRAM="$NINJA" \
-  -DCMAKE_CXX_FLAGS="$EXTRA_FLAGS" \
-	-DATLAS_PACKAGE_FILTER_FILE="$package_filters" \
+  -DCMAKE_CXX_FLAGS="$EXTRA_FLAGS -isystem ${gm_install_dir}/include" \
+  -DATLAS_PACKAGE_FILTER_FILE="$package_filters" \
   -DCMAKE_CXX_COMPILER_LAUNCHER=$CCACHE \
   -DCMAKE_INSTALL_PREFIX=$install_dir
+
 popd
 
 echo "Patching env_setup.sh to pick up correct GeoModel shared libs"
 
 echo "" >> athena-build/*/env_setup.sh
 echo "# GeoModel hack build injected library path:" >> athena-build/*/env_setup.sh
-echo "export LD_LIBRARY_PATH=\"${gm_install_dir}/lib64:\$LD_LIBRARY_PATH\"" >> athena-build/*/env_setup.sh
+echo "export LD_LIBRARY_PATH=\"${gm_install_dir}/lib64:\${LD_LIBRARY_PATH}\"" >> athena-build/*/env_setup.sh
+
+echo "export PATH=\"${gm_install_dir}/share:\${PATH}\"" >> athena-build/*/env_setup.sh
+echo "export ROOT_INCLUDE_PATH=\"${gm_install_dir}/include:\${ROOT_INCLUDE_PATH}\"" >> athena-build/*/env_setup.sh
+
+
 
 heading "Build Athena"
 
@@ -211,7 +230,7 @@ if [ -z "$CI" ]; then
   heading "Interactive mode, dropping into shell"
   bash
 else
-  cmake --build athena-build -- -j3
+  VERBOSE=1 cmake --build athena-build -- -j3
   $CCACHE -s
   cmake --install athena-build > athena_install.log
 fi

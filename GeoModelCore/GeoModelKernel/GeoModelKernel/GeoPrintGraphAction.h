@@ -31,26 +31,32 @@ class GeoPrintGraphAction : public GeoNodeAction
   virtual ~GeoPrintGraphAction();
 
   //	Handles a Transform.
-  virtual void handleTransform (const GeoTransform *xform);
+  virtual void handleTransform (const GeoTransform *xform) override final;
   
   //	Handles a physical volume.
-  virtual void handlePhysVol (const GeoPhysVol *vol);
+  virtual void handlePhysVol (const GeoPhysVol *vol) override final;
   
   //	Handles a physical volume.
-  virtual void handleFullPhysVol (const GeoFullPhysVol *vol);
+  virtual void handleFullPhysVol (const GeoFullPhysVol *vol) override final;
   
   //	Handles a Name Tag.
-  virtual void handleNameTag (const GeoNameTag *nameTag);
+  virtual void handleNameTag (const GeoNameTag *nameTag) override final;
   
   //	Handles a Serial Denominator.
-  virtual void handleSerialDenominator (const GeoSerialDenominator *sD);
+  virtual void handleSerialDenominator (const GeoSerialDenominator *sD) override final;
   
   //	Handles a Serial Transformer
-  virtual void handleSerialTransformer (const GeoSerialTransformer  *sT);
+  virtual void handleSerialTransformer (const GeoSerialTransformer  *sT) override final;
   
   //	Handles an Identifier Tag.
-  virtual void handleIdentifierTag (const GeoIdentifierTag *idTag);
+  virtual void handleIdentifierTag (const GeoIdentifierTag *idTag) override final;
   
+  //    Handle a virtual surface.
+  virtual void handleVSurface(const GeoVSurface *surface) override final;
+
+  //    Handle a rectangular surface.
+  virtual void handleRectSurface( const GeoRectSurface *rect) override final; 
+
   //	Sets the notification state.  Default: everything on.
   void setNotification (Type type, bool state);
   

@@ -86,6 +86,22 @@ void GeoPrintGraphAction::handleIdentifierTag (const GeoIdentifierTag *idTag)
   }
 }
 
+
+//    Handle GeoVirSurface
+void GeoPrintGraphAction::handleVSurface (const GeoVSurface *surface) {
+  indent();
+  m_o << "HELLO from VirtualSurface" << std::endl;
+}
+
+  //    Handle GeoVSurface
+void GeoPrintGraphAction::handleRectSurface (const GeoRectSurface *surface) {
+  indent();
+  m_o << "HELLO from RectSurface" << std::endl;
+}
+
+
+
+
 void GeoPrintGraphAction::setNotification (Type type, bool state)
 {
   if (type==TRANSFORM) {

@@ -80,3 +80,12 @@ void GeoNodeAction::handleIdentifierTag (const GeoIdentifierTag *)
 void GeoNodeAction::handleSerialIdentifier(const GeoSerialIdentifier *)
 {
 }
+
+void GeoNodeAction::handleVSurface (const GeoVSurface *surface) {
+}
+
+void GeoNodeAction::handleRectSurface (const GeoRectSurface *rect) {
+}
+
+
+

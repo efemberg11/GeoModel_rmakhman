@@ -21,15 +21,20 @@
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoTube.h"
+#include "GeoModelKernel/GeoPrintGraphAction.h"
+#include "GeoModelKernel/GeoVolumeCursor.h"
 
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoTransform.h"
+#include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoRectSurface.h"
 #include "GeoModelKernel/Units.h"
 #include "GeoModelHelpers/defineWorld.h"
+
+#include "GeoModelKernel/GeoSurfaceCursor.h"
 using namespace GeoModelKernelUnits;
 
 // Class Declaration
@@ -100,20 +105,57 @@ void SurfaceTestPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
   GeoLogVol  *boxLog = new GeoLogVol("BoxLog",boxShape,Air);
   GeoPhysVol *boxPhys = new GeoPhysVol(boxLog);
 
-
+// define a virtual surface
   GeoRectSurface *rectSurface = new GeoRectSurface(5, 7.5);
+  GeoAlignableTransform *surf_rot=new GeoAlignableTransform(GeoTrf::TranslateZ3D(12));  
+  boxPhys->add(surf_rot);
   boxPhys->add(rectSurface);
-
+  surf_rot->setDelta(GeoTrf::RotateX3D(0.1)*GeoTrf::RotateY3D(0.15));
+//
   {
     GeoBox     *boxShape = new GeoBox(5,5,5);
     GeoLogVol  *boxLog = new GeoLogVol("BoxLog",boxShape,Air);
     GeoPhysVol *boxPhys2 = new GeoPhysVol(boxLog);
     boxPhys->add(boxPhys2);
+
+    GeoAlignableTransform *xf=new GeoAlignableTransform(GeoTrf::TranslateZ3D(12));
+    GeoPhysVol *boxPhys3 = new GeoPhysVol(boxLog);
+
+    boxPhys->add(xf);
+    boxPhys->add(boxPhys3);
+
+    xf->setDelta(GeoTrf::RotateX3D(0.1)*GeoTrf::RotateY3D(0.15));
   }
   
   world->add(boxPhys);
 
+  GeoPrintGraphAction printGraphAction(std::cout);
+  world->exec(&printGraphAction);;
 
+  {
+    int i = 0;
+    
+    std::cout << " " << std::endl;
+    std::cout << " " << std::endl;    
+    std::cout << " cursor at i= " << i << std::endl;
+    //GeoVolumeCursor cursor(boxPhys);
+    GeoSurfaceCursor cursor(boxPhys);
+    
+    while (!cursor.atEnd()) {
+      i += 1;
+      //std::cout << "!!! " << cursor.getVolume()->getLogVol() << std::endl;
+      std::cout << "!!! " << cursor.getTransform().rotation() << std::endl;
+      std::cout << "!!! " << cursor.getTransform().translation() << std::endl;
+      std::cout << " " << std::endl;
+      std::cout << " " << std::endl;
+      std::cout << " cursor at i= " << i << std::endl;
+      cursor.next();
+      //std::cout << " FINISHED NEXT " << std::endl;
+      std::cout << " " << std::endl;
+    }
+  }
+
+  
   
   //--------------------------------------//
 }

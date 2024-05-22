@@ -25,6 +25,8 @@
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoSerialIdentifier.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
+#include "GeoModelKernel/GeoVSurface.h"
+#include "GeoModelKernel/GeoRectSurface.h"
 #include "GeoModelKernel/GeoNodePath.h"
 
 class GeoNodeAction 
@@ -65,6 +67,11 @@ class GeoNodeAction
   //	Handles a SerialIdentifier.
   virtual void handleSerialIdentifier(const GeoSerialIdentifier *);
 
+  //    Handle GeoVSurface
+  virtual void handleVSurface (const GeoVSurface *surface);
+
+  //    Handle GeoVSurface
+  virtual void handleRectSurface (const GeoRectSurface *surface);
 
   //	Returns a pointer to the path object.
   GeoNodePath* getPath ();
@@ -83,6 +90,8 @@ class GeoNodeAction
   
   //	Clears a depth limit, if any.
   void clearDepthLimit ();
+
+
   
  protected:
   //	Termination flag; causes an abortion of action execution.

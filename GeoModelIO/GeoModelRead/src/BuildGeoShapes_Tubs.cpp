@@ -23,11 +23,12 @@ void BuildGeoShapes_Tubs::buildShape(const std::vector<std::variant<int, long, f
   // shape volume
   const double shapeVolume = GeoModelHelpers::variantHelper::getFromVariant_Double(row[1], "Tubs:shapeVolume");
   // shape parameters
-  double RMin = GeoModelHelpers::variantHelper::getFromVariant_Double(row[2], "Tubs:RMin");
-  double RMax = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Tubs:RMax");
-  double ZHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[4], "Tubs:ZHalfLength");
-  double SPhi = GeoModelHelpers::variantHelper::getFromVariant_Double(row[5], "Tubs:SPhi");
-  double DPhi = GeoModelHelpers::variantHelper::getFromVariant_Double(row[6], "Tubs:DPhi");
+  const double RMin = GeoModelHelpers::variantHelper::getFromVariant_Double(row[2], "Tubs:RMin");
+  const double RMax = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Tubs:RMax");
+  const double ZHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[4], "Tubs:ZHalfLength");
+  const double SPhi = GeoModelHelpers::variantHelper::getFromVariant_Double(row[5], "Tubs:SPhi");
+  const double DPhi = GeoModelHelpers::variantHelper::getFromVariant_Double(row[6], "Tubs:DPhi");
+  
   GeoShape *shape = new GeoTubs(RMin, RMax, ZHalfLength, SPhi, DPhi);
 
   storeBuiltShape(shapeId, shape);

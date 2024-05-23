@@ -345,7 +345,8 @@ int main(int argc, char *argv[])
   toyPhys->add(nSimplePolygonBrep);
   toyPhys->add(pSimplePolygonBrep);
 
-  // Add a test GeoShift boolean shape
+  // Add a test GeoShift boolean shape:
+  // a shift of a box
   GeoShapeShift* sShift = new GeoShapeShift(sPass, GeoTrf::TranslateZ3D(50*SYSTEM_OF_UNITS::cm));
   GeoLogVol *lShift = new GeoLogVol("Shift", sShift, steel);
   GeoPhysVol *pShift = new GeoPhysVol(lShift);
@@ -378,6 +379,14 @@ int main(int argc, char *argv[])
   toyPhys->add(pUnion);
 
 
+// Add a test GeoShift boolean shape:
+// a shift of a shift of a box
+  GeoShapeShift* sShift2 = new GeoShapeShift(sShift, GeoTrf::TranslateZ3D(50*SYSTEM_OF_UNITS::cm));
+  GeoLogVol *lShift2 = new GeoLogVol("Shift2", sShift2, steel);
+  GeoPhysVol *pShift2 = new GeoPhysVol(lShift2);
+  GeoNameTag *nShift2 = new GeoNameTag("Shape-Shift-2");
+  toyPhys->add(nShift2);
+  toyPhys->add(pShift2);
 
 
   //------------------------------------------------------------------------------------//

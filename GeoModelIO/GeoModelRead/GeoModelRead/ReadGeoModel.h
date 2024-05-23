@@ -185,6 +185,9 @@ class ReadGeoModel {
     void buildAllShapes_Pcon();
     void buildAllShapes_Pgon();
     void buildAllShapes_SimplePolygonBrep();
+    
+    void buildAllShapes_Operators();
+
 
     void buildAllShapes();
     void buildAllElements();
@@ -220,8 +223,12 @@ class ReadGeoModel {
                                unsigned int logVol_ID = 0);
 
     GeoLogVol* buildLogVol(const unsigned int id);
+    
     GeoShape* buildShape(const unsigned int id,
                          type_shapes_boolean_info* shapes_info_sub);
+    GeoShape *buildShapeOperator(const std::string_view shapeType, const DBRowEntry row,
+                                 type_shapes_boolean_info *shapes_info_sub);
+
     GeoMaterial* buildMaterial(const unsigned id);
     GeoElement* buildElement(const unsigned int id);
     GeoAlignableTransform* buildAlignableTransform(const unsigned int id);
@@ -238,10 +245,11 @@ class ReadGeoModel {
     // methods for shapes
     std::string getShapeType(const unsigned int shapeId);
     bool isShapeOperator(const unsigned int shapeId);
-    bool isShapeOperator(const std::string type);
+    bool isShapeOperator(const std::string_view type);
     bool isShapeBoolean(const unsigned int shapeId);
     bool isShapeBoolean(const std::string type);
     void createBooleanShapeOperands(type_shapes_boolean_info* shapes_info_sub);
+    void createBooleanShapeOperands(const std::string_view shapeType, type_shapes_boolean_info* shapes_info_sub);
     std::pair<unsigned int, unsigned int> getBooleanShapeOperands(
         const unsigned int shape);
     GeoShape* addEmptyBooleanShapeForCompletion(
@@ -253,8 +261,18 @@ class ReadGeoModel {
     // TODO: perhaps we could merge all those 'isBuiltYYY' methods in a single
     // one, with the GeoModel class as a second argument ? (RMB)
     bool isBuiltShape(const unsigned int id);
+    bool isBuiltShape_Operators_Shift(const unsigned int id);
+    bool isBuiltShape_Operators_Subtraction(const unsigned int id);
+    bool isBuiltShape_Operators_Intersection(const unsigned int id);
+    bool isBuiltShape_Operators_Union(const unsigned int id);
+    bool isBuiltShape(std::string_view shapeType, const unsigned int id);
     void storeBuiltShape(const unsigned int, GeoShape* node);
     GeoShape* getBuiltShape(const unsigned int shapeId, std::string_view shapeType = "");
+
+    void storeBuiltShapeOperators_Shift(const unsigned int, GeoShape* node);
+    void storeBuiltShapeOperators_Subtraction(const unsigned int, GeoShape* node);
+    void storeBuiltShapeOperators_Union(const unsigned int, GeoShape* node);
+    void storeBuiltShapeOperators_Intersection(const unsigned int, GeoShape* node);
 
     bool isBuiltTransform(const unsigned int id);
     void storeBuiltTransform(GeoTransform* node);
@@ -397,6 +415,12 @@ class ReadGeoModel {
     DBRowsList m_shapes_Pgon_data;
     DBRowsList m_shapes_SimplePolygonBrep_data;
 
+    // containers to store shape operators / boolean shapes
+    DBRowsList m_shapes_Shift;
+    DBRowsList m_shapes_Subtraction;
+    DBRowsList m_shapes_Intersection;
+    DBRowsList m_shapes_Union;
+
     // containers to store Functions and their related data
     DBRowsList m_functions;
     std::deque<double> m_funcExprData;
@@ -425,11 +449,16 @@ class ReadGeoModel {
     std::vector<GeoMaterial*> m_memMapMaterials;
     std::vector<GeoElement*> m_memMapElements;
     //  std::vector<GeoXF::Function*> m_memMapFunctions; // FIXME:
-    std::unordered_map<unsigned int, GeoShape*>
-        m_memMapShapes;  // we need keys, because shapes are not built following
-                         // the ID order
-    std::unordered_map<std::string, GeoGraphNode*>
-        m_memMap;  // we need keys, to keep track of the volume's copyNumber
+    
+    // we need keys, because shapes are not built following the ID order
+    std::unordered_map<unsigned int, GeoShape*> m_memMapShapes; // OLD DB CACHE
+    std::unordered_map<unsigned int, GeoShape*> m_memMapShapes_Shift;  
+    std::unordered_map<unsigned int, GeoShape*> m_memMapShapes_Subtraction;  
+    std::unordered_map<unsigned int, GeoShape*> m_memMapShapes_Union;  
+    std::unordered_map<unsigned int, GeoShape*> m_memMapShapes_Intersection;  
+
+    // we need keys, to keep track of the volume's copyNumber
+    std::unordered_map<std::string, GeoGraphNode*> m_memMap;  
 
     //! container to store unknown shapes
     std::set<std::string> m_unknown_shapes;

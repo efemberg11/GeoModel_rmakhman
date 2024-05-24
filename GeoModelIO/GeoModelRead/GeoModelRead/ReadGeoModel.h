@@ -107,7 +107,12 @@ typedef const GeoXF::Function& TRANSFUNCTION;
 typedef std::tuple<unsigned int /*shape ID*/, GeoShape*,
                    unsigned int /*opA ID*/, unsigned int /*opB ID*/>
     tuple_shapes_boolean_info;
+typedef std::tuple<std::string /*shape Type*/, unsigned /*shape ID*/, GeoShape*,
+                   std::string /*opA type*/, unsigned /*opA ID*/, std::string /*opB type*/, unsigned /*opB ID*/>
+    tuple_boolean_shapes_operands;
+
 typedef std::vector<tuple_shapes_boolean_info> type_shapes_boolean_info;
+typedef std::vector<tuple_boolean_shapes_operands> boolean_shapes_operands_info;
 
 
 
@@ -227,7 +232,7 @@ class ReadGeoModel {
     GeoShape* buildShape(const unsigned int id,
                          type_shapes_boolean_info* shapes_info_sub);
     GeoShape *buildShapeOperator(const std::string_view shapeType, const DBRowEntry row,
-                                 type_shapes_boolean_info *shapes_info_sub);
+                                 boolean_shapes_operands_info *shapes_info_sub);
 
     GeoMaterial* buildMaterial(const unsigned id);
     GeoElement* buildElement(const unsigned int id);
@@ -247,15 +252,21 @@ class ReadGeoModel {
     bool isShapeOperator(const unsigned int shapeId);
     bool isShapeOperator(const std::string_view type);
     bool isShapeBoolean(const unsigned int shapeId);
-    bool isShapeBoolean(const std::string type);
+    bool isShapeBoolean(const std::string_view type);
     void createBooleanShapeOperands(type_shapes_boolean_info* shapes_info_sub);
-    void createBooleanShapeOperands(const std::string_view shapeType, type_shapes_boolean_info* shapes_info_sub);
+    void createBooleanShapeOperands(boolean_shapes_operands_info* shapes_info_sub);
     std::pair<unsigned int, unsigned int> getBooleanShapeOperands(
         const unsigned int shape);
+    std::tuple<std::string, unsigned int, std::string, unsigned int> getBooleanShapeOperands(
+        const std::string_view shapeType, const unsigned shapeId);
     GeoShape* addEmptyBooleanShapeForCompletion(
         const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub);
     GeoShape* getBooleanReferencedShape(
         const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub);
+    GeoShape* addEmptyBooleanShapeForCompletion(
+        const std::string_view shapeType, const unsigned shapeID, boolean_shapes_operands_info* shapes_info_sub);
+    GeoShape* getBooleanReferencedShape(
+        const std::string_view shapeType, const unsigned shapeID, boolean_shapes_operands_info* shapes_info_sub);
 
     // caching methods
     // TODO: perhaps we could merge all those 'isBuiltYYY' methods in a single
@@ -267,6 +278,7 @@ class ReadGeoModel {
     bool isBuiltShape_Operators_Union(const unsigned int id);
     bool isBuiltShape(std::string_view shapeType, const unsigned int id);
     void storeBuiltShape(const unsigned int, GeoShape* node);
+    void storeBuiltShape(const std::string_view type, const unsigned id, GeoShape *nodePtr);
     GeoShape* getBuiltShape(const unsigned int shapeId, std::string_view shapeType = "");
 
     void storeBuiltShapeOperators_Shift(const unsigned int, GeoShape* node);

@@ -535,7 +535,10 @@ void ReadGeoModel::buildAllShapes_Operators()
 {
     if (m_loglevel >= 1)
         std::cout << "Building all shape operators / boolean shapes...\n";
-    
+
+    // tuple to store the boolean shapes to
+    // complete at a second stage
+    boolean_shapes_operands_info shapes_info_sub;    
     
     if (m_loglevel >= 2)
         std::cout << "Building all Shift operators...\n";
@@ -544,8 +547,8 @@ void ReadGeoModel::buildAllShapes_Operators()
     for (const auto &row : m_shapes_Shift)
     {
         
-        type_shapes_boolean_info
-            shapes_info_sub; // tuple to store the boolean shapes to
+        // boolean_shapes_operands_info
+        //     shapes_info_sub; // tuple to store the boolean shapes to
                              // complete at a second stage
         buildShapeOperator("Shift", row, &shapes_info_sub);
     }
@@ -559,8 +562,8 @@ void ReadGeoModel::buildAllShapes_Operators()
     for (const auto &row : m_shapes_Subtraction)
     {
         
-        type_shapes_boolean_info
-            shapes_info_sub; // tuple to store the boolean shapes to
+        // boolean_shapes_operands_info
+        //     shapes_info_sub; // tuple to store the boolean shapes to
                              // complete at a second stage
         buildShapeOperator("Subtraction", row, &shapes_info_sub);
     }
@@ -574,8 +577,8 @@ void ReadGeoModel::buildAllShapes_Operators()
     for (const auto &row : m_shapes_Intersection)
     {
         
-        type_shapes_boolean_info
-            shapes_info_sub; // tuple to store the boolean shapes to
+        // boolean_shapes_operands_info
+        //     shapes_info_sub; // tuple to store the boolean shapes to
                              // complete at a second stage
         buildShapeOperator("Intersection", row, &shapes_info_sub);
     }
@@ -589,8 +592,8 @@ void ReadGeoModel::buildAllShapes_Operators()
     for (const auto &row : m_shapes_Union)
     {
         
-        type_shapes_boolean_info
-            shapes_info_sub; // tuple to store the boolean shapes to
+        // boolean_shapes_operands_info
+        //     shapes_info_sub; // tuple to store the boolean shapes to
                              // complete at a second stage
         buildShapeOperator("Union", row, &shapes_info_sub);
     }
@@ -598,7 +601,7 @@ void ReadGeoModel::buildAllShapes_Operators()
         std::cout << "All " << nSize << " Shape-Operators-Union have been built!\n";
 
 
-    // createBooleanShapeOperands("Shift", &shapes_info_sub);
+    createBooleanShapeOperands(&shapes_info_sub);
 }
 
 //! Iterate over the list of GeoBox shape nodes, build them all, 
@@ -1688,14 +1691,15 @@ std::string ReadGeoModel::getShapeType(const unsigned int shapeId) {
 }
 
 GeoShape *ReadGeoModel::buildShapeOperator(const std::string_view shapeType, const DBRowEntry row,
-                                            type_shapes_boolean_info *shapes_info_sub)
+                                            boolean_shapes_operands_info *shapes_info_sub)
 {
     GeoShape *shape = nullptr;
+    unsigned shapeId{0};
 
     if ("Shift" == shapeType)
     {
         // metadata
-        const unsigned shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Shift:shapeID");
+        shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Shift:shapeID");
         // computed volume (not defined by default)
         const double shapeVolume = GeoModelHelpers::variantHelper::getFromVariant_Double(row[1], "Shift:shapeVolume");
         // shape parameters
@@ -1730,82 +1734,82 @@ GeoShape *ReadGeoModel::buildShapeOperator(const std::string_view shapeType, con
             // storeBuiltShape(shapeId, shapeNew);
             shape = shapeNew;
         }
-        else {
-            THROW_EXCEPTION("Operand shapes have not been built!");
-        }
-        // // otherwise, build the operands
-        // else
-        // {
-        //     // TODO: IMPORTANT!!! --> check how the transf used in shift are
-        //     // saved into the DB, because they are bare transf and not
-        //     // GeoTransform nodes...
-
-        //     // first, check if the transform is built;
-        //     // if so, use that;
-        //     // if not, build the transform
-
-        //     // get the referenced Transform, then get the bare transform matrix
-        //     // from it
-        //     GeoTransform *transf = nullptr;
-        //     GeoTrf::Transform3D transfX;
-        //     if (isBuiltTransform(transfId))
-        //     {
-        //         transf = getBuiltTransform(transfId);
-        //     }
-        //     else
-        //     {
-        //         transf = buildTransform(transfId);
-        //     }
-        //     // TODO: here we create a fake GeoTransform to get a
-        //     // GeoTrf::Transform3D.
-        //     // TODO: ==> Perhaps we could keep a table for bare
-        //     // GeoTrf::Transform3D transforms used in GeoShift nodes.
-        //     transfX = transf->getTransform();
-        //     transf->unref(); // delete the transf from the heap, because we
-        //                      // don't need the node, only the bare
-        //                      // transformation matrix
-
-        //     // then, check the type of the operand shape
-        //     bool isOperatorShape = isShapeOperator(shapeOpType);
-
-        //     // if operand shape is simple/actual shape (i.e., not
-        //     // boolean/operator), then build it, then build the boolean shape
-        //     // with that
-        //     if (!isOperatorShape)
-        //     {
-        //         const GeoShape *shapeOp =
-        //             getBuiltShape(shapeOpId, shapeOpType);
-
-        //         if (shapeOp == nullptr || transf == nullptr)
-        //         {
-        //             std::cout << "ERROR!!! Shift - shapeOp or transfX are "
-        //                          "NULL! Exiting..."
-        //                       << std::endl;
-        //             exit(EXIT_FAILURE);
-        //         }
-        //         GeoShapeShift *shapeNew = new GeoShapeShift(shapeOp, transfX);
-        //         shape = shapeNew;
-        //     }
-        //     // ...otherwise, build the Shift operator shape without operands
-        //     // and save the needed pieces of information to build the actual
-        //     // operands and shape later.
-        //     else
-        //     {
-        //         GeoShapeShift *shapeNew = new GeoShapeShift();
-        //         tuple_shapes_boolean_info tt(shapeId, shapeNew, shapeOpId,
-        //                                      transfId);
-        //         shapes_info_sub->push_back(
-        //             tt); //! Push the information about the new boolean shape
-        //                  //! at the end of the very same container we are
-        //                  //! iterating over
-        //         shape = shapeNew;
-        //     }
+        // else {
+        //     THROW_EXCEPTION("Operand shapes have not been built!");
         // }
+        // otherwise, build the operands
+        else
+        {
+            // TODO: IMPORTANT!!! --> check how the transf used in shift are
+            // saved into the DB, because they are bare transf and not
+            // GeoTransform nodes...
+
+            // first, check if the transform is built;
+            // if so, use that;
+            // if not, build the transform
+
+            // get the referenced Transform, then get the bare transform matrix
+            // from it
+            GeoTransform *transf = nullptr;
+            GeoTrf::Transform3D transfX;
+            // if (isBuiltTransform(transfId))
+            // {
+            //     transf = getBuiltTransform(transfId);
+            // }
+            // else
+            // {
+                transf = buildTransform(transfId);
+            // }
+            // TODO: here we create a fake GeoTransform to get a
+            // GeoTrf::Transform3D.
+            // TODO: ==> Perhaps we could keep a table for bare
+            // GeoTrf::Transform3D transforms used in GeoShift nodes.
+            transfX = transf->getTransform();
+            transf->unref(); // delete the transf from the heap, because we
+                             // don't need the GeoGraph node, only the bare
+                             // transformation matrix
+
+            // then, check the type of the operand shape
+            bool isOperatorShape = isShapeOperator(shapeOpType);
+
+            // if operand shape is simple/actual shape (i.e., not
+            // boolean/operator), then build it, 
+            // and then build the boolean shape with that
+            if (!isOperatorShape)
+            {
+                const GeoShape *shapeOp =
+                    getBuiltShape(shapeOpId, shapeOpType);
+
+                if (shapeOp == nullptr || transf == nullptr)
+                {
+                    std::cout << "ERROR!!! Shift - shapeOp or transfX are "
+                                 "NULL! Exiting..."
+                              << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+                // GeoShapeShift *shapeNew = new GeoShapeShift(shapeOp, transfX);
+                shape = new GeoShapeShift(shapeOp, transfX);
+            }
+            // ...otherwise, build the Shift operator shape without operands
+            // and save the needed pieces of information to build the actual
+            // operands and shape later.
+            else
+            {
+                GeoShapeShift *shapeNew = new GeoShapeShift();
+                tuple_boolean_shapes_operands tt(std::string(shapeType), shapeId, shapeNew, shapeOpType, shapeOpId, "NULL",
+                                             transfId); // We set opBType to NULL because for Shift we don't need/use it.
+                shapes_info_sub->push_back(
+                    tt); //! Push the information about the new boolean shape
+                         //! at the end of the very same container we are
+                         //! iterating over
+                shape = shapeNew;
+            }
+        }
 
 
         //! store into the cache the shape we have just built,
         //! for later use when referenced by another node
-        storeBuiltShapeOperators_Shift(shapeId, shape);
+        // storeBuiltShapeOperators_Shift(shapeId, shape);
     }
     else if ("Subtraction" == shapeType || "Union" == shapeType ||
                "Intersection" == shapeType) {
@@ -1815,7 +1819,7 @@ GeoShape *ReadGeoModel::buildShapeOperator(const std::string_view shapeType, con
         // and continue
 
         // metadata
-        const unsigned shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Boolean:shapeID");
+        shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Boolean:shapeID");
         // computed volume (not defined by default)
         const double shapeVolume = GeoModelHelpers::variantHelper::getFromVariant_Double(row[1], "Boolean:shapeVolume");
         // shape operands
@@ -1836,83 +1840,77 @@ GeoShape *ReadGeoModel::buildShapeOperator(const std::string_view shapeType, con
             const GeoShape *shapeA = getBuiltShape(shapeOpAId, shapeOpAType);
             const GeoShape *shapeB = getBuiltShape(shapeOpBId, shapeOpBType);
             if ("Subtraction" == shapeType)
-            {
                 shape = new GeoShapeSubtraction(shapeA, shapeB);
-                storeBuiltShapeOperators_Subtraction(shapeId, shape);
-            }
             else if ("Union" == shapeType)
-            {
                 shape = new GeoShapeUnion(shapeA, shapeB);
-                storeBuiltShapeOperators_Union(shapeId, shape);
-            }
             else if ("Intersection" == shapeType)
-            {
                 shape = new GeoShapeIntersection(shapeA, shapeB);
-                storeBuiltShapeOperators_Intersection(shapeId, shape);
-            }
-            // shape = shapeNew;
         }
-        else {
-            THROW_EXCEPTION("Operand shapes have not been built!");
-        }
-        /*
+        // else {
+        //     THROW_EXCEPTION("Operand shapes have not been built!");
+        // }
+        
         // otherwise, build the operand shapes...
         else {
             // first check the operands' type
-            bool isAOperator = isShapeOperator(opA);
-            bool isBOperator = isShapeOperator(opB);
+            bool isAOperator = isShapeOperator(shapeOpAType);
+            bool isBOperator = isShapeOperator(shapeOpBType);
 
             // if both are simple/actual shapes (i.e., not booleans),
             // build them, then build the boolean shape with them, and
             // store that.
+            // TODO: I suspect that this snippet below in the IF clause is dead code,
+            // it's never reached.
             if (!isAOperator && !isBOperator) {
-                const GeoShape* shapeA = buildShape(opA, shapes_info_sub);
-                const GeoShape* shapeB = buildShape(opB, shapes_info_sub);
-                if (shapeA == NULL || shapeB == NULL) {
-                    std::cout << "ERROR!!! shapeA or shapeB are NULL!"
-                              << std::endl;
-                    exit(EXIT_FAILURE);
+                const GeoShape* shapeA = getBuiltShape(shapeOpAId, shapeOpAType);
+                const GeoShape* shapeB = getBuiltShape(shapeOpAId, shapeOpBType);
+                if (shapeA == NULL || shapeB == NULL)
+                {
+                    THROW_EXCEPTION("ERROR!!! shapeA or shapeB are NULL!");
                 }
 
                 GeoShape* shapeNew = nullptr;
-                if ("Subtraction" == type) {
+                if ("Subtraction" == shapeType) {
                     shapeNew = new GeoShapeSubtraction(shapeA, shapeB);
-                } else if ("Union" == type) {
+                } else if ("Union" == shapeType) {
                     shapeNew = new GeoShapeUnion(shapeA, shapeB);
-                } else if ("Intersection" == type) {
+                } else if ("Intersection" == shapeType) {
                     shapeNew = new GeoShapeIntersection(shapeA, shapeB);
                 }
 
                 shape = shapeNew;
             }
-            // ...otherwise, build the Subtraction operator shape without
+            // ...otherwise, build the boolean shape without
             // operands and save the needed pieces of information to build the
             // actual operands and shape later.
             else {
                 GeoShape* shapeNew = nullptr;
-                if ("Subtraction" == type) {
+                if ("Subtraction" == shapeType) {
                     shapeNew = new GeoShapeSubtraction;
-                } else if ("Union" == type) {
+                } else if ("Union" == shapeType) {
                     shapeNew = new GeoShapeUnion;
-                } else if ("Intersection" == type) {
+                } else if ("Intersection" == shapeType) {
                     shapeNew = new GeoShapeIntersection;
                 }
 
-                tuple_shapes_boolean_info tt(shapeId, shapeNew, opA, opB);
-                shapes_info_sub->push_back(
-                    tt);  //! Push the information about the new boolean shape
-                          //! at the end of the very same container we are
-                          //! iterating over
-
+                tuple_boolean_shapes_operands tt(std::string(shapeType), shapeId, shapeNew, shapeOpAType, shapeOpAId, shapeOpBType,
+                                             shapeOpBId); 
+                //! Push the information about the new boolean shape
+                //! at the end of the very same container we are
+                //! iterating over
+                shapes_info_sub->push_back(tt); 
                 shape = shapeNew;
             }
-        }*/
+        }
         
     }
     else {
         THROW_EXCEPTION("ERROR!!! Shape type not defined/handled: '" + std::string(shapeType) + "'!");
     }
 
+    //! store into the cache the shape we have just built,
+    //! for later use when referenced by another node
+    storeBuiltShape(shapeType, shapeId, shape);
     return shape;
 }
 
@@ -2476,101 +2474,101 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
     //         }
     //     }
     // } 
-    else if (type == "Subtraction" || type == "Union" ||
-               type == "Intersection") {
-        // Check what shapes are subtracted/united/intersected:
-        // - If they are actual shapes, build them and return
-        // - If they are boolean/operator shapes, then store the shape for later
-        // and continue
+    // else if (type == "Subtraction" || type == "Union" ||
+    //            type == "Intersection") {
+    //     // Check what shapes are subtracted/united/intersected:
+    //     // - If they are actual shapes, build them and return
+    //     // - If they are boolean/operator shapes, then store the shape for later
+    //     // and continue
 
-        // shape's operands
-        unsigned int opA = 0;
-        unsigned int opB = 0;
-        // get parameters
-        for (auto& par : shapePars) {
-            std::vector<std::string> vars = splitString(par, '=');
-            std::string varName = vars[0];
-            std::string varValue = vars[1];
-            if (varName == "opA") opA = std::stoi(varValue);
-            if (varName == "opB") opB = std::stoi(varValue);
-        }
-        if (opA == 0 || opB == 0) {
-            std::cout << "ERROR! Subtraction/Union/Intersection shape - input "
-                         "operand shapes' IDs are empty! (opA: "
-                      << opA << ", opB:" << opB << ")" << std::endl;
-            exit(EXIT_FAILURE);
-        }
+    //     // shape's operands
+    //     unsigned int opA = 0;
+    //     unsigned int opB = 0;
+    //     // get parameters
+    //     for (auto& par : shapePars) {
+    //         std::vector<std::string> vars = splitString(par, '=');
+    //         std::string varName = vars[0];
+    //         std::string varValue = vars[1];
+    //         if (varName == "opA") opA = std::stoi(varValue);
+    //         if (varName == "opB") opB = std::stoi(varValue);
+    //     }
+    //     if (opA == 0 || opB == 0) {
+    //         std::cout << "ERROR! Subtraction/Union/Intersection shape - input "
+    //                      "operand shapes' IDs are empty! (opA: "
+    //                   << opA << ", opB:" << opB << ")" << std::endl;
+    //         exit(EXIT_FAILURE);
+    //     }
 
-        // if both operands are built already,
-        // then get them from cache,
-        // and build the operator with them
-        if (isBuiltShape(opA) && isBuiltShape(opB)) {
-            // std::cout << "both operand shapes are built, build the operator
-            // shape..." << std::endl;
-            GeoShape* shapeNew = nullptr;
-            const GeoShape* shapeA = getBuiltShape(opA);
-            const GeoShape* shapeB = getBuiltShape(opB);
-            if ("Subtraction" == type) {
-                shapeNew = new GeoShapeSubtraction(shapeA, shapeB);
-            } else if ("Union" == type) {
-                shapeNew = new GeoShapeUnion(shapeA, shapeB);
-            } else if ("Intersection" == type) {
-                shapeNew = new GeoShapeIntersection(shapeA, shapeB);
-            }
-            shape = shapeNew;
-        }
-        // otherwise, build the operand shapes...
-        else {
-            // first check the operands' type
-            bool isAOperator = isShapeOperator(opA);
-            bool isBOperator = isShapeOperator(opB);
+    //     // if both operands are built already,
+    //     // then get them from cache,
+    //     // and build the operator with them
+    //     if (isBuiltShape(opA) && isBuiltShape(opB)) {
+    //         // std::cout << "both operand shapes are built, build the operator
+    //         // shape..." << std::endl;
+    //         GeoShape* shapeNew = nullptr;
+    //         const GeoShape* shapeA = getBuiltShape(opA);
+    //         const GeoShape* shapeB = getBuiltShape(opB);
+    //         if ("Subtraction" == type) {
+    //             shapeNew = new GeoShapeSubtraction(shapeA, shapeB);
+    //         } else if ("Union" == type) {
+    //             shapeNew = new GeoShapeUnion(shapeA, shapeB);
+    //         } else if ("Intersection" == type) {
+    //             shapeNew = new GeoShapeIntersection(shapeA, shapeB);
+    //         }
+    //         shape = shapeNew;
+    //     }
+    //     // otherwise, build the operand shapes...
+    //     else {
+    //         // first check the operands' type
+    //         bool isAOperator = isShapeOperator(opA);
+    //         bool isBOperator = isShapeOperator(opB);
 
-            // if both are simple/actual shapes (i.e., not booleans),
-            // build them, then build the boolean shape with them, and
-            // store that.
-            if (!isAOperator && !isBOperator) {
-                const GeoShape* shapeA = buildShape(opA, shapes_info_sub);
-                const GeoShape* shapeB = buildShape(opB, shapes_info_sub);
-                if (shapeA == NULL || shapeB == NULL) {
-                    std::cout << "ERROR!!! shapeA or shapeB are NULL!"
-                              << std::endl;
-                    exit(EXIT_FAILURE);
-                }
+    //         // if both are simple/actual shapes (i.e., not booleans),
+    //         // build them, then build the boolean shape with them, and
+    //         // store that.
+    //         if (!isAOperator && !isBOperator) {
+    //             const GeoShape* shapeA = buildShape(opA, shapes_info_sub);
+    //             const GeoShape* shapeB = buildShape(opB, shapes_info_sub);
+    //             if (shapeA == NULL || shapeB == NULL) {
+    //                 std::cout << "ERROR!!! shapeA or shapeB are NULL!"
+    //                           << std::endl;
+    //                 exit(EXIT_FAILURE);
+    //             }
 
-                GeoShape* shapeNew = nullptr;
-                if ("Subtraction" == type) {
-                    shapeNew = new GeoShapeSubtraction(shapeA, shapeB);
-                } else if ("Union" == type) {
-                    shapeNew = new GeoShapeUnion(shapeA, shapeB);
-                } else if ("Intersection" == type) {
-                    shapeNew = new GeoShapeIntersection(shapeA, shapeB);
-                }
+    //             GeoShape* shapeNew = nullptr;
+    //             if ("Subtraction" == type) {
+    //                 shapeNew = new GeoShapeSubtraction(shapeA, shapeB);
+    //             } else if ("Union" == type) {
+    //                 shapeNew = new GeoShapeUnion(shapeA, shapeB);
+    //             } else if ("Intersection" == type) {
+    //                 shapeNew = new GeoShapeIntersection(shapeA, shapeB);
+    //             }
 
-                shape = shapeNew;
-            }
-            // ...otherwise, build the Subtraction operator shape without
-            // operands and save the needed pieces of information to build the
-            // actual operands and shape later.
-            else {
-                GeoShape* shapeNew = nullptr;
-                if ("Subtraction" == type) {
-                    shapeNew = new GeoShapeSubtraction;
-                } else if ("Union" == type) {
-                    shapeNew = new GeoShapeUnion;
-                } else if ("Intersection" == type) {
-                    shapeNew = new GeoShapeIntersection;
-                }
+    //             shape = shapeNew;
+    //         }
+    //         // ...otherwise, build the Subtraction operator shape without
+    //         // operands and save the needed pieces of information to build the
+    //         // actual operands and shape later.
+    //         else {
+    //             GeoShape* shapeNew = nullptr;
+    //             if ("Subtraction" == type) {
+    //                 shapeNew = new GeoShapeSubtraction;
+    //             } else if ("Union" == type) {
+    //                 shapeNew = new GeoShapeUnion;
+    //             } else if ("Intersection" == type) {
+    //                 shapeNew = new GeoShapeIntersection;
+    //             }
 
-                tuple_shapes_boolean_info tt(shapeId, shapeNew, opA, opB);
-                shapes_info_sub->push_back(
-                    tt);  //! Push the information about the new boolean shape
-                          //! at the end of the very same container we are
-                          //! iterating over
+    //             tuple_shapes_boolean_info tt(shapeId, shapeNew, opA, opB);
+    //             shapes_info_sub->push_back(
+    //                 tt);  //! Push the information about the new boolean shape
+    //                       //! at the end of the very same container we are
+    //                       //! iterating over
 
-                shape = shapeNew;
-            }
-        }
-    }
+    //             shape = shapeNew;
+    //         }
+    //     }
+    // }
     // LAr custom shape
     else if (type == "CustomShape") {
         std::string name = "";
@@ -2697,13 +2695,21 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
 }
 
 // TODO: move to an untilities file/class
-void printTuple(tuple_shapes_boolean_info tuple) {
+// void printTuple(tuple_shapes_boolean_info tuple) {
+template<typename T> void printTuple(T tuple) {
     std::apply([](auto&&... args) { ((std::cout << args << ", "), ...); },
                tuple);  // needs C++17
     std::cout << std::endl;
 }
 // TODO: move to an untilities file/class
 void inspectListShapesToBuild(type_shapes_boolean_info& list) {
+    for (auto tuple : list) {
+        printTuple(tuple);
+        std::cout << std::endl;
+    }
+}
+// TODO: move to an untilities file/class
+void inspectListShapesToBuild(boolean_shapes_operands_info& list) {
     for (auto tuple : list) {
         printTuple(tuple);
         std::cout << std::endl;
@@ -2837,9 +2843,7 @@ void ReadGeoModel::createBooleanShapeOperands(
 }
 
 // NEW VERSION FOR THE NEW DB SCHEMA!
-void ReadGeoModel::createBooleanShapeOperands(const std::string_view shapeType,
-    type_shapes_boolean_info* shapes_info_sub) {
-    std::cout << "******* NEW VERSION ********" << std::endl;
+void ReadGeoModel::createBooleanShapeOperands(boolean_shapes_operands_info* shapes_info_sub) {
     if (shapes_info_sub->size() == 0) return;
 
     // debug
@@ -2849,46 +2853,43 @@ void ReadGeoModel::createBooleanShapeOperands(const std::string_view shapeType,
 
     // Iterate over the list. The size may be incremented while iterating
     // (therefore, we cannot use iterators)
-    for (type_shapes_boolean_info::size_type ii = 0;
+    for (boolean_shapes_operands_info::size_type ii = 0;
          ii < shapes_info_sub->size(); ++ii) {
         // get the tuple containing the data about the operand shapes to
         // build
-        tuple_shapes_boolean_info tuple = (*shapes_info_sub)[ii];
+        tuple_boolean_shapes_operands tuple = (*shapes_info_sub)[ii];
         // std::cout << "tuple: "; printTuple(tuple); // debug
 
         // Initializing variables for unpacking
-        unsigned int shapeID = 0;       // std::get<0>(tuple);
-        GeoShape* boolShPtr = nullptr;  // std::get<1>(tuple);
-        unsigned int idA = 0;           // std::get<2>(tuple);
-        unsigned int idB = 0;           // std::get<3>(tuple);
+        
+        std::string shapeType;           // std::get<2>(tuple);
+        unsigned shapeID{0};       // std::get<0>(tuple);
+        GeoShape* boolShPtr{nullptr};  // std::get<1>(tuple);
+        std::string typeA;           // std::get<2>(tuple);
+        unsigned idA{0};           // std::get<3>(tuple);
+        std::string typeB;           // std::get<4>(tuple);
+        unsigned idB{0};           // std::get<5>(tuple);
 
         // use 'tie' to unpack the tuple values into separate variables
-        std::tie(shapeID, boolShPtr, idA, idB) = tuple;
+        std::tie(shapeType, shapeID, boolShPtr, typeA, idA, typeB, idB) = tuple;
 
         if (shapeID == 0 || boolShPtr == nullptr || idA == 0 || idB == 0) {
-            muxCout.lock();
-            std::cout << "ERROR! Boolean/Operator shape - shape is NULL or "
-                         "operands' IDs are not defined! (shapeID: "
-                      << shapeID << ", idA: " << idA << ", idB:" << idB << ")"
-                      << std::endl;
-            muxCout.unlock();
-            exit(EXIT_FAILURE);
+            THROW_EXCEPTION("ERROR! Boolean/Operator shape - shape is NULL or operands' IDs are not defined!");
         }
 
-        if (isShapeBoolean(shapeID)) {
+        if (isShapeBoolean(shapeType)) {
             GeoShape* shapeA = nullptr;
             GeoShape* shapeB = nullptr;
 
             // if both operands are built already...
-            if (isBuiltShape(idA) && isBuiltShape(idB)) {
+            if (isBuiltShape(typeA, idA) && isBuiltShape(typeB, idB)) {
                 // then build the operator shape...
-                shapeA = getBuiltShape(idA);
-                shapeB =
-                    getBuiltShape(idB);  // TODO: customize for Shift as well
+                shapeA = getBuiltShape(idA, typeA);
+                shapeB = getBuiltShape(idB, typeB);
             } else {
                 // otherwise, build the operand shapes
-                shapeA = getBooleanReferencedShape(idA, shapes_info_sub);
-                shapeB = getBooleanReferencedShape(idB, shapes_info_sub);
+                shapeA = getBooleanReferencedShape(typeA, idA, shapes_info_sub);
+                shapeB = getBooleanReferencedShape(typeB, idB, shapes_info_sub);
             }
             // Now, assign the new shapes to the boolean shape we're
             // building
@@ -2913,13 +2914,9 @@ void ReadGeoModel::createBooleanShapeOperands(const std::string_view shapeType,
                 ptr->m_opA->ref();
                 ptr->m_opB->ref();
             } else {
-                // TODO: move to standard error message for all instances
-                std::cout << "ERROR!!! shape is not boolean/operator! Write to "
-                             "'geomodel-developers@cern.ch'. Exiting..."
-                          << std::endl;
-                exit(EXIT_FAILURE);
+                THROW_EXCEPTION("ERROR!!! shape is not boolean/operator! Write to 'geomodel-developers@cern.ch'...");
             }
-        } else if ("Shift" == getShapeType(shapeID)) {
+        } else if ("Shift" == shapeType) {
             GeoShape* opShape = nullptr;
             GeoTrf::Transform3D shiftX;
             GeoTransform* shiftTransf =
@@ -2927,13 +2924,13 @@ void ReadGeoModel::createBooleanShapeOperands(const std::string_view shapeType,
                           // store the bare transforms as well...
 
             // if both operands are built already...
-            if (isBuiltShape(idA) && isBuiltTransform(idB)) {
+            if (isBuiltShape(typeA, idA) && isBuiltTransform(idB)) {
                 // then build the operator shape...
-                opShape = getBuiltShape(idA);
+                opShape = getBuiltShape(idA, typeA);
                 shiftTransf = getBuiltTransform(idB);
             } else {
                 // otherwise, build the operand shapes
-                opShape = getBooleanReferencedShape(idA, shapes_info_sub);
+                opShape = getBooleanReferencedShape(typeA, idA, shapes_info_sub);
                 shiftTransf = buildTransform(idB);
             }
             shiftX = shiftTransf->getTransform();
@@ -2953,10 +2950,7 @@ void ReadGeoModel::createBooleanShapeOperands(const std::string_view shapeType,
                 exit(EXIT_FAILURE);
             }
         } else {
-            std::cout << "ERROR! Undefined operator shape! This part of the "
-                         "code should not be reached! Exiting..."
-                      << std::endl;
-            exit(EXIT_FAILURE);
+            THROW_EXCEPTION("ERROR! Undefined operator shape! This part of the code should not be reached!");
         }
         // then, store the now completed shape and continue to the next item
         storeBuiltShape(shapeID, boolShPtr);
@@ -3004,6 +2998,50 @@ GeoShape* ReadGeoModel::getBooleanReferencedShape(
     //   inspectListShapesToBuild(m_shapes_info_sub); // debug
     return shape;
 }
+GeoShape* ReadGeoModel::getBooleanReferencedShape(
+    const std::string_view shapeType, const unsigned shapeID, boolean_shapes_operands_info* shapes_info_sub) {
+    if (0 == shapeID || "" == shapeType) {
+        THROW_EXCEPTION("ERROR!! ShapeID == 0 or shapeType == NULL !");
+    }
+
+    GeoShape* shape{nullptr};
+    // if A is built already, then take it from cache
+    if (isBuiltShape(shapeID)) {
+        if (m_loglevel >= 2)
+            std::cout << "operandA is built, taking it from cache..."
+                      << std::endl;  // debug
+        shape = getBuiltShape(shapeID, shapeType);
+    } else {
+        // // if not a boolean shape, then build it
+        // if (!isShapeOperator(shapeType)) {
+        //     if (m_loglevel >= 2)
+        //         std::cout << "operandA is not built and not an operator, "
+        //                      "build it..."
+        //                   << std::endl;  // debug
+        //     shape = getBuiltShape(shapeID, shapeType);
+        //     if ( nullptr == shape ) {
+        //         THROW_EXCEPTION("ERROR!!! shape is NULL!");
+        //     }
+        // }
+        // if A is a boolean shape, then create an empty shape,
+        // store it for later completion, and use that
+        if (isShapeOperator(shapeType)) {
+            if (m_loglevel >= 2)
+                std::cout << "operandA is not built and it is an operator, add "
+                             "it to build it later..."
+                          << std::endl;  // debug
+            shape = addEmptyBooleanShapeForCompletion(shapeType, shapeID, shapes_info_sub);
+        } else {
+            THROW_EXCEPTION("Undefined behavior... Check the shape operand!");
+        }
+    }
+    if ( nullptr == shape ) {
+        THROW_EXCEPTION("ERROR!!! shape is NULL!");
+    }
+
+    //   inspectListShapesToBuild(m_shapes_info_sub); // debug
+    return shape;
+}
 
 GeoShape* ReadGeoModel::addEmptyBooleanShapeForCompletion(
     const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub) {
@@ -3033,6 +3071,46 @@ GeoShape* ReadGeoModel::addEmptyBooleanShapeForCompletion(
     shapes_info_sub->push_back(
         tt);  //! Push the information about the new boolean shape at the
               //! end of the very same container we are iterating over
+
+    return shape;
+}
+GeoShape *ReadGeoModel::addEmptyBooleanShapeForCompletion(
+    const std::string_view shapeType, const unsigned shapeID, boolean_shapes_operands_info *shapes_info_sub)
+{
+    // get the operands' IDs,
+    // build an empty instance of the appropriate boolean/operator shape,
+    // and store all of that together, by appending to this same container,
+    // so it will be visited at a later time during this very same loop
+    std::tuple<std::string, unsigned int, std::string, unsigned int> ops =
+        getBooleanShapeOperands(shapeType, shapeID);
+    std::string opAType;
+    unsigned opAId{0};  
+    std::string opBType;
+    unsigned opBId{0};  
+    std::tie(opAType, opAId, opBType, opBId) = ops;
+
+    GeoShape *shape = nullptr;
+    if (shapeType == "Intersection")
+    {
+        shape = new GeoShapeIntersection();
+    }
+    else if (shapeType == "Shift")
+    {
+        shape = new GeoShapeShift();
+    }
+    else if (shapeType == "Subtraction")
+    {
+        shape = new GeoShapeSubtraction();
+    }
+    else if (shapeType == "Union")
+    {
+        shape = new GeoShapeUnion();
+    }
+
+    tuple_boolean_shapes_operands tt(shapeType, shapeID, shape, opAType, opAId, opBType, opBId);
+    shapes_info_sub->push_back(
+        tt); //! Push the information about the new boolean shape at the
+             //! end of the very same container we are iterating over
 
     return shape;
 }
@@ -3130,6 +3208,51 @@ std::pair<unsigned int, unsigned int> ReadGeoModel::getBooleanShapeOperands(
 
     return pair;
 }
+std::tuple<std::string, unsigned int, std::string, unsigned int> ReadGeoModel::getBooleanShapeOperands(
+    const std::string_view shapeType, const unsigned int shapeID)
+{
+
+    DBRowEntry record;
+    if ("Shift" == shapeType)
+        record = m_shapes_Shift[shapeID - 1];
+    else if ("Subtraction" == shapeType)
+        record = m_shapes_Subtraction[shapeID - 1];
+    else if ("Intersection" == shapeType)
+        record = m_shapes_Intersection[shapeID - 1];
+    else if ("Union" == shapeType)
+        record = m_shapes_Union[shapeID - 1];
+
+    unsigned shapeId{0};
+    double shapeVolume{0};
+    std::string shapeOpAType;
+    unsigned shapeOpAId{0};
+    std::string shapeOpBType;
+    unsigned shapeOpBId{0};
+
+    shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(record[0], "Boolean:shapeID");
+    // computed volume (not defined by default)
+    shapeVolume = GeoModelHelpers::variantHelper::getFromVariant_Double(record[1], "Boolean:shapeVolume");
+    // shape operands
+    shapeOpAType = GeoModelHelpers::variantHelper::getFromVariant_String(record[2], "Boolean:shapeType");
+    shapeOpAId = GeoModelHelpers::variantHelper::getFromVariant_Int(record[3], "Boolean:shapeId");
+    if ("Shift" == shapeType)
+    {
+        shapeOpBType = "NULL";
+        shapeOpBId = GeoModelHelpers::variantHelper::getFromVariant_Int(record[4], "Boolean:shapeId");
+    }
+    else
+    {
+        shapeOpBType = GeoModelHelpers::variantHelper::getFromVariant_String(record[4], "Boolean:shapeType");
+        shapeOpBId = GeoModelHelpers::variantHelper::getFromVariant_Int(record[5], "Boolean:shapeId");
+    }
+
+    if (shapeOpAId == 0 || shapeOpBId == 0 || shapeOpAType.empty() || shapeOpBType.empty())
+    {
+        THROW_EXCEPTION("ERROR! Intersection/Subtraction/Union/Shift shape operands' info are empty!");
+    }
+
+    return std::make_tuple(shapeOpAType, shapeOpAId, shapeOpBType, shapeOpBId);
+}
 
 bool ReadGeoModel::isShapeOperator(const unsigned int shapeId) {
     return isShapeOperator(getShapeType(shapeId));
@@ -3143,10 +3266,10 @@ bool ReadGeoModel::isShapeOperator(const std::string_view type) {
 bool ReadGeoModel::isShapeBoolean(const unsigned int shapeId) {
     return isShapeBoolean(getShapeType(shapeId));
 }
-bool ReadGeoModel::isShapeBoolean(const std::string type) {
+bool ReadGeoModel::isShapeBoolean(const std::string_view type) {
     std::unordered_set<std::string> opShapes = {"Intersection", "Subtraction",
                                                 "Union"};
-    return (opShapes.find(type) != opShapes.end());
+    return (opShapes.find(std::string(type)) != opShapes.end());
 }
 
 GeoBox* ReadGeoModel::buildDummyShape() {
@@ -3529,6 +3652,20 @@ const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "
 void ReadGeoModel::storeBuiltShape(const unsigned id, GeoShape* nodePtr) {
     m_memMapShapes[id] = nodePtr;
 }
+void ReadGeoModel::storeBuiltShape(const std::string_view type, const unsigned id, GeoShape *nodePtr)
+{
+    if ("Shift" == type)
+        storeBuiltShapeOperators_Shift(id, nodePtr);
+    else if ("Subtraction" == type)
+        storeBuiltShapeOperators_Subtraction(id, nodePtr);
+    else if ("Intersection" == type)
+        storeBuiltShapeOperators_Intersection(id, nodePtr);
+    else if ("Union" == type)
+        storeBuiltShapeOperators_Union(id, nodePtr);
+    else
+        THROW_EXCEPTION("ERROR!!! Undefined operator type!");
+}
+
 void ReadGeoModel::storeBuiltShapeOperators_Shift(const unsigned id, GeoShape* nodePtr) {
     m_memMapShapes_Shift[id] = nodePtr;
 }

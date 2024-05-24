@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
   toyPhys->add(pUnion);
 
 
-// Add a test GeoShift boolean shape:
+// Add a test chain GeoShift operator shape:
 // a shift of a shift of a box
   GeoShapeShift* sShift2 = new GeoShapeShift(sShift, GeoTrf::TranslateZ3D(50*SYSTEM_OF_UNITS::cm));
   GeoLogVol *lShift2 = new GeoLogVol("Shift2", sShift2, steel);
@@ -387,6 +387,29 @@ int main(int argc, char *argv[])
   GeoNameTag *nShift2 = new GeoNameTag("Shape-Shift-2");
   toyPhys->add(nShift2);
   toyPhys->add(pShift2);
+
+// Add a test chain & mixed GeoShift boolean shape:
+// a shift of a union of two boxes
+  GeoShapeShift* sShiftUnion = new GeoShapeShift(sUnion, GeoTrf::TranslateZ3D(50*SYSTEM_OF_UNITS::cm));
+  GeoLogVol *lShiftUnion = new GeoLogVol("Shift-Union", sShiftUnion, steel);
+  GeoPhysVol *pShiftUnion = new GeoPhysVol(lShiftUnion);
+  GeoNameTag *nShiftUnion = new GeoNameTag("Shape-Shift-Union");
+  toyPhys->add(nShiftUnion);
+  toyPhys->add(pShiftUnion);
+
+// Add a test chain & mixed GeoShift boolean shape:
+// a shift of a union of a subtraction of two boxes and an intersection of two boxes
+  GeoShapeUnion* sUnionSubInt = new GeoShapeUnion(sSubtraction, sIntersection);
+  GeoShapeShift* sShiftUnionSubInt = new GeoShapeShift(sUnionSubInt, GeoTrf::TranslateZ3D(50*SYSTEM_OF_UNITS::cm));
+  GeoLogVol *lShiftUnionSubInt = new GeoLogVol("Shift-Union-Subtraction-Intersection", sShiftUnionSubInt, steel);
+  GeoPhysVol *pShiftUnionSubInt = new GeoPhysVol(lShiftUnionSubInt);
+  GeoNameTag *nShiftUnionSubInt = new GeoNameTag("Shape-Shift-Union-Subtraction_Intersection");
+  toyPhys->add(nShiftUnionSubInt);
+  toyPhys->add(pShiftUnionSubInt);
+
+
+
+
 
 
   //------------------------------------------------------------------------------------//

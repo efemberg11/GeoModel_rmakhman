@@ -2861,15 +2861,13 @@ void ReadGeoModel::createBooleanShapeOperands(boolean_shapes_operands_info* shap
         // std::cout << "tuple: "; printTuple(tuple); // debug
 
         // Initializing variables for unpacking
-        
-        std::string shapeType;           // std::get<2>(tuple);
-        unsigned shapeID{0};       // std::get<0>(tuple);
-        GeoShape* boolShPtr{nullptr};  // std::get<1>(tuple);
-        std::string typeA;           // std::get<2>(tuple);
-        unsigned idA{0};           // std::get<3>(tuple);
-        std::string typeB;           // std::get<4>(tuple);
-        unsigned idB{0};           // std::get<5>(tuple);
-
+        std::string shapeType;     
+        unsigned shapeID{0};       
+        GeoShape* boolShPtr{nullptr}; 
+        std::string typeA;          
+        unsigned idA{0};           
+        std::string typeB;         
+        unsigned idB{0};           
         // use 'tie' to unpack the tuple values into separate variables
         std::tie(shapeType, shapeID, boolShPtr, typeA, idA, typeB, idB) = tuple;
 
@@ -2953,7 +2951,7 @@ void ReadGeoModel::createBooleanShapeOperands(boolean_shapes_operands_info* shap
             THROW_EXCEPTION("ERROR! Undefined operator shape! This part of the code should not be reached!");
         }
         // then, store the now completed shape and continue to the next item
-        storeBuiltShape(shapeID, boolShPtr);
+        storeBuiltShape(shapeType, shapeID, boolShPtr);
     }
 }
 

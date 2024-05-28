@@ -15,7 +15,7 @@
 
 #include <vector>
 #include <variant>
-
+#include <string>
 // define the data types used to retrieve and store data from the DB
 using DBRecordEntry = std::variant<int,long,float,double,std::string>;
 using DBRowEntry = std::vector<DBRecordEntry>;

@@ -74,7 +74,7 @@ namespace GeoModelHelpers {
             }
             return ret;
         }
-        static int getFromVariant_Double(const std::variant<int, long, float, double, std::string> &record, std::string_view logMsg = "")
+        static double getFromVariant_Double(const std::variant<int, long, float, double, std::string> &record, std::string_view logMsg = "")
         {
             std::string_view type{"double"};
             double ret;

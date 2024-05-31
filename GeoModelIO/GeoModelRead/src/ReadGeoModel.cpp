@@ -381,7 +381,6 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         std::thread t24(&ReadGeoModel::buildAllShapes_TwistedTrap, this);
         std::thread t25(&ReadGeoModel::buildAllShapes_SimplePolygonBrep, this);
         
-        std::thread t26(&ReadGeoModel::buildAllShapes_Operators, this);
 
         t2.join();  // ok, all Elements have been built
         // needs Elements
@@ -400,6 +399,8 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         t24.join();  // ok, all Shapes-TwistedTrap have been built
         t25.join();  // ok, all Shapes-SimplePolygonBrep have been built
 
+	// Needs more primitive shapes:
+        std::thread t26(&ReadGeoModel::buildAllShapes_Operators, this);
         t26.join();  // ok, all Shapes-Operators have been built
         
         t3.join();  // ok, all Materials have been built

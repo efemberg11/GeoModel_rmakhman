@@ -274,10 +274,10 @@ const GeoVPhysVol* ReadGeoModel::buildGeoModel() {
 
 void ReadGeoModel::loadDB() {
     // *** get all data from the DB ***
-    std::chrono::system_clock::time_point start =
-        std::chrono::system_clock::now();  // timing: get start time
+    // timing: get start time
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();  
     // get all GeoModel nodes from the DB
-    m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
+    // m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
     m_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
     m_elements = m_dbManager->getTableFromNodeType("GeoElement");
     m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
@@ -1598,12 +1598,18 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id) {
         std::cout << "ReadGeoModel::buildMaterial()" << std::endl;
         muxCout.unlock();
     }
-    std::vector<std::string> values = m_materials[id - 1];
+    // std::vector<std::string> values = m_materials[id - 1];
+    DBRowEntry values = m_materials[id - 1];
 
-    const unsigned int matId = std::stoi(values[0]);
-    const std::string matName = values[1];
-    double matDensity = std::stod(values[2]);
-    std::string matElements = values[3];
+    // const unsigned int matId = std::stoi(values[0]);
+    // const std::string matName = values[1];
+    // double matDensity = std::stod(values[2]);
+    // std::string matElements = values[3];
+
+    const unsigned int matId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Material:id");
+    const std::string matName = GeoModelHelpers::variantHelper::getFromVariant_String(row[0], "Material:matName");
+    const double matDensity = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Material:matDensity");
+    const std::string matElements = GeoModelHelpers::variantHelper::getFromVariant_String(row[0], "Material:matElements");
 
     if (m_loglevel >= 2) {
         muxCout.lock();

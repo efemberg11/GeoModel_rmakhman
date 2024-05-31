@@ -1,3 +1,6 @@
+/*
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+*/
 /* vim: set ft=cpp: */ // VIM modeline options
 /*
  * ReadGeoModel.tpp
@@ -11,6 +14,10 @@
 
 #include "GeoModelKernel/GeoFullPhysVol.h"
 
+#include "GeoModelHelpers/variantHelpers.h"
+#include "GeoModelHelpers/throwExcept.h"
+
+
 
 namespace GeoModelIO {
 
@@ -21,7 +28,9 @@ namespace GeoModelIO {
         std::map<T, N> mapNodes;
         std::string keyType = "";
 
-        std::vector<std::vector<std::string>> vecRecords;
+        // std::vector<std::vector<std::string>> vecRecords;
+        DBRowsList vecRecords;
+
         static_assert(std::is_same_v<GeoFullPhysVol*, N> || std::is_same_v<GeoAlignableTransform*, N> ,
                     "ERROR! The node type is not currently supported. If in doubt, please ask to 'geomodel-developers@cern.ch'.\n");
 
@@ -41,15 +50,15 @@ namespace GeoModelIO {
         unsigned ii = 0;
         for( auto const &record : vecRecords ) {
             // record[0] is the record's ID in the DB table, we skip that.
-            std::string keyStr  = record[1];
-            std::string volID   = record[2];
-            if(0==ii) keyType   = record[3];//this is the same for all records. TODO: it should be stored in a metadata table
+            const std::string keyStr  = GeoModelHelpers::variantHelper::getFromVariant_String(record[1], "getPublishedNodes:keyStr");
+            const unsigned volID   = GeoModelHelpers::variantHelper::getFromVariant_Int(record[2], "getPublishedNodes:volID");
+            if(0==ii) keyType   = GeoModelHelpers::variantHelper::getFromVariant_String(record[3], "getPublishedNodes:keyType"); //this is the same for all records. TODO: it should be stored in a metadata table
             ++ii;
             N volPtr = nullptr;
             if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
-                volPtr = dynamic_cast<GeoFullPhysVol*>( getVPhysVol(std::stoul(volID), 2) ); //always table=2, and we should have copyN=1 because FullPhysVols are not sharable 
+                volPtr = dynamic_cast<GeoFullPhysVol*>( getVPhysVol(volID, 2) ); //always table=2, and we should have copyN=1 because FullPhysVols are not sharable 
             } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
-                volPtr = getBuiltAlignableTransform(std::stoul(volID));
+                volPtr = getBuiltAlignableTransform(volID);
             } else {
                 std::cout << "ERROR! The node type '" << typeid(N).name() 
                     << "' is not currently supported.\n"
@@ -58,6 +67,7 @@ namespace GeoModelIO {
                 exit(EXIT_FAILURE);
             }
 
+            //TODO: check if we can get rid of stoul/stoi...
             if constexpr ( std::is_same_v<unsigned, T> ) {
                 unsigned int key = std::stoul( keyStr );
                 mapNodes.insert( {key, volPtr} );
@@ -71,10 +81,11 @@ namespace GeoModelIO {
                 mapNodes.insert( {keyStr, volPtr} );
             } 
             else {
-                std::cout << "ERROR! Key type '" << keyType << "' is not currently supported.\n"
-                          << "If in doubt, please ask to 'geomodel-developers@cern.ch'.\n"
-                          << "Exiting...\n";
-                exit(EXIT_FAILURE);
+                const std::string errMsg = "ERROR! Key type '" + keyType + "' is not currently supported.\n"
+                          + "For the moment, unsigned int, int, and string are supported.\n" 
+                          + "If in doubt, please ask to 'geomodel-developers@cern.ch'.\n"
+                          + "Exiting...\n";
+                THROW_EXCEPTION(errMsg);
             }
         }
         return mapNodes;

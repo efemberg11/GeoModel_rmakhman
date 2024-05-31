@@ -23,7 +23,8 @@ add_library( GeoModelVisualization::GXGeometryPlugin ALIAS GXGeometryPlugin )
 install( TARGETS GXGeometryPlugin
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/gxplugins
-   COMPONENT Runtime )
+   COMPONENT Runtime 
+   NAMELINK_COMPONENT Development )
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/VP1GeometryPlugin
    COMPONENT Development )

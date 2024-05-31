@@ -389,7 +389,9 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<std::variant<int, long, float, double, std::string>> m_exprData; // numbers used in Function's expression
 
     // caches for Metadata to be saved into the DB
-    std::vector<std::string> m_rootVolume;
+    // std::vector<std::string> m_rootVolume;
+    std::pair<std::string, unsigned> m_rootVolume;
+
     std::vector<std::vector<std::string>> m_childrenPositions;
     std::vector<std::vector<std::string>> m_publishedAlignableTransforms_String;
     std::vector<std::vector<std::string>> m_publishedFullPhysVols_String;

@@ -6,7 +6,7 @@
 #include "GeoModelKernel/GeoShapeAction.h"
 
 const std::string GeoBox::s_classType = "Box";
-const ShapeType GeoBox::s_classTypeID = 0x10;
+const ShapeType GeoBox::s_classTypeID = 0x10; // 16
 
 GeoBox::GeoBox (double XHalfLength, double YHalfLength, double ZHalfLength):
   m_xHalfLength {XHalfLength},

@@ -172,9 +172,9 @@ class ReadGeoModel {
     unsigned long getNNameTags() { return m_nameTags.size(); };
     unsigned long getNShapes() { return m_shapes.size(); };
     unsigned long getNChildrenConnections() { return m_allchildren.size(); };
-    std::vector<std::vector<std::string>> getTableFromTableName(
-        std::string tableName) {
-        return m_dbManager->getTableRecords(tableName);
+    std::vector<std::vector<std::string>> getTableFromTableName_String(
+        const std::string_view tableName) {
+        return m_dbManager->getTableRecords_String(tableName);
     };
 
    private:
@@ -400,11 +400,12 @@ class ReadGeoModel {
     std::vector<std::vector<std::string>> m_identifierTags;
     std::vector<std::vector<std::string>> m_serialTransformers;
     std::vector<std::vector<std::string>> m_nameTags;
-    std::vector<std::vector<std::string>> m_materials;
+    // std::vector<std::vector<std::string>> m_materials;
     std::vector<std::vector<std::string>> m_elements;
     std::vector<std::vector<std::string>> m_shapes;
     std::vector<std::vector<std::string>> m_allchildren;
 
+    DBRowsList m_materials;
     DBRowsList m_logVols;
 
     // containers to store shapes' parameters

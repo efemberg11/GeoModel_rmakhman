@@ -136,25 +136,38 @@ void VolumeHandleSharedData::registerNodeSepForVolumeHandle(SoSeparator*n,Volume
 //_____________________________________________________________________________________
 void VolumeHandleSharedData::setShowVolumeOutlines(SoGroup*nodegroup,bool showvol)
 {
-  for (int i = 0; i<nodegroup->getNumChildren();++i) {
-    SoNode * n = nodegroup->getChild(i);
-    if (n->getTypeId().isDerivedFrom(SoGenericBox::getClassTypeId())) {
-      if (static_cast<SoGenericBox*>(n)->drawEdgeLines.getValue()!=showvol)
-        static_cast<SoGenericBox*>(n)->drawEdgeLines.setValue(showvol);
-    } else if (n->getTypeId().isDerivedFrom(SoTubs::getClassTypeId())) {
-      if (static_cast<SoTubs*>(n)->drawEdgeLines.getValue()!=showvol){
-	static_cast<SoTubs*>(n)->drawEdgeLines.setValue(showvol);
+  for (int i = 0; i < nodegroup->getNumChildren(); ++i)
+  {
+    SoNode *n = nodegroup->getChild(i);
+    if (n->getTypeId().isDerivedFrom(SoGenericBox::getClassTypeId()))
+    {
+      if (static_cast<SoGenericBox *>(n)->drawEdgeLines.getValue() != showvol)
+        static_cast<SoGenericBox *>(n)->drawEdgeLines.setValue(showvol);
+    }
+    else if (n->getTypeId().isDerivedFrom(SoTubs::getClassTypeId()))
+    {
+      if (static_cast<SoTubs *>(n)->drawEdgeLines.getValue() != showvol)
+      {
+        static_cast<SoTubs *>(n)->drawEdgeLines.setValue(showvol);
       }
-    } else if (n->getTypeId().isDerivedFrom(SoPcons::getClassTypeId())) {
-      if (static_cast<SoPcons*>(n)->drawEdgeLines.getValue()!=showvol){
-        static_cast<SoPcons*>(n)->drawEdgeLines.setValue(showvol);
+    }
+    else if (n->getTypeId().isDerivedFrom(SoPcons::getClassTypeId()))
+    {
+      if (static_cast<SoPcons *>(n)->drawEdgeLines.getValue() != showvol)
+      {
+        static_cast<SoPcons *>(n)->drawEdgeLines.setValue(showvol);
       }
-    } else if (n->getTypeId().isDerivedFrom(SoTessellated::getClassTypeId())) {
-      if (static_cast<SoTessellated*>(n)->drawEdgeLines.getValue()!=showvol){
-        static_cast<SoTessellated*>(n)->drawEdgeLines.setValue(showvol);
+    }
+    else if (n->getTypeId().isDerivedFrom(SoTessellated::getClassTypeId()))
+    {
+      if (static_cast<SoTessellated *>(n)->drawEdgeLines.getValue() != showvol)
+      {
+        static_cast<SoTessellated *>(n)->drawEdgeLines.setValue(showvol);
       }
-    } else if (n->getTypeId().isDerivedFrom(SoGroup::getClassTypeId())) {
-      setShowVolumeOutlines(static_cast<SoGroup*>(n),showvol);
+    }
+    else if (n->getTypeId().isDerivedFrom(SoGroup::getClassTypeId()))
+    {
+      setShowVolumeOutlines(static_cast<SoGroup *>(n), showvol);
     }
   }
 }

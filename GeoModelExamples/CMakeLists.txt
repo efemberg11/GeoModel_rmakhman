@@ -15,13 +15,15 @@ add_subdirectory( MinimalPlugin )
 add_subdirectory( SurfaceTestPlugin )
 
 add_subdirectory( HelloGeo )
-add_subdirectory( HelloGeoWrite )
-add_subdirectory( HelloGeoWriteReadWrite )
-add_subdirectory( HelloGeoRead )
-add_subdirectory( HelloGeoReadNodeAction )
+# add_subdirectory( HelloGeoWrite )
+# add_subdirectory( HelloGeoWriteReadWrite )
+# add_subdirectory( HelloGeoRead )
+# add_subdirectory( HelloGeoReadNodeAction )
+# add_subdirectory( SharedNodes )
+add_subdirectory( HelloToyWrite )
 
 #add_subdirectory( HelloDummyMaterial )
-#add_subdirectory( HelloToy )
+add_subdirectory( HelloToy )
 #add_subdirectory( HelloToyDetectorFactory )
 #add_subdirectory( HelloToyXML ) # this should be moved to GeoModelATLAS, because it uses GeoModelDataManagers
 

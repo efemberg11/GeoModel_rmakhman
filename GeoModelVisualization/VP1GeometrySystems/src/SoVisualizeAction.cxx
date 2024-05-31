@@ -45,13 +45,12 @@ SoVisualizeAction::SoVisualizeAction()
 
 SoVisualizeAction::~SoVisualizeAction()
 {
-  // Don't delete.  Let ref count take care of the memory.
+  // NOTE: Don't delete.  Let ref count take care of the memory.
 }
 
 
 void SoVisualizeAction::handleShape(const GeoShape *shape)
 {
-  //qDebug() << "SoVisualizeAction::handleShape";
   // We don't recognize it.  Try to polyhedrize it!
   SbPolyhedrizeAction a;
   shape->exec(&a);
@@ -65,7 +64,6 @@ void SoVisualizeAction::handleShape(const GeoShape *shape)
 
 void SoVisualizeAction::handleBox(const GeoBox *box)
 {
-  //qDebug() << "SoVisualizeAction::handleBox";
   SoGenericBox * gb = new SoGenericBox;
   gb->setParametersForBox( box->getXHalfLength(),box->getYHalfLength(),box->getZHalfLength() );
   m_shape=gb;
@@ -73,7 +71,6 @@ void SoVisualizeAction::handleBox(const GeoBox *box)
 
 void SoVisualizeAction::handleCons(const GeoCons *cons)
 {
-  //qDebug() << "SoVisualizeAction::handleCons";
   SoCons::initClass();
   SoCons *socons= new SoCons;
   socons->fRmin1 =cons->getRMin1();
@@ -89,7 +86,6 @@ void SoVisualizeAction::handleCons(const GeoCons *cons)
 
 void SoVisualizeAction::handleTorus(const GeoTorus *torus)
 {
-  //qDebug() << "SoVisualizeAction::handleTorus";
   SoTorus::initClass();
   SoTorus *sotorus= new SoTorus;
   sotorus->fRInner = torus->getRMin();
@@ -103,9 +99,6 @@ void SoVisualizeAction::handleTorus(const GeoTorus *torus)
 
 void SoVisualizeAction::handlePcon(const GeoPcon *pcon)
 {
-
-  //qDebug() << "SoVisualizeAction::handlePcon";
-
   //Set up temporary data arrays for profile:
   float *z  = new float[pcon->getNPlanes()];
   float *rmn= new float[pcon->getNPlanes()];
@@ -136,7 +129,6 @@ void SoVisualizeAction::handlePcon(const GeoPcon *pcon)
 
 void SoVisualizeAction::handleTrap(const GeoTrap *trap)
 {
-  //qDebug() << "SoVisualizeAction::handleTrap";
   SoGenericBox * gb = new SoGenericBox;
   gb->setParametersForTrapezoid(trap->getZHalfLength(), trap->getTheta(), trap->getPhi(),
 				trap->getDydzn(), trap->getDxdyndzn(), trap->getDxdypdzn(),
@@ -158,7 +150,6 @@ void SoVisualizeAction::handleTwistedTrap(const GeoTwistedTrap *twistedtrap)
 
 void SoVisualizeAction::handleTrd(const GeoTrd *trd)
 {
-  //qDebug() << "SoVisualizeAction::handleTrd";
   SoGenericBox * gb = new SoGenericBox;
   gb->setParametersForTrd( trd->getXHalfLength1(), trd->getXHalfLength2(),
 			   trd->getYHalfLength1(), trd->getYHalfLength2(),
@@ -168,7 +159,6 @@ void SoVisualizeAction::handleTrd(const GeoTrd *trd)
 
 void SoVisualizeAction::handleTube(const GeoTube *tube)
 {
-  //qDebug() << "SoVisualizeAction::handleTube";
   SoTubs *sotubs= new SoTubs;
   sotubs->pRMin= tube->getRMin();
   sotubs->pRMax= tube->getRMax();
@@ -180,7 +170,6 @@ void SoVisualizeAction::handleTube(const GeoTube *tube)
 
 void SoVisualizeAction::handleTubs(const GeoTubs *tubs)
 {
-  //qDebug() << "SoVisualizeAction::handleTubs";
   SoTubs *sotubs= new SoTubs;
   sotubs->pRMin= tubs->getRMin();
   sotubs->pRMax= tubs->getRMax();
@@ -192,9 +181,7 @@ void SoVisualizeAction::handleTubs(const GeoTubs *tubs)
 
 void SoVisualizeAction::handleSimplePolygonBrep(const GeoSimplePolygonBrep *brep)
 {
-  //qDebug() << "SoVisualizeAction::handleSimplePolygonBrep";
   //Fixme: Detect if order of vertices is the wrong way around... and reorder if necessary.
-
   double dz = brep->getDZ();
   std::vector<double> x, y;
   for(unsigned int i=0; i<brep->getNVertices(); ++i)
@@ -210,8 +197,6 @@ void SoVisualizeAction::handleSimplePolygonBrep(const GeoSimplePolygonBrep *brep
 
 void SoVisualizeAction::handleTessellatedSolid (const GeoTessellatedSolid* geoTessellated)
 {
-  //std::cout << "SoVisualizeAction::handleTessellatedSolid" << std::endl;
-
   SoTessellated * soTessellated = new SoTessellated;
 
   //std::cout << "\tn. facets: " << geoTessellated->getNumberOfFacets() << std::endl;
@@ -270,7 +255,6 @@ void SoVisualizeAction::handleTessellatedSolid (const GeoTessellatedSolid* geoTe
 
 void SoVisualizeAction::handleGenericTrap(const GeoGenericTrap *gentrap)
 {
-  //qDebug() << "SoVisualizeAction::handleGenericTrap";
   SoGenericBox * gb = new SoGenericBox;
   const GeoGenericTrapVertices& trapVertices = gentrap->getVertices();
   double dZ = gentrap->getZHalfLength();

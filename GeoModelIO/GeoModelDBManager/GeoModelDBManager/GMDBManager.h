@@ -15,6 +15,8 @@
 #ifndef GMDBManager_H
 #define GMDBManager_H
 
+#include "GeoModelDBManager/definitions.h"
+
 // include C++
 #include <iostream>
 #include <string>
@@ -92,6 +94,13 @@ class GMDBManager {
      * @brief Print names of all GeoShape objects in db
      */
     void printAllShapes() const;
+    
+    /**
+     * @brief Print the data related to the GeoShape nodes in the DB 
+     * with a variable number of parameters 
+     * (for example, a variable number of planes along the Z axis)
+     */
+    void printAllShapesData() const;
 
     /**
      * @brief Print names of all GeoSerialDenominator objects in db
@@ -245,13 +254,16 @@ class GMDBManager {
         const std::vector<std::vector<std::string>> &records,
         std::string suffix = "");
 
-    bool addRootVolume(const std::vector<std::string> &values);
+    // bool addRootVolume(const std::vector<std::string> &values);
+    bool addRootVolume(const std::string_view nodeType, const unsigned nodeId);
+    bool addRootVolume(const std::pair<std::string, unsigned> rootValues);
 
     // GET methods
 
     std::string getDBFilePath();
 
-    std::vector<std::string> getRootPhysVol();
+    // std::vector<std::string> getRootPhysVol();
+    std::pair<unsigned, unsigned> getRootPhysVol();
 
     std::vector<std::string> getItemFromTableName(std::string tableName,
                                                   unsigned int id);
@@ -262,7 +274,8 @@ class GMDBManager {
     std::string getNodeTypeFromTableId(unsigned int id);
 
     /// methods to dump the DB
-    std::vector<std::vector<std::string>> getChildrenTable();
+    // std::vector<std::vector<std::string>> getChildrenTable();
+    DBRowsList getChildrenTable();
 
     // Table names for Aux tables are of the form prefix_suffix
     // where prefix depends on the type of data in the table
@@ -270,12 +283,14 @@ class GMDBManager {
 
     // These two require only the suffix, the prefix is already specified based
     // on the table type being accessed
-    std::vector<std::vector<std::string>> getPublishedFPVTable(
-        std::string suffix = "");
-    std::vector<std::vector<std::string>> getPublishedAXFTable(
-        std::string suffix = "");
+    // std::vector<std::vector<std::string>> getPublishedFPVTable(
+    //     std::string suffix = "");
+    // std::vector<std::vector<std::string>> getPublishedAXFTable(
+    //     std::string suffix = "");
+    DBRowsList getPublishedFPVTable(const std::string_view suffix = "");
+    DBRowsList getPublishedAXFTable(const std::string_view suffix = "");
 
-    std::vector<std::vector<std::string>> getTableFromNodeType(
+    std::vector<std::vector<std::string>> getTableFromNodeType_String(
         std::string nodeType);
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableFromNodeType_VecVecData(
         std::string nodeType);
@@ -291,9 +306,9 @@ class GMDBManager {
     std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
     std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDs();
 
-    std::vector<std::vector<std::string>> getTableRecords(std::string tableName) const;
-    std::vector<std::variant<int, long, float, double, std::string>> getTableRecords_VecData(std::string tableName) const;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableRecords_VecVecData(std::string tableName) const;
+    std::vector<std::vector<std::string>> getTableRecords_String(const std::string_view tableName) const;
+    std::vector<std::variant<int, long, float, double, std::string>> getTableRecords_VecData(const std::string_view tableName) const;
+    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableRecords_VecVecData(const std::string_view tableName) const;
 
     //! Test if a given table exists
     //! This requires the *full* table name (i.e. prefix_suffix)
@@ -321,7 +336,7 @@ class GMDBManager {
             &records);
 
 
-    unsigned int getTableIdFromNodeType(const std::string &nodeType);
+    unsigned int getTableIdFromNodeType(const std::string_view nodeType);
     // bool createCustomTable(const std::string tableName, const
     // std::vector<std::string> tableColNames, const std::vector<std::string>
     // tableColTypes, const std::vector<std::vector<std::string>> &records ); //
@@ -371,7 +386,7 @@ class GMDBManager {
     int getTableColIndex(const std::string &tableName,
                          const std::string &colName);
 
-    bool storeRootVolume(const unsigned int &id, const std::string &nodeType);
+    bool storeRootVolume(const unsigned &id, const std::string_view nodeType);
 
     std::string m_dbpath;
 

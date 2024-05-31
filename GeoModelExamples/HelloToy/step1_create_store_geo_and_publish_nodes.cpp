@@ -184,6 +184,7 @@ int main(int argc, char *argv[])
   //--------------------------------------//
 
   GeoBox       *sPass = new GeoBox(5.0*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm);
+  // GeoTube       *sPass = new GeoTube(5.0*SYSTEM_OF_UNITS::cm, 10*SYSTEM_OF_UNITS::cm, 30*SYSTEM_OF_UNITS::cm);
   GeoLogVol    *lPass = new GeoLogVol("Passive", sPass, steel);
   GeoPhysVol   *pPass = new GeoPhysVol(lPass);
 
@@ -217,6 +218,26 @@ int main(int argc, char *argv[])
   GeoSerialTransformer *s2 = new GeoSerialTransformer(pPass,&t2, NPLATES);
   toyPhys->add(pass2Name);
   toyPhys->add(s2);
+
+
+
+  // === Add single test instances for all shapes ===
+
+  // Add a test GeoBox shape
+  GeoBox *sBox = new GeoBox(5.0 * SYSTEM_OF_UNITS::cm, 30 * SYSTEM_OF_UNITS::cm, 30 * SYSTEM_OF_UNITS::cm);
+  GeoLogVol *lBox = new GeoLogVol("box", sBox, steel);
+  GeoPhysVol *pBox = new GeoPhysVol(lBox);
+  GeoNameTag *nBox = new GeoNameTag("Shape-Box");
+  toyPhys->add(nBox);
+  toyPhys->add(pBox);
+
+  // Add a test GeoTube shape
+  GeoTube *sTube = new GeoTube(5.0 * SYSTEM_OF_UNITS::cm, 10 * SYSTEM_OF_UNITS::cm, 30 * SYSTEM_OF_UNITS::cm);
+  GeoLogVol *lTube = new GeoLogVol("tube", sTube, steel);
+  GeoPhysVol *pTube = new GeoPhysVol(lTube);
+  GeoNameTag *nTube = new GeoNameTag("Shape-Tube");
+  toyPhys->add(nTube);
+  toyPhys->add(pTube);
 
   // Add a test GeoPcon shape
   GeoPcon *sPcon = new GeoPcon(0, 360 * SYSTEM_OF_UNITS::deg);
@@ -406,6 +427,7 @@ int main(int argc, char *argv[])
   GeoNameTag *nShiftUnionSubInt = new GeoNameTag("Shape-Shift-Union-Subtraction_Intersection");
   toyPhys->add(nShiftUnionSubInt);
   toyPhys->add(pShiftUnionSubInt);
+
 
 
 

@@ -2482,9 +2482,10 @@ unsigned int WriteGeoModel::addPhysVol(const unsigned int& logVolId,
     values.push_back(std::to_string(logVolId));  // INT
     unsigned int idx = addRecord(container, values);
     if (isRootVolume) {
-        std::vector<std::string> rootValues;
-        rootValues.insert(rootValues.begin(),
-                          {std::to_string(idx), "GeoPhysVol"});  // INT
+        // std::vector<std::string> rootValues;
+        // rootValues.insert(rootValues.begin(),
+        //                   {std::to_string(idx), "GeoPhysVol"});  // INT
+        std::pair<std::string, unsigned> rootValues{"GeoPhysVol", idx};
         m_rootVolume = rootValues;
     }
     return idx;
@@ -2498,9 +2499,10 @@ unsigned int WriteGeoModel::addFullPhysVol(
     values.push_back(std::to_string(logVolId));  // INT
     unsigned int idx = addRecord(container, values);
     if (isRootVolume) {
-        std::vector<std::string> rootValues;
-        rootValues.insert(rootValues.begin(),
-                          {std::to_string(idx), "GeoFullPhysVol"});  // INT
+        // std::vector<std::string> rootValues;
+        // rootValues.insert(rootValues.begin(),
+        //                   {std::to_string(idx), "GeoFullPhysVol"});  // INT
+        std::pair<std::string, unsigned> rootValues{"GeoFullPhysVol", idx};
         m_rootVolume = rootValues;
     }
     return idx;

@@ -21,7 +21,6 @@
  */
 
 #include <GeoModelDBManager/GMDBManager.h>
-#include "GeoModelDBManager/definitions.h"
 
 #include "GeoModelCppHelpers/GMCppHelpers.h"
 
@@ -61,9 +60,9 @@ class GMDBManager::Imp {
     /// Variable to store error messages from SQLite
     char* m_SQLiteErrMsg;
 
-    sqlite3_stmt* selectAllFromTable(std::string tableName) const;
-    sqlite3_stmt* selectAllFromTableSortBy(std::string tableName,
-                                           std::string sortColumn = "") const;
+    sqlite3_stmt* selectAllFromTable(const std::string_view tableName) const;
+    sqlite3_stmt* selectAllFromTableSortBy(const std::string_view tableName,
+                                           const std::string_view sortColumn = "") const;
     sqlite3_stmt* selectAllFromTableChildrenPositions() const;
     bool checkTable_imp(std::string tableName) const;
 };
@@ -123,7 +122,29 @@ GMDBManager::~GMDBManager() {
 void GMDBManager::printAllMaterials() const { printAllRecords("Materials"); }
 void GMDBManager::printAllElements() const { printAllRecords("Elements"); }
 
-void GMDBManager::printAllShapes() const { printAllRecords("Shapes"); }
+void GMDBManager::printAllShapes() const { 
+    printAllRecords("Shapes_Box"); 
+    printAllRecords("Shapes_Tube"); 
+    printAllRecords("Shapes_Cons"); 
+    printAllRecords("Shapes_Para");
+    printAllRecords("Shapes_Trap"); 
+    printAllRecords("Shapes_Trd"); 
+    printAllRecords("Shapes_Tubs"); 
+    printAllRecords("Shapes_TwistedTrap"); 
+    printAllRecords("Shapes_Pcon"); 
+    printAllRecords("Shapes_Pgon"); 
+    printAllRecords("Shapes_SimplePolygonBrep"); 
+    printAllRecords("Shapes_Intersection"); 
+    printAllRecords("Shapes_Shift"); 
+    printAllRecords("Shapes_Subtraction"); 
+    printAllRecords("Shapes_Union"); 
+}
+
+void GMDBManager::printAllShapesData() const { 
+    printAllRecords("Shapes_Pcon_Data");
+    printAllRecords("Shapes_Pgon_Data");
+    printAllRecords("Shapes_SimplePolygonBrep_Data");
+}
 
 void GMDBManager::printAllSerialDenominators() const {
     printAllRecords("SerialDenominators");
@@ -201,7 +222,7 @@ void GMDBManager::printAllRecords(const std::string& tableName) const {
     // --- print records
     std::vector<std::vector<std::string>> records;
     //  std::vector<std::string> nodeParams;
-    records = getTableRecords(tableName);
+    records = getTableRecords_String(tableName);
     if (records.size()) {
         for (auto& row : records) {
             std::cout << "* ";
@@ -216,12 +237,8 @@ void GMDBManager::printAllRecords(const std::string& tableName) const {
     // query gives 0 results.
 }
 
-// FIXME: TODO: we now return all records as text, but should we get
-// double/int instead when appropriate? In that case, we should create
-// dedicated methods for all tables, I guess.
-// TODO: fill a cache and returns that if asked a second time
-std::vector<std::vector<std::string>> GMDBManager::getTableRecords(
-    std::string tableName) const {
+std::vector<std::vector<std::string>> GMDBManager::getTableRecords_String(
+    const std::string_view tableName) const {
 
     // container to be returned
     std::vector<std::vector<std::string>> records;
@@ -277,9 +294,8 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords(
     return records;
 }
 
-// New version with variant
 std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GMDBManager::getTableRecords_VecVecData(
-    std::string tableName) const
+    const std::string_view tableName) const
 {
     
     // container to be returned
@@ -394,10 +410,10 @@ std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GM
 }
 // New version with variant
 std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::getTableRecords_VecData(
-    std::string tableName) const
+    const std::string_view tableName) const
 {
     if (!checkTableFromCache(tableName)) {
-        THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+        THROW_EXCEPTION("ERROR!!! Table name '" + std::string(tableName) + "' does not exist in cache! (It has not been loaded from the DB)");
     }
     // container to be returned
     std::vector<std::variant<int, long, float, double, std::string>> records;
@@ -509,7 +525,7 @@ std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::ge
     return records;
 }
 
-std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType(
+std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType_String(
     std::string nodeType)
 {
     std::vector<std::vector<std::string>> out;
@@ -535,7 +551,7 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType(
         {
             THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
         }
-        out = getTableRecords(tableName);
+        out = getTableRecords_String(tableName);
     }
     return out;
 }
@@ -681,13 +697,16 @@ bool GMDBManager::addListOfPublishedAlignableTransforms(
     std::string nodeType = "GeoAlignableTransform";
     const std::type_info& keyType(
         typeid(std::string));  // TODO: type should be custom too!!
-    if ("" != suffix) {
+    if ("" != suffix)
+    {
         tableName += "_";
         tableName += suffix;
-        // debug msg
-        // std::cout << "\nSaving the published '"<< nodeType << "' nodes to
-        // the custom table: '"
-        //          << tableName << "'." << std::endl;
+        if (m_debug)
+        {
+            std::cout << "\nSaving the published '" << nodeType
+                      << "' nodes to the custom table : '" << tableName
+                      << "'." << std::endl;
+        }
     }
     // create custom table first then add to it
     createTableCustomPublishedNodes(tableName, nodeType, &keyType);
@@ -702,12 +721,16 @@ bool GMDBManager::addListOfPublishedFullPhysVols(
     std::string nodeType = "GeoFullPhysVol";
     const std::type_info& keyType(
         typeid(std::string));  // TODO: type should be custom too!!
-    if ("" != suffix) {
+    if ("" != suffix)
+    {
         tableName += "_";
         tableName += suffix;
-        // std::cout << "\nSaving the published '"<< nodeType << "' nodes to
-        // the custom table: '"
-        //           << tableName << "'." << std::endl;
+        if (m_debug)
+        {
+            std::cout << "\nSaving the published '" << nodeType
+                      << "' nodes to the custom table : '"
+                      << tableName << "'." << std::endl;
+        }
     }
     // create custom table first then add to it
     createTableCustomPublishedNodes(tableName, nodeType, &keyType);
@@ -814,9 +837,6 @@ bool GMDBManager::addListOfRecordsToTable(
     return true;
 }
 
-// TODO: use this with std::variant to replace the version with std::string
-// only, here above, for all tables; so we can store native values (int,
-// double, etc...) -- R.M.B.
 bool GMDBManager::addListOfRecordsToTable(
     const std::string tableName,
     const std::vector<
@@ -981,17 +1001,18 @@ bool GMDBManager::addRecordsToTable(
 }
 
 
-bool GMDBManager::addRootVolume(const std::vector<std::string>& values) {
-    if (values.size() > 0) {
-        const unsigned int volId = std::stoi(values[0]);
-        const std::string nodeType = values[1];
-        return storeRootVolume(volId, nodeType);
-    } else {
-        std::cout << "ERROR! No records to save for RootVolume! All GeoModel "
-                     "trees must have a 'World'/'Root' volume! Exiting..."
-                  << std::endl;
-        exit(EXIT_FAILURE);
-    }
+// bool GMDBManager::addRootVolume(const std::vector<std::string>& values) {
+bool GMDBManager::addRootVolume(const std::string_view type, const unsigned id)
+{
+    const std::string nodeType{type};
+    const unsigned int volId{id};
+    return storeRootVolume(volId, nodeType);
+}
+bool GMDBManager::addRootVolume(const std::pair<std::string, unsigned> rootValues)
+{
+    const std::string nodeType{rootValues.first};
+    const unsigned int volId{rootValues.second};
+    return storeRootVolume(volId, nodeType);
 }
 
 void GMDBManager::addDBversion(std::string version) {
@@ -1112,12 +1133,13 @@ std::vector<std::string> GMDBManager::getItemFromTableName(
 }
 
 // Get all parent-children data from the database in one go
-std::vector<std::vector<std::string>> GMDBManager::getChildrenTable() {
-    return getTableRecords("ChildrenPositions");
+DBRowsList GMDBManager::getChildrenTable() {
+    return getTableRecords_VecVecData("ChildrenPositions");
 }
 
-unsigned int GMDBManager::getTableIdFromNodeType(const std::string& nodeType) {
-    return m_cache_nodeType_tableID[nodeType];
+unsigned int GMDBManager::getTableIdFromNodeType(const std::string_view nodeType) {
+    if (m_cache_nodeType_tableID.empty()) THROW_EXCEPTION("ERROR! Cache is empty!");
+    return m_cache_nodeType_tableID[std::string(nodeType)];
 }
 
 std::string GMDBManager::getTableNameFromNodeType(const std::string& nodeType) {
@@ -1185,14 +1207,13 @@ int GMDBManager::loadGeoNodeTypesAndBuildCache() {
     return rc;
 }
 
-// FIXME: should throw an error if the method
-// `loadGeoNodeTypesAndBuildCache()` was not called before calling this
-// method
 std::string GMDBManager::getTableNameFromTableId(unsigned int tabId) {
+    if (m_cache_tableId_tableName.empty()) THROW_EXCEPTION("ERROR! Cache is empty!");
     return m_cache_tableId_tableName[tabId];
 }
 
 std::string GMDBManager::getNodeTypeFromTableId(unsigned int tabId) {
+    if (m_cache_tableId_nodeType.empty()) THROW_EXCEPTION("ERROR! Cache is empty!");
     return m_cache_tableId_nodeType[tabId];
 }
 
@@ -1207,12 +1228,13 @@ GMDBManager::getAll_NodeTypesTableIDs() {
 }
 
 sqlite3_stmt* GMDBManager::Imp::selectAllFromTable(
-    std::string tableName) const {
+    const std::string_view tableName) const {
     return selectAllFromTableSortBy(tableName, "id");
 }
 
 sqlite3_stmt* GMDBManager::Imp::selectAllFromTableSortBy(
-    std::string tableName, std::string sortColumn) const {
+    const std::string_view tableName, const std::string_view sortCol) const {
+    std::string sortColumn{sortCol};
     theManager->checkIsDBOpen();
     if ("" == sortColumn || 0 == sortColumn.size()) {
         sortColumn = "id";
@@ -1363,10 +1385,11 @@ void GMDBManager::getAllDBTableColumns() {
 
 // TODO: currently, we retrieve published data as strings, but we want to
 // retrieve that according to the original data type
-std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable(
-    std::string suffix) {
+// std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable(
+DBRowsList GMDBManager::getPublishedFPVTable(
+    const std::string_view suffix) {
     std::string tableName = "PublishedFullPhysVols";  // default table name
-    if ("" != suffix) {
+    if ( !suffix.empty() ) {
         tableName += "_";
         tableName += suffix;
     }
@@ -1374,15 +1397,16 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedFPVTable(
     {
         THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
     }
-    return getTableRecords(tableName);
+    return getTableRecords_VecVecData(tableName);
 }
 // TODO: currently, we retrieve published data as strings, but we want to
 // retrieve that according to the original data type
-std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable(
-    std::string suffix) {
+// std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable(
+DBRowsList GMDBManager::getPublishedAXFTable(
+    const std::string_view suffix) {
     std::string tableName =
         "PublishedAlignableTransforms";  // default table name
-    if ("" != suffix) {
+    if ( !suffix.empty() ) {
         tableName += "_";
         tableName += suffix;
     }
@@ -1390,7 +1414,7 @@ std::vector<std::vector<std::string>> GMDBManager::getPublishedAXFTable(
     {
         THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
     }
-    return getTableRecords(tableName);
+    return getTableRecords_VecVecData(tableName);
 }
 
 bool GMDBManager::checkTable(std::string tableName) const {
@@ -1491,6 +1515,7 @@ bool GMDBManager::createCustomTable(
     for (size_t ii = 0; ii < tableColNames.size(); ++ii) {
         std::string colType = "";
 
+        // *** NOTE: ***
         // -- Here we check the datum's type, which is more universal than
         // using string-encoded types
         // -- but this does not work if the first entry of a given column is
@@ -1763,23 +1788,23 @@ bool GMDBManager::createTables() {
     }
     tab.clear();
 
-    // Shapes table
-    geoNode = "GeoShape";
-    tableName = "Shapes";
-    m_childType_tableName[geoNode] = tableName;
-    tab.push_back(tableName);
-    tab.push_back("id");
-    tab.push_back("type");
-    tab.push_back("parameters");
-    storeTableColumnNames(tab);
-    queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} varchar, {3} "
-        "varchar)",
-        tab[0], tab[1], tab[2], tab[3]);
-    if (0 == (rc = execQuery(queryStr))) {
-        storeNodeType(geoNode, tableName);
-    }
-    tab.clear();
+    // // Shapes table
+    // geoNode = "GeoShape";
+    // tableName = "Shapes";
+    // m_childType_tableName[geoNode] = tableName;
+    // tab.push_back(tableName);
+    // tab.push_back("id");
+    // tab.push_back("type");
+    // tab.push_back("parameters");
+    // storeTableColumnNames(tab);
+    // queryStr = fmt::format(
+    //     "create table {0}({1} integer primary key, {2} varchar, {3} "
+    //     "varchar)",
+    //     tab[0], tab[1], tab[2], tab[3]);
+    // if (0 == (rc = execQuery(queryStr))) {
+    //     storeNodeType(geoNode, tableName);
+    // }
+    // tab.clear();
 
     // Shapes-Box table
     // ID, XHalfLength, YHalfLength, ZHalfLength
@@ -2383,8 +2408,8 @@ void GMDBManager::storeNodeType(std::string nodeType, std::string tableName) {
 //  QVariant childPhysId = addPhysVol(toyLogId, rootPhysId);
 //}
 
-bool GMDBManager::storeRootVolume(const unsigned int& id,
-                                  const std::string& nodeType) {
+bool GMDBManager::storeRootVolume(const unsigned &id,
+                                  const std::string_view nodeType) {
     checkIsDBOpen();
 
     std::string tableName = "RootVolume";
@@ -2426,7 +2451,8 @@ bool GMDBManager::storeRootVolume(const unsigned int& id,
     return true;
 }
 
-std::vector<std::string> GMDBManager::getRootPhysVol() {
+// std::vector<std::string> GMDBManager::getRootPhysVol() {
+std::pair<unsigned, unsigned> GMDBManager::getRootPhysVol() {
     // get the ID of the ROOT vol from the table "RootVolume"
     sqlite3_stmt* stmt = m_d->selectAllFromTable("RootVolume");
     // declare the data we want to fetch
@@ -2448,8 +2474,8 @@ std::vector<std::string> GMDBManager::getRootPhysVol() {
     // finalize
     sqlite3_finalize(stmt);
     
-    std::vector<std::string> results = getItemAndType(typeId, id);
-    return results;
+    // std::vector<std::string> results = getItemAndType(typeId, id);
+    return std::pair<unsigned, unsigned>{typeId, id};
     
 }
 

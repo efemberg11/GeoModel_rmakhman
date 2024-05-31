@@ -25,6 +25,7 @@
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
+#include "GeoModelKernel/GeoUnidentifiedShape.h"
 
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoShapeIntersection.h"
@@ -429,6 +430,15 @@ int main(int argc, char *argv[])
   toyPhys->add(pShiftUnionSubInt);
 
 
+
+  // Add a test "UnidentifiedShape" shape node
+  const std::string nameUnidentifiedShape = "LAr::Example";
+  GeoUnidentifiedShape* sUnidentifiedShape = new GeoUnidentifiedShape("LArCustomShape",nameUnidentifiedShape);
+  GeoLogVol* lUnidentifiedShape = new GeoLogVol("UnidentifiedShape", sUnidentifiedShape, steel);
+  GeoPhysVol *pUnidentifiedShape = new GeoPhysVol(lUnidentifiedShape);
+  GeoNameTag *nUnidentifiedShape = new GeoNameTag("UnidentifiedShape");
+  toyPhys->add(nUnidentifiedShape);
+  toyPhys->add(pUnidentifiedShape);
 
 
 

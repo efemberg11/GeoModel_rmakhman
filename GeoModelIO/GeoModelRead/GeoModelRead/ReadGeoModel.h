@@ -96,10 +96,10 @@ class BuildGeoShapes_Trap;
 class BuildGeoShapes_Trd;
 class BuildGeoShapes_Tubs;
 class BuildGeoShapes_TwistedTrap;
-
 class BuildGeoShapes_Pcon;
 class BuildGeoShapes_Pgon;
 class BuildGeoShapes_SimplePolygonBrep;
+class BuildGeoShapes_UnidentifiedShape;
 
 // type definitions
 typedef const GeoXF::Function& TRANSFUNCTION;
@@ -178,6 +178,7 @@ class ReadGeoModel {
     };
 
    private:
+    void buildAllShapes(); // TODO: OLD METHOD, TO BE REMOVED WHEN READY
     void buildAllShapes_Box();
     void buildAllShapes_Tube();
     void buildAllShapes_Cons();
@@ -186,15 +187,13 @@ class ReadGeoModel {
     void buildAllShapes_Trd();
     void buildAllShapes_Tubs();
     void buildAllShapes_TwistedTrap();
-
     void buildAllShapes_Pcon();
     void buildAllShapes_Pgon();
     void buildAllShapes_SimplePolygonBrep();
-    
+    void buildAllShapes_UnidentifiedShape();
     void buildAllShapes_Operators();
 
 
-    void buildAllShapes();
     void buildAllElements();
     void buildAllMaterials();
     void buildAllLogVols();
@@ -384,11 +383,10 @@ class ReadGeoModel {
     BuildGeoShapes_Trd* m_builderShape_Trd;
     BuildGeoShapes_Tubs* m_builderShape_Tubs;
     BuildGeoShapes_TwistedTrap* m_builderShape_TwistedTrap;
-
     BuildGeoShapes_Pcon* m_builderShape_Pcon;
     BuildGeoShapes_Pgon* m_builderShape_Pgon;
     BuildGeoShapes_SimplePolygonBrep* m_builderShape_SimplePolygonBrep;
-
+    BuildGeoShapes_UnidentifiedShape* m_builderShape_UnidentifiedShape;
 
     //! containers to store the list of GeoModel nodes coming from the DB
     std::vector<std::vector<std::string>> m_physVols;
@@ -417,10 +415,10 @@ class ReadGeoModel {
     DBRowsList m_shapes_Trd;
     DBRowsList m_shapes_Tubs;
     DBRowsList m_shapes_TwistedTrap;
-
     DBRowsList m_shapes_Pcon;
     DBRowsList m_shapes_Pgon;
     DBRowsList m_shapes_SimplePolygonBrep;
+    DBRowsList m_shapes_UnidentifiedShape;
     
     // containers to store shapes' data, 
     // for those shapes with a variable number of build parameters

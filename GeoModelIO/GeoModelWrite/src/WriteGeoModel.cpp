@@ -59,6 +59,8 @@
 
 #include "GeoModelCppHelpers/GMCppHelpers.h"
 
+#include "GeoModelHelpers/throwExcept.h"
+
 // C++ includes
 #include <sstream>
 
@@ -699,7 +701,7 @@ std::pair<std::string, unsigned> WriteGeoModel::storeShape(const GeoShape* shape
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType == "CustomShape") shapeType = "UnidentifiedShape";
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep", "Intersection", "Shift", "Subtraction", "Union"};
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep", "Intersection", "Shift", "Subtraction", "Union", "UnidentifiedShape"};
 
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
@@ -973,6 +975,7 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
     std::vector<std::vector<std::variant<int, long, float, double, std::string>>> shapeData;
     std::pair<std::vector<std::variant<int, long, float, double, std::string>>, std::vector<std::vector<std::variant<int, long, float, double, std::string>>>> shapePair;
     std::vector<std::variant<int, long, float, double, std::string>> dataRow;
+
     // init the 'computedVolume' column with a dummy value: '-1'
     // the real value will be added later, when the DB will be passed throug
     // the tool to compute the volume for the shapes and store them
@@ -1196,6 +1199,11 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
         shapePars.push_back(shapeTypeB);
         shapePars.push_back(shapeIdB);
 
+    } else if (shapeType == "UnidentifiedShape") {
+        const GeoUnidentifiedShape* shapeIn =
+            dynamic_cast<const GeoUnidentifiedShape*>(shape);
+        shapePars.push_back(shapeIn->name());
+        shapePars.push_back(shapeIn->asciiData());
     }
     else
     {
@@ -1208,6 +1216,9 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
     shapePair.second = shapeData;
     return shapePair;
 }
+
+
+// OLD VERSIONS!!!! TO BE REMOVED WHEN ALL SHAPES ARE MIGRATED!! 
 // Get shape parameters
 std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     const std::string shapeType = shape->type();
@@ -1498,12 +1509,13 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
             pars.push_back(
                 "Y=" + CppHelper::to_string_with_precision(shapeIn->getVertices()[i](1)));
         }
-    } else if (shapeType == "UnidentifiedShape") {
-        const GeoUnidentifiedShape* shapeIn =
-            dynamic_cast<const GeoUnidentifiedShape*>(shape);
-        pars.push_back("name=" + shapeIn->name());
-        pars.push_back("asciiData=" + shapeIn->asciiData());
-    }
+    } 
+    // else if (shapeType == "UnidentifiedShape") {
+    //     const GeoUnidentifiedShape* shapeIn =
+    //         dynamic_cast<const GeoUnidentifiedShape*>(shape);
+    //     pars.push_back("name=" + shapeIn->name());
+    //     pars.push_back("asciiData=" + shapeIn->asciiData());
+    // }
     // LAr custom shape
     //  else if(shapeType == "CustomShape") {
     //    std::cout << "\n\tWARNING!!! - Use of LArCustomShape is deprecated,
@@ -1515,9 +1527,11 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     //    shapePars=pars.join(";");
     //  }
     else {
-        std::cout << "\n\tGeoModelWrite -- ERROR!!! - Shape '" << shapeType
-                  << "' needs to be persistified!!\n\n";
+        std::string errMsg = "GeoModelWrite -- ERROR!!! - Shape '" + shapeType 
+                  + "' needs to be persistified!!";
+        std::cout << "\n\nobject to be persistified:" << std::endl;
         CppHelper::printStdVectorStrings(m_objectsNotPersistified);
+        THROW_EXCEPTION(errMsg);
     }
 
     shapePars = joinVectorStrings(pars, ";");
@@ -2464,12 +2478,15 @@ unsigned int WriteGeoModel::addShape(const std::string &type,
     {
         container = &m_shapes_Shift;
     }
+    else if ("UnidentifiedShape" == type)
+    {
+        container = &m_shapes_UnidentifiedShape;
+    }
     else
     {
-        std::cout << "\nERROR! Shape type '" << type
-                  << "' still needs to be ported to the new DB schema. Ask to 'geomodel-developers@cern.ch.\n"
-                  << std::endl;
-        exit(EXIT_FAILURE);
+        const std::string errMsg = "ERROR!!! Shape type '" + type
+                  + "' still needs to be ported to the new DB schema. Ask to 'geomodel-developers@cern.ch.";
+        THROW_EXCEPTION(errMsg);
     }
     return addRecord(container, parameters);
 }
@@ -2602,6 +2619,9 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecords("GeoShapeIntersection", m_shapes_Intersection); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoShapeSubtraction", m_shapes_Subtraction); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoShapeUnion", m_shapes_Union); // new version, with shape's parameters as numbers
+
+    m_dbManager->addListOfRecords("GeoUnidentifiedShape", m_shapes_UnidentifiedShape); // new version, with shape's parameters as numbers
+
 
     m_dbManager->addListOfChildrenPositions(m_childrenPositions);
     m_dbManager->addRootVolume(m_rootVolume);

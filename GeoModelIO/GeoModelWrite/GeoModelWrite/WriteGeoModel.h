@@ -382,6 +382,10 @@ class WriteGeoModel : public GeoNodeAction {
     DBRowsList m_shapes_Subtraction;
     DBRowsList m_shapes_Union;
 
+    DBRowsList m_shapes_UnidentifiedShape;
+
+
+    
     // std::vector<std::vector<std::string>> m_functions;
     DBRowsList m_functions; // operators used in Function's expression
 

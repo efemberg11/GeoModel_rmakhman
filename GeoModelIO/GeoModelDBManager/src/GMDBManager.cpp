@@ -2128,6 +2128,25 @@ bool GMDBManager::createTables() {
     }
     tab.clear();
 
+    // Shapes-Box table
+    // ID, XHalfLength, YHalfLength, ZHalfLength
+    geoNode = "GeoUnidentifiedShape";
+    tableName = "Shapes_UnidentifiedShape";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("name");
+    tab.push_back("asciiData");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} varchar )",
+        tab[0], tab[1], tab[2], tab[3], tab[4]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+
     // SerialDenominators table
     geoNode = "GeoSerialDenominator";
     tableName = "SerialDenominators";

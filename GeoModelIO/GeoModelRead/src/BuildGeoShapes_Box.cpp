@@ -19,13 +19,13 @@ void BuildGeoShapes_Box::buildShape(const std::vector<std::variant<int, long, fl
 {
     // === get shape numeric data from the DB row
     // shape ID
-    const unsigned shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Tube:shapeID");
+    const unsigned shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Box:shapeID");
     // shape volume
-    const double shapeVolume = GeoModelHelpers::variantHelper::getFromVariant_Double(row[1], "Tube:shapeVolume");
+    const double shapeVolume = GeoModelHelpers::variantHelper::getFromVariant_Double(row[1], "Box:shapeVolume");
     // shape parameters
-    const double XHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[2], "Tube:XHalfLength");
-    const double YHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Tube:YHalfLength");
-    const double ZHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[4], "Tube:ZHalfLength");
+    const double XHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[2], "Box:XHalfLength");
+    const double YHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[3], "Box:YHalfLength");
+    const double ZHalfLength = GeoModelHelpers::variantHelper::getFromVariant_Double(row[4], "Box:ZHalfLength");
 
     GeoBox *shape = new GeoBox(XHalfLength, YHalfLength, ZHalfLength);
 

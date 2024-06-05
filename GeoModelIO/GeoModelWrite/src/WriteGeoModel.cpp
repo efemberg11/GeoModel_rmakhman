@@ -57,7 +57,7 @@
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
-#include "GeoModelCppHelpers/GMCppHelpers.h"
+#include "GeoModelCppHelpers/GMCppHelpers.h" // TODO: move the methods here to the global GeoModelHelpers
 
 #include "GeoModelHelpers/throwExcept.h"
 

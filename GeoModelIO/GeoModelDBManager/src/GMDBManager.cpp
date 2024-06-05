@@ -986,6 +986,13 @@ bool GMDBManager::addRecordsToTable(
     }
     // we build the long string containing all values
     std::string values = GeoModelIO::CppHelper::joinVectorStrings(items);
+
+    // TODO: replace CppHelper with global Helpers
+    std::string valuesTest = GeoStrUtils::chainUp(items, ",");
+    std::cout << "values: " << values << std::endl;
+    std::cout << "valuesTest: " << valuesTest << std::endl;
+
+
     sql += " " + values + ";";
     if (m_debug)
         std::cout << "Query string:" << sql << std::endl; // debug

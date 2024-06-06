@@ -72,11 +72,11 @@ namespace GeoModelIO {
             return s;
         }
 
-        static std::string getEnvVar(std::string const &key)
-        {
-            char *val = std::getenv(key.c_str());
-            return val == NULL ? std::string("") : std::string(val);
-        }
+        // static std::string getEnvVar(std::string const &key)
+        // {
+        //     char *val = std::getenv(key.c_str());
+        //     return val == NULL ? std::string("") : std::string(val);
+        // }
 
         // static void printStdVectorVariants(const std::vector<std::variant<int, long, float, double, std::string>> vec)
         // {

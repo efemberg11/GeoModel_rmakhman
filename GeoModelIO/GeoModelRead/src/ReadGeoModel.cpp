@@ -87,6 +87,7 @@
 
 #include "GeoModelHelpers/variantHelpers.h"
 #include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelHelpers/StringUtils.h"
 
 // Units
 #include "GeoModelKernel/Units.h"
@@ -145,21 +146,21 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress)
       m_runMultithreaded_nThreads(0),
       m_progress(nullptr) {
     // Check if the user asked for debug messages
-    if ("" != getEnvVar("GEOMODEL_ENV_IO_LOGLEVEL_1")) {
+    if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_LOGLEVEL_1")) {
         m_loglevel = 1;
         std::cout << "You defined the GEOMODEL_ENV_IO_DEBUG variable, so you "
                      "will see a verbose output."
                   << std::endl;
     }
     // Check if the user asked for verbose debug messages
-    if ("" != getEnvVar("GEOMODEL_ENV_IO_LOGLEVEL_2")) {
+    if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_LOGLEVEL_2")) {
         m_loglevel = 2;
         std::cout << "You defined the GEOMODEL_ENV_IO_READ_DEBUG_VERBOSE "
                      "variable, so you will see a verbose output."
                   << std::endl;
     }
     // Check if the user asked for timing output
-    if ("" != getEnvVar("GEOMODEL_ENV_IO_READ_TIMING")) {
+    if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_READ_TIMING")) {
         m_timing = true;
         std::cout << "You defined the GEOMODEL_ENV_IO_READ_TIMING variable, so "
                      "you will see a timing measurement in the output."
@@ -186,8 +187,8 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress)
     // m_builderShape_Box = std::make_unique<BuildGeoShapes_Box>();
 
     // Check if the user asked for running in serial or multi-threading mode
-    if ("" != getEnvVar("GEOMODEL_ENV_IO_NTHREADS")) {
-        int nThreads = std::stoi(getEnvVar("GEOMODEL_ENV_IO_NTHREADS"));
+    if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_NTHREADS")) {
+        int nThreads = std::stoi(GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_NTHREADS"));
         if (nThreads == 0) {
             std::cout << "Info: You set the GEOMODEL_ENV_IO_NTHREADS to '"
                       << nThreads
@@ -248,11 +249,11 @@ ReadGeoModel::~ReadGeoModel() {
     m_builderShape_UnidentifiedShape = nullptr;
 }
 
-// FIXME: TODO: move to an utility class
-std::string ReadGeoModel::getEnvVar(std::string const& key) const {
-    char* val = std::getenv(key.c_str());
-    return val == NULL ? std::string("") : std::string(val);
-}
+// // FIXME: TODO: move to an utility class
+// std::string ReadGeoModel::getEnvVar(std::string const& key) const {
+//     char* val = std::getenv(key.c_str());
+//     return val == NULL ? std::string("") : std::string(val);
+// }
 
 const GeoVPhysVol* ReadGeoModel::buildGeoModel() {
     if (m_loglevel >= 2)

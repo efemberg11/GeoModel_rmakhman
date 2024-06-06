@@ -351,10 +351,9 @@ class ReadGeoModel {
     GeoSerialTransformer* getBuiltSerialTransformer(const unsigned int id);
 
     // Utility functions
-    std::string getEnvVar(std::string const& key) const;
-    std::vector<std::string> splitString(const std::string& s, char delimiter);
+    std::vector<std::string> splitString(const std::string& s, char delimiter); // TODO: move to global helpers
     void printStdVectorStrings(
-        std::vector<std::string> vec);  // TODO: move it to utility class
+        std::vector<std::string> vec);  // TODO: move it to utility class or move to global helpers
 
     // void printTransformationValues(QStringList t); // TODO: move to a Qt
     // utility class QList<double> convertQstringListToDouble(QStringList

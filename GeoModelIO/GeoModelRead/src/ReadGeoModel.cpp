@@ -656,7 +656,7 @@ void ReadGeoModel::buildAllShapes_Box()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Box->buildShape(row);
     }
-    m_builderShape_Box->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Box->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Box have been built!\n";
     }
@@ -674,7 +674,7 @@ void ReadGeoModel::buildAllShapes_Tube()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Tube->buildShape(row);
     }
-    m_builderShape_Tube->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Tube->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Tube have been built!\n";
     }
@@ -693,7 +693,7 @@ void ReadGeoModel::buildAllShapes_Cons()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Cons->buildShape(row);
     }
-    m_builderShape_Cons->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Cons->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Cons have been built!\n";
     }
@@ -711,7 +711,7 @@ void ReadGeoModel::buildAllShapes_Para()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Para->buildShape(row);
     }
-    m_builderShape_Para->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Para->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Para have been built!\n";
     }
@@ -729,7 +729,7 @@ void ReadGeoModel::buildAllShapes_Trap()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Trap->buildShape(row);
     }
-    m_builderShape_Trap->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Trap->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Trap have been built!\n";
     }
@@ -747,7 +747,7 @@ void ReadGeoModel::buildAllShapes_Trd()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Trd->buildShape(row);
     }
-    m_builderShape_Trd->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Trd->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Trd have been built!\n";
     }
@@ -765,7 +765,7 @@ void ReadGeoModel::buildAllShapes_Tubs()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Tubs->buildShape(row);
     }
-    m_builderShape_Tubs->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Tubs->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Tubs have been built!\n";
     }
@@ -783,7 +783,7 @@ void ReadGeoModel::buildAllShapes_TwistedTrap()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_TwistedTrap->buildShape(row);
     }
-    m_builderShape_TwistedTrap->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_TwistedTrap->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-TwistedTrap have been built!\n";
     }
@@ -801,7 +801,7 @@ void ReadGeoModel::buildAllShapes_Pcon()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Pcon->buildShape(row);
     }
-    m_builderShape_Pcon->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Pcon->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Pcon have been built!\n";
     }
@@ -819,7 +819,7 @@ void ReadGeoModel::buildAllShapes_Pgon()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_Pgon->buildShape(row);
     }
-    m_builderShape_Pgon->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_Pgon->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Pgon have been built!\n";
     }
@@ -837,7 +837,7 @@ void ReadGeoModel::buildAllShapes_SimplePolygonBrep()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_SimplePolygonBrep->buildShape(row);
     }
-    m_builderShape_SimplePolygonBrep->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_SimplePolygonBrep->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-SimplePolygonBrep have been built!\n";
     }
@@ -856,7 +856,7 @@ void ReadGeoModel::buildAllShapes_UnidentifiedShape()
         // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
         m_builderShape_UnidentifiedShape->buildShape(row);
     }
-    m_builderShape_UnidentifiedShape->printBuiltShapes(); // DEBUG MSG
+    // m_builderShape_UnidentifiedShape->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-UnidentifiedShape have been built!\n";
     }

@@ -296,7 +296,7 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords_String(
 
 // New version with variant
 DBRowsList GMDBManager::getTableRecords_VecVecData(
-    std::string tableName) const
+    const std::string_view tableName) const
 {
     
     // container to be returned
@@ -411,7 +411,7 @@ DBRowsList GMDBManager::getTableRecords_VecVecData(
 }
 // New version with variant
 DBRowEntry GMDBManager::getTableRecords_VecData(
-    std::string tableName) const
+    const std::string_view tableName) const
 {
     if (!checkTableFromCache(tableName)) {
         THROW_EXCEPTION("ERROR!!! Table name '" + std::string(tableName) + "' does not exist in cache! (It has not been loaded from the DB)");

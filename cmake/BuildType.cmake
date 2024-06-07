@@ -3,7 +3,7 @@
 # Source: https://blog.kitware.com/cmake-and-the-default-build-type/
 
 # Set a default build type if none was specified
-set(default_build_type "Debug")
+set(default_build_type "Release")
 
 # TODO: at the moment, we want to build in Release mode by default,
 # even if we build from a Git clone, because that is the default mode

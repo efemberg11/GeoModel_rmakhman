@@ -68,7 +68,7 @@ class GMDBManager::Imp {
 };
 
 GMDBManager::GMDBManager(const std::string& path)
-    : m_dbpath(path), m_dbIsOK(false), m_debug(false), m_d(new Imp(this)) {
+    : m_dbpath(path), m_debug(false), m_d(new Imp(this)) {
     // Check if the user asked for running in serial or multi-threading mode
     if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_DBMANAGER_DEBUG")) {
         m_debug = true;
@@ -77,7 +77,6 @@ GMDBManager::GMDBManager(const std::string& path)
                   << std::endl;
     }
 
-    m_dbIsOK = false;
 
     // FIXME: TODO: we should check the existence of the file, otherwise SQLite
     // will create a new file from scratch
@@ -89,11 +88,9 @@ GMDBManager::GMDBManager(const std::string& path)
     if (exit == SQLITE_OK) {
         std::cout << "The Geometry Database '" << path
                   << "' has been opened successfully!" << std::endl;
-        m_dbIsOK = true;
     } else {
         std::cout << "DB Open Error: " << sqlite3_errmsg(m_d->m_dbSqlite)
                   << std::endl;
-        m_dbIsOK = false;
     }
 
     // set verbosity level
@@ -342,8 +339,8 @@ DBRowsList GMDBManager::getTableRecords_VecVecData(
                     // debug msg
                     // if (0==nRows) std::cout << "table: " << tableName << ", col " << i << "/" << ctotal << " -- typecode: " << datacode << std::endl;
 
-                    int valI;
-                    double valD;
+                    int valI{0};
+                    double valD{0.};
                     std::string valS;
 
                     // ** INT **
@@ -377,16 +374,16 @@ DBRowsList GMDBManager::getTableRecords_VecVecData(
                     // ** BLOB **
                     else if (4 == datacode)
                     {
-                        std::cout << "ERROR!!! The 'BLOB' data format is not supported yet!!" << std::endl;
+                        THROW_EXCEPTION("ERROR!!! The 'BLOB' data format is not supported yet!!");
                     }
                     // ** NULL **
                     else if (5 == datacode)
                     {
-                        std::cout << "WARNING! 'NULL' format detected. Check that!" << std::endl;
+                        THROW_EXCEPTION("WARNING! 'NULL' format detected. Check that!");
                     }
                     else
                     {
-                        std::cout << "ERROR!!! You should NOT get here!! Unsupport SQLite data typecode: " << datacode << " -- Check this!!" << std::endl;
+                        THROW_EXCEPTION("ERROR!!! You should NOT get here!! Unsupport SQLite data typecode: " << datacode << " -- Check this!!");
                     }
                 }
                 records.push_back(nodeParams);
@@ -437,9 +434,8 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
         // for this case, we should have only one column
         if (ctotal > 2)
         {
-            std::cout << "ERROR! Table '" << tableName << "' is supposed to have two columns only, one for the ID and one for actual data; but it has '"
-                      << ctotal << "' columns! Check that!!" << std::endl;
-            exit(EXIT_FAILURE);
+            THROW_EXCEPTION("ERROR! Table '" << tableName << "' is supposed to have two columns only, one for the ID and one for actual data; but it has '"
+                      << ctotal << "' columns! Check that!!");
         }
         int res = 0;
         while (1)
@@ -467,8 +463,8 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
                     // debug msg
                     // std::cout << "table: " << tableName << ", col " << colData << "/" << ctotal << " -- typecode: " << datacode << std::endl;
 
-                    int valI;
-                    double valD;
+                    int valI{0};
+                    double valD{0.};
                     std::string valS;
                     if (1 == datacode)
                     {
@@ -495,7 +491,7 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
                     }
                     else if (4 == datacode)
                     {
-                        std::cout << "ERROR!!! The 'BLOB' data format is not supported yet!!" << std::endl;
+                        THROW_EXCEPTION("ERROR!!! The 'BLOB' data format is not supported yet!!");
                     }
                     else if (5 == datacode)
                     {
@@ -503,7 +499,7 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
                     }
                     else
                     {
-                        std::cout << "ERROR!!! You should NOT get here!! Unsupport SQLite data typecode: " << datacode << " -- Check this!!" << std::endl;
+                        THROW_EXCEPTION("ERROR!!! You should NOT get here!! Unsupport SQLite data typecode: " << datacode << " -- Check this!!");
                     }
                 // }
                 // records.push_back(rowValue);
@@ -550,7 +546,7 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType_String(
         // if (!checkTable(tableName))
         if (!checkTableFromCache(tableName))
         {
-            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+            THROW_EXCEPTION("ERROR!!! Table name '" << tableName << "' does not exist in cache! (It has not been loaded from the DB)");
         }
         out = getTableRecords_String(tableName);
     }
@@ -1059,9 +1055,7 @@ bool GMDBManager::checkIsDBOpen() const {
     if (m_d->m_dbSqlite != nullptr) {
         return true;
     } else {
-        std::cout << "ERROR! The SQLite DB is not accessible! Exiting..."
-                  << std::endl;
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("ERROR! The SQLite DB is not accessible! Exiting...");
     }
 }
 
@@ -1139,10 +1133,8 @@ std::vector<std::string> GMDBManager::getItemFromTableName(
     sqlite3_finalize(stmt);
 
     if (item.size() == 0) {
-        std::cout << "ERROR!!"
-                  << "Item with ID:'" << id << "' does not exist in table"
-                  << tableName << "! Exiting...";
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("ERROR!! Item with ID:'" << id << "' does not exist in table"
+                  << tableName << "! Exiting...");
     }
 
     return item;
@@ -1446,12 +1438,10 @@ bool GMDBManager::createTableCustomPublishedNodes(
     // get the right node type and referenced table
     if (nodeType != "GeoFullPhysVol" && nodeType != "GeoVFullPhysVol" &&
         nodeType != "GeoAlignableTransform") {
-        std::cout << "ERROR!! GeoModel node type '" << nodeType
+        THROW_EXCEPTION("ERROR!! GeoModel node type '" << nodeType
                   << "' is not currently supported in "
                      "GMDBManager::createTableCustomPublishedNodes()"
-                  << " Please, ask to geomodel-developers@cern.ch. Exiting..."
-                  << std::endl;
-        exit(EXIT_FAILURE);
+                  << " Please, ask to geomodel-developers@cern.ch. Exiting...");
     }
     std::string referencedTable = "";
     if ("GeoFullPhysVol" == nodeType || "GeoVFullPhysVol" == nodeType)
@@ -1467,12 +1457,10 @@ bool GMDBManager::createTableCustomPublishedNodes(
     else if (typeid(int) == *keyType || typeid(unsigned) == *keyType)
         keyTypeDB = "integer";
     else {
-        std::cout << "ERROR!!! The key type '" << typeid(keyType).name()
+        THROW_EXCEPTION("ERROR!!! The key type '" << typeid(keyType).name()
                   << "' is not currently supported in "
                      "GMDBManager::createTableCustomPublishedNodes()."
-                  << " Please, ask to 'geomodel-developers@cern.ch'. Exiting..."
-                  << std::endl;
-        exit(EXIT_FAILURE);
+                  << " Please, ask to 'geomodel-developers@cern.ch'. Exiting...");                  
     }
 
     int rc = -1;  // sqlite's return code

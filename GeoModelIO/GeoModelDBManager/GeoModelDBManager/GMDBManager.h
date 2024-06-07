@@ -394,8 +394,6 @@ class GMDBManager {
 
     std::string m_dbpath;
 
-    bool m_dbIsOK;
-
     bool m_debug;
 
     // verbosity level

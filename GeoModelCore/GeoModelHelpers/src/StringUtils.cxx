@@ -143,4 +143,22 @@ namespace GeoStrUtils {
         convertToNumber(str, result);
         return result;
     }
+
+    std::string to_string_with_precision(const double a_value, const unsigned n)
+    {
+        std::ostringstream out;
+        out.precision(n);
+        out << std::fixed << a_value;
+        return out.str();
+    }
+
+    void printStdVectorStrings(const std::vector<std::string> vec)
+    {
+        for (const auto &str : vec)
+        {
+            std::cout << str << " ";
+        }
+        std::cout << std::endl;
+        return;
+    }
 }

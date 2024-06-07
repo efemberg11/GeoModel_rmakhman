@@ -655,7 +655,7 @@ std::vector<double> GMDBManager::getTableFromTableName_VectorDouble(std::string 
     {
         try
         {
-            // std::cout << "variant data: " << GeoModelIO::CppHelper::to_string_with_precision(std::get<double>(rec)) << '\n';
+            // std::cout << "variant data: " << GeoStrUtils::to_string_with_precision(std::get<double>(rec)) << '\n';
             outRecords.push_back(std::get<double>(rec));
         }
         catch (std::bad_variant_access const &ex)
@@ -881,9 +881,9 @@ bool GMDBManager::addListOfRecordsToTable(
             else if (std::holds_alternative<long>(item))
                 items.push_back(std::to_string(std::get<long>(item))); // INT
             else if (std::holds_alternative<float>(item))
-                items.push_back(GeoModelIO::CppHelper::to_string_with_precision(std::get<float>(item)));
+                items.push_back(GeoStrUtils::to_string_with_precision(std::get<float>(item)));
             else if (std::holds_alternative<double>(item))
-                items.push_back(GeoModelIO::CppHelper::to_string_with_precision(std::get<double>(item)));
+                items.push_back(GeoStrUtils::to_string_with_precision(std::get<double>(item)));
             else if (std::holds_alternative<std::string>(item)) {
                 std::string str = std::get<std::string>(item);
                 // NOTE: if item is a "NULL" string, we don't encapsulate it
@@ -958,9 +958,9 @@ bool GMDBManager::addRecordsToTable(
         else if (std::holds_alternative<long>(item))
             items.push_back(std::to_string(std::get<long>(item))); // INT
         else if (std::holds_alternative<float>(item))
-            items.push_back(GeoModelIO::CppHelper::to_string_with_precision(std::get<float>(item)));
+            items.push_back(GeoStrUtils::to_string_with_precision(std::get<float>(item)));
         else if (std::holds_alternative<double>(item))
-            items.push_back(GeoModelIO::CppHelper::to_string_with_precision(std::get<double>(item)));
+            items.push_back(GeoStrUtils::to_string_with_precision(std::get<double>(item)));
         else if (std::holds_alternative<std::string>(item))
         {
             std::string str = std::get<std::string>(item);

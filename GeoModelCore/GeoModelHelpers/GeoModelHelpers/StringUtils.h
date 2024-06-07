@@ -63,6 +63,10 @@ namespace GeoStrUtils{
     template <class ObjType> std::string chainUp(const std::vector<ObjType>& vector,
                                                  const std::string_view glue =";");
 
+    /// Function to set the precision of the conversion from double to string
+    std::string to_string_with_precision(const double a_value, const unsigned n = 16);
+
+    void printStdVectorStrings(const std::vector<std::string> vec);
 }
 #include "GeoModelHelpers/StringUtils.icc"
 #endif

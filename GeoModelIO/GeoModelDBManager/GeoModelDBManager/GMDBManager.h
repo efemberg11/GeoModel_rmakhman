@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -10,6 +10,9 @@
  * AlignableTransform nodes
  * - Jun 2022 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
  *              Added support for "Verbose" output
+ * - May 2024 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+ *              Major change: moving to a new DB schema where we use REAL values 
+ *              for numeric data instead of TEXT. 
  */
 
 #ifndef GMDBManager_H

@@ -72,7 +72,7 @@ GMDBManager::GMDBManager(const std::string& path)
     // Check if the user asked for running in serial or multi-threading mode
     if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_DBMANAGER_DEBUG")) {
         m_debug = true;
-        std::cout << "You defined the GEOMODEL_IO_DEBUG variable, so you will "
+        std::cout << "*** NOTE: You defined the GEOMODEL_IO_DEBUG variable, so you will "
                      "see a verbose output."
                   << std::endl;
     }
@@ -1034,17 +1034,13 @@ void GMDBManager::addDBversion(std::string version) {
     std::string sql = "INSERT INTO dbversion(version) VALUES(?)";
     rc = sqlite3_prepare_v2(m_d->m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) {
-        printf("[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_d->m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
     rc = sqlite3_bind_text(st, 1, version.c_str(), version.length(),
                            SQLITE_TRANSIENT);
     rc = sqlite3_step(st);
     if (rc != SQLITE_DONE) {
-        printf("[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_d->m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
     // finalize
     sqlite3_finalize(st);
@@ -1088,9 +1084,7 @@ std::vector<std::string> GMDBManager::getItemFromTableName(
     int rc = -1;
     rc = sqlite3_prepare_v2(m_d->m_dbSqlite, sql.c_str(), -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
-        printf("[SQLite ERR] 'prepare' (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_d->m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] 'prepare' (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
     // bind the parameters
     rc = sqlite3_bind_int(stmt, 1, id);
@@ -1180,9 +1174,7 @@ int GMDBManager::loadGeoNodeTypesAndBuildCache() {
     // prepare the query
     rc = sqlite3_prepare_v2(m_d->m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) {
-        printf("[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_d->m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
     // execute the statement until all selected records are processed
     while ((rc = sqlite3_step(st)) == SQLITE_ROW) {
@@ -1255,9 +1247,7 @@ sqlite3_stmt* GMDBManager::Imp::selectAllFromTableSortBy(
     // prepare the query
     rc = sqlite3_prepare_v2(m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) {
-        printf("[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_dbSqlite));
     }
     return st;
 }
@@ -1285,9 +1275,7 @@ sqlite3_stmt* GMDBManager::Imp::selectAllFromTableChildrenPositions() const {
     // prepare the query
     rc = sqlite3_prepare_v2(m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) {
-        printf("[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_dbSqlite));
     }
     return st;
 }
@@ -2390,9 +2378,7 @@ void GMDBManager::storeNodeType(std::string nodeType, std::string tableName) {
         "INSERT INTO GeoNodesTypes(nodeType, tableName) VALUES(?, ?)";
     rc = sqlite3_prepare_v2(m_d->m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) {
-        printf("[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_d->m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
     if (m_debug)
         std::cout << "storeNodeType - Query string:" << sql
@@ -2405,9 +2391,7 @@ void GMDBManager::storeNodeType(std::string nodeType, std::string tableName) {
     // execute the query
     rc = sqlite3_step(st);
     if (rc != SQLITE_DONE) {
-        printf("[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_d->m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
     // finalize
     sqlite3_finalize(st);
@@ -2468,11 +2452,7 @@ bool GMDBManager::storeRootVolume(const unsigned &id,
     int rc = -1;
     rc = sqlite3_prepare_v2(m_d->m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) {
-        printf(
-            "[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-            sqlite3_errmsg(m_d->m_dbSqlite));  // TODO: add __func__ to all
-                                               // error messages, as I did here
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
     if (m_debug) std::cout << "Query string:" << sql << std::endl;  // debug
     // bind the parameters
@@ -2481,9 +2461,7 @@ bool GMDBManager::storeRootVolume(const unsigned &id,
     // execute the query
     rc = sqlite3_step(st);
     if (rc != SQLITE_DONE) {
-        printf("[SQLite ERR] (%s) : Error msg: %s\n", __func__,
-               sqlite3_errmsg(m_d->m_dbSqlite));
-        exit(EXIT_FAILURE);
+        THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
     // finalize
     sqlite3_finalize(st);

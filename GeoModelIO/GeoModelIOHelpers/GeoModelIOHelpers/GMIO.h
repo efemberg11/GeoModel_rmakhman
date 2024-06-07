@@ -22,6 +22,8 @@
 #include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModelWrite/WriteGeoModel.h"
 
+#include "GeoModelHelpers/throwExcept.h"
+
 namespace GeoModelIO {
 
 class IO {
@@ -59,7 +61,7 @@ class IO {
         // check the DB connection
         if (!db.checkIsDBOpen()) {
             std::cout << "Database ERROR!! Exiting..." << std::endl;
-            exit(EXIT_FAILURE);
+            THROW_EXCEPTION("It was not possible to open the DB correctly!");
         }
 
         // Dump the tree volumes to a local file
@@ -98,7 +100,7 @@ class IO {
         GMDBManager* db = new GMDBManager(path);
         if (!db->checkIsDBOpen()) {
             std::cout << "ERROR!! -- Database is not open!\n";
-            throw;
+            THROW_EXCEPTION("It was not possible to open the DB correctly!");
         }
 
         /* setup the GeoModel reader */
@@ -135,7 +137,7 @@ class IO {
         GMDBManager* db = new GMDBManager(path);
         if (!db->checkIsDBOpen()) {
             std::cout << "ERROR!! -- Database is not open!\n";
-            throw;
+            THROW_EXCEPTION("It was not possible to open the DB correctly!");
         }
 
         /* setup the GeoModel reader */

@@ -283,7 +283,7 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords_String(
                 if (res == SQLITE_ERROR) {
                     std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
                     sqlite3_finalize(stmt);
-                    throw errmsg;
+                    THROW_EXCEPTION(errmsg);
                 }
                 break;
             }
@@ -399,7 +399,7 @@ DBRowsList GMDBManager::getTableRecords_VecVecData(
                 {
                     std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
                     sqlite3_finalize(stmt);
-                    throw errmsg;
+                    THROW_EXCEPTION(errmsg);
                 }
                 break;
             }
@@ -515,7 +515,7 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
                 {
                     std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
                     sqlite3_finalize(stmt);
-                    throw errmsg;
+                    THROW_EXCEPTION(errmsg);
                 }
                 break;
             }
@@ -896,8 +896,7 @@ bool GMDBManager::addListOfRecordsToTable(
                 else
                     items.push_back("'" + str + "'");
             } else
-                throw std::runtime_error(
-                    "No std::variant alternative found!\n");
+                THROW_EXCEPTION("No std::variant alternative found!");
         }
         // we build the long string containing all values
         std::string values = GeoModelIO::CppHelper::joinVectorStrings(items, ",");
@@ -980,8 +979,7 @@ bool GMDBManager::addRecordsToTable(
         }
         else
         {
-            throw std::runtime_error(
-                "No std::variant alternative found!\n");
+            THROW_EXCEPTION("No std::variant alternative found!");
         }
 
         std::string endRow = ")";
@@ -1125,7 +1123,7 @@ std::vector<std::string> GMDBManager::getItemFromTableName(
                 if (res == SQLITE_ERROR) {
                     std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
                     sqlite3_finalize(stmt);
-                    throw errmsg;
+                    THROW_EXCEPTION(errmsg);
                 }
                 break;
             }
@@ -1218,7 +1216,7 @@ int GMDBManager::loadGeoNodeTypesAndBuildCache() {
     if (rc != SQLITE_DONE) {
         std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
         sqlite3_finalize(st);
-        throw errmsg;
+        THROW_EXCEPTION(errmsg);
     }
     // finalize
     sqlite3_finalize(st);
@@ -1345,7 +1343,7 @@ void GMDBManager::getAllDBTables() {
     int rc =
         sqlite3_prepare_v2(m_d->m_dbSqlite, queryStr.c_str(), -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
-        throw std::string(sqlite3_errmsg(m_d->m_dbSqlite));
+        THROW_EXCEPTION(std::string(sqlite3_errmsg(m_d->m_dbSqlite)));
     }
     // execute the statement until all selected records are processed
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -1357,7 +1355,7 @@ void GMDBManager::getAllDBTables() {
     if (rc != SQLITE_DONE) {
         std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
         sqlite3_finalize(stmt);
-        throw errmsg;
+        THROW_EXCEPTION(errmsg);
     }
     // finalize
     sqlite3_finalize(stmt);
@@ -1507,16 +1505,14 @@ bool GMDBManager::createCustomTable(
     const std::vector<
         DBRowEntry>&
         records) {
-    if (tableColNames.size() == 0)
-        throw std::runtime_error(
-            "GMDBManager::createCustomTable -- The list of columns' names "
-            "is "
-            "empty!!");
-    if (tableColTypes.size() == 0)
-        throw std::runtime_error(
-            "GMDBManager::createCustomTable -- The list of columns' types "
-            "is "
-            "empty!!");
+    if (tableColNames.size() == 0) {
+        THROW_EXCEPTION("GMDBManager::createCustomTable -- The list of columns' names "
+            "is empty!!");
+    }
+    if (tableColTypes.size() == 0) {
+        THROW_EXCEPTION("GMDBManager::createCustomTable -- The list of columns' types "
+            "is empty!!");
+    }
 
     std::string queryStr;
 
@@ -1565,9 +1561,8 @@ bool GMDBManager::createCustomTable(
         else if (tableColTypes[ii] == "STRING")
             colType = "TEXT";
         else
-            throw std::runtime_error(
-                "No suitable column type has been found ==> " +
-                tableColTypes[ii] + "\n");
+             THROW_EXCEPTION("No suitable column type has been found ==> " +
+                tableColTypes[ii]);
 
         std::string colStr =
             fmt::format(", {0} {1} ", tableColNames[ii], colType);
@@ -2531,7 +2526,7 @@ std::pair<unsigned, unsigned> GMDBManager::getRootPhysVol() {
     if (rc != SQLITE_DONE) {
         std::string errmsg(sqlite3_errmsg(m_d->m_dbSqlite));
         sqlite3_finalize(stmt);
-        throw errmsg;
+        THROW_EXCEPTION(errmsg);
     }
     // finalize
     sqlite3_finalize(stmt);

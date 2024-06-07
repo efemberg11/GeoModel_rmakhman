@@ -23,7 +23,7 @@ class BuildGeoShapes_Trap : public BuildGeoShapes
 {
 public:
   BuildGeoShapes_Trap(const unsigned size):BuildGeoShapes("Trap", size){};
-  void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
+  void buildShape(const DBRowEntry row) override;
 };
 
 #endif

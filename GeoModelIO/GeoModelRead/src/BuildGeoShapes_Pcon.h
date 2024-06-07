@@ -24,7 +24,7 @@ class BuildGeoShapes_Pcon : public BuildGeoShapes
 {
 public:
   BuildGeoShapes_Pcon(const unsigned size, DBRowsList shapeData):BuildGeoShapes("Pcon", size, shapeData){};
-  void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
+  void buildShape(const DBRowEntry row) override;
 };
 
 #endif

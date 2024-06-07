@@ -15,7 +15,7 @@
 #include <vector>
 #include <iostream>
 
-void BuildGeoShapes_Para::buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row)
+void BuildGeoShapes_Para::buildShape(const DBRowEntry row)
 {
   // === get shape numeric data from the DB row
   // shape ID

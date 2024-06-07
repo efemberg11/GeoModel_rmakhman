@@ -23,7 +23,7 @@ class BuildGeoShapes_Para : public BuildGeoShapes
 {
 public:
   BuildGeoShapes_Para(const unsigned size):BuildGeoShapes("Para", size){};
-  void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
+  void buildShape(const DBRowEntry row) override;
 };
 
 #endif

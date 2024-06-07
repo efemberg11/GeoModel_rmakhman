@@ -220,11 +220,11 @@ class GMDBManager {
     bool addListOfRecords(const std::string geoType,
                           const std::vector<std::vector<std::string>> records);
     bool addListOfRecords(const std::string geoType,
-                          const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> records);
+                          const DBRowsList records);
 
     bool addRecordsToTable(
         const std::string tableName,
-        const std::vector<std::variant<int, long, float, double, std::string>>
+        const DBRowEntry
             records);
 
     bool addListOfChildrenPositions(
@@ -309,9 +309,9 @@ class GMDBManager {
     std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
     std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDs();
 
-    std::vector<std::vector<std::string>> getTableRecords_String(const std::string_view tableName) const;
-    std::vector<std::variant<int, long, float, double, std::string>> getTableRecords_VecData(const std::string_view tableName) const;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableRecords_VecVecData(const std::string_view tableName) const;
+    std::vector<std::vector<std::string>> getTableRecords(std::string tableName) const;
+    DBRowEntry getTableRecords_VecData(std::string tableName) const;
+    DBRowsList getTableRecords_VecVecData(std::string tableName) const;
 
     //! Test if a given table exists
     //! This requires the *full* table name (i.e. prefix_suffix)
@@ -335,7 +335,7 @@ class GMDBManager {
         const std::vector<std::string> tableColNames,
         const std::vector<std::string> tableColTypes,
         const std::vector<
-            std::vector<std::variant<int, long, float, double, std::string>>>
+            DBRowEntry>
             &records);
 
 
@@ -351,7 +351,7 @@ class GMDBManager {
     bool addListOfRecordsToTable(
         const std::string tableName,
         const std::vector<
-            std::vector<std::variant<int, long, float, double, std::string>>>
+            DBRowEntry>
             records);
     //  bool addListOfRecordsToTableOld(const QString tableName, const
     //  std::vector<QStringList> records); // for the old SQlite only

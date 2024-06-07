@@ -16,7 +16,7 @@
 #include <vector>
 #include <iostream>
 
-void BuildGeoShapes_Pcon::buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row)
+void BuildGeoShapes_Pcon::buildShape(const DBRowEntry row)
 {
     if (!(m_shape_data.size())) {
         THROW_EXCEPTION("ERROR! GeoPcon shape has no ZPlanes data!! [m_shape_data.size() == 0]");

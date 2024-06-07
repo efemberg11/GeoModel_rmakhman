@@ -22,7 +22,7 @@ class BuildGeoShapes_Tube : public BuildGeoShapes
 {
 public:
   BuildGeoShapes_Tube(const unsigned size):BuildGeoShapes("Tube", size){};
-  void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
+  void buildShape(const DBRowEntry row) override;
 };
 
 #endif

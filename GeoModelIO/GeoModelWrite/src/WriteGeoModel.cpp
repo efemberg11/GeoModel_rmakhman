@@ -972,16 +972,16 @@ void WriteGeoModel::handleReferencedVPhysVol(const GeoVPhysVol* vol) {
 }
 
 // Get shape parameters
-std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
-          std::vector<std::vector<std::variant<int, long, float, double, std::string>>>>
+std::pair<DBRowEntry,
+          DBRowsList>
 WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
 {
     const std::string shapeType = shape->type();
 
-    std::vector<std::variant<int, long, float, double, std::string>> shapePars;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> shapeData;
-    std::pair<std::vector<std::variant<int, long, float, double, std::string>>, std::vector<std::vector<std::variant<int, long, float, double, std::string>>>> shapePair;
-    std::vector<std::variant<int, long, float, double, std::string>> dataRow;
+    DBRowEntry shapePars;
+    DBRowsList shapeData;
+    std::pair<DBRowEntry, DBRowsList> shapePair;
+    DBRowEntry dataRow;
 
     // init the 'computedVolume' column with a dummy value: '-1'
     // the real value will be added later, when the DB will be passed throug
@@ -1978,8 +1978,8 @@ unsigned int WriteGeoModel::addRecord(
 }
 
 unsigned int WriteGeoModel::addRecord(
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>>* container,
-    const std::vector<std::variant<int, long, float, double, std::string>> values) const {
+    DBRowsList* container,
+    const DBRowEntry values) const {
     container->push_back(values);
     unsigned int idx =
         container->size();  // index of pushed element = size after pushing, to
@@ -1988,8 +1988,8 @@ unsigned int WriteGeoModel::addRecord(
 }
 
 std::pair<unsigned, unsigned> WriteGeoModel::addRecordData(
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container,
-    const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> values) const
+    DBRowsList *container,
+    const DBRowsList values) const
 {
     const unsigned dataStart = container->size() + 1;
     // Note: ^ we add +1 because start filling the table 
@@ -2009,7 +2009,7 @@ std::pair<unsigned, unsigned> WriteGeoModel::addRecordData(
 std::vector<unsigned> WriteGeoModel::addExprData(
     const std::deque<double>& exprData) 
 {
-    std::vector<std::variant<int, long, float, double, std::string>> *container = &m_exprData;
+    DBRowEntry *container = &m_exprData;
     const unsigned dataStart = container->size() + 1; 
     // Note: ^ we add +1 because start filling the table 
     // from a new row with respect to what we currently have
@@ -2399,8 +2399,8 @@ unsigned int WriteGeoModel::addIdentifierTag(const int& identifier) {
 
 unsigned int WriteGeoModel::addFunction(const std::string& expression, const unsigned &dataStart, const unsigned &dataEnd) {
     // std::vector<std::vector<std::string>>* container = &m_functions;
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>>* container = &m_functions;
-    std::vector<std::variant<int, long, float, double, std::string>> values;
+    DBRowsList* container = &m_functions;
+    DBRowEntry values;
     values.push_back(expression);
     values.push_back(dataStart);
     values.push_back(dataEnd);
@@ -2459,9 +2459,9 @@ unsigned int WriteGeoModel::addShape(const std::string& type,
     return addRecord(container, values);
 }
 unsigned int WriteGeoModel::addShape(const std::string &type,
-                                     const std::vector<std::variant<int, long, float, double, std::string>> &parameters)
+                                     const DBRowEntry &parameters)
 {
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> *container = nullptr;
+    DBRowsList *container = nullptr;
     if ("Box" == type)
     {
         container = &m_shapes_Box;
@@ -2573,8 +2573,8 @@ unsigned int WriteGeoModel::addLogVol(const std::string& name,
                                       const unsigned int& shapeId,
                                       std::string_view shapeType,
                                       const unsigned int& materialId) {
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>>* container = &m_logVols;
-    std::vector<std::variant<int, long, float, double, std::string>> values;
+    DBRowsList* container = &m_logVols;
+    DBRowEntry values;
     values.push_back(name);
     values.push_back(shapeId);
     values.push_back(std::string(shapeType));
@@ -2871,9 +2871,7 @@ std::vector<std::vector<std::string>> tableData )
 void WriteGeoModel::storeDataTable(
     std::string tableName, std::vector<std::string> colNames,
     std::vector<std::string> colTypes,
-    std::vector<
-        std::vector<std::variant<int, long, float, double, std::string>>>
-        tableData) {
+    DBRowsList tableData) {
     m_auxiliaryTablesVar[tableName] = std::make_pair(colNames, colTypes);
     m_auxiliaryTablesVarData[tableName] = tableData;
 }

@@ -119,8 +119,7 @@ class WriteGeoModel : public GeoNodeAction {
     void storeDataTable(
         std::string tableName, std::vector<std::string> colNames,
         std::vector<std::string> colTypes,
-        std::vector<
-            std::vector<std::variant<int, long, float, double, std::string>>>
+        DBRowsList
             tableData);
 
     void saveToDB(GeoPublisher *store = nullptr);
@@ -244,7 +243,7 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned int addShape(const std::string &type,
                           const std::string &parameters);
     unsigned int addShape(const std::string &type,
-                          const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
+                          const DBRowEntry &parameters);
     std::pair<unsigned, unsigned> addShapeData(const std::string type,
                                        const DBRowsList &shapeData);
     
@@ -312,7 +311,7 @@ class WriteGeoModel : public GeoNodeAction {
                                // moved to an Utility class, so we can use it
                                // from TransFunctionRecorder as well.
     std::string getShapeParameters(const GeoShape *);
-    std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
+    std::pair<DBRowEntry,
               DBRowsList>
     getShapeParametersV(const GeoShape *, const bool data = false);
 
@@ -400,7 +399,7 @@ class WriteGeoModel : public GeoNodeAction {
     DBRowsList m_functions; // operators used in Function's expression
 
     // caches for additional data to be saved into the DB
-    std::vector<std::variant<int, long, float, double, std::string>> m_exprData; // numbers used in Function's expression
+    DBRowEntry m_exprData; // numbers used in Function's expression
 
     // caches for Metadata to be saved into the DB
     // std::vector<std::string> m_rootVolume;

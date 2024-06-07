@@ -24,7 +24,7 @@ class BuildGeoShapes_SimplePolygonBrep : public BuildGeoShapes
 {
 public:
   BuildGeoShapes_SimplePolygonBrep(const unsigned size, DBRowsList shapeData):BuildGeoShapes("SimplePolygonBrep", size, shapeData){};
-  void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
+  void buildShape(const DBRowEntry row) override;
 };
 
 #endif

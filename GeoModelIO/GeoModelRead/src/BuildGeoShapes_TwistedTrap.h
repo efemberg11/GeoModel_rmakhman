@@ -22,7 +22,7 @@ class BuildGeoShapes_TwistedTrap : public BuildGeoShapes
 {
 public:
   BuildGeoShapes_TwistedTrap(const unsigned size):BuildGeoShapes("TwistedTrap", size){};
-  void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
+  void buildShape(const DBRowEntry row) override;
 };
 
 #endif

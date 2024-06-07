@@ -294,12 +294,13 @@ std::vector<std::vector<std::string>> GMDBManager::getTableRecords_String(
     return records;
 }
 
-std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GMDBManager::getTableRecords_VecVecData(
-    const std::string_view tableName) const
+// New version with variant
+DBRowsList GMDBManager::getTableRecords_VecVecData(
+    std::string tableName) const
 {
     
     // container to be returned
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> records;
+    DBRowsList records;
     // get the query statetement ready to be executed
     sqlite3_stmt *stmt = nullptr;
 
@@ -323,7 +324,7 @@ std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GM
             res = sqlite3_step(stmt); // Execute SQL Statement.
             if (res == SQLITE_ROW)
             {
-                std::vector<std::variant<int, long, float, double, std::string>>
+                DBRowEntry
                     nodeParams; // stores the data items contained in a
                                 // single row
                 // Loop times the number of columns in the table
@@ -409,14 +410,14 @@ std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GM
     return records;
 }
 // New version with variant
-std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::getTableRecords_VecData(
-    const std::string_view tableName) const
+DBRowEntry GMDBManager::getTableRecords_VecData(
+    std::string tableName) const
 {
     if (!checkTableFromCache(tableName)) {
         THROW_EXCEPTION("ERROR!!! Table name '" + std::string(tableName) + "' does not exist in cache! (It has not been loaded from the DB)");
     }
     // container to be returned
-    std::vector<std::variant<int, long, float, double, std::string>> records;
+    DBRowEntry records;
     // get the query statetement ready to be executed
     sqlite3_stmt *stmt = nullptr;
 
@@ -534,15 +535,14 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType_String(
     {
         std::mutex coutMutex;
         coutMutex.lock();
-        printf(
-            "\t ===> WARNING! The geometry input file does not contain a "
-            "table "
-            "for the %s nodes. That means that you are probably using an "
-            "old "
-            "geometry file. Unless you know exactly what you are doing, "
-            "please "
-            "expect to see incomplete geometries or crashes.\n",
-            nodeType.c_str());
+        std::string errMsg = "\t ===> WARNING! The geometry input file does not contain a "
+                             "table for the " 
+                             + nodeType 
+                             + " nodes. That means that you are probably using an "
+                             + "old geometry file."
+                             + "Unless you know exactly what you are doing, "
+                             + "please expect to see incomplete geometries or crashes.\n";
+        std::cout << errMsg << std::endl;
         coutMutex.unlock();
     }
     else
@@ -567,15 +567,13 @@ DBRowsList GMDBManager::getTableFromNodeType_VecVecData(
     {
         std::mutex coutMutex;
         coutMutex.lock();
-        printf(
-            "\t ===> WARNING! The geometry input file does not contain a "
-            "table "
-            "for the %s nodes. That means that you are probably using an "
-            "old "
-            "geometry file. Unless you know exactly what you are doing, "
-            "please "
-            "expect to see incomplete geometries or crashes.\n",
-            nodeType.c_str());
+        std::cout << 
+            "\t ===> WARNING! The geometry input file does not contain a table for the" 
+            << nodeType 
+            << "nodes. That means that you are probably using an "
+            << "old geometry file. Unless you know exactly what you are doing, "
+            << "please expect to see incomplete geometries or crashes.\n" 
+            << std::endl;
         coutMutex.unlock();
     }
     else
@@ -591,20 +589,21 @@ DBRowsList GMDBManager::getTableFromNodeType_VecVecData(
 DBRowsList GMDBManager::getTableFromTableName_VecVecData(
     std::string tableName)
 {
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> out;
+    DBRowsList out;
     if (tableName.empty())
     {
         std::mutex coutMutex;
         coutMutex.lock();
-        printf(
+        std::cout << 
             "\t ===> WARNING! The geometry input file does not contain a "
-            "table "
-            "for the %s nodes. That means that you are probably using an "
-            "old "
-            "geometry file. Unless you know exactly what you are doing, "
-            "please "
-            "expect to see incomplete geometries or crashes.\n",
-            tableName.c_str());
+            "table for the " 
+            << tableName 
+            << "nodes. That means that you are probably using an "
+            << "old "
+            << "geometry file. Unless you know exactly what you are doing, "
+            << "please "
+            << "expect to see incomplete geometries or crashes.\n"
+            << std::endl;
         coutMutex.unlock();
     }
     else
@@ -625,15 +624,14 @@ DBRowEntry GMDBManager::getTableFromTableName_VecData(
     {
         std::mutex coutMutex;
         coutMutex.lock();
-        printf(
-            "\t ===> WARNING! The geometry input file does not contain a "
-            "table "
-            "for the %s nodes. That means that you are probably using an "
-            "old "
-            "geometry file. Unless you know exactly what you are doing, "
-            "please "
-            "expect to see incomplete geometries or crashes.\n",
-            tableName.c_str());
+        std::cout << "\t ===> WARNING! The geometry input file does not contain a "
+            << "table "
+            << "for the "
+            << tableName 
+            << "nodes. That means that you are probably using an "
+            << "old geometry file. Unless you know exactly what you are doing, "
+            << "please expect to see incomplete geometries or crashes.\n" 
+            << std::endl;
         coutMutex.unlock();
     }
     else
@@ -649,7 +647,7 @@ DBRowEntry GMDBManager::getTableFromTableName_VecData(
 
 std::vector<double> GMDBManager::getTableFromTableName_VectorDouble(std::string tableName)
 {
-    std::vector<std::variant<int, long, float, double, std::string>> inputRecords = getTableFromTableName_VecData(tableName);
+    DBRowEntry inputRecords = getTableFromTableName_VecData(tableName);
     std::vector<double> outRecords;
     for (const auto &rec : inputRecords)
     {
@@ -665,6 +663,9 @@ std::vector<double> GMDBManager::getTableFromTableName_VectorDouble(std::string 
     }
     return outRecords;
 }
+
+// TODO: make template
+// from Johannes: Couldn't you declare this method as a general template method to downcast the variant?
 std::deque<double> GMDBManager::getTableFromTableName_DequeDouble(std::string tableName)
 {
     std::vector<double> inputRecords = getTableFromTableName_VectorDouble(tableName);
@@ -765,7 +766,7 @@ bool GMDBManager::addListOfRecords(
 
 bool GMDBManager::addListOfRecords(
     const std::string geoType,
-    const std::vector<std::vector<std::variant<int, long, float, double, std::string>>> records) {
+    const DBRowsList records) {
     //  if (m_debug) qDebug() << "GMDBManager::addListOfRecords():" <<
     //  geoType;
 
@@ -845,7 +846,7 @@ bool GMDBManager::addListOfRecordsToTable(
 bool GMDBManager::addListOfRecordsToTable(
     const std::string tableName,
     const std::vector<
-        std::vector<std::variant<int, long, float, double, std::string>>>
+        DBRowEntry>
         records) {
 
     if ( !(hasTableBeenCreatedInDB(tableName)) ) {
@@ -867,7 +868,7 @@ bool GMDBManager::addListOfRecordsToTable(
     std::string sql =
         fmt::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
     unsigned int id = 0;
-    for (const std::vector<std::variant<int, long, float, double, std::string>>&
+    for (const DBRowEntry&
              rec : records) {
         ++id;
         // a vector to store string-conversions of values, to build the SQL
@@ -922,7 +923,7 @@ bool GMDBManager::addListOfRecordsToTable(
 
 bool GMDBManager::addRecordsToTable(
     const std::string tableName,
-    const std::vector<std::variant<int, long, float, double, std::string>>
+    const DBRowEntry
         records)
 {
     if (records.size() > 0) {
@@ -1504,7 +1505,7 @@ bool GMDBManager::createCustomTable(
     const std::string tableName, const std::vector<std::string> tableColNames,
     const std::vector<std::string> tableColTypes,
     const std::vector<
-        std::vector<std::variant<int, long, float, double, std::string>>>&
+        DBRowEntry>&
         records) {
     if (tableColNames.size() == 0)
         throw std::runtime_error(

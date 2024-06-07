@@ -34,7 +34,7 @@ public:
   BuildGeoShapes(std::string_view shapeType, const unsigned size);
   BuildGeoShapes(std::string_view shapeType, const unsigned size, DBRowsList shapesData);
 
-  virtual void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) = 0;
+  virtual void buildShape(const DBRowEntry row) = 0;
 
   // --- methods for caching GeoShape nodes ---
   void storeBuiltShape(const unsigned id, GeoShape *nodePtr);

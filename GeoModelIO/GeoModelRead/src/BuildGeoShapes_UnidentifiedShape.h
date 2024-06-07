@@ -22,7 +22,7 @@ class BuildGeoShapes_UnidentifiedShape : public BuildGeoShapes
 {
 public:
   BuildGeoShapes_UnidentifiedShape(const unsigned size):BuildGeoShapes("UnidentifiedShape", size){};
-  void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
+  void buildShape(const DBRowEntry row) override;
 };
 
 #endif

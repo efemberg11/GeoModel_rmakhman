@@ -16,7 +16,7 @@
 #include <vector>
 #include <iostream>
 
-void BuildGeoShapes_SimplePolygonBrep::buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row)
+void BuildGeoShapes_SimplePolygonBrep::buildShape(const DBRowEntry row)
 {
     if (!(m_shape_data.size()))
     {

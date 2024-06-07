@@ -23,7 +23,7 @@ class BuildGeoShapes_Cons : public BuildGeoShapes
 {
 public:
   BuildGeoShapes_Cons(const unsigned size):BuildGeoShapes("Cons", size){};
-  void buildShape(const std::vector<std::variant<int, long, float, double, std::string>> row) override;
+  void buildShape(const DBRowEntry row) override;
 };
 
 #endif

@@ -2041,10 +2041,18 @@ unsigned int WriteGeoModel::addMaterial(const std::string& name,
 unsigned int WriteGeoModel::addElement(const std::string& name,
                                        const std::string& symbol,
                                        const double& elZ, const double& elA) {
-    std::vector<std::vector<std::string>>* container = &m_elements;
-    std::vector<std::string> values;
-    values.insert(values.begin(), {name, symbol, CppHelper::to_string_with_precision(elZ),
-                                   CppHelper::to_string_with_precision(elA)});
+    // std::vector<std::vector<std::string>>* container = &m_elements;
+    // std::vector<std::string> values;
+    // values.insert(values.begin(), {name, symbol, CppHelper::to_string_with_precision(elZ),
+    //                                CppHelper::to_string_with_precision(elA)});
+    
+    DBRowsList* container = &m_elements;
+    DBRowEntry values;
+    values.push_back(name);
+    values.push_back(symbol);
+    values.push_back(elZ);
+    values.push_back(elA);
+    
     return addRecord(container, values);
 }
 

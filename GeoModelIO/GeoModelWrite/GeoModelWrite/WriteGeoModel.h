@@ -351,7 +351,7 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<std::vector<std::string>> m_physVols;
     std::vector<std::vector<std::string>> m_fullPhysVols;
     std::vector<std::vector<std::string>> m_materials;
-    std::vector<std::vector<std::string>> m_elements;
+    // std::vector<std::vector<std::string>> m_elements;
     std::vector<std::vector<std::string>> m_transforms;
     std::vector<std::vector<std::string>> m_alignableTransforms;
     std::vector<std::vector<std::string>> m_serialDenominators;
@@ -360,6 +360,8 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<std::vector<std::string>> m_serialTransformers;
     std::vector<std::vector<std::string>> m_nameTags;
     std::vector<std::vector<std::string>> m_shapes;
+
+    DBRowsList m_elements;
 
     DBRowsList m_shapes_Box;
     DBRowsList m_shapes_Tube;

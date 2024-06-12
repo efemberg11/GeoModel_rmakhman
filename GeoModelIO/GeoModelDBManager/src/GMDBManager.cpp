@@ -987,10 +987,10 @@ bool GMDBManager::addRecordsToTable(
     // we build the long string containing all values
     std::string values = GeoModelIO::CppHelper::joinVectorStrings(items);
 
-    // TODO: replace CppHelper with global Helpers
-    std::string valuesTest = GeoStrUtils::chainUp(items, ",");
-    std::cout << "values: " << values << std::endl;
-    std::cout << "valuesTest: " << valuesTest << std::endl;
+    // // TODO: replace CppHelper with global Helpers
+    // std::string valuesTest = GeoStrUtils::chainUp(items, ",");
+    // std::cout << "values: " << values << std::endl;
+    // std::cout << "valuesTest: " << valuesTest << std::endl;
 
 
     sql += " " + values + ";";
@@ -1788,7 +1788,7 @@ bool GMDBManager::createTables() {
     queryStr = fmt::format(
         "create table {0}({1} integer primary key, {2} varchar, {3} "
         "varchar, "
-        "{4} varchar, {5} varchar)",
+        "{4} integer, {5} real)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);

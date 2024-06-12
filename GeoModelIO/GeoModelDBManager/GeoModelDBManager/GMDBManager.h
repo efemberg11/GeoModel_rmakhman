@@ -292,12 +292,12 @@ class GMDBManager {
 
     std::vector<std::vector<std::string>> getTableFromNodeType_String(
         std::string nodeType);
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableFromNodeType_VecVecData(
+    DBRowsList getTableFromNodeType_VecVecData(
         std::string nodeType);
     
-    std::vector<std::variant<int, long, float, double, std::string>> getTableFromTableName_VecData(
+    DBRowEntry getTableFromTableName_VecData(
         std::string tableName);
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> getTableFromTableName_VecVecData(
+    DBRowsList getTableFromTableName_VecVecData(
         std::string tableName);
     // specializations
     std::vector<double> getTableFromTableName_VectorDouble(std::string tableName);
@@ -312,7 +312,7 @@ class GMDBManager {
 
     //! Test if a given table exists
     //! This requires the *full* table name (i.e. prefix_suffix)
-    bool checkTable(std::string tableName) const;
+    bool checkTableFromDB(std::string tableName) const;
 
     //! Test if a table has been loaded from a DB, that is it exists in the cache
     bool checkTableFromCache(const std::string_view tableName) const;
@@ -382,6 +382,7 @@ class GMDBManager {
     void storeTableColumnNames(std::vector<std::string> input);
 
     std::vector<std::string> getTableColumnNames(const std::string &tableName);
+    bool hasTableBeenCreatedInDB(const std::string_view tableName);
 
     int getTableColIndex(const std::string &tableName,
                          const std::string &colName);

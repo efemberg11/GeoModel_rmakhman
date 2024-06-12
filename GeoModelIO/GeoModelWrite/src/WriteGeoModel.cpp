@@ -706,30 +706,19 @@ std::pair<std::string, unsigned> WriteGeoModel::storeShape(const GeoShape* shape
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
     {
-        std::pair<std::vector<std::variant<int, long, float, double, std::string>>,
-                  std::vector<std::vector<std::variant<int, long, float, double, std::string>>>>
+        std::pair<DBRowEntry, DBRowsList>
             shapePair = getShapeParametersV(shape);
         
-        std::vector<std::variant<int, long, float, double, std::string>> shapePars = shapePair.first;
-        std::vector<std::vector<std::variant<int, long, float, double, std::string>>> shapeData = shapePair.second;
-
-        if (shapeData.size() > 0)
-        {
-            // Store the node's additional data 
-            // (e.g., the numeric values of a Function, or the ZPlanes of a GeoPcon shape node)
-            std::pair<unsigned, unsigned> dataRows = addShapeData(shapeType, shapeData);
-            unsigned dataStart = dataRows.first;
-            unsigned dataEnd = dataRows.second;
-            shapePars.push_back(dataStart);
-            shapePars.push_back(dataEnd);
-        }
+        DBRowEntry shapePars = shapePair.first;
+        DBRowsList shapeData = shapePair.second;
+       
         // DEBUG MSGS
         // std::cout << "shape: " << shapeType << std::endl;
         // GeoModelIO::CppHelper::printStdVectorVariants(shapePars);
         // std::cout << std::endl;
 
         // store the shape in the DB and returns the ID
-        return storeObj(shape, shapeType, shapePars);
+        return storeObj(shape, shapeType, shapePars, shapeData);
 
     }
     else
@@ -747,15 +736,26 @@ std::pair<std::string, unsigned> WriteGeoModel::storeShape(const GeoShape* shape
 
 //______________________________________________________________________
 unsigned int WriteGeoModel::storeMaterial(const GeoMaterial* mat) {
-    const std::string matName = mat->getName();   // The name of the material.
-    const double matDensity = mat->getDensity();  // The density of the
-                                                  // material.
-    const unsigned int numElements = mat->getNumElements();
+    const std::string matName = mat->getName();  // The name of the material
+    const double matDensity = mat->getDensity(); // The density of the material
+    const unsigned numElements = mat->getNumElements(); // The number of elements composing the material
+
+    if (0 == numElements) {
+        THROW_EXCEPTION("ERROR!!! The material '" << matName << "' has zero elements!");
+    }
+
+    // std::string matElements;
+    // std::vector<std::string> matElementsList;
+
+    DBRowEntry matData_ElementFraction;
+    DBRowsList matData_List;
 
     // loop over the elements composing the material
-    std::string matElements;
-    std::vector<std::string> matElementsList;
     for (unsigned int i = 0; i < numElements; i++) {
+        
+        // clear the container for the row (elemnt,fraction)
+        matData_ElementFraction.clear();
+
         // Gets the i-th element.
         const GeoElement* element = mat->getElement(i);
         std::string elName = element->getName();
@@ -764,16 +764,24 @@ unsigned int WriteGeoModel::storeMaterial(const GeoMaterial* mat) {
         unsigned int elementId = storeElement(element);
 
         // Gets the fraction by weight of the i-th element
-        const std::string elementFraction =
-            CppHelper::to_string_with_precision(mat->getFraction(i));
+        const double elementFraction = mat->getFraction(i);
 
-        matElementsList.push_back(std::to_string(elementId) + ":" +
-                                  elementFraction);  // INT+string
+        // Build one row for a single element that compose 
+        // the material: (element, fraction)
+        matData_ElementFraction.push_back(elementId);
+        matData_ElementFraction.push_back(elementFraction);
+
+        // matElementsList.push_back(std::to_string(elementId) + ":" +
+        //                           elementFraction);  // INT+string
+
+        // Add the (element,fraction) 
+        // to the list of all elements for the given material
+        matData_List.push_back(matData_ElementFraction);
     }
-    matElements = joinVectorStrings(matElementsList, ";");
+    // matElements = joinVectorStrings(matElementsList, ";");
 
     // store the material in the DB and returns the ID
-    return storeObj(mat, matName, matDensity, matElements);
+    return storeObj(mat, matName, matDensity, matData_List);
 }
 
 //_______________________________________________________________________
@@ -1618,13 +1626,18 @@ void WriteGeoModel::showMemoryMap() {
 
 unsigned int WriteGeoModel::storeObj(const GeoMaterial* pointer,
                                      const std::string& name,
-                                     const double& density,
-                                     const std::string& elements) {
+                                     const double &density,
+                                     const DBRowsList &materialData) {
     std::string address = getAddressStringFromPointer(pointer);
     unsigned int materialId;
 
     if (!isAddressStored(address)) {
-        materialId = addMaterial(name, density, elements);
+        // Store the material's additional data,
+        // that is, the list of the elements that compose the material and their fraction
+        std::pair<unsigned, unsigned> dataRows = addMaterialData(materialData);
+        unsigned dataStart = dataRows.first;
+        unsigned dataEnd = dataRows.second;
+        materialId = addMaterial(name, density, dataStart, dataEnd);
         storeAddress(address, materialId);
     } else {
         materialId = getStoredIdFromAddress(address);
@@ -1664,11 +1677,26 @@ unsigned int WriteGeoModel::storeObj(const GeoShape* pointer,
 }
 std::pair<std::string, unsigned> WriteGeoModel::storeObj(const GeoShape* pointer,
                                      const std::string& shapeName,
-                                     const std::vector<std::variant<int, long, float, double, std::string>>& parameters) {
+                                     DBRowEntry& parameters,
+                                     const DBRowsList &shapeData) {
     std::string address = getAddressStringFromPointer(pointer);
 
     unsigned int shapeId;
     if (!isAddressStored(address)) {
+
+        // if the shape has additional data, store them in the DB,
+        // get the start and end rows, then add those to the shape
+        // parameters to be stored with the shape
+         if (shapeData.size() > 0)
+        {
+            // Store the node's additional data
+            // (e.g., the numeric values of a Function, or the ZPlanes of a GeoPcon shape node)
+            std::pair<unsigned, unsigned> dataRows = addShapeData(shapeName, shapeData);
+            unsigned dataStart = dataRows.first;
+            unsigned dataEnd = dataRows.second;
+            parameters.push_back(dataStart);
+            parameters.push_back(dataEnd);
+        }
         shapeId = addShape(shapeName, parameters);
         storeAddress(address, shapeId); // TODO: check if this step of storing the address and the ID is still used/needed.
     } else {
@@ -2022,17 +2050,27 @@ std::pair<unsigned, unsigned> WriteGeoModel::addShapeData(const std::string type
     std::pair<unsigned, unsigned> dataPair = addRecordData(container, shapeData);
     return dataPair;
 }
+std::pair<unsigned, unsigned> WriteGeoModel::addMaterialData(const DBRowsList& matListElementFraction) 
+{
+    DBRowsList *container = &m_materials_Data;
+    std::pair<unsigned, unsigned> dataPair = addRecordData(container, matListElementFraction);
+    return dataPair;
+}
 
 
 
 unsigned int WriteGeoModel::addMaterial(const std::string& name,
                                         const double& density,
-                                        const std::string& elements) {
-    std::vector<std::vector<std::string>>* container = &m_materials;
-    std::vector<std::string> values;
+                                        const unsigned &dataStart,
+                                        const unsigned &dataEnd) {
+    // std::vector<std::vector<std::string>>* container = &m_materials;
+    // std::vector<std::string> values;
+    DBRowsList* container = &m_materials;
+    DBRowEntry values;
     values.push_back(name);
-    values.push_back(CppHelper::to_string_with_precision(density));
-    values.push_back(elements);
+    values.push_back(density);
+    values.push_back(dataStart);
+    values.push_back(dataEnd);
     return addRecord(container, values);
 }
 
@@ -2587,8 +2625,10 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     std::cout << "Saving the GeoModel tree to file: '" << m_dbpath << "'"
               << std::endl;
 
-    m_dbManager->addListOfRecords("GeoMaterial", m_materials);
     m_dbManager->addListOfRecords("GeoElement", m_elements);
+    m_dbManager->addListOfRecords("GeoMaterial", m_materials);
+    m_dbManager->addListOfRecordsToTable("Materials_Data", m_materials_Data); // new version, with list of (element,fraction) stored separately
+    
     m_dbManager->addListOfRecords("GeoNameTag", m_nameTags);
     m_dbManager->addListOfRecords("GeoAlignableTransform",
                                   m_alignableTransforms);
@@ -2604,7 +2644,7 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     
     m_dbManager->addRecordsToTable("FuncExprData", m_exprData);
 
-    m_dbManager->addListOfRecords("GeoShape", m_shapes); // old version, with shape's parameters as trings
+    m_dbManager->addListOfRecords("GeoShape", m_shapes); // OLD version, with shape's parameters as strings
     m_dbManager->addListOfRecords("GeoBox", m_shapes_Box); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoTube", m_shapes_Tube); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoCons", m_shapes_Cons); // new version, with shape's parameters as numbers

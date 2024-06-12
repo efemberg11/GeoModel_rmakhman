@@ -281,21 +281,24 @@ void ReadGeoModel::loadDB() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();  
     // get all GeoModel nodes from the DB
     // m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
-    m_materials = m_dbManager->getTableFromNodeType("GeoMaterial");
-    m_elements = m_dbManager->getTableFromNodeType("GeoElement");
-    m_physVols = m_dbManager->getTableFromNodeType("GeoPhysVol");
-    m_fullPhysVols = m_dbManager->getTableFromNodeType("GeoFullPhysVol");
-    m_transforms = m_dbManager->getTableFromNodeType("GeoTransform");
+    m_elements = m_dbManager->getTableFromNodeType_VecVecData("GeoElement");
+    GeoModelHelpers::variantHelper::printStdVectorVariants(m_elements[0]);
+    GeoModelHelpers::variantHelper::getFromVariant_Type(m_elements[0][3]);
+
+    m_materials = m_dbManager->getTableFromNodeType_String("GeoMaterial");
+    m_physVols = m_dbManager->getTableFromNodeType_String("GeoPhysVol");
+    m_fullPhysVols = m_dbManager->getTableFromNodeType_String("GeoFullPhysVol");
+    m_transforms = m_dbManager->getTableFromNodeType_String("GeoTransform");
     m_alignableTransforms =
-        m_dbManager->getTableFromNodeType("GeoAlignableTransform");
+        m_dbManager->getTableFromNodeType_String("GeoAlignableTransform");
     m_serialDenominators =
-        m_dbManager->getTableFromNodeType("GeoSerialDenominator");
+        m_dbManager->getTableFromNodeType_String("GeoSerialDenominator");
     m_serialIdentifiers =
-        m_dbManager->getTableFromNodeType("GeoSerialIdentifier");
-    m_identifierTags = m_dbManager->getTableFromNodeType("GeoIdentifierTag");
+        m_dbManager->getTableFromNodeType_String("GeoSerialIdentifier");
+    m_identifierTags = m_dbManager->getTableFromNodeType_String("GeoIdentifierTag");
     m_serialTransformers =
-        m_dbManager->getTableFromNodeType("GeoSerialTransformer");
-    m_nameTags = m_dbManager->getTableFromNodeType("GeoNameTag");
+        m_dbManager->getTableFromNodeType_String("GeoSerialTransformer");
+    m_nameTags = m_dbManager->getTableFromNodeType_String("GeoNameTag");
 
     // containers to store data that have been moved to the new DB schema
     m_functions = m_dbManager->getTableFromNodeType_VecVecData("Function");
@@ -473,7 +476,8 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
 
     // *** recreate all mother-daughter relatioships between nodes ***
     start = std::chrono::system_clock::now();  // timing: get start time
-    loopOverAllChildrenInBunches();
+    // loopOverAllChildrenInBunches_String(); // OLD
+    loopOverAllChildrenInBunches_VecVecData(); //NEW
     end = std::chrono::system_clock::now();  // timing: get end time
     diff =
         std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
@@ -486,10 +490,47 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
     return getRootVolume();
 }
 
+// OLD method
+//----------------------------------------
+// loop over parent-child relationship data
+// void ReadGeoModel::loopOverAllChildrenRecords(
+//     std::vector<std::vector<std::string>> records) {
+//     int nChildrenRecords = records.size();
+
+//     if (m_loglevel >= 1) {
+//         muxCout.lock();
+//         std::cout << "\nReadGeoModel::loopOverAllChildrenRecords -- Thread "
+//                   << std::this_thread::get_id() << " - processing "
+//                   << nChildrenRecords << " keys..." << std::endl;
+//         muxCout.unlock();
+//     }
+
+//     //  // Get Start Time
+//     //  std::chrono::system_clock::time_point start =
+//     //  std::chrono::system_clock::now();
+
+//     for (auto& record : records) {
+//         processParentChild(record);
+//     }
+
+//     //  // Get End Time
+//     //  auto end = std::chrono::system_clock::now();
+//     //  auto diff = std::chrono::duration_cast < std::chrono::seconds > (end
+//     //  - start).count();
+//     //
+//     //  if (m_timing || (m_loglevel >= 1)) {
+//     //    muxCout.lock();
+//     //    std::cout << "Time Taken to process " << nChildrenRecords << "
+//     //    parent-child relationships = " << diff << " Seconds" << std::endl;
+//     //    muxCout.unlock();
+//     //  }
+// }
+
+// NEW method
 //----------------------------------------
 // loop over parent-child relationship data
 void ReadGeoModel::loopOverAllChildrenRecords(
-    std::vector<std::vector<std::string>> records) {
+    DBRowsList records) {
     int nChildrenRecords = records.size();
 
     if (m_loglevel >= 1) {
@@ -499,26 +540,9 @@ void ReadGeoModel::loopOverAllChildrenRecords(
                   << nChildrenRecords << " keys..." << std::endl;
         muxCout.unlock();
     }
-
-    //  // Get Start Time
-    //  std::chrono::system_clock::time_point start =
-    //  std::chrono::system_clock::now();
-
     for (auto& record : records) {
         processParentChild(record);
     }
-
-    //  // Get End Time
-    //  auto end = std::chrono::system_clock::now();
-    //  auto diff = std::chrono::duration_cast < std::chrono::seconds > (end
-    //  - start).count();
-    //
-    //  if (m_timing || (m_loglevel >= 1)) {
-    //    muxCout.lock();
-    //    std::cout << "Time Taken to process " << nChildrenRecords << "
-    //    parent-child relationships = " << diff << " Seconds" << std::endl;
-    //    muxCout.unlock();
-    //  }
 }
 
 //! Iterate over the list of shapes, build them all, and store their
@@ -916,7 +940,8 @@ void ReadGeoModel::buildAllElements() {
     size_t nSize = m_elements.size();
     m_memMapElements.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
-        const unsigned int nodeID = std::stoi(m_elements[ii][0]);
+        // const unsigned int nodeID = std::stoi(m_elements[ii][0]);
+        const unsigned nodeID = GeoModelHelpers::variantHelper::getFromVariant_Int(m_elements[ii][0], "Element:ID");
         buildElement(nodeID);  // nodes' IDs start from 1
     }
     if (nSize > 0)
@@ -1183,7 +1208,117 @@ void ReadGeoModel::buildAllFunctions() {
 
 
 
-void ReadGeoModel::loopOverAllChildrenInBunches() {
+// void ReadGeoModel::loopOverAllChildrenInBunches_String() {
+//     int nChildrenRecords = m_allchildren.size();
+//     if (m_loglevel >= 1)
+//         std::cout << "number of children to process: " << nChildrenRecords
+//                   << std::endl;
+
+//     // If we have a few children, then process them serially
+//     // std::cout << "Running concurrently? " << m_runMultithreaded <<
+//     // std::endl;
+//     if (true)  // !(m_runMultithreaded) || nChildrenRecords <= 500) // TODO:
+//                // test if you can optimize, then revert to if()...else()
+//     {
+//         // std::cout << "Running serially...\n";
+//         loopOverAllChildrenRecords(m_allchildren);
+//     }
+//     // ...otherwise, let's spawn some threads to process them in bunches,
+//     // parallelly!
+//     else {
+//         // std::cout << "Running concurrently...\n";
+
+//         std::chrono::system_clock::time_point start, end;
+//         if (m_timing || (m_loglevel >= 1)) {
+//             // Get Start Time
+//             start = std::chrono::system_clock::now();
+//         }
+
+//         // set number of worker threads
+//         unsigned int nThreads = 0;
+//         if (m_runMultithreaded_nThreads > 0) {
+//             nThreads = m_runMultithreaded_nThreads;
+//         } else if (m_runMultithreaded_nThreads == -1) {
+//             unsigned int nThreadsPlatform = std::thread::hardware_concurrency();
+//             nThreads = nThreadsPlatform;
+//             if (m_loglevel >= 1)
+//                 std::cout << "INFO - You have asked for hardware native "
+//                              "parellelism. On this platform, "
+//                           << nThreadsPlatform
+//                           << " concurrent threads are supported. Thus, using "
+//                           << nThreads << " threads.\n";
+//         }
+
+//         unsigned int nBunches = nChildrenRecords / nThreads;
+//         if (m_loglevel >= 1)
+//             std::cout << "Processing " << nThreads << " bunches, with "
+//                       << nBunches << " children each, plus the remainder."
+//                       << std::endl;
+
+//         // a vector to store the "futures" of async calls
+//         std::vector<std::future<void>> futures;
+
+//         for (unsigned int bb = 0; bb < nThreads; ++bb) {
+//             std::vector<std::vector<std::string>> bunch;
+
+//             unsigned int start = nBunches * bb;
+//             int len = nBunches;
+//             const unsigned int stop = start + len;
+//             std::vector<std::vector<std::string>>::const_iterator first =
+//                 m_allchildren.begin() + start;
+//             std::vector<std::vector<std::string>>::const_iterator last =
+//                 m_allchildren.begin() + stop;
+//             std::vector<std::vector<std::string>>::const_iterator end =
+//                 m_allchildren.end();
+//             if (bb == (nThreads - 1)) {  // last bunch
+//                 bunch = std::vector<std::vector<std::string>>(first, end);
+//             } else {  // all bunches but last one
+//                 bunch = std::vector<std::vector<std::string>>(first, last);
+//             }
+
+//             if (m_loglevel >= 1) {
+//                 muxCout.lock();
+//                 std::cout << "Thread " << bb + 1 << " - Start: " << start
+//                           << ", len: " << len
+//                           << "   ['len=-1' = all remaining items]" << std::endl;
+//                 muxCout.unlock();
+//             }
+
+//             if (m_loglevel >= 1) {
+//                 muxCout.lock();
+//                 std::cout << "'bunch' size: " << bunch.size() << std::endl;
+//                 muxCout.unlock();
+//             }
+
+//             futures.push_back(std::async(
+//                 std::launch::async, &ReadGeoModel::loopOverAllChildrenRecords,
+//                 this, bunch));
+//         }
+
+//         // wait for all async calls to complete
+//         // retrieve and print the value stored in the 'std::future'
+//         if (m_loglevel >= 1)
+//             std::cout << "Waiting for the threads to finish...\n" << std::flush;
+//         for (auto& e : futures) {
+//             e.wait();
+//         }
+//         if (m_loglevel >= 1) std::cout << "Done!\n";
+
+//         if (m_timing || (m_loglevel >= 1)) {
+//             // Get End Time
+//             end = std::chrono::system_clock::now();
+//             auto diff =
+//                 std::chrono::duration_cast<std::chrono::seconds>(end - start)
+//                     .count();
+//             std::cout << "(Total time taken to recreate all "
+//                       << nChildrenRecords
+//                       << " mother-children relationships: " << diff
+//                       << " seconds)" << std::endl;
+//         }
+//     }
+//     return;
+// }
+void ReadGeoModel::loopOverAllChildrenInBunches_VecVecData() {
     int nChildrenRecords = m_allchildren.size();
     if (m_loglevel >= 1)
         std::cout << "number of children to process: " << nChildrenRecords
@@ -1234,21 +1369,21 @@ void ReadGeoModel::loopOverAllChildrenInBunches() {
         std::vector<std::future<void>> futures;
 
         for (unsigned int bb = 0; bb < nThreads; ++bb) {
-            std::vector<std::vector<std::string>> bunch;
+            DBRowsList bunch;
 
             unsigned int start = nBunches * bb;
             int len = nBunches;
             const unsigned int stop = start + len;
-            std::vector<std::vector<std::string>>::const_iterator first =
+            DBRowsList::const_iterator first =
                 m_allchildren.begin() + start;
-            std::vector<std::vector<std::string>>::const_iterator last =
+            DBRowsList::const_iterator last =
                 m_allchildren.begin() + stop;
-            std::vector<std::vector<std::string>>::const_iterator end =
+            DBRowsList::const_iterator end =
                 m_allchildren.end();
             if (bb == (nThreads - 1)) {  // last bunch
-                bunch = std::vector<std::vector<std::string>>(first, end);
+                bunch = DBRowsList(first, end);
             } else {  // all bunches but last one
-                bunch = std::vector<std::vector<std::string>>(first, last);
+                bunch = DBRowsList(first, last);
             }
 
             if (m_loglevel >= 1) {
@@ -1324,6 +1459,105 @@ void ReadGeoModel::processParentChild(
     const unsigned int childTableId = std::stoi(parentchild[5]);
     const unsigned int childId = std::stoi(parentchild[6]);
     const unsigned int childCopyN = std::stoi(parentchild[7]);
+
+    //    std::string childNodeType =
+    //    m_tableID_toTableName[childTableId].toStdString();
+    std::string childNodeType = m_tableID_toTableName[childTableId];
+
+    if ("" == childNodeType || 0 == childNodeType.size()) {
+        std::cout << "ReadGeoModel -- ERROR!!! childNodeType is empty!!! "
+                     "Aborting..."
+                  << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    GeoVPhysVol* parentVol = nullptr;
+
+    // build or get parent volume.
+    // Using the parentCopyNumber here, to get a given instance of the
+    // parent volume
+    if (m_loglevel >= 2) {
+        muxCout.lock();
+        std::cout << "build/get parent volume...\n";
+        muxCout.unlock();
+    }
+    parentVol = dynamic_cast<GeoVPhysVol*>(
+        buildVPhysVolInstance(parentId, parentTableId, parentCopyN));
+    std::string parentName = parentVol->getLogVol()->getName();
+
+    if (childNodeType == "GeoPhysVol") {
+        GeoPhysVol* childNode = dynamic_cast<GeoPhysVol*>(
+            buildVPhysVolInstance(childId, childTableId, childCopyN));
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoFullPhysVol") {
+        GeoFullPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(
+            buildVPhysVolInstance(childId, childTableId, childCopyN));
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoSerialDenominator") {
+        GeoSerialDenominator* childNode = getBuiltSerialDenominator(childId);
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoSerialIdentifier") {
+        GeoSerialIdentifier* childNode = getBuiltSerialIdentifier(childId);
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoIdentifierTag") {
+        GeoIdentifierTag* childNode = getBuiltIdentifierTag(childId);
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoAlignableTransform") {
+        GeoAlignableTransform* childNode = getBuiltAlignableTransform(childId);
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoTransform") {
+        if (m_loglevel >= 2) {
+            muxCout.lock();
+            std::cout << "get transform child...\n";
+            muxCout.unlock();
+        }
+        GeoTransform* childNode = getBuiltTransform(childId);
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoSerialTransformer") {
+        GeoSerialTransformer* childNode = getBuiltSerialTransformer(childId);
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoNameTag") {
+        GeoNameTag* childNode = getBuiltNameTag(childId);
+        volAddHelper(parentVol, childNode);
+    } else {
+        std::cout << "[" << childNodeType
+                  << "] ==> ERROR!!! - The conversion for this type of child "
+                     "node needs to be implemented."
+                  << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+void ReadGeoModel::processParentChild(
+    const DBRowEntry& parentchild) {
+    
+    // if (m_loglevel >= 2) {
+    //     muxCout.lock();
+    //     std::cout << "\nReadGeoModel::processParentChild()..." << std::endl;
+    //     for (auto& rec : parentchild) std::cout << rec << "-";
+    //     std::cout << std::endl;
+    //     muxCout.unlock();
+    // }
+
+    // safety check
+    if (parentchild.size() < 8) {
+        std::cout << "ERROR!!! Probably you are using an old geometry file. "
+                     "Please, get a new one. Exiting..."
+                  << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // get the parent's details
+    const unsigned int parentId = GeoModelHelpers::variantHelper::getFromVariant_Int(parentchild[1], "ParentChild:parentID");
+    const unsigned int parentTableId = GeoModelHelpers::variantHelper::getFromVariant_Int(parentchild[2], "ParentChild:parentID"); 
+    const unsigned int parentCopyN = GeoModelHelpers::variantHelper::getFromVariant_Int(parentchild[3], "ParentChild:parentID"); 
+
+    // get the child's position in the parent's children list
+    // const unsigned int position = parentchild[4]; // unused, at the moment
+
+    // get the child's details
+    const unsigned int childTableId = GeoModelHelpers::variantHelper::getFromVariant_Int(parentchild[5], "ParentChild:parentID"); 
+    const unsigned int childId = GeoModelHelpers::variantHelper::getFromVariant_Int(parentchild[6], "ParentChild:parentID"); 
+    const unsigned int childCopyN = GeoModelHelpers::variantHelper::getFromVariant_Int(parentchild[7], "ParentChild:parentID"); 
 
     //    std::string childNodeType =
     //    m_tableID_toTableName[childTableId].toStdString();
@@ -1601,14 +1835,12 @@ GeoVPhysVol* ReadGeoModel::getRootVolume() {
     if (m_loglevel >= 2) {
         muxCout.lock();
         std::cout << "ReadGeoModel::getRootVolume()" << std::endl;
-        std::cout << "m_root_vol_data: " << m_root_vol_data[0] << ", " << m_root_vol_data[1] << ", " << m_root_vol_data[2] << std::endl;       
+        std::cout << "m_root_vol_data: " << m_root_vol_data.first << ", " << m_root_vol_data.second << std::endl;       
         muxCout.unlock();
     }
-    const unsigned int id =
-        std::stoi(m_root_vol_data[1]);  // TODO: GeoModel GetRoot() should
-                                        // return integers instead of strings...
-    const std::string tableName = m_root_vol_data[0];
-    const unsigned int tableId = m_dbManager->getTableIdFromNodeType(tableName);
+    const unsigned tableId = m_root_vol_data.first;
+    const unsigned id = m_root_vol_data.second;
+    // const unsigned int tableId = m_dbManager->getTableIdFromNodeType(tableName);
     const unsigned int copyNumber =
         1;  // the Root volume has only one copy by definition
     GeoVPhysVol* root = buildVPhysVolInstance(id, tableId, copyNumber);
@@ -1626,18 +1858,20 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id) {
         std::cout << "ReadGeoModel::buildMaterial()" << std::endl;
         muxCout.unlock();
     }
-    // std::vector<std::string> values = m_materials[id - 1];
-    DBRowEntry values = m_materials[id - 1];
 
-    // const unsigned int matId = std::stoi(values[0]);
-    // const std::string matName = values[1];
-    // double matDensity = std::stod(values[2]);
-    // std::string matElements = values[3];
+    // OLD
+    std::vector<std::string> values = m_materials[id - 1];
+    const unsigned int matId = std::stoi(values[0]);
+    const std::string matName = values[1];
+    double matDensity = std::stod(values[2]);
+    std::string matElements = values[3];
 
-    const unsigned int matId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Material:id");
-    const std::string matName = GeoModelHelpers::variantHelper::getFromVariant_String(row[0], "Material:matName");
-    const double matDensity = GeoModelHelpers::variantHelper::getFromVariant_Int(row[0], "Material:matDensity");
-    const std::string matElements = GeoModelHelpers::variantHelper::getFromVariant_String(row[0], "Material:matElements");
+    // NEW
+    // DBRowEntry values = m_materials[id - 1];
+    // const unsigned int matId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[0], "Material:id");
+    // const std::string matName = GeoModelHelpers::variantHelper::getFromVariant_String(values[0], "Material:matName");
+    // const double matDensity = GeoModelHelpers::variantHelper::getFromVariant_Int(values[0], "Material:matDensity");
+    // const std::string matElements = GeoModelHelpers::variantHelper::getFromVariant_String(values[0], "Material:matElements");
 
     if (m_loglevel >= 2) {
         muxCout.lock();
@@ -1684,18 +1918,19 @@ GeoElement* ReadGeoModel::buildElement(const unsigned int id) {
         muxCout.unlock();
     }
 
-    if (m_elements.size() == 0)
-        std::cout << "ERROR! 'm_elements' is empty! Did you load the "
-                     "'Elements' table? \n\t ==> Aborting...\n"
-                  << std::endl;
+    // if (m_elements.size() == 0)
+    //     std::cout << "ERROR! 'm_elements' is empty! Did you load the "
+    //                  "'Elements' table? \n\t ==> Aborting...\n"
+    //               << std::endl;
 
-    std::vector<std::string> values = m_elements[id - 1];
+    // std::vector<std::string> values = m_elements[id - 1];
+    DBRowEntry values = m_elements[id - 1];
 
-    const unsigned int elId = std::stoi(values[0]);
-    std::string elName = values[1];
-    std::string elSymbol = values[2];
-    double elZ = std::stod(values[3]);
-    double elA = std::stod(values[4]);
+    const unsigned elId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[0], "Element:ID"); //values[0];
+    std::string elName = GeoModelHelpers::variantHelper::getFromVariant_String(values[1], "Element:name"); // values[1];
+    std::string elSymbol = GeoModelHelpers::variantHelper::getFromVariant_String(values[2], "Element:symbol"); //values[2];
+    double elZ = GeoModelHelpers::variantHelper::getFromVariant_Double(values[3], "Element:Z"); //std::stod(values[3]);
+    double elA = GeoModelHelpers::variantHelper::getFromVariant_Double(values[4], "Element:A"); //std::stod(values[4]);
 
     if (m_loglevel >= 2) {
         muxCout.lock();

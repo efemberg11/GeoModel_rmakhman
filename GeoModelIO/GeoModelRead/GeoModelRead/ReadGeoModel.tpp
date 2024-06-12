@@ -36,13 +36,13 @@ namespace GeoModelIO {
 
         if constexpr ( std::is_same_v<GeoFullPhysVol*, N> ) {
             if(doCheckTable){ 
-                bool tableExists = m_dbManager->checkTable("PublishedFullPhysVols_"+publisherName);
+                bool tableExists = m_dbManager->checkTableFromDB("PublishedFullPhysVols_"+publisherName);
                 if(!tableExists) return mapNodes;
             }
             vecRecords = m_dbManager->getPublishedFPVTable( publisherName );
         } else if constexpr ( std::is_same_v<GeoAlignableTransform*, N> ) {
             if(doCheckTable){ 
-                bool tableExists = m_dbManager->checkTable("PublishedAlignableTransforms_"+publisherName);
+                bool tableExists = m_dbManager->checkTableFromDB("PublishedAlignableTransforms_"+publisherName);
                 if(!tableExists) return mapNodes;
             }
             vecRecords = m_dbManager->getPublishedAXFTable( publisherName );

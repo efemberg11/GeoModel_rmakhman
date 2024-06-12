@@ -212,10 +212,13 @@ class ReadGeoModel {
 
     GeoBox* buildDummyShape();
 
-    void loopOverAllChildrenInBunches();
-    void loopOverAllChildrenRecords(
-        std::vector<std::vector<std::string>> records);
+    // void loopOverAllChildrenInBunches_String(); // OLD
+    void loopOverAllChildrenInBunches_VecVecData();
+    // void loopOverAllChildrenRecords(
+    //     std::vector<std::vector<std::string>> records);
+    void loopOverAllChildrenRecords(DBRowsList records);
     void processParentChild(const std::vector<std::string>& parentchild);
+    void processParentChild(const DBRowEntry& parentchild);
 
     GeoVPhysVol* getRootVolume();
 
@@ -398,13 +401,13 @@ class ReadGeoModel {
     std::vector<std::vector<std::string>> m_identifierTags;
     std::vector<std::vector<std::string>> m_serialTransformers;
     std::vector<std::vector<std::string>> m_nameTags;
-    // std::vector<std::vector<std::string>> m_materials;
-    std::vector<std::vector<std::string>> m_elements;
+    std::vector<std::vector<std::string>> m_materials;
+    // std::vector<std::vector<std::string>> m_elements;
     std::vector<std::vector<std::string>> m_shapes;
-    std::vector<std::vector<std::string>> m_allchildren;
 
-    DBRowsList m_materials;
+    DBRowsList m_elements;
     DBRowsList m_logVols;
+    DBRowsList m_allchildren;
 
     // containers to store shapes' parameters
     DBRowsList m_shapes_Box;
@@ -444,7 +447,8 @@ class ReadGeoModel {
         m_tableName_toTableID;  // to look for table ID starting from node's
                                 // type name
 
-    std::vector<std::string> m_root_vol_data;
+    // std::vector<std::string> m_root_vol_data;
+    std::pair<unsigned, unsigned> m_root_vol_data;
 
     //! memory chaches
     std::vector<GeoPhysVol*> m_memMapPhysVols;

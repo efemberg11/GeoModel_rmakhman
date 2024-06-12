@@ -64,7 +64,7 @@ class GMDBManager::Imp {
     sqlite3_stmt* selectAllFromTableSortBy(const std::string_view tableName,
                                            const std::string_view sortColumn = "") const;
     sqlite3_stmt* selectAllFromTableChildrenPositions() const;
-    bool checkTable_imp(std::string tableName) const;
+    bool checkTableFromDB_imp(std::string tableName) const;
 };
 
 GMDBManager::GMDBManager(const std::string& path)
@@ -547,7 +547,8 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType_String(
     }
     else
     {
-        if (!checkTable(tableName))
+        // if (!checkTable(tableName))
+        if (!checkTableFromCache(tableName))
         {
             THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
         }
@@ -556,10 +557,10 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType_String(
     return out;
 }
 
-std::vector<std::vector<std::variant<int, long, float, double, std::string>>> GMDBManager::getTableFromNodeType_VecVecData(
+DBRowsList GMDBManager::getTableFromNodeType_VecVecData(
     std::string nodeType)
 {
-    std::vector<std::vector<std::variant<int, long, float, double, std::string>>> out;
+    DBRowsList out;
     std::string tableName = getTableNameFromNodeType(nodeType);
     
     if (tableName.empty())
@@ -616,10 +617,10 @@ DBRowsList GMDBManager::getTableFromTableName_VecVecData(
     }
     return out;
 }
-std::vector<std::variant<int, long, float, double, std::string>> GMDBManager::getTableFromTableName_VecData(
+DBRowEntry GMDBManager::getTableFromTableName_VecData(
     std::string tableName)
 {
-    std::vector<std::variant<int, long, float, double, std::string>> out;
+    DBRowEntry out;
     if (tableName.empty())
     {
         std::mutex coutMutex;
@@ -797,6 +798,10 @@ bool GMDBManager::addListOfRecordsToTable(
     const std::string tableName,
     const std::vector<std::vector<std::string>> records) {
     
+    if ( !(hasTableBeenCreatedInDB(tableName)) ) {
+        THROW_EXCEPTION("ERROR!!! The DB has no '" << tableName << "' table; probably, the table has not been created in the DB.");
+    }
+
     // get table columns and format them for query
     std::string tableColString =
         "(" + GeoModelIO::CppHelper::joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
@@ -842,6 +847,11 @@ bool GMDBManager::addListOfRecordsToTable(
     const std::vector<
         std::vector<std::variant<int, long, float, double, std::string>>>
         records) {
+
+    if ( !(hasTableBeenCreatedInDB(tableName)) ) {
+        THROW_EXCEPTION("ERROR!!! The DB has no '" << tableName << "' table; probably, the table has not been created in the DB.");
+    }
+
     if (records.size() > 0) {
     // get table columns and format them for query
     std::string tableColString =
@@ -1261,7 +1271,7 @@ sqlite3_stmt* GMDBManager::Imp::selectAllFromTableSortBy(
     return st;
 }
 
-bool GMDBManager::Imp::checkTable_imp(std::string tableName) const {
+bool GMDBManager::Imp::checkTableFromDB_imp(std::string tableName) const {
     theManager->checkIsDBOpen();
     sqlite3_stmt* st = nullptr;  // SQLite statement to be returned
     int rc = -1;                 // SQLite return code
@@ -1298,6 +1308,7 @@ bool GMDBManager::initDB() {
     addDBversion(dbversion);
     return tablesOK;
 }
+
 
 bool GMDBManager::checkTableFromCache(const std::string_view tableName) const
 {
@@ -1424,8 +1435,8 @@ DBRowsList GMDBManager::getPublishedAXFTable(
     return getTableRecords_VecVecData(tableName);
 }
 
-bool GMDBManager::checkTable(std::string tableName) const {
-    return m_d->checkTable_imp(tableName);
+bool GMDBManager::checkTableFromDB(std::string tableName) const {
+    return m_d->checkTableFromDB_imp(tableName);
 }
 
 // create a user-defined custom table to store the published nodes
@@ -1762,16 +1773,31 @@ bool GMDBManager::createTables() {
     tab.push_back("id");
     tab.push_back("name");
     tab.push_back("density");
-    tab.push_back("elements");
+    tab.push_back("dataStart");
+    tab.push_back("dataEnd");
     storeTableColumnNames(tab);
     queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} varchar, {3} "
-        "varchar, "
-        "{4} varchar)",
-        tab[0], tab[1], tab[2], tab[3], tab[4]);
+        "create table {0}({1} integer primary key, {2} varchar, "
+        "{3} real, {4} integer, {5} integer)",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
     }
+    tab.clear();
+
+    // create a table to store the numeric data used in GeoPcon shapes
+    tableName = "Materials_Data";
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("element");
+    tab.push_back("fraction");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, "
+        "{2} integer not null REFERENCES Elements(id), "
+        "{3} real )",
+        tab[0], tab[1], tab[2], tab[3]);
+    rc = execQuery(queryStr);
     tab.clear();
 
     // Elements table
@@ -1786,32 +1812,33 @@ bool GMDBManager::createTables() {
     tab.push_back("A");
     storeTableColumnNames(tab);
     queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} varchar, {3} "
-        "varchar, "
-        "{4} integer, {5} real)",
+        "create table {0}({1} integer primary key, {2} varchar, "
+        "{3} varchar, "
+        "{4} real, {5} real)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
     }
     tab.clear();
 
-    // // Shapes table
-    // geoNode = "GeoShape";
-    // tableName = "Shapes";
-    // m_childType_tableName[geoNode] = tableName;
-    // tab.push_back(tableName);
-    // tab.push_back("id");
-    // tab.push_back("type");
-    // tab.push_back("parameters");
-    // storeTableColumnNames(tab);
-    // queryStr = fmt::format(
-    //     "create table {0}({1} integer primary key, {2} varchar, {3} "
-    //     "varchar)",
-    //     tab[0], tab[1], tab[2], tab[3]);
-    // if (0 == (rc = execQuery(queryStr))) {
-    //     storeNodeType(geoNode, tableName);
-    // }
-    // tab.clear();
+    // TODO: to be removed as soson as all shapes are migrated to the new DB schema
+    // Shapes table
+    geoNode = "GeoShape";
+    tableName = "Shapes";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("type");
+    tab.push_back("parameters");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} varchar, {3} "
+        "varchar)",
+        tab[0], tab[1], tab[2], tab[3]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
 
     // Shapes-Box table
     // ID, XHalfLength, YHalfLength, ZHalfLength
@@ -2363,6 +2390,12 @@ std::vector<std::string> GMDBManager::getTableColumnNames(
     return m_tableNames.at(tableName);
 }
 
+bool GMDBManager::hasTableBeenCreatedInDB(const std::string_view tableName) {
+    if (m_tableNames.count(std::string(tableName)) == 0) return false;
+    return true;
+}
+
+
 void GMDBManager::storeNodeType(std::string nodeType, std::string tableName) {
     checkIsDBOpen();
     std::string queryStr;
@@ -2479,7 +2512,7 @@ bool GMDBManager::storeRootVolume(const unsigned &id,
 
 // std::vector<std::string> GMDBManager::getRootPhysVol() {
 std::pair<unsigned, unsigned> GMDBManager::getRootPhysVol() {
-    // get the ID of the ROOT vol from the table "RootVolume"
+    // get the type and ID of the ROOT vol from the table "RootVolume"
     sqlite3_stmt* stmt = m_d->selectAllFromTable("RootVolume");
     // declare the data we want to fetch
     unsigned int id = 0;
@@ -2487,7 +2520,9 @@ std::pair<unsigned, unsigned> GMDBManager::getRootPhysVol() {
     // execute the statement on all rows
     int rc = -1;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-        // get the data
+        // get the data;
+        // we skip the SQLite record ID stored in column 0, 
+        // because we only have one Root volume
         id = sqlite3_column_int(stmt, 1);
         typeId = sqlite3_column_int(stmt, 2);
         // TODO: fill a cache

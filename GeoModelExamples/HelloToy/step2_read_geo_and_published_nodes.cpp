@@ -154,9 +154,9 @@ int main(int argc, char *argv[])
   std::map<std::string, GeoAlignableTransform*> mapAXF = readInGeo.getPublishedNodes<std::string, GeoAlignableTransform*>("HelloToyExample");
 
   //check for a table we know doesn't exist
-  if (db->checkTable("PublishedFullPhysVols_HelloToyExample")) std::cout<<"We find the table that we expected - good!"<<std::endl;
+  if (db->checkTableFromDB("PublishedFullPhysVols_HelloToyExample")) std::cout<<"We find the table that we expected - good!"<<std::endl;
   else std::cout<<"Uh oh, we don't find the expected table - bad!"<<std::endl;
-  if(!db->checkTable("PublishedFullPhysVols_ByeByeToyExample")) std::cout<<"We don't find the table that we didn't expect - good!"<<std::endl;
+  if(!db->checkTableFromDB("PublishedFullPhysVols_ByeByeToyExample")) std::cout<<"We don't find the table that we didn't expect - good!"<<std::endl;
   else std::cout<<"Uh oh, we found a table which doesn't exist - bad!"<<std::endl;  
 
   //Now test via the specific accessors with additional checks

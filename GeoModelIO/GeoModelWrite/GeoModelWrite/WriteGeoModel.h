@@ -174,14 +174,15 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned int storeTranform(const GeoTransform *node);
 
     unsigned int storeObj(const GeoMaterial *pointer, const std::string &name,
-                          const double &density, const std::string &elements);
+                          const double &density, const DBRowsList &materialData);
     unsigned int storeObj(const GeoElement *pointer, const std::string &name,
                           const std::string &symbol, const double &elZ,
                           const double &elA);
     unsigned int storeObj(const GeoShape *pointer, const std::string &type,
                           const std::string &parameters);
     std::pair<std::string, unsigned> storeObj(const GeoShape *pointer, const std::string &type,
-                          const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
+                                            DBRowEntry &parameters,
+                                            const DBRowsList &shapeData);
     unsigned int storeObj(const GeoLogVol *pointer, const std::string &name,
                           const unsigned int &shapeId, std::string_view shapeType,
                           const unsigned int &materialId);
@@ -218,30 +219,35 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned int addRecord(std::vector<std::vector<std::string>> *container,
                            const std::vector<std::string> values) const;
     unsigned int addRecord(DBRowsList *container,
-                           const std::vector<std::variant<int, long, float, double, std::string>> values) const;
+                           const DBRowEntry values) const;
     
     std::pair<unsigned, unsigned> addRecordData(
         DBRowsList *container,
         const DBRowsList values) const;
 
-    unsigned int addMaterial(const std::string &name, const double &density,
-                             const std::string &elements);
     unsigned int addElement(const std::string &name, const std::string &symbol,
                             const double &elZ, const double &elA);
+    
+    unsigned int addMaterial(const std::string &name, const double &density,
+                             const unsigned &dataStart, const unsigned &dataEnd);
+    std::pair<unsigned, unsigned> addMaterialData(const DBRowsList &matElementFraction);
+
     unsigned int addNameTag(const std::string &name);
     unsigned int addAlignableTransform(const std::vector<double> &params);
     unsigned int addTransform(const std::vector<double> &params);
     unsigned int addFunction(const std::string &expression, const unsigned &dataStart, const unsigned &dataEnd);
-    unsigned int addSerialTransformer(const unsigned int &funcId,
-                                      const unsigned int &physvolId,
+    unsigned int addSerialTransformer(const unsigned &funcId,
+                                      const unsigned &physvolId,
                                       const std::string volType,
-                                      const unsigned int &copies);
+                                      const unsigned &copies);
+    
     unsigned int addShape(const std::string &type,
                           const std::string &parameters);
     unsigned int addShape(const std::string &type,
                           const std::vector<std::variant<int, long, float, double, std::string>> &parameters);
     std::pair<unsigned, unsigned> addShapeData(const std::string type,
                                        const DBRowsList &shapeData);
+    
     unsigned int addSerialDenominator(const std::string &baseName);
     unsigned int addSerialIdentifier(const int &baseId);
     unsigned int addIdentifierTag(const int &identifier);
@@ -350,7 +356,7 @@ class WriteGeoModel : public GeoNodeAction {
     // std::vector<std::vector<std::string>> m_logVols;
     std::vector<std::vector<std::string>> m_physVols;
     std::vector<std::vector<std::string>> m_fullPhysVols;
-    std::vector<std::vector<std::string>> m_materials;
+    // std::vector<std::vector<std::string>> m_materials;
     // std::vector<std::vector<std::string>> m_elements;
     std::vector<std::vector<std::string>> m_transforms;
     std::vector<std::vector<std::string>> m_alignableTransforms;
@@ -362,6 +368,8 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<std::vector<std::string>> m_shapes;
 
     DBRowsList m_elements;
+    DBRowsList m_materials;
+    DBRowsList m_materials_Data;
 
     DBRowsList m_shapes_Box;
     DBRowsList m_shapes_Tube;

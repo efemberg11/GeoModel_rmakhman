@@ -55,7 +55,7 @@ namespace GeoModelHelpers {
             }
             catch (std::bad_variant_access const &ex)
             {
-                std::cout << ex.what() << ": '" << logMsg << "'  is not a 'string'!\n";
+                std::cout << ex.what() << ": '" << logMsg << "'  is not a 'string'! " << getFromVariant_Type(record) << "\n";
             }
             return ret;
         }
@@ -70,7 +70,7 @@ namespace GeoModelHelpers {
             }
             catch (std::bad_variant_access const &ex)
             {
-                std::cout << ex.what() << ": '" << logMsg << "'  is not a '" << type << "'!\n";
+                std::cout << ex.what() << ": '" << logMsg << "'  is not a '" << type << "'! " << getFromVariant_Type(record) << "\n";
             }
             return ret;
         }
@@ -84,7 +84,7 @@ namespace GeoModelHelpers {
             }
             catch (std::bad_variant_access const &ex)
             {
-                std::cout << ex.what() << ": '" << logMsg << "'  is not a '" << type << "'!\n";
+                std::cout << ex.what() << ": '" << logMsg << "'  is not a '" << type << "'! " << getFromVariant_Type(record) << "\n";
             }
             return ret;
         }

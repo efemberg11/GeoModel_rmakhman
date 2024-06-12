@@ -153,21 +153,16 @@ class IO {
         // map to populate and return
         std::map<std::string, unsigned long> mmap;
         // get the number of all nodes in the DB from the DB manager
-        unsigned long nphysvols = db.getTableFromNodeType("GeoPhysVol").size();
-        unsigned long nfullphysvols =
-            db.getTableFromNodeType("GeoFullPhysVol").size();
-        unsigned long nlogvols = db.getTableFromNodeType("GeoLogVol").size();
-        unsigned long nelements = db.getTableFromNodeType("GeoElement").size();
-        unsigned long nmaterials =
-            db.getTableFromNodeType("GeoMaterial").size();
-        unsigned long nalignables =
-            db.getTableFromNodeType("GeoAlignableTransform").size();
-        unsigned long nfunctions = db.getTableFromNodeType("Function").size();
-        unsigned long nserialtransformers =
-            db.getTableFromNodeType("GeoSerialTransformer").size();
-        unsigned long nshapes = db.getTableFromNodeType("GeoShape").size();
-        unsigned long nserialdenominators =
-            db.getTableFromNodeType("GeoSerialDenominator").size();
+        unsigned long nphysvols = db.getTableFromNodeType_String("GeoPhysVol").size();
+        unsigned long nfullphysvols = db.getTableFromNodeType_String("GeoFullPhysVol").size();
+        unsigned long nlogvols = db.getTableFromNodeType_VecVecData("GeoLogVol").size();
+        unsigned long nelements = db.getTableFromNodeType_VecVecData("GeoElement").size();
+        unsigned long nmaterials = db.getTableFromNodeType_VecVecData("GeoMaterial").size();
+        unsigned long nalignables = db.getTableFromNodeType_String("GeoAlignableTransform").size();
+        unsigned long nfunctions = db.getTableFromNodeType_VecVecData("Function").size();
+        unsigned long nserialtransformers = db.getTableFromNodeType_String("GeoSerialTransformer").size();
+        unsigned long nshapes = db.getTableFromNodeType_String("GeoShape").size();
+        unsigned long nserialdenominators = db.getTableFromNodeType_String("GeoSerialDenominator").size();
         // get metadata
         unsigned long nchildrenconnections = db.getChildrenTable().size();
 

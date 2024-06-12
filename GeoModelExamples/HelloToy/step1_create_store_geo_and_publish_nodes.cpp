@@ -367,6 +367,13 @@ int main(int argc, char *argv[])
   toyPhys->add(nSimplePolygonBrep);
   toyPhys->add(pSimplePolygonBrep);
 
+  // Add a test *shared* GeoSimplePolygonBrep shape
+  GeoLogVol *lSimplePolygonBrep2 = new GeoLogVol("SimplePolygonBrepShared", sSimplePolygonBrep, steel);
+  GeoPhysVol *pSimplePolygonBrep2 = new GeoPhysVol(lSimplePolygonBrep2);
+  GeoNameTag *nSimplePolygonBrep2 = new GeoNameTag("Shape-SimplePolygonBrepShared");
+  toyPhys->add(nSimplePolygonBrep2);
+  toyPhys->add(pSimplePolygonBrep2);
+
   // Add a test GeoShift boolean shape:
   // a shift of a box
   GeoShapeShift* sShift = new GeoShapeShift(sPass, GeoTrf::TranslateZ3D(50*SYSTEM_OF_UNITS::cm));

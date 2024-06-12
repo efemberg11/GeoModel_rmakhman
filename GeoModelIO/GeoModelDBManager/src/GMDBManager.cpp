@@ -328,13 +328,6 @@ DBRowsList GMDBManager::getTableRecords_VecVecData(
                 for (int i = 0; i < ctotal;
                      i++)
                 {
-                    /* NOTE: 'sqlite3_column_type' return codes:
-                       - 1 INT
-                       - 2 FLOAT
-                       - 3 TEXT
-                       - 4 BLOB
-                       - 5 NULL
-                    */
                     int datacode = sqlite3_column_type(stmt, i);
                     // debug msg
                     // if (0==nRows) std::cout << "table: " << tableName << ", col " << i << "/" << ctotal << " -- typecode: " << datacode << std::endl;
@@ -344,21 +337,21 @@ DBRowsList GMDBManager::getTableRecords_VecVecData(
                     std::string valS;
 
                     // ** INT **
-                    if (1 == datacode)
+                    if (SQLiteColumnTypes::INT_TYPE == datacode)
                     {
                         valI = sqlite3_column_int(stmt, i);
                         // if (0==nRows) std::cout << "valI: " << valI << std::endl;// debug msg
                         nodeParams.push_back(valI);
                     }
                     // ** FLOAT **
-                    else if (2 == datacode)
+                    else if (SQLiteColumnTypes::FLOAT_TYPE == datacode)
                     {
                         valD = sqlite3_column_double(stmt, i);
                         // if (0==nRows) std::cout << "valD: " << valD << std::endl;// debug msg
                         nodeParams.push_back(valD);
                     }
                     // ** TEXT **
-                    else if (3 == datacode)
+                    else if (SQLiteColumnTypes::TEXT_TYPE == datacode)
                     {
                         const char *cc = (char *)sqlite3_column_text(stmt, i);
                         if (cc == NULL)
@@ -372,18 +365,18 @@ DBRowsList GMDBManager::getTableRecords_VecVecData(
                         nodeParams.push_back(valS);
                     }
                     // ** BLOB **
-                    else if (4 == datacode)
+                    else if (SQLiteColumnTypes::BLOB_TYPE == datacode)
                     {
                         THROW_EXCEPTION("ERROR!!! The 'BLOB' data format is not supported yet!!");
                     }
                     // ** NULL **
-                    else if (5 == datacode)
+                    else if (SQLiteColumnTypes::NULL_TYPE == datacode)
                     {
-                        THROW_EXCEPTION("WARNING! 'NULL' format detected. Check that!");
+                        THROW_EXCEPTION("ERROR!!! 'NULL' format detected. Check that!");
                     }
                     else
                     {
-                        THROW_EXCEPTION("ERROR!!! You should NOT get here!! Unsupport SQLite data typecode: " << datacode << " -- Check this!!");
+                        THROW_EXCEPTION("ERROR!!! You should NOT get here!! Unsupported SQLite data typecode: " << datacode << " -- Check this!!");
                     }
                 }
                 records.push_back(nodeParams);
@@ -431,7 +424,8 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
     {
         // Count the Number of Columns in the Table
         int ctotal = sqlite3_column_count(stmt);
-        // for this case, we should have only one column
+        // Note: for this case, we should have only one column of data;
+        // so, we throw an error if we get more than two columns in total
         if (ctotal > 2)
         {
             THROW_EXCEPTION("ERROR! Table '" << tableName << "' is supposed to have two columns only, one for the ID and one for actual data; but it has '"
@@ -443,22 +437,11 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
             res = sqlite3_step(stmt); // Execute SQL Statement.
             if (res == SQLITE_ROW)
             {
-                // stores the value contained in a single row
-                // std::variant<int, long, float, double, std::string> rowValue;
-
-                // we are only interested in returning the 'data' column, that is column '1'
-                // (column '0' contains the ID)
+                // NOTE: 
+                // we are only interested in returning 
+                // the 'data' column, that is column '1'
+                // (while column '0' contains the ID)
                 int colData = 1;
-                // for (int i = 0; i < ctotal;
-                    //  i++) // Loop times the number of columns in the table
-                // {
-                    /* NOTE: 'sqlite3_column_type' return codes:
-                       - 1 INT
-                       - 2 FLOAT
-                       - 3 TEXT
-                       - 4 BLOB
-                       - 5 NULL
-                    */
                     int datacode = sqlite3_column_type(stmt, 1);
                     // debug msg
                     // std::cout << "table: " << tableName << ", col " << colData << "/" << ctotal << " -- typecode: " << datacode << std::endl;
@@ -466,17 +449,17 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
                     int valI{0};
                     double valD{0.};
                     std::string valS;
-                    if (1 == datacode)
+                    if (SQLiteColumnTypes::INT_TYPE == datacode)
                     {
                         valI = sqlite3_column_int(stmt, colData);
                         records.push_back(valI);
                     }
-                    else if (2 == datacode)
+                    else if (SQLiteColumnTypes::FLOAT_TYPE == datacode)
                     {
                         valD = sqlite3_column_double(stmt, colData);
                         records.push_back(valD);
                     }
-                    else if (3 == datacode)
+                    else if (SQLiteColumnTypes::TEXT_TYPE == datacode)
                     {
                         const char *cc = (char *)sqlite3_column_text(stmt, colData);
                         if (cc == NULL)
@@ -489,20 +472,18 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
                         }
                         records.push_back(valS);
                     }
-                    else if (4 == datacode)
+                    else if (SQLiteColumnTypes::BLOB_TYPE == datacode)
                     {
                         THROW_EXCEPTION("ERROR!!! The 'BLOB' data format is not supported yet!!");
                     }
-                    else if (5 == datacode)
+                    else if (SQLiteColumnTypes::NULL_TYPE == datacode)
                     {
-                        std::cout << "WARNING! 'NULL' format detected. Check that!" << std::endl;
+                        std::cout << "ERROR!!! 'NULL' format detected. Check that!" << std::endl;
                     }
                     else
                     {
-                        THROW_EXCEPTION("ERROR!!! You should NOT get here!! Unsupport SQLite data typecode: " << datacode << " -- Check this!!");
+                        THROW_EXCEPTION("ERROR!!! You should NOT get here!! Unsupported SQLite data typecode: " << datacode << " -- Check this!!");
                     }
-                // }
-                // records.push_back(rowValue);
             }
 
             if (res == SQLITE_DONE || res == SQLITE_ERROR)

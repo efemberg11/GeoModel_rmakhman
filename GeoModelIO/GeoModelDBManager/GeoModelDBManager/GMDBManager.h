@@ -358,68 +358,86 @@ class GMDBManager {
 
 
    private:
-    /**
-     * @brief Create all the default DB tables.
-     */
-    bool createTables();
+       /* NOTE: 'sqlite3_column_type' return codes:
+        - 1 INT
+        - 2 FLOAT
+        - 3 TEXT
+        - 4 BLOB
+        - 5 NULL
+       */
+       enum SQLiteColumnTypes : int
+       {
+           INT_TYPE = 1,
+           FLOAT_TYPE = 2,
+           TEXT_TYPE = 3,
+           BLOB_TYPE = 4,
+           NULL_TYPE = 5
+       };
 
-    /**
-     * @brief Create a custom DB table to store a list of published nodes.
-     * @param tableName The table's name.
-     * @param keyType The type of the 'key' that identifies the linked node.
-     */
-    bool createTableCustomPublishedNodes(const std::string tableName,
-                                         const std::string nodeType,
-                                         const std::type_info *keyType);
+       /**
+        * @brief Create all the default DB tables.
+        */
+       bool createTables();
 
-    void addDBversion(std::string version);
+       /**
+        * @brief Create a custom DB table to store a list of published nodes.
+        * @param tableName The table's name.
+        * @param keyType The type of the 'key' that identifies the linked node.
+        */
+       bool createTableCustomPublishedNodes(const std::string tableName,
+                                            const std::string nodeType,
+                                            const std::type_info *keyType);
 
-    //  void loadTestData(); // for debug only
+       void addDBversion(std::string version);
 
-    std::string getTableNameFromTableId(unsigned int tabId);
+       //  void loadTestData(); // for debug only
 
-    void storeNodeType(std::string nodeType, std::string tableName);
+       std::string getTableNameFromTableId(unsigned int tabId);
 
-    std::string getTableNameFromNodeType(const std::string &nodeType);
+       void storeNodeType(std::string nodeType, std::string tableName);
 
-    void storeTableColumnNames(std::vector<std::string> input);
+       std::string getTableNameFromNodeType(const std::string &nodeType);
 
-    std::vector<std::string> getTableColumnNames(const std::string &tableName);
-    bool hasTableBeenCreatedInDB(const std::string_view tableName);
+       std::vector<std::string> getTableColumnNames(const std::string &tableName);
+       bool hasTableBeenCreatedInDB(const std::string_view tableName);
+       void storeTableColumnNames(std::vector<std::string> input);
 
-    int getTableColIndex(const std::string &tableName,
-                         const std::string &colName);
+       bool storeRootVolume(const unsigned &id, const std::string_view nodeType);
+       int getTableColIndex(const std::string &tableName,
+                            const std::string &colName);
 
-    bool storeRootVolume(const unsigned &id, const std::string_view nodeType);
+       bool storeRootVolume(const unsigned int &id, const std::string &nodeType);
 
-    std::string m_dbpath;
+       std::string m_dbpath;
 
-    bool m_debug;
+       bool m_debug;
 
-    // verbosity level
-    int m_verbose;
+       // verbosity level
+       int m_verbose;
 
-    /// stores the column names for each table
-    std::unordered_map<std::string, std::vector<std::string>> m_tableNames;
+       /// stores the column names for each table
+       std::unordered_map<std::string, std::vector<std::string>> m_tableNames;
 
-    std::unordered_map<std::string, std::string> m_childType_tableName;
+       std::unordered_map<std::string, std::string> m_childType_tableName;
 
-    /// cache for the list of tables in the DB
-    // std::vector<std::string> m_cache_tables;
-    std::set<std::string> m_cache_tables;
+       /// cache for the list of tables in the DB
+       // std::vector<std::string> m_cache_tables;
+       std::set<std::string> m_cache_tables;
 
-    std::unordered_map<unsigned int, std::string>
-        m_cache_tableId_tableName;  /// cache for tableID-->tableName
-    std::unordered_map<unsigned int, std::string>
-        m_cache_tableId_nodeType;  /// cache for tableID-->nodeType
-    std::unordered_map<std::string, std::string>
-        m_cache_nodeType_tableName;  /// cache for nodeType-->tableName
-    std::unordered_map<std::string, unsigned int>
-        m_cache_nodeType_tableID;  /// cache for nodeType-->tableID
+       std::unordered_map<unsigned int, std::string>
+           m_cache_tableId_tableName; /// cache for tableID-->tableName
+       std::unordered_map<unsigned int, std::string>
+           m_cache_tableId_nodeType; /// cache for tableID-->nodeType
+       std::unordered_map<std::string, std::string>
+           m_cache_nodeType_tableName; /// cache for nodeType-->tableName
+       std::unordered_map<std::string, unsigned int>
+           m_cache_nodeType_tableID; /// cache for nodeType-->tableID
 
    protected:
     class Imp;
     Imp *m_d;
+
+
 };
 
 #endif  // GMDBManager_H

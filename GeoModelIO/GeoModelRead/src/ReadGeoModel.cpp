@@ -282,11 +282,6 @@ void ReadGeoModel::loadDB() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();  
     // get all GeoModel nodes from the DB
     // m_shapes = m_dbManager->getTableFromNodeType("GeoShape");
-    m_elements = m_dbManager->getTableFromNodeType_VecVecData("GeoElement");
-    GeoModelHelpers::variantHelper::printStdVectorVariants(m_elements[0]);
-    GeoModelHelpers::variantHelper::getFromVariant_Type(m_elements[0][3]);
-
-    m_materials = m_dbManager->getTableFromNodeType_String("GeoMaterial");
     m_physVols = m_dbManager->getTableFromNodeType_String("GeoPhysVol");
     m_fullPhysVols = m_dbManager->getTableFromNodeType_String("GeoFullPhysVol");
     m_transforms = m_dbManager->getTableFromNodeType_String("GeoTransform");
@@ -304,6 +299,9 @@ void ReadGeoModel::loadDB() {
     // containers to store data that have been moved to the new DB schema
     m_functions = m_dbManager->getTableFromNodeType_VecVecData("Function");
     m_logVols = m_dbManager->getTableFromNodeType_VecVecData("GeoLogVol");
+    m_elements = m_dbManager->getTableFromNodeType_VecVecData("GeoElement");
+    m_materials = m_dbManager->getTableFromNodeType_VecVecData("GeoMaterial");
+    m_materials_Data = m_dbManager->getTableFromTableName_VecVecData("Materials_Data");
 
     // shapes from the new DB schema
     m_shapes_Box = m_dbManager->getTableFromNodeType_VecVecData("GeoBox");
@@ -955,7 +953,7 @@ void ReadGeoModel::buildAllMaterials() {
     size_t nSize = m_materials.size();
     m_memMapMaterials.reserve(nSize);
     for (unsigned int ii = 0; ii < nSize; ++ii) {
-        const unsigned int nodeID = std::stoi(m_materials[ii][0]);
+        const unsigned nodeID = GeoModelHelpers::variantHelper::getFromVariant_Int(m_materials[ii][0], "MaterialElement:ID");
         buildMaterial(nodeID);  // nodes' IDs start from 1
     }
     if (nSize > 0)
@@ -1849,7 +1847,7 @@ GeoVPhysVol* ReadGeoModel::getRootVolume() {
     return root;
 }
 
-GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id) {
+GeoMaterial* ReadGeoModel::buildMaterial(const unsigned id) {
     if (isBuiltMaterial(id)) {
         return getBuiltMaterial(id);
     }
@@ -1861,49 +1859,56 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned int id) {
     }
 
     // OLD
-    std::vector<std::string> values = m_materials[id - 1];
-    const unsigned int matId = std::stoi(values[0]);
-    const std::string matName = values[1];
-    double matDensity = std::stod(values[2]);
-    std::string matElements = values[3];
+    // std::vector<std::string> values = m_materials[id - 1];
+    // const unsigned int matId = std::stoi(values[0]);
+    // const std::string matName = values[1];
+    // double matDensity = std::stod(values[2]);
+    // std::string matElements = values[3];
 
     // NEW
-    // DBRowEntry values = m_materials[id - 1];
-    // const unsigned int matId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[0], "Material:id");
-    // const std::string matName = GeoModelHelpers::variantHelper::getFromVariant_String(values[0], "Material:matName");
-    // const double matDensity = GeoModelHelpers::variantHelper::getFromVariant_Int(values[0], "Material:matDensity");
-    // const std::string matElements = GeoModelHelpers::variantHelper::getFromVariant_String(values[0], "Material:matElements");
+    DBRowEntry values = m_materials[id - 1];
+    const unsigned int matId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[0], "Material:id");
+    const std::string matName = GeoModelHelpers::variantHelper::getFromVariant_String(values[1], "Material:matName");
+    const double matDensity = GeoModelHelpers::variantHelper::getFromVariant_Double(values[2], "Material:matDensity");
+    const unsigned dataStart = GeoModelHelpers::variantHelper::getFromVariant_Int(values[3], "Material:dataStart");
+    const unsigned dataEnd = GeoModelHelpers::variantHelper::getFromVariant_Int(values[3], "Material:dataEnd");
 
-    if (m_loglevel >= 2) {
-        muxCout.lock();
-        std::cout << "\tMaterial - ID:" << matId << ", name:" << matName
-                  << ", density:" << matDensity << " ( "
-                  << matDensity / (SYSTEM_OF_UNITS::g / SYSTEM_OF_UNITS::cm3)
-                  << "[g/cm3] )"
-                  << ", elements:" << matElements;
-        muxCout.unlock();
-    }
+
+    // debug msg
+    // if (m_loglevel >= 2) {
+    //     muxCout.lock();
+    //     std::cout << "\tMaterial - ID:" << matId << ", name:" << matName
+    //               << ", density:" << matDensity << " ( "
+    //               << matDensity / (SYSTEM_OF_UNITS::g / SYSTEM_OF_UNITS::cm3)
+    //               << "[g/cm3] )"
+    //               << ", elements:" << matElements;
+    //     muxCout.unlock();
+    // }
 
     GeoMaterial* mat = new GeoMaterial(matName, matDensity);
 
+    DBRowsList matElements(m_materials_Data.begin() + (dataStart-1),
+                           m_materials_Data.begin() + (dataEnd) );
+
     if (matElements.size() > 0) {
-        // get parameters from DB string
-        const std::vector<std::string> elements = splitString(matElements, ';');
-        for (auto& par : elements) {
-            if (m_loglevel >= 2) {
-                muxCout.lock();
-                std::cout << "par: " << par << std::endl;
-                muxCout.unlock();
-            }
-            std::vector<std::string> vars = splitString(par, ':');
-            const unsigned int elId = std::stoi(vars[0]);
-            double elFraction = std::stod(vars[1]);
+        // get parameters from DB
+
+        // const std::vector<std::string> elements = splitString(matElements, ';');
+        for (const auto& row : matElements) {
+        //     if (m_loglevel >= 2) {
+        //         muxCout.lock();
+        //         std::cout << "par: " << par << std::endl;
+        //         muxCout.unlock();
+        //     }
+        //     std::vector<std::string> vars = splitString(par, ':');
+            const unsigned elId = GeoModelHelpers::variantHelper::getFromVariant_Int(row[1], "MatElement:id");
+            double elFraction = GeoModelHelpers::variantHelper::getFromVariant_Double(row[2], "MatElement:fraction");
             //      GeoElement* el = buildElement(elId);
             GeoElement* el = getBuiltElement(elId);
             mat->add(el, elFraction);
         }
         mat->lock();
-    }
+    } 
     storeBuiltMaterial(mat);
     return mat;
 }

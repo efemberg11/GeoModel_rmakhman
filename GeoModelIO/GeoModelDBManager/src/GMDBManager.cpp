@@ -822,9 +822,7 @@ bool GMDBManager::addListOfRecordsToTable(
 
 bool GMDBManager::addListOfRecordsToTable(
     const std::string tableName,
-    const std::vector<
-        DBRowEntry>
-        records) {
+    const DBRowsList records) {
 
     if ( !(hasTableBeenCreatedInDB(tableName)) ) {
         THROW_EXCEPTION("ERROR!!! The DB has no '" << tableName << "' table; probably, the table has not been created in the DB.");
@@ -1747,7 +1745,7 @@ bool GMDBManager::createTables() {
     storeTableColumnNames(tab);
     queryStr = fmt::format(
         "create table {0}({1} integer primary key, "
-        "{2} integer not null REFERENCES Elements(id), "
+        "{2} integer not null, "
         "{3} real )",
         tab[0], tab[1], tab[2], tab[3]);
     rc = execQuery(queryStr);

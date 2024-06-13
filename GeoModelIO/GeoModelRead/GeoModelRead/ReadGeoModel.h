@@ -222,26 +222,26 @@ class ReadGeoModel {
 
     GeoVPhysVol* getRootVolume();
 
-    GeoVPhysVol* buildVPhysVolInstance(const unsigned int id,
-                                       const unsigned int tableId,
-                                       const unsigned int copyNumber);
-    GeoVPhysVol* buildVPhysVol(const unsigned int id,
-                               const unsigned int tableId,
-                               unsigned int logVol_ID = 0);
+    GeoVPhysVol* buildVPhysVolInstance(const unsigned id,
+                                       const unsigned tableId,
+                                       const unsigned copyNumber);
+    GeoVPhysVol* buildVPhysVol(const unsigned id,
+                               const unsigned tableId,
+                               unsigned logVol_ID = 0);
 
-    GeoLogVol* buildLogVol(const unsigned int id);
+    GeoLogVol* buildLogVol(const unsigned id);
     
-    GeoShape* buildShape(const unsigned int id,
+    GeoShape* buildShape(const unsigned id,
                          type_shapes_boolean_info* shapes_info_sub);
     GeoShape *buildShapeOperator(const std::string_view shapeType, const DBRowEntry row,
                                  boolean_shapes_operands_info *shapes_info_sub);
 
     GeoMaterial* buildMaterial(const unsigned id);
-    GeoElement* buildElement(const unsigned int id);
-    GeoAlignableTransform* buildAlignableTransform(const unsigned int id);
+    GeoElement* buildElement(const unsigned id);
+    GeoAlignableTransform* buildAlignableTransform(const unsigned id);
     GeoTransform* buildTransform(const unsigned int id);
-    GeoSerialTransformer* buildSerialTransformer(const unsigned int id);
-    TRANSFUNCTION buildFunction(const unsigned int id);
+    GeoSerialTransformer* buildSerialTransformer(const unsigned id);
+    TRANSFUNCTION buildFunction(const unsigned id);
 
     void checkNodePtr(GeoGraphNode* nodePtr, std::string varName = "",
                       std::string funcName = "",
@@ -250,21 +250,21 @@ class ReadGeoModel {
     void volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild);
 
     // methods for shapes
-    std::string getShapeType(const unsigned int shapeId);
-    bool isShapeOperator(const unsigned int shapeId);
+    std::string getShapeType(const unsigned shapeId);
+    bool isShapeOperator(const unsigned shapeId);
     bool isShapeOperator(const std::string_view type);
-    bool isShapeBoolean(const unsigned int shapeId);
+    bool isShapeBoolean(const unsigned shapeId);
     bool isShapeBoolean(const std::string_view type);
     void createBooleanShapeOperands(type_shapes_boolean_info* shapes_info_sub);
     void createBooleanShapeOperands(boolean_shapes_operands_info* shapes_info_sub);
-    std::pair<unsigned int, unsigned int> getBooleanShapeOperands(
-        const unsigned int shape);
-    std::tuple<std::string, unsigned int, std::string, unsigned int> getBooleanShapeOperands(
+    std::pair<unsigned, unsigned> getBooleanShapeOperands(
+        const unsigned shape);
+    std::tuple<std::string, unsigned int, std::string, unsigned> getBooleanShapeOperands(
         const std::string_view shapeType, const unsigned shapeId);
     GeoShape* addEmptyBooleanShapeForCompletion(
-        const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub);
+        const unsigned shapeID, type_shapes_boolean_info* shapes_info_sub);
     GeoShape* getBooleanReferencedShape(
-        const unsigned int shapeID, type_shapes_boolean_info* shapes_info_sub);
+        const unsigned shapeID, type_shapes_boolean_info* shapes_info_sub);
     GeoShape* addEmptyBooleanShapeForCompletion(
         const std::string_view shapeType, const unsigned shapeID, boolean_shapes_operands_info* shapes_info_sub);
     GeoShape* getBooleanReferencedShape(
@@ -273,28 +273,28 @@ class ReadGeoModel {
     // caching methods
     // TODO: perhaps we could merge all those 'isBuiltYYY' methods in a single
     // one, with the GeoModel class as a second argument ? (RMB)
-    bool isBuiltShape(const unsigned int id);
-    bool isBuiltShape_Operators_Shift(const unsigned int id);
-    bool isBuiltShape_Operators_Subtraction(const unsigned int id);
-    bool isBuiltShape_Operators_Intersection(const unsigned int id);
-    bool isBuiltShape_Operators_Union(const unsigned int id);
-    bool isBuiltShape(std::string_view shapeType, const unsigned int id);
-    void storeBuiltShape(const unsigned int, GeoShape* node);
+    bool isBuiltShape(const unsigned id);
+    bool isBuiltShape_Operators_Shift(const unsigned id);
+    bool isBuiltShape_Operators_Subtraction(const unsigned id);
+    bool isBuiltShape_Operators_Intersection(const unsigned id);
+    bool isBuiltShape_Operators_Union(const unsigned id);
+    bool isBuiltShape(std::string_view shapeType, const unsigned id);
+    void storeBuiltShape(const unsigned, GeoShape* node);
     void storeBuiltShape(const std::string_view type, const unsigned id, GeoShape *nodePtr);
-    GeoShape* getBuiltShape(const unsigned int shapeId, std::string_view shapeType = "");
+    GeoShape* getBuiltShape(const unsigned shapeId, std::string_view shapeType = "");
 
-    void storeBuiltShapeOperators_Shift(const unsigned int, GeoShape* node);
-    void storeBuiltShapeOperators_Subtraction(const unsigned int, GeoShape* node);
-    void storeBuiltShapeOperators_Union(const unsigned int, GeoShape* node);
-    void storeBuiltShapeOperators_Intersection(const unsigned int, GeoShape* node);
+    void storeBuiltShapeOperators_Shift(const unsigned, GeoShape* node);
+    void storeBuiltShapeOperators_Subtraction(const unsigned, GeoShape* node);
+    void storeBuiltShapeOperators_Union(const unsigned, GeoShape* node);
+    void storeBuiltShapeOperators_Intersection(const unsigned, GeoShape* node);
 
-    bool isBuiltTransform(const unsigned int id);
+    bool isBuiltTransform(const unsigned id);
     void storeBuiltTransform(GeoTransform* node);
-    GeoTransform* getBuiltTransform(const unsigned int id);
+    GeoTransform* getBuiltTransform(const unsigned id);
 
-    bool isBuiltAlignableTransform(const unsigned int id);
+    bool isBuiltAlignableTransform(const unsigned id);
     void storeBuiltAlignableTransform(GeoAlignableTransform* node);
-    GeoAlignableTransform* getBuiltAlignableTransform(const unsigned int id);
+    GeoAlignableTransform* getBuiltAlignableTransform(const unsigned id);
 
     // void storeVPhysVol(const unsigned int id, const unsigned int tableId,
     // const unsigned int copyNumber, GeoGraphNode* node); GeoGraphNode*
@@ -400,11 +400,13 @@ class ReadGeoModel {
     std::vector<std::vector<std::string>> m_identifierTags;
     std::vector<std::vector<std::string>> m_serialTransformers;
     std::vector<std::vector<std::string>> m_nameTags;
-    std::vector<std::vector<std::string>> m_materials;
+    // std::vector<std::vector<std::string>> m_materials;
     // std::vector<std::vector<std::string>> m_elements;
     std::vector<std::vector<std::string>> m_shapes;
 
     DBRowsList m_elements;
+    DBRowsList m_materials;
+    DBRowsList m_materials_Data;
     DBRowsList m_logVols;
     DBRowsList m_allchildren;
 

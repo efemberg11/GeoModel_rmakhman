@@ -2588,20 +2588,25 @@ void WriteGeoModel::addChildPosition(const unsigned int& parentId,
                                      const unsigned int& parentCopyN,
                                      const unsigned int& childPos,
                                      const std::string& childType,
-                                     const unsigned int& childCopyN) {
-    std::vector<std::vector<std::string>>* container = &m_childrenPositions;
+                                     const unsigned int& childCopyN)
+{
+    // std::vector<std::vector<std::string>>* container = &m_childrenPositions;
+    DBRowsList* container = &m_childrenPositions;
+
     const unsigned int parentTableID = getIdFromNodeType(parentType);
     const unsigned int childTableID = getIdFromNodeType(childType);
 
-    std::vector<std::string> values;
+    // std::vector<std::string> values;
+    DBRowEntry values;
+
     //  values << parentId.toString() << parentTableID <<
     //  QString::number(parentCopyN) << QString::number(childPos) <<
     //  childTableID << childId.toString() << QString::number(childCopyN);
     values.insert(values.begin(),
-                  {std::to_string(parentId), std::to_string(parentTableID),
-                   std::to_string(parentCopyN), std::to_string(childPos),
-                   std::to_string(childTableID), std::to_string(childId),
-                   std::to_string(childCopyN)});  // INT
+                  {parentId, parentTableID,
+                   parentCopyN, childPos,
+                   childTableID, childId,
+                   childCopyN});
     addRecord(container, values);
     return;
 }

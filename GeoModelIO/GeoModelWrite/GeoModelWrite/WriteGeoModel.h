@@ -405,7 +405,9 @@ class WriteGeoModel : public GeoNodeAction {
     // std::vector<std::string> m_rootVolume;
     std::pair<std::string, unsigned> m_rootVolume;
 
-    std::vector<std::vector<std::string>> m_childrenPositions;
+    // std::vector<std::vector<std::string>> m_childrenPositions;
+    DBRowsList m_childrenPositions;
+
     std::vector<std::vector<std::string>> m_publishedAlignableTransforms_String;
     std::vector<std::vector<std::string>> m_publishedFullPhysVols_String;
 

@@ -659,7 +659,7 @@ std::deque<double> GMDBManager::getTableFromTableName_DequeDouble(std::string ta
 //}
 
 bool GMDBManager::addListOfChildrenPositions(
-    const std::vector<std::vector<std::string>>& records) {
+    const DBRowsList& records) {
     if (records.size() > 0) {
         // NOTE: Choose the right function for your version of SQLite!!
         return addListOfRecordsToTable("ChildrenPositions",
@@ -1581,12 +1581,11 @@ bool GMDBManager::createTables() {
     tab.push_back("childCopyNumber");
     storeTableColumnNames(tab);
     queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} integer, {3} "
-        "integer "
-        "not null REFERENCES GeoNodesTypes(id), {4} integer, {5} integer, "
-        "{6} "
-        "integer not null REFERENCES GeoNodesTypes(id), {7} integer not "
-        "null, "
+        "create table {0}({1} integer primary key, {2} integer, "
+        "{3} integer not null REFERENCES GeoNodesTypes(id), "
+        "{4} integer, {5} integer, "
+        "{6} integer not null REFERENCES GeoNodesTypes(id), "
+        "{7} integer not null, "
         "{8} integer not null)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8]);
     rc = execQuery(queryStr);

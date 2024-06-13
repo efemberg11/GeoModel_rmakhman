@@ -227,8 +227,7 @@ class GMDBManager {
         const DBRowEntry
             records);
 
-    bool addListOfChildrenPositions(
-        const std::vector<std::vector<std::string>> &records);
+    bool addListOfChildrenPositions(const DBRowsList &records);
 
     /**
      * @brief Save the list of 'published' GeoAlignableTransform nodes to the

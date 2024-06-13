@@ -12,6 +12,8 @@
 #ifndef GEOMODELHELPERS_VARIANTHELPERS_H
 #define GEOMODELHELPERS_VARIANTHELPERS_H
 
+#include "GeoModelHelpers/throwExcept.h"
+
 #include <iostream> 
 #include <string> 
 #include <vector> 
@@ -55,7 +57,7 @@ namespace GeoModelHelpers {
             }
             catch (std::bad_variant_access const &ex)
             {
-                std::cout << ex.what() << ": '" << logMsg << "'  is not a 'string'! " << getFromVariant_Type(record) << "\n";
+                THROW_EXCEPTION(std::string(ex.what()) + ": '" + std::string(logMsg) + "'  is not a '" + std::string(type) + "'! It's a '" + getFromVariant_Type(record) + "'.");
             }
             return ret;
         }
@@ -70,7 +72,8 @@ namespace GeoModelHelpers {
             }
             catch (std::bad_variant_access const &ex)
             {
-                std::cout << ex.what() << ": '" << logMsg << "'  is not a '" << type << "'! " << getFromVariant_Type(record) << "\n";
+                THROW_EXCEPTION(std::string(ex.what()) + ": '" + std::string(logMsg) + "'  is not a '" + std::string(type) + "'! It's a '" + getFromVariant_Type(record) + "'.");
+
             }
             return ret;
         }
@@ -84,7 +87,7 @@ namespace GeoModelHelpers {
             }
             catch (std::bad_variant_access const &ex)
             {
-                std::cout << ex.what() << ": '" << logMsg << "'  is not a '" << type << "'! " << getFromVariant_Type(record) << "\n";
+                THROW_EXCEPTION(std::string(ex.what()) + ": '" + std::string(logMsg) + "'  is not a '" + std::string(type) + "'! It's a '" + getFromVariant_Type(record) + "'.");
             }
             return ret;
         }
@@ -113,7 +116,6 @@ namespace GeoModelHelpers {
             } else {
                 type = "UNKOWN";
             }
-            std::cout << "Variant is of type '" << type << "'" << std::endl;
             return type;
         }
     };

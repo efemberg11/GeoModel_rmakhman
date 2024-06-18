@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 ################################################################################
 # Package: GeoModelDBManager
 # author: Riccardo Maria BIANCHI @ CERN - 2017
@@ -16,7 +16,7 @@ add_library( GeoModelDBManager SHARED ${HEADERS} ${SOURCES} )
 target_link_libraries( GeoModelDBManager PRIVATE SQLite::SQLite3 )
 target_include_directories( GeoModelDBManager PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 source_group( "GeoModelDBManager" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoModelDBManager PROPERTIES

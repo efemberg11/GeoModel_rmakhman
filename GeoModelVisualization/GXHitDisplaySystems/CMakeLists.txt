@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -8,12 +8,12 @@ find_package (HDF5 REQUIRED)
 # Add the library.
 add_library( GXHitDisplaySystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXHitDisplaySystems
-   PUBLIC Coin::Coin GXBase 
+   PUBLIC Coin::Coin GXBase
    PRIVATE Qt${QT_VERSION}::Core Qt${QT_VERSION}::Widgets ${HDF5_CXX_LIBRARIES} ${HDF5_LIBRARIES} )
 target_include_directories( GXHitDisplaySystems PUBLIC
-   ${HDF5_CXX_INCLUDE_DIRS} 
+   ${HDF5_CXX_INCLUDE_DIRS}
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 source_group( "GXHitDisplaySystems" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} ${UIS} ${RCS} )
 set_target_properties( GXHitDisplaySystems PROPERTIES

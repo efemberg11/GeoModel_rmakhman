@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -15,7 +15,7 @@ target_link_libraries( GXGeometrySystems
            GeoModelIO::GeoModelWrite GeoModelIO::GeoModelDBManager GXHEPVis )
 target_include_directories( GXGeometrySystems PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 target_compile_definitions( GXGeometrySystems PRIVATE
    GEOMODEL_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" )
 source_group( "VP1GeometrySystems" FILES ${HEADERS} )

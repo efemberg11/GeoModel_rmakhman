@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 # Set up the project.
 cmake_minimum_required(VERSION 3.16...3.26)
 project( "DummyUserActionsPlugin" )
@@ -10,7 +10,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Make the root module directory visible to CMake.
     list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../../cmake )
     # get global GeoModel version
-    include( GeoModelATLAS-version ) 
+    include( GeoModelATLAS-version )
     # set the project, with the version taken from the GeoModel parent project
     project( "DummyUserActionsPlugin" VERSION ${GeoModelATLAS_VERSION} LANGUAGES CXX )
     # Define color codes for CMake messages
@@ -58,9 +58,8 @@ file( GLOB SOURCES src/*.cxx )
 add_library( DummyUserActionsPlugin SHARED ${SOURCES} )
 
 target_link_libraries ( DummyUserActionsPlugin PUBLIC FullSimLight ${CMAKE_DL_LIBS} ${Geant4_LIBRARIES} )
-target_include_directories( DummyUserActionsPlugin PUBLIC 
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> ${FullSimLight_INCLUDE_DIR} )
+target_include_directories( DummyUserActionsPlugin PUBLIC
+   ${FullSimLight_INCLUDE_DIR} )
 
 
 source_group( "src" FILES ${SOURCES} )

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -10,7 +10,7 @@ target_link_libraries( GeoModelKernel PUBLIC Eigen3::Eigen GeoGenericFunctions
    ${CMAKE_DL_LIBS} )
 target_include_directories( GeoModelKernel PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 source_group( "GeoModelKernel" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoModelKernel PROPERTIES
@@ -51,15 +51,14 @@ install( FILES ${HEADERS}
 foreach(_exeFile ${files})
   get_filename_component(_theExec ${_exeFile} NAME_WE)
   get_filename_component(_theLoc ${_exeFile} DIRECTORY)
-  
+
   if(${_theLoc} MATCHES "DoNotBuild")
     continue()
-  endif() 
-  
+  endif()
+
   add_executable(${_theExec} ${_exeFile})
   target_link_libraries( ${_theExec} GeoModelKernel)
   add_test(NAME ${_theExec}
            COMMAND ${_theExec})
 
 endforeach()
-

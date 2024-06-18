@@ -25,14 +25,16 @@ fill_line "-"
 
 git checkout $NIGHTLY_COMMIT
 
-for p in "$SCRIPT_DIR"/patches/*.patch; do
-    echo "---- Applying ${p} ----"
-    patch -p1 < ${p}
-    #cat "${p}" | git am -3
-    #git --no-pager log -1 $sha
-    
-    fill_line "-"
-done
+if compgen -G "${SCRIPT_DIR}/patches/*.patch" > /dev/null; then
+    for p in "$SCRIPT_DIR"/patches/*.patch; do
+        echo "---- Applying ${p} ----"
+        patch -p1 < ${p}
+        #cat "${p}" | git am -3
+        #git --no-pager log -1 $sha
+
+        fill_line "-"
+    done
+fi
 
 
 #git diff HEAD ${NIGHTLY_COMMIT}

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -6,10 +6,6 @@ file( GLOB SOURCES src/*.cxx )
 # Create the library.
 add_library( GMXPlugin SHARED ${SOURCES} )
 target_link_libraries( GMXPlugin PUBLIC GeoModelCore::GeoModelKernel XercesC::XercesC GeoModelXml )
-target_include_directories( GMXPlugin PUBLIC 
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
-source_group( "GMXPlugin" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GMXPlugin PROPERTIES
    VERSION ${PROJECT_VERSION}
@@ -33,12 +29,3 @@ install(TARGETS GMXPlugin
             COMPONENT Development
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
-
-install( FILES ${HEADERS}
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GMXPlugin
-   COMPONENT Development )
-
-# set ( PLUGIN_NAME  "GMXPlugin.so" )
-# ADD_CUSTOM_TARGET( GMX_plugin ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${GMXPlugin} ${PLUGIN_NAME} )
-
-

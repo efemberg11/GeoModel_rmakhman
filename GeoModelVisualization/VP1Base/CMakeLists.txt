@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -8,7 +8,7 @@ file( GLOB RCS src/*.qrc )
 
 # Add the library.
 add_library( GXBase SHARED ${SOURCES} ${HEADERS} ${UIS} ${RCS} )
-if (GEOMODEL_USE_QT6) 
+if (GEOMODEL_USE_QT6)
   target_link_libraries( GXBase
      PUBLIC Coin::Coin Qt${QT_VERSION}::Core Qt${QT_VERSION}::Gui Qt${QT_VERSION}::Widgets Qt${QT_VERSION}::Core5Compat SoQt::SoQt
      PRIVATE Qt${QT_VERSION}::PrintSupport Qt${QT_VERSION}::OpenGL GXHEPVis )
@@ -20,7 +20,7 @@ endif()
 
 target_include_directories( GXBase PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 target_compile_definitions( GXBase PUBLIC
    -DQT_NO_DEBUG_OUTPUT -DQT_NO_INFO_OUTPUT )
 source_group( "VP1Base" FILES ${HEADERS} )

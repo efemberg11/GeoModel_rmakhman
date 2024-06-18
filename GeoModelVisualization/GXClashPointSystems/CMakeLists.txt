@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -12,7 +12,7 @@ target_link_libraries( GXClashPointSystems
    PRIVATE Qt${QT_VERSION}::Core Qt${QT_VERSION}::Widgets nlohmann_json::nlohmann_json )
 target_include_directories( GXClashPointSystems PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 source_group( "GXClashPointSystems" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} ${UIS} ${RCS} )
 set_target_properties( GXClashPointSystems PROPERTIES

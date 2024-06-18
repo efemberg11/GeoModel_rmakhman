@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 ################################################################################
 # Package: MinimalPlugin
@@ -14,11 +14,11 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 
 # Find the needed dependencies, when building individually
-  message (${CMAKE_SOURCE_DIR}) 
+  message (${CMAKE_SOURCE_DIR})
   message (${PROJECT_SOURCE_DIR})
-  
+
 if ( CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR ) # when buildingindividually
-   find_package( GeoModelCore REQUIRED  ) 
+   find_package( GeoModelCore REQUIRED  )
 endif()
 
 
@@ -27,10 +27,6 @@ file( GLOB SOURCES src/*.cxx )
 
 add_library( MinimalPlugin SHARED ${SOURCES} )
 target_link_libraries( MinimalPlugin PUBLIC GeoModelCore::GeoModelKernel)
-
-target_include_directories( MinimalPlugin PUBLIC
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
 
 source_group( "src" FILES ${SOURCES} )
 
@@ -44,4 +40,3 @@ install( TARGETS MinimalPlugin
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    COMPONENT Runtime
    NAMELINK_SKIP )
-

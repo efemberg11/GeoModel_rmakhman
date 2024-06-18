@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cxx )
@@ -14,9 +14,9 @@ find_package( ZLIB REQUIRED )
 add_library( GeoModelXml SHARED ${HEADERS} ${SOURCES} )
 # link libraries
 target_link_libraries( GeoModelXml PUBLIC GeoModelCore::GeoModelKernel GeoModelCore::GeoModelHelpers GeoModelTools::ExpressionEvaluator XercesC::XercesC PRIVATE ZLIB::ZLIB  )
-target_include_directories( GeoModelXml PUBLIC 
+target_include_directories( GeoModelXml PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 source_group( "GeoModelXml" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoModelXml PROPERTIES

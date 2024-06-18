@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 ################################################################################
 # Package: GeoModelIOHelpers
 # author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - 2023 Jan
@@ -16,7 +16,7 @@ target_link_libraries( GeoModelIOHelpers PUBLIC
 # even if the latter is headers only
 target_include_directories( GeoModelIOHelpers PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 source_group( "GeoModelIOHelpers" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoModelIOHelpers PROPERTIES

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2019 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Find the header and source files.
 file( GLOB SOURCES src/*.cpp )
@@ -8,7 +8,7 @@ file( GLOB HEADERS GeoGenericFunctions/*.h GeoGenericFunctions/*.icc )
 add_library( GeoGenericFunctions SHARED ${HEADERS} ${SOURCES} )
 target_include_directories( GeoGenericFunctions PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 source_group( "GeoGenericFunctions" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoGenericFunctions PROPERTIES

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 ################################################################################
 # Package: GeoModel2G4
@@ -38,7 +38,7 @@ target_compile_definitions(GeoModel2G4 PRIVATE G4EXTENSION_SOLID_DIR=${PATHEXTEN
 target_include_directories(GeoModel2G4
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include> )
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 target_link_libraries(GeoModel2G4
   PUBLIC  ${Geant4_LIBRARIES}
   PRIVATE GeoMaterial2G4 GeoModelCore::GeoModelKernel)
@@ -52,6 +52,6 @@ set_target_properties( GeoModel2G4 PROPERTIES
    SOVERSION ${PROJECT_VERSION_MAJOR} )
 # Install the library.
 install( TARGETS GeoModel2G4
-  EXPORT GeoModel2G4-export 
+  EXPORT GeoModel2G4-export
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModel2G4 )

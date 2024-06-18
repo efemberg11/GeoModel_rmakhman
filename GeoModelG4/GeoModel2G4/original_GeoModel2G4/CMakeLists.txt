@@ -53,12 +53,10 @@ target_link_libraries( Geo2G4Lib
 target_include_directories( Geo2G4Lib SYSTEM PUBLIC ${XERCESC_INCLUDE_DIRS} ${GEANT4_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS} PRIVATE ${Boost_INCLUDE_DIRS} ${CLHEP_INCLUDE_DIRS} ${GEOMODEL_INCLUDE_DIRS} )
 target_include_directories( Geo2G4Lib PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 
 ### TODO: do we need this from Athena? Maybe not...
 # atlas_add_component( Geo2G4 ... )
 
 ### TODO: do we need this from Athena? Maybe not...
 # atlas_add_dictionary( LArWheelSolidCheckerDict ... )
-
-

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 ################################################################################
 # Package: GeoMaterial2G4
@@ -18,7 +18,7 @@ add_library( GeoMaterial2G4 SHARED ${HEADERS} ${SOURCES} )
 target_include_directories( GeoMaterial2G4
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include> )
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 target_link_libraries( GeoMaterial2G4 PUBLIC GeoModelCore::GeoModelKernel ${Geant4_LIBRARIES} )
 
 # Set installation of library headers
@@ -30,6 +30,6 @@ set_target_properties( GeoMaterial2G4 PROPERTIES
 
 # new test GeoModelG4
 install(TARGETS GeoMaterial2G4
-  EXPORT GeoMaterial2G4-export 
+  EXPORT GeoMaterial2G4-export
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoMaterial2G4 )

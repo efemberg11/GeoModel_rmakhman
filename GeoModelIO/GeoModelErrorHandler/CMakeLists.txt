@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # Set up how CMake should handle file names given to target_sources().
 if( POLICY CMP0076 )
@@ -13,7 +13,7 @@ add_library( GeoModelErrorHandler INTERFACE )
 source_group( "GeoModelErrorHandler" FILES ${HEADERS} )
 target_include_directories( GeoModelErrorHandler INTERFACE
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 target_link_libraries( GeoModelErrorHandler INTERFACE Qt5::Core )
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
    "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )

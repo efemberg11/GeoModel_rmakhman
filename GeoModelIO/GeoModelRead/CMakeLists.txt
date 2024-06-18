@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 ################################################################################
 # Package: GeoModelRead
 # author: Riccardo Maria BIANCHI <rbianchi@cern.ch> - 2017
@@ -15,7 +15,7 @@ target_link_libraries( GeoModelRead PUBLIC
 GeoModelKernel GeoModelDBManager TFPersistification )
 target_include_directories( GeoModelRead PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-   $<INSTALL_INTERFACE:include> )
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 source_group( "GeoModelRead" FILES ${HEADERS} )
 source_group( "src" FILES ${SOURCES} )
 set_target_properties( GeoModelRead PROPERTIES

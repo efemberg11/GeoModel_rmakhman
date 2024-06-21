@@ -16,7 +16,7 @@
  *
  */
 
-
+//pipppo  
 // GeoModel includes
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Cos.h"
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 
     // --- I/O TESTS ---
     std::cout << "\nTests:\n";
-    unsigned loglevel = 3;
+    unsigned loglevel = 2;
     unsigned printtests = 1;
     const bool forceDelete = true;
     std::pair<bool, std::map<std::string, bool>> tests =

@@ -48,9 +48,3 @@ install(
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 include( GeoModelIOPackaging )
 
-# global I/O tests
-add_executable(test_io_shared_serialtransformers tests/test_io_shared_serialtransformers.cpp)
-target_link_libraries( test_io_shared_serialtransformers GeoModelIO::GeoModelDBManager GeoModelCore::GeoModelHelpers GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers)
-add_test(NAME testIOSharedSerialTransformers
-         COMMAND test_io_shared_serialtransformers)
-

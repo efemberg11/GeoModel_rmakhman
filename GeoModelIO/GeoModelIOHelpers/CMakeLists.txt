@@ -46,3 +46,10 @@ install(TARGETS GeoModelIOHelpers
 install( FILES ${HEADERS}
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/GeoModelIOHelpers
    COMPONENT Development )
+
+
+# global I/O tests
+add_executable(test_io_shared_serialtransformers tests/test_io_shared_serialtransformers.cpp)
+target_link_libraries( test_io_shared_serialtransformers GeoModelIO::GeoModelDBManager GeoModelCore::GeoModelHelpers GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers)
+add_test(NAME testIOSharedSerialTransformers
+         COMMAND test_io_shared_serialtransformers)

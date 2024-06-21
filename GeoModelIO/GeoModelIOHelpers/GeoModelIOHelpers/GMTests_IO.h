@@ -41,39 +41,26 @@ class TestIO {
         const std::string db1_name = "geometry_db_test_1.db";
         const std::string db2_name = "geometry_db_test_2.db";
 
-        //-----------------------------------------------//
-        // 1 -- Writing the geometry to file - 1st time
-        //-----------------------------------------------//
+        std:: cout << "1 -- Writing the geometry to file - 1st time" << std::endl;
         GMDBManager db1 = GeoModelIO::IO::saveToDB(world, db1_name, loglevel, forceDelete);
 
-        //-----------------------------------------------//
-        // 2 -- Get number of nodes from the DB we just saved
-        //-----------------------------------------------//
+        std::cout << "2 -- Get number of nodes from the DB we just saved" << std::endl;
         std::map<std::string, unsigned long> mmap_1 =
             GeoModelIO::IO::countNodesFromDB(db1);
 
-        //-----------------------------------------------//
-        // 3 -- Reading back the geometry from file
-        //-----------------------------------------------//
+        std::cout << "3 -- Reading back the geometry from file" << std::endl;
         const GeoVPhysVol* world2 = GeoModelIO::IO::loadDB(db1_name, loglevel);
 
-        //-----------------------------------------------//
-        // 4 -- Writing the geometry to file - 2nd time
-        //-----------------------------------------------//
+        std::cout << "4 -- Writing the geometry to file - 2nd time" << std::endl;
         GMDBManager db2 = GeoModelIO::IO::saveToDB(world2, db2_name, loglevel, forceDelete);
 
-        //-----------------------------------------------//
-        // 5 -- Get number of nodes from the DB we created from the restored
-        // GeoModel tree
-        //-----------------------------------------------//
+        std::cout << "5 -- Get number of nodes from the DB we created from the restored GeoModel tree" << std::endl;
         std::map<std::string, unsigned long> mmap_2 =
             GeoModelIO::IO::countNodesFromDB(db2);
 
-        //-----------------------------------------------//
-        // 6 -- Comparison
-        //-----------------------------------------------//
-
+        std::cout <<  "6 -- Comparison" << std::endl;
         bool testok = false;
+        GeoModelIO::IO::checkTwoNodesMapsSameSize(mmap_1, mmap_2);
         if (mmap_1 == mmap_2) {
             if (loglevel >= 1) {
                 std::cout
@@ -94,6 +81,7 @@ class TestIO {
                 if (loglevel >= 2) {
                     GeoModelIO::IO::printCompareTwoNodesMaps(mmap_1, mmap_2);
                 }
+                GeoModelIO::IO::printDifferencesBetweenTwoNodesMaps(mmap_1, mmap_2);
                 std::cout << "----\n";
             }
             testok = false;
@@ -140,6 +128,7 @@ class TestIO {
         // TODO: add number-by-number comparison as with the other tests!!
 
         bool testok = false;
+        GeoModelIO::IO::checkTwoNodesMapsSameSize(mmap_1, mmap_2);
         if (mmap_1 == mmap_2) {
             if (loglevel >= 1) {
                 std::cout << "OK! The number of starting in-memory nodes is "
@@ -151,15 +140,16 @@ class TestIO {
         } else {
             if (loglevel >= 1) {
                 std::cout
-                    << "!!! ERROR !!! The number of teh starting in-memory "
+                    << "!!! ERROR !!! The number of the starting in-memory "
                        "nodes is DIFFERENT from "
                        "the number of the restored in-memory nodes!!!\n";
                 if (loglevel >= 2) {
-                    std::cout << "Starting in-memory nodes:\n";
+                    std::cout << "*** Starting in-memory nodes:\n";
                     GeoModelIO::IO::printNodesMap(mmap_1);
-                    std::cout << "Restored in-memory nodes:\n";
+                    std::cout << "*** Restored in-memory nodes:\n";
                     GeoModelIO::IO::printNodesMap(mmap_2);
                 }
+                GeoModelIO::IO::printDifferencesBetweenTwoNodesMaps(mmap_1, mmap_2);
                 std::cout << "----\n";
             }
             testok = false;
@@ -196,6 +186,7 @@ class TestIO {
             read.setLogLevel(loglevel);
         }
         // load the data from the DB
+        std::cout << "-- 1: load data from the DB" << std::endl;
         read.loadDB();
 
         // count all nodes loaded from the DB by the Read action
@@ -205,14 +196,16 @@ class TestIO {
             GeoModelIO::IO::countLoadedNodesFromReadAction(read);
 
         // build the GeoModel tree from the loaded nodes
+        std::cout << "-- 2: build the GeoModel tree and restore it into memory" << std::endl;
         const GeoVPhysVol* rootVolume = read.buildGeoModel();
 
-        // count the number of all the restored nodes;
+        // count the number of all restored nodes;
         // i.e., the nodes of the restored in-memory GeoModel tree
         std::map<std::string, unsigned long> mmap_restored =
             GeoModelIO::IO::countTreeMemoryNodesFromVolume(rootVolume);
 
         bool testok = false;
+        GeoModelIO::IO::checkTwoNodesMapsSameSize(mmap_loaded, mmap_restored);
         if (mmap_loaded == mmap_restored) {
             if (loglevel >= 1) {
                 std::cout << "OK! The number of loaded nodes is equal to the "
@@ -225,11 +218,13 @@ class TestIO {
                              "DIFFERENT from "
                              "the number of restored nodes!!!\n";
                 if (loglevel >= 2) {
-                    std::cout << "Loaded:\n";
+                    std::cout << "\n*** -- Loaded:\n";
                     GeoModelIO::IO::printNodesMap(mmap_loaded);
-                    std::cout << "Restored:\n";
+                    std::cout << "\n*** -- Restored:\n";
                     GeoModelIO::IO::printNodesMap(mmap_restored);
                 }
+                GeoModelIO::IO::printDifferencesBetweenTwoNodesMaps(mmap_loaded, mmap_restored);
+                std::cout << "----\n";
             }
             testok = false;
         }
@@ -275,7 +270,8 @@ class TestIO {
             std::cout << "Single results: \n";
             for (auto& tt : tests.second) {
                 std::cout << "test: '" << tt.first << "' ==> " << tt.second
-                          << " [" << (testall ? "PASSED." : "FAILED!") << "]"
+                          << " [" << (tt.second ? "PASSED." : "FAILED!") << "]"
+                          << " -- [overall: " << (testall ? "PASSED." : "FAILED!") << "]"
                           << std::endl;
             }
         }

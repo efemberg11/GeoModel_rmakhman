@@ -170,12 +170,28 @@ class ReadGeoModel {
     };
     unsigned long getNFunctions() { return m_functions.size(); };
     unsigned long getNNameTags() { return m_nameTags.size(); };
-    unsigned long getNShapes() { return m_shapes.size(); };
     unsigned long getNChildrenConnections() { return m_allchildren.size(); };
     std::vector<std::vector<std::string>> getTableFromTableName_String(
         const std::string_view tableName) {
         return m_dbManager->getTableRecords_String(tableName);
     };
+    unsigned long getNShapes() { return m_shapes.size(); }; // TODO: to be removed later
+    unsigned long getNShapes_Box() { return m_shapes_Box.size(); };
+    unsigned long getNShapes_Cons() { return m_shapes_Cons.size(); };
+    unsigned long getNShapes_Para() { return m_shapes_Para.size(); };
+    unsigned long getNShapes_Pcon() { return m_shapes_Pcon.size(); };
+    unsigned long getNShapes_Pgon() { return m_shapes_Pgon.size(); };
+    unsigned long getNShapes_SimplePolygonBrep() { return m_shapes_SimplePolygonBrep.size(); };
+    unsigned long getNShapes_Trap() { return m_shapes_Trap.size(); };
+    unsigned long getNShapes_Trd() { return m_shapes_Trd.size(); };
+    unsigned long getNShapes_Tube() { return m_shapes_Tube.size(); };
+    unsigned long getNShapes_Tubs() { return m_shapes_Tubs.size(); };
+    unsigned long getNShapes_TwistedTrap() { return m_shapes_TwistedTrap.size(); };
+    unsigned long getNShapes_UnidentifiedShape() { return m_shapes_UnidentifiedShape.size(); };
+    unsigned long getNShapes_Shift() { return m_shapes_Shift.size(); };
+    unsigned long getNShapes_Union() { return m_shapes_Union.size(); };
+    unsigned long getNShapes_Intersection() { return m_shapes_Intersection.size(); };
+    unsigned long getNShapes_Subtraction() { return m_shapes_Subtraction.size(); };
 
    private:
     void buildAllShapes(); // TODO: OLD METHOD, TO BE REMOVED WHEN READY

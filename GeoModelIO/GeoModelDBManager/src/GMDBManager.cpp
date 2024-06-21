@@ -525,9 +525,9 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType_String(
     else
     {
         // if (!checkTable(tableName))
-        if (!checkTableFromCache(tableName))
+        if (!checkTableFromDB(tableName))
         {
-            THROW_EXCEPTION("ERROR!!! Table name '" << tableName << "' does not exist in cache! (It has not been loaded from the DB)");
+            THROW_EXCEPTION("ERROR!!! Table name '" << tableName << "' does not exist in the DB!");
         }
         out = getTableRecords_String(tableName);
     }
@@ -555,9 +555,9 @@ DBRowsList GMDBManager::getTableFromNodeType_VecVecData(
     }
     else
     {
-        if (!checkTableFromCache(tableName))
+        if (!checkTableFromDB(tableName))
         {
-            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in the DB!");
         }
         out = getTableRecords_VecVecData(tableName);
     }
@@ -585,9 +585,9 @@ DBRowsList GMDBManager::getTableFromTableName_VecVecData(
     }
     else
     {
-        if (!checkTableFromCache(tableName))
+        if (!checkTableFromDB(tableName))
         {
-            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in the DB!");
         }
         out = getTableRecords_VecVecData(tableName);
     }
@@ -613,9 +613,9 @@ DBRowEntry GMDBManager::getTableFromTableName_VecData(
     }
     else
     {
-        if (!checkTableFromCache(tableName))
+        if (!checkTableFromDB(tableName))
         {
-            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+            THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in the DB!");
         }
         out = getTableRecords_VecData(tableName);
     }
@@ -1371,7 +1371,7 @@ DBRowsList GMDBManager::getPublishedFPVTable(
     }
     if (!checkTableFromCache(tableName))
     {
-        THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in cache! (It has not been loaded from the DB)");
+        THROW_EXCEPTION("ERROR!!! Table name '" + tableName + "' does not exist in the DB!");
     }
     return getTableRecords_VecVecData(tableName);
 }

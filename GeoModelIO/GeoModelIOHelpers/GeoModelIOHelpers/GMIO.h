@@ -163,10 +163,63 @@ class IO {
         unsigned long nalignables = db.getTableFromNodeType_String("GeoAlignableTransform").size();
         unsigned long nfunctions = db.getTableFromNodeType_VecVecData("Function").size();
         unsigned long nserialtransformers = db.getTableFromNodeType_String("GeoSerialTransformer").size();
-        unsigned long nshapes = db.getTableFromNodeType_String("GeoShape").size();
         unsigned long nserialdenominators = db.getTableFromNodeType_String("GeoSerialDenominator").size();
+        unsigned long ntransforms = db.getTableFromNodeType_VecVecData("GeoTransform").size();
+        unsigned long nserialidentifiers = db.getTableFromNodeType_VecVecData("GeoSerialIdentifier").size();
+        unsigned long nidentifiertags = db.getTableFromNodeType_VecVecData("GeoIdentifierTag").size();
+        unsigned long nnametags = db.getTableFromNodeType_VecVecData("GeoNameTag").size();
+        // get shapes
+        unsigned long nshapes = db.getTableFromNodeType_String("GoShape").size(); // TODO: to be removed later
+        unsigned long nshapes_box = db.getTableFromNodeType_VecVecData("GeoBox").size();
+        unsigned long nshapes_cons = db.getTableFromNodeType_VecVecData("GeoCons").size();
+        unsigned long nshapes_para = db.getTableFromNodeType_VecVecData("GeoPara").size();
+        unsigned long nshapes_pcon = db.getTableFromNodeType_VecVecData("GeoPcon").size();
+        unsigned long nshapes_pgon = db.getTableFromNodeType_VecVecData("GeoPgon").size();
+        unsigned long nshapes_simplepol = db.getTableFromNodeType_VecVecData("GeoSimplePolygonBrep").size();
+        unsigned long nshapes_trap = db.getTableFromNodeType_VecVecData("GeoTrap").size();
+        unsigned long nshapes_trd = db.getTableFromNodeType_VecVecData("GeoTrd").size();
+        unsigned long nshapes_tube = db.getTableFromNodeType_VecVecData("GeoTube").size();
+        unsigned long nshapes_tubs = db.getTableFromNodeType_VecVecData("GeoTubs").size();
+        unsigned long nshapes_twisted = db.getTableFromNodeType_VecVecData("GeoTwistedTrap").size();
+        unsigned long nshapes_unid = db.getTableFromNodeType_VecVecData("GeoUnidentifiedShape").size();
+        unsigned long nshapes_shift = db.getTableFromNodeType_VecVecData("GeoShapeShift").size();
+        unsigned long nshapes_union = db.getTableFromNodeType_VecVecData("GeoShapeUnion").size();
+        unsigned long nshapes_intersection = db.getTableFromNodeType_VecVecData("GeoShapeIntersection").size();
+        unsigned long nshapes_subtraction = db.getTableFromNodeType_VecVecData("GeoShapeSubtraction").size();
         // get metadata
         unsigned long nchildrenconnections = db.getChildrenTable().size();
+
+        mmap["PhysVol"] = nphysvols;
+        mmap["FullPhysVol"] = nfullphysvols;
+        mmap["LogVol"] = nlogvols;
+        mmap["Element"] = nelements;
+        mmap["Material"] = nmaterials;
+        mmap["Alignable"] = nalignables;
+        mmap["Function"] = nfunctions;
+        mmap["SerialTransformer"] = nserialtransformers;
+        mmap["SerialDenominator"] = nserialdenominators;
+        mmap["ChildrenConnections"] = nchildrenconnections;
+        mmap["Transform"] = ntransforms;
+        mmap["SerialIdentifier"] = nserialidentifiers;
+        mmap["IdentifierTag"] = nidentifiertags;
+        mmap["NameTag"] = nnametags;
+        mmap["Shape"] = nshapes;
+        mmap["Shape_Box"] = nshapes_box;
+        mmap["Shape_Cons"] = nshapes_cons;
+        mmap["Shape_Para"] = nshapes_para;
+        mmap["Shape_Pcon"] = nshapes_pcon;
+        mmap["Shape_Pgon"] = nshapes_pgon;
+        mmap["Shape_SimplePolygonBrep"] = nshapes_simplepol;
+        mmap["Shape_Trap"] = nshapes_trap;
+        mmap["Shape_Trd"] = nshapes_trd;
+        mmap["Shape_Tube"] = nshapes_tube;
+        mmap["Shape_Tubs"] = nshapes_tubs;
+        mmap["Shape_TwistedTrap"] = nshapes_twisted;
+        mmap["Shape_UnidentifiedShape"] = nshapes_unid;
+        mmap["Shape_Shift"] = nshapes_shift;
+        mmap["Shape_Union"] = nshapes_union;
+        mmap["Shape_Intersection"] = nshapes_intersection;
+        mmap["Shape_Subtraction"] = nshapes_subtraction;
 
         return mmap;
     }
@@ -181,7 +234,7 @@ class IO {
         if (loglevel > 0) {
             dump.setLogLevel(loglevel);
         }
-        world->exec(&dump);  // visit all GeoModel nodes
+        world->exec(&dump);  // visit all GeoModel nodes of the 'world' volume
 
         unsigned long nphysvols = dump.getNPhysVols();
         unsigned long nfullphysvols = dump.getNFullPhysVols();
@@ -191,7 +244,6 @@ class IO {
         unsigned long nalignables = dump.getNAlignableTransforms();
         unsigned long nfunctions = dump.getNFunctions();
         unsigned long nserialtransformers = dump.getNSerialTransformers();
-        unsigned long nshapes = dump.getNShapes();
         unsigned long nserialdenominators = dump.getNSerialDenominators();
         unsigned long nchildrenconnections = dump.getNChildrenConnections();
         // unsigned nrootvolume = dump.getNRootVolume();
@@ -199,6 +251,24 @@ class IO {
         unsigned long nserialidentifiers = dump.getNSerialIdentifiers();
         unsigned long nidentifiertags = dump.getNIdentifierTags();
         unsigned long nnametags = dump.getNNameTags();
+         // get shapes
+        unsigned long nshapes = dump.getNShapes(); // TODO: to be removed later
+        unsigned long nshapes_box = dump.getNShapes_Box();
+        unsigned long nshapes_cons = dump.getNShapes_Cons();
+        unsigned long nshapes_para = dump.getNShapes_Para();
+        unsigned long nshapes_pcon = dump.getNShapes_Pcon();
+        unsigned long nshapes_pgon = dump.getNShapes_Pgon();
+        unsigned long nshapes_simplepol = dump.getNShapes_SimplePolygonBrep();
+        unsigned long nshapes_trap = dump.getNShapes_Trap();
+        unsigned long nshapes_trd = dump.getNShapes_Trd();
+        unsigned long nshapes_tube = dump.getNShapes_Tube();
+        unsigned long nshapes_tubs = dump.getNShapes_Tubs();
+        unsigned long nshapes_twisted = dump.getNShapes_TwistedTrap();
+        unsigned long nshapes_unid = dump.getNShapes_UnidentifiedShape();
+        unsigned long nshapes_shift = dump.getNShapes_Shift();
+        unsigned long nshapes_union = dump.getNShapes_Union();
+        unsigned long nshapes_intersection = dump.getNShapes_Intersection();
+        unsigned long nshapes_subtraction = dump.getNShapes_Subtraction();
 
         mmap["PhysVol"] = nphysvols;
         mmap["FullPhysVol"] = nfullphysvols;
@@ -215,6 +285,23 @@ class IO {
         mmap["SerialIdentifier"] = nserialidentifiers;
         mmap["IdentifierTag"] = nidentifiertags;
         mmap["NameTag"] = nnametags;
+        mmap["Shape"] = nshapes;
+        mmap["Shape_Box"] = nshapes_box;
+        mmap["Shape_Cons"] = nshapes_cons;
+        mmap["Shape_Para"] = nshapes_para;
+        mmap["Shape_Pcon"] = nshapes_pcon;
+        mmap["Shape_Pgon"] = nshapes_pgon;
+        mmap["Shape_SimplePolygonBrep"] = nshapes_simplepol;
+        mmap["Shape_Trap"] = nshapes_trap;
+        mmap["Shape_Trd"] = nshapes_trd;
+        mmap["Shape_Tube"] = nshapes_tube;
+        mmap["Shape_Tubs"] = nshapes_tubs;
+        mmap["Shape_TwistedTrap"] = nshapes_twisted;
+        mmap["Shape_UnidentifiedShape"] = nshapes_unid;
+        mmap["Shape_Shift"] = nshapes_shift;
+        mmap["Shape_Union"] = nshapes_union;
+        mmap["Shape_Intersection"] = nshapes_intersection;
+        mmap["Shape_Subtraction"] = nshapes_subtraction;
 
         return mmap;
     }
@@ -230,7 +317,6 @@ class IO {
         unsigned long nalignables = read.getNAlignableTransforms();
         unsigned long nfunctions = read.getNFunctions();
         unsigned long nserialtransformers = read.getNSerialTransformers();
-        unsigned long nshapes = read.getNShapes();
         unsigned long nserialdenominators = read.getNSerialDenominators();
         unsigned long nchildrenconnections = read.getNChildrenConnections();
         // unsigned nrootvolume = read.getNRootVolume();
@@ -238,6 +324,24 @@ class IO {
         unsigned long nserialidentifiers = read.getNSerialIdentifiers();
         unsigned long nidentifiertags = read.getNIdentifierTags();
         unsigned long nnametags = read.getNNameTags();
+        // get shapes
+        unsigned long nshapes = read.getNShapes(); // TODO: to be removed later
+        unsigned long nshapes_box = read.getNShapes_Box();
+        unsigned long nshapes_cons = read.getNShapes_Cons();
+        unsigned long nshapes_para = read.getNShapes_Para();
+        unsigned long nshapes_pcon = read.getNShapes_Pcon();
+        unsigned long nshapes_pgon = read.getNShapes_Pgon();
+        unsigned long nshapes_simplepol = read.getNShapes_SimplePolygonBrep();
+        unsigned long nshapes_trap = read.getNShapes_Trap();
+        unsigned long nshapes_trd = read.getNShapes_Trd();
+        unsigned long nshapes_tube = read.getNShapes_Tube();
+        unsigned long nshapes_tubs = read.getNShapes_Tubs();
+        unsigned long nshapes_twisted = read.getNShapes_TwistedTrap();
+        unsigned long nshapes_unid = read.getNShapes_UnidentifiedShape();
+        unsigned long nshapes_shift = read.getNShapes_Shift();
+        unsigned long nshapes_union = read.getNShapes_Union();
+        unsigned long nshapes_intersection = read.getNShapes_Intersection();
+        unsigned long nshapes_subtraction = read.getNShapes_Subtraction();
 
         mmap["PhysVol"] = nphysvols;
         mmap["FullPhysVol"] = nfullphysvols;
@@ -254,6 +358,23 @@ class IO {
         mmap["SerialIdentifier"] = nserialidentifiers;
         mmap["IdentifierTag"] = nidentifiertags;
         mmap["NameTag"] = nnametags;
+        mmap["Shape"] = nshapes;
+        mmap["Shape_Box"] = nshapes_box;
+        mmap["Shape_Cons"] = nshapes_cons;
+        mmap["Shape_Para"] = nshapes_para;
+        mmap["Shape_Pcon"] = nshapes_pcon;
+        mmap["Shape_Pgon"] = nshapes_pgon;
+        mmap["Shape_SimplePolygonBrep"] = nshapes_simplepol;
+        mmap["Shape_Trap"] = nshapes_trap;
+        mmap["Shape_Trd"] = nshapes_trd;
+        mmap["Shape_Tube"] = nshapes_tube;
+        mmap["Shape_Tubs"] = nshapes_tubs;
+        mmap["Shape_TwistedTrap"] = nshapes_twisted;
+        mmap["Shape_UnidentifiedShape"] = nshapes_unid;
+        mmap["Shape_Shift"] = nshapes_shift;
+        mmap["Shape_Union"] = nshapes_union;
+        mmap["Shape_Intersection"] = nshapes_intersection;
+        mmap["Shape_Subtraction"] = nshapes_subtraction;
 
         return mmap;
     }
@@ -271,7 +392,8 @@ class IO {
                   << m2[key] << std::endl;
     }
 
-    static std::vector<std::string> getMapKeys() {
+    static std::vector<std::string> getMapKeys()
+    {
         std::vector<std::string> keys{"PhysVol",
                                       "FullPhysVol",
                                       "LogVol",
@@ -280,13 +402,29 @@ class IO {
                                       "Alignable",
                                       "Function",
                                       "SerialTransformer",
-                                      "Shape",
                                       "Transform",
                                       "SerialIdentifier",
                                       "IdentifierTag",
                                       "NameTag"
                                       "SerialDenominator",
-                                      "ChildrenConnections"};
+                                      "ChildrenConnections",
+                                      "Shape",
+                                      "Shape_Box",
+                                      "Shape_Cons",
+                                      "Shape_Para",
+                                      "Shape_Pcon",
+                                      "Shape_Pgon",
+                                      "Shape_SimplePolygonBrep",
+                                      "Shape_Trap",
+                                      "Shape_Trd",
+                                      "Shape_Tube",
+                                      "Shape_Tubs",
+                                      "Shape_TwistedTrap",
+                                      "Shape_UnidentifiedShape",
+                                      "Shape_Shift",
+                                      "Shape_Union",
+                                      "Shape_Intersection",
+                                      "Shape_Subtraction"};
         return keys;
     }
     static void printCompareTwoNodesMaps(
@@ -298,6 +436,22 @@ class IO {
         }
     }
 
+    static void printDifferencesBetweenTwoNodesMaps(
+        std::map<std::string, unsigned long> m1,
+        std::map<std::string, unsigned long> m2)
+    {
+        for (const auto &entry : m1)
+        {
+            const std::string key = entry.first;
+            const unsigned i1 = m1[key];
+            const unsigned i2 = m2[key];
+            if (i1 != i2)
+            {
+                std::cout << "ERROR! ==> the number of '" << key << "' are different! " << i1 << " <-> " << i2 << std::endl;
+            }
+        }
+    }
+
     static std::map<std::string, unsigned long> initNodesMap() {
         std::map<std::string, unsigned long> nmap;
         std::vector<std::string> keys = getMapKeys();
@@ -306,6 +460,16 @@ class IO {
             nmap[key] = 0;
         }
         return nmap;
+    }
+
+    static void checkTwoNodesMapsSameSize(
+        std::map<std::string, unsigned long> m1,
+        std::map<std::string, unsigned long> m2)
+    {
+        if (m1.size() != m2.size())
+        {
+            THROW_EXCEPTION("ERROR! Maps are not of the same size!");
+        }
     }
 };
 

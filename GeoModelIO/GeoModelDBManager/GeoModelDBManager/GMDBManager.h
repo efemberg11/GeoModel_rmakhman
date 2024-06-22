@@ -308,7 +308,7 @@ class GMDBManager {
     std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
     std::unordered_map<std::string, unsigned int> getAll_NodeTypesTableIDs();
 
-    std::vector<std::vector<std::string>> getTableRecords(const std::string_view tableName) const;
+    std::vector<std::vector<std::string>> getTableRecords_String(const std::string_view tableName) const;
     DBRowEntry getTableRecords_VecData(const std::string_view tableName) const;
     DBRowsList getTableRecords_VecVecData(const std::string_view tableName) const;
 
@@ -404,8 +404,6 @@ class GMDBManager {
        bool storeRootVolume(const unsigned &id, const std::string_view nodeType);
        int getTableColIndex(const std::string &tableName,
                             const std::string &colName);
-
-       bool storeRootVolume(const unsigned int &id, const std::string &nodeType);
 
        std::string m_dbpath;
 

@@ -272,7 +272,6 @@ const GeoVPhysVol* ReadGeoModel::buildGeoModel() {
                      "cube of 30cm side length.\n\n"
                   << std::endl;
     }
-
     return rootVolume;
 }
 
@@ -1475,7 +1474,7 @@ void ReadGeoModel::processParentChild(
     // build or get parent volume.
     // Using the parentCopyNumber here, to get a given instance of the
     // parent volume
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "build/get parent volume...\n";
         muxCout.unlock();
@@ -1574,7 +1573,7 @@ void ReadGeoModel::processParentChild(
     // build or get parent volume.
     // Using the parentCopyNumber here, to get a given instance of the
     // parent volume
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "build/get parent volume...\n";
         muxCout.unlock();
@@ -1665,7 +1664,7 @@ void ReadGeoModel::checkNodePtr(GeoGraphNode* nodePtr, std::string varName,
 GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id,
                                                  const unsigned int tableId,
                                                  const unsigned int copyN) {
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "ReadGeoModel::buildVPhysVolInstance() - id: " << id
                   << ", tableId: " << tableId << ", copyN: " << copyN
@@ -1676,7 +1675,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id,
     // A - if the instance has been previously built, return that
     // if ( nullptr != getVPhysVol(id, tableId, copyN)) {
     if (nullptr != getVPhysVol(id, tableId)) {
-        if (m_loglevel >= 2) {
+        if (m_loglevel >= 3) {
             muxCout.lock();
             // std::cout << "getting the instance volume from memory...
             // Returning: [" << getVPhysVol(id, tableId, copyN) << "] --
@@ -1711,7 +1710,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id,
     if (1 == tableId) {
         if (isBuiltPhysVol(id)) {
             vol = new GeoPhysVol(getBuiltPhysVol(id)->getLogVol());
-            if (m_loglevel >= 2) {
+            if (m_loglevel >= 3) {
                 muxCout.lock();
                 std::cout
                     << "PhysVol not instanced yet, building the instance now ["
@@ -1748,7 +1747,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVolInstance(const unsigned int id,
 GeoVPhysVol* ReadGeoModel::buildVPhysVol(
     const unsigned int id, const unsigned int tableId,
     unsigned int /*defaults to "0"*/ logVol_ID) {
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "ReadGeoModel::buildVPhysVol() - " << id << ", " << tableId
                   << std::endl;
@@ -1761,7 +1760,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(
 
     // get the actual VPhysVol volume, if built already
     if (nodeType == "GeoPhysVol" && isBuiltPhysVol(id)) {
-        if (m_loglevel >= 2) {
+        if (m_loglevel >= 3) {
             muxCout.lock();
             std::cout << "getting the actual PhysVol from cache...\n";
             ;
@@ -1769,7 +1768,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(
         }
         return getBuiltPhysVol(id);
     } else if (nodeType == "GeoFullPhysVol" && isBuiltFullPhysVol(id)) {
-        if (m_loglevel >= 2) {
+        if (m_loglevel >= 3) {
             muxCout.lock();
             std::cout << "getting the actual FullPhysVol from cache...\n";
             ;
@@ -1796,7 +1795,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(
         std::cout << "ERROR!!! LogVol is NULL!" << std::endl;
         //    exit(EXIT_FAILURE);
     }
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "using the cached LogVol [" << logVol_ID
                   << "] w/ address: " << logVol << "...\n";
@@ -1831,7 +1830,7 @@ GeoVPhysVol* ReadGeoModel::buildVPhysVol(
 
 // Get the root volume
 GeoVPhysVol* ReadGeoModel::getRootVolume() {
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "ReadGeoModel::getRootVolume()" << std::endl;
         std::cout << "m_root_vol_data: " << m_root_vol_data.first << ", " << m_root_vol_data.second << std::endl;       
@@ -1858,32 +1857,23 @@ GeoMaterial* ReadGeoModel::buildMaterial(const unsigned id) {
         muxCout.unlock();
     }
 
-    // OLD
-    // std::vector<std::string> values = m_materials[id - 1];
-    // const unsigned int matId = std::stoi(values[0]);
-    // const std::string matName = values[1];
-    // double matDensity = std::stod(values[2]);
-    // std::string matElements = values[3];
-
-    // NEW
     DBRowEntry values = m_materials[id - 1];
     const unsigned int matId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[0], "Material:id");
     const std::string matName = GeoModelHelpers::variantHelper::getFromVariant_String(values[1], "Material:matName");
     const double matDensity = GeoModelHelpers::variantHelper::getFromVariant_Double(values[2], "Material:matDensity");
     const unsigned dataStart = GeoModelHelpers::variantHelper::getFromVariant_Int(values[3], "Material:dataStart");
-    const unsigned dataEnd = GeoModelHelpers::variantHelper::getFromVariant_Int(values[3], "Material:dataEnd");
-
+    const unsigned dataEnd = GeoModelHelpers::variantHelper::getFromVariant_Int(values[4], "Material:dataEnd");
 
     // debug msg
-    // if (m_loglevel >= 2) {
-    //     muxCout.lock();
-    //     std::cout << "\tMaterial - ID:" << matId << ", name:" << matName
-    //               << ", density:" << matDensity << " ( "
-    //               << matDensity / (SYSTEM_OF_UNITS::g / SYSTEM_OF_UNITS::cm3)
-    //               << "[g/cm3] )"
-    //               << ", elements:" << matElements;
-    //     muxCout.unlock();
-    // }
+    if (m_loglevel >= 3) {
+        muxCout.lock();
+        std::cout << "\tbuildMaterial() : Material - ID:" << matId << ", name:" << matName
+                  << ", density:" << matDensity << " ( "
+                  << matDensity / (SYSTEM_OF_UNITS::g / SYSTEM_OF_UNITS::cm3)
+                  << "[g/cm3] )"
+                  << ", elements: dataStart: " << dataStart << ", dataEnd: " << dataEnd;
+        muxCout.unlock();
+    }
 
     GeoMaterial* mat = new GeoMaterial(matName, matDensity);
 
@@ -3554,7 +3544,7 @@ GeoBox* ReadGeoModel::buildDummyShape() {
 }
 
 GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "buildLogVol(), testing LogVol id: " << id << "...\n";
         ;
@@ -3562,7 +3552,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
     }
 
     if (isBuiltLog(id)) {
-        if (m_loglevel >= 2) {
+        if (m_loglevel >= 3) {
             muxCout.lock();
             std::cout << "getting the LogVol from cache...\n";
             ;
@@ -3571,7 +3561,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
         return getBuiltLog(id);
     }
 
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "ReadGeoModel::buildLogVol()" << std::endl;
         muxCout.unlock();
@@ -3596,7 +3586,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
     // const unsigned int matId = std::stoi(values[3]);
     const int matId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[4], "LogVol_MaterialID");
 
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "buildLogVol() - material Id:" << matId << std::endl;
         muxCout.unlock();
@@ -3608,7 +3598,7 @@ GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
 
     GeoLogVol* logPtr = new GeoLogVol(logVolName, shape, mat);
     storeBuiltLog(logPtr);
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         muxCout.lock();
         std::cout << "buildLogVol() - address of the stored LogVol:" << logPtr
                   << std::endl;

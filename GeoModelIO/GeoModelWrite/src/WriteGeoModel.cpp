@@ -147,7 +147,7 @@ void WriteGeoModel::handleFullPhysVol(const GeoFullPhysVol* vol) {
 }
 
 void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         std::cout << "WriteGeoModel::handleVPhysVolObjects() -- visiting... "
                   << vol << std::endl;
     }
@@ -338,7 +338,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
     const unsigned int volCopyN = setVolumeCopyNumber(physId, volTypeStr);
 
     // debug msg
-    if (m_loglevel >= 2) {
+    if (m_loglevel >= 3) {
         std::cout << "WriteGeoModel -- physId: " << physId
                   << "- volume copy number : " << volCopyN << std::endl;
     }
@@ -738,6 +738,10 @@ unsigned int WriteGeoModel::storeMaterial(const GeoMaterial* mat) {
     const std::string matName = mat->getName();  // The name of the material
     const double matDensity = mat->getDensity(); // The density of the material
     const unsigned numElements = mat->getNumElements(); // The number of elements composing the material
+
+    if (m_loglevel >= 3) {
+        std::cout << "mat: " << matName << " -- get n elems: " << numElements << std::endl;
+    }
 
     if (0 == numElements) {
         THROW_EXCEPTION("ERROR!!! The material '" << matName << "' has zero elements!");
@@ -1648,14 +1652,17 @@ unsigned int WriteGeoModel::storeObj(const GeoElement* pointer,
                                      const std::string& name,
                                      const std::string& symbol,
                                      const double& elZ, const double& elA) {
+    if(m_loglevel>=3) std::cout << "storing " << name << std::endl;
     std::string address = getAddressStringFromPointer(pointer);
     unsigned int elementId;
 
     if (!isAddressStored(address)) {
         elementId = addElement(name, symbol, elZ, elA);
         storeAddress(address, elementId);
+        if(m_loglevel>=3) std::cout << "stored\n";
     } else {
         elementId = getStoredIdFromAddress(address);
+        if(m_loglevel>=3) std::cout << "retrieved from cache\n";
     }
     return elementId;
 }

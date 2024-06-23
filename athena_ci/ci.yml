@@ -156,7 +156,7 @@ run_workflow_tests_run3_mc:
   extends: .run_base
   script:
     - cd run
-    - RunWorkflowTests_Run3.py --CI -r -w MCReco -e '--maxEvents 25' --detailed-comparison
+    - RunWorkflowTests_Run3.py --CI -r -w MCReco -e '--maxEvents 25 --conditionsTag OFLCOND-MC23-SDR-RUN3-05' --detailed-comparison
 
 run_workflow_tests_run4_reco:
   extends: .run_base

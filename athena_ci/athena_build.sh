@@ -230,7 +230,7 @@ if [ -z "$CI" ]; then
   heading "Interactive mode, dropping into shell"
   bash
 else
-  VERBOSE=1 cmake --build athena-build -- -j3
+  cmake --build athena-build -- -j3
   $CCACHE -s
   cmake --install athena-build > athena_install.log
 fi

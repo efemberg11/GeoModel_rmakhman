@@ -8,7 +8,6 @@ if [ -z "${SOURCE_DIR}" ]; then
     SOURCE_DIR="${PWD}"
 fi
 
-echo "${EOS_ACCOUNT_PASSWORD}" | kinit ${EOS_ACCOUNT_USERNAME}@CERN.CH
 echo "SOURCE_DIR=\"${SOURCE_DIR}\""
 echo "BUILD_DIR=\"${CI_PROJECT_DIR}/../build\""
 echo "INSTALL_DIR=\"${CI_PROJECT_DIR}/install\""
@@ -34,22 +33,41 @@ echo "export ROOT_INCLUDE_PATH=\"${INSTALL_DIR}/include:${ROOT_INCLUDE_PATH}\""
 echo "export PATH=\"${INSTALL_DIR}/bin:${PATH}\""
 
 
-cmake ${CMAKE_CONFIG_FLAGS} \
-    -DCMAKE_CXX_FLAGS="${CMAKE_EXTRA_FLAGS}" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
-     ${SOURCE_DIR}
-
 echo "cmake ${CMAKE_CONFIG_FLAGS} \
     -DCMAKE_CXX_FLAGS=\"${CMAKE_EXTRA_FLAGS}\" \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
      ${SOURCE_DIR}"
 
+cmake ${CMAKE_CONFIG_FLAGS} \
+    -DCMAKE_CXX_FLAGS="${CMAKE_EXTRA_FLAGS}" \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+     ${SOURCE_DIR}
+
+result=$?
+if [ ${result} -ne 0 ];then 
+   echo "Cmake failed"
+   exit 1
+fi
+
+
 
 make -j4
 
+result=$?
+if [ ${result} -ne 0 ];then 
+   echo "Compilation failed"
+   exit 1
+fi
+
 make install
+
+result=$?
+if [ ${result} -ne 0 ];then 
+   echo "Installation failed"
+   exit 1
+fi
 
 ls -lh ${INSTALL_DIR}
 

@@ -61,7 +61,7 @@ void BuildGeoShapes_SimplePolygonBrep::buildShape(const DBRowEntry row)
     {
         const double xV = GeoModelHelpers::variantHelper::getFromVariant_Double(dataRow[1], "SimplePolygonBrep:data_xV");
         const double yV = GeoModelHelpers::variantHelper::getFromVariant_Double(dataRow[2], "SimplePolygonBrep:data_yV");
-        // add a Z plane to the GeoSimplePolygonBrep
+        // add a vertex to the GeoSimplePolygonBrep
         shape->addVertex(xV, yV);
     }
 

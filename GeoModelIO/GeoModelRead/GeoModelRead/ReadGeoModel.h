@@ -100,6 +100,7 @@ class BuildGeoShapes_TwistedTrap;
 class BuildGeoShapes_Pcon;
 class BuildGeoShapes_Pgon;
 class BuildGeoShapes_SimplePolygonBrep;
+class BuildGeoShapes_GenericTrap;
 class BuildGeoShapes_UnidentifiedShape;
 
 // type definitions
@@ -183,6 +184,7 @@ class ReadGeoModel {
     unsigned long getNShapes_Pcon() { return m_shapes_Pcon.size(); };
     unsigned long getNShapes_Pgon() { return m_shapes_Pgon.size(); };
     unsigned long getNShapes_SimplePolygonBrep() { return m_shapes_SimplePolygonBrep.size(); };
+    unsigned long getNShapes_GenericTrap() { return m_shapes_GenericTrap.size(); };
     unsigned long getNShapes_Trap() { return m_shapes_Trap.size(); };
     unsigned long getNShapes_Trd() { return m_shapes_Trd.size(); };
     unsigned long getNShapes_Tube() { return m_shapes_Tube.size(); };
@@ -206,10 +208,11 @@ class ReadGeoModel {
     void buildAllShapes_Tubs();
     void buildAllShapes_Torus();
     void buildAllShapes_TwistedTrap();
+    void buildAllShapes_UnidentifiedShape();
     void buildAllShapes_Pcon();
     void buildAllShapes_Pgon();
     void buildAllShapes_SimplePolygonBrep();
-    void buildAllShapes_UnidentifiedShape();
+    void buildAllShapes_GenericTrap();
     void buildAllShapes_Operators();
 
 
@@ -408,6 +411,7 @@ class ReadGeoModel {
     BuildGeoShapes_Pcon* m_builderShape_Pcon;
     BuildGeoShapes_Pgon* m_builderShape_Pgon;
     BuildGeoShapes_SimplePolygonBrep* m_builderShape_SimplePolygonBrep;
+    BuildGeoShapes_GenericTrap* m_builderShape_GenericTrap;
     BuildGeoShapes_UnidentifiedShape* m_builderShape_UnidentifiedShape;
 
     //! containers to store the list of GeoModel nodes coming from the DB
@@ -443,6 +447,7 @@ class ReadGeoModel {
     DBRowsList m_shapes_Pcon;
     DBRowsList m_shapes_Pgon;
     DBRowsList m_shapes_SimplePolygonBrep;
+    DBRowsList m_shapes_GenericTrap;
     DBRowsList m_shapes_UnidentifiedShape;
     
     // containers to store shapes' data, 
@@ -450,6 +455,7 @@ class ReadGeoModel {
     DBRowsList m_shapes_Pcon_data;
     DBRowsList m_shapes_Pgon_data;
     DBRowsList m_shapes_SimplePolygonBrep_data;
+    DBRowsList m_shapes_GenericTrap_data;
 
     // containers to store shape operators / boolean shapes
     DBRowsList m_shapes_Shift;

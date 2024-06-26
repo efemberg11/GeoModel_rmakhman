@@ -451,7 +451,7 @@ int main(int argc, char *argv[])
 
 
   // Add a test "Torus" shape node
-  const GeoTorus* sTorus = new GeoTorus(2*SYSTEM_OF_UNITS::m, 1*SYSTEM_OF_UNITS::m, 10*SYSTEM_OF_UNITS::m, 0*SYSTEM_OF_UNITS::rad, (270*SYSTEM_OF_UNITS::degree)*(SYSTEM_OF_UNITS::rad/SYSTEM_OF_UNITS::degree));
+  const GeoTorus* sTorus = new GeoTorus(2*SYSTEM_OF_UNITS::m, 1*SYSTEM_OF_UNITS::m, 10*SYSTEM_OF_UNITS::m, 0*SYSTEM_OF_UNITS::rad, 4.5*SYSTEM_OF_UNITS::rad);
   const GeoLogVol* lTorus = new GeoLogVol("Torus", sTorus, steel);
   GeoPhysVol* pTorus = new GeoPhysVol(lTorus);
   GeoNameTag* nTorus = new GeoNameTag("Shape-Torus");

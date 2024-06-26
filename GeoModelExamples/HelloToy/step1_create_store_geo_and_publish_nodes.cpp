@@ -21,8 +21,10 @@
 #include "GeoModelKernel/GeoTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTubs.h"
+#include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
+#include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
@@ -441,15 +443,43 @@ int main(int argc, char *argv[])
   // Add a test "UnidentifiedShape" shape node
   const std::string nameUnidentifiedShape = "LAr::Example";
   GeoUnidentifiedShape* sUnidentifiedShape = new GeoUnidentifiedShape("LArCustomShape",nameUnidentifiedShape);
-  GeoLogVol* lUnidentifiedShape = new GeoLogVol("UnidentifiedShape", sUnidentifiedShape, steel);
+  const GeoLogVol* lUnidentifiedShape = new GeoLogVol("UnidentifiedShape", sUnidentifiedShape, steel);
   GeoPhysVol *pUnidentifiedShape = new GeoPhysVol(lUnidentifiedShape);
   GeoNameTag *nUnidentifiedShape = new GeoNameTag("UnidentifiedShape");
   toyPhys->add(nUnidentifiedShape);
   toyPhys->add(pUnidentifiedShape);
 
 
+  // Add a test "Torus" shape node
+  const GeoTorus* sTorus = new GeoTorus(2*SYSTEM_OF_UNITS::m, 1*SYSTEM_OF_UNITS::m, 10*SYSTEM_OF_UNITS::m, 0*SYSTEM_OF_UNITS::rad, (270*SYSTEM_OF_UNITS::degree)*(SYSTEM_OF_UNITS::rad/SYSTEM_OF_UNITS::degree));
+  const GeoLogVol* lTorus = new GeoLogVol("Torus", sTorus, steel);
+  GeoPhysVol* pTorus = new GeoPhysVol(lTorus);
+  GeoNameTag* nTorus = new GeoNameTag("Shape-Torus");
+  toyPhys->add(nTorus);
+  toyPhys->add(pTorus);
 
-
+  // Add a test GeoGenericTrap shape
+  const double gt_Zlength = 1 * SYSTEM_OF_UNITS::m;
+  const double gt_xV1 = 1.5 * SYSTEM_OF_UNITS::m;
+  const double gt_yV1 = 1.5 * SYSTEM_OF_UNITS::m;
+  const double gt_xV2 = 3 * SYSTEM_OF_UNITS::m;
+  const double gt_yV2 = 3 * SYSTEM_OF_UNITS::m;
+  const double gt_xV3 = 4 * SYSTEM_OF_UNITS::m;
+  const double gt_yV3 = 4 * SYSTEM_OF_UNITS::m;
+  GeoGenericTrapVertices gt_Vertices;
+  gt_Vertices.push_back(GeoTwoVector(gt_xV1, gt_yV1));
+  gt_Vertices.push_back(GeoTwoVector(gt_xV2, gt_yV2));
+  gt_Vertices.push_back(GeoTwoVector(gt_xV3, gt_yV3));
+  GeoGenericTrap *sGenericTrap = new GeoGenericTrap(gt_Zlength, gt_Vertices);
+  // if (!sGenericTrap->isValid())
+  // {
+  //   THROW_EXCEPTION("ERROR! GeoGenericTrap shape is not valid!!");
+  // }
+  GeoLogVol *lGenericTrap = new GeoLogVol("GeoGenericTrap", sGenericTrap, steel);
+  GeoPhysVol *pGenericTrap = new GeoPhysVol(lGenericTrap);
+  GeoNameTag *nGenericTrap = new GeoNameTag("Shape-GenericTrap");
+  toyPhys->add(nGenericTrap);
+  toyPhys->add(pGenericTrap);
 
   //------------------------------------------------------------------------------------//
   // Writing the geometry to file

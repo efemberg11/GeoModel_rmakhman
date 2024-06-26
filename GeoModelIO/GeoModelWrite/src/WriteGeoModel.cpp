@@ -48,12 +48,14 @@
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
+#include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
+#include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
@@ -700,7 +702,7 @@ std::pair<std::string, unsigned> WriteGeoModel::storeShape(const GeoShape* shape
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType == "CustomShape") shapeType = "UnidentifiedShape";
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep", "Intersection", "Shift", "Subtraction", "Union", "UnidentifiedShape"};
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep", "GenericTrap", "Intersection", "Shift", "Subtraction", "Union", "UnidentifiedShape"};
 
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
@@ -1077,6 +1079,23 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
         shapePars.push_back(shapeIn->getSPhi());
         shapePars.push_back(shapeIn->getDPhi());
     }
+    else if (shapeType == "Torus")
+    {
+        // Member Data:
+        // * Rmax - outside radius of the torus tube
+        // * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
+        // * Rtor - radius of the torus itself
+        // *
+        // * SPhi - starting angle of the segment in radians
+        // * DPhi - delta angle of the segment in radians
+        //
+        const GeoTorus* shapeIn = dynamic_cast<const GeoTorus*>(shape);
+        shapePars.push_back(shapeIn->getRMin());
+        shapePars.push_back(shapeIn->getRMax());
+        shapePars.push_back(shapeIn->getRTor());
+        shapePars.push_back(shapeIn->getSPhi());
+        shapePars.push_back(shapeIn->getDPhi());
+    }
     else if (shapeType == "Pcon")
     {
         const GeoPcon* shapeIn = dynamic_cast<const GeoPcon*>(shape);
@@ -1124,10 +1143,23 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
             dataRow.clear();
         }
     }
+    else if (shapeType == "GenericTrap") {
+        const GeoGenericTrap* shapeIn = dynamic_cast<const GeoGenericTrap*>(shape);
+
+        shapePars.push_back(shapeIn->getZHalfLength());
+        // get number of Z planes and loop over them
+        const int nVertices = shapeIn->getVertices().size();
+        shapePars.push_back(nVertices);
+        for (int i = 0; i < nVertices; ++i) {
+            dataRow.push_back(shapeIn->getVertices()[i](0));
+            dataRow.push_back(shapeIn->getVertices()[i](1));
+            shapeData.push_back(dataRow);
+            dataRow.clear();
+        }
+    } 
     else if (shapeType == "Intersection")
     {
-        const GeoShapeIntersection* shapeIn =
-            dynamic_cast<const GeoShapeIntersection*>(shape);
+        const GeoShapeIntersection* shapeIn = dynamic_cast<const GeoShapeIntersection*>(shape);
         
         // get the two referenced Shape nodes used in the 'Intersection' operation, 
         // then store them in the DB
@@ -1148,8 +1180,7 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
     }
     else if (shapeType == "Shift")
     {
-        const GeoShapeShift* shapeIn =
-            dynamic_cast<const GeoShapeShift*>(shape);
+        const GeoShapeShift* shapeIn = dynamic_cast<const GeoShapeShift*>(shape);
 
         // get the referenced Shape used in the 'shift' operation, 
         // then store it in the DB
@@ -1167,10 +1198,9 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
     }
     else if (shapeType == "Subtraction")
     {
-        const GeoShapeSubtraction* shapeIn =
-            dynamic_cast<const GeoShapeSubtraction*>(shape);
+        const GeoShapeSubtraction* shapeIn = dynamic_cast<const GeoShapeSubtraction*>(shape);
         
-         // get the two referenced Shape nodes used in the 'Subtraction' operation, 
+        // get the two referenced Shape nodes used in the 'Subtraction' operation, 
         // then store them in the DB
         const GeoShape* shapeOpA = shapeIn->getOpA();
         const std::pair<std::string, unsigned> shapeStoredA = storeShape(shapeOpA);
@@ -1190,10 +1220,9 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
     }
     else if (shapeType == "Union")
     {
-        const GeoShapeUnion* shapeIn =
-            dynamic_cast<const GeoShapeUnion*>(shape);
+        const GeoShapeUnion* shapeIn = dynamic_cast<const GeoShapeUnion*>(shape);
         
-         // get the two referenced Shape nodes used in the 'Subtraction' operation, 
+        // get the two referenced Shape nodes used in the 'Subtraction' operation, 
         // then store them in the DB
         const GeoShape* shapeOpA = shapeIn->getOpA();
         const std::pair<std::string, unsigned> shapeStoredA = storeShape(shapeOpA);
@@ -1211,8 +1240,7 @@ WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
         shapePars.push_back(shapeIdB);
 
     } else if (shapeType == "UnidentifiedShape") {
-        const GeoUnidentifiedShape* shapeIn =
-            dynamic_cast<const GeoUnidentifiedShape*>(shape);
+        const GeoUnidentifiedShape* shapeIn = dynamic_cast<const GeoUnidentifiedShape*>(shape);
         shapePars.push_back(shapeIn->name());
         shapePars.push_back(shapeIn->asciiData());
     }
@@ -1261,22 +1289,22 @@ std::string WriteGeoModel::getShapeParameters(const GeoShape* shape) {
     //     pars.push_back("SPhi=" + GeoStrUtils::to_string_with_precision(shapeIn->getSPhi()));
     //     pars.push_back("DPhi=" + GeoStrUtils::to_string_with_precision(shapeIn->getDPhi()));
     // } 
-    else if (shapeType == "Torus") {
-        // Member Data:
-        // * Rmax - outside radius of the torus tube
-        // * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
-        // * Rtor - radius of the torus itself
-        // *
-        // * SPhi - starting angle of the segment in radians
-        // * DPhi - delta angle of the segment in radians
-        //
-        const GeoTorus* shapeIn = dynamic_cast<const GeoTorus*>(shape);
-        pars.push_back("Rmin=" + GeoStrUtils::to_string_with_precision(shapeIn->getRMin()));
-        pars.push_back("Rmax=" + GeoStrUtils::to_string_with_precision(shapeIn->getRMax()));
-        pars.push_back("Rtor=" + GeoStrUtils::to_string_with_precision(shapeIn->getRTor()));
-        pars.push_back("SPhi=" + GeoStrUtils::to_string_with_precision(shapeIn->getSPhi()));
-        pars.push_back("DPhi=" + GeoStrUtils::to_string_with_precision(shapeIn->getDPhi()));
-    } 
+    // else if (shapeType == "Torus") {
+    //     // Member Data:
+    //     // * Rmax - outside radius of the torus tube
+    //     // * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
+    //     // * Rtor - radius of the torus itself
+    //     // *
+    //     // * SPhi - starting angle of the segment in radians
+    //     // * DPhi - delta angle of the segment in radians
+    //     //
+    //     const GeoTorus* shapeIn = dynamic_cast<const GeoTorus*>(shape);
+    //     pars.push_back("Rmin=" + GeoStrUtils::to_string_with_precision(shapeIn->getRMin()));
+    //     pars.push_back("Rmax=" + GeoStrUtils::to_string_with_precision(shapeIn->getRMax()));
+    //     pars.push_back("Rtor=" + GeoStrUtils::to_string_with_precision(shapeIn->getRTor()));
+    //     pars.push_back("SPhi=" + GeoStrUtils::to_string_with_precision(shapeIn->getSPhi()));
+    //     pars.push_back("DPhi=" + GeoStrUtils::to_string_with_precision(shapeIn->getDPhi()));
+    // } 
     // else if (shapeType == "Para") {
     //     const GeoPara* shapeIn = dynamic_cast<const GeoPara*>(shape);
     //     pars.push_back("XHalfLength=" +
@@ -2049,6 +2077,9 @@ std::pair<unsigned, unsigned> WriteGeoModel::addShapeData(const std::string type
     else if ("SimplePolygonBrep" == type) {
         container = &m_shapes_SimplePolygonBrep_Data;
     } 
+    else if ("GenericTrap" == type) {
+        container = &m_shapes_GenericTrap_Data;
+    } 
     else {
         std::cout << "\nERROR!!! Shape data for shape '" << type << "' have not been set, yet!\n" << std::endl;
     }
@@ -2497,6 +2528,10 @@ unsigned int WriteGeoModel::addShape(const std::string &type,
     {
         container = &m_shapes_Tubs;
     }
+    else if ("Torus" == type)
+    {
+        container = &m_shapes_Torus;
+    }
     else if ("TwistedTrap" == type)
     {
         container = &m_shapes_TwistedTrap;
@@ -2512,6 +2547,10 @@ unsigned int WriteGeoModel::addShape(const std::string &type,
     else if ("SimplePolygonBrep" == type)
     {
         container = &m_shapes_SimplePolygonBrep;
+    }
+    else if ("GenericTrap" == type)
+    {
+        container = &m_shapes_GenericTrap;
     }
     else if ("Intersection" == type)
     {
@@ -2662,6 +2701,7 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecords("GeoTrap", m_shapes_Trap); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoTrd", m_shapes_Trd); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoTubs", m_shapes_Tubs); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoTorus", m_shapes_Torus); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoTwistedTrap", m_shapes_TwistedTrap); // new version, with shape's parameters as numbers
     
     // store shapes' data // TODO: maybe this should be encapsulated with shapes? 
@@ -2669,9 +2709,11 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecords("GeoPcon", m_shapes_Pcon); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoPgon", m_shapes_Pgon); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoSimplePolygonBrep", m_shapes_SimplePolygonBrep); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoGenericTrap", m_shapes_GenericTrap); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecordsToTable("Shapes_Pcon_Data", m_shapes_Pcon_Data); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecordsToTable("Shapes_Pgon_Data", m_shapes_Pgon_Data); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecordsToTable("Shapes_SimplePolygonBrep_Data", m_shapes_SimplePolygonBrep_Data); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecordsToTable("Shapes_GenericTrap_Data", m_shapes_GenericTrap_Data); // new version, with shape's parameters as numbers
 
     m_dbManager->addListOfRecords("GeoShapeShift", m_shapes_Shift); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoShapeIntersection", m_shapes_Intersection); // new version, with shape's parameters as numbers

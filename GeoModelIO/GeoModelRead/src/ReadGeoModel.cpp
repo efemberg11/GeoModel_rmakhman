@@ -37,6 +37,7 @@
 #include "BuildGeoShapes_Trap.h"
 #include "BuildGeoShapes_Trd.h"
 #include "BuildGeoShapes_Tubs.h"
+#include "BuildGeoShapes_Torus.h"
 #include "BuildGeoShapes_TwistedTrap.h"
 #include "BuildGeoShapes_SimplePolygonBrep.h"
 #include "BuildGeoShapes_UnidentifiedShape.h"
@@ -82,6 +83,7 @@
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
+#include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
@@ -233,6 +235,7 @@ ReadGeoModel::~ReadGeoModel() {
     delete m_builderShape_Trap;
     delete m_builderShape_Trd;
     delete m_builderShape_Tubs;
+    delete m_builderShape_Torus;
     delete m_builderShape_TwistedTrap;
     delete m_builderShape_SimplePolygonBrep;
     delete m_builderShape_UnidentifiedShape;
@@ -244,6 +247,7 @@ ReadGeoModel::~ReadGeoModel() {
     m_builderShape_Trap = nullptr;
     m_builderShape_Trd = nullptr;
     m_builderShape_Tubs = nullptr;
+    m_builderShape_Torus = nullptr;
     m_builderShape_TwistedTrap = nullptr;
     m_builderShape_SimplePolygonBrep = nullptr;
     m_builderShape_UnidentifiedShape = nullptr;
@@ -310,6 +314,7 @@ void ReadGeoModel::loadDB() {
     m_shapes_Trap = m_dbManager->getTableFromNodeType_VecVecData("GeoTrap");
     m_shapes_Trd = m_dbManager->getTableFromNodeType_VecVecData("GeoTrd");
     m_shapes_Tubs = m_dbManager->getTableFromNodeType_VecVecData("GeoTubs");
+    m_shapes_Torus = m_dbManager->getTableFromNodeType_VecVecData("GeoTorus");
     m_shapes_TwistedTrap = m_dbManager->getTableFromNodeType_VecVecData("GeoTwistedTrap");
     
     m_shapes_Pcon = m_dbManager->getTableFromNodeType_VecVecData("GeoPcon");
@@ -386,6 +391,7 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         std::thread t24(&ReadGeoModel::buildAllShapes_TwistedTrap, this);
         std::thread t25(&ReadGeoModel::buildAllShapes_SimplePolygonBrep, this);
         std::thread t26(&ReadGeoModel::buildAllShapes_UnidentifiedShape, this);
+        std::thread t27(&ReadGeoModel::buildAllShapes_Torus, this);
         
 
         t2.join();  // ok, all Elements have been built
@@ -405,6 +411,7 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         t24.join();  // ok, all Shapes-TwistedTrap have been built
         t25.join();  // ok, all Shapes-SimplePolygonBrep have been built
         t26.join();  // ok, all Shapes-UnidentifiedShape have been built
+        t27.join();  // ok, all Shapes-Torus have been built
 
 	    // Build boolean shapes and shape operators,
         // this needs Shapes to be built
@@ -456,6 +463,7 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         buildAllShapes_Trap();
         buildAllShapes_Trd();
         buildAllShapes_Tubs();
+        buildAllShapes_Torus();
         buildAllShapes_TwistedTrap();
         buildAllShapes_Operators();
         buildAllMaterials();
@@ -765,6 +773,24 @@ void ReadGeoModel::buildAllShapes_Tubs()
     // m_builderShape_Tubs->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Tubs have been built!\n";
+    }
+}
+//! Iterate over the list of GeoTorus shape nodes, build them all, 
+//! and store their pointers
+void ReadGeoModel::buildAllShapes_Torus()
+{
+    // create a builder and reserve size of memory map
+    size_t nSize = m_shapes_Torus.size();
+    m_builderShape_Torus = new BuildGeoShapes_Torus(nSize);
+    // loop over the DB rows and build the shapes
+    for (const auto &row : m_shapes_Torus)
+    {
+        // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
+        m_builderShape_Torus->buildShape(row);
+    }
+    // m_builderShape_Torus->printBuiltShapes(); // DEBUG MSG
+    if (nSize > 0) {
+        std::cout << "All " << nSize << " Shapes-Torus have been built!\n";
     }
 }
 //! Iterate over the list of GeoTwistedTrap shape nodes, build them all, 
@@ -3844,7 +3870,7 @@ return (!(m_memMapShapes_Union.find(id) == m_memMapShapes_Union.end()));
 }
 // --- methods for caching GeoShape nodes ---
 bool ReadGeoModel::isBuiltShape(std::string_view shapeType, const unsigned shapeId) {
-const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "Pgon", "Trap", "Trd", "Tubs", "TwistedTrap", "SimplePolygonBrep", "Shift", "Subtraction", "Intersection", "Union"};
+const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "Pgon", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "SimplePolygonBrep", "Shift", "Subtraction", "Intersection", "Union"};
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
     {
@@ -3883,6 +3909,10 @@ const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "
         else if ("Tubs" == shapeType)
         {
             return m_builderShape_Tubs->isBuiltShape(shapeId);
+        } 
+        else if ("Torus" == shapeType)
+        {
+            return m_builderShape_Torus->isBuiltShape(shapeId);
         } 
         else if ("TwistedTrap" == shapeType)
         {
@@ -3947,7 +3977,7 @@ void ReadGeoModel::storeBuiltShapeOperators_Union(const unsigned id, GeoShape* n
 GeoShape *ReadGeoModel::getBuiltShape(const unsigned shapeId, std::string_view shapeType)
 {
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "Pgon", "Trap", "Trd", "Tubs", "TwistedTrap", "SimplePolygonBrep", "Shift", "Intersection", "Subtraction", "Union", "UnidentifiedShape"};
+    const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "Pgon", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "SimplePolygonBrep", "Shift", "Intersection", "Subtraction", "Union", "UnidentifiedShape"};
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
     {
@@ -3986,6 +4016,10 @@ GeoShape *ReadGeoModel::getBuiltShape(const unsigned shapeId, std::string_view s
         else if ("Tubs" == shapeType)
         {
             return m_builderShape_Tubs->getBuiltShape(shapeId);
+        } 
+        else if ("Torus" == shapeType)
+        {
+            return m_builderShape_Torus->getBuiltShape(shapeId);
         } 
         else if ("TwistedTrap" == shapeType)
         {

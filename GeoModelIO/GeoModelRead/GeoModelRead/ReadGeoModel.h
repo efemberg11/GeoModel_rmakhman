@@ -95,6 +95,7 @@ class BuildGeoShapes_Para;
 class BuildGeoShapes_Trap;
 class BuildGeoShapes_Trd;
 class BuildGeoShapes_Tubs;
+class BuildGeoShapes_Torus;
 class BuildGeoShapes_TwistedTrap;
 class BuildGeoShapes_Pcon;
 class BuildGeoShapes_Pgon;
@@ -186,6 +187,7 @@ class ReadGeoModel {
     unsigned long getNShapes_Trd() { return m_shapes_Trd.size(); };
     unsigned long getNShapes_Tube() { return m_shapes_Tube.size(); };
     unsigned long getNShapes_Tubs() { return m_shapes_Tubs.size(); };
+    unsigned long getNShapes_Torus() { return m_shapes_Torus.size(); };
     unsigned long getNShapes_TwistedTrap() { return m_shapes_TwistedTrap.size(); };
     unsigned long getNShapes_UnidentifiedShape() { return m_shapes_UnidentifiedShape.size(); };
     unsigned long getNShapes_Shift() { return m_shapes_Shift.size(); };
@@ -202,6 +204,7 @@ class ReadGeoModel {
     void buildAllShapes_Trap();
     void buildAllShapes_Trd();
     void buildAllShapes_Tubs();
+    void buildAllShapes_Torus();
     void buildAllShapes_TwistedTrap();
     void buildAllShapes_Pcon();
     void buildAllShapes_Pgon();
@@ -400,6 +403,7 @@ class ReadGeoModel {
     BuildGeoShapes_Trap* m_builderShape_Trap;
     BuildGeoShapes_Trd* m_builderShape_Trd;
     BuildGeoShapes_Tubs* m_builderShape_Tubs;
+    BuildGeoShapes_Torus* m_builderShape_Torus;
     BuildGeoShapes_TwistedTrap* m_builderShape_TwistedTrap;
     BuildGeoShapes_Pcon* m_builderShape_Pcon;
     BuildGeoShapes_Pgon* m_builderShape_Pgon;
@@ -434,6 +438,7 @@ class ReadGeoModel {
     DBRowsList m_shapes_Trap;
     DBRowsList m_shapes_Trd;
     DBRowsList m_shapes_Tubs;
+    DBRowsList m_shapes_Torus;
     DBRowsList m_shapes_TwistedTrap;
     DBRowsList m_shapes_Pcon;
     DBRowsList m_shapes_Pgon;

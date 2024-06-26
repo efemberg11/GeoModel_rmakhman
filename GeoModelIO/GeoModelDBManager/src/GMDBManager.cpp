@@ -1604,48 +1604,6 @@ bool GMDBManager::createTables() {
     rc = execQuery(queryStr);
     tab.clear();
     
-    // create a table to store the numeric data used in GeoPcon shapes
-    tableName = "Shapes_Pcon_Data";
-    tab.push_back(tableName);
-    tab.push_back("id");
-    tab.push_back("ZPlane");
-    tab.push_back("RMinPlane");
-    tab.push_back("RMaxPlane");
-    storeTableColumnNames(tab);
-    queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real )",
-        tab[0], tab[1], tab[2], tab[3], tab[4]);
-    rc = execQuery(queryStr);
-    tab.clear();
-    
-    // create a table to store the numeric data used in GeoPcon shapes
-    tableName = "Shapes_Pgon_Data";
-    tab.push_back(tableName);
-    tab.push_back("id");
-    tab.push_back("ZPlane");
-    tab.push_back("RMinPlane");
-    tab.push_back("RMaxPlane");
-    storeTableColumnNames(tab);
-    queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real )",
-        tab[0], tab[1], tab[2], tab[3], tab[4]);
-    rc = execQuery(queryStr);
-    tab.clear();
-    
-    // create a table to store the numeric data used in GeoPcon shapes
-    tableName = "Shapes_SimplePolygonBrep_Data";
-    tab.push_back(tableName);
-    tab.push_back("id");
-    tab.push_back("XVertex");
-    tab.push_back("YVertex");
-    storeTableColumnNames(tab);
-    queryStr = fmt::format(
-        "create table {0}({1} integer primary key, {2} real, {3} real )",
-        tab[0], tab[1], tab[2], tab[3]);
-    rc = execQuery(queryStr);
-    tab.clear();
-
-
     // create a table to store information about the 'root' volume (also
     // known as the 'world' volume)
     tableName = "RootVolume";
@@ -1943,6 +1901,27 @@ bool GMDBManager::createTables() {
     }
     tab.clear();
     
+    // Shapes-Tubs table
+    geoNode = "GeoTorus";
+    tableName = "Shapes_Torus";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("RMin");
+    tab.push_back("RMax");
+    tab.push_back("RTor");
+    tab.push_back("SPhi");
+    tab.push_back("DPhi");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7] );
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+    
     // Shapes-TwistedTrap table
     geoNode = "GeoTwistedTrap";
     tableName = "Shapes_TwistedTrap";
@@ -2021,6 +2000,26 @@ bool GMDBManager::createTables() {
     tab.push_back("id");
     tab.push_back("computedVolume");
     tab.push_back("DZ");
+    tab.push_back("NVertices");
+    tab.push_back("dataStart");
+    tab.push_back("dataEnd");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} integer, {5} integer, {6} integer )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+    
+    // Shapes-SimplePolygonBrep table
+    geoNode = "GeoGenericTrap";
+    tableName = "Shapes_GenericTrap";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("ZHalfLength");
     tab.push_back("NVertices");
     tab.push_back("dataStart");
     tab.push_back("dataEnd");
@@ -2129,6 +2128,60 @@ bool GMDBManager::createTables() {
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
     }
+    tab.clear();
+
+    // create a table to store the numeric data used in GeoPcon shapes
+    tableName = "Shapes_Pcon_Data";
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("ZPlane");
+    tab.push_back("RMinPlane");
+    tab.push_back("RMaxPlane");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real )",
+        tab[0], tab[1], tab[2], tab[3], tab[4]);
+    rc = execQuery(queryStr);
+    tab.clear();
+    
+    // create a table to store the numeric data used in GeoPcon shapes
+    tableName = "Shapes_Pgon_Data";
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("ZPlane");
+    tab.push_back("RMinPlane");
+    tab.push_back("RMaxPlane");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real )",
+        tab[0], tab[1], tab[2], tab[3], tab[4]);
+    rc = execQuery(queryStr);
+    tab.clear();
+    
+    // create a table to store the numeric data used in GeoPcon shapes
+    tableName = "Shapes_SimplePolygonBrep_Data";
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("XVertex");
+    tab.push_back("YVertex");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real )",
+        tab[0], tab[1], tab[2], tab[3]);
+    rc = execQuery(queryStr);
+    tab.clear();
+    
+    // create a table to store the numeric data used in GeoPcon shapes
+    tableName = "Shapes_GenericTrap_Data";
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("XVertex");
+    tab.push_back("YVertex");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real )",
+        tab[0], tab[1], tab[2], tab[3]);
+    rc = execQuery(queryStr);
     tab.clear();
 
     // SerialDenominators table

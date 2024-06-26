@@ -157,10 +157,12 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned long getNShapes_Pcon() { return m_shapes_Pcon.size(); };
     unsigned long getNShapes_Pgon() { return m_shapes_Pgon.size(); };
     unsigned long getNShapes_SimplePolygonBrep() { return m_shapes_SimplePolygonBrep.size(); };
+    unsigned long getNShapes_GenericTrap() { return m_shapes_GenericTrap.size(); };
     unsigned long getNShapes_Trap() { return m_shapes_Trap.size(); };
     unsigned long getNShapes_Trd() { return m_shapes_Trd.size(); };
     unsigned long getNShapes_Tube() { return m_shapes_Tube.size(); };
     unsigned long getNShapes_Tubs() { return m_shapes_Tubs.size(); };
+    unsigned long getNShapes_Torus() { return m_shapes_Torus.size(); };
     unsigned long getNShapes_TwistedTrap() { return m_shapes_TwistedTrap.size(); };
     unsigned long getNShapes_UnidentifiedShape() { return m_shapes_UnidentifiedShape.size(); };
     unsigned long getNShapes_Shift() { return m_shapes_Shift.size(); };
@@ -394,14 +396,17 @@ class WriteGeoModel : public GeoNodeAction {
     DBRowsList m_shapes_Trap;
     DBRowsList m_shapes_Trd;
     DBRowsList m_shapes_Tubs;
+    DBRowsList m_shapes_Torus;
     DBRowsList m_shapes_TwistedTrap;
     
     DBRowsList m_shapes_Pcon;
     DBRowsList m_shapes_Pgon;
     DBRowsList m_shapes_SimplePolygonBrep;
+    DBRowsList m_shapes_GenericTrap;
     DBRowsList m_shapes_Pcon_Data;
     DBRowsList m_shapes_Pgon_Data;
     DBRowsList m_shapes_SimplePolygonBrep_Data;
+    DBRowsList m_shapes_GenericTrap_Data;
 
     DBRowsList m_shapes_Shift;
     DBRowsList m_shapes_Intersection;

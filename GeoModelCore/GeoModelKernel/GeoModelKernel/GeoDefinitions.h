@@ -197,6 +197,8 @@ namespace GeoTrf {
       /// @brief Simple comparison returning -1, 0, 1
       int compare(const EulerAngles& other) const;
       operator bool() const;
+      /// @brief Returns the set of Euler angles to invert the rotation
+      EulerAngles inverse() const;
 
   };
 
@@ -218,6 +220,8 @@ namespace GeoTrf {
     bool operator<(const CoordEulerAngles& other) const;
     /// @brief Simple comparison returning -1, 0, 1
     int compare(const CoordEulerAngles& other) const;
+    /// @brief  Returns the set of CoordEulerAngles to invert the Rotation
+    CoordEulerAngles inverse() const;
     operator bool() const;
   };
   
@@ -250,9 +254,10 @@ namespace GeoTrf {
 
   class GeoTransformRT : public Transform3D {
   public:
-    GeoTransformRT(const GeoRotation& rot, const Vector3D& trans)
-      : Transform3D(Translation3D(trans)*Transform3D(AngleAxis3D(rot)))
-      {}
+    GeoTransformRT(const GeoRotation& rot, const Vector3D& trans);    
+    GeoTransformRT(const EulerAngles& angles, const Vector3D& trans);
+    GeoTransformRT(const CoordEulerAngles&angles, const Vector3D& trans);
+
     virtual ~GeoTransformRT() = default;
   };
 }

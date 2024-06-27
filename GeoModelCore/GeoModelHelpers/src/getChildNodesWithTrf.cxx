@@ -64,14 +64,16 @@ std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink physVol,
     }
     return children;
 }
-
-std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol) {
-    std::vector<GeoChildNodeWithTrf> children{getChildrenWithRef(physVol, false)}, subVolumes{};
+std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol,
+                                                  std::function<bool(const GeoChildNodeWithTrf&)> selector,
+                                                  bool summarizeEqualVol) {
+    std::vector<GeoChildNodeWithTrf> children{getChildrenWithRef(physVol, summarizeEqualVol)}, subVolumes{};
     subVolumes.reserve(children.size());
     for (const GeoChildNodeWithTrf& child : children) {
-        subVolumes.push_back(child);
-        std::vector<GeoChildNodeWithTrf> grandChildren = getAllSubVolumes(child.volume);
-        subVolumes.reserve(grandChildren.size() + subVolumes.size());
+        std::vector<GeoChildNodeWithTrf> grandChildren = getAllSubVolumes(child.volume, selector, summarizeEqualVol);
+        if (selector(child)) subVolumes.push_back(child);
+  
+        subVolumes.reserve(grandChildren.size() + subVolumes.capacity());
         std::transform(std::make_move_iterator(grandChildren.begin()),
                        std::make_move_iterator(grandChildren.end()),
                        std::back_inserter(subVolumes), [&child](GeoChildNodeWithTrf&& grandChild){
@@ -80,6 +82,13 @@ std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol) {
                        });
     }
     return subVolumes;
+ }
+
+
+std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol) {
+    return getAllSubVolumes(physVol, 
+                            [](const GeoChildNodeWithTrf& child){
+                                        return true;}, false);
 }
 
 bool hasFullPhysVolInTree(PVConstLink physVol) {

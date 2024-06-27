@@ -80,6 +80,12 @@ int main() {
                                  GeoTrf::get3DRotMatX(coordAngles.alpha *GeoModelKernelUnits::deg)<<std::endl;
 
                 }
+                if (!isIdentity(coordRot * GeoTrf::GeoRotation{coordAngles.inverse()})){
+                    std::cout<<"testEulerAngles() "<<__LINE__<<"The inverse of "<<coordAngles<<" "
+                             <<coordAngles.inverse()<<" does not lead to Identity rotation "<<std::endl;
+                    return EXIT_FAILURE;
+                }
+
                 const GeoTrf::CoordEulerAngles calcCoordAngles = GeoTrf::getCoordRotationAngles(coordRot);
                 const GeoTrf::GeoRotation extCoordRot{calcCoordAngles};
                 if (!isIdentity(extCoordRot.inverse()* coordRot)) {
@@ -88,6 +94,11 @@ int main() {
                               <<std::endl<<coordRot<<std::endl;
                     std::cout<<"testEulerAngles() "<<__LINE__<<" Extracted rotation angles  "<<calcCoordAngles.alpha*toDeg<<"/"
                              <<calcCoordAngles.beta*toDeg<<"/"<<calcCoordAngles.gamma*toDeg<<std::endl<<extCoordRot<<std::endl;
+                    return EXIT_FAILURE;
+                }
+                if (!isIdentity(extCoordRot * GeoTrf::GeoRotation{calcCoordAngles.inverse()})){
+                    std::cout<<"testEulerAngles() "<<__LINE__<<"The inverse of "<<calcCoordAngles<<" "
+                             <<calcCoordAngles.inverse()<<" does not lead to Identity rotation "<<std::endl;
                     return EXIT_FAILURE;
                 }
             }

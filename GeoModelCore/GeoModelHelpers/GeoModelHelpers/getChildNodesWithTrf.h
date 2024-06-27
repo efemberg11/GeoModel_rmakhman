@@ -39,8 +39,12 @@ std::vector <GeoChildNodeWithTrf> getChildrenWithRef (PVConstLink physVol,
                                                       bool summarizeEqualVol = true);
 /**** @brief Traverses through the GeoVPhysVol tree and returns all sub volumes of this tree.*/
 std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol);
-
-
+/*** @brief Traverses thorugh the GeoVPhysVOl tree and returns all subvolumes satisfying an external 
+ *          selection.
+ */
+std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol,
+                                                  std::function<bool(const GeoChildNodeWithTrf&)> selector,
+                                                  bool summarizeEqualVol = false);
 
 /**
  *  Returns whether a volume has fullPhysical volume nodes in 

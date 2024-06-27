@@ -7,7 +7,7 @@
 #include <cmath>
 
 namespace {
-  constexpr double rotTolerance = 0.01 * GeoModelKernelUnits::deg;
+  constexpr double rotTolerance = 0.001 * GeoModelKernelUnits::deg;
 
   inline double cutOff(const double val, const double cutOff) {
      return std::abs(val) > cutOff ? val : 0.;
@@ -91,6 +91,10 @@ namespace GeoTrf {
   EulerAngles::operator bool() const {
      return std::abs(phi) > rotTolerance || std::abs(theta) > rotTolerance || std::abs(psi) > rotTolerance;
   }
+  EulerAngles EulerAngles::inverse() const {
+     return getGeoRotationAngles(GeoRotation(*this).inverse());
+  }
+
 
   int CoordEulerAngles::compare(const CoordEulerAngles& other) const {
       if (std::abs(alpha - other.alpha) > rotTolerance) return alpha < other.alpha ? -1 : 1;
@@ -104,6 +108,21 @@ namespace GeoTrf {
   CoordEulerAngles::operator bool() const {
      return std::abs(alpha) > rotTolerance || std::abs(beta) > rotTolerance || std::abs(gamma) > rotTolerance;
   }
+  CoordEulerAngles CoordEulerAngles::inverse() const {
+     return getCoordRotationAngles(GeoRotation(*this).inverse());
+  }
+
+  GeoTransformRT::GeoTransformRT(const EulerAngles& angles, const Vector3D& trans):
+        GeoTransformRT{GeoRotation{angles}, trans}{}
+
+    
+  GeoTransformRT::GeoTransformRT(const CoordEulerAngles&angles, const Vector3D& trans):
+      GeoTransformRT{GeoRotation{angles}, trans} {
+
+  }
+
+  GeoTransformRT::GeoTransformRT(const GeoRotation& rot, const Vector3D& trans): 
+    Transform3D(Translation3D(trans)*Transform3D(AngleAxis3D(rot))){}
 
 }
 

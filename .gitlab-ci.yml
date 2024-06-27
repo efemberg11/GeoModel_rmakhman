@@ -350,7 +350,7 @@ ubu-single-gmfsl:
   stage: step-E
   needs: ["ubu-single-gmfullsimlight"]
   variables:
-      SOURCE_DIR: ${CMAKE_PROJECT_DIR}/FSL
+      SOURCE_DIR: ${CI_PROJECT_DIR}/FSL
   script:
     - CI/compile_GeoModel.sh
 
@@ -359,7 +359,7 @@ ubu-geomodelatlas:
   stage: step-B
   needs : ["ubu-gm-all"]
   variables:
-      SOURCE_DIR: ${CMAKE_PROJECT_DIR}/GeoModelATLAS
+      SOURCE_DIR: ${CI_PROJECT_DIR}/GeoModelATLAS
   script:
     - git clone https://${EOS_ACCOUNT_USERNAME}:${GEOMODEL_READ_ACCESS}@gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS.git
     - ls -lh

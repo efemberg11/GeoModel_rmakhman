@@ -3170,9 +3170,12 @@ void ReadGeoModel::createBooleanShapeOperands(boolean_shapes_operands_info* shap
     if (shapes_info_sub->size() == 0) return;
 
     // debug
-    std::cout << "\ncreateBooleanShapeOperands() - start..." << std::endl;
-    inspectListShapesToBuild(*shapes_info_sub);
-    std::cout << std::endl;
+    if (m_loglevel >= 3)
+    {
+        std::cout << "\ncreateBooleanShapeOperands() - start..." << std::endl;
+        inspectListShapesToBuild(*shapes_info_sub);
+        std::cout << std::endl;
+    }
 
     // Iterate over the list. The size may be incremented while iterating
     // (therefore, we cannot use iterators)

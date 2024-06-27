@@ -2265,135 +2265,135 @@ GeoShape* ReadGeoModel::buildShape(const unsigned int shapeId,
 
     if (false) {
     } 
-    else if (type == "Torus") {
-        // Member Data:
-        // * Rmax - outside radius of the torus tube
-        // * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
-        // * Rtor - radius of the torus itself
-        // *
-        // * SPhi - starting angle of the segment in radians
-        // * DPhi - delta angle of the segment in radians
-        //
-        // shape parameters
-        double Rmin = 0.;
-        double Rmax = 0.;
-        double Rtor = 0.;
-        double SPhi = 0.;
-        double DPhi = 0.;
-        // get parameters from DB string
-        for (auto& par : shapePars) {
-            std::vector<std::string> vars = splitString(par, '=');
-            std::string varName = vars[0];
-            std::string varValue = vars[1];
-            if (varName == "Rmin")
-                Rmin = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "Rmax")
-                Rmax = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "Rtor")
-                Rtor = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "SPhi")
-                SPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-            if (varName == "DPhi")
-                DPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
-        }
-        shape = new GeoTorus(Rmin, Rmax, Rtor, SPhi, DPhi);
-    } 
-    else if (type == "GenericTrap") {
-        // shape parameters
-        double ZHalfLength = 0.;
-        unsigned int NVertices = 0;
-        GeoGenericTrapVertices Vertices;
-        bool error = false;
-        GeoGenericTrap* gTrap = nullptr;
+    // else if (type == "Torus") {
+    //     // Member Data:
+    //     // * Rmax - outside radius of the torus tube
+    //     // * Rmin - inside radius  of the torus tube (Rmin=0 if not hollow)
+    //     // * Rtor - radius of the torus itself
+    //     // *
+    //     // * SPhi - starting angle of the segment in radians
+    //     // * DPhi - delta angle of the segment in radians
+    //     //
+    //     // shape parameters
+    //     double Rmin = 0.;
+    //     double Rmax = 0.;
+    //     double Rtor = 0.;
+    //     double SPhi = 0.;
+    //     double DPhi = 0.;
+    //     // get parameters from DB string
+    //     for (auto& par : shapePars) {
+    //         std::vector<std::string> vars = splitString(par, '=');
+    //         std::string varName = vars[0];
+    //         std::string varValue = vars[1];
+    //         if (varName == "Rmin")
+    //             Rmin = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "Rmax")
+    //             Rmax = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "Rtor")
+    //             Rtor = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "SPhi")
+    //             SPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //         if (varName == "DPhi")
+    //             DPhi = std::stod(varValue);  // * SYSTEM_OF_UNITS::mm;
+    //     }
+    //     shape = new GeoTorus(Rmin, Rmax, Rtor, SPhi, DPhi);
+    // } 
+    // else if (type == "GenericTrap") {
+    //     // shape parameters
+    //     double ZHalfLength = 0.;
+    //     unsigned int NVertices = 0;
+    //     GeoGenericTrapVertices Vertices;
+    //     bool error = false;
+    //     GeoGenericTrap* gTrap = nullptr;
 
-        std::string par;
-        std::vector<std::string> vars;
-        std::string varName;
-        std::string varValue;
+    //     std::string par;
+    //     std::vector<std::string> vars;
+    //     std::string varName;
+    //     std::string varValue;
 
-        int sizePars = shapePars.size();
-        // check if we have more than 3 parameters
-        if (sizePars > 3) {
-            // get the two GeoGenericTrap parameters: the ZHalfLength plus the
-            // number of vertices
-            for (int it = 0; it < 2; it++) {
-                par = shapePars[it];
-                vars = splitString(par, '=');
-                varName = vars[0];
-                varValue = vars[1];
-                // qInfo() << "vars: " << vars; // for debug only
-                if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);
-                if (varName == "NVertices") NVertices = std::stoi(varValue);
-            }
+    //     int sizePars = shapePars.size();
+    //     // check if we have more than 3 parameters
+    //     if (sizePars > 3) {
+    //         // get the two GeoGenericTrap parameters: the ZHalfLength plus the
+    //         // number of vertices
+    //         for (int it = 0; it < 2; it++) {
+    //             par = shapePars[it];
+    //             vars = splitString(par, '=');
+    //             varName = vars[0];
+    //             varValue = vars[1];
+    //             // qInfo() << "vars: " << vars; // for debug only
+    //             if (varName == "ZHalfLength") ZHalfLength = std::stod(varValue);
+    //             if (varName == "NVertices") NVertices = std::stoi(varValue);
+    //         }
 
-            // and now loop over the rest of the list, to get the parameters of
-            // all Z planes
-            for (unsigned it = 2; it < NVertices * 2 + 1; it++) {
-                par = shapePars[it];
-                vars = splitString(par, '=');
-                varName = vars[0];
-                varValue = vars[1];
+    //         // and now loop over the rest of the list, to get the parameters of
+    //         // all Z planes
+    //         for (unsigned it = 2; it < NVertices * 2 + 1; it++) {
+    //             par = shapePars[it];
+    //             vars = splitString(par, '=');
+    //             varName = vars[0];
+    //             varValue = vars[1];
 
-                if (varName == "X") {
-                    double x = std::stod(varValue);
+    //             if (varName == "X") {
+    //                 double x = std::stod(varValue);
 
-                    it++;  // go to next variable
+    //                 it++;  // go to next variable
 
-                    par = shapePars[it];
-                    vars = splitString(par, '=');
-                    varName = vars[0];
-                    varValue = vars[1];
-                    if (varName == "Y") {
-                        double y = std::stod(varValue);
-                        Vertices.push_back(GeoTwoVector(x, y));
-                    } else {
-                        error = 1;
-                    }
-                    if (error) {
-                        muxCout.lock();
-                        std::cout << "ERROR! GeoGenericTrap 'X' and 'Y' values "
-                                     "are not at the right place! --> ";
-                        printStdVectorStrings(shapePars);
-                        muxCout.unlock();
-                    }
-                } else {
-                    error = 1;
-                    muxCout.lock();
-                    std::cout << "ERROR! GeoGenericTrap 'ZPos' value is not at "
-                                 "the right place! --> ";
-                    printStdVectorStrings(shapePars);
-                    muxCout.unlock();
-                }
-            }
-            if (error) {
-                muxCout.lock();
-                std::cout << "FATAL ERROR!!! - GeoGenericTrap shape error!!! "
-                             "Aborting..."
-                          << std::endl;
-                muxCout.unlock();
-                exit(EXIT_FAILURE);
-            }
-            // build the basic GenericTrap shape
-            gTrap = new GeoGenericTrap(ZHalfLength, Vertices);
-        }  // end if (size>3)
-        else {
-            muxCout.lock();
-            std::cout << "ERROR!! GeoGenericTrap has no Z vertices!! --> shape "
-                         "input parameters: ";
-            printStdVectorStrings(shapePars);
-            muxCout.unlock();
-            error = 1;
-        }
-        if (error) {
-            muxCout.lock();
-            std::cout
-                << "FATAL ERROR!!! - GeoGenericTrap shape error!!! Aborting..."
-                << std::endl;
-            muxCout.unlock();
-            exit(EXIT_FAILURE);
-        }
-        shape = gTrap;
-    } 
+    //                 par = shapePars[it];
+    //                 vars = splitString(par, '=');
+    //                 varName = vars[0];
+    //                 varValue = vars[1];
+    //                 if (varName == "Y") {
+    //                     double y = std::stod(varValue);
+    //                     Vertices.push_back(GeoTwoVector(x, y));
+    //                 } else {
+    //                     error = 1;
+    //                 }
+    //                 if (error) {
+    //                     muxCout.lock();
+    //                     std::cout << "ERROR! GeoGenericTrap 'X' and 'Y' values "
+    //                                  "are not at the right place! --> ";
+    //                     printStdVectorStrings(shapePars);
+    //                     muxCout.unlock();
+    //                 }
+    //             } else {
+    //                 error = 1;
+    //                 muxCout.lock();
+    //                 std::cout << "ERROR! GeoGenericTrap 'ZPos' value is not at "
+    //                              "the right place! --> ";
+    //                 printStdVectorStrings(shapePars);
+    //                 muxCout.unlock();
+    //             }
+    //         }
+    //         if (error) {
+    //             muxCout.lock();
+    //             std::cout << "FATAL ERROR!!! - GeoGenericTrap shape error!!! "
+    //                          "Aborting..."
+    //                       << std::endl;
+    //             muxCout.unlock();
+    //             exit(EXIT_FAILURE);
+    //         }
+    //         // build the basic GenericTrap shape
+    //         gTrap = new GeoGenericTrap(ZHalfLength, Vertices);
+    //     }  // end if (size>3)
+    //     else {
+    //         muxCout.lock();
+    //         std::cout << "ERROR!! GeoGenericTrap has no Z vertices!! --> shape "
+    //                      "input parameters: ";
+    //         printStdVectorStrings(shapePars);
+    //         muxCout.unlock();
+    //         error = 1;
+    //     }
+    //     if (error) {
+    //         muxCout.lock();
+    //         std::cout
+    //             << "FATAL ERROR!!! - GeoGenericTrap shape error!!! Aborting..."
+    //             << std::endl;
+    //         muxCout.unlock();
+    //         exit(EXIT_FAILURE);
+    //     }
+    //     shape = gTrap;
+    // } 
     else if (type == "TessellatedSolid") {
         // Tessellated pars example:
         // "nFacets=1;TRI;vT=ABSOLUTE;nV=3;xV=0;yV=0;zV=1;xV=0;yV=1;zV=0;xV=1;yV=0;zV=0"

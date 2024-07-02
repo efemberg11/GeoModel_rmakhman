@@ -14,6 +14,8 @@
 #include "GeoModelHelpers/TransformSorter.h"
 
 #include <set>
+#include <mutex>
+#include <thread>
 /***
  *  Helper class to deduplicate shapes, volumes and non-alignable transforms in the GeoModel tree that are equivalent
  *  but instantiated in different places. Every time when the cache function is invoked, it's tried to insert the object 
@@ -71,7 +73,7 @@ class GeoDeDuplicator {
         using GeoPhysVolPtr = GeoIntrusivePtr<GeoPhysVol>;
 
         GeoDeDuplicator() = default;
-        ~GeoDeDuplicator() = default;
+        virtual ~GeoDeDuplicator() = default;
 
         GeoPhysVolPtr cacheVolume(GeoPhysVolPtr vol) const;
         GeoTrfPtr makeTransform(const GeoTrf::Transform3D& trf) const;
@@ -98,6 +100,8 @@ class GeoDeDuplicator {
 
         static TrfSet s_trfStore;
         static ShapeSet s_shapeStore;
+
+        mutable std::mutex m_mutex{};
 };
 
 

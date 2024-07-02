@@ -6,7 +6,9 @@
 
 GeoDeDuplicator::TrfSet GeoDeDuplicator::s_trfStore{};
 GeoDeDuplicator::ShapeSet GeoDeDuplicator::s_shapeStore{};
-
+namespace {
+    std::mutex s_mutex{};
+}
 
 void GeoDeDuplicator::setShapeDeDuplication(bool enable){
     m_deDuplicateShape = enable;
@@ -23,15 +25,18 @@ void GeoDeDuplicator::setPhysVolDeDuplication(bool enable) {
 
 GeoDeDuplicator::GeoTrfPtr 
     GeoDeDuplicator::makeTransform(const GeoTrf::Transform3D& trf) const {
-        GeoTrfPtr trfNode{new GeoTransform(trf)};
+        GeoTrfPtr trfNode{make_intrusive<GeoTransform>(trf)};
         if (!m_deDuplicateTransform) {
+            std::lock_guard guard{m_mutex};
             m_genericCache.push_back(trfNode);
             return trfNode;
         }
+        std::lock_guard guard{s_mutex};
         return *s_trfStore.emplace(trfNode).first;
     }
 GeoDeDuplicator::GeoPhysVolPtr 
     GeoDeDuplicator::cacheVolume(GeoPhysVolPtr vol) const {
+        std::lock_guard guard{m_mutex};
         if (!m_deDuplicatePhysVol) {
             m_genericCache.push_back(vol);
             return vol;
@@ -40,6 +45,7 @@ GeoDeDuplicator::GeoPhysVolPtr
     }
 GeoDeDuplicator::GeoLogVolPtr 
     GeoDeDuplicator::cacheVolume(GeoLogVolPtr vol) const {
+        std::lock_guard guard{m_mutex};
         if (!m_deDuplicateLogVol) {
             m_genericCache.push_back(vol);
             return vol;
@@ -49,8 +55,10 @@ GeoDeDuplicator::GeoLogVolPtr
 GeoDeDuplicator::GeoShapePtr 
     GeoDeDuplicator::cacheShape(GeoShapePtr shape) const {
         if (!m_deDuplicateShape) {
+            std::lock_guard guard{m_mutex};
             m_genericCache.push_back(shape);
             return shape;
-        } 
+        }
+        std::lock_guard guard{s_mutex}; 
         return *s_shapeStore.insert(shape).first;
     }

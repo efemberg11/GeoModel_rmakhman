@@ -82,8 +82,8 @@ if( GEOMODEL_USE_BUILTIN_COIN3D )
    ExternalProject_Add( SoQtBuiltIn
       PREFIX "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/SoQtBuild"
       INSTALL_DIR "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/SoQtInstall"
-      URL "https://github.com/coin3d/soqt/releases/download/SoQt-1.6.0/soqt-1.6.0-src.tar.gz"
-      URL_MD5 "724996aedad2a33760dc36f08ceeda22"
+      URL "https://github.com/coin3d/soqt/releases/download/v1.6.2/soqt-1.6.2-src.tar.gz"
+      URL_MD5 "70ef0990e009d806c59941d819a62c98"
       CMAKE_CACHE_ARGS
       -DCMAKE_PREFIX_PATH:PATH=${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/Coin3DInstall
       -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/SoQtInstall

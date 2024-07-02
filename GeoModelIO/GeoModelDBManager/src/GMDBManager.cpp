@@ -22,8 +22,6 @@
 
 #include <GeoModelDBManager/GMDBManager.h>
 
-#include "GeoModelCppHelpers/GMCppHelpers.h"
-
 #include "GeoModelHelpers/throwExcept.h"
 #include "GeoModelHelpers/StringUtils.h"
 
@@ -214,7 +212,7 @@ void GMDBManager::printAllRecords(const std::string& tableName) const {
         return;
     }
     // --- print table column names
-    std::cout << "- " << GeoModelIO::CppHelper::joinVectorStrings(m_tableNames.at(tableName), ", ")
+    std::cout << "- " << GeoStrUtils::chainUp(m_tableNames.at(tableName), ", ")
               << std::endl;
     // --- print records
     std::vector<std::vector<std::string>> records;
@@ -782,7 +780,7 @@ bool GMDBManager::addListOfRecordsToTable(
 
     // get table columns and format them for query
     std::string tableColString =
-        "(" + GeoModelIO::CppHelper::joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
+        "(" + GeoStrUtils::chainUp(m_tableNames.at(tableName), ", ") + ")";
     if (m_debug) std::cout << "tableColString:" << tableColString << std::endl;
 
     unsigned int nRecords = records.size();
@@ -803,7 +801,7 @@ bool GMDBManager::addListOfRecordsToTable(
                        // values when inserting them in the table, as we now
                        // do for the std::variant version!
         }
-        std::string values = GeoModelIO::CppHelper::joinVectorStrings(items, ",");
+        std::string values = GeoStrUtils::chainUp(items, ",");
         sql += " (" + std::to_string(id) + "," + values + ")"; // INT
         if (id != nRecords) {
             sql += ",";
@@ -831,7 +829,7 @@ bool GMDBManager::addListOfRecordsToTable(
     if (records.size() > 0) {
     // get table columns and format them for query
     std::string tableColString =
-        "(" + GeoModelIO::CppHelper::joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
+        "(" + GeoStrUtils::chainUp(m_tableNames.at(tableName), ", ") + ")";
     if (m_debug) std::cout << "tableColString:" << tableColString << std::endl;
 
     unsigned int nRecords = records.size();
@@ -874,7 +872,7 @@ bool GMDBManager::addListOfRecordsToTable(
                 THROW_EXCEPTION("No std::variant alternative found!");
         }
         // we build the long string containing all values
-        std::string values = GeoModelIO::CppHelper::joinVectorStrings(items, ",");
+        std::string values = GeoStrUtils::chainUp(items, ",");
         sql += " (" + std::to_string(id) + "," + values + ")"; // INT
         if (id != nRecords) {
             sql += ",";
@@ -893,19 +891,15 @@ bool GMDBManager::addListOfRecordsToTable(
     return false;
 }
 
-
-
 bool GMDBManager::addRecordsToTable(
     const std::string tableName,
-    const DBRowEntry
-        records)
+    const DBRowEntry records)
 {
     if (records.size() > 0) {
     // get table columns and format them for query
     std::string tableColString =
-        "(" + GeoModelIO::CppHelper::joinVectorStrings(m_tableNames.at(tableName), ", ") + ")";
-    if (m_debug)
-        std::cout << "tableColString:" << tableColString << std::endl;
+        "(" + GeoStrUtils::chainUp(m_tableNames.at(tableName), ", ") + ")";
+    if (m_debug) std::cout << "tableColString:" << tableColString << std::endl;
 
     unsigned int nRecords = records.size();
 
@@ -918,6 +912,8 @@ bool GMDBManager::addRecordsToTable(
     unsigned int id = 0;
     // a vector to store string-conversions of values, to build the SQL
     // query
+    // TODO: we should remove this TEXT-conversion 
+    // and we should use prepared statements instead!
     std::vector<std::string> items;
     // loop over all entries in a row/record
     for (const std::variant<int, long, float, double, std::string> &item :
@@ -968,14 +964,8 @@ bool GMDBManager::addRecordsToTable(
         }
         items.push_back(endRow);
     }
-    // we build the long string containing all values
-    std::string values = GeoModelIO::CppHelper::joinVectorStrings(items);
-
-    // // TODO: replace CppHelper with global Helpers
-    // std::string valuesTest = GeoStrUtils::chainUp(items, ",");
-    // std::cout << "values: " << values << std::endl;
-    // std::cout << "valuesTest: " << valuesTest << std::endl;
-
+    // we build the long SQL string containing all values
+    std::string values = GeoStrUtils::chainUp<std::string>(items, "");
 
     sql += " " + values + ";";
     if (m_debug)

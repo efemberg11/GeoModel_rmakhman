@@ -35,10 +35,11 @@ const std::string shared_obj_extension=".so";
 
 
 void publishMetaData( GMDBManager & db,
-		      const std::string& repoPath,
-		      std::vector<std::string> &inputFiles,
-		      std::vector<std::string> &inputPlugins,
-		      std::string              &outputFile);
+                      const std::string& repoPath,
+                      const std::vector<std::string> &inputFiles,
+                      const std::vector<std::string> &inputPlugins,
+                      const std::vector<std::string> &pluginNames,
+                      const std::string              &outputFile);
 
 int main(int argc, char ** argv) {
 
@@ -65,8 +66,7 @@ int main(int argc, char ** argv) {
   //
   // Parse the command line:
   //
-  std::vector<std::string> inputFiles;
-  std::vector<std::string> inputPlugins;
+  std::vector<std::string> inputFiles{}, inputPlugins{};
   std::string outputFile;
   std::string gmAtlasDir{"."};
   bool outputFileSet = false;
@@ -86,7 +86,7 @@ int main(int argc, char ** argv) {
           verbose=true;
       }
       else if (argument.find("-g")!=std::string::npos) {
-	gmAtlasDir = std::string(argv[++argi]);
+          gmAtlasDir = std::string(argv[++argi]);
       }
       else if (argument.find(shared_obj_extension)!=std::string::npos) {
           inputPlugins.push_back(argument);
@@ -112,8 +112,8 @@ int main(int argc, char ** argv) {
   if (access(outputFile.c_str(),F_OK)==0) {
     if (!access(outputFile.c_str(),W_OK)) {
       if (system(("rm -f "+ outputFile).c_str())) {
-	std::cerr << "gmcat -- Error, cannot overwrite existing file " << outputFile << std::endl;
-	return 3;
+          std::cerr << "gmcat -- Error, cannot overwrite existing file " << outputFile << std::endl;
+          return 3;
       }
     }
     else {
@@ -142,6 +142,7 @@ int main(int argc, char ** argv) {
   }
   
   std::vector<GeoPublisher*> vecPluginsPublishers; // caches the stores from all plugins
+  std::vector<std::unique_ptr<GeoVGeometryPlugin>> pluginInstances{};
   for (const std::string & plugin : inputPlugins) {
     GeoGeometryPluginLoader loader;
 
@@ -151,7 +152,7 @@ int main(int argc, char ** argv) {
       std::cout.rdbuf(fileBuff);
     }
 
-    GeoVGeometryPlugin *factory=loader.load(plugin);
+    std::unique_ptr<GeoVGeometryPlugin> factory{loader.load(plugin)};
     if (!factory) {
       std::cerr << "gmcat -- Could not load plugin " << plugin << std::endl;
       return 5;
@@ -172,6 +173,7 @@ int main(int argc, char ** argv) {
       std::cout << "\t ... DONE!" << std::endl;
       std::cout.rdbuf(fileBuff);
     }
+    pluginInstances.emplace_back(std::move(factory));
   }
 
   //
@@ -184,41 +186,35 @@ int main(int argc, char ** argv) {
       std::cout.rdbuf(fileBuff);
     }
 
-    GMDBManager* db = new GMDBManager(file);
+    auto db = std::make_unique<GMDBManager>(file);
     if (!db->checkIsDBOpen()){
       std::cerr << "gmcat -- Error opening the input file: " << file << std::endl;
       return 6;
     }
 
     /* set the GeoModel reader */
-    GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db);
+    GeoModelIO::ReadGeoModel readInGeo = GeoModelIO::ReadGeoModel(db.get());
 
     /* build the GeoModel geometry */
-    const GeoVPhysVol* dbPhys = readInGeo.buildGeoModel(); // builds the whole GeoModel tree in memory
+   PVConstLink dbPhys{readInGeo.buildGeoModel()}; // builds the whole GeoModel tree in memory
 
     /* get an handle on a Volume Cursor, to traverse the whole set of Volumes */
     GeoVolumeCursor aV(dbPhys);
 
     /* loop over the Volumes in the tree */
     while (!aV.atEnd()) {
-
-	if (aV.getName()!="ANON") {
-	  GeoNameTag *nameTag=new GeoNameTag(aV.getName());
-	  world->add(nameTag);
-	}
-	GeoTransform *transform= new GeoTransform(aV.getTransform());
-	world->add(transform);
-	world->add((GeoVPhysVol *) &*aV.getVolume());
-	aV.next();
+        if (aV.getName()!="ANON") {
+          world->add(make_intrusive<GeoNameTag>(aV.getName()));
+        }
+        world->add(make_intrusive<GeoTransform>(aV.getTransform()));
+        world->add(const_pointer_cast(aV.getVolume()));
+        aV.next();
     }
-
-    delete db;
     if(!verbose) {
       std::cout.rdbuf(coutBuff);
       std::cout << "\t ... DONE!" << std::endl;
       std::cout.rdbuf(fileBuff);
     }
-
   }
   //
   // Open a new database:
@@ -259,10 +255,17 @@ int main(int argc, char ** argv) {
     std::cout << "Writing metadata to the output database ..." << std::endl;
     std::cout.rdbuf(fileBuff);
   }
-  try {
-    publishMetaData(db,gmAtlasDir,inputFiles,inputPlugins,outputFile);
+  std::vector<std::string> systemNames{};
+  for (auto& plugin : pluginInstances) {
+    if(plugin->getName().size()){
+      systemNames.push_back(plugin->getName());
+    }
   }
-  catch(std::runtime_error& e) {
+  std::sort(systemNames.begin(), systemNames.end());
+
+  try {
+    publishMetaData(db, gmAtlasDir, inputFiles, inputPlugins, systemNames, outputFile);
+  } catch(const std::runtime_error& e) {
     std::cerr << "ERROR: " << e.what() << std::endl;
     return 1;
   }

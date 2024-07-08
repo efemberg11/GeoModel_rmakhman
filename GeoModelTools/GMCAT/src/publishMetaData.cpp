@@ -1,4 +1,5 @@
 #include "GeoModelDBManager/GMDBManager.h"
+#include <GeoModelHelpers/StringUtils.h>
 #include <string>
 #include <iostream>
 #include <unistd.h>
@@ -10,11 +11,12 @@
 #define STR_VALUE(arg) #arg
 #define STR_NAME(name) STR_VALUE(name)
 
-std::string resolveVariable(const std::string& varName) {
-   const char* var = std::getenv(varName.c_str());
-   if (!var) return std::string{};
-   return std::string(var);
+namespace{
+    static const std::string tableName{"AAHEADER"};
 }
+
+using tableVariant = std::variant<int,long,float,double,std::string>;
+
 std::string getCommandOutput(const std::string & cmd, bool firstLineOnly=false)
 {
   std::string response;
@@ -33,19 +35,20 @@ std::string getCommandOutput(const std::string & cmd, bool firstLineOnly=false)
 }
 
 void publishMetaData( GMDBManager & db,
-		      const std::string& repoPath,
-		      std::vector<std::string> &inputFiles,
-		      std::vector<std::string> &inputPlugins,
-		      std::string              &outputFile) {
+                      const std::string& repoPath,
+                      const std::vector<std::string> &inputFiles,
+                      const std::vector<std::string> &inputPlugins,
+                      const std::vector<std::string> &pluginNames,
+                      const std::string              &outputFile) {
 
   struct Metadata {
     std::string dateString=getCommandOutput("date -Iminutes");
-    std::string username{resolveVariable("USER")};
+    std::string username{GeoStrUtils::resolveEnviromentVariables("${USER}")};
     std::string hostname{};
-    std::string os;
-    std::string wd;
+    std::string os{};
+    std::string wd{};
     std::string gmversion=STR_NAME(GMVERSION);
-    std::string outputFile;
+    std::string outputFile{};
     std::string geoModelDataBranch="Undefined";      // or overwritten below
     std::string gmdataIsClean     ="Not applicable"; // or overwritten below
     std::string gmdataCommitHash  ="Undefined";      // or overwritten below
@@ -64,7 +67,7 @@ void publishMetaData( GMDBManager & db,
   char wdbuff[1024];
   metadata.wd=std::string(getcwd(wdbuff,1024));
 #else
-  metadata.wd= resolveVariable("PWD");
+  metadata.wd= GeoStrUtils::resolveEnviromentVariables("${PWD}");
 #endif
 
   metadata.outputFile=outputFile;
@@ -78,24 +81,22 @@ void publishMetaData( GMDBManager & db,
     if (gethostname (hn,1024)==0) metadata.hostname=std::string(hn);
   }
   
-  std::string geomodel_xml_dir=resolveVariable("GEOMODEL_XML_DIR");
+  std::string geomodel_xml_dir=GeoStrUtils::resolveEnviromentVariables("${GEOMODEL_XML_DIR}");
   if (!geomodel_xml_dir.empty())  {
     {
       metadata.geoModelDataBranch=getCommandOutput("git -C "+ geomodel_xml_dir + " rev-parse --abbrev-ref HEAD");
       std::string shortGitStatus=getCommandOutput("git -C "+ geomodel_xml_dir + " status -s ");
       if (shortGitStatus!="") {
-	metadata.gmdataIsClean="no";
-      }
-      else {
-	std::string synchedToOrigin=getCommandOutput("git -C "+ std::string(geomodel_xml_dir) + " diff origin/"+metadata.geoModelDataBranch,true);
-	if (synchedToOrigin!="") {
-	  metadata.gmdataIsClean="no";
-	}
-	else {
-	  metadata.gmdataIsClean="yes";
-	  metadata.gmdataCommitHash=getCommandOutput("git -C " + std::string(geomodel_xml_dir) + " log -1 --format=format:\"%H\"");
-	  metadata.gmdataAssociatedTag=getCommandOutput("git -C " + std::string(geomodel_xml_dir) +  " describe --tag " + metadata.gmdataCommitHash+ "  2> /dev/null");
-	}
+        metadata.gmdataIsClean="no";
+      } else {
+        std::string synchedToOrigin=getCommandOutput("git -C "+ std::string(geomodel_xml_dir) + " diff origin/"+metadata.geoModelDataBranch,true);
+        if (synchedToOrigin.size()) {
+            metadata.gmdataIsClean="no";
+        }else {
+            metadata.gmdataIsClean="yes";
+            metadata.gmdataCommitHash=getCommandOutput("git -C " + std::string(geomodel_xml_dir) + " log -1 --format=format:\"%H\"");
+            metadata.gmdataAssociatedTag=getCommandOutput("git -C " + std::string(geomodel_xml_dir) +  " describe --tag " + metadata.gmdataCommitHash+ "  2> /dev/null");
+        }
       }
     }
   }
@@ -109,59 +110,46 @@ void publishMetaData( GMDBManager & db,
     }
     else {
       std::string synchedToOrigin=getCommandOutput("git -C " + repoPath + " diff origin/"+xtraMetadata.branch,true);
-      if (synchedToOrigin!="") {
-	xtraMetadata.isClean="no";
-      }
-      else {
-	xtraMetadata.isClean="yes";
-	xtraMetadata.commitHash=getCommandOutput("git -C " + repoPath + " log -1 --format=format:\"%H\"");
-	xtraMetadata.associatedTag=getCommandOutput("git -C " + repoPath + " describe --tag " + xtraMetadata.commitHash+ "  2> /dev/null");
+      xtraMetadata.isClean = synchedToOrigin.empty() ? "yes" : "no";
+      if (synchedToOrigin.empty()){
+        xtraMetadata.commitHash=getCommandOutput("git -C " + repoPath + " log -1 --format=format:\"%H\"");
+        xtraMetadata.associatedTag=getCommandOutput("git -C " + repoPath + " describe --tag " + xtraMetadata.commitHash+ "  2> /dev/null");
       }
     }
-  }
-  else {
+  } else {
     std::cerr << std::endl << "WARNING: no information on User repository will be written to metadata. " << std::endl;
   }
 
   //
   // Fill the header file with metadata
   //
-  std::vector<std::string>                                                   gmcatColNames={"Date",
-											    "GeoModelDataBranch",
-											    "Username",
-											    "Hostname",
-											    "OS",
-											    "WorkingDirectory",
-											    "GeoModelVersion",
-											    "OutputFile",
-											    "GeoModelDataIsClean",
-											    "GeoModelDataCommitHash",
-											    "GeoModelDataAssociatedTag"
-  };
-  std::vector<std::string>                                                   gmcatColTypes={"STRING",
-											    "STRING" ,
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING",
-											    "STRING"
-  };
-  
+  std::vector<std::string> gmcatColNames={"Date",
+                                          "GeoModelDataBranch",
+                                          "Username",
+                                          "Hostname",
+                                          "OS",
+                                          "WorkingDirectory",
+                                          "GeoModelVersion",
+                                          "OutputFile",
+                                          "PluginNames",
+                                          "PluginLibs",
+                                          "DataBaseFiles",
+                                          "GeoModelDataIsClean",
+                                          "GeoModelDataCommitHash",
+                                          "GeoModelDataAssociatedTag",
+                                          tableName + "_DATA_ID"
+                                           };
+  std::vector<std::string>  gmcatColTypes(gmcatColNames.size(), "STRING");
+  gmcatColTypes[gmcatColTypes.size() - 1] = "INT";
   // Strip extraneous \n
-  for (std::string * s : {
-      &metadata.geoModelDataBranch,
-      &metadata.dateString,
-      &metadata.gmdataAssociatedTag}) { 
-    s->erase(std::remove(s->begin(), s->end(), '\n'), s->end());
+  for (std::string * s : {&metadata.geoModelDataBranch,  &metadata.dateString, 
+                          &metadata.gmdataAssociatedTag, &xtraMetadata.repo, &xtraMetadata.branch}) { 
+       s->erase(std::remove(s->begin(), s->end(), '\n'), s->end());
   }
-	
-	
+    
+    
   
-  std::vector<std::vector<std::variant<int,long,float,double,std::string>>>  gmcatData    ={{
+  std::vector<std::vector<tableVariant>>  gmcatData    ={{
       metadata.dateString,
       metadata.geoModelDataBranch,
       metadata.username,
@@ -170,59 +158,32 @@ void publishMetaData( GMDBManager & db,
       metadata.wd,
       metadata.gmversion,
       metadata.outputFile,
+      GeoStrUtils::chainUp(pluginNames,";"),      
+      GeoStrUtils::chainUp(inputPlugins,";"),
+      GeoStrUtils::chainUp(inputFiles,";"),
       metadata.gmdataIsClean,
       metadata.gmdataCommitHash,
-      metadata.gmdataAssociatedTag
+      metadata.gmdataAssociatedTag,
+      0
     }};
 
-  unsigned int pcounter(0);
-  for (std::string plugin : inputPlugins) {
-    gmcatColNames.push_back("P"+std::to_string(pcounter++));
-    gmcatColTypes.push_back("STRING");
-    gmcatData[0].push_back((plugin));
-  }
-  unsigned int fcounter(0);
-  for (std::string file : inputFiles) {
-    gmcatColNames.push_back("F"+std::to_string(fcounter++));
-    gmcatColTypes.push_back("STRING");
-    gmcatData[0].push_back(file);
-  }
-  
-  // Strip extraneous \n
-  for (std::string * s : {
-      &xtraMetadata.repo,
-      &xtraMetadata.branch }) { 
-    s->erase(std::remove(s->begin(), s->end(), '\n'), s->end());
-  }
-	
-
-
   if (xtraMetadata.branch!="Undefined") {
-    std::vector<std::string>                                                   xtraColNames={
-      "UserCodeGitRepository",
-      "UserCodeGitBranch",
-      "UserCodeRepoIsClean",
-      "UserCodeRepoCommitHash",
-      "UserCodeAssociatedTag"};
-    std::vector<std::string>                                                   xtraColTypes={"STRING",
-											     "STRING",
-											     "STRING",
-											     "STRING",
-											     "STRING"};
-    std::vector<std::vector<std::variant<int,long,float,double,std::string>>>  xtraData    ={{
-	xtraMetadata.repo,
-	xtraMetadata.branch,
-	xtraMetadata.isClean,
-	xtraMetadata.commitHash,
-	xtraMetadata.associatedTag
-    }};    
-    using std::begin, std::end;
-    gmcatColNames.insert(end(gmcatColNames), begin(xtraColNames), end(xtraColNames));
-    gmcatColTypes.insert(end(gmcatColTypes), begin(xtraColTypes), end(xtraColTypes));
-    gmcatData[0].insert(end(gmcatData[0]), begin(xtraData[0]), end(xtraData[0]));
-    db.createCustomTable("AAHEADER", gmcatColNames,gmcatColTypes,gmcatData);
+    std::vector<std::string> xtraColNames={"UserCodeGitRepository",
+                                           "UserCodeGitBranch",
+                                           "UserCodeRepoIsClean",
+                                           "UserCodeRepoCommitHash",
+                                           "UserCodeAssociatedTag"};
+    std::vector<std::string> xtraColTypes(xtraColNames.size(), "STRING");
+    std::vector<std::vector<tableVariant>>  xtraData    ={{xtraMetadata.repo,
+                                                           xtraMetadata.branch,
+                                                           xtraMetadata.isClean,
+                                                           xtraMetadata.commitHash,
+                                                           xtraMetadata.associatedTag }};    
+    gmcatColNames.insert(std::end(gmcatColNames), std::begin(xtraColNames), std::end(xtraColNames));
+    gmcatColTypes.insert(std::end(gmcatColTypes), std::begin(xtraColTypes), std::end(xtraColTypes));
+    gmcatData[0].insert(std::end(gmcatData[0]), std::begin(xtraData[0]), std::end(xtraData[0]));
+   
   }
-  else {
-    db.createCustomTable("AAHEADER", gmcatColNames,gmcatColTypes,gmcatData); 
-  }
+  db.createCustomTable(tableName, gmcatColNames,gmcatColTypes,gmcatData); 
+  
 }

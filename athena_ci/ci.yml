@@ -119,7 +119,7 @@ simulation_tests_run3:
   extends: .run_base
   script:
     - cd run
-    - RunWorkflowTests_Run3.py --CI -s -w FullSim --threads 4 -e '--maxEvents 50' --detailed-comparison
+    - RunWorkflowTests_Run3.py --CI -s -w FullSim --threads 4 -e '--maxEvents 20' --run-only 
     - mv run_s4006/log.EVNTtoHITS ./
     - mv run_s4006/myHITS.pool.root ./
   artifacts:

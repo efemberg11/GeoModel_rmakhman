@@ -441,8 +441,9 @@ int main(int argc, char *argv[])
 
 
   // Add a test "UnidentifiedShape" shape node
-  const std::string nameUnidentifiedShape = "LAr::Example";
-  GeoUnidentifiedShape* sUnidentifiedShape = new GeoUnidentifiedShape("LArCustomShape",nameUnidentifiedShape);
+  const std::string shapeUnidName = "LArCustomShape";
+  const std::string shapeUnidAscii = "LAr::Example";
+  GeoUnidentifiedShape* sUnidentifiedShape = new GeoUnidentifiedShape(shapeUnidName, shapeUnidAscii);
   const GeoLogVol* lUnidentifiedShape = new GeoLogVol("UnidentifiedShape", sUnidentifiedShape, steel);
   GeoPhysVol *pUnidentifiedShape = new GeoPhysVol(lUnidentifiedShape);
   GeoNameTag *nUnidentifiedShape = new GeoNameTag("UnidentifiedShape");

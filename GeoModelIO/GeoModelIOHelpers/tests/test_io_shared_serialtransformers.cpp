@@ -16,7 +16,6 @@
  *
  */
 
-//pipppo  
 // GeoModel includes
 #include "GeoGenericFunctions/AbsFunction.h"
 #include "GeoGenericFunctions/Cos.h"

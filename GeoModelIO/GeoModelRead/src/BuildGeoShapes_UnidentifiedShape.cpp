@@ -23,10 +23,10 @@ void BuildGeoShapes_UnidentifiedShape::buildShape(const DBRowEntry row)
     // shape volume
     const double shapeVolume = GeoModelHelpers::variantHelper::getFromVariant_Double(row[1], "UnidentifiedShape:shapeVolume");
     // shape parameters
-    const std::string type = GeoModelHelpers::variantHelper::getFromVariant_String(row[2], "UnidentifiedShape:type");
     const std::string name = GeoModelHelpers::variantHelper::getFromVariant_String(row[2], "UnidentifiedShape:name");
+    const std::string asciiData = GeoModelHelpers::variantHelper::getFromVariant_String(row[3], "UnidentifiedShape:asciiData");
 
-    GeoUnidentifiedShape *shape = new GeoUnidentifiedShape(type, name);
+    GeoUnidentifiedShape *shape = new GeoUnidentifiedShape(name, asciiData);
 
     storeBuiltShape(shapeId, shape);
 

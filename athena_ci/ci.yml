@@ -165,7 +165,7 @@ run_workflow_tests_run4_reco:
       - build_geomodel_athena
   script:
       - cd run
-      - RunWorkflowTests_Run4.py --CI -r -w MCReco -e '--maxEvents 5 --inputHITSFile=../../myHITS.pool.root' --no-output-checks
+      - RunWorkflowTests_Run4.py --CI -r -w MCReco -e '--conditionsTag OFLCOND-MC21-SDR-RUN4-01 --maxEvents 5 --inputHITSFile=../../myHITS.pool.root' --no-output-checks
 
 
 ###################################################

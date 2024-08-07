@@ -27,8 +27,8 @@ void TransFunctionInterpreter::add(const std::string & str, const TransFunctionR
 
 
 TFPTR TransFunctionInterpreter::interpret(const std::string &exprString, std::deque<double> *fpData) const {
-  size_t begin = exprString.find_first_of("{");
-  size_t end = exprString.find_last_of("}");
+  size_t begin = exprString.find_first_of('{');
+  size_t end = exprString.find_last_of('}');
   if (!((begin!=std::string::npos) && (end!=std::string::npos))) {
     throw std::runtime_error ("Ominous warning in TransFunctionPersistier:  cannot parse function");
   }

@@ -67,10 +67,10 @@ namespace GeoFileUtils {
             std::cerr<<"copyFile() -- File "<<from<<" does not exist"<<std::endl;
             return false;
         }
-        if (to.find("/") != std::string::npos) {
-            if (!mkdir(to.substr(0, to.rfind("/")))){
+        if (to.find('/') != std::string::npos) {
+            if (!mkdir(to.substr(0, to.rfind('/')))){
                 std::cerr<<"copyFile() -- Cannot create directory "
-                         <<to.substr(0, to.rfind("/"))<<".";
+                         <<to.substr(0, to.rfind('/'))<<".";
             }
         }
         std::filesystem::copy(from, to, std::filesystem::copy_options::overwrite_existing);    

@@ -48,8 +48,8 @@ namespace GeoGenfun {
     // It is illegal to assign a fixed constant
     const Power & operator=(const Power &right);
 
-    double _doublePower; // power (as a double)
-    int    _intPower;    // power (as an integer)
+    double _doublePower{}; // power (as a double)
+    int    _intPower{};    // power (as an integer)
     bool   _asInteger;   // flag:  object constructed with integer argument
 
   };

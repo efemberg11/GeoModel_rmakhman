@@ -13,6 +13,6 @@
  * @param allowShared: Switch to allow that GeoPhysVols that don't host GeoFullPhysVols are simply moved to the copied 
  *                     volume and hence become shared objects.
 */
-PVLink cloneVolume(PVLink volume,  bool allowShared = true);
+PVLink cloneVolume(const PVLink& volume,  bool allowShared = true);
 
 #endif

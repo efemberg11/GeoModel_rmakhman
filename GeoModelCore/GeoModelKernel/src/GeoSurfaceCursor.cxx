@@ -1,8 +1,10 @@
+#include <utility>
+
 #include "GeoModelKernel/GeoSurfaceCursor.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
 
 GeoSurfaceCursor::GeoSurfaceCursor (PVConstLink parent, GeoVAlignmentStore* store)
-  : m_parent(parent)
+  : m_parent(std::move(parent))
   , m_transform(GeoTrf::Transform3D::Identity())
   , m_defTransform(GeoTrf::Transform3D::Identity())  
   , m_majorIndex(0)

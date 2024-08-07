@@ -32,7 +32,7 @@ protected:
 public:
   //! contructors
   BuildGeoShapes(std::string_view shapeType, const unsigned size);
-  BuildGeoShapes(std::string_view shapeType, const unsigned size, DBRowsList shapesData);
+  BuildGeoShapes(std::string_view shapeType, const unsigned size, const DBRowsList& shapesData);
 
   virtual void buildShape(const DBRowEntry row) = 0;
 

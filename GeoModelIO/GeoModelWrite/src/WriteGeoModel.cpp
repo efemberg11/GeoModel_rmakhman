@@ -50,14 +50,12 @@
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
-#include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
-#include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
@@ -66,13 +64,14 @@
 
 // C++ includes
 #include <sstream>
+#include <utility>
 
 namespace GeoModelIO {
 
 // TODO: should go to an utility class
 // FIXME: should go to an utility class
-std::string joinVectorStrings(std::vector<std::string> vec,
-                              std::string sep = "") {
+std::string joinVectorStrings(const std::vector<std::string>& vec,
+                              const std::string& sep = "") {
     std::string s;
     unsigned int ii = 0;
     for (const auto& piece : vec) {
@@ -392,7 +391,7 @@ void WriteGeoModel::handleIdentifierTag(const GeoIdentifierTag* node) {
     // get the parent volume
     const std::vector<std::string> parentList = getParentNode();
     const unsigned int parentId = std::stoi(parentList[0]);
-    const std::string parentType = parentList[1];
+    const std::string& parentType = parentList[1];
     const unsigned int parentCopyN =
         getLatestParentCopyNumber(parentId, parentType);
 
@@ -427,7 +426,7 @@ void WriteGeoModel::handleSerialIdentifier(const GeoSerialIdentifier* node) {
     // get the parent volume
     const std::vector<std::string> parentList = getParentNode();
     const unsigned int parentId = std::stoi(parentList[0]);
-    const std::string parentType = parentList[1];
+    const std::string& parentType = parentList[1];
     const unsigned int parentCopyN =
         getLatestParentCopyNumber(parentId, parentType);
 
@@ -458,7 +457,7 @@ void WriteGeoModel::handleSerialDenominator(const GeoSerialDenominator* node) {
     // get the parent volume
     const std::vector<std::string> parentList = getParentNode();
     const unsigned int parentId = std::stoi(parentList[0]);
-    const std::string parentType = parentList[1];
+    const std::string& parentType = parentList[1];
     const unsigned int parentCopyN =
         getLatestParentCopyNumber(parentId, parentType);
 
@@ -498,7 +497,7 @@ void WriteGeoModel::handleSerialTransformer(const GeoSerialTransformer* node) {
     // get the parent volume
     const std::vector<std::string> parentList = getParentNode();
     const unsigned int parentId = std::stoi(parentList[0]);
-    const std::string parentType = parentList[1];
+    const std::string& parentType = parentList[1];
     unsigned int parentCopyN = getLatestParentCopyNumber(parentId, parentType);
 
     // check if this object has been stored already
@@ -577,7 +576,7 @@ void WriteGeoModel::handleTransform(const GeoTransform* node) {
     // get the parent volume
     const std::vector<std::string> parentList = getParentNode();
     const unsigned int parentId = std::stoi(parentList[0]);
-    const std::string parentType = parentList[1];
+    const std::string& parentType = parentList[1];
 
     unsigned int parentCopyN = getLatestParentCopyNumber(parentId, parentType);
 
@@ -616,7 +615,7 @@ void WriteGeoModel::handleNameTag(const GeoNameTag* node) {
     // get the parent volume
     const std::vector<std::string> parentList = getParentNode();
     const unsigned int parentId = std::stoi(parentList[0]);
-    const std::string parentType = parentList[1];
+    const std::string& parentType = parentList[1];
     unsigned int parentCopyN = getLatestParentCopyNumber(parentId, parentType);
 
     // FIXME: TODO: add "if stored"...
@@ -704,7 +703,7 @@ std::pair<std::string, unsigned> WriteGeoModel::storeShape(const GeoShape* shape
     const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep", "GenericTrap", "Intersection", "Shift", "Subtraction", "Union", "UnidentifiedShape"};
 
     // get shape parameters
-    if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
+    if (shapesNewDB.count(shapeType))
     {
         std::pair<DBRowEntry, DBRowsList>
             shapePair = getShapeParametersV(shape);
@@ -1613,7 +1612,7 @@ unsigned int WriteGeoModel::storeObj(const GeoXF::Function* pointer) {
                          "std::runtime_error! -->"
                       << error.what() << std::endl;
         }
-        std::string expression      = persistifier.getCodedString();
+        const std::string& expression      = persistifier.getCodedString();
         std::deque<double> exprData = persistifier.getFloatingPointData();
         
         if (expression.size() == 0) {
@@ -1739,7 +1738,7 @@ void WriteGeoModel::storeChildPosition(const unsigned int& parentId,
 
 unsigned int WriteGeoModel::addRecord(
     std::vector<std::vector<std::string>>* container,
-    const std::vector<std::string> values) const {
+    const std::vector<std::string>& values) const {
     container->push_back(values);
     unsigned int idx =
         container->size();  // index of pushed element = size after pushing, to
@@ -1749,7 +1748,7 @@ unsigned int WriteGeoModel::addRecord(
 
 unsigned int WriteGeoModel::addRecord(
     DBRowsList* container,
-    const DBRowEntry values) const {
+    const DBRowEntry& values) const {
     container->push_back(values);
     unsigned int idx =
         container->size();  // index of pushed element = size after pushing, to
@@ -1759,7 +1758,7 @@ unsigned int WriteGeoModel::addRecord(
 
 std::pair<unsigned, unsigned> WriteGeoModel::addRecordData(
     DBRowsList *container,
-    const DBRowsList values) const
+    const DBRowsList& values) const
 {
     const unsigned dataStart = container->size() + 1;
     // Note: ^ we add +1 because start filling the table 
@@ -1798,7 +1797,7 @@ std::vector<unsigned> WriteGeoModel::addExprData(
     return dataRows;
 }
 
-std::pair<unsigned, unsigned> WriteGeoModel::addShapeData(const std::string type,
+std::pair<unsigned, unsigned> WriteGeoModel::addShapeData(const std::string& type,
     const DBRowsList& shapeData) 
 {
     DBRowsList *container = nullptr;
@@ -1908,7 +1907,8 @@ unsigned int WriteGeoModel::addAlignableTransform(
     const std::vector<double>& params) {
     std::vector<std::vector<std::string>>* container = &m_alignableTransforms;
     std::vector<std::string> values;
-    for (const double& par : params) {
+    values.reserve(params.size());
+for (const double& par : params) {
         values.push_back(GeoStrUtils::to_string_with_precision(par));
     }
     return addRecord(container, values);
@@ -1917,7 +1917,8 @@ unsigned int WriteGeoModel::addAlignableTransform(
 unsigned int WriteGeoModel::addTransform(const std::vector<double>& params) {
     std::vector<std::vector<std::string>>* container = &m_transforms;
     std::vector<std::string> values;
-    for (const double& par : params) {
+    values.reserve(params.size());
+for (const double& par : params) {
         values.push_back(GeoStrUtils::to_string_with_precision(par));
     }
     return addRecord(container, values);
@@ -1934,7 +1935,7 @@ unsigned int WriteGeoModel::getIdFromNodeType(const std::string& nodeType) {
 
 unsigned int WriteGeoModel::addSerialTransformer(const unsigned int& funcId,
                                                  const unsigned int& physvolId,
-                                                 const std::string volType,
+                                                 const std::string& volType,
                                                  const unsigned int& copies) {
     std::vector<std::vector<std::string>>* container = &m_serialTransformers;
     const unsigned int volTypeID = getIdFromNodeType(volType);
@@ -2372,11 +2373,11 @@ void WriteGeoModel::storeRecordPublishedNodes(
 }
 
 void WriteGeoModel::storeDataTable(
-    std::string tableName, std::vector<std::string> colNames,
-    std::vector<std::string> colTypes,
+    const std::string& tableName, const std::vector<std::string>& colNames,
+    const std::vector<std::string>& colTypes,
     DBRowsList tableData) {
     m_auxiliaryTablesVar[tableName] = std::make_pair(colNames, colTypes);
-    m_auxiliaryTablesVarData[tableName] = tableData;
+    m_auxiliaryTablesVarData[tableName] = std::move(tableData);
 }
 
 void WriteGeoModel::storeAddress(const std::string& address,

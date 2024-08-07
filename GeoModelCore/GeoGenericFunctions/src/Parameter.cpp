@@ -4,13 +4,15 @@
 // GNU Lesser Public License v3.                                            //
 //==========================================================================//
 
+#include <utility>
+
 #include "GeoGenericFunctions/Parameter.h"
 
 namespace GeoGenfun {
 PARAMETER_OBJECT_IMP(Parameter)
 
 Parameter::Parameter(std::string name, double value, double lowerLimit, double upperLimit):
-  _name(name),_value(value),_lowerLimit(lowerLimit),_upperLimit(upperLimit),_sourceParameter(NULL)
+  _name(std::move(name)),_value(value),_lowerLimit(lowerLimit),_upperLimit(upperLimit),_sourceParameter(NULL)
 {
 } 
 

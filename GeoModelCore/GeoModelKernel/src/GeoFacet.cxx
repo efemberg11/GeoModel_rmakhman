@@ -2,6 +2,8 @@
   Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
 */
 
+#include <utility>
+
 #include "GeoModelKernel/GeoFacet.h"
 
 // ___________________ Triangular Facet ________________________
@@ -14,9 +16,9 @@ GeoTriangularFacet::GeoTriangularFacet(GeoFacetVertex v0
   m_nVertices = 3;
   m_vertexType = type;
   m_vertices.reserve(3);
-  m_vertices[0] = v0;
-  m_vertices[1] = v1;
-  m_vertices[2] = v2;
+  m_vertices[0] = std::move(v0);
+  m_vertices[1] = std::move(v1);
+  m_vertices[2] = std::move(v2);
 }
 
 
@@ -32,9 +34,9 @@ GeoQuadrangularFacet::GeoQuadrangularFacet(GeoFacetVertex v0
   m_nVertices = 4;
   m_vertexType = type;
   m_vertices.reserve(4);
-  m_vertices[0] = v0;
-  m_vertices[1] = v1;
-  m_vertices[2] = v2;
-  m_vertices[3] = v3;
+  m_vertices[0] = std::move(v0);
+  m_vertices[1] = std::move(v1);
+  m_vertices[2] = std::move(v2);
+  m_vertices[3] = std::move(v3);
 }
 

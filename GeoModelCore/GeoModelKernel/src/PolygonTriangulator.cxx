@@ -73,16 +73,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstdlib>
-#include <map>
+#include <iostream>
 #include <limits>
 #include <list>
+#include <map>
 #include <queue>
 #include <set>
-#include <iostream>
 #include <stack>
-#include <assert.h>
 
 namespace internal_poltrig {
 
@@ -370,7 +370,7 @@ namespace internal_poltrig {
   /*                                                                           */
   /*****************************************************************************/
 
-  int fast_expansion_sum_zeroelim(const int& elen, REAL* e, const int& flen, REAL* f, REAL* h)
+  int fast_expansion_sum_zeroelim(const int& elen, const REAL* e, const int& flen, const REAL* f, REAL* h)
     /* h cannot be e or f. */
   {
     REAL Q;
@@ -449,7 +449,7 @@ namespace internal_poltrig {
   /*                                                                           */
   /*****************************************************************************/
 
-  REAL estimate(const int& elen, REAL* e)
+  REAL estimate(const int& elen, const REAL* e)
   {
     REAL Q;
     int eindex;
@@ -487,7 +487,7 @@ namespace internal_poltrig {
   /*                                                                           */
   /*****************************************************************************/
 
-  REAL orient2dadapt(REAL* pa, REAL* pb, REAL* pc, const REAL& detsum)
+  REAL orient2dadapt(const REAL* pa, const REAL* pb, const REAL* pc, const REAL& detsum)
   {
     INEXACT REAL acx, acy, bcx, bcy;
     REAL acxtail, acytail, bcxtail, bcytail;
@@ -706,7 +706,7 @@ namespace internal_poltrig {
 
   private:
     BTreeNode<T, KeyType> *m_root;
-    long int              m_size;
+    long int              m_size{};
 
     void reclaimMemory( BTreeNode<T, KeyType> * t ) const;
     BTreeNode<T, KeyType> * clone( BTreeNode<T, KeyType> *t ) const;
@@ -1337,7 +1337,7 @@ namespace internal_poltrig {
   //----------------------------------------------------------------------------
   //square of the distance of two points;
   //----------------------------------------------------------------------------
-  double dist_sqr(double *pa, double *pb)
+  double dist_sqr(const double *pa, const double *pb)
   {
     return sqr(pa[0]-pb[0])+sqr(pa[1]-pb[1]);
   }
@@ -1480,7 +1480,7 @@ private:
 
 
   //angle ABC for three given points, for monotone polygon searching purpose;
-  double       angleCosb(double *A, double *B, double *C);
+  double       angleCosb(const double *A, const double *B, const double *C);
   //find the next edge, for monotone polygon searching purpose;
   unsigned int selectNextEdge(internal_poltrig::Linebase* edge);
 
@@ -1867,7 +1867,7 @@ void PolygonTriangulator::Polygon::partition2Monotone()
 //----------------------------------------------------------------------------
 //calculate angle B for A, B, C three given points
 //----------------------------------------------------------------------------
-double PolygonTriangulator::Polygon::angleCosb(double *pa, double *pb, double *pc)
+double PolygonTriangulator::Polygon::angleCosb(const double *pa, const double *pb, const double *pc)
 {
   double dxab = pa[0] - pb[0];
   double dyab = pa[1] - pb[1];

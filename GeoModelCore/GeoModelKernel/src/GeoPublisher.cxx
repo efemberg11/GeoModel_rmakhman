@@ -13,6 +13,7 @@
 
 // C++ includes
 #include <iostream>
+#include <utility>
 
 
 
@@ -29,7 +30,7 @@ std::map<GeoAlignableTransform*, std::any> GeoPublisher::getPublishedAXF()
 
 void GeoPublisher::setName(std::string name)
 {
-    m_name = name;
+    m_name = std::move(name);
 }
 
 /*
@@ -40,9 +41,9 @@ void GeoPublisher::storeDataTable( std::string tableName, std::vector<std::strin
 }
 */
 
-void GeoPublisher::storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData )
+void GeoPublisher::storeDataTable( const std::string& tableName, const std::vector<std::string>& colNames, const std::vector<std::string>& colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData )
 {
     m_auxiliaryTablesVar[ tableName ] = std::make_pair(colNames, colTypes);
-    m_auxiliaryTablesVarData[ tableName ] = tableData;
+    m_auxiliaryTablesVarData[ tableName ] = std::move(tableData);
 }
 

@@ -20,7 +20,7 @@ public:
   std::vector<PVConstLink>                physicalVolumes;
   unsigned int                            lV;
 
-  void finalize(unsigned int i, PVConstLink v);
+  void finalize(unsigned int i, const PVConstLink& v);
 };
 
 
@@ -41,11 +41,11 @@ void GeometryMap::add(const std::string & Path) {
   size_t pos = 0;
   while (1) {
     size_t end = path.find('/',pos);
-    if (end==path.npos) break;
+    if (end==std::string::npos) break;
 
     std::string sub0(path,pos,end-pos);
     pathList.push_back(sub0);
-    std::string sub1(path,end+1,path.npos-end-1);
+    std::string sub1(path,end+1,std::string::npos-end-1);
     path=sub1;
     pos=0;
   }
@@ -58,10 +58,10 @@ void GeometryMap::add(const std::string & Path) {
     size_t end = path.find('*',pos);
     std::string sub(path,pos,end-pos);
     regex+=sub;
-    if (end==path.npos) break;
+    if (end==std::string::npos) break;
     regex+=".*";
     pos=end+1;
-    if (pos==path.npos) break;
+    if (pos==std::string::npos) break;
   }
   regex+="$";
   m_c->geometryRegex.push_back(regex);
@@ -71,7 +71,7 @@ void GeometryMap::add(const std::string & Path) {
 
 }
 
-void GeometryMap::finalize( PVConstLink v) {
+void GeometryMap::finalize( const PVConstLink& v) {
 
   for (size_t i=0;i<m_c->pathList.size();i++) {
     m_c->lV=0;
@@ -80,7 +80,7 @@ void GeometryMap::finalize( PVConstLink v) {
 }
 
 
-void GeometryMap::Clockwork::finalize(unsigned int i, PVConstLink v) {
+void GeometryMap::Clockwork::finalize(unsigned int i, const PVConstLink& v) {
 
   static const size_t NMATCH=11;     
   regmatch_t pmatch[NMATCH];          

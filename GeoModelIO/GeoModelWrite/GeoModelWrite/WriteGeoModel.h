@@ -118,8 +118,8 @@ class WriteGeoModel : public GeoNodeAction {
     // colNames, std::vector<std::string> colTypes,
     // std::vector<std::vector<std::string>> tableData );
     void storeDataTable(
-        std::string tableName, std::vector<std::string> colNames,
-        std::vector<std::string> colTypes,
+        const std::string& tableName, const std::vector<std::string>& colNames,
+        const std::vector<std::string>& colTypes,
         DBRowsList
             tableData);
 
@@ -235,13 +235,13 @@ class WriteGeoModel : public GeoNodeAction {
     std::vector<unsigned> addExprData(const std::deque<double> &exprData) ;
 
     unsigned int addRecord(std::vector<std::vector<std::string>> *container,
-                           const std::vector<std::string> values) const;
+                           const std::vector<std::string>& values) const;
     unsigned int addRecord(DBRowsList *container,
-                           const DBRowEntry values) const;
+                           const DBRowEntry& values) const;
     
     std::pair<unsigned, unsigned> addRecordData(
         DBRowsList *container,
-        const DBRowsList values) const;
+        const DBRowsList& values) const;
 
     unsigned int addElement(const std::string &name, const std::string &symbol,
                             const double &elZ, const double &elA);
@@ -256,14 +256,14 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned int addFunction(const std::string &expression, const unsigned &dataStart, const unsigned &dataEnd);
     unsigned int addSerialTransformer(const unsigned &funcId,
                                       const unsigned &physvolId,
-                                      const std::string volType,
+                                      const std::string& volType,
                                       const unsigned &copies);
     
     unsigned int addShape(const std::string &type,
                           const std::string &parameters);
     unsigned int addShape(const std::string &type,
                           const DBRowEntry &parameters);
-    std::pair<unsigned, unsigned> addShapeData(const std::string type,
+    std::pair<unsigned, unsigned> addShapeData(const std::string& type,
                                        const DBRowsList &shapeData);
     
     unsigned int addSerialDenominator(const std::string &baseName);

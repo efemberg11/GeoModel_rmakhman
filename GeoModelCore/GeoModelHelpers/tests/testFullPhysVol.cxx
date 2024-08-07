@@ -1,12 +1,11 @@
 // Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 
-#include <GeoModelKernel/GeoFullPhysVol.h>
-#include <GeoModelKernel/GeoTransform.h>
-#include <GeoModelKernel/GeoPhysVol.h>
-#include <GeoModelKernel/GeoFullPhysVol.h>
 #include <GeoModelKernel/GeoBox.h>
+#include <GeoModelKernel/GeoFullPhysVol.h>
 #include <GeoModelKernel/GeoIdentifierTag.h>
+#include <GeoModelKernel/GeoPhysVol.h>
+#include <GeoModelKernel/GeoTransform.h>
 
 #include <GeoModelHelpers/defineWorld.h>
 #include <GeoModelHelpers/TransformSorter.h>

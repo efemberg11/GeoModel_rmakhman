@@ -13,10 +13,11 @@
 #include "GeoModelHelpers/throwExcept.h"
 #include "GeoModelHelpers/StringUtils.h"
 
+#include <cstdio>
 #include <cstdlib>
 #include <iomanip>
-#include <stdio.h>
 #include <iostream>
+#include <utility>
 
 namespace {
    std::string replaceDColon(const std::string& name) {
@@ -46,16 +47,16 @@ MaterialManager::MaterialFactory::~MaterialFactory() {
 }
 
 MaterialManager::MaterialFactory::MaterialFactory(MaterialPtr mat):
-    m_material{mat} {
+    m_material{std::move(mat)} {
 }
 
-void MaterialManager::MaterialFactory::addComponent(ConstMaterialPtr mat, double fraction) {
+void MaterialManager::MaterialFactory::addComponent(const ConstMaterialPtr& mat, double fraction) {
     for (unsigned int ele = 0 ; ele < mat->getNumElements(); ++ele) {
         ConstElementPtr elePtr{mat->getElement(ele)};
         addComponent(elePtr, mat->getFraction(ele) * fraction);
     }
 }
-void MaterialManager::MaterialFactory::addComponent(ConstElementPtr ele, 
+void MaterialManager::MaterialFactory::addComponent(const ConstElementPtr& ele, 
                                                     double fraction) {
     m_components.emplace_back(std::make_pair(ele, fraction));
     m_totFraction += fraction;

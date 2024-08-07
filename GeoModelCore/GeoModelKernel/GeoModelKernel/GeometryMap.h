@@ -25,7 +25,7 @@ class GeometryMap {
   
   // Create the map; this will maintain a list of all volumes matching
   // the expressions under the given physical volume.
-  void finalize(PVConstLink pv);
+  void finalize(const PVConstLink& pv);
 
   
   // For iteration:

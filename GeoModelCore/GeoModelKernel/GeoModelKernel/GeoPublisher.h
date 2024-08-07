@@ -56,7 +56,7 @@ class GeoPublisher
   void setName(std::string name);
   std::string getName() { return m_name; }
 
-  void storeDataTable( std::string tableName, std::vector<std::string> colNames, std::vector<std::string> colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData );
+  void storeDataTable( const std::string& tableName, const std::vector<std::string>& colNames, const std::vector<std::string>& colTypes, std::vector<std::vector<std::variant<int,long,float,double,std::string>>> tableData );
 
     std::pair<AuxTableDefs, AuxTableData> getPublishedAuxData() { return std::make_pair(m_auxiliaryTablesVar, m_auxiliaryTablesVarData); }
 

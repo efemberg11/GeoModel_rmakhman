@@ -66,7 +66,7 @@ namespace GeoStrUtils{
     /// Function to set the precision of the conversion from double to string
     std::string to_string_with_precision(const double a_value, const unsigned n = 16);
 
-    void printStdVectorStrings(const std::vector<std::string> vec);
+    void printStdVectorStrings(const std::vector<std::string>& vec);
 }
 #include "GeoModelHelpers/StringUtils.icc"
 #endif

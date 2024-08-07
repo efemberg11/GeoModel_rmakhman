@@ -224,8 +224,8 @@ protected:
 		   bool ifWholeCircle, int ns, int &kface);
 
   // Set side facets for the case of incomplete rotation
-  void SetSideFacets (int ii[4], int vv[4],
-		      int *kk, double *r, double dphi, int ns, int &kface);
+  void SetSideFacets (const int ii[4], int vv[4],
+		      const int *kk, const double *r, double dphi, int ns, int &kface);
 
   // Create GeoPolyhedron for body of revolution around Z-axis
   void RotateAroundZ (int nstep, double phi, double dphi,

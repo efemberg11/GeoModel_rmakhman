@@ -5,7 +5,7 @@
 #include "GeoModelKernel/Units.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 
 bool isIdentity(const GeoTrf::RotationMatrix3D& mat) {

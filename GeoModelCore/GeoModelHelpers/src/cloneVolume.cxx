@@ -7,7 +7,7 @@
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 
-PVLink cloneVolume(PVLink volume, 
+PVLink cloneVolume(const PVLink& volume, 
                    bool allowShared) {
     PVLink newVolume{volume};
     if (!allowShared || hasFullPhysVolInTree(volume)) {

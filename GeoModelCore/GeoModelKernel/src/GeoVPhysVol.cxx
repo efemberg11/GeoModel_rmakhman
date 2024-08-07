@@ -15,7 +15,7 @@
 GeoVPhysVol::GeoVPhysVol(const GeoLogVol* LogVol): 
     m_logVol(LogVol) {}
 
-Query<unsigned int> GeoVPhysVol::indexOf(PVConstLink daughter) const {
+Query<unsigned int> GeoVPhysVol::indexOf(const PVConstLink& daughter) const {
   unsigned int nChildVols{getNChildVols()};
   for(unsigned int i=0; i<nChildVols; i++) { // To Do: replace this with Volume Iterator!
     if(getChildVol(i) == daughter) return i;
@@ -71,7 +71,7 @@ void GeoVPhysVol::apply(GeoVolumeAction *action) const {
   }
 }
 
-void GeoVPhysVol::add(GeoIntrusivePtr<GeoGraphNode> graphNode) {
+void GeoVPhysVol::add(const GeoIntrusivePtr<GeoGraphNode>& graphNode) {
   std::unique_lock lk{m_muxVec};
   m_daughters.emplace_back(graphNode);
   graphNode->dockTo(this);

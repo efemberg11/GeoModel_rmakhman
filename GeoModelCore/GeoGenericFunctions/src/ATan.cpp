@@ -5,7 +5,7 @@
 //==========================================================================//
 #include "GeoGenericFunctions/ATan.h"
 #include "GeoGenericFunctions/Square.h"
-#include <assert.h>
+#include <cassert>
 #include <cmath>      // for atan()
 
 namespace GeoGenfun {

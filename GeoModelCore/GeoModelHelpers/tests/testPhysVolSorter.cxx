@@ -3,13 +3,13 @@
 */
 
 #include "GeoModelHelpers/GeoPhysVolSorter.h"
+#include "GeoModelHelpers/TransformToStringConverter.h"
 #include "GeoModelHelpers/defineWorld.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
-#include "GeoModelHelpers/TransformToStringConverter.h"
-#include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoBox.h"
+#include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/Units.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <set>
 

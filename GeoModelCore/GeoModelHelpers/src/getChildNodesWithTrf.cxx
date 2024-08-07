@@ -1,6 +1,8 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
+#include <utility>
+
 #include "GeoModelHelpers/getChildNodesWithTrf.h"
 
 #include "GeoModelHelpers/GeoPhysVolSorter.h"
@@ -34,7 +36,7 @@ std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink physVol,
     static const GeoTrf::TransformSorter transSort{};
 
     
-    GeoVolumeCursor cursor{physVol};
+    GeoVolumeCursor cursor{std::move(physVol)};
     GeoTrf::Transform3D lastNodeTrf{GeoTrf::Transform3D::Identity()};
 
     while (!cursor.atEnd()) {
@@ -65,9 +67,9 @@ std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink physVol,
     return children;
 }
 std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol,
-                                                  std::function<bool(const GeoChildNodeWithTrf&)> selector,
+                                                  const std::function<bool(const GeoChildNodeWithTrf&)>& selector,
                                                   bool summarizeEqualVol) {
-    std::vector<GeoChildNodeWithTrf> children{getChildrenWithRef(physVol, summarizeEqualVol)}, subVolumes{};
+    std::vector<GeoChildNodeWithTrf> children{getChildrenWithRef(std::move(physVol), summarizeEqualVol)}, subVolumes{};
     subVolumes.reserve(children.size());
     for (const GeoChildNodeWithTrf& child : children) {
         std::vector<GeoChildNodeWithTrf> grandChildren = getAllSubVolumes(child.volume, selector, summarizeEqualVol);
@@ -86,12 +88,12 @@ std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol,
 
 
 std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol) {
-    return getAllSubVolumes(physVol, 
+    return getAllSubVolumes(std::move(physVol), 
                             [](const GeoChildNodeWithTrf& child){
                                         return true;}, false);
 }
 
-bool hasFullPhysVolInTree(PVConstLink physVol) {
+bool hasFullPhysVolInTree(const PVConstLink& physVol) {
     if (typeid(*physVol) == typeid(GeoFullPhysVol) ||
         typeid(*physVol) == typeid(GeoVFullPhysVol)){
         return true;

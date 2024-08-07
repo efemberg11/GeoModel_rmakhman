@@ -20,7 +20,7 @@ BuildGeoShapes::BuildGeoShapes(std::string_view shapeType, const unsigned size)
     m_memMapShapes.reserve(size);
 }
 
-BuildGeoShapes::BuildGeoShapes(std::string_view shapeType, const unsigned size, const DBRowsList shapeData)
+BuildGeoShapes::BuildGeoShapes(std::string_view shapeType, const unsigned size, const DBRowsList& shapeData)
 {
     m_shapeType = shapeType;
     m_memMapShapes.reserve(size);

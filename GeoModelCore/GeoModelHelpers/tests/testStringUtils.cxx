@@ -4,8 +4,8 @@
 
 #include "GeoModelHelpers/StringUtils.h"
 #include "GeoModelHelpers/throwExcept.h"
+#include <cstdlib>
 #include <iostream>
-#include <stdlib.h>
 using namespace GeoStrUtils;
 
 

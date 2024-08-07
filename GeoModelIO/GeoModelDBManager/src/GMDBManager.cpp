@@ -34,10 +34,11 @@
 #include <sqlite3.h>
 
 // C++ includes
-#include <stdlib.h> /* exit, EXIT_FAILURE */
+#include <cstdlib> /* exit, EXIT_FAILURE */
 
 #include <mutex>
 #include <sstream>
+#include <utility>
 
 static std::string dbversion =
     "1.0.0";  // New format with REAL columns for numeric values
@@ -46,7 +47,7 @@ static std::string dbversion =
 class GMDBManager::Imp {
    public:
     // constructor
-    Imp(GMDBManager* dbm)
+    explicit Imp(GMDBManager* dbm)
         : theManager(dbm), m_dbSqlite(nullptr), m_SQLiteErrMsg(0) {}
 
     // The class
@@ -62,7 +63,7 @@ class GMDBManager::Imp {
     sqlite3_stmt* selectAllFromTableSortBy(const std::string_view tableName,
                                            const std::string_view sortColumn = "") const;
     sqlite3_stmt* selectAllFromTableChildrenPositions() const;
-    bool checkTableFromDB_imp(std::string tableName) const;
+    bool checkTableFromDB_imp(const std::string& tableName) const;
 };
 
 GMDBManager::GMDBManager(const std::string& path)
@@ -168,7 +169,7 @@ void GMDBManager::printAllAlignableTransforms() const {
 }
 void GMDBManager::printAllNameTags() const { printAllRecords("NameTags"); }
 void GMDBManager::printAllPublishedFullPhysVols(
-    const std::string suffix) const {
+    const std::string& suffix) const {
     if ("" == suffix)
         printAllRecords("PublishedFullPhysVols");
     else {
@@ -178,7 +179,7 @@ void GMDBManager::printAllPublishedFullPhysVols(
     }
 }
 void GMDBManager::printAllPublishedAlignableTransforms(
-    const std::string suffix) const {
+    const std::string& suffix) const {
     if ("" == suffix)
         printAllRecords("PublishedAlignableTransforms");
     else {
@@ -502,7 +503,7 @@ DBRowEntry GMDBManager::getTableRecords_VecData(
 }
 
 std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType_String(
-    std::string nodeType)
+    const std::string& nodeType)
 {
     std::vector<std::vector<std::string>> out;
     std::string tableName = getTableNameFromNodeType(nodeType);
@@ -533,7 +534,7 @@ std::vector<std::vector<std::string>> GMDBManager::getTableFromNodeType_String(
 }
 
 DBRowsList GMDBManager::getTableFromNodeType_VecVecData(
-    std::string nodeType)
+    const std::string& nodeType)
 {
     DBRowsList out;
     std::string tableName = getTableNameFromNodeType(nodeType);
@@ -562,7 +563,7 @@ DBRowsList GMDBManager::getTableFromNodeType_VecVecData(
     return out;
 }
 DBRowsList GMDBManager::getTableFromTableName_VecVecData(
-    std::string tableName)
+    const std::string& tableName)
 {
     DBRowsList out;
     if (tableName.empty())
@@ -592,7 +593,7 @@ DBRowsList GMDBManager::getTableFromTableName_VecVecData(
     return out;
 }
 DBRowEntry GMDBManager::getTableFromTableName_VecData(
-    std::string tableName)
+    const std::string& tableName)
 {
     DBRowEntry out;
     if (tableName.empty())
@@ -620,7 +621,7 @@ DBRowEntry GMDBManager::getTableFromTableName_VecData(
     return out;
 }
 
-std::vector<double> GMDBManager::getTableFromTableName_VectorDouble(std::string tableName)
+std::vector<double> GMDBManager::getTableFromTableName_VectorDouble(const std::string& tableName)
 {
     DBRowEntry inputRecords = getTableFromTableName_VecData(tableName);
     std::vector<double> outRecords;
@@ -643,7 +644,7 @@ std::vector<double> GMDBManager::getTableFromTableName_VectorDouble(std::string 
 // from Johannes: Couldn't you declare this method as a general template method to downcast the variant?
 std::deque<double> GMDBManager::getTableFromTableName_DequeDouble(std::string tableName)
 {
-    std::vector<double> inputRecords = getTableFromTableName_VectorDouble(tableName);
+    std::vector<double> inputRecords = getTableFromTableName_VectorDouble(std::move(tableName));
     // Initialize a deque from vector using range constructor
     std::deque<double> outRecords(inputRecords.begin(), inputRecords.end());
     return outRecords;
@@ -668,7 +669,7 @@ bool GMDBManager::addListOfChildrenPositions(
 
 bool GMDBManager::addListOfPublishedAlignableTransforms(
     const std::vector<std::vector<std::string>>& records,
-    std::string suffix /* optional parameter */) {
+    const std::string& suffix /* optional parameter */) {
     std::string tableName =
         "PublishedAlignableTransforms";  // default table name
     std::string nodeType = "GeoAlignableTransform";
@@ -693,7 +694,7 @@ bool GMDBManager::addListOfPublishedAlignableTransforms(
 
 bool GMDBManager::addListOfPublishedFullPhysVols(
     const std::vector<std::vector<std::string>>& records,
-    std::string suffix /* optional parameter */) {
+    const std::string& suffix /* optional parameter */) {
     std::string tableName = "PublishedFullPhysVols";  // default table name
     std::string nodeType = "GeoFullPhysVol";
     const std::type_info& keyType(
@@ -717,8 +718,8 @@ bool GMDBManager::addListOfPublishedFullPhysVols(
 
 
 bool GMDBManager::addListOfRecords(
-    const std::string geoType,
-    const std::vector<std::vector<std::string>> records) {
+    const std::string& geoType,
+    const std::vector<std::vector<std::string>>& records) {
     //  if (m_debug) qDebug() << "GMDBManager::addListOfRecords():" <<
     //  geoType;
 
@@ -740,8 +741,8 @@ bool GMDBManager::addListOfRecords(
 }
 
 bool GMDBManager::addListOfRecords(
-    const std::string geoType,
-    const DBRowsList records) {
+    const std::string& geoType,
+    const DBRowsList& records) {
     //  if (m_debug) qDebug() << "GMDBManager::addListOfRecords():" <<
     //  geoType;
 
@@ -771,8 +772,8 @@ bool GMDBManager::addListOfRecords(
 // (2,'Silicon'), (368,'ShieldSteel');");
 //
 bool GMDBManager::addListOfRecordsToTable(
-    const std::string tableName,
-    const std::vector<std::vector<std::string>> records) {
+    const std::string& tableName,
+    const std::vector<std::vector<std::string>>& records) {
     
     if ( !(hasTableBeenCreatedInDB(tableName)) ) {
         THROW_EXCEPTION("ERROR!!! The DB has no '" << tableName << "' table; probably, the table has not been created in the DB.");
@@ -794,7 +795,8 @@ bool GMDBManager::addListOfRecordsToTable(
     for (const std::vector<std::string>& rec : records) {
         ++id;
         std::vector<std::string> items;
-        for (const std::string& item : rec) {
+        items.reserve(rec.size());
+for (const std::string& item : rec) {
             items.push_back(
                 "'" + item +
                 "'");  // TODO: we should differentiate strings from other
@@ -819,8 +821,8 @@ bool GMDBManager::addListOfRecordsToTable(
 }
 
 bool GMDBManager::addListOfRecordsToTable(
-    const std::string tableName,
-    const DBRowsList records) {
+    const std::string& tableName,
+    const DBRowsList& records) {
 
     if ( !(hasTableBeenCreatedInDB(tableName)) ) {
         THROW_EXCEPTION("ERROR!!! The DB has no '" << tableName << "' table; probably, the table has not been created in the DB.");
@@ -892,8 +894,8 @@ bool GMDBManager::addListOfRecordsToTable(
 }
 
 bool GMDBManager::addRecordsToTable(
-    const std::string tableName,
-    const DBRowEntry records)
+    const std::string& tableName,
+    const DBRowEntry& records)
 {
     if (records.size() > 0) {
     // get table columns and format them for query
@@ -989,14 +991,14 @@ bool GMDBManager::addRootVolume(const std::string_view type, const unsigned id)
     const unsigned int volId{id};
     return storeRootVolume(volId, nodeType);
 }
-bool GMDBManager::addRootVolume(const std::pair<std::string, unsigned> rootValues)
+bool GMDBManager::addRootVolume(const std::pair<std::string, unsigned>& rootValues)
 {
     const std::string nodeType{rootValues.first};
     const unsigned int volId{rootValues.second};
     return storeRootVolume(volId, nodeType);
 }
 
-void GMDBManager::addDBversion(std::string version) {
+void GMDBManager::addDBversion(const std::string& version) {
     checkIsDBOpen();
     sqlite3_stmt* st = nullptr;
     int rc = -1;
@@ -1038,7 +1040,7 @@ std::vector<std::string> GMDBManager::getItemAndType(unsigned int tableId,
 }
 
 std::vector<std::string> GMDBManager::getItemFromTableName(
-    std::string tableName, unsigned int id) {
+    const std::string& tableName, unsigned int id) {
     // FIXME: when you create caches for all tables, replace this method
     // with a lookup action in the cache.
     /*
@@ -1221,7 +1223,7 @@ sqlite3_stmt* GMDBManager::Imp::selectAllFromTableSortBy(
     return st;
 }
 
-bool GMDBManager::Imp::checkTableFromDB_imp(std::string tableName) const {
+bool GMDBManager::Imp::checkTableFromDB_imp(const std::string& tableName) const {
     theManager->checkIsDBOpen();
     sqlite3_stmt* st = nullptr;  // SQLite statement to be returned
     int rc = -1;                 // SQLite return code
@@ -1276,7 +1278,7 @@ void GMDBManager::printAllDBTables() {
     if (m_cache_tables.size() == 0) {
         getAllDBTables();  // load tables and build the cache
     }
-    for (auto& str : m_cache_tables) std::cout << str << std::endl;
+    for (const auto& str : m_cache_tables) std::cout << str << std::endl;
 }
 
 void GMDBManager::getAllDBTables() {
@@ -1324,7 +1326,7 @@ void GMDBManager::getAllDBTableColumns() {
         return;
     }
 
-    for (auto& tableName : m_cache_tables) {
+    for (const auto& tableName : m_cache_tables) {
         sqlite3_stmt* stmt;
         // get the 'name' column from the PRAGMA's table's definition
         // see: https://stackoverflow.com/a/54962853/320369
@@ -1383,14 +1385,14 @@ DBRowsList GMDBManager::getPublishedAXFTable(
     return getTableRecords_VecVecData(tableName);
 }
 
-bool GMDBManager::checkTableFromDB(std::string tableName) const {
+bool GMDBManager::checkTableFromDB(const std::string& tableName) const {
     return m_d->checkTableFromDB_imp(tableName);
 }
 
 // create a user-defined custom table to store the published nodes
 // (usually GeoFullPhysVol and AlignableTransform nodes) and their keys.
 bool GMDBManager::createTableCustomPublishedNodes(
-    const std::string tableName, const std::string nodeType,
+    const std::string& tableName, const std::string& nodeType,
     const std::type_info* keyType) {
     // get the right node type and referenced table
     if (nodeType != "GeoFullPhysVol" && nodeType != "GeoVFullPhysVol" &&
@@ -1445,8 +1447,8 @@ bool GMDBManager::createTableCustomPublishedNodes(
 // create a user-defined custom table to store auxiliary data, from
 // vector<vector<variant>>
 bool GMDBManager::createCustomTable(
-    const std::string tableName, const std::vector<std::string> tableColNames,
-    const std::vector<std::string> tableColTypes,
+    const std::string& tableName, const std::vector<std::string>& tableColNames,
+    const std::vector<std::string>& tableColTypes,
     const std::vector<
         DBRowEntry>&
         records) {
@@ -1465,7 +1467,7 @@ bool GMDBManager::createCustomTable(
 
     tab.push_back(tableName);
     tab.push_back("id");  // this is the column to store the records' IDs
-    for (auto& colName : tableColNames) tab.push_back(colName);
+    for (const auto& colName : tableColNames) tab.push_back(colName);
 
     storeTableColumnNames(tab);
 
@@ -2352,7 +2354,7 @@ bool GMDBManager::createTables() {
     return false;
 }
 
-int GMDBManager::execQuery(std::string queryStr) {
+int GMDBManager::execQuery(const std::string& queryStr) {
     if (m_debug)
         std::cout << "queryStr to execute: " << queryStr << std::endl;  // debug
     checkIsDBOpen();
@@ -2389,7 +2391,7 @@ bool GMDBManager::hasTableBeenCreatedInDB(const std::string_view tableName) {
 }
 
 
-void GMDBManager::storeNodeType(std::string nodeType, std::string tableName) {
+void GMDBManager::storeNodeType(const std::string& nodeType, const std::string& tableName) {
     checkIsDBOpen();
     std::string queryStr;
     sqlite3_stmt* st = nullptr;
@@ -2526,7 +2528,7 @@ std::pair<unsigned, unsigned> GMDBManager::getRootPhysVol() {
 std::string GMDBManager::getDBFilePath() { return m_dbpath; }
 
 // FIXME: TODO: move to an utility class
-int lastIndexOf(std::vector<std::string> v, std::string str, int pos = 0) {
+int lastIndexOf(std::vector<std::string> v, const std::string& str, int pos = 0) {
     auto it = std::find(std::next(v.rbegin(), v.size() - pos), v.rend(), str);
     if (it != v.rend()) {
         auto idx = std::distance(v.begin(), it.base() - 1);

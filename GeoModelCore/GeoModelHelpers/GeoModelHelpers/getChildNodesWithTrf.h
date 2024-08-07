@@ -43,14 +43,14 @@ std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol);
  *          selection.
  */
 std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol,
-                                                  std::function<bool(const GeoChildNodeWithTrf&)> selector,
+                                                  const std::function<bool(const GeoChildNodeWithTrf&)>& selector,
                                                   bool summarizeEqualVol = false);
 
 /**
  *  Returns whether a volume has fullPhysical volume nodes in 
  *  it's children and grand children tree
 */
-bool hasFullPhysVolInTree(PVConstLink physVol);
+bool hasFullPhysVolInTree(const PVConstLink& physVol);
 
 
 

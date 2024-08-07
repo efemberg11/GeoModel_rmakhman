@@ -7,7 +7,7 @@
 #define perMillion 0.000001
 #define deg (M_PI/180.0)
 
-#include <float.h>    //G.Barrand : to have DBL_EPSILON on Windows.
+#include <cfloat>    //G.Barrand : to have DBL_EPSILON on Windows.
 
 // G.Barrand : introduce iabs to avoid a mess with cmath and some compiler.
 inline int
@@ -413,8 +413,8 @@ GeoPolyhedron::RotateEdge (int k1, int k2, double r1, double r2,
 }
 
 void
-GeoPolyhedron::SetSideFacets (int ii[4], int vv[4],
-            int *kk, double *r,
+GeoPolyhedron::SetSideFacets (const int ii[4], int vv[4],
+            const int *kk, const double *r,
             double dphi, int ns, int &kface)
 /***********************************************************************
  *                                                                     *

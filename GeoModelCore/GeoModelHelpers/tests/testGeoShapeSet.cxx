@@ -11,7 +11,7 @@
 #include "GeoModelKernel/GeoShapeShift.h"
 
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 
 template<class T, typename... args> bool insertVolume(const bool printFailure,

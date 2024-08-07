@@ -90,8 +90,8 @@ class MaterialManager {
        ~MaterialFactory();
         MaterialFactory(MaterialPtr mat);
 
-        void addComponent(ConstMaterialPtr mat, double fraction);
-        void addComponent(ConstElementPtr ele, double fraction);
+        void addComponent(const ConstMaterialPtr& mat, double fraction);
+        void addComponent(const ConstElementPtr& ele, double fraction);
 
         const GeoMaterial* get() const;
       private:

@@ -5,7 +5,7 @@
 //==========================================================================//
 #include "GeoGenericFunctions/Rectangular.h"
 #include "GeoGenericFunctions/FixedConstant.h"
-#include <assert.h>
+#include <cassert>
 
 namespace GeoGenfun {
 FUNCTION_OBJECT_IMP(Rectangular)

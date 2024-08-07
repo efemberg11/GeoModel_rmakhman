@@ -58,7 +58,7 @@ class GeoSurfaceCursor final : public GeoNodeAction
    
   std::vector<const GeoTransform *>     m_pendingTransformList;
   
-  bool                                  m_hasAlignTrans;  
+  bool                                  m_hasAlignTrans{};  
   GeoVAlignmentStore                   *m_alignStore;
 };
 

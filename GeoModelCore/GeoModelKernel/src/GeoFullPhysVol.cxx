@@ -57,7 +57,7 @@ void GeoFullPhysVol::exec(GeoNodeAction *action) const {
 
 GeoFullPhysVol* GeoFullPhysVol::clone(bool attached) {
   GeoFullPhysVol* clone = new GeoFullPhysVol(this->getLogVol());
-  for(auto daughter : m_daughters) {
+  for(const auto& daughter : m_daughters) {
     clone->add(daughter);
   }
 

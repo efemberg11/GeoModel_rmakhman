@@ -238,7 +238,7 @@ class ReadGeoModel {
     void loopOverAllChildrenInBunches_VecVecData();
     // void loopOverAllChildrenRecords(
     //     std::vector<std::vector<std::string>> records);
-    void loopOverAllChildrenRecords(DBRowsList records);
+    void loopOverAllChildrenRecords(const DBRowsList& records);
     void processParentChild(const std::vector<std::string>& parentchild);
     void processParentChild(const DBRowEntry& parentchild);
 
@@ -255,7 +255,7 @@ class ReadGeoModel {
     
     GeoShape* buildShape(const unsigned id,
                          type_shapes_boolean_info* shapes_info_sub);
-    GeoShape *buildShapeOperator(const std::string_view shapeType, const DBRowEntry row,
+    GeoShape *buildShapeOperator(const std::string_view shapeType, const DBRowEntry& row,
                                  boolean_shapes_operands_info *shapes_info_sub);
 
     GeoMaterial* buildMaterial(const unsigned id);
@@ -265,9 +265,9 @@ class ReadGeoModel {
     GeoSerialTransformer* buildSerialTransformer(const unsigned id);
     TRANSFUNCTION buildFunction(const unsigned id);
 
-    void checkNodePtr(GeoGraphNode* nodePtr, std::string varName = "",
-                      std::string funcName = "",
-                      std::string funcSignature =
+    void checkNodePtr(GeoGraphNode* nodePtr, const std::string& varName = "",
+                      const std::string& funcName = "",
+                      const std::string& funcSignature =
                           "");  // TODO: to be moved to an utility class
     void volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild);
 
@@ -375,7 +375,7 @@ class ReadGeoModel {
     // Utility functions
     std::vector<std::string> splitString(const std::string& s, char delimiter); // TODO: move to global helpers
     void printStdVectorStrings(
-        std::vector<std::string> vec);  // TODO: move it to utility class or move to global helpers
+        const std::vector<std::string>& vec);  // TODO: move it to utility class or move to global helpers
 
     // void printTransformationValues(QStringList t); // TODO: move to a Qt
     // utility class QList<double> convertQstringListToDouble(QStringList
@@ -399,20 +399,20 @@ class ReadGeoModel {
 
     //! builders
     // std::unique_ptr<BuildGeoShapes_Box> m_builderShape_Box;
-    BuildGeoShapes_Box* m_builderShape_Box;
-    BuildGeoShapes_Tube* m_builderShape_Tube;
-    BuildGeoShapes_Cons* m_builderShape_Cons;
-    BuildGeoShapes_Para* m_builderShape_Para;
-    BuildGeoShapes_Trap* m_builderShape_Trap;
-    BuildGeoShapes_Trd* m_builderShape_Trd;
-    BuildGeoShapes_Tubs* m_builderShape_Tubs;
-    BuildGeoShapes_Torus* m_builderShape_Torus;
-    BuildGeoShapes_TwistedTrap* m_builderShape_TwistedTrap;
-    BuildGeoShapes_Pcon* m_builderShape_Pcon;
-    BuildGeoShapes_Pgon* m_builderShape_Pgon;
-    BuildGeoShapes_SimplePolygonBrep* m_builderShape_SimplePolygonBrep;
-    BuildGeoShapes_GenericTrap* m_builderShape_GenericTrap;
-    BuildGeoShapes_UnidentifiedShape* m_builderShape_UnidentifiedShape;
+    BuildGeoShapes_Box* m_builderShape_Box{};
+    BuildGeoShapes_Tube* m_builderShape_Tube{};
+    BuildGeoShapes_Cons* m_builderShape_Cons{};
+    BuildGeoShapes_Para* m_builderShape_Para{};
+    BuildGeoShapes_Trap* m_builderShape_Trap{};
+    BuildGeoShapes_Trd* m_builderShape_Trd{};
+    BuildGeoShapes_Tubs* m_builderShape_Tubs{};
+    BuildGeoShapes_Torus* m_builderShape_Torus{};
+    BuildGeoShapes_TwistedTrap* m_builderShape_TwistedTrap{};
+    BuildGeoShapes_Pcon* m_builderShape_Pcon{};
+    BuildGeoShapes_Pgon* m_builderShape_Pgon{};
+    BuildGeoShapes_SimplePolygonBrep* m_builderShape_SimplePolygonBrep{};
+    BuildGeoShapes_GenericTrap* m_builderShape_GenericTrap{};
+    BuildGeoShapes_UnidentifiedShape* m_builderShape_UnidentifiedShape{};
 
     //! containers to store the list of GeoModel nodes coming from the DB
     std::vector<std::vector<std::string>> m_physVols;

@@ -165,7 +165,7 @@ class GMDBManager {
      * @note The 'suffix' parameter is optional. If not provided, the default
      * table will be printed.
      */
-    void printAllPublishedFullPhysVols(const std::string suffix = "") const;
+    void printAllPublishedFullPhysVols(const std::string& suffix = "") const;
 
     /**
      * @brief Print the db table storing all the 'published'
@@ -181,7 +181,7 @@ class GMDBManager {
      * table will be printed.
      */
     void printAllPublishedAlignableTransforms(
-        const std::string suffix = "") const;
+        const std::string& suffix = "") const;
 
     /**
      * @brief Print the db table storing all the children positions per parent
@@ -215,16 +215,16 @@ class GMDBManager {
     /// and populate the cache that stores them
     void getAllDBTableColumns();
 
-    int execQuery(std::string queryStr);
+    int execQuery(const std::string& queryStr);
 
-    bool addListOfRecords(const std::string geoType,
-                          const std::vector<std::vector<std::string>> records);
-    bool addListOfRecords(const std::string geoType,
-                          const DBRowsList records);
+    bool addListOfRecords(const std::string& geoType,
+                          const std::vector<std::vector<std::string>>& records);
+    bool addListOfRecords(const std::string& geoType,
+                          const DBRowsList& records);
 
     bool addRecordsToTable(
-        const std::string tableName,
-        const DBRowEntry
+        const std::string& tableName,
+        const DBRowEntry&
             records);
 
     bool addListOfChildrenPositions(const DBRowsList &records);
@@ -241,7 +241,7 @@ class GMDBManager {
      */
     bool addListOfPublishedAlignableTransforms(
         const std::vector<std::vector<std::string>> &records,
-        std::string suffix = "");
+        const std::string& suffix = "");
 
     /**
      * @brief Save the list of 'published' GeoVFullPhysVol nodes to the DB.
@@ -254,11 +254,11 @@ class GMDBManager {
      */
     bool addListOfPublishedFullPhysVols(
         const std::vector<std::vector<std::string>> &records,
-        std::string suffix = "");
+        const std::string& suffix = "");
 
     // bool addRootVolume(const std::vector<std::string> &values);
     bool addRootVolume(const std::string_view nodeType, const unsigned nodeId);
-    bool addRootVolume(const std::pair<std::string, unsigned> rootValues);
+    bool addRootVolume(const std::pair<std::string, unsigned>& rootValues);
 
     // GET methods
 
@@ -267,7 +267,7 @@ class GMDBManager {
     // std::vector<std::string> getRootPhysVol();
     std::pair<unsigned, unsigned> getRootPhysVol();
 
-    std::vector<std::string> getItemFromTableName(std::string tableName,
+    std::vector<std::string> getItemFromTableName(const std::string& tableName,
                                                   unsigned int id);
 
     std::vector<std::string> getItemAndType(unsigned int tableId,
@@ -293,16 +293,16 @@ class GMDBManager {
     DBRowsList getPublishedAXFTable(const std::string_view suffix = "");
 
     std::vector<std::vector<std::string>> getTableFromNodeType_String(
-        std::string nodeType);
+        const std::string& nodeType);
     DBRowsList getTableFromNodeType_VecVecData(
-        std::string nodeType);
+        const std::string& nodeType);
     
     DBRowEntry getTableFromTableName_VecData(
-        std::string tableName);
+        const std::string& tableName);
     DBRowsList getTableFromTableName_VecVecData(
-        std::string tableName);
+        const std::string& tableName);
     // specializations
-    std::vector<double> getTableFromTableName_VectorDouble(std::string tableName);
+    std::vector<double> getTableFromTableName_VectorDouble(const std::string& tableName);
     std::deque<double> getTableFromTableName_DequeDouble(std::string tableName);
 
     std::unordered_map<unsigned int, std::string> getAll_TableIDsNodeTypes();
@@ -314,7 +314,7 @@ class GMDBManager {
 
     //! Test if a given table exists
     //! This requires the *full* table name (i.e. prefix_suffix)
-    bool checkTableFromDB(std::string tableName) const;
+    bool checkTableFromDB(const std::string& tableName) const;
 
     //! Test if a table has been loaded from a DB, that is it exists in the cache
     bool checkTableFromCache(const std::string_view tableName) const;
@@ -330,9 +330,9 @@ class GMDBManager {
      * storing the table's rows' data
      */
     bool createCustomTable(
-        const std::string tableName,
-        const std::vector<std::string> tableColNames,
-        const std::vector<std::string> tableColTypes,
+        const std::string& tableName,
+        const std::vector<std::string>& tableColNames,
+        const std::vector<std::string>& tableColTypes,
         const std::vector<
             DBRowEntry>
             &records);
@@ -345,12 +345,12 @@ class GMDBManager {
     // not used anymore!!
 
     bool addListOfRecordsToTable(
-        const std::string tableName,
-        const std::vector<std::vector<std::string>> records);
+        const std::string& tableName,
+        const std::vector<std::vector<std::string>>& records);
     bool addListOfRecordsToTable(
-        const std::string tableName,
+        const std::string& tableName,
         const std::vector<
-            DBRowEntry>
+            DBRowEntry>&
             records);
     //  bool addListOfRecordsToTableOld(const QString tableName, const
     //  std::vector<QStringList> records); // for the old SQlite only
@@ -383,17 +383,17 @@ class GMDBManager {
         * @param tableName The table's name.
         * @param keyType The type of the 'key' that identifies the linked node.
         */
-       bool createTableCustomPublishedNodes(const std::string tableName,
-                                            const std::string nodeType,
+       bool createTableCustomPublishedNodes(const std::string& tableName,
+                                            const std::string& nodeType,
                                             const std::type_info *keyType);
 
-       void addDBversion(std::string version);
+       void addDBversion(const std::string& version);
 
        //  void loadTestData(); // for debug only
 
        std::string getTableNameFromTableId(unsigned int tabId);
 
-       void storeNodeType(std::string nodeType, std::string tableName);
+       void storeNodeType(const std::string& nodeType, const std::string& tableName);
 
        std::string getTableNameFromNodeType(const std::string &nodeType);
 

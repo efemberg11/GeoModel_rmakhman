@@ -78,14 +78,12 @@
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
-#include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTrap.h"
 #include "GeoModelKernel/GeoTrd.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
-#include "GeoModelKernel/GeoTorus.h"
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
@@ -105,20 +103,19 @@
 // #include "VP1Base/VP1Msg.h"
 
 // C++ includes
-#include <stdlib.h> /* exit, EXIT_FAILURE */
+#include <cstdlib> /* exit, EXIT_FAILURE */
 
 #include <chrono>  /* system_clock */
-#include <cstdlib> /* std::getenv */
 #include <ctime>   /* std::time */
 #include <future>
+#include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 #include <variant>
-#include <memory>
+#include <vector>
 
 // mutexes for synchronized access to containers and output streams in
 // multi-threading mode
@@ -509,7 +506,7 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
 //----------------------------------------
 // loop over parent-child relationship data
 void ReadGeoModel::loopOverAllChildrenRecords(
-    DBRowsList records) {
+    const DBRowsList& records) {
     int nChildrenRecords = records.size();
 
     if (m_loglevel >= 1) {
@@ -519,7 +516,7 @@ void ReadGeoModel::loopOverAllChildrenRecords(
                   << nChildrenRecords << " keys..." << std::endl;
         muxCout.unlock();
     }
-    for (auto& record : records) {
+    for (const auto& record : records) {
         processParentChild(record);
     }
 }
@@ -1228,7 +1225,7 @@ void ReadGeoModel::processParentChild(
     if (m_loglevel >= 2) {
         muxCout.lock();
         std::cout << "\nReadGeoModel::processParentChild()..." << std::endl;
-        for (auto& rec : parentchild) std::cout << rec << "-";
+        for (const auto& rec : parentchild) std::cout << rec << "-";
         std::cout << std::endl;
         muxCout.unlock();
     }
@@ -1434,9 +1431,9 @@ void ReadGeoModel::volAddHelper(GeoVPhysVol* vol, GeoGraphNode* volChild) {
 }
 
 // TODO: to be moved to an utility class
-void ReadGeoModel::checkNodePtr(GeoGraphNode* nodePtr, std::string varName,
-                                std::string funcName,
-                                std::string funcSignature) {
+void ReadGeoModel::checkNodePtr(GeoGraphNode* nodePtr, const std::string& varName,
+                                const std::string& funcName,
+                                const std::string& funcSignature) {
     if (!nodePtr) {
         muxCout.lock();
         std::cout << "ERROR! A pointer to a GeoGraphNode instance is NULL {"
@@ -1751,7 +1748,7 @@ std::string ReadGeoModel::getShapeType(const unsigned int shapeId) {
     return type;
 }
 
-GeoShape *ReadGeoModel::buildShapeOperator(const std::string_view shapeType, const DBRowEntry row,
+GeoShape *ReadGeoModel::buildShapeOperator(const std::string_view shapeType, const DBRowEntry& row,
                                             boolean_shapes_operands_info *shapes_info_sub)
 {
     GeoShape *shape = nullptr;
@@ -2344,7 +2341,7 @@ void inspectListShapesToBuild(type_shapes_boolean_info& list) {
 }
 // TODO: move to an untilities file/class
 void inspectListShapesToBuild(boolean_shapes_operands_info& list) {
-    for (auto tuple : list) {
+    for (const auto& tuple : list) {
         printTuple(tuple);
         std::cout << std::endl;
     }
@@ -2783,7 +2780,7 @@ std::vector<std::string> ReadGeoModel::splitString(const std::string& s,
 // }
 
 // TODO: move this to utility class/file
-void ReadGeoModel::printStdVectorStrings(std::vector<std::string> vec) {
+void ReadGeoModel::printStdVectorStrings(const std::vector<std::string>& vec) {
     for (const auto& str : vec) {
         std::cout << str << " ";
     }
@@ -2814,7 +2811,7 @@ std::pair<unsigned int, unsigned int> ReadGeoModel::getBooleanShapeOperands(
     // std::cout << "shapePars size: " << shapePars.size() << std::endl; //
     // debug only
 
-    for (auto par : shapePars) {
+    for (const auto& par : shapePars) {
         std::vector<std::string> vars = splitString(par, '=');
         std::string varName = vars[0];
         std::string varValue = vars[1];

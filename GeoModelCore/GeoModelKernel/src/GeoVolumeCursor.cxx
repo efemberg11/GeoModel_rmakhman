@@ -3,14 +3,15 @@
 */
 
 #include "GeoModelKernel/GeoVolumeCursor.h"
+#include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoSerialDenominator.h"
 #include "GeoModelKernel/GeoSerialIdentifier.h"
-#include "GeoModelKernel/GeoAlignableTransform.h"
 #include <string>
+#include <utility>
 
 GeoVolumeCursor::GeoVolumeCursor (PVConstLink parent, GeoVAlignmentStore* store)
-  : m_parent(parent)
+  : m_parent(std::move(parent))
   , m_transform(GeoTrf::Transform3D::Identity())
   , m_defTransform(GeoTrf::Transform3D::Identity())
   , m_majorIndex(0)

@@ -45,9 +45,9 @@ namespace GeoStrUtils {
         std::string str{inStr};
 
         while (str.find("${") != std::string::npos) {
-            std::string varName = str.substr(str.find("${") + 2, str.find("}") - str.find("${") - 2);
+            std::string varName = str.substr(str.find("${") + 2, str.find('}') - str.find("${") - 2);
             std::string envVar{std::getenv(varName.data()) ? std::getenv(varName.data()) : ""};
-            str = replaceExpInString(str, str.substr(str.find("${"), str.find("}") - str.find("${") + 1), envVar);
+            str = replaceExpInString(str, str.substr(str.find("${"), str.find('}') - str.find("${") + 1), envVar);
         }
         return str;
     }
@@ -152,7 +152,7 @@ namespace GeoStrUtils {
         return out.str();
     }
 
-    void printStdVectorStrings(const std::vector<std::string> vec)
+    void printStdVectorStrings(const std::vector<std::string>& vec)
     {
         for (const auto &str : vec)
         {

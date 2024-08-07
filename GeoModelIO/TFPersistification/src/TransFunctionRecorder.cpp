@@ -19,7 +19,6 @@ const TransFunctionPersistifier *TransFunctionRecorder::getPersistifier() const 
 
 TransFunctionRecorder::~TransFunctionRecorder () {}
 
-#include "GeoModelKernel/GeoXF.h"                          //
 
 #include "GeoModelKernel/GeoDefinitions.h"
 

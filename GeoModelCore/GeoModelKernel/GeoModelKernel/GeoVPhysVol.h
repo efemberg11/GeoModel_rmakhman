@@ -32,7 +32,7 @@ class GeoVPhysVol: public GeoPlacement {
     /// Returns the index of a specific daughter volume.  The Query class can be used
     /// just like an unsigned int, but it provides and isValid() method to determine
     /// whether it is valid and throws an exception if an invalid value is blithely used.
-    Query<unsigned int> indexOf(PVConstLink daughter) const;
+    Query<unsigned int> indexOf(const PVConstLink& daughter) const;
 
     /// Returns the logical volume.
     const GeoLogVol* getLogVol() const {
@@ -73,7 +73,7 @@ class GeoVPhysVol: public GeoPlacement {
     const GeoGraphNode* const* findChildNode(const GeoGraphNode *n) const;
 
     /// Adds a Graph Node to the Geometry Graph
-    void add(GeoIntrusivePtr<GeoGraphNode> graphNode);
+    void add(const GeoIntrusivePtr<GeoGraphNode>& graphNode);
   protected:
     virtual ~GeoVPhysVol() = default;
 

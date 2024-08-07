@@ -37,7 +37,6 @@ std::pair<std::string, std::string> TransFunctionReader::split(const std::string
 }
 TransFunctionReader::~TransFunctionReader () {}
 
-#include "GeoModelKernel/GeoXF.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
 #include <iostream>

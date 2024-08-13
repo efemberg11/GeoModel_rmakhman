@@ -36,7 +36,7 @@ void materialHandler::ElementHandle()
 			{
                     		std::string nH=h->GetName();
                     		//std::cout<<" handler name "<<nH<<std::endl;
-                    		if (nH=="fraction") 
+                    		if (nH=="fraction" || nH=="composite") 
 				{
                         		fractionHandler* fH=dynamic_cast<fractionHandler*>(h);
                         		if (!fH) std::cout<<" something is wrong! can not retrieve fractionHandler!!!"<<std::endl;

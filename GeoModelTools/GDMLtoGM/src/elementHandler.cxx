@@ -42,7 +42,7 @@ void elementHandler::ElementHandle() {
                     }
                     break;
                 }
-                else if (nH=="fraction") {
+                else if (nH=="fraction" || nH=="composite") {
                     fractionHandler* fH=dynamic_cast<fractionHandler*>(h);
                     if (!fH) std::cout<<" something is wrong! can not retrieve fractionHandler!!!"<<std::endl;
                     e.addIsotope(fH->getFraction());

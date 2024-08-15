@@ -8,11 +8,7 @@
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoIntrusivePtr.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-
-
-#ifndef _GeoShapePersistification_On_
-  class Persistifier;
-#endif
+#include "GeoModelKernel/PersistifierFwd.h"
 
 
 class GeoShapeShift : public GeoShape {

@@ -7,10 +7,8 @@
 
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoIntrusivePtr.h"
+#include "GeoModelKernel/PersistifierFwd.h"
 
-#ifndef _GeoShapePersistification_On_
-  class Persistifier;
-#endif
 
 class GeoShapeIntersection : public GeoShape
 {

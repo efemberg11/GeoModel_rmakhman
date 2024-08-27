@@ -25,7 +25,7 @@ class GeoPcon : public GeoShape {
   GeoPcon (double SPhi, double DPhi);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -42,6 +42,11 @@ class GeoPcon : public GeoShape {
   //    Returns the PCON shape type, as a coded integer.
   virtual ShapeType typeID() const {
      return getClassTypeID();
+  }
+
+  //    Returns false as PCON is not a polyhedron.
+  virtual bool isPolyhedron () const {
+    return false;
   }
 
   //    Add another plane to the polycone  A minimum of two
@@ -102,7 +107,6 @@ class GeoPcon : public GeoShape {
   virtual ~GeoPcon() = default;
 
  private:
-
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
@@ -118,6 +122,5 @@ class GeoPcon : public GeoShape {
   //    Maximum radius of poly-cone planes.
   std::vector<double> m_rMaxPlane{};
 };
-
 
 #endif

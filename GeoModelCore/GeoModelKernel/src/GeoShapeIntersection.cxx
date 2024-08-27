@@ -15,10 +15,14 @@ GeoShapeIntersection::GeoShapeIntersection (const GeoShape* A,
                                             const GeoShape* B) :
   m_opA (A) , m_opB (B) {}
 
-
-
-double GeoShapeIntersection::volume () const {
-  return fVolume < 0. ? fVolume = GeoShape::volume() : fVolume.load();
+double GeoShapeIntersection::volume (int npoints) const {
+  double vol = getVolumeValue();
+  if (vol < 0)
+  {
+    vol = GeoShape::volume(npoints);
+    setVolumeValue(vol);
+  }
+  return vol;
 }
 
 void GeoShapeIntersection::extent (double& xmin, double& ymin, double& zmin,
@@ -46,27 +50,26 @@ void GeoShapeIntersection::exec (GeoShapeAction *action) const
   action->getPath ()->push (this);
   action->handleIntersection (this);
   if (action->shouldTerminate ())
-    {
-      action->getPath ()->pop ();
-      return;
-    }
+  {
+    action->getPath ()->pop ();
+    return;
+  }
 
   if (action->getDepthLimit ().isValid ()
       && action->getPath ()->getLength () > action->getDepthLimit ())
-    {
-    }
-
+  {
+  }
   else
   {
     m_opA->exec(action);
     if (action->shouldTerminate ())
-  {
+    {
       action->getPath ()->pop ();
       return;
-  }
+    }
     m_opB->exec(action);
     if (action->shouldTerminate ())
-  {
+    {
       action->getPath ()->pop ();
       return;
     }

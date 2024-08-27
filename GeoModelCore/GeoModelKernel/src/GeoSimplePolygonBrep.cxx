@@ -12,11 +12,10 @@ const std::string GeoSimplePolygonBrep::s_classType = "SimplePolygonBrep";
 const ShapeType GeoSimplePolygonBrep::s_classTypeID = 0x20;
 
 GeoSimplePolygonBrep::GeoSimplePolygonBrep(double dz)
-   : m_dZ(dz){}
+   : m_dZ(dz)
+{}
 
-
-
-double GeoSimplePolygonBrep::volume () const {
+double GeoSimplePolygonBrep::volume (int) const {
   if (!isValid())
     throw std::runtime_error ("Volume requested for incomplete simple polygon brep");
   int n = getNVertices();
@@ -63,7 +62,6 @@ bool GeoSimplePolygonBrep::contains (double x, double y, double z) const
   }
   return in;
 }
-
 
 void GeoSimplePolygonBrep::addVertex(double XVertex, double YVertex)
 {

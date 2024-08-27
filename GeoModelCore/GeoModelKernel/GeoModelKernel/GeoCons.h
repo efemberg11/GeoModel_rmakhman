@@ -12,7 +12,7 @@ class GeoCons : public GeoShape {
   GeoCons (double RMin1, double RMin2, double RMax1, double RMax2, double DZ, double SPhi, double DPhi);
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -29,6 +29,11 @@ class GeoCons : public GeoShape {
   //    Returns the CONS shape type, as a coded integer.
   virtual ShapeType typeID () const {
      return getClassTypeID();
+  }
+
+  //    Returns false as CONS is not a polyhedron.
+  virtual bool isPolyhedron () const {
+    return false;
   }
 
   //    Executes a GeoShapeAction.
@@ -63,8 +68,6 @@ protected:
   virtual ~GeoCons() = default;
 
  private:
-
-
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 
@@ -76,6 +79,5 @@ protected:
   double m_sPhi{0.};
   double m_dPhi{0.};
 };
-
 
 #endif

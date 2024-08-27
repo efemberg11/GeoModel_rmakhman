@@ -13,7 +13,7 @@ GeoTessellatedSolid::GeoTessellatedSolid()
 {
 }
 
-double GeoTessellatedSolid::volume() const
+double GeoTessellatedSolid::volume(int) const
 {
   if (!isValid ())
     throw std::runtime_error ("Volume requested for incomplete tessellated solid");

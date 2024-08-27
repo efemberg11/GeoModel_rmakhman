@@ -10,10 +10,10 @@ const ShapeType GeoGenericTrap::s_classTypeID = 0x23;
 
 GeoGenericTrap::GeoGenericTrap(double ZHalfLength, const GeoGenericTrapVertices& Vertices)
   : m_zHalfLength(ZHalfLength)
-  , m_vertices(Vertices) {}
+  , m_vertices(Vertices)
+{}
 
-
-double GeoGenericTrap::volume() const
+double GeoGenericTrap::volume(int) const
 {
   // diagonals
   GeoTwoVector a = m_vertices[3] - m_vertices[1];

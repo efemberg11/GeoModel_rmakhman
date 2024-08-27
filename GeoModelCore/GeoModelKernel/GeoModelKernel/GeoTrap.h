@@ -19,7 +19,7 @@ class GeoTrap : public GeoShape
   GeoTrap (double ZHalfLength, double Theta, double Phi, double Dydzn, double Dxdyndzn, double Dxdypdzn, double Angleydzn, double Dydzp, double Dxdyndzp, double Dxdypdzp, double Angleydzp);
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -36,6 +36,11 @@ class GeoTrap : public GeoShape
   //    Returns the TRAP shape type, as a coded integer.
   virtual ShapeType typeID() const {
      return getClassTypeID();
+  }
+
+  //    Returns true as TRAP is a polyhedron.
+  virtual bool isPolyhedron () const {
+    return true;
   }
 
   //    Executes a GeoShapeAction.
@@ -85,7 +90,6 @@ class GeoTrap : public GeoShape
   virtual ~GeoTrap() = default;
 
  private:
-
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;

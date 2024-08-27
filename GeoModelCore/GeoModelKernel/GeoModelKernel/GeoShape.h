@@ -27,6 +27,7 @@
 #include "GeoModelKernel/RCBase.h"
 #include <GeoModelKernel/GeoDefinitions.h>
 #include <string>
+#include <atomic>
 
 using ShapeType = unsigned int;
 class GeoShapeIntersection;
@@ -42,7 +43,7 @@ class GeoShape : public RCBase
   GeoShape () = default;
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume () const;
+  virtual double volume (int npoints = 1000000) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -69,19 +70,38 @@ class GeoShape : public RCBase
   //    Returns the shape type, as an coded integer.
   virtual ShapeType typeID () const = 0;
 
+  //    Returns true if the shape is a polyhedron.
+  virtual bool isPolyhedron () const = 0;
+
+  //    Returns number of constituents
+  virtual unsigned int getNoConstituents () const {
+    return 1;
+  }
+
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const = 0;
 
+  //    Returns volume value
+  double getVolumeValue () const {
+    return m_shape_volume.load();
+  }
+
+  //    Sets volume value
+  void setVolumeValue (double value) const {
+    m_shape_volume = value;
+  }
+
  protected:
-  virtual ~GeoShape() = default;
+  virtual ~GeoShape () = default;
 
   //    Returns the bounding box of the specified disk. This method is used
   //    for calculation of the extend of a tube, cone, polycone, torus.
   static void diskExtent(double rmin, double rmax, double sphi, double dphi,
                          double& xmin, double& ymin, double& xmax, double& ymax);
 
-
-
+ private:
+  //    Cached volume
+  mutable std::atomic<double> m_shape_volume{-1.};
 };
 
 #endif

@@ -64,24 +64,23 @@ void GeoShapeShift::exec (GeoShapeAction *action) const {
   action->getPath ()->push (this);
   action->handleShift (this);
   if (action->shouldTerminate ())
-    {
-      action->getPath ()->pop ();
-      return;
-    }
+  {
+    action->getPath ()->pop ();
+    return;
+  }
 
   if (action->getDepthLimit ().isValid ()
       && action->getPath ()->getLength () > action->getDepthLimit ())
-    {
-    }
-
+  {
+  }
   else
-        {
+  {
     m_op->exec(action);
     if (action->shouldTerminate ())
-        {
+    {
       action->getPath ()->pop ();
       return;
-        }
+    }
   }
   action->getPath()->pop();
 }

@@ -20,7 +20,7 @@ class GeoEllipticalTube : public GeoShape {
   GeoEllipticalTube(double XHalfLength, double YHalfLength, double ZHalfLength);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -37,6 +37,11 @@ class GeoEllipticalTube : public GeoShape {
   //    Returns the ELLIPTICAL TUBE shape type, as a coded integer
   virtual ShapeType typeID () const {
     return getClassTypeID();
+  }
+
+  //    Returns false as ELLIPTICAL TUBE is not a polyhedron.
+  virtual bool isPolyhedron () const {
+    return false;
   }
 
   //    Executes a GeoShapeAction
@@ -71,7 +76,6 @@ class GeoEllipticalTube : public GeoShape {
   virtual ~GeoEllipticalTube() = default;
 
  private:
-
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 

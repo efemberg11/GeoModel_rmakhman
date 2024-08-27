@@ -13,11 +13,9 @@ const ShapeType GeoPcon::s_classTypeID = 0x13;
 GeoPcon::GeoPcon (double SPhi, double DPhi)
   : m_sPhi (SPhi)
   , m_dPhi (DPhi)
-{
-}
+{}
 
-
-double GeoPcon::volume () const
+double GeoPcon::volume (int) const
 {
   if (!isValid ())
     throw std::runtime_error ("Volume requested for incomplete polycone");

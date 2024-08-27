@@ -17,8 +17,8 @@ class GeoShapeShift : public GeoShape {
   GeoShapeShift (const GeoShape* A, const GeoTrf::Transform3D &X);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const {
-     return m_op->volume();
+  virtual double volume (int npoints = 1000000) const {
+     return m_op->volume(npoints);
   }
 
   //    Returns the bonding box of the shape
@@ -38,6 +38,16 @@ class GeoShapeShift : public GeoShape {
     return getClassTypeID();
   }
 
+  //    Returns true if OR is a polyhedron, false otherwise
+  virtual bool isPolyhedron () const {
+    return m_op->isPolyhedron();
+  }
+
+  //    Returns number of constituents
+  virtual unsigned int getNoConstituents () const {
+    return m_op->getNoConstituents();
+  }
+
   // Returns the first operand being ORed
   const GeoShape* getOp() const {
       return m_op;
@@ -51,12 +61,10 @@ class GeoShapeShift : public GeoShape {
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
- 
 
   static ShapeType getClassTypeID () {
      return s_classTypeID;
   }
-
 
   //    For type identification.
   static const std::string& getClassType () {

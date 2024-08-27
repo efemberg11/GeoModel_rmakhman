@@ -14,7 +14,7 @@ class GeoPara : public GeoShape
   GeoPara (double XHalfLength, double YHalfLength, double ZHalfLength, double Alpha, double Theta, double Phi);
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -31,6 +31,11 @@ class GeoPara : public GeoShape
   //    Returns the PARA shape type, as a coded integer.
   virtual ShapeType typeID () const {
     return getClassTypeID();
+  }
+
+  //    Returns true as PARA is a polyhedron.
+  virtual bool isPolyhedron () const {
+    return true;
   }
 
   //    Executes a GeoShapeAction

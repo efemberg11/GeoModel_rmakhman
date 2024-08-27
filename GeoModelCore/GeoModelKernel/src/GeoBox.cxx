@@ -11,10 +11,10 @@ const ShapeType GeoBox::s_classTypeID = 0x10; // 16
 GeoBox::GeoBox (double XHalfLength, double YHalfLength, double ZHalfLength):
   m_xHalfLength {XHalfLength},
   m_yHalfLength {YHalfLength},
-  m_zHalfLength {ZHalfLength} {}
+  m_zHalfLength {ZHalfLength}
+{}
 
-
-double GeoBox::volume () const {
+double GeoBox::volume (int) const {
   return 8.0 * m_xHalfLength * m_yHalfLength * m_zHalfLength;
 }
 
@@ -34,7 +34,6 @@ bool GeoBox::contains (double x, double y, double z) const {
   double distz = std::abs(z) - m_zHalfLength;
   return (std::max(std::max(distx, disty), distz) <= 0.0);
 }
-
 
 void GeoBox::exec (GeoShapeAction *action) const {
   action->handleBox(this);

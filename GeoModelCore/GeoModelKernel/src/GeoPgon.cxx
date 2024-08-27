@@ -14,10 +14,9 @@ GeoPgon::GeoPgon (double SPhi, double DPhi, unsigned int NSides)
   : m_sPhi (SPhi)
   , m_dPhi (DPhi)
   , m_nSides (NSides)
-{
-}
+{}
 
-double GeoPgon::volume () const
+double GeoPgon::volume (int) const
 {
 #ifndef M_PI
   constexpr double M_PI = 3.14159265358979323846;

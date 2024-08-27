@@ -85,7 +85,7 @@ GeoTwistedTrap(double  pPhiTwist,  // twist angle
 }
 
 
-double GeoTwistedTrap::volume () const
+double GeoTwistedTrap::volume (int) const
 {
   return m_dz * ((m_dx1 + m_dx2 + m_dx3 + m_dx4) * (m_dy1 + m_dy2) +
                  (m_dx4 + m_dx3 - m_dx2 - m_dx1) * (m_dy2 - m_dy1) * (1./3.));

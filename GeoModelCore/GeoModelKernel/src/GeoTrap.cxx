@@ -20,11 +20,9 @@ GeoTrap::GeoTrap (double ZHalfLength, double Theta, double Phi, double Dydzn, do
   , m_dxdyndzp (Dxdyndzp)
   , m_dxdypdzp (Dxdypdzp)
   , m_angleydzp (Angleydzp)
-{
-}
+{}
 
-
-double GeoTrap::volume () const
+double GeoTrap::volume (int) const
 {
   double dz = m_zHalfLength;
   double dy1 = m_dydzn;
@@ -107,7 +105,6 @@ bool GeoTrap::contains (double x, double y, double z) const
   double x0 = x - y0 * tanAlpha - z0 * tanTheta * std::cos(m_phi);
   return (std::abs(x0) - dx <= 0.0);
 }
-
 
 void GeoTrap::exec (GeoShapeAction *action) const
 {

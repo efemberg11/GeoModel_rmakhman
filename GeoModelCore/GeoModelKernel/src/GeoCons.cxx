@@ -17,11 +17,9 @@ GeoCons::GeoCons (double RMin1, double RMin2, double RMax1, double RMax2, double
   , m_dZ (DZ)
   , m_sPhi (SPhi)
   , m_dPhi (DPhi)
-{
-}
+{}
 
-
-double GeoCons::volume () const
+double GeoCons::volume (int) const
 {
   return (m_dPhi * (1./3.)) * m_dZ *
     (m_rMax1 * m_rMax1 + m_rMax2 * m_rMax2 + m_rMax1 * m_rMax2 -
@@ -58,8 +56,6 @@ bool GeoCons::contains (double x, double y, double z) const
   double de = ne.dot(r);
   return (m_dPhi <= M_PI) ? (ds <= 0 && de <= 0) : (ds <= 0 || de <= 0);
 }
-
-
 
 void GeoCons::exec (GeoShapeAction *action) const {
   action->handleCons(this);

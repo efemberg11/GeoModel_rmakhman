@@ -7,15 +7,15 @@
 #include "GeoModelKernel/GeoShapeUnion.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeShift.h"
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 
-
-double GeoShape::volume () const
+double GeoShape::volume (int npoints) const
 {
-  constexpr int npoints = 1000000;     // number of random points
   constexpr double expansion = 0.001;  // bounding box expansion
   constexpr double f = 1./4294967296.; // 2^-32 - int to double conversion
+  int np = std::max(npoints, 1000);    // number of points is at least 1000
 
   // set up bonding box
   double xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
@@ -32,7 +32,7 @@ double GeoShape::volume () const
 
   uint32_t y = 2463534242; // seed for random number generation
   int icount = 0; // counter of inside points
-  for (auto i = 0; i < npoints; ++i)
+  for (int i = 0; i < np; ++i)
   {
     // generate three random numbers
     uint32_t x = y;

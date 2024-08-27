@@ -17,7 +17,7 @@ class GeoGenericTrap : public GeoShape {
   GeoGenericTrap(double ZHalfLength, const GeoGenericTrapVertices& Vertices);
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume() const;
+  virtual double volume(int npoints = 0) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -34,6 +34,11 @@ class GeoGenericTrap : public GeoShape {
   //    Returns the GENERIC TRAP shape type, as a coded integer.
   virtual ShapeType typeID() const{
      return getClassTypeID();
+  }
+
+  //    Returns false as GENERIC TRAP is not a polyhedron.
+  virtual bool isPolyhedron () const {
+    return false;
   }
 
   //    For type identification.

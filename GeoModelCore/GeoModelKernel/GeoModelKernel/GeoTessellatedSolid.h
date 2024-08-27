@@ -17,7 +17,7 @@ class GeoTessellatedSolid : public GeoShape {
   GeoTessellatedSolid();
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume() const;
+  virtual double volume(int npoints = 0) const;
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -34,6 +34,11 @@ class GeoTessellatedSolid : public GeoShape {
   //    Returns the TESSELLATED SOLID shape type, as a coded integer
   virtual ShapeType typeID() const {
      return getClassTypeID();
+  }
+
+  //    Returns true as TESSELLATED SOLID is a polyhedron.
+  virtual bool isPolyhedron () const {
+    return true;
   }
 
   //    For type identification

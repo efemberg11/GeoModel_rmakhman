@@ -13,7 +13,7 @@ class GeoTrd : public GeoShape
   GeoTrd (double XHalfLength1, double XHalfLength2, double YHalfLength1, double YHalfLength2, double ZHalfLength);
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -30,6 +30,11 @@ class GeoTrd : public GeoShape
   //    Returns the TRD shape type, as a coded integer.
   virtual ShapeType typeID () const {
      return getClassTypeID();
+  }
+
+  //    Returns true as TRD is a polyhedron.
+  virtual bool isPolyhedron () const {
+    return true;
   }
 
   //    Executes a GeoShapeAction.
@@ -51,10 +56,10 @@ class GeoTrd : public GeoShape
   //    Half length in the x-direction at +dz.
   double  getXHalfLength2 () const { return m_xHalfLength2; }
 
-  //    Half-length in the y direction at +dz.
+  //    Half-length in the y direction at -dz.
   double  getYHalfLength1 () const { return m_yHalfLength1; } 
 
-  //    Half-length in the y direction at -dz.
+  //    Half-length in the y direction at +dz.
   double  getYHalfLength2 () const { return m_yHalfLength2; } 
 
   //    Half-length in the z direction.

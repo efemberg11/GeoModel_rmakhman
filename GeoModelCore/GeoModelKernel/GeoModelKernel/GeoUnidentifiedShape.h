@@ -54,6 +54,11 @@ class GeoUnidentifiedShape: public GeoShape {
   // Returns the shape type, as an coded integer.
   virtual ShapeType typeID () const;
 
+  // Returns false as the shape is not a polyhedron.
+  virtual bool isPolyhedron () const {
+    return false;
+  }
+
   // For type identification.
   static const std::string& getClassType ();
 

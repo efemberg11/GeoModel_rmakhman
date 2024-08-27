@@ -14,14 +14,9 @@ GeoTube::GeoTube (double RMin, double RMax, double ZHalfLength)
   : m_rMin (RMin)
   , m_rMax (RMax)
   , m_zHalfLength (ZHalfLength)
-{
-}
+{}
 
-GeoTube::~GeoTube()
-{
-}
-
-double GeoTube::volume () const
+double GeoTube::volume (int) const
 {
 #ifndef M_PI
   constexpr double M_PI = 3.14159265358979323846;

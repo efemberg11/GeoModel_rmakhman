@@ -64,7 +64,7 @@ class GeoTwistedTrap : public GeoShape
   );
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -83,6 +83,11 @@ class GeoTwistedTrap : public GeoShape
      return getClassTypeID();
   }
 
+  //    Returns false as TWISTED TRAP is not a polyhedron.
+  virtual bool isPolyhedron () const {
+    return false;
+  }
+
   //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
@@ -95,7 +100,6 @@ class GeoTwistedTrap : public GeoShape
   static ShapeType getClassTypeID () {
      return s_classTypeID;
   }
-
 
   inline double getY1HalfLength() const { return m_dy1 ; }
   inline double getX1HalfLength() const { return m_dx1 ; }

@@ -27,7 +27,7 @@ class GeoSimplePolygonBrep : public GeoShape {
   GeoSimplePolygonBrep(double dz);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume() const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -44,6 +44,11 @@ class GeoSimplePolygonBrep : public GeoShape {
   //    Returns the BREP shape type, as a coded integer
   virtual ShapeType typeID() const{
     return getClassTypeID();
+  }
+
+  //    Returns true as BREP is a polyhedron.
+  virtual bool isPolyhedron () const {
+    return true;
   }
 
   //    For type identification

@@ -13,7 +13,7 @@ class GeoTube : public GeoShape
   GeoTube (double RMin, double RMax, double ZHalfLength);
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -31,6 +31,12 @@ class GeoTube : public GeoShape
   virtual ShapeType typeID () const{
      return getClassTypeID();
   }
+
+  //    Returns false as TUBE is not a polyhedron.
+  virtual bool isPolyhedron () const {
+    return false;
+  }
+
   //    Executes a GeoShapeAction.
   virtual void exec (GeoShapeAction *action) const;
 
@@ -60,8 +66,7 @@ class GeoTube : public GeoShape
   }
 
  protected:
-  //## Destructor (generated)
-  virtual ~GeoTube();
+  virtual ~GeoTube() = default;
 
  private:
   GeoTube(const GeoTube &right);

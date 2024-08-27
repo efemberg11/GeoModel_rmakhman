@@ -11,12 +11,12 @@ const std::string GeoEllipticalTube::s_classType = "EllipticalTube";
 const ShapeType GeoEllipticalTube::s_classTypeID = 0x22;
 
 GeoEllipticalTube::GeoEllipticalTube(double XHalfLength, double YHalfLength, double ZHalfLength): 
-    m_xHalfLength{XHalfLength},
-   m_yHalfLength{YHalfLength},
-   m_zHalfLength{ZHalfLength} {}
+  m_xHalfLength{XHalfLength},
+  m_yHalfLength{YHalfLength},
+  m_zHalfLength{ZHalfLength}
+{}
 
-
-double GeoEllipticalTube::volume () const
+double GeoEllipticalTube::volume (int) const
 {
 #ifndef M_PI
   constexpr double M_PI = 3.14159265358979323846;
@@ -41,7 +41,6 @@ bool GeoEllipticalTube::contains (double x, double y, double z) const
   return ((x * x) / (m_xHalfLength * m_xHalfLength) +
           (y * y) / (m_yHalfLength * m_yHalfLength) <= 1.0);
 }
-
 
 void GeoEllipticalTube::exec (GeoShapeAction *action) const {
   action->handleEllipticalTube(this);

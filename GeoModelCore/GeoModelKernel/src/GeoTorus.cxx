@@ -15,11 +15,9 @@ GeoTorus::GeoTorus (double Rmin, double Rmax, double Rtor, double SPhi, double D
    , m_rTor (Rtor)
    , m_sPhi (SPhi)
    , m_dPhi (DPhi)
-{
-}
+{}
 
-
-double GeoTorus::volume () const
+double GeoTorus::volume (int) const
 {
 #ifndef M_PI
   constexpr double M_PI = 3.14159265358979323846;

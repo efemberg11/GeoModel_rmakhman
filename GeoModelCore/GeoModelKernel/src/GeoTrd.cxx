@@ -16,8 +16,7 @@ GeoTrd::GeoTrd (double XHalfLength1, double XHalfLength2, double YHalfLength1, d
   , m_zHalfLength (ZHalfLength)
 {}
 
-
-double GeoTrd::volume () const
+double GeoTrd::volume (int) const
 {
   double fDz = m_zHalfLength;
   double fDy1 = m_yHalfLength1;

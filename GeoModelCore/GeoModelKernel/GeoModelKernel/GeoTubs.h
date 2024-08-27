@@ -13,7 +13,7 @@ class GeoTubs : public GeoShape
   GeoTubs (double RMin, double RMax, double ZHalfLength, double SPhi, double DPhi);
 
   //    Returns the volume of the shape, for mass inventory.
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape.
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -30,6 +30,11 @@ class GeoTubs : public GeoShape
   //    Returns the TUBS shape type, as a coded integer.
   virtual ShapeType typeID () const {
      return getClassTypeID();
+  }
+
+  //    Returns false as TUBS is not a polyhedron.
+  virtual bool isPolyhedron () const {
+    return false;
   }
 
   //    Executes a GeoShapeAction.

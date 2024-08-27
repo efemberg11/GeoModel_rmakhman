@@ -14,7 +14,7 @@ class GeoBox : public GeoShape
   GeoBox (double XHalfLength, double YHalfLength, double ZHalfLength);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -33,7 +33,12 @@ class GeoBox : public GeoShape
      return getClassTypeID();
   }
 
-  //     Executes a GeoShapeAction
+  //    Returns true as BOX is a polyhedron.
+  virtual bool isPolyhedron () const {
+    return true;
+  }
+
+  //    Executes a GeoShapeAction
   virtual void exec (GeoShapeAction *action) const;
 
   //    For type identification
@@ -60,7 +65,6 @@ class GeoBox : public GeoShape
   double getZHalfLength () const {
      return m_zHalfLength;
   }
-
 
  protected:
   virtual ~GeoBox() = default;

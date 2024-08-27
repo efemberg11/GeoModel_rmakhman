@@ -17,7 +17,7 @@ class GeoPgon : public GeoShape
   GeoPgon (double SPhi, double DPhi, unsigned int NSides);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const;
+  virtual double volume (int npoints = 0) const;
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -34,6 +34,11 @@ class GeoPgon : public GeoShape
   //    Returns the PGON shape type, as a coded integer.
   virtual ShapeType typeID() const {
      return getClassTypeID();
+  }
+
+  //    Returns true as PGON is a polyhedron.
+  virtual bool isPolyhedron () const {
+    return true;
   }
 
   //    Add another plane to the polygon. A minimum of two
@@ -99,7 +104,6 @@ class GeoPgon : public GeoShape
   virtual ~GeoPgon() = default;
 
  private:
-  
   static const std::string s_classType;
   static const ShapeType s_classTypeID;
 

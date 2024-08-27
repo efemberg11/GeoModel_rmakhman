@@ -19,9 +19,7 @@ m_alpha (Alpha),
 m_phi (Phi)
 {}
 
-
-
-double GeoPara::volume () const
+double GeoPara::volume (int) const
 {
   return 8.0 * m_xHalfLength * m_yHalfLength * m_zHalfLength;
 }

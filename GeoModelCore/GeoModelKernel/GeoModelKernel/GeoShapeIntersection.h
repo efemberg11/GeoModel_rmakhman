@@ -17,7 +17,7 @@ class GeoShapeIntersection : public GeoShape
   GeoShapeIntersection (const GeoShape* A, const GeoShape* B);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const;
+  virtual double volume (int npoints = 1000000) const;
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -34,6 +34,16 @@ class GeoShapeIntersection : public GeoShape
   //    Returns the AND shape type, as a coded integer.
   virtual ShapeType typeID () const {
      return getClassTypeID();
+  }
+
+  //    Returns true if the resulting shape is a polyhedron, false otherwise.
+  virtual bool isPolyhedron () const {
+    return (m_opA->isPolyhedron() && m_opB->isPolyhedron());
+  }
+
+  //    Returns total number of constituents
+  virtual unsigned int getNoConstituents () const {
+    return (m_opA->getNoConstituents() + m_opB->getNoConstituents());
   }
 
   //    Returns the first operand being ANDed
@@ -67,9 +77,6 @@ class GeoShapeIntersection : public GeoShape
 
   //    The second shape operand in the AND operation.
   GeoIntrusivePtr<const GeoShape> m_opB{};
-
-  //    Cached volume
-  mutable std::atomic<double> fVolume{-1};
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;

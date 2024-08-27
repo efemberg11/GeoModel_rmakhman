@@ -16,7 +16,7 @@ class GeoShapeSubtraction : public GeoShape {
   GeoShapeSubtraction (const GeoShape* A, const GeoShape* B);
 
   //    Returns the volume of the shape, for mass inventory
-  virtual double volume () const;
+  virtual double volume (int npoints = 1000000) const;
 
   //    Returns the bonding box of the shape
   virtual void extent (double& xmin, double& ymin, double& zmin,
@@ -33,6 +33,16 @@ class GeoShapeSubtraction : public GeoShape {
   //    Returns the NOT shape type, as a coded integer.
   virtual ShapeType typeID () const{
      return  getClassTypeID();
+  }
+
+  //    Returns true if the resulting shape is a polyhedron, false otherwise.
+  virtual bool isPolyhedron () const {
+    return (m_opA->isPolyhedron() && m_opB->isPolyhedron());
+  }
+
+  //    Returns total number of constituents
+  virtual unsigned int getNoConstituents () const {
+    return (m_opA->getNoConstituents() + m_opB->getNoConstituents());
   }
 
   //    Returns the first operand in the subtraction
@@ -68,9 +78,6 @@ class GeoShapeSubtraction : public GeoShape {
 
   //    The second shape operand in the Subtraction operation
   GeoIntrusivePtr<const GeoShape> m_opB{nullptr};
-
-  //    Cached volume
-  mutable std::atomic<double> fVolume{-1.};
 
   static const std::string s_classType;
   static const ShapeType s_classTypeID;

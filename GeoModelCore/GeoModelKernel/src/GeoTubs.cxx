@@ -15,11 +15,9 @@ GeoTubs::GeoTubs (double RMin, double RMax, double ZHalfLength, double SPhi, dou
   , m_zHalfLength (ZHalfLength)
   , m_sPhi (SPhi)
   , m_dPhi (DPhi)
-{
-}
+{}
 
-
-double GeoTubs::volume () const
+double GeoTubs::volume (int) const
 {
   return m_dPhi * (m_rMax * m_rMax - m_rMin * m_rMin) * m_zHalfLength;
 }
@@ -49,7 +47,6 @@ bool GeoTubs::contains (double x, double y, double z) const
   double de = ne.dot(r);
   return (m_dPhi <= M_PI) ? (ds <= 0 && de <= 0) : (ds <= 0 || de <= 0);
 }
-
 
 void GeoTubs::exec (GeoShapeAction *action) const
 {

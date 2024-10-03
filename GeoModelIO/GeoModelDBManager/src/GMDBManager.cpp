@@ -118,6 +118,7 @@ void GMDBManager::printAllElements() const { printAllRecords("Elements"); }
 
 void GMDBManager::printAllShapes() const { 
     printAllRecords("Shapes_Box"); 
+    printAllRecords("Shapes_EllipticalTube"); 
     printAllRecords("Shapes_Tube"); 
     printAllRecords("Shapes_Cons"); 
     printAllRecords("Shapes_Para");
@@ -1759,6 +1760,26 @@ bool GMDBManager::createTables() {
     }
     tab.clear();
     
+    // Shapes-EllipticalTube table
+    // ID, XHalfLength, YHalfLength, ZHalfLength
+    geoNode = "GeoEllipticalTube";
+    tableName = "Shapes_EllipticalTube";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedVolume");
+    tab.push_back("XHalfLength");
+    tab.push_back("YHalfLength");
+    tab.push_back("ZHalfLength");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real )",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+    
     // Shapes-Tube table
     geoNode = "GeoTube";
     tableName = "Shapes_Tube";
@@ -2102,7 +2123,7 @@ bool GMDBManager::createTables() {
     }
     tab.clear();
 
-    // Shapes-Box table
+    // Shapes-GeoUnidentifiedShape table
     // ID, XHalfLength, YHalfLength, ZHalfLength
     geoNode = "GeoUnidentifiedShape";
     tableName = "Shapes_UnidentifiedShape";

@@ -21,11 +21,18 @@
 // - Nov 2023 - R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
 //              Updated to use the AlignableTransform 'default position', 
 //              which does not include alignment constants
-//
-// - May 2024 - Major change: we move to the new DB schema that uses numerical data
+// - May 2024 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+//              Major change: we move to the new DB schema that uses numerical data
 //              instead of strings/TEXT
 // - Jun 2024 - R.Xue  <r.xue@cern.ch><rux23@pitt.edu>
 //              Added methods to write out virtual surfaces to .db files
+// - May 2024 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+//              Major change: we move to the new DB schema that uses numerical data
+//              instead of strings/TEXT
+// - Oct 2024 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+//              Support for the EllipticalTube shape was added.
+//
+
 
 // local includes
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -41,6 +48,7 @@
 #include "GeoModelKernel/GeoNodePath.h"
 // GeoModelKernel shapes
 #include "GeoModelKernel/GeoBox.h"
+#include "GeoModelKernel/GeoEllipticalTube.h"
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoPara.h"
@@ -779,7 +787,7 @@ std::pair<std::string, unsigned> WriteGeoModel::storeShape(const GeoShape* shape
     // LArCustomShape is deprecated.  Write it out as a GeoUnidentifiedShape;
     if (shapeType == "CustomShape") shapeType = "UnidentifiedShape";
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep", "GenericTrap", "Intersection", "Shift", "Subtraction", "Union", "UnidentifiedShape"};
+    const std::set<std::string> shapesNewDB{"Box", "EllipticalTube", "Tube", "Cons", "Para", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "Pcon", "Pgon", "SimplePolygonBrep", "GenericTrap", "Intersection", "Shift", "Subtraction", "Union", "UnidentifiedShape"};
 
     // get shape parameters
     if (shapesNewDB.count(shapeType))
@@ -1125,6 +1133,13 @@ std::pair<DBRowEntry, DBRowsList> WriteGeoModel::getShapeParametersV(const GeoSh
     if ("Box" == shapeType)
     {
         const GeoBox *box = dynamic_cast<const GeoBox *>(shape);
+        shapePars.push_back(box->getXHalfLength());
+        shapePars.push_back(box->getYHalfLength());
+        shapePars.push_back(box->getZHalfLength());
+    }
+    else if ("EllipticalTube" == shapeType)
+    {
+        const GeoEllipticalTube *box = dynamic_cast<const GeoEllipticalTube *>(shape);
         shapePars.push_back(box->getXHalfLength());
         shapePars.push_back(box->getYHalfLength());
         shapePars.push_back(box->getZHalfLength());
@@ -2142,6 +2157,10 @@ unsigned int WriteGeoModel::addShape(const std::string &type,
     {
         container = &m_shapes_Box;
     }
+    else if ("EllipticalTube" == type)
+    {
+        container = &m_shapes_EllipticalTube;
+    }
     else if ("Tube" == type)
     {
         container = &m_shapes_Tube;
@@ -2372,6 +2391,7 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
 
     m_dbManager->addListOfRecords("GeoShape", m_shapes); // OLD version, with shape's parameters as strings
     m_dbManager->addListOfRecords("GeoBox", m_shapes_Box); // new version, with shape's parameters as numbers
+    m_dbManager->addListOfRecords("GeoEllipticalTube", m_shapes_EllipticalTube); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoTube", m_shapes_Tube); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoCons", m_shapes_Cons); // new version, with shape's parameters as numbers
     m_dbManager->addListOfRecords("GeoPara", m_shapes_Para); // new version, with shape's parameters as numbers

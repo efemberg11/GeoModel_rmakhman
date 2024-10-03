@@ -20,9 +20,13 @@
  *              Also added methods to get the numbers of visited nodes.
  * - Feb 2023 - R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
  *              Added 'setLoglevel' method, to steer output messages
- *
  * - Jun 2024 - R.Xue <r.xue@cern.ch><rux23@pitt.edu>
  *              Added methods to write out virtual surfaces to .db files
+ * - May 2024 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+ *              Major change: we move to the new DB schema that uses numerical data
+ *              instead of strings/TEXT
+ * - Oct 2024 - Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,
+ *              Support for the EllipticalTube shape was added.
  */
 
 #ifndef GeoModelWrite_WriteGeoModel_H
@@ -158,6 +162,7 @@ class WriteGeoModel : public GeoNodeAction {
     };
     unsigned long getNShapes() { return m_shapes.size(); }; // TODO: to be removed later
     unsigned long getNShapes_Box() { return m_shapes_Box.size(); };
+    unsigned long getNShapes_EllipticalTube() { return m_shapes_EllipticalTube.size(); };
     unsigned long getNShapes_Cons() { return m_shapes_Cons.size(); };
     unsigned long getNShapes_Para() { return m_shapes_Para.size(); };
     unsigned long getNShapes_Pcon() { return m_shapes_Pcon.size(); };
@@ -410,6 +415,7 @@ class WriteGeoModel : public GeoNodeAction {
     DBRowsList m_materials_Data;
 
     DBRowsList m_shapes_Box;
+    DBRowsList m_shapes_EllipticalTube;
     DBRowsList m_shapes_Tube;
     DBRowsList m_shapes_Cons;
     DBRowsList m_shapes_Para;

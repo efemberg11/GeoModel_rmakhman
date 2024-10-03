@@ -59,3 +59,8 @@ add_executable(test_io_shapes_unidentifiedshape tests/test_io_UnidentifiedShape.
 target_link_libraries( test_io_shapes_unidentifiedshape GeoModelIO::GeoModelDBManager GeoModelCore::GeoModelHelpers GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers)
 add_test(NAME test_IO_Shapes_UnidentifiedShape
          COMMAND test_io_shapes_unidentifiedshape)
+
+add_executable(test_io_shapes_ellipticaltube tests/test_io_shape_EllipticalTube.cpp)
+target_link_libraries( test_io_shapes_ellipticaltube GeoModelIO::GeoModelDBManager GeoModelCore::GeoModelHelpers GeoModelCore::GeoModelKernel GeoModelIO::GeoModelIOHelpers)
+add_test(NAME test_IO_Shapes_EllipticalTube
+         COMMAND test_io_shapes_ellipticaltube)

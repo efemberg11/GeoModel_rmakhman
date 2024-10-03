@@ -25,14 +25,16 @@
  *              https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/39
  *  - May 2024, R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
  *              Major re-write: moved to the new DB schema based on numeric data
- *
  *  - Jun 2024, R.Xue  <r.xue@cern.ch><rux23@pitt.edu>
  *              Added methods to read in virtual surfaces from .db files
+ *  - Oct 2024, Riccardo Maria Bianchi, <riccardo.maria.bianchi@cern.ch>,                                  
+ *              Support for the EllipticalTube shape was added. 
  *
  */
 
 // local includes
 #include "BuildGeoShapes_Box.h"
+#include "BuildGeoShapes_EllipticalTube.h"
 #include "BuildGeoShapes_Tube.h"
 #include "BuildGeoShapes_Cons.h"
 #include "BuildGeoShapes_Para.h"
@@ -79,6 +81,7 @@
 
 // GeoModel shapes
 #include "GeoModelKernel/GeoBox.h"
+#include "GeoModelKernel/GeoEllipticalTube.h"
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoGenericTrap.h"
 #include "GeoModelKernel/GeoPara.h"
@@ -196,9 +199,6 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress)
     m_dbManager->loadGeoNodeTypesAndBuildCache();
     m_dbManager->createTableDataCaches();
 
-    // prepare builders
-    // m_builderShape_Box = std::make_unique<BuildGeoShapes_Box>();
-
     // Check if the user asked for running in serial or multi-threading mode
     if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_NTHREADS")) {
         int nThreads = std::stoi(GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_NTHREADS"));
@@ -239,6 +239,7 @@ ReadGeoModel::ReadGeoModel(GMDBManager* db, unsigned long* progress)
 
 ReadGeoModel::~ReadGeoModel() {
     delete m_builderShape_Box;
+    delete m_builderShape_EllipticalTube;
     delete m_builderShape_Tube;
     delete m_builderShape_Pcon;
     delete m_builderShape_Cons;
@@ -252,6 +253,7 @@ ReadGeoModel::~ReadGeoModel() {
     delete m_builderShape_GenericTrap;
     delete m_builderShape_UnidentifiedShape;
     m_builderShape_Box = nullptr;
+    m_builderShape_EllipticalTube = nullptr;
     m_builderShape_Tube = nullptr;
     m_builderShape_Pcon = nullptr;
     m_builderShape_Cons = nullptr;
@@ -321,6 +323,7 @@ void ReadGeoModel::loadDB() {
 
     // shapes from the new DB schema
     m_shapes_Box = m_dbManager->getTableFromNodeType_VecVecData("GeoBox");
+    m_shapes_EllipticalTube = m_dbManager->getTableFromNodeType_VecVecData("GeoEllipticalTube");
     m_shapes_Tube = m_dbManager->getTableFromNodeType_VecVecData("GeoTube");
     m_shapes_Cons = m_dbManager->getTableFromNodeType_VecVecData("GeoCons");
     m_shapes_Para = m_dbManager->getTableFromNodeType_VecVecData("GeoPara");
@@ -415,6 +418,7 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         std::thread t26(&ReadGeoModel::buildAllShapes_UnidentifiedShape, this);
         std::thread t27(&ReadGeoModel::buildAllShapes_Torus, this);
         std::thread t28(&ReadGeoModel::buildAllShapes_GenericTrap, this);
+        std::thread t29(&ReadGeoModel::buildAllShapes_EllipticalTube, this);
         
 
         t2.join();  // ok, all Elements have been built
@@ -436,6 +440,7 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         t26.join();  // ok, all Shapes-UnidentifiedShape have been built
         t27.join();  // ok, all Shapes-Torus have been built
         t28.join();  // ok, all Shapes-GenericTrap have been built
+        t29.join();  // ok, all Shapes-EllipticalTube have been built
 
 	    // Build boolean shapes and shape operators,
         // this needs Shapes to be built
@@ -479,6 +484,7 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         buildAllNameTags();
         // buildAllShapes();
         buildAllShapes_Box();
+        buildAllShapes_EllipticalTube();
         buildAllShapes_Tube();
         buildAllShapes_Pcon();
         buildAllShapes_Pgon();
@@ -655,6 +661,29 @@ void ReadGeoModel::buildAllShapes_Box()
     // m_builderShape_Box->printBuiltShapes(); // DEBUG MSG
     if (nSize > 0) {
         std::cout << "All " << nSize << " Shapes-Box have been built!\n";
+    }
+}
+//! Iterate over the list of GeoEllipticalTube shape nodes, build them all, 
+//! and store their pointers
+void ReadGeoModel::buildAllShapes_EllipticalTube()
+{
+    if (m_loglevel >= 1) {
+        std::cout << "Building all shapes -- EllipticalTube ...\n";
+    }
+
+    // create a builder and reserve size of memory map
+    size_t nSize = m_shapes_EllipticalTube.size();
+    m_builderShape_EllipticalTube = new BuildGeoShapes_EllipticalTube(nSize);
+
+    // loop over the DB rows and build the shapes
+    for (const auto &row : m_shapes_EllipticalTube)
+    {
+        // GeoModelIO::CppHelper::printStdVectorVariants(row); // DEBUG MSG
+        m_builderShape_EllipticalTube->buildShape(row);
+    }
+    // m_builderShape_EllipticalTube->printBuiltShapes(); // DEBUG MSG
+    if (nSize > 0) {
+        std::cout << "All " << nSize << " Shapes-EllipticalTube have been built!\n";
     }
 }
 //! Iterate over the list of GeoTube shape nodes, build them all, 
@@ -3279,13 +3308,17 @@ return (!(m_memMapShapes_Union.find(id) == m_memMapShapes_Union.end()));
 }
 // --- methods for caching GeoShape nodes ---
 bool ReadGeoModel::isBuiltShape(std::string_view shapeType, const unsigned shapeId) {
-const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "Pgon", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "SimplePolygonBrep", "GenericTrap", "Shift", "Subtraction", "Intersection", "Union"};
+const std::set<std::string> shapesNewDB{"Box", "EllipticalTube", "Tube", "Pcon", "Cons", "Para", "Pgon", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "SimplePolygonBrep", "GenericTrap", "Shift", "Subtraction", "Intersection", "Union"};
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
     {
         if ("Box" == shapeType)
         {
             return m_builderShape_Box->isBuiltShape(shapeId);
+        }
+        else if ("EllipticalTube" == shapeType)
+        {
+            return m_builderShape_EllipticalTube->isBuiltShape(shapeId);
         }
         else if ("Tube" == shapeType)
         {
@@ -3524,13 +3557,17 @@ void ReadGeoModel::storeBuiltVSurface(GeoVSurface* nodePtr) {
 GeoShape *ReadGeoModel::getBuiltShape(const unsigned shapeId, std::string_view shapeType)
 {
 
-    const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "Pgon", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "SimplePolygonBrep", "GenericTrap", "Shift", "Intersection", "Subtraction", "Union", "UnidentifiedShape"};
+    const std::set<std::string> shapesNewDB{"Box", "EllipticalTube", "Tube", "Pcon", "Cons", "Para", "Pgon", "Trap", "Trd", "Tubs", "Torus", "TwistedTrap", "SimplePolygonBrep", "GenericTrap", "Shift", "Intersection", "Subtraction", "Union", "UnidentifiedShape"};
     // get shape parameters
     if (std::count(shapesNewDB.begin(), shapesNewDB.end(), shapeType))
     {
         if ("Box" == shapeType)
         {
             return m_builderShape_Box->getBuiltShape(shapeId);
+        }
+        else if ("EllipticalTube" == shapeType)
+        {
+            return m_builderShape_EllipticalTube->getBuiltShape(shapeId);
         }
         else if ("Tube" == shapeType)
         {

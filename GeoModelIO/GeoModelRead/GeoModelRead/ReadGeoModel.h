@@ -77,8 +77,10 @@ class GeoSerialTransformer;
 class GeoGraphNode;
 class GeoShapeSubtraction;
 class GeoBox;
+class GeoEllipticalTube;
 
 class BuildGeoShapes_Box;
+class BuildGeoShapes_EllipticalTube;
 class BuildGeoShapes_Tube;
 class BuildGeoShapes_Cons;
 class BuildGeoShapes_Para;
@@ -169,6 +171,7 @@ class ReadGeoModel {
     };
     unsigned long getNShapes() { return m_shapes.size(); }; // TODO: to be removed later
     unsigned long getNShapes_Box() { return m_shapes_Box.size(); };
+    unsigned long getNShapes_EllipticalTube() { return m_shapes_EllipticalTube.size(); };
     unsigned long getNShapes_Cons() { return m_shapes_Cons.size(); };
     unsigned long getNShapes_Para() { return m_shapes_Para.size(); };
     unsigned long getNShapes_Pcon() { return m_shapes_Pcon.size(); };
@@ -190,6 +193,7 @@ class ReadGeoModel {
    private:
     void buildAllShapes(); // TODO: OLD METHOD, TO BE REMOVED WHEN READY
     void buildAllShapes_Box();
+    void buildAllShapes_EllipticalTube();
     void buildAllShapes_Tube();
     void buildAllShapes_Cons();
     void buildAllShapes_Para();
@@ -405,6 +409,7 @@ class ReadGeoModel {
     // std::unique_ptr<BuildGeoShapes_Box> m_builderShape_Box;
     BuildGeoVSurface*   buildsurfTool{};
     BuildGeoShapes_Box* m_builderShape_Box{};
+    BuildGeoShapes_EllipticalTube* m_builderShape_EllipticalTube{};
     BuildGeoShapes_Tube* m_builderShape_Tube{};
     BuildGeoShapes_Cons* m_builderShape_Cons{};
     BuildGeoShapes_Para* m_builderShape_Para{};
@@ -448,6 +453,7 @@ class ReadGeoModel {
 
     // containers to store shapes' parameters
     DBRowsList m_shapes_Box;
+    DBRowsList m_shapes_EllipticalTube;
     DBRowsList m_shapes_Tube;
     DBRowsList m_shapes_Cons;
     DBRowsList m_shapes_Para;

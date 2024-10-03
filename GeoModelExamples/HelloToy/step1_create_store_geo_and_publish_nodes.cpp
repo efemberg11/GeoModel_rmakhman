@@ -15,6 +15,7 @@
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/GeoBox.h"
+#include "GeoModelKernel/GeoEllipticalTube.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoCons.h"
 #include "GeoModelKernel/GeoPara.h"
@@ -234,6 +235,14 @@ int main(int argc, char *argv[])
   toyPhys->add(nBox);
   toyPhys->add(pBox);
 
+  // Add a test GeoEllipticalTube shape
+  GeoEllipticalTube *sEllipticalTube = new GeoEllipticalTube(5.0 * SYSTEM_OF_UNITS::cm, 30 * SYSTEM_OF_UNITS::cm, 30 * SYSTEM_OF_UNITS::cm);
+  GeoLogVol *lEllipticalTube = new GeoLogVol("ellipticaltube", sEllipticalTube, steel);
+  GeoPhysVol *pEllipticalTube = new GeoPhysVol(lEllipticalTube);
+  GeoNameTag *nEllipticalTube = new GeoNameTag("Shape-EllipticalTube");
+  toyPhys->add(nEllipticalTube);
+  toyPhys->add(pEllipticalTube);
+  
   // Add a test GeoTube shape
   GeoTube *sTube = new GeoTube(5.0 * SYSTEM_OF_UNITS::cm, 10 * SYSTEM_OF_UNITS::cm, 30 * SYSTEM_OF_UNITS::cm);
   GeoLogVol *lTube = new GeoLogVol("tube", sTube, steel);

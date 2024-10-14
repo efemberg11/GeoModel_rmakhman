@@ -18,6 +18,9 @@
  *              New DB format to extend the storage of numbers as REAL instead of TEXT,
  *              New methods to handle vector<variants> as input of records,
  *              Set precision to all conversions Double --> String
+ * - Jul 2024 - Rui Xue, <r.xue@cern.ch><rux23@pitt.edu>,
+ *              Added support for virtual surfaces, including:
+ *              GeoRectSurface, GeoTrapezoidSurface, GeoAnnulusSurface, GeoDiamondSurface
  */
 
 #include <GeoModelDBManager/GMDBManager.h>
@@ -745,7 +748,6 @@ bool GMDBManager::addListOfRecords(
     const DBRowsList& records) {
     //  if (m_debug) qDebug() << "GMDBManager::addListOfRecords():" <<
     //  geoType;
-
     std::string tableName = m_childType_tableName[geoType];
 
     if (tableName.size() == 0) {
@@ -755,7 +757,7 @@ bool GMDBManager::addListOfRecords(
     if (records.size() > 0) {
         return addListOfRecordsToTable(
             tableName, records);  // needs SQLite >= 3.7.11
-    } else {
+    } else {  
         if (m_debug)
             std::cout << "Info: no records to save for geoType '" << geoType
                       << "'. Skipping..." << std::endl;
@@ -2341,7 +2343,113 @@ bool GMDBManager::createTables() {
         storeNodeType(geoNode, tableName);
     }
     tab.clear();
+//----------------------------------------------------------------------------
+    // VSurface table
+    // ID = 33 in GeoNodesTypes, so that .db files introduced before Virtual Surface won't crush
+    geoNode = "GeoVSurface";
+    tableName = "VirtualSurface";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("shapeType");
+    tab.push_back("shapeId");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} varchar not null, {3} integer not null)",
+        tab[0], tab[1], tab[2], tab[3]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
 
+    // Surface-Rectangle table
+    // ID = 34 in GeoNodesTypes
+    // ID, XHalfLength, YHalfLength
+    geoNode = "RectangleSurface";
+    tableName = "Surface_Rectangle";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedArea");
+    tab.push_back("XHalfLength");
+    tab.push_back("YHalfLength");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real)",
+        tab[0], tab[1], tab[2], tab[3], tab[4]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+    
+    // Surface-Trapezoid table
+    // ID = 35 in GeoNodesTypes
+    // ID, XHalfLengthMin, XHalfLengthMax, YHalfLength
+    geoNode = "TrapezoidSurface";
+    tableName = "Surface_Trapezoid";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedArea");
+    tab.push_back("XHalfLengthMin");
+    tab.push_back("XHalfLengthMax");
+    tab.push_back("YHalfLength");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real)",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+
+    // Surface-Annulus table
+    // ID = 36 in GeoNodesTypes
+    // ID, Ox, Oy, radius_in, radius_out, phi
+    geoNode = "AnnulusSurface";
+    tableName = "Surface_Annulus";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedArea");
+    tab.push_back("Ox");
+    tab.push_back("Oy");
+    tab.push_back("radius_in");
+    tab.push_back("radius_out");
+    tab.push_back("phi");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real)",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();
+
+    // Surface-Diamond table
+    // ID = 37 in GeoNodesTypes
+    // ID, X_bottom_half, X_mid_half, X_top_half, Y_bottom_half, Y_top_half
+    geoNode = "DiamondSurface";
+    tableName = "Surface_Diamond";
+    m_childType_tableName[geoNode] = tableName;
+    tab.push_back(tableName);
+    tab.push_back("id");
+    tab.push_back("computedArea");
+    tab.push_back("X_bottom_half");
+    tab.push_back("X_mid_half");
+    tab.push_back("X_top_half");
+    tab.push_back("Y_bottom_half");
+    tab.push_back("Y_top_half");
+    storeTableColumnNames(tab);
+    queryStr = fmt::format(
+        "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real)",
+        tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7]);
+    if (0 == (rc = execQuery(queryStr))) {
+        storeNodeType(geoNode, tableName);
+    }
+    tab.clear();     
+
+//----------------------------------------------------------------------------
     if (m_debug) {
         std::cout << "All these tables have been successfully created:"
                   << std::endl;  // debug

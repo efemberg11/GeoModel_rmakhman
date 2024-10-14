@@ -87,20 +87,45 @@ void GeoPrintGraphAction::handleIdentifierTag (const GeoIdentifierTag *idTag)
 }
 
 
-//    Handle GeoVirSurface
+//    Handle GeoVSurface
 void GeoPrintGraphAction::handleVSurface (const GeoVSurface *surface) {
   indent();
-  m_o << "HELLO from VirtualSurface" << std::endl;
+  m_o << " Virtual Surface" << std::endl;
+  m_pendingTransformList.erase(m_pendingTransformList.begin(),m_pendingTransformList.end());
+  m_indented=false;
 }
 
-  //    Handle GeoVSurface
+  //    Handle GeoRectSurface
 void GeoPrintGraphAction::handleRectSurface (const GeoRectSurface *surface) {
   indent();
-  m_o << "HELLO from RectSurface" << std::endl;
+  m_o << " Rectangle Surface" << std::endl;
+  m_pendingTransformList.erase(m_pendingTransformList.begin(),m_pendingTransformList.end());
+  m_indented=false;
 }
 
+  //    Handle GeoTrapezoidSurface
+void GeoPrintGraphAction::handleTrapezoidSurface (const GeoTrapezoidSurface *surface) {
+  indent();
+  m_o << " Trapezoid Surface" << std::endl;
+  m_pendingTransformList.erase(m_pendingTransformList.begin(),m_pendingTransformList.end());
+  m_indented=false;
+}
 
+  //    Handle GeoAnnulusSurface
+void GeoPrintGraphAction::handleAnnulusSurface (const GeoAnnulusSurface *surface) {
+  indent();
+  m_o << " Annulus Surface" << std::endl;
+  m_pendingTransformList.erase(m_pendingTransformList.begin(),m_pendingTransformList.end());
+  m_indented=false;
+}
 
+  //    Handle GeoDiamondSurface
+void GeoPrintGraphAction::handleDiamondSurface (const GeoDiamondSurface *surface) {
+  indent();
+  m_o << " Diamond Surface" << std::endl;
+  m_pendingTransformList.erase(m_pendingTransformList.begin(),m_pendingTransformList.end());
+  m_indented=false;
+}
 
 void GeoPrintGraphAction::setNotification (Type type, bool state)
 {

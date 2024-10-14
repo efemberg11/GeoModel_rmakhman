@@ -9,7 +9,7 @@ file( GLOB UIS src/*.ui )
 add_library( GXGuideLineSystems SHARED ${SOURCES} ${HEADERS} ${UIS} )
 target_link_libraries( GXGuideLineSystems
    PUBLIC Coin::Coin Qt${QT_VERSION}::Core Qt${QT_VERSION}::Gui Qt${QT_VERSION}::Widgets GXBase
-   PRIVATE GeoModelCore::GeoModelKernel GXHEPVis )
+   PRIVATE GeoModelCore::GeoModelKernel GXHepVis )
 target_include_directories( GXGuideLineSystems PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )

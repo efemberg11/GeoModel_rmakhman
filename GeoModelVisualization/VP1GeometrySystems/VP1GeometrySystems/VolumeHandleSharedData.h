@@ -9,8 +9,11 @@
 //for all volume handle nodes under a given top-level handle.
 
 #include "GeoModelKernel/GeoVPhysVol.h"
+#include "GeoModelKernel/GeoVSurface.h"
 #include "VP1GeometrySystems/VP1GeoFlags.h"
+#include <Inventor/nodes/SoShape.h>
 #include <map>
+
 class SoNode;
 class SoGroup;
 class SoSeparator;
@@ -32,7 +35,7 @@ public:
   ~VolumeHandleSharedData();
   void ref();
   void unref();
-
+   
   //Fixme: Inline?
   PVConstLink geoPVConstLinkOfTreeTopsMother() const;
   PhiSectorManager* phiSectorManager() const;
@@ -47,6 +50,8 @@ public:
   void removeZappedVolumesFromGui(VolumeHandle*);
 
   SoNode * toShapeNode(const PVConstLink& pV, bool *shapeIsKnown=nullptr);//Returns shape of pV->getLogVol() (uses shared instancing as appropriate)
+  
+  SoNode * toShapeNode(const VSConstLink& vS, SoSeparator* nodesep);
   SoNode * getSoCylinderOrientedLikeGeoTube(const double& radius, const double& halfLength);//(uses shared instancing as appropriate)
 
   void registerNodeSepForVolumeHandle(SoSeparator*,VolumeHandle*);

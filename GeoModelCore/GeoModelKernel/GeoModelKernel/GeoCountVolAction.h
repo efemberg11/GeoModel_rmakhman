@@ -21,7 +21,10 @@ class GeoCountVolAction : public GeoNodeAction
   
   //	Handles a Serial Transformer
   virtual void handleSerialTransformer (const GeoSerialTransformer  *st);
-
+  
+  //	Handles a virtual surface.
+  virtual void handleVSurface (const GeoVSurface *) override;
+  
   //	The volume count.
   unsigned int getCount () const;
 

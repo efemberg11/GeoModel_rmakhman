@@ -29,7 +29,10 @@ class GeoSurfaceCursor final : public GeoNodeAction
   
   /// Returns the default ransformation to the surface or volume.
   GeoTrf::Transform3D getDefTransform () const;
-        
+/*
+  /// Returns the name of the surface. All are called VSurface for now.
+  std::string getName () const;
+*/
  private:
   /// Handles a Transform.
   virtual void handleTransform (const GeoTransform *xform) override; 

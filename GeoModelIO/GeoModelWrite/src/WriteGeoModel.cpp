@@ -21,9 +21,11 @@
 // - Nov 2023 - R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
 //              Updated to use the AlignableTransform 'default position', 
 //              which does not include alignment constants
+//
 // - May 2024 - Major change: we move to the new DB schema that uses numerical data
 //              instead of strings/TEXT
-//
+// - Jun 2024 - R.Xue  <r.xue@cern.ch><rux23@pitt.edu>
+//              Added methods to write out virtual surfaces to .db files
 
 // local includes
 #include "GeoModelWrite/WriteGeoModel.h"
@@ -58,6 +60,10 @@
 #include "GeoModelKernel/GeoTubs.h"
 #include "GeoModelKernel/GeoTwistedTrap.h"
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
+#include "GeoModelKernel/GeoRectSurface.h"
+#include "GeoModelKernel/GeoTrapezoidSurface.h"
+#include "GeoModelKernel/GeoAnnulusSurface.h"
+#include "GeoModelKernel/GeoDiamondSurface.h"
 
 #include "GeoModelHelpers/throwExcept.h"
 #include "GeoModelHelpers/StringUtils.h"
@@ -125,6 +131,22 @@ unsigned int WriteGeoModel::setVolumeCopyNumber(const unsigned int& volId,
     return m_volumeCopiesMap[key];
 }
 
+unsigned int WriteGeoModel::setSurfaceCopyNumber(const unsigned int& VSurfaceId,
+                                                 const std::string& surfType) {
+    const unsigned int tableId = getIdFromNodeType(surfType); // deal with DBManager
+    std::string key =
+        std::to_string(tableId) + ":" + std::to_string(VSurfaceId);  // INT
+
+    std::unordered_map<std::string, unsigned int>::iterator it =
+        m_surfaceCopiesMap.find(key);
+    if (it == m_surfaceCopiesMap.end()) {
+        m_surfaceCopiesMap[key] = 1;    // if not found, copy number is 1
+    } else {
+        ++m_surfaceCopiesMap[key];      // if found, copy number increase by 1
+    }
+    return m_surfaceCopiesMap[key];
+}
+
 unsigned int WriteGeoModel::getLatestParentCopyNumber(
     const unsigned int& parentId, const std::string& parentType) {
     const unsigned int tableId = getIdFromNodeType(parentType);
@@ -149,6 +171,63 @@ void WriteGeoModel::handleFullPhysVol(const GeoFullPhysVol* vol) {
     handleVPhysVolObjects(vol);
 }
 
+//------------------------------------------------------------------------
+
+void WriteGeoModel::handleVSurface(const GeoVSurface* surf) {
+    handleVSurfaceObjects(surf);
+}
+
+void WriteGeoModel::handleVSurfaceObjects(const GeoVSurface* surf) {
+    if (m_loglevel >= 3) {
+        std::cout << "WriteGeoModel::handleVSurfaceObjects() -- visiting... "
+                  << surf << std::endl;
+    }
+
+    std::string address = getAddressStringFromPointer(surf);
+    unsigned int surfShapeId;
+    std::string surfShapeType;    
+    unsigned int VSurfaceId;
+    std::string surfTypeStr = "GeoVSurface";
+    GeoNodePath* path = getPath();
+    unsigned int len = path->getLength() + 1; // VS must have parent node and must not have child node, and is never added to GeoNodePath
+    const GeoVPhysVol* upperVol = nullptr;
+    upperVol = path->getItem(len - 2);        // VS definitely has NodePath lenghth larger than 1
+
+    /*
+     * VSurface features:
+     * - 1 parent VPhysVol (definitely) // add at ChildPosition member function
+     * - 1 Shape
+     */
+     
+    unsigned int parentId = 0;
+    const GeoVPhysVol* parentNode = upperVol;
+    std::string parentAddress = getAddressStringFromPointer(parentNode);
+    parentId = getStoredIdFromAddress(parentAddress);
+    
+    if (!isAddressStored(address)) {   // The VSurface is new, needs to store
+        const GeoVSurfaceShape* surf_shape = surf->getShape();
+        surfShapeId = storeSurfaceShape(surf_shape);                    // surfShapeId is given by the size of container named "&m_(shape)_surface"
+        surfShapeType = surf_shape->type();
+        VSurfaceId = storeVSurface(surf, surfShapeId, surfShapeType);   // VSurfaceId is given by the size of container named "&m_VSurface"
+
+    } else {
+        VSurfaceId = getStoredIdFromAddress(address);
+    }    
+    const unsigned int surfCopyN = setSurfaceCopyNumber(VSurfaceId, surfTypeStr);
+   
+   // store the parent-child relationship in the DB
+    std::string parentType = getGeoTypeFromVPhysVol(parentNode);
+    
+    // get the copy number of the parent
+    // virtual surfaces always have PV as parents
+    const unsigned int parentCopyN = getLatestParentCopyNumber(parentId, parentType);
+    storeChildPosition(parentId, parentType, VSurfaceId, parentCopyN,
+                       getChildPosition(parentId, parentType, parentCopyN),
+                       surfTypeStr, surfCopyN);   
+}
+
+//------------------------------------------------------------------------
+
 void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
     if (m_loglevel >= 3) {
         std::cout << "WriteGeoModel::handleVPhysVolObjects() -- visiting... "
@@ -156,13 +235,13 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
     }
     // get the address string for the current volume
     std::string address = getAddressStringFromPointer(vol);
-
     // variables used to persistify the object
     unsigned int physId;
 
     // check the volume position in the geometry tree
     GeoNodePath* path = getPath();
     unsigned int len = path->getLength();
+
     //    const GeoVPhysVol* tailVol = path->getTail();
     //    const GeoVPhysVol* headVol = path->getHead();
     const GeoVPhysVol* upperVol = nullptr;
@@ -353,7 +432,7 @@ void WriteGeoModel::handleVPhysVolObjects(const GeoVPhysVol* vol) {
         // get the copy number of the parent
         const unsigned int parentCopyN =
             getLatestParentCopyNumber(parentId, parentType);
-        std::string childType = getGeoTypeFromVPhysVol(vol);
+        std::string childType = getGeoTypeFromVPhysVol(vol);  // TODO: dummy variable, same as volTypeStr
         storeChildPosition(parentId, parentType, physId, parentCopyN,
                            getChildPosition(parentId, parentType, parentCopyN),
                            childType, volCopyN);
@@ -976,9 +1055,59 @@ void WriteGeoModel::handleReferencedVPhysVol(const GeoVPhysVol* vol) {
 }
 
 // Get shape parameters
-std::pair<DBRowEntry,
-          DBRowsList>
-WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
+
+          
+std::pair<DBRowEntry, DBRowsList> WriteGeoModel::getSurfaceParameters(const GeoVSurfaceShape* surf_shape)
+{
+    const std::string shapeType = surf_shape->type();
+    
+    DBRowEntry shapePars;
+    DBRowsList shapeData;
+    std::pair<DBRowEntry, DBRowsList> shapePair;
+    DBRowEntry dataRow;
+    
+    double computedAreaDummy = -1;
+    shapePars.push_back(computedAreaDummy);
+    
+    if ("RectangleSurface" == shapeType){
+        const GeoRectSurface* rect_surf = dynamic_cast<const GeoRectSurface*>(surf_shape); 
+        shapePars.push_back(rect_surf->getXHalfLength());
+        shapePars.push_back(rect_surf->getYHalfLength());
+    }
+    else if ("TrapezoidSurface" == shapeType){
+        const GeoTrapezoidSurface* trapezoid = dynamic_cast<const GeoTrapezoidSurface*>(surf_shape); 
+        shapePars.push_back(trapezoid->getXHalfLengthMin());
+        shapePars.push_back(trapezoid->getXHalfLengthMax());        
+        shapePars.push_back(trapezoid->getYHalfLength());    
+    }
+    else if ("AnnulusSurface" == shapeType){
+        const GeoAnnulusSurface* annulus = dynamic_cast<const GeoAnnulusSurface*>(surf_shape); 
+        shapePars.push_back(annulus->getOx());
+        shapePars.push_back(annulus->getOy());
+        shapePars.push_back(annulus->getRadiusIn());
+        shapePars.push_back(annulus->getRadiusOut());
+        shapePars.push_back(annulus->getPhi());
+    }
+    else if ("DiamondSurface" == shapeType){
+        const GeoDiamondSurface* diamond = dynamic_cast<const GeoDiamondSurface*>(surf_shape);
+        shapePars.push_back(diamond->getXbottomHalf());
+        shapePars.push_back(diamond->getXmidHalf());
+        shapePars.push_back(diamond->getXtopHalf());
+        shapePars.push_back(diamond->getYbottomHalf());
+        shapePars.push_back(diamond->getYtopHalf());
+    }
+    else
+    {
+        std::cout << "\n\tGeoModelWrite -- WARNING!!! - Shape '" << shapeType
+                  << "' is not supported in the new DB format, yet.\n\n";
+    }
+
+    shapePair.first = shapePars;
+    shapePair.second = shapeData;
+    return shapePair;    
+}
+          
+std::pair<DBRowEntry, DBRowsList> WriteGeoModel::getShapeParametersV(const GeoShape *shape, const bool data)
 {
     const std::string shapeType = shape->type();
 
@@ -1528,6 +1657,54 @@ unsigned int WriteGeoModel::storeObj(const GeoFullPhysVol* pointer,
     return physvolId;
 }
 
+//__________________________________________________________________
+
+unsigned int WriteGeoModel::storeVSurface(const GeoVSurface* pointer, const unsigned int& surfShapeId, const std::string& surfShapeType) {
+    // SurfaceShape address is different from VSurface address
+    // VSurface has position info, similar to GeoFullPhysVol
+    unsigned int VSurfaceId;
+    std::string address = getAddressStringFromPointer(pointer);
+    VSurfaceId = addVSurface(surfShapeType, surfShapeId);
+    storeAddress(address, VSurfaceId);
+    return VSurfaceId;
+}
+
+
+unsigned int WriteGeoModel::storeSurfaceShape(const GeoVSurfaceShape* surf_shape) {
+
+    std::string shapeType = surf_shape->type();
+    std::pair<DBRowEntry, DBRowsList> shapePair = getSurfaceParameters(surf_shape);
+    DBRowEntry shapePars = shapePair.first;
+    DBRowsList shapeData = shapePair.second; 
+    return storeObj(surf_shape, shapeType, shapePars, shapeData); // return surfShapeId
+}
+
+unsigned int WriteGeoModel::storeObj(const GeoVSurfaceShape* pointer, const std::string& shapeName, DBRowEntry& parameters, const DBRowsList &shapeData) {
+    
+    std::string address = getAddressStringFromPointer(pointer);
+    unsigned int surfShapeId;
+    if (!isAddressStored(address)) {
+         //if (shapeData.size() > 0)
+        //{
+            // Store the node's additional data
+            // Rectangualr Virtual Surface now doesn't need to do this
+        //    std::pair<unsigned, unsigned> dataRows = addShapeData(shapeName, shapeData); //TODO: need to be revised for more complicated surfaces in future
+        //    unsigned dataStart = dataRows.first;
+        //    unsigned dataEnd = dataRows.second;
+        //    parameters.push_back(dataStart);
+        //    parameters.push_back(dataEnd);
+        //}
+        surfShapeId = addSurfaceShape(shapeName, parameters); // store parameters for surfaceShape
+        storeAddress(address, surfShapeId); // TODO: check if this step of storing the address and the ID is still used/needed.
+    } else {
+        // TODO: check if that is still needed/used! And if it's consistent with the new DB schema.
+        surfShapeId = getStoredIdFromAddress(address); // TODO: this is needed, because we need to check whether the surface shape could be shared,
+    }                                                  //       then return ID to VSurface, and VSurface cannot be shared
+    return surfShapeId;
+}
+
+//__________________________________________________________________
+
 unsigned int WriteGeoModel::storeObj(const GeoSerialIdentifier* pointer,
                                      const int& baseId) {
     const std::string address = getAddressStringFromPointer(pointer);
@@ -1956,6 +2133,7 @@ unsigned int WriteGeoModel::addShape(const std::string& type,
     values.push_back(parameters);
     return addRecord(container, values);
 }
+
 unsigned int WriteGeoModel::addShape(const std::string &type,
                                      const DBRowEntry &parameters)
 {
@@ -2075,6 +2253,44 @@ unsigned int WriteGeoModel::addFullPhysVol(
     return idx;
 }
 
+//------------------------------------------------------------------------
+unsigned int WriteGeoModel::addVSurface(const std::string &type, const unsigned int& surfShapeId) {
+    DBRowsList* container = &m_VSurface;
+    DBRowEntry values;
+    values.push_back(type);
+    values.push_back(surfShapeId);  // INT
+    unsigned int idx = addRecord(container, values);
+    return idx;
+}
+
+unsigned int WriteGeoModel::addSurfaceShape(const std::string &type,
+                                            const DBRowEntry &parameters)
+{
+    DBRowsList *container = nullptr;
+    if ("RectangleSurface" == type)
+    {
+        container = &m_rectangle_surface;
+    }
+    else if ("TrapezoidSurface" == type)
+    {
+        container = &m_trapezoid_surface;
+    }
+    else if ("AnnulusSurface" == type)
+    {
+        container = &m_annulus_surface;
+    }
+    else if ("DiamondSurface" == type)
+    {
+        container = &m_diamond_surface;
+    }    
+    else{
+        THROW_EXCEPTION("ERROR!!! Cannot recognize '" << type << "' while adding the surface shape!");
+    }
+    unsigned int idx = addRecord(container, parameters);
+    return idx;
+}
+//------------------------------------------------------------------------
+
 unsigned int WriteGeoModel::addLogVol(const std::string& name,
                                       const unsigned int& shapeId,
                                       std::string_view shapeType,
@@ -2149,6 +2365,7 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
     m_dbManager->addListOfRecords("GeoIdentifierTag", m_identifierTags);
     m_dbManager->addListOfRecords("GeoPhysVol", m_physVols);
     m_dbManager->addListOfRecords("GeoFullPhysVol", m_fullPhysVols);
+    m_dbManager->addListOfRecords("GeoVSurface", m_VSurface);
     m_dbManager->addListOfRecords("GeoLogVol", m_logVols);
     
     m_dbManager->addRecordsToTable("FuncExprData", m_exprData);
@@ -2182,7 +2399,11 @@ void WriteGeoModel::saveToDB(std::vector<GeoPublisher*>& publishers) {
 
     m_dbManager->addListOfRecords("GeoUnidentifiedShape", m_shapes_UnidentifiedShape); // new version, with shape's parameters as numbers
 
-
+    m_dbManager->addListOfRecords("RectangleSurface", m_rectangle_surface); 
+    m_dbManager->addListOfRecords("TrapezoidSurface", m_trapezoid_surface);
+    m_dbManager->addListOfRecords("AnnulusSurface", m_annulus_surface);
+    m_dbManager->addListOfRecords("DiamondSurface", m_diamond_surface);
+    
     m_dbManager->addListOfChildrenPositions(m_childrenPositions);
     m_dbManager->addRootVolume(m_rootVolume);
 
@@ -2435,6 +2656,18 @@ std::string WriteGeoModel::getAddressStringFromPointer(
 }
 std::string WriteGeoModel::getAddressStringFromPointer(
     const GeoVPhysVol* pointer) {
+    std::ostringstream oss;
+    oss << pointer;
+    return getQStringFromOss(oss);
+}
+std::string WriteGeoModel::getAddressStringFromPointer(
+    const GeoVSurface* pointer) {
+    std::ostringstream oss;
+    oss << pointer;
+    return getQStringFromOss(oss);
+}
+std::string WriteGeoModel::getAddressStringFromPointer(
+    const GeoVSurfaceShape* pointer) {
     std::ostringstream oss;
     oss << pointer;
     return getQStringFromOss(oss);

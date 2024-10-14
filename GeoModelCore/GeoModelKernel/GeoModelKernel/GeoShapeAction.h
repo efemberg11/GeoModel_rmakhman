@@ -40,6 +40,12 @@ class GeoTessellatedSolid;
 
 class GeoGenericTrap;
 
+class GeoVSurfaceShape;
+class GeoRectSurface;
+class GeoTrapezoidSurface;
+class GeoAnnulusSurface;
+class GeoDiamondSurface;
+
 class GeoShapeAction 
 {
  public:
@@ -104,6 +110,21 @@ class GeoShapeAction
 
   //	Handles a tubs shape.
   virtual void handleTubs (const GeoTubs *tubs);
+  
+  //	Handles a virtual surface.
+  virtual void handleShape (const GeoVSurfaceShape *);
+  
+  //    Handles a rectangular surface.
+  virtual void handleRectSurface (const GeoRectSurface *surf);
+
+  //    Handles a trapezoid surface.
+  virtual void handleTrapezoidSurface (const GeoTrapezoidSurface *surf);
+
+  //    Handles an annulus surface.
+  virtual void handleAnnulusSurface (const GeoAnnulusSurface *surf);
+
+  //    Handles a diamond surface.
+  virtual void handleDiamondSurface (const GeoDiamondSurface *surf);
 
   //	Returns a pointer to the path object.
   GeoShapePath * getPath ();

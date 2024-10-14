@@ -4,6 +4,7 @@
 #include "GeoModelKernel/GeoPlacement.h"
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoVPhysVol.h"
+#include "GeoModelKernel/GeoVSurface.h"
 #include "GeoModelKernel/GeoTransform.h"
 
 
@@ -51,6 +52,11 @@ GeoTrf::Transform3D GeoPlacement::getX(const GeoVAlignmentStore* store) const {
 
     // If this happens, we are done, compute & return--------------------//
     //                                                                   //
+    if (dynamic_cast<const GeoVSurface *>(*current)) break;              //
+    //-------------------------------------------------------------------//
+
+    // If this happens, we are done, compute & return--------------------//
+    //                                                                   //
     if (dynamic_cast<const GeoSerialTransformer *>(*current)) break;     //
     //-------------------------------------------------------------------//
 
@@ -86,6 +92,11 @@ GeoTrf::Transform3D GeoPlacement::getDefX(const GeoVAlignmentStore* store) const
     // If this happens, we are done, compute & return--------------------//
     //                                                                   //
     if (dynamic_cast<const GeoVPhysVol *>(*current)) break;              //
+    //-------------------------------------------------------------------//
+
+    // If this happens, we are done, compute & return--------------------//
+    //                                                                   //
+    if (dynamic_cast<const GeoVSurface *>(*current)) break;              //
     //-------------------------------------------------------------------//
 
     // If this happens, we are done, compute & return--------------------//

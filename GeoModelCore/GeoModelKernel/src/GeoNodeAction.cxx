@@ -87,5 +87,11 @@ void GeoNodeAction::handleVSurface (const GeoVSurface *surface) {
 void GeoNodeAction::handleRectSurface (const GeoRectSurface *rect) {
 }
 
+void GeoNodeAction::handleTrapezoidSurface (const GeoTrapezoidSurface *trapezoid) {
+}
 
+void GeoNodeAction::handleAnnulusSurface (const GeoAnnulusSurface *annulus) {
+}
 
+void GeoNodeAction::handleDiamondSurface (const GeoDiamondSurface *diamond) {
+}

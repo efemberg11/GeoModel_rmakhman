@@ -13,16 +13,24 @@
 // Original code by Joe Boudreau, adapted                            //
 // in the present form by T. Kittelmann                              //
 //                                                                   //
+// Updates:                                                          //
+// Jun 2024, Rui Xue                                                 //
+//           Add new method for Virtual Surface.                     //
+//                                                                   //
+//                                                                   //
 ///////////////////////////////////////////////////////////////////////
 
 #include <QStringList>
 
 class GeoShape;
+class GeoVSurfaceShape;
 
 class DumpShape {
 public:
 
   static QStringList shapeToStringList(const GeoShape* shape);
+  static QStringList shapeToStringList(const GeoVSurfaceShape* surf_shape);
+  
 private:
 
   DumpShape(){};

@@ -18,7 +18,8 @@
 //  - Jul 2021, Riccardo Maria Bianchi <riccardo.maria.bianchi@cern.ch>
 //              * Added the 'filter volumes' tool
 //              * Added signal/slot to update transparency type in the 3D window
-//                                                                     
+//  - Jun 2024, Rui Xue  <r.xue@cern.ch><rux23@pitt.edu>
+//              * Added methods to print out virtual surface information                                                                     
 /////////////////////////////////////////////////////////////////////////
 
 #include "VP1Base/IVP13DSystemSimple.h"
@@ -26,12 +27,24 @@
 #include "VP1GeometrySystems/VolumeHandle.h"//fixme
 
 #include "GeoModelKernel/GeoPhysVol.h"
+#include "GeoModelKernel/GeoVSurface.h"
 
 #include <set>
 #include <map>
 #include <QStack>
 #include <QString>
 
+#include <iostream>
+#include <exception>
+#include <sstream>
+
+#define THROW_EXCEPTION(MESSAGE)                      \
+    {                                                 \
+        std::stringstream except_str{};               \
+        except_str<<__FILE__<<":"<<__LINE__<<" --- "; \
+        except_str<<MESSAGE;                          \
+        throw std::runtime_error(except_str.str());   \
+    }
 
 
 

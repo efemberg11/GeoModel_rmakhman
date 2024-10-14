@@ -346,8 +346,12 @@ QVariant VolumeTreeModel::data(const QModelIndex& index, int role) const
 
     if (volumeHandle->nChildren()>0)
       return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") [" + QString::number(volumeHandle->nChildren())+"] ("+ volState + ")" ;
-    else
-      return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") ("+ volState + ")" ;
+    else{
+      if (volumeHandle->geoVSConstLink())
+        return volumeHandle->getName();
+      else
+        return volumeHandle->getName() + " (" + QString::fromStdString(volumeHandle->geoMaterial()->getName()) + ") ("+ volState + ")" ;
+    }
   }
 
   if (role==Qt::ForegroundRole)

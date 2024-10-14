@@ -57,6 +57,15 @@ class GeoPrintGraphAction : public GeoNodeAction
   //    Handle a rectangular surface.
   virtual void handleRectSurface( const GeoRectSurface *rect) override final; 
 
+  //    Handle a trapezoid surface.
+  virtual void handleTrapezoidSurface( const GeoTrapezoidSurface *trapezoid) override final; 
+
+  //    Handle an annulus surface.
+  virtual void handleAnnulusSurface( const GeoAnnulusSurface *annulus) override final;
+
+  //    Handle a diamond surface.
+  virtual void handleDiamondSurface( const GeoDiamondSurface *diamond) override final;
+
   //	Sets the notification state.  Default: everything on.
   void setNotification (Type type, bool state);
   

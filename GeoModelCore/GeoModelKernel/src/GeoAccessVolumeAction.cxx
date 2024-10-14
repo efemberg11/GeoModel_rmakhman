@@ -115,6 +115,13 @@ void GeoAccessVolumeAction::handleFullPhysVol (const GeoFullPhysVol *vol)
   m_counter++;
 }
 
+void GeoAccessVolumeAction::handleVSurface (const GeoVSurface *surface)
+{
+    m_pendingTransformList.erase (m_pendingTransformList.begin (),
+				  m_pendingTransformList.end ());
+}
+
+
 PVConstLink GeoAccessVolumeAction::getVolume () const
 {
   return m_volume;

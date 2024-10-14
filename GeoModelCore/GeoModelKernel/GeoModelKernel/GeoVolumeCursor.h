@@ -7,6 +7,7 @@
 
 #include "GeoModelKernel/GeoNodeAction.h"
 #include "GeoModelKernel/GeoDefinitions.h"
+#include "GeoModelKernel/GeoVSurface.h"
 #include <vector>
 
 class GeoVAlignmentStore;
@@ -14,6 +15,7 @@ class GeoVAlignmentStore;
 class GeoVolumeCursor final : public GeoNodeAction
 {
  public:
+  using VSConstLink = GeoVSurface::VSConstLink;
   GeoVolumeCursor (PVConstLink parent, GeoVAlignmentStore* store=nullptr);
   virtual ~GeoVolumeCursor() override;
  
@@ -28,6 +30,9 @@ class GeoVolumeCursor final : public GeoNodeAction
 
   /// Returns the selected physical volume or nullptr if not found.
   PVConstLink getVolume () const;
+
+  /// Returns the selected virtual surface or nullptr if not found.
+  VSConstLink getSurface () const;
 
   /// Returns the transformation to the volume.
   GeoTrf::Transform3D getTransform () const;
@@ -52,7 +57,10 @@ class GeoVolumeCursor final : public GeoNodeAction
 
   /// Handles a physical volume.
   virtual void handleFullPhysVol (const GeoFullPhysVol *vol) override;
-
+  
+  /// Handles a virtual surface.
+  virtual void handleVSurface (const GeoVSurface *surf) override;
+  
   /// Handles a Name Tag.
   virtual void handleNameTag (const GeoNameTag *nameTag) override;
 
@@ -74,6 +82,7 @@ class GeoVolumeCursor final : public GeoNodeAction
 
   PVConstLink                           m_parent;
   PVConstLink                           m_volume;
+  VSConstLink                           m_surface;
   GeoTrf::Transform3D                           m_transform;
   GeoTrf::Transform3D                           m_defTransform;
   
@@ -90,7 +99,6 @@ class GeoVolumeCursor final : public GeoNodeAction
   const GeoSerialIdentifier            *m_serialIdentifier;
   unsigned int                          m_serialIdentPosition;
   unsigned int                          m_volCount;
-  
   bool                                  m_hasAlignTrans;
 
   GeoVAlignmentStore                   *m_alignStore;

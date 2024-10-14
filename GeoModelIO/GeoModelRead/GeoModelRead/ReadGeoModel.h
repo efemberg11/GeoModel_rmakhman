@@ -26,6 +26,10 @@
  *   Added method to get records out of custom tables from client code.
  * - Feb 2023, R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
  *             Added 'setLoglevel' method, to steer output messages
+ *
+ * - Jun 2024, R.Xue  <r.xue@cern.ch><rux23@pitt.edu>
+ *             Added methods to read in virtual surfaces from .db files
+ *
  */
 
 #ifndef GeoModelRead_ReadGeoModel_H_
@@ -53,6 +57,12 @@
 class GeoVPhysVol;
 class GeoPhysVol;
 class GeoFullPhysVol;
+class GeoRectSurface;
+class GeoTrapezoidSurface;
+class GeoAnnulusSurface;
+class GeoDiamondSurface;
+class GeoVSurface;
+class GeoVSurfaceShape;
 class GeoLogVol;
 class GeoShape;
 class GeoMaterial;
@@ -82,7 +92,7 @@ class BuildGeoShapes_Pgon;
 class BuildGeoShapes_SimplePolygonBrep;
 class BuildGeoShapes_GenericTrap;
 class BuildGeoShapes_UnidentifiedShape;
-
+class BuildGeoVSurface;
 // type definitions
 typedef const GeoXF::Function& TRANSFUNCTION;
 // containers for boolean shapes' information
@@ -210,6 +220,10 @@ class ReadGeoModel {
     void buildAllSerialTransformers();
     void buildAllNameTags();
 
+    void buildAllVSurfaces();
+    void buildVSurface(const unsigned int id);
+    GeoVSurfaceShape* BuildWhichSurface(std::string_view shapeType, const unsigned int shapeId);
+
     GeoVPhysVol* buildGeoModelPrivate();
 
     GeoBox* buildDummyShape();
@@ -275,6 +289,11 @@ class ReadGeoModel {
     // caching methods
     // TODO: perhaps we could merge all those 'isBuiltYYY' methods in a single
     // one, with the GeoModel class as a second argument ? (RMB)
+    bool isBuiltVSurface(const unsigned int shapeId);
+    bool isBuiltRectSurface(const unsigned int shapeId);
+    bool isBuiltTrapezoidSurface(const unsigned int shapeId);
+    bool isBuiltAnnulusSurface(const unsigned int shapeId);
+    bool isBuiltDiamondSurface(const unsigned int shapeId);
     bool isBuiltShape(const unsigned id);
     bool isBuiltShape_Operators_Shift(const unsigned id);
     bool isBuiltShape_Operators_Subtraction(const unsigned id);
@@ -289,7 +308,12 @@ class ReadGeoModel {
     void storeBuiltShapeOperators_Subtraction(const unsigned, GeoShape* node);
     void storeBuiltShapeOperators_Union(const unsigned, GeoShape* node);
     void storeBuiltShapeOperators_Intersection(const unsigned, GeoShape* node);
-
+    void storeBuiltRectSurface(GeoRectSurface* nodePtr);
+    void storeBuiltTrapezoidSurface(GeoTrapezoidSurface* nodePtr);
+    void storeBuiltDiamondSurface(GeoDiamondSurface* nodePtr);
+    void storeBuiltAnnulusSurface(GeoAnnulusSurface* nodePtr);
+    void storeBuiltVSurface(GeoVSurface* nodePtr);
+    
     bool isBuiltTransform(const unsigned id);
     void storeBuiltTransform(GeoTransform* node);
     GeoTransform* getBuiltTransform(const unsigned id);
@@ -379,6 +403,7 @@ class ReadGeoModel {
 
     //! builders
     // std::unique_ptr<BuildGeoShapes_Box> m_builderShape_Box;
+    BuildGeoVSurface*   buildsurfTool{};
     BuildGeoShapes_Box* m_builderShape_Box{};
     BuildGeoShapes_Tube* m_builderShape_Tube{};
     BuildGeoShapes_Cons* m_builderShape_Cons{};
@@ -413,6 +438,13 @@ class ReadGeoModel {
     DBRowsList m_materials_Data;
     DBRowsList m_logVols;
     DBRowsList m_allchildren;
+
+    // containers to store virtual surfaces
+    DBRowsList m_rectangle_surface;  // For Virtual Surface Shape
+    DBRowsList m_trapezoid_surface;
+    DBRowsList m_annulus_surface;
+    DBRowsList m_diamond_surface;
+    DBRowsList m_VSurface;           // For Virtual Surface Abstract Class
 
     // containers to store shapes' parameters
     DBRowsList m_shapes_Box;
@@ -471,6 +503,11 @@ class ReadGeoModel {
     std::vector<GeoLogVol*> m_memMapLogVols;
     std::vector<GeoMaterial*> m_memMapMaterials;
     std::vector<GeoElement*> m_memMapElements;
+    std::vector<GeoRectSurface*> m_memMapRectSurface;
+    std::vector<GeoTrapezoidSurface*> m_memMapTrapezoidSurface;
+    std::vector<GeoAnnulusSurface*> m_memMapAnnulusSurface;
+    std::vector<GeoDiamondSurface*> m_memMapDiamondSurface;
+    std::vector<GeoVSurface*> m_memMapVSurface;
     //  std::vector<GeoXF::Function*> m_memMapFunctions; // FIXME:
     
     // we need keys, because shapes are not built following the ID order

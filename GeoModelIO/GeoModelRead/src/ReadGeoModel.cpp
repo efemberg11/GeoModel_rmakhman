@@ -25,6 +25,10 @@
  *              https://gitlab.cern.ch/GeoModelDev/GeoModel/-/issues/39
  *  - May 2024, R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
  *              Major re-write: moved to the new DB schema based on numeric data
+ *
+ *  - Jun 2024, R.Xue  <r.xue@cern.ch><rux23@pitt.edu>
+ *              Added methods to read in virtual surfaces from .db files
+ *
  */
 
 // local includes
@@ -42,6 +46,8 @@
 #include "BuildGeoShapes_SimplePolygonBrep.h"
 #include "BuildGeoShapes_GenericTrap.h"
 #include "BuildGeoShapes_UnidentifiedShape.h"
+
+#include "BuildGeoVSurface.h"
 
 #include "GeoModelRead/ReadGeoModel.h"
 
@@ -64,6 +70,12 @@
 #include "GeoModelKernel/GeoTransform.h"
 #include "GeoModelKernel/GeoUtilFunctions.h"
 #include "GeoModelKernel/GeoVPhysVol.h"
+#include "GeoModelKernel/GeoVSurface.h"
+#include "GeoModelKernel/GeoVSurfaceShape.h"
+#include "GeoModelKernel/GeoRectSurface.h"
+#include "GeoModelKernel/GeoTrapezoidSurface.h"
+#include "GeoModelKernel/GeoAnnulusSurface.h"
+#include "GeoModelKernel/GeoDiamondSurface.h"
 
 // GeoModel shapes
 #include "GeoModelKernel/GeoBox.h"
@@ -341,6 +353,12 @@ void ReadGeoModel::loadDB() {
     // m_funcExprData = m_dbManager->getTableFromTableNameVecVecData("FuncExprData");
     m_funcExprData = m_dbManager->getTableFromTableName_DequeDouble("FuncExprData");
     
+    // get virtual surface shape and class from DB
+    m_rectangle_surface = m_dbManager->getTableFromNodeType_VecVecData("RectangleSurface");
+    m_trapezoid_surface = m_dbManager->getTableFromNodeType_VecVecData("TrapezoidSurface");
+    m_annulus_surface = m_dbManager->getTableFromNodeType_VecVecData("AnnulusSurface");
+    m_diamond_surface = m_dbManager->getTableFromNodeType_VecVecData("DiamondSurface");
+    m_VSurface = m_dbManager->getTableFromNodeType_VecVecData("GeoVSurface");
 
     // get the children table from DB
     m_allchildren = m_dbManager->getChildrenTable();
@@ -432,9 +450,11 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         // needs LogVols
         std::thread t5(&ReadGeoModel::buildAllPhysVols, this);
         std::thread t6(&ReadGeoModel::buildAllFullPhysVols, this);
-
+        std::thread t29(&ReadGeoModel::buildAllVSurfaces, this);
+        
         t5.join();  // ok, all PhysVols have been built
         t6.join();  // ok, all FullPhysVols have been built
+        t29.join();        
         //  t7.join(); // ok, all Functions have been built
         // needs Functions, PhysVols, FullPhysVols
         std::thread t12(&ReadGeoModel::buildAllSerialTransformers, this);
@@ -478,6 +498,7 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         buildAllPhysVols();
         buildAllFullPhysVols();
         buildAllSerialTransformers();
+        buildAllVSurfaces();          // Virtual Surface!
     }
     auto end = std::chrono::system_clock::now();  // timing: get end time
     auto diff =
@@ -975,6 +996,29 @@ void ReadGeoModel::buildAllMaterials() {
 }
 
 //! Iterate over the list of nodes, build them all, and store their pointers
+void ReadGeoModel::buildAllVSurfaces()
+{
+    if (m_loglevel >= 1)
+        std::cout << "Building all Virtual Surfaces...\n";
+    size_t nSize = m_VSurface.size();
+    BuildGeoVSurface* buildsurfTool = new BuildGeoVSurface();  // TODO: change the name of this class
+    for (unsigned int ii = 0; ii < nSize; ++ii)
+    {
+        try
+        {
+            const unsigned int nodeID = std::get<int>(m_VSurface[ii][0]);
+            buildVSurface(nodeID);
+        }
+        catch (std::bad_variant_access const &ex)
+        {
+            std::cout << ex.what() << ": Virtual Surface 'ID' is not an 'int' value!\n";
+        }
+    }
+    if (nSize > 0)
+        std::cout << "All " << nSize << " Virtual Surface have been built!\n";
+}
+
+//! Iterate over the list of nodes, build them all, and store their pointers
 void ReadGeoModel::buildAllLogVols()
 {
     if (m_loglevel >= 1)
@@ -1284,6 +1328,9 @@ void ReadGeoModel::processParentChild(
         GeoFullPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(
             buildVPhysVolInstance(childId, childTableId, childCopyN));
         volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoVSurface") {
+        GeoVSurface* childNode = m_memMapVSurface[childId-1];
+        volAddHelper(parentVol, childNode);
     } else if (childNodeType == "GeoSerialDenominator") {
         GeoSerialDenominator* childNode = getBuiltSerialDenominator(childId);
         volAddHelper(parentVol, childNode);
@@ -1328,7 +1375,6 @@ void ReadGeoModel::processParentChild(
     //     std::cout << std::endl;
     //     muxCout.unlock();
     // }
-
     // safety check
     if (parentchild.size() < 8) {
         std::cout << "ERROR!!! Probably you are using an old geometry file. "
@@ -1382,6 +1428,9 @@ void ReadGeoModel::processParentChild(
     } else if (childNodeType == "GeoFullPhysVol") {
         GeoFullPhysVol* childNode = dynamic_cast<GeoFullPhysVol*>(
             buildVPhysVolInstance(childId, childTableId, childCopyN));
+        volAddHelper(parentVol, childNode);
+    } else if (childNodeType == "GeoVSurface") {
+        GeoVSurface* childNode = m_memMapVSurface[childId-1];
         volAddHelper(parentVol, childNode);
     } else if (childNodeType == "GeoSerialDenominator") {
         GeoSerialDenominator* childNode = getBuiltSerialDenominator(childId);
@@ -2909,6 +2958,26 @@ GeoBox* ReadGeoModel::buildDummyShape() {
                       30 * SYSTEM_OF_UNITS::cm);
 }
 
+void ReadGeoModel::buildVSurface(const unsigned int id) {
+    if (m_loglevel >= 3) {
+        muxCout.lock();
+        std::cout << "buildVSurface(), testing VSurface id: " << id << "...\n";
+        ;
+        muxCout.unlock();
+    }
+    
+    if(!isBuiltVSurface(id)){  // the VSurface hasnt been built yet
+      DBRowEntry values = m_VSurface[id - 1];
+      const std::string shapeType = GeoModelHelpers::variantHelper::getFromVariant_String(values[1], "VSurf_shapeType");
+      const unsigned int shapeId = GeoModelHelpers::variantHelper::getFromVariant_Int(values[2], "VSurf_shapeID");
+      GeoVSurfaceShape* buildVSurfShape = BuildWhichSurface(shapeType, shapeId);  // build the shape of surface
+      GeoVSurface* buildVSurf = new GeoVSurface(buildVSurfShape);                 // build the virtual surface class itself
+      storeBuiltVSurface(buildVSurf);
+    }
+    // else do nothing
+}
+//-----------------------------------------------------------------------
+
 GeoLogVol* ReadGeoModel::buildLogVol(const unsigned int id) {
     if (m_loglevel >= 3) {
         muxCout.lock();
@@ -3292,6 +3361,7 @@ const std::set<std::string> shapesNewDB{"Box", "Tube", "Pcon", "Cons", "Para", "
 void ReadGeoModel::storeBuiltShape(const unsigned id, GeoShape* nodePtr) {
     m_memMapShapes[id] = nodePtr;
 }
+
 void ReadGeoModel::storeBuiltShape(const std::string_view type, const unsigned id, GeoShape *nodePtr)
 {
     if ("Shift" == type)
@@ -3318,6 +3388,139 @@ void ReadGeoModel::storeBuiltShapeOperators_Intersection(const unsigned id, GeoS
 void ReadGeoModel::storeBuiltShapeOperators_Union(const unsigned id, GeoShape* nodePtr) {
     m_memMapShapes_Union[id] = nodePtr;
 }
+
+//------------------------------------------------------------------------------------------
+
+GeoVSurfaceShape* ReadGeoModel::BuildWhichSurface(std::string_view shapeType, const unsigned int shapeId)
+{   
+  
+  if ("RectangleSurface" == shapeType){
+          m_memMapRectSurface.reserve(m_rectangle_surface.size());      
+     if(!isBuiltRectSurface(shapeId)){
+          // Not built yet
+          DBRowEntry row = m_rectangle_surface[shapeId - 1];
+          GeoRectSurface* builtSurface = buildsurfTool->buildRectSurface(row);
+          storeBuiltRectSurface(builtSurface);
+          return builtSurface;     
+     }
+     else{
+          GeoRectSurface* builtSurface = m_memMapRectSurface[shapeId - 1];
+          return builtSurface;
+     }
+     
+  }
+  else if ("TrapezoidSurface" == shapeType){
+          m_memMapTrapezoidSurface.reserve(m_trapezoid_surface.size());      
+     if(!isBuiltTrapezoidSurface(shapeId)){
+          // Not built yet
+          DBRowEntry row = m_trapezoid_surface[shapeId - 1];
+          GeoTrapezoidSurface* builtSurface = buildsurfTool->buildTrapezoidSurface(row);
+          storeBuiltTrapezoidSurface(builtSurface);
+          return builtSurface;     
+     }
+     else{
+          GeoTrapezoidSurface* builtSurface = m_memMapTrapezoidSurface[shapeId - 1];
+          return builtSurface;
+     }
+     
+  }
+  else if ("AnnulusSurface" == shapeType){
+          m_memMapAnnulusSurface.reserve(m_annulus_surface.size());
+     if(!isBuiltAnnulusSurface(shapeId)){
+          // Not built yet
+          DBRowEntry row = m_annulus_surface[shapeId - 1];
+          GeoAnnulusSurface* builtSurface = buildsurfTool->buildAnnulusSurface(row);
+          storeBuiltAnnulusSurface(builtSurface);
+          return builtSurface;
+     }
+     else{
+          GeoAnnulusSurface* builtSurface = m_memMapAnnulusSurface[shapeId - 1];
+          return builtSurface;
+     }
+
+  }
+  else if ("DiamondSurface" == shapeType){
+        m_memMapDiamondSurface.reserve(m_diamond_surface.size());
+        if(!isBuiltDiamondSurface(shapeId)){
+            // Not built yet
+            DBRowEntry row = m_diamond_surface[shapeId - 1];
+            GeoDiamondSurface* builtSurface = buildsurfTool->buildDiamondSurface(row);
+            storeBuiltDiamondSurface(builtSurface);
+            return builtSurface;
+        }
+        else{
+            GeoDiamondSurface* builtSurface = m_memMapDiamondSurface[shapeId - 1];
+            return builtSurface;
+        }
+            
+  }
+  else{
+    THROW_EXCEPTION("ERROR!!! VSurface '" + std::string(shapeType) + "' is not built correctly!");
+  }    
+}
+
+bool ReadGeoModel::isBuiltVSurface(const unsigned int shapeId) {
+    return (shapeId <= m_memMapVSurface.size());
+}
+
+//------------------------------------------------------------------------------------------
+
+bool ReadGeoModel::isBuiltRectSurface(const unsigned int shapeId) {
+    return (shapeId <= m_memMapRectSurface.size());
+}
+
+void ReadGeoModel::storeBuiltRectSurface(GeoRectSurface* nodePtr) {
+    if (!nodePtr)
+        THROW_EXCEPTION(" RECTANGLE SURFACE POINTER IS NULL, NO RECT SURFS ARE BUILT YET ");
+    m_memMapRectSurface.push_back(nodePtr);
+}
+
+//------------------------------------------------------------------------------------------
+
+bool ReadGeoModel::isBuiltTrapezoidSurface(const unsigned int shapeId) {
+    return (shapeId <= m_memMapTrapezoidSurface.size());
+}
+
+void ReadGeoModel::storeBuiltTrapezoidSurface(GeoTrapezoidSurface* nodePtr) {
+    if (!nodePtr)
+        THROW_EXCEPTION(" TRAPEZOID SURFACE POINTER IS NULL, NO TRAPE SURFS ARE BUILT YET ");
+    m_memMapTrapezoidSurface.push_back(nodePtr);
+}
+
+//------------------------------------------------------------------------------------------
+
+bool ReadGeoModel::isBuiltAnnulusSurface(const unsigned int shapeId) {
+    return (shapeId <= m_memMapAnnulusSurface.size());
+}
+
+void ReadGeoModel::storeBuiltAnnulusSurface(GeoAnnulusSurface* nodePtr) {
+    if (!nodePtr)
+        THROW_EXCEPTION(" ANNULUS SURFACE POINTER IS NULL, NO ANNULUS SURFS ARE BUILT YET ");
+    m_memMapAnnulusSurface.push_back(nodePtr);
+}
+
+//------------------------------------------------------------------------------------------
+
+bool ReadGeoModel::isBuiltDiamondSurface(const unsigned int shapeId) {
+    return (shapeId <= m_memMapDiamondSurface.size());
+}
+
+void ReadGeoModel::storeBuiltDiamondSurface(GeoDiamondSurface* nodePtr) {
+    if (!nodePtr)
+        THROW_EXCEPTION(" DIAMOND SURFACE POINTER IS NULL, NO DIAMOND SURFS ARE BUILT YET ");
+    m_memMapDiamondSurface.push_back(nodePtr);
+}
+
+//------------------------------------------------------------------------------------------
+
+void ReadGeoModel::storeBuiltVSurface(GeoVSurface* nodePtr) {
+    if (!nodePtr)
+        THROW_EXCEPTION(" VIRTUAL SURFACE POINTER IS NULL, NO VSURFS ARE BUILT YET ");
+    m_memMapVSurface.push_back(nodePtr);    
+}
+
+//------------------------------------------------------------------------------------------
+
 GeoShape *ReadGeoModel::getBuiltShape(const unsigned shapeId, std::string_view shapeType)
 {
 

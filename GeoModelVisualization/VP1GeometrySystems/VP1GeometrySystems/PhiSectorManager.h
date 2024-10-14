@@ -41,6 +41,8 @@ public:
 
   //Volume handles first call this method to figure out what kind of volume they are:
   int getVolumeType(const SbMatrix& transform, SoNode * shape) const;
+  
+  int getSurfaceType(const SbMatrix& transform, SoNode * shape) const;
   //The return value, iphi, indicates the type:
   // 0...(nphi-1): Volume with a bounding box not around the Z axis.
   //  -1: Volume has bounding box around Z-axis, but can not be dynamically altered  (probably boolean)

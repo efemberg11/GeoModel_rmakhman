@@ -27,6 +27,9 @@
 #include "GeoModelKernel/GeoSerialTransformer.h"
 #include "GeoModelKernel/GeoVSurface.h"
 #include "GeoModelKernel/GeoRectSurface.h"
+#include "GeoModelKernel/GeoTrapezoidSurface.h"
+#include "GeoModelKernel/GeoAnnulusSurface.h"
+#include "GeoModelKernel/GeoDiamondSurface.h"
 #include "GeoModelKernel/GeoNodePath.h"
 
 class GeoNodeAction 
@@ -38,6 +41,8 @@ class GeoNodeAction
 
  public:
   GeoNodeAction();
+  GeoNodeAction(const GeoNodeAction &right) = delete;
+  GeoNodeAction & operator=(const GeoNodeAction &right) = delete; 
   virtual ~GeoNodeAction();
   
   //	Handles a Node.
@@ -70,8 +75,17 @@ class GeoNodeAction
   //    Handle GeoVSurface
   virtual void handleVSurface (const GeoVSurface *surface);
 
-  //    Handle GeoVSurface
+  //    Handle Rectangle Virtual Surface
   virtual void handleRectSurface (const GeoRectSurface *surface);
+
+  //    Handle Trapezoid Virtual Surface
+  virtual void handleTrapezoidSurface (const GeoTrapezoidSurface *surface);
+
+  //    Handle Annulus Virtual Surface
+  virtual void handleAnnulusSurface (const GeoAnnulusSurface *surface);
+
+  //    Handle Diamond Virtual Surface
+  virtual void handleDiamondSurface (const GeoDiamondSurface *surface);
 
   //	Returns a pointer to the path object.
   GeoNodePath* getPath ();
@@ -98,8 +112,6 @@ class GeoNodeAction
   bool m_terminate;
 
  private:
-  GeoNodeAction(const GeoNodeAction &right);
-  GeoNodeAction & operator=(const GeoNodeAction &right);
   
   //	A limit may be placed upon the depth to which the action
   //	descends.  0 = self.  1 = self and children.

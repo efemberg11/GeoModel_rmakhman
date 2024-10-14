@@ -32,6 +32,13 @@ void GeoCountVolAction::handleFullPhysVol (const GeoFullPhysVol *)
     m_count++;
 }
 
+void GeoCountVolAction::handleVSurface (const GeoVSurface *)
+{
+  // Virtual Surface is always child of Physical Volume  
+  m_count++;
+}
+
+
 void GeoCountVolAction::handleSerialTransformer (const GeoSerialTransformer  *st)
 {
   m_count += st->getNCopies ();

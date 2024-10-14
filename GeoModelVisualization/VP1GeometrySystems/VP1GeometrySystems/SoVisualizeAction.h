@@ -15,6 +15,12 @@
 #include "GeoModelKernel/GeoShapeAction.h"
 
 class SoShape;
+#include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoMaterialBinding.h>
+#include <Inventor/nodes/SoNormal.h>
+#include <Inventor/nodes/SoNormalBinding.h>
+#include <Inventor/nodes/SoCoordinate3.h>
+#include <Inventor/nodes/SoFaceSet.h>
 
 class SoVisualizeAction : public GeoShapeAction {
 
@@ -49,9 +55,23 @@ public:
   virtual void handleTessellatedSolid (const GeoTessellatedSolid *);
 
   virtual void handleGenericTrap (const GeoGenericTrap *);
+  
+  virtual void handleRectSurface (const GeoRectSurface *);
+
+  virtual void handleTrapezoidSurface (const GeoTrapezoidSurface *);
+
+  virtual void handleAnnulusSurface (const GeoAnnulusSurface *);
+
+  virtual void handleDiamondSurface (const GeoDiamondSurface *);
 
   SoShape * getShape() { return m_shape; }
   void reset() { m_shape = 0; }
+  void reset_separator() { vs_shape = new SoSeparator; }
+  SoNormal * getNormal() { return surfaceNorms; }
+  SoNormalBinding * getNormalBinding() { return surfBinding; }
+  SoMaterialBinding * getMaterialBinding() { return surfMaterialBinding; }
+  SoCoordinate3 * getCoords() { return coords; }
+  SoSeparator * getVSurfaceShape() { return vs_shape; }
 
 private:
 
@@ -59,11 +79,13 @@ private:
   const SoVisualizeAction & operator=(const SoVisualizeAction &);
 
   SoShape *m_shape;
+  SoNormal *surfaceNorms = new SoNormal;
+  SoNormalBinding* surfBinding = new SoNormalBinding;
+  SoMaterialBinding* surfMaterialBinding = new SoMaterialBinding;
+  SoCoordinate3 *coords;
+  SoSeparator* vs_shape = new SoSeparator;
+
+  
 };
-
-
-
-
-
 
 #endif

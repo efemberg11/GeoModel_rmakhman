@@ -59,6 +59,7 @@ void GeoVolumeCursor::next() {
 				  m_pendingTransformList.end ());
     m_hasAlignTrans = false;
     m_volume=nullptr;
+    m_surface=nullptr;
     
     int N = m_parent->getNChildNodes();
     if(N==0) return;
@@ -67,6 +68,7 @@ void GeoVolumeCursor::next() {
     const GeoGraphNode * const *end   = back+1;
     while (node!=end) {
       (*node)->exec(this);
+      const GeoGraphNode * const * flag = node;
       if (m_minorLimit) { // We have stepped into ST
       }
       else {            // We have not stepped into ST.
@@ -86,7 +88,8 @@ void GeoVolumeCursor::resuscitate() {
 }
 
 bool GeoVolumeCursor::atEnd() const {
-  return !m_volume;
+  //return !m_volume;
+  return (!m_volume and !m_surface);
 }
 
 void GeoVolumeCursor::handleTransform (const GeoTransform *xform)
@@ -132,6 +135,27 @@ void GeoVolumeCursor::handleFullPhysVol (const GeoFullPhysVol *vol)
       m_defTransform = m_defTransform * m_pendingTransformList[t]->getDefTransform(m_alignStore);
     }
   }
+  terminate ();
+}
+
+void GeoVolumeCursor::handleVSurface (const GeoVSurface *surf)
+{
+  m_surface = surf;
+  
+  unsigned int listSize = m_pendingTransformList.size ();
+  if (listSize == 0) {
+    m_transform    = GeoTrf::Transform3D::Identity();
+    m_defTransform = GeoTrf::Transform3D::Identity();
+  }
+  else {
+    m_transform = m_pendingTransformList[0]->getTransform(m_alignStore);
+    m_defTransform = m_pendingTransformList[0]->getDefTransform(m_alignStore);
+    for (unsigned int t = 1; t < m_pendingTransformList.size (); t++) {
+      m_transform    = m_transform    * m_pendingTransformList[t]->getTransform(m_alignStore);
+      m_defTransform = m_defTransform * m_pendingTransformList[t]->getDefTransform(m_alignStore);
+    }
+  }  
+  
   terminate ();
 }
 
@@ -189,6 +213,11 @@ void GeoVolumeCursor::handleSerialIdentifier(const GeoSerialIdentifier *sI)
 PVConstLink GeoVolumeCursor::getVolume () const
 {
   return m_volume;
+}
+
+VSConstLink GeoVolumeCursor::getSurface () const
+{
+  return m_surface;
 }
 
 GeoTrf::Transform3D GeoVolumeCursor::getTransform () const

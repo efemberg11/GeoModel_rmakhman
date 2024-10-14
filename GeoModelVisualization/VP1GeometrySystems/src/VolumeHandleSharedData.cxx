@@ -9,17 +9,19 @@
 
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoShapeShift.h"
-#include "VP1HEPVis/nodes/SoGenericBox.h"
-#include "VP1HEPVis/nodes/SoTubs.h"
-#include "VP1HEPVis/nodes/SoPcons.h"
-#include "VP1HEPVis/nodes/SoTessellated.h"
+#include "GXHepVis/nodes/SoGenericBox.h"
+#include "GXHepVis/nodes/SoTubs.h"
+#include "GXHepVis/nodes/SoPcons.h"
+#include "GXHepVis/nodes/SoTessellated.h"
 
 #include <Inventor/nodes/SoCylinder.h>
 #include <Inventor/nodes/SoRotationXYZ.h>
 #include <Inventor/nodes/SoSeparator.h>
+#include <Inventor/nodes/SoSelection.h>
+
 
 #include <map>
-
+#include <iostream>
 //____________________________________________________________________
 class VolumeHandleSharedData::Imp {
 public:
@@ -207,6 +209,23 @@ SoNode * VolumeHandleSharedData::toShapeNode(const PVConstLink& pV, bool * shape
   }
 
   return shape;
+}
+
+
+//____________________________________________________________________
+SoNode * VolumeHandleSharedData::toShapeNode(const VSConstLink& vS, SoSeparator* nodesep)
+{ 
+  SoSelection * integrate_shape = new SoSelection;
+  SoSeparator * shape = new SoSeparator;
+  //SoGroup * shape = new SoGroup;
+  m_d->visaction.reset_separator();
+  const GeoVSurfaceShape* surf_shape = vS->getShape();
+  surf_shape->exec(&(m_d->visaction));
+  shape = m_d->visaction.getVSurfaceShape();
+  integrate_shape->addChild(shape);
+  //shape->ref();
+  integrate_shape->ref();
+  return integrate_shape;
 }
 
 //____________________________________________________________________

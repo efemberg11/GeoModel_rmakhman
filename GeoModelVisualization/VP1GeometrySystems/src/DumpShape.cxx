@@ -20,7 +20,13 @@
 #include "GeoModelKernel/GeoShapeIntersection.h"
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoGenericTrap.h"
+#include "GeoModelKernel/GeoVSurfaceShape.h"
+#include "GeoModelKernel/GeoRectSurface.h"
+#include "GeoModelKernel/GeoTrapezoidSurface.h"
+#include "GeoModelKernel/GeoAnnulusSurface.h"
+#include "GeoModelKernel/GeoDiamondSurface.h"
 
+#include "GeoModelHelpers/throwExcept.h"
 #include "Inventor/SbMatrix.h"
 #include <cassert>
 
@@ -28,6 +34,57 @@
 
 //TODO: Add support for the SimpleBREP GeoShape.
 //TODO: Add GeoTorus
+
+QStringList DumpShape::shapeToStringList(const GeoVSurfaceShape* surf_shape)
+{
+  QStringList out;
+  static const double mm=1.0;
+  if(surf_shape->type() == "RectangleSurface"){
+    const GeoRectSurface* rectsurf = dynamic_cast<const GeoRectSurface*>(surf_shape);
+    if(rectsurf){
+      out << " =========> Rectangle Surface:";
+      out << "  X = "+QString::number(rectsurf->getXHalfLength()/mm)+" mm";
+      out << "  Y = "+QString::number(rectsurf->getYHalfLength()/mm)+" mm";
+    }
+  }
+  else if(surf_shape->type() == "TrapezoidSurface"){
+    const GeoTrapezoidSurface* trapezoid = dynamic_cast<const GeoTrapezoidSurface*>(surf_shape);
+    if(trapezoid){
+      out << " =========> Trapezoid Surface:";
+      out << "  Short Half Base = "+QString::number(trapezoid->getXHalfLengthMin()/mm)+" mm";
+      out << "  Long Half Base = "+QString::number(trapezoid->getXHalfLengthMax()/mm)+" mm";
+      out << "  Height = "+QString::number(trapezoid->getYHalfLength()/mm)+" mm";
+    }
+  }
+  else if(surf_shape->type() == "AnnulusSurface"){
+    const GeoAnnulusSurface* annulus = dynamic_cast<const GeoAnnulusSurface*>(surf_shape);
+    if(annulus){
+      out << " =========> Annulus Surface:";
+      out << "  Ox (Deviation in X-direction) = "+QString::number(annulus->getOx()/mm)+" mm";
+      out << "  Oy (Deviation in Y-direction) = "+QString::number(annulus->getOy()/mm)+" mm";
+      out << "  Inner Radius = "+QString::number(annulus->getRadiusIn()/mm)+" mm";
+      out << "  Outer Radius = "+QString::number(annulus->getRadiusOut()/mm)+" mm";
+      out << "  Phi (Span Angle) = "+QString::number(annulus->getPhi())+" rad"; 
+    }
+  }
+  else if(surf_shape->type() == "DiamondSurface"){
+    const GeoDiamondSurface* diamond = dynamic_cast<const GeoDiamondSurface*>(surf_shape);
+    if(diamond){
+      out << " =========> Diamond Surface:";
+      out << "  X1 = "+QString::number(diamond->getXbottomHalf()/mm)+" mm";
+      out << "  X2 = "+QString::number(diamond->getXmidHalf()/mm)+" mm";
+      out << "  X3 = "+QString::number(diamond->getXtopHalf()/mm)+" mm";
+      out << "  Y1 = "+QString::number(diamond->getYbottomHalf()/mm)+" mm";
+      out << "  Y2 = "+QString::number(diamond->getYtopHalf()/mm)+" mm";
+    }
+  }
+  else{
+    //out << " =========> Unknown surface...";
+    THROW_EXCEPTION("ERROR!!! VSurfaceShape is Unknown, cannot print out shape information!");
+  }
+  
+  return out; 
+}
 
 //____________________________________________________________________
 QStringList DumpShape::shapeToStringList(const GeoShape* shape)

@@ -27,9 +27,9 @@
 #include "VP1Base/VP1Settings.h"
 #include "VP1Base/VP1CustomTourEditor.h"
 #include "VP1Base/VP1CustomStereoEditor.h"
-#include "VP1HEPVis/VP1HEPVisUtils.h"
-#include "VP1HEPVis/actions/SoGL2PSAction.h"
-#include "VP1HEPVis/gl2ps.h"
+#include "GXHepVis/GXHepVisUtils.h"
+#include "GXHepVis/actions/SoGL2PSAction.h"
+#include "GXHepVis/gl2ps.h"
 
 #include <Inventor/nodes/SoSphere.h>
 #include <Inventor/nodes/SoGroup.h>
@@ -83,8 +83,6 @@ public:
   popup_bgdColAction(0),
   popup_ambientLightAction(0),
   popup_focalLengthAction(0),
-  popup_dumpSceneAction(0),
-  popup_dumpSceneVRMLAction(0),
   popup_toSVGAction(0),
   popup_toEPSAction(0),
   popup_resetCameraAction(0),
@@ -217,8 +215,6 @@ public:
 	QAction* popup_bgdColAction;
 	QAction* popup_ambientLightAction;
 	QAction* popup_focalLengthAction;
-	QAction* popup_dumpSceneAction;
-	QAction* popup_dumpSceneVRMLAction;
 	QAction* popup_toSVGAction;
 	QAction* popup_toEPSAction;
 	QAction* popup_resetCameraAction;
@@ -1932,8 +1928,6 @@ bool VP1ExaminerViewer::Imp::ensureMenuInit()
 	popup_hidedecorationsaction = advancedmenu->addAction("Hide &controls");
 	popup_headLightAction = advancedmenu->addAction("&Headlight");
 	popup_ambientLightAction = advancedmenu->addAction("dummy");
-	popup_dumpSceneAction = advancedmenu->addAction("Dump &scene to file");
-	popup_dumpSceneVRMLAction = advancedmenu->addAction("Dump &scene to VRML file");
 	popup_toSVGAction = advancedmenu->addAction("Produce SV&G image");
 	popup_toEPSAction = advancedmenu->addAction("Produce &EPS image");
 
@@ -2256,78 +2250,6 @@ void VP1ExaminerViewer::Imp::updatePopupMenuStates()
 }
 
 //____________________________________________________________________
-void VP1ExaminerViewer::dumpSceneToFile(QString filename)
-{
-	VP1Msg::messageVerbose("VP1ExaminerViewer::dumpSceneToFile()");
-
-	SoNode * rootnode = getSceneGraph();
-	if (!rootnode)
-		return;
-
-	QWidget * w = getWidget();
-	if (!w)
-		return;
-
-	if(filename.isEmpty()) {
-		if (isAnimating())
-			stopAnimating();
-		filename = QFileDialog::getSaveFileName(w, "Select output file",
-				(m_d->lastDumpFile.isEmpty()?VP1Settings::defaultFileSelectDirectory():m_d->lastDumpFile),
-				"Inventor files (*.iv)",0,QFileDialog::DontResolveSymlinks);
-		if(filename.isEmpty())
-			return;
-		if (!filename.endsWith(".iv"))
-			filename += ".iv";
-		m_d->lastDumpFile=filename;
-	}
-
-	SoGroup * standardisedRoot(0);
-	if ( rootnode->getTypeId().isDerivedFrom(SoGroup::getClassTypeId()))
-		standardisedRoot = VP1HEPVisUtils::convertToStandardScene(static_cast<SoGroup*>(rootnode));
-
-	if (standardisedRoot&&VP1QtInventorUtils::writeGraphToFile(standardisedRoot, filename))
-		VP1Msg::messageDebug("VP1ExaminerViewer: Dumped scene to file "+filename);
-	else
-		VP1Msg::messageDebug("VP1ExaminerViewer: Error: Problems dumping scene to file "+filename);
-
-}
-
-void VP1ExaminerViewer::dumpSceneToVRMLFile(QString filename){
-	VP1Msg::messageVerbose("VP1ExaminerViewer::dumpSceneToVRMLFile()");
-
-	SoNode * rootnode = getSceneGraph();
-	if (!rootnode)
-		return;
-
-	QWidget * w = getWidget();
-	if (!w)
-		return;
-
-	if(filename.isEmpty()) {
-		if (isAnimating())
-			stopAnimating();
-		filename = QFileDialog::getSaveFileName(w, "Select output file",
-				(m_d->lastDumpFile.isEmpty()?VP1Settings::defaultFileSelectDirectory():m_d->lastDumpFile),
-				"VRML2.0/X3D files (*.wrl)",0,QFileDialog::DontResolveSymlinks);
-		if(filename.isEmpty())
-			return;
-		if (!filename.endsWith(".wrl"))
-			filename += ".wrl";
-		m_d->lastDumpFile=filename;
-	}
-
-	SoGroup * standardisedRoot(0);
-	if ( rootnode->getTypeId().isDerivedFrom(SoGroup::getClassTypeId()))
-		standardisedRoot = VP1HEPVisUtils::convertToStandardScene(static_cast<SoGroup*>(rootnode));
-
-	if (standardisedRoot&&VP1QtInventorUtils::writeGraphToVRMLFile(standardisedRoot, filename))
-		VP1Msg::messageDebug("VP1ExaminerViewer: Dumped scene to VRML file "+filename);
-	else
-		VP1Msg::messageDebug("VP1ExaminerViewer: Error: Problems dumping scene to VRML file "+filename);
-
-}
-
-//____________________________________________________________________
 void VP1ExaminerViewer::produceSVGImage(QString filename)
 {
 	QWidget * w = getWidget();
@@ -2494,17 +2416,6 @@ void VP1ExaminerViewer::showPopupMenu()
         VP1Msg::messageVerbose("Anti-aliasing, done.");
         return;
 	}
-    if ( selAct == m_d->popup_dumpSceneAction ) {
-        VP1Msg::messageVerbose("VP1ExaminerViewer::showPopupMenu Dump scene to an *.iv (OpenInventor) file");
-		dumpSceneToFile();
-		return;
-	}
-    if ( selAct == m_d->popup_dumpSceneVRMLAction ) {
-        VP1Msg::messageVerbose("VP1ExaminerViewer::showPopupMenu Dump scene to a *.wrl (VRML) file");
-		dumpSceneToVRMLFile();
-		return;
-	}
-
 	if ( selAct == m_d->popup_toSVGAction ) {
 		VP1Msg::messageVerbose("VP1ExaminerViewer::showPopupMenu Produce SVG image");
 		produceSVGImage();

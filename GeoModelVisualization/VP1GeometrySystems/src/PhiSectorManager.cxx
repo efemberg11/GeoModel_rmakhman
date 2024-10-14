@@ -18,10 +18,10 @@
 #include "VP1Base/VP1Msg.h"
 #include "VP1Base/IVP1System.h"
 
-#include <VP1HEPVis/nodes/SoTubs.h>
-#include "VP1HEPVis/nodes/SoPcons.h"
-#include "VP1HEPVis/nodes/SoCons.h"
-#include "VP1HEPVis/nodes/SoLAr.h"
+#include <GXHepVis/nodes/SoTubs.h>
+#include "GXHepVis/nodes/SoPcons.h"
+#include "GXHepVis/nodes/SoCons.h"
+#include "GXHepVis/nodes/SoLAr.h"
 
 #include <Inventor/nodes/SoSwitch.h>
 #include <Inventor/nodes/SoSeparator.h>
@@ -261,6 +261,36 @@ int PhiSectorManager::getVolumeType(const SbMatrix& transform, SoNode * shape) c
 
 }
 
+//____________________________________________________________________
+
+int PhiSectorManager::getSurfaceType(const SbMatrix& transform, SoNode * shape) const {
+ 
+  int iphi;
+  
+  float x = 0.0;
+  float y = 0.0;
+  float z = 0.0;
+
+  float a = 0.0;
+  float b = 0.0;
+  float c = 0.0;
+  
+  a = x*transform[0][0] + y*transform[1][0] + z*transform[2][0] + transform[3][0];
+  b = x*transform[0][1] + y*transform[1][1] + z*transform[2][1] + transform[3][1];
+  c = x*transform[0][2] + y*transform[1][2] + z*transform[2][2] + transform[3][2];
+  
+  if ( a == 0 && b == 0){
+    iphi = -1;
+  }
+  else{
+    double angle = atan2(b,a);
+    while (angle<0) angle+=(2*M_PI);
+    while (angle>=(2*M_PI)) angle-=(2*M_PI);
+    if (angle<0.0) angle=0.0;
+    iphi = static_cast<int>(36*angle/((2*M_PI)));
+  }
+  return iphi;
+}
 //____________________________________________________________________
 PhiSectorManager::PhiSectorManager(PhiSectionWidget * psw, IVP1System * sys, QObject*parent)
   : QObject(parent), m_d(new Imp)

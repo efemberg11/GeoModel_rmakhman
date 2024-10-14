@@ -31,10 +31,15 @@
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoRectSurface.h"
+#include "GeoModelKernel/GeoVSurface.h"
 #include "GeoModelKernel/Units.h"
 #include "GeoModelHelpers/defineWorld.h"
 
 #include "GeoModelKernel/GeoSurfaceCursor.h"
+#include "GeoModelKernel/GeoCountSurfaceAction.h"
+#include "GeoModelKernel/GeoCountVolAction.h"
+#include "GeoModelKernel/GeoAccessSurfaceAction.h"
+#include "GeoModelKernel/GeoAccessVolumeAction.h"
 using namespace GeoModelKernelUnits;
 
 // Class Declaration
@@ -105,30 +110,76 @@ void SurfaceTestPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
   GeoLogVol  *boxLog = new GeoLogVol("BoxLog",boxShape,Air);
   GeoPhysVol *boxPhys = new GeoPhysVol(boxLog);
 
+
+  {
+/*
 // define a virtual surface
-  GeoRectSurface *rectSurface = new GeoRectSurface(5, 7.5);
-  GeoAlignableTransform *surf_rot=new GeoAlignableTransform(GeoTrf::TranslateZ3D(12));  
+  GeoRectSurface *rectSurface = new GeoRectSurface(5, 5);
+  GeoAlignableTransform *surf_rot=new GeoAlignableTransform(GeoTrf::TranslateY3D(18));  
   boxPhys->add(surf_rot);
   boxPhys->add(rectSurface);
-  surf_rot->setDelta(GeoTrf::RotateX3D(0.1)*GeoTrf::RotateY3D(0.15));
+  surf_rot->setDelta(GeoTrf::RotateX3D(1.2));
+  */
 //
-  {
     GeoBox     *boxShape = new GeoBox(5,5,5);
     GeoLogVol  *boxLog = new GeoLogVol("BoxLog",boxShape,Air);
     GeoPhysVol *boxPhys2 = new GeoPhysVol(boxLog);
+
+    GeoAlignableTransform *xf_initial=new GeoAlignableTransform(GeoTrf::TranslateZ3D(3));
+    boxPhys->add(xf_initial);
     boxPhys->add(boxPhys2);
+    xf_initial->setDelta(GeoTrf::RotateX3D(1.2));
 
-    GeoAlignableTransform *xf=new GeoAlignableTransform(GeoTrf::TranslateZ3D(12));
+// define a virtual surface
+  GeoRectSurface* rectSurface = new GeoRectSurface(5, 5);
+/*  GeoVSurface* surf = new GeoVSurface(rectSurface);
+  GeoAlignableTransform *surf_rot=new GeoAlignableTransform(GeoTrf::TranslateY3D(10));  
+  boxPhys->add(surf_rot);
+  boxPhys->add(surf);
+  surf_rot->setDelta(GeoTrf::RotateY3D(1.2));*/
+
+
+// define a virtual surface2
+  GeoRectSurface *rectSurface2 = new GeoRectSurface(5, 7.5);
+/*  GeoVSurface* surf2 = new GeoVSurface(rectSurface2);
+  GeoAlignableTransform *surf_rot2=new GeoAlignableTransform(GeoTrf::TranslateX3D(-20));  
+  boxPhys->add(surf_rot2);
+  boxPhys->add(surf2);
+  surf_rot2->setDelta(GeoTrf::RotateY3D(0.8));*/
+//
+
+    GeoAlignableTransform *xf=new GeoAlignableTransform(GeoTrf::TranslateZ3D(18));
     GeoPhysVol *boxPhys3 = new GeoPhysVol(boxLog);
-
-    boxPhys->add(xf);
+    GeoPhysVol *boxPhys4 = new GeoPhysVol(boxLog);
+    
+    boxPhys3->add(xf);
+    boxPhys3->add(boxPhys4);
+    
+  GeoRectSurface *rectSurface2_2 = new GeoRectSurface(7.5, 7.5);
+/*  GeoVSurface* surf2_2 = new GeoVSurface(rectSurface2_2);
+  GeoAlignableTransform *surf_rot2_2 = new GeoAlignableTransform(GeoTrf::TranslateX3D(-10));  
+  boxPhys3->add(surf_rot2_2);
+  boxPhys3->add(surf2_2);
+  surf_rot2_2->setDelta(GeoTrf::RotateY3D(1.0));*/    
+   
+   boxPhys->add(xf);
     boxPhys->add(boxPhys3);
-
     xf->setDelta(GeoTrf::RotateX3D(0.1)*GeoTrf::RotateY3D(0.15));
-  }
-  
-  world->add(boxPhys);
 
+// define a virtual surface3
+  GeoRectSurface *rectSurface3 = new GeoRectSurface(10, 12);
+/*  GeoVSurface* surf3 = new GeoVSurface(rectSurface3);
+  GeoAlignableTransform *surf_rot3=new GeoAlignableTransform(GeoTrf::TranslateX3D(10)*GeoTrf::TranslateY3D(15)*GeoTrf::TranslateZ3D(20));  
+  boxPhys->add(surf_rot3);
+  boxPhys->add(surf3);
+  surf_rot3->setDelta(GeoTrf::RotateZ3D(0.9));*/
+//    
+
+  }
+  GeoLogVol  *boxLog5 = new GeoLogVol("BoxLog5",boxShape,Air);
+  GeoPhysVol *boxPhys5 = new GeoPhysVol(boxLog5);
+  world->add(boxPhys);
+  //world->add(boxPhys5);
   GeoPrintGraphAction printGraphAction(std::cout);
   world->exec(&printGraphAction);;
 
@@ -138,25 +189,44 @@ void SurfaceTestPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
     std::cout << " " << std::endl;
     std::cout << " " << std::endl;    
     std::cout << " cursor at i= " << i << std::endl;
-    //GeoVolumeCursor cursor(boxPhys);
-    GeoSurfaceCursor cursor(boxPhys);
+    GeoVolumeCursor cursor(boxPhys);
+    //GeoSurfaceCursor cursor(boxPhys);
     
     while (!cursor.atEnd()) {
       i += 1;
-      //std::cout << "!!! " << cursor.getVolume()->getLogVol() << std::endl;
-      std::cout << "!!! " << cursor.getTransform().rotation() << std::endl;
-      std::cout << "!!! " << cursor.getTransform().translation() << std::endl;
+      std::cout << "!!! " << std::endl;
+      std::cout << cursor.getTransform().rotation() << std::endl;
+      std::cout << "!!! " << std::endl; 
+      std::cout << cursor.getTransform().translation() << std::endl;
       std::cout << " " << std::endl;
-      std::cout << " " << std::endl;
-      std::cout << " cursor at i= " << i << std::endl;
       cursor.next();
-      //std::cout << " FINISHED NEXT " << std::endl;
-      std::cout << " " << std::endl;
     }
   }
 
+/*  
+  GeoCountVolAction countVol;
+  boxPhys->exec(&countVol);
+  std::cout << "Number of Physical Volume: " << countVol.getCount() << std::endl;  
+
+  unsigned int index = 2;
+  GeoAccessVolumeAction volumeAccess (index, nullptr);
+  boxPhys->exec(&volumeAccess);
+  std::cout << "volume transform rotation: " << volumeAccess.getTransform().rotation() << std::endl;
+  std::cout << "volume transform trans: " << volumeAccess.getTransform().translation() << std::endl;
+*/ 
+
+  GeoCountSurfaceAction countSurface;
+  boxPhys->exec(&countSurface);
+  std::cout << "Number of Virtual Surface: " << countSurface.getCount() << std::endl;
+  unsigned int totalVSurface = countSurface.getCount();
   
-  
+  for (unsigned int i = 0; i< totalVSurface; i++){
+    GeoAccessSurfaceAction surfaceAccess (i, nullptr);
+    boxPhys->exec(&surfaceAccess);
+    std::cout << "surface transform rotation: " << surfaceAccess.getTransform().rotation() << std::endl;
+    std::cout << "surface transform trans: " << surfaceAccess.getTransform().translation() << std::endl;
+  }
+ 
   //--------------------------------------//
 }
 

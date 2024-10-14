@@ -12,7 +12,7 @@ target_link_libraries( GXGeometrySystems
    PUBLIC Coin::Coin Qt${QT_VERSION}::Core Qt${QT_VERSION}::Gui Qt${QT_VERSION}::Widgets
           GeoModelCore::GeoModelKernel GXBase
    PRIVATE nlohmann_json::nlohmann_json GeoModelIO::GeoModelRead
-           GeoModelIO::GeoModelWrite GeoModelIO::GeoModelDBManager GXHEPVis )
+           GeoModelIO::GeoModelWrite GeoModelIO::GeoModelDBManager GXHepVis )
 target_include_directories( GXGeometrySystems PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )

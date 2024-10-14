@@ -9,6 +9,7 @@
 #include "GeoModelKernel/GeoDefinitions.h"
 #include <vector>
 
+class GeoVSurface;
 class GeoVPhysVol;
 class GeoTransform;
 class GeoVAlignmentStore;
@@ -34,6 +35,9 @@ class GeoAccessVolumeAction final : public GeoNodeAction
 
   /// Handles a physical volume.
   virtual void handleFullPhysVol (const GeoFullPhysVol *vol) override;
+
+  /// Handles a virtual surface, to refresh the pendingTransformlist
+  virtual void handleVSurface (const GeoVSurface *surface) override;
 
   /// Returns the selected physical volume or nullptr if not found.
   PVConstLink getVolume () const;

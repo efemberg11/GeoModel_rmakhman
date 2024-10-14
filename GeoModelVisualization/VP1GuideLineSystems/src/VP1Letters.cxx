@@ -13,8 +13,8 @@
 ////////////////////////////////////////////////////////////////
 
 #include "VP1GuideLineSystems/VP1Letters.h"
-#include "VP1HEPVis/SbPolyhedron.h"
-#include "VP1HEPVis/nodes/SoPolyhedron.h"
+#include "GXHepVis/SbPolyhedron.h"
+#include "GXHepVis/nodes/SoPolyhedron.h"
 #include <Inventor/nodes/SoMaterial.h>
 #include <Inventor/nodes/SoCube.h>
 #include <Inventor/nodes/SoSeparator.h>

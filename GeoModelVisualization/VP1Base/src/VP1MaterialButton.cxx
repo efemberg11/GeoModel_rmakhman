@@ -248,10 +248,12 @@ void VP1MaterialButton::copyValuesFromMaterial(SoMaterial*m)
   }
   m->ref();
   if (m->ambientColor.getNum()!=1
-      ||m->diffuseColor.getNum()!=1
+      ||(m->diffuseColor.getNum()!=1
+      &&m->diffuseColor.getNum()!=2)
       ||m->specularColor.getNum()!=1
       ||m->emissiveColor.getNum()!=1
-      ||m->transparency.getNum()!=1
+      ||(m->transparency.getNum()!=1
+      &&m->transparency.getNum()!=2)
       ||m->shininess.getNum()!=1) {
     message("VP1MaterialButton::copyValuesFromMaterial Error: Passed material must have exactly one value in each of the 6 fields!!");
     m->unrefNoDelete();

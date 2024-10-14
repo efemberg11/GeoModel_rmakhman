@@ -24,7 +24,7 @@
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "VP1GeometrySystems/SbPolyhedrizeAction.h"
 
-#include "VP1HEPVis/SbPolyhedron.h"
+#include "GXHepVis/SbPolyhedron.h"
 
 #include <map>
 
@@ -53,7 +53,7 @@ void SbPolyhedrizeAction::handleShift(const GeoShapeShift *shift)
 //			  rotation.xz(),rotation.yz(),rotation.zz(),0,
 //			  0,0,0,1));
   SbVec3d    trx(translation.x(),translation.y(),translation.z());
-  #include <VP1HEPVis/SbRotation.h> //using doubles instead of floats.
+  #include <GXHepVis/SbRotation.h> //using doubles instead of floats.
   HEPVis::SbRotation rot(rotation(0,0),rotation(1,0),rotation(2,0),0,
 			 rotation(0,1),rotation(1,1),rotation(2,1),0,
 			 rotation(0,2),rotation(1,2),rotation(2,2),0,

@@ -18,6 +18,10 @@
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
 #include "GeoModelKernel/GeoPara.h"
+#include "GeoModelKernel/GeoRectSurface.h"
+#include "GeoModelKernel/GeoTrapezoidSurface.h"
+#include "GeoModelKernel/GeoAnnulusSurface.h"
+#include "GeoModelKernel/GeoDiamondSurface.h"
 
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoTessellatedSolid.h"
@@ -61,6 +65,10 @@ bool GeoShapeAction::shouldTerminate () const
 }
 
 void GeoShapeAction::handleShape (const GeoShape *)
+{
+}
+
+void GeoShapeAction::handleShape (const GeoVSurfaceShape *)
 {
 }
 
@@ -132,6 +140,26 @@ void GeoShapeAction::handleTube (const GeoTube *tube)
 void GeoShapeAction::handleTubs (const GeoTubs *tubs)
 {
   handleShape(tubs);
+}
+
+void GeoShapeAction::handleRectSurface (const GeoRectSurface *surf)
+{
+  handleShape(surf);
+}
+
+void GeoShapeAction::handleTrapezoidSurface (const GeoTrapezoidSurface *surf)
+{
+  handleShape(surf);
+}
+
+void GeoShapeAction::handleAnnulusSurface (const GeoAnnulusSurface *surf)
+{
+  handleShape(surf);
+}
+
+void GeoShapeAction::handleDiamondSurface (const GeoDiamondSurface *surf)
+{
+  handleShape(surf);
 }
 
 GeoShapePath * GeoShapeAction::getPath ()

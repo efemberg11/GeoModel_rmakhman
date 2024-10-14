@@ -12,6 +12,7 @@ GeoSurfaceCursor::GeoSurfaceCursor (PVConstLink parent, GeoVAlignmentStore* stor
   , m_surfCount(0)
   , m_alignStore(store)  
 {
+  // depth is set to be 0, with next(), go to the child node
   setDepthLimit(0);
   next();
 }
@@ -31,8 +32,6 @@ void GeoSurfaceCursor::next() {
  	                        m_pendingTransformList.end ());  
  	                        
   int N = m_parent->getNChildNodes();
-  std::cout << " ChildNodes = " << N << std::endl;////////////
-  std::cout << " m_majorIndex = " << m_majorIndex << std::endl;////////////
   if (N==0) return;  
   
   const GeoGraphNode * const *node  = m_parent->getChildNode(m_majorIndex);
@@ -50,13 +49,9 @@ void GeoSurfaceCursor::next() {
       
       if (dynamic_cast<const GeoVPhysVol*> (*flag)){
         m_volCount++;
-        std::cout << " PHYSICS VOLUME " << std::endl;
-        std::cout << " volume count = " << m_volCount << std::endl;////////////
       }
       else if (dynamic_cast<const GeoVSurface*> (*flag)){
         m_surfCount++;
-        std::cout << " VIRTUAL SURFACE " << std::endl;
-        std::cout << " surf count = " << m_surfCount << std::endl;////////////
       }
       
       break;
@@ -161,3 +156,10 @@ GeoTrf::Transform3D GeoSurfaceCursor::getDefTransform () const
     return m_defTransform;
   //}
 }
+/*
+std::string GeoSurfaceCursor::getName() const
+{ 
+    std::string name = "VSurface";
+    return name;
+}
+*/

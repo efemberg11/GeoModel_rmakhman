@@ -71,8 +71,6 @@ public:
 	void startTour();
 	bool startTourEachEvent() const;
 	void startCustomTour();
-	void dumpSceneToFile(QString filename="");//empty file names causes file dialog to be launched
-	void dumpSceneToVRMLFile(QString filename="");//empty file names causes file dialog to be launched
 	void produceSVGImage(QString filename="");//empty file names causes file dialog to be launched
 	void produceEPSImage(QString filename="");//empty file names causes file dialog to be launched
 

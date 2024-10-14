@@ -19,7 +19,8 @@
 //  - Jul 2021, Riccardo Maria Bianchi <riccardo.maria.bianchi@cern.ch> 
 //              * Added the 'filter volumes' tool
 //              * Added signal/slot to update transparency type in the 3D window
-//                                                                     
+//  - Jun 2024, Rui Xue  <r.xue@cern.ch><rux23@pitt.edu>
+//              * Added methods to print out virtual surface information                 
 /////////////////////////////////////////////////////////////////////////
 
 // local includes
@@ -59,7 +60,8 @@
 #include <Inventor/nodes/SoLightModel.h>
 #include <Inventor/nodes/SoTransform.h>
 #include <Inventor/nodes/SoScale.h>
-
+#include <Inventor/nodes/SoSelection.h>
+#include <Inventor/nodes/SoFaceSet.h>
 // GeoModelCore includes
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelKernel/GeoPrintGraphAction.h"
@@ -398,6 +400,9 @@ void VP1GeometrySystem::buildPermanentSceneGraph(StoreGateSvc*/*detstore*/, SoSe
 
 	  found = true;
 	  //We did... now, time to extract info:
+    if(av.getVolume() == nullptr) {
+      THROW_EXCEPTION(" \n \n ERROR!!! \n Virtual Surface Cannot Serve As TreeTop Info \n \n");
+    }
 	  subsys->treetopinfo.resize(subsys->treetopinfo.size()+1);
 	  subsys->treetopinfo.back().pV = av.getVolume();
 	  subsys->treetopinfo.back().xf = av.getTransform();
@@ -703,7 +708,6 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   // all phi-slices of the part gets highlighted (since more than one
   // soshape node represents the volume).
 
-
 	VP1Msg::messageDebug("VP1GeometrySystem::userPickedNode()");
 
   if (pickedPath->getNodeFromTail(0)->getTypeId()==SoCylinder::getClassTypeId())
@@ -715,8 +719,18 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   }
 
   SoSeparator * nodesep(0);
+  
+  if (pickedPath->getNodeFromTail(0)->getTypeId()==SoFaceSet::getClassTypeId()
+   && pickedPath->getNodeFromTail(1)->getTypeId()==SoSeparator::getClassTypeId()
+   && pickedPath->getNodeFromTail(2)->getTypeId()==SoSelection::getClassTypeId()){
 
-  if (pickedPath->getNodeFromTail(1)->getTypeId()==SoSeparator::getClassTypeId()
+    //Scenario 0: this is a virtual surface
+      nodesep = static_cast<SoSeparator*>(pickedPath->getNodeFromTail(3));
+      pickedPath->pop();
+      pickedPath->pop();
+      pickedPath->pop();
+  }  
+  else if (pickedPath->getNodeFromTail(1)->getTypeId()==SoSeparator::getClassTypeId()
       && pickedPath->getNodeFromTail(2)->getTypeId()==SoSwitch::getClassTypeId()
       && pickedPath->getNodeFromTail(3)->getTypeId()==SoSeparator::getClassTypeId())
   {
@@ -883,13 +897,19 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 
   message("===> Selected Node: "+volhandle->getName());
   if (m_d->controller->printInfoOnClick_Shape()) {
-    foreach (QString str, DumpShape::shapeToStringList(volhandle->geoPVConstLink()->getLogVol()->getShape()))
-      message(str);
-  }
+    if(volhandle->geoPVConstLink()){
+      foreach (QString str, DumpShape::shapeToStringList(volhandle->geoPVConstLink()->getLogVol()->getShape()))
+        message(str);}
+    else{
+      foreach (QString str, DumpShape::shapeToStringList(volhandle->geoVSConstLink()->getShape()))
+        message(str);}
+  }       
 
   if (m_d->controller->printInfoOnClick_Material()) {
+      message("===> Material:");
+      if(volhandle->geoPVConstLink()){
 	  const GeoMaterial* mat = volhandle->geoMaterial();
-	  message("===> Material:");
+	  
 	  QStringList out;
 	  out << VP1GeomUtils::geoMaterialToStringList(mat);
 	  message("     "+out.join(" "));
@@ -905,6 +925,10 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
 	  } else {
 		  message("          (the material has no elements defined)");
 	  }
+      }
+      else{
+          message("     Virtual Surface has no material.");
+      }
   }
 
   if ( m_d->controller->printInfoOnClick_CopyNumber() ) {
@@ -966,21 +990,32 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
   }
 
   if (m_d->controller->printInfoOnClick_Tree()) {
-    std::ostringstream str;
-    GeoPrintGraphAction pg(str);
-    volhandle->geoPVConstLink()->exec(&pg);
     message("===> Tree:");
-    foreach (QString line, QString(str.str().c_str()).split("\n"))
-      message("     "+line);
+    if(volhandle->geoPVConstLink()){
+        std::ostringstream str;
+        GeoPrintGraphAction pg(str);
+        volhandle->geoPVConstLink()->exec(&pg);
+        foreach (QString line, QString(str.str().c_str()).split("\n"))
+          message("     "+line);
+    }
+    else{
+        message("        Virtual Surface has no child node.");
+    }    
   }
 
   if (m_d->controller->printInfoOnClick_Mass()) {
     //FIXME: Move the mass calculations to the volume handles, and let
     //the common data cache some of the volume information by
     //logVolume).
-    message("===> Total Mass &lt;===");
-    message("Inclusive "+QString::number(Imp::inclusiveMass(volhandle->geoPVConstLink())/SYSTEM_OF_UNITS::kilogram)+" kg");
-    message("Exclusive "+QString::number(Imp::exclusiveMass(volhandle->geoPVConstLink())/SYSTEM_OF_UNITS::kilogram)+" kg");
+    if(volhandle->geoPVConstLink()){
+        message("===> Total Mass &lt;===");
+        message("Inclusive "+QString::number(Imp::inclusiveMass(volhandle->geoPVConstLink())/SYSTEM_OF_UNITS::kilogram)+" kg");
+        message("Exclusive "+QString::number(Imp::exclusiveMass(volhandle->geoPVConstLink())/SYSTEM_OF_UNITS::kilogram)+" kg");
+    }
+    else{
+        message("===> Total Mass: ");
+        message("        Virtual Surface has no mass.");
+    }
   }
 
 }
@@ -1120,15 +1155,16 @@ double VP1GeometrySystem::Imp::inclusiveMass(const PVConstLink& pv) {
 
   GeoVolumeCursor av(pv);
   while (!av.atEnd()) {
-    std::string materialName=av.getVolume()->getLogVol()->getMaterial()->getName();
-    
-    if (QString(materialName.c_str()).endsWith("Ether") || QString(materialName.c_str()).endsWith("HyperUranium")) {
-      // Do nothing.  These are not real volumes. 
-    }
-    else {
-      double delta =  inclusiveMass(av.getVolume()) -  (volume(av.getVolume())*density);
-      mass += delta;
-    }
+    if(av.getVolume()){
+      std::string materialName=av.getVolume()->getLogVol()->getMaterial()->getName();    
+      if (QString(materialName.c_str()).endsWith("Ether") || QString(materialName.c_str()).endsWith("HyperUranium")) {
+        // Do nothing.  These are not real volumes. 
+      }
+      else {
+        double delta =  inclusiveMass(av.getVolume()) -  (volume(av.getVolume())*density);
+        mass += delta;
+      }
+    }    
     av.next();
   }
   return mass;

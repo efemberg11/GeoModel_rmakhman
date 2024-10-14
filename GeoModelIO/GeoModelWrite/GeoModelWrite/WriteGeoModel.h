@@ -20,6 +20,9 @@
  *              Also added methods to get the numbers of visited nodes.
  * - Feb 2023 - R.M.Bianchi <riccardo.maria.bianchi@cern.ch>
  *              Added 'setLoglevel' method, to steer output messages
+ *
+ * - Jun 2024 - R.Xue <r.xue@cern.ch><rux23@pitt.edu>
+ *              Added methods to write out virtual surfaces to .db files
  */
 
 #ifndef GeoModelWrite_WriteGeoModel_H
@@ -40,6 +43,7 @@
 #include "GeoModelKernel/GeoNodeAction.h"
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoXF.h"
+#include "GeoModelKernel/GeoVSurfaceShape.h"
 
 // C++ includes
 #include <set>
@@ -102,6 +106,8 @@ class WriteGeoModel : public GeoNodeAction {
         const GeoPhysVol *vol);  //	Handles a physical volume.
     virtual void handleFullPhysVol(
         const GeoFullPhysVol *vol);  //	Handles a full physical volume.
+    virtual void handleVSurface(
+        const GeoVSurface* surf);  //	Handles a virtual surface.        
     virtual void handleSerialDenominator(
         const GeoSerialDenominator *sD);  //	Handles a Serial Denominator.
     virtual void handleSerialTransformer(
@@ -178,7 +184,7 @@ class WriteGeoModel : public GeoNodeAction {
     WriteGeoModel &operator=(const WriteGeoModel &right);
 
     void handleVPhysVolObjects(const GeoVPhysVol *vol);
-
+    void handleVSurfaceObjects(const GeoVSurface *surf);
     /// Handles a physical volume referenced by a SerialTrasformer
     void handleReferencedVPhysVol(const GeoVPhysVol *vol);
 
@@ -190,7 +196,18 @@ class WriteGeoModel : public GeoNodeAction {
     unsigned int storeMaterial(const GeoMaterial *mat);
     unsigned int storeElement(const GeoElement *el);
     unsigned int storeTranform(const GeoTransform *node);
-
+    
+    // virtual surface ---------------------------------------------------------------------
+    unsigned int storeSurfaceShape(const GeoVSurfaceShape* surf);
+    std::pair<DBRowEntry, DBRowsList> getSurfaceParameters(const GeoVSurfaceShape* surf_shape);
+    unsigned int addSurfaceShape(const std::string &type,  const DBRowEntry &parameters);
+    unsigned int storeVSurface(const GeoVSurface* pointer, const unsigned int& surfShapeId, const std::string& surfShapeType);
+    unsigned int addVSurface(const std::string &type, const unsigned int& surfShapeId);
+    unsigned int storeObj(const GeoVSurfaceShape* pointer, const std::string& shapeName, 
+                          DBRowEntry& parameters, const DBRowsList &shapeData);
+    unsigned int setSurfaceCopyNumber(const unsigned int& VSurfaceId, const std::string& surfType);                          
+    //--------------------------------------------------------------------------------------
+    
     unsigned int storeObj(const GeoMaterial *pointer, const std::string &name,
                           const double &density, const DBRowsList &materialData);
     unsigned int storeObj(const GeoElement *pointer, const std::string &name,
@@ -313,6 +330,8 @@ class WriteGeoModel : public GeoNodeAction {
     std::string getAddressStringFromPointer(const GeoLogVol *pointer);
     std::string getAddressStringFromPointer(const GeoPhysVol *pointer);
     std::string getAddressStringFromPointer(const GeoVPhysVol *pointer);
+    std::string getAddressStringFromPointer(const GeoVSurface *pointer);
+    std::string getAddressStringFromPointer(const GeoVSurfaceShape *pointer);
     std::string getAddressStringFromPointer(
         const GeoSerialDenominator *pointer);
     std::string getAddressStringFromPointer(const GeoSerialIdentifier *pointer);
@@ -353,6 +372,7 @@ class WriteGeoModel : public GeoNodeAction {
     std::set<std::string> m_linkSet;
     std::unordered_map<std::string, unsigned int> m_parentChildrenMap;
     std::unordered_map<std::string, unsigned int> m_volumeCopiesMap;
+    std::unordered_map<std::string, unsigned int> m_surfaceCopiesMap;
     std::unordered_map<std::string, unsigned int> m_memMap;
     std::unordered_map<std::string, unsigned int> m_memMap_Tables;
 
@@ -415,7 +435,11 @@ class WriteGeoModel : public GeoNodeAction {
 
     DBRowsList m_shapes_UnidentifiedShape;
 
-
+    DBRowsList m_rectangle_surface;  // For Virtual Surface Shape
+    DBRowsList m_trapezoid_surface;
+    DBRowsList m_annulus_surface;
+    DBRowsList m_diamond_surface;
+    DBRowsList m_VSurface;           // For Virtual Surface Abstract Class
     
     // std::vector<std::vector<std::string>> m_functions;
     DBRowsList m_functions; // operators used in Function's expression

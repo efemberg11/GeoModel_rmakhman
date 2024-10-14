@@ -13,12 +13,13 @@
 #include "VP1Base/VP1Msg.h"
 // #include "VP1Base/VP1QtInventorUtils.h"
 //#include "VP1Utils/VP1LinAlgUtils.h"
-#include "VP1HEPVis/nodes/SoTransparency.h"
-#include "VP1HEPVis/nodes/SoPolyhedron.h"
-#include "VP1HEPVis/nodes/SoPcons.h"
-#include "VP1HEPVis/VP1HEPVisUtils.h"
+#include "GXHepVis/nodes/SoTransparency.h"
+#include "GXHepVis/nodes/SoPolyhedron.h"
+#include "GXHepVis/nodes/SoPcons.h"
+#include "GXHepVis/GXHepVisUtils.h"
 
 #include "GeoModelKernel/GeoVolumeCursor.h"
+#include "GeoModelKernel/GeoSurfaceCursor.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoTube.h"
 #include "GeoModelKernel/GeoTubs.h"
@@ -40,14 +41,22 @@
 #include <QMap>
 #include <QDataStream>
 #include <unistd.h>
+#include "GeoModelKernel/GeoRectSurface.h"
+#include "GeoModelKernel/Units.h"
+using namespace GeoModelKernelUnits;
 //____________________________________________________________________
 class VolumeHandle::Imp {
 public:
   Imp(VolumeHandleSharedData * the_cd, const PVConstLink& the_pV, const SbMatrix& the_ac)
     : commondata(the_cd), pV(the_pV),accumTrans(the_ac),attachsepHelper(0),attachlabelSepHelper(0),nodesep(0), material(0), label_sep(0), labels(0), isattached(false) {}
-
+  //overload Imp constructor
+  Imp(VolumeHandleSharedData * the_cd, const VSConstLink& the_vS, const SbMatrix& the_ac)
+    : commondata(the_cd), vS(the_vS),accumTrans(the_ac),attachsepHelper(0),attachlabelSepHelper(0),nodesep(0), material(0), label_sep(0), labels(0), isattached(false) {}
+    
   VolumeHandleSharedData * commondata;
   PVConstLink pV;
+  VSConstLink vS;
+  
   const SbMatrix accumTrans;//FIXME: Use pointer - and free once children are created AND nodesep has been build. Or just construct on the fly!
 
   VP1ExtraSepLayerHelper * attachsepHelper;
@@ -91,8 +100,9 @@ QDataStream & operator>> ( QDataStream & in, VolumeHandle::Imp::VolState & vs ) 
 
 //____________________________________________________________________
 VolumeHandle::VolumeHandle(VolumeHandleSharedData * cd,VolumeHandle * parent, const PVConstLink& pV, int childNumber, const SbMatrix& accumTrans)
-  : m_d(new Imp(cd,pV,accumTrans)), m_childNumber(childNumber), m_nchildren(childNumber>=0?pV->getNChildVols():0), m_parent(parent),
-    m_state(VP1GeoFlags::CONTRACTED)
+: m_d(new Imp(cd,pV,accumTrans)), m_childNumber(childNumber), m_nchildren(childNumber>=0?pV->getNChildVols():0), m_parent(parent),
+  //m_d(new Imp(cd,pV,accumTrans)), m_childNumber(childNumber), m_nchildren(childNumber>=0?3:0), m_parent(parent),
+  m_state(VP1GeoFlags::CONTRACTED)
 {
   if (cd) {
     cd->ref();
@@ -101,6 +111,17 @@ VolumeHandle::VolumeHandle(VolumeHandleSharedData * cd,VolumeHandle * parent, co
   }
 }
 
+//overload VolumeHandle
+VolumeHandle::VolumeHandle(VolumeHandleSharedData * cd,VolumeHandle * parent, const VSConstLink& vS, int childNumber, const SbMatrix& accumTrans)
+: m_d(new Imp(cd,vS,accumTrans)), m_childNumber(childNumber), m_nchildren(childNumber>=0?vS->getNChildVols():0), m_parent(parent),
+  m_state(VP1GeoFlags::CONTRACTED)
+{
+  if (cd) {
+    cd->ref();
+    if (!haveParentsNotExpanded())
+      m_d->attach(this);
+  }
+}
 //____________________________________________________________________
 VolumeHandle::~VolumeHandle()
 {
@@ -131,10 +152,11 @@ void VolumeHandle::initialiseChildren()
     return;
 
   assert(m_nchildren);
-
+  
   //Loop over children:
   m_children.reserve(m_nchildren);
   unsigned ichild(0);
+  
   GeoVolumeCursor av(m_d->pV);
   while (!av.atEnd()) {
 
@@ -146,13 +168,20 @@ void VolumeHandle::initialiseChildren()
 		  mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
 
     matr.multRight(m_d->accumTrans);
-    m_children.push_back(new VolumeHandle(m_d->commondata,this,av.getVolume(),ichild++,matr));
+
+    if(av.getVolume()){
+        //cursor at physics volume
+        m_children.push_back(new VolumeHandle(m_d->commondata,this,av.getVolume(),ichild++,matr));
+    }
+    else{
+        //cursor at virtual surface volume
+        m_children.push_back(new VolumeHandle(m_d->commondata,this,av.getSurface(),ichild++,matr));
+    }
     m_children.back()->expandMothersRecursivelyToNonEther();
-    av.next();
+    av.next();    
   }
-
+  
   assert(ichild==m_nchildren&&m_children.size()==m_nchildren);
-
 }
 
 //____________________________________________________________________
@@ -161,10 +190,20 @@ PVConstLink VolumeHandle::geoPVConstLink() const
   return m_d->pV;
 }
 
+VSConstLink VolumeHandle::geoVSConstLink() const
+{
+  return m_d->vS;
+}
+
 //____________________________________________________________________
 QString VolumeHandle::getName() const
 {
-  return m_d->pV->getLogVol()->getName().c_str();
+  if(m_d->pV){
+      return m_d->pV->getLogVol()->getName().c_str();
+  }
+  else{
+      return m_d->vS->getShape()->type().c_str();
+  }
 }
 
 //____________________________________________________________________
@@ -182,15 +221,32 @@ bool VolumeHandle::hasName(const std::string& n) const
 //____________________________________________________________________
 SoMaterial * VolumeHandle::material()
 {
+  if(m_d->pV){
   VP1Msg::messageDebug2("VolumeHandle::material() - LogVol name: " + QString::fromStdString(m_d->pV->getLogVol()->getName()));
+  }
   // if it's not the first time here and
   // the material has been assigned already, then return that
   if (m_d->material)
     return m_d->material;
-
   // if it's the first timne here, the material has not been assigned yet, then...
-
   //Then, see if the "databases" of defined volumes/material know about this volume:
+  
+  if(!m_d->pV){
+    SoMaterial *surf_material = new SoMaterial;
+    static float colors[2][3] = {
+      {0.0, 1.0, 0.0}, {1.0, 0.0, 0.0}
+    };
+    static float transps[2] = {0.6, 0.6};
+    
+    surf_material->diffuseColor.setValues(0, 2, colors);
+    surf_material->transparency.setValues(0, 2, transps);
+    m_d->material = surf_material;
+//      m_d->material = SurfaceMaterial();
+    assert(m_d->material);
+    m_d->material->ref();      
+    return m_d->material;
+  }
+  
   SoMaterial * mat = m_d->commondata->volVisAttributes()->get(m_d->pV->getLogVol()->getName());
   if (mat) {
     m_d->material = mat;
@@ -216,7 +272,7 @@ SoMaterial * VolumeHandle::material()
     m_d->material->ref();
     return m_d->material;
   }
-
+  
   if (m_parent) {
     m_d->material = m_parent->material();
     assert(m_d->material);
@@ -229,6 +285,7 @@ SoMaterial * VolumeHandle::material()
   m_d->material->ref();
   return m_d->material;
 }
+      
 
 //____________________________________________________________________
 SoSeparator * VolumeHandle::nodeSoSeparator() const
@@ -238,7 +295,7 @@ SoSeparator * VolumeHandle::nodeSoSeparator() const
 
 //____________________________________________________________________
 void VolumeHandle::ensureBuildNodeSep()
-{
+{ 
   VP1Msg::messageDebug3("VolumeHandle::ensureBuildNodeSep()");
   if (m_d->nodesep && m_d->label_sep)
     return;
@@ -250,7 +307,7 @@ void VolumeHandle::ensureBuildNodeSep()
   //   m_d->nodesep->renderCaching.setValue(SoSeparator::ON);
   //   m_d->nodesep->boundingBoxCaching.setValue(SoSeparator::ON);
   m_d->nodesep->ref();//Since we are keeping it around irrespective of whether it is attached or not.
-
+  
   //Transform:
   {
     SoTransform *xf=new SoTransform();
@@ -258,10 +315,18 @@ void VolumeHandle::ensureBuildNodeSep()
     m_d->nodesep->addChild(xf);
   }
 
-
   //VP1Msg::messageDebug("calling toShapeNode()...");
-  bool shapeIsKnown;
-  SoNode * shape = m_d->commondata->toShapeNode(m_d->pV, &shapeIsKnown);//NB: Ignore contained transformation of GeoShapeShifts.
+  bool shapeIsKnown=true;
+
+  SoNode * shape = nullptr;
+  if(m_d->pV){
+      shape = m_d->commondata->toShapeNode(m_d->pV, &shapeIsKnown);//NB: Ignore contained transformation of GeoShapeShifts.  
+  }
+  else{
+    shape = m_d->commondata->toShapeNode(m_d->vS, m_d->nodesep);
+    shapeIsKnown = true;
+  }  
+  
   static const char *unknownShapeTextureFile[]={"/usr/share/gmex/unknownShape.jpg","/usr/local/share/gmex/unknownShape.jpg"};
   SoTexture2 *skin=nullptr;
   if (!shapeIsKnown) {
@@ -281,40 +346,50 @@ void VolumeHandle::ensureBuildNodeSep()
   }
 
   //What phi sector do we belong in?
-  int iphi = m_d->commondata->phiSectorManager()->getVolumeType(m_d->accumTrans, shape);
-
-  if (iphi >= -1 ) {
-    //VP1Msg::messageDebug("Cylinders [iphi >= -1]...");
-    //Substitute shapes that are essentially cylinders with such. This
-    //can be done safely since this tube won't need
-    //phi-slicing and is done to gain render performance.
-    if ( m_d->pV->getLogVol()->getShape()->typeID()==GeoTube::getClassTypeID() )
-    {
-      //VP1Msg::messageDebug("GeoTube...");
-      const GeoTube * geotube = static_cast<const GeoTube*>(m_d->pV->getLogVol()->getShape());
-      if (geotube->getRMin()==0.0)
-        shape = m_d->commondata->getSoCylinderOrientedLikeGeoTube(geotube->getRMax(),geotube->getZHalfLength());
-    }
-    else if ( m_d->pV->getLogVol()->getShape()->typeID()==GeoTubs::getClassTypeID() )
-    {
-      //VP1Msg::messageDebug("GeoTubs...");
-      const GeoTubs * geotubs = static_cast<const GeoTubs*>(m_d->pV->getLogVol()->getShape());
-      if (geotubs->getRMin()==0.0 && geotubs->getDPhi() >= 2*M_PI-1.0e-6)
-        shape = m_d->commondata->getSoCylinderOrientedLikeGeoTube(geotubs->getRMax(),geotubs->getZHalfLength());
-    }
+  int iphi;
+  if (m_d -> pV){
+  iphi = m_d->commondata->phiSectorManager()->getVolumeType(m_d->accumTrans, shape);
   }
+  else{
+  iphi = m_d->commondata->phiSectorManager()->getSurfaceType(m_d->accumTrans, shape);
+  }
+  // SKIP FOR VIRTUAL SURFACE
+  if(m_d->pV){
+      if (iphi >= -1 ) {
+        //VP1Msg::messageDebug("Cylinders [iphi >= -1]...");
+        //Substitute shapes that are essentially cylinders with such. This
+        //can be done safely since this tube won't need
+        //phi-slicing and is done to gain render performance.
+
+        if ( m_d->pV->getLogVol()->getShape()->typeID()==GeoTube::getClassTypeID() )
+        { 
+          //VP1Msg::messageDebug("GeoTube...");
+          const GeoTube * geotube = static_cast<const GeoTube*>(m_d->pV->getLogVol()->getShape());
+          if (geotube->getRMin()==0.0)
+            shape = m_d->commondata->getSoCylinderOrientedLikeGeoTube(geotube->getRMax(),geotube->getZHalfLength());
+        }
+        else if ( m_d->pV->getLogVol()->getShape()->typeID()==GeoTubs::getClassTypeID() )
+        {
+          //VP1Msg::messageDebug("GeoTubs...");
+          const GeoTubs * geotubs = static_cast<const GeoTubs*>(m_d->pV->getLogVol()->getShape());
+          if (geotubs->getRMin()==0.0 && geotubs->getDPhi() >= 2*M_PI-1.0e-6)
+            shape = m_d->commondata->getSoCylinderOrientedLikeGeoTube(geotubs->getRMax(),geotubs->getZHalfLength());
+        }
+      }
+  
 
   //In the case of a GeoShapeShift we add its contained transformation here:
   //Fixme: Remember to use this extra transformation for phisector cuts also!
-  if (m_d->pV->getLogVol()->getShape()->typeID()==GeoShapeShift::getClassTypeID()) {
-    const GeoTrf::Transform3D::MatrixType &mtx=dynamic_cast<const GeoShapeShift*>(m_d->pV->getLogVol()->getShape())->getX().matrix();
-    SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, conventions
-		  mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // differ!
-		  mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),
-		  mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
-    SoTransform *xf=new SoTransform();
-    m_d->nodesep->addChild(xf);
-    xf->setMatrix(matr);
+      if (m_d->pV->getLogVol()->getShape()->typeID()==GeoShapeShift::getClassTypeID()) {
+        const GeoTrf::Transform3D::MatrixType &mtx=dynamic_cast<const GeoShapeShift*>(m_d->pV->getLogVol()->getShape())->getX().matrix();
+        SbMatrix matr(mtx(0,0),mtx(1,0),mtx(2,0),mtx(3,0),  // Beware, conventions
+	        mtx(0,1),mtx(1,1),mtx(2,1),mtx(3,1),  // differ!
+	        mtx(0,2),mtx(1,2),mtx(2,2),mtx(3,2),
+	        mtx(0,3),mtx(1,3),mtx(2,3),mtx(3,3));
+        SoTransform *xf=new SoTransform();
+        m_d->nodesep->addChild(xf);
+        xf->setMatrix(matr);
+      }
   }
   //Add shape child(ren) and get the separator (helper) where we attach the nodesep when volume is visible:
   if (iphi >= -1) {
@@ -344,7 +419,7 @@ void VolumeHandle::ensureBuildNodeSep()
 
 //____________________________________________________________________
 void VolumeHandle::Imp::attach(VolumeHandle*vh)
-{
+{ 
   VP1Msg::messageDebug3("VolumeHandle::Imp::attach() - name: " + vh->getName());
   if (!isattached) {
     vh->ensureBuildNodeSep();
@@ -473,9 +548,9 @@ bool VolumeHandle::haveParentsNotExpanded() const
 
 //____________________________________________________________________
 void VolumeHandle::attachAllContractedChildren() {
-
   if (!m_nchildren)
     return;
+    
   if (!childrenAreInitialised())
     initialiseChildren();
 
@@ -558,23 +633,42 @@ bool VolumeHandle::isAttached() const
 
 //____________________________________________________________________
 const GeoMaterial * VolumeHandle::geoMaterial() const {
+  if(!geoPVConstLink()){
+  
+  GeoElement  *oxygen        = new GeoElement("Oxygen",    "O",   19,  39*gram/mole);
+  GeoElement  *nitrogen      = new GeoElement("Nitrogen",  "N",   7,  14*gram/mole);
+  GeoElement  *argon         = new GeoElement("Argon",     "Ar", 18,  40*gram/mole);
+  GeoElement  *aluminium     = new GeoElement("Aluminium", "Al", 13,  26*gram/mole);  
+  
+    // Define Air:
+  double densityOfAir     = 1.2E-3*gram/cm3;               // g/cm^3
+  GeoMaterial *Air           = new GeoMaterial("Air",densityOfAir);
+  Air->add(oxygen,2*0.21);                        // diatomic   oxygen   21% by volume.
+  Air->add(nitrogen,2*0.78);                        // diatomic   nitrogen 78% by volume.
+  Air->add(argon,0.01);                          // monoatomic argon    78% by volume.
+  Air->lock();
+  
+     return Air;
+  }
   return geoPVConstLink()->getLogVol()->getMaterial();
 }
 
 //____________________________________________________________________
 bool VolumeHandle::isEther() const
 {
+  if(!m_d->pV){
+      return false;
+  }
   return QString(geoMaterial()->getName().c_str()).endsWith("Ether") ||
     QString(geoMaterial()->getName().c_str()).endsWith("HyperUranium");
 }
 
 //____________________________________________________________________
 void VolumeHandle::expandMothersRecursivelyToNonEther() {
-
   if (!nChildren()||!isEther()) {
     return;
   }
-
+  
   setState(VP1GeoFlags::ZAPPED);
   initialiseChildren();
   VolumeHandleListItr childItrE = m_children.end();
@@ -655,7 +749,7 @@ VolumeHandle::Imp::VolState VolumeHandle::Imp::getChildStates(const VolumeHandle
 
 //____________________________________________________________________
 void VolumeHandle::Imp::applyChildStates(const VolState& vs,VolumeHandle*theclass)
-{
+{ 
   bool hasExpandedChildren = !vs.m_expandedChildren.isEmpty();
   bool hasZappedChildren = !vs.m_zappedChildren.isEmpty();
   if (!hasExpandedChildren&&!hasZappedChildren)
@@ -665,6 +759,7 @@ void VolumeHandle::Imp::applyChildStates(const VolState& vs,VolumeHandle*theclas
   QSet<quint32>::const_iterator zapItr, zapItrEnd = vs.m_zappedChildren.end();
 
   theclass->initialiseChildren();
+  
   VolumeHandleListConstItr it, itE = theclass->m_children.end();
   for (it = theclass->m_children.begin(); it!=itE; ++it) {
     quint32 id = (*it)->hashID();
@@ -705,7 +800,7 @@ bool VolumeHandle::Imp::hasNonStandardShapeChildren(const SoGroup*g)
 //____________________________________________________________________
 bool VolumeHandle::isInitialisedAndHasNonStandardShape() const
 {
-  VP1HEPVisUtils::initAllCustomClasses();
+  GXHepVisUtils::initAllCustomClasses();
   return m_d->nodesep ? Imp::hasNonStandardShapeChildren(m_d->nodesep) : false;
 }
 

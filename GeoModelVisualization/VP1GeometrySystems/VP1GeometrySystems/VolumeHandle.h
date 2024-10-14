@@ -9,6 +9,7 @@
 
 #include "VP1GeometrySystems/VP1GeoFlags.h"
 #include "GeoModelKernel/GeoVPhysVol.h"
+#include "GeoModelKernel/GeoVSurface.h"
 #include <QString>
 
 //Only initialises child classes on demand. And even then their SoNodes are not initialised until they must be shown.
@@ -16,6 +17,7 @@ class VolumeHandleSharedData;
 class SoMaterial;
 class SoSeparator;
 class GeoMaterial;
+class SoMaterialBinding;
 #include <Inventor/C/errors/debugerror.h>
 #include <Inventor/SbMatrix.h>
 
@@ -24,6 +26,9 @@ public:
 
 
   VolumeHandle(VolumeHandleSharedData * ,VolumeHandle * parent, const PVConstLink&,int childNumber,
+	       const SbMatrix& accumTrans = SbMatrix() );
+
+  VolumeHandle(VolumeHandleSharedData * ,VolumeHandle * parent, const VSConstLink&,int childNumber,
 	       const SbMatrix& accumTrans = SbMatrix() );
 
   virtual ~VolumeHandle();//lots of stuff to do here!
@@ -40,6 +45,7 @@ public:
   quint32 hashID() const;//For vp1 persistification
 
   PVConstLink geoPVConstLink() const;
+  VSConstLink geoVSConstLink() const;
   const GeoMaterial * geoMaterial() const;
   std::string getNameStdString() const;
 
@@ -121,6 +127,7 @@ private:
   bool haveParentsNotExpanded() const;
   void attachAllContractedChildren();//also checks children of expanded children (recursively).
   void detachAllContractedChildren();//also checks children of expanded children (recursively).
+  //SoMaterial * SurfaceMaterial() const;
 };
 
 /////////////////

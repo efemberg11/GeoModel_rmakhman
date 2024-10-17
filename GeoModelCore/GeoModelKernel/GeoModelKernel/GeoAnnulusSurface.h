@@ -76,6 +76,7 @@ class GeoAnnulusSurface : public GeoVSurfaceShape
 
       void exec (GeoShapeAction *action) const override final;
 
+      virtual bool isOnSurface (const double Px, const double Py, const double Pz, const GeoTrf::Transform3D & trans) const override final;
     
     protected:
 

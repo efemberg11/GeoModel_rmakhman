@@ -47,6 +47,9 @@ class GeoRectSurface : public GeoVSurfaceShape
   //     Executes a GeoShapeAction
   void exec (GeoShapeAction *action) const override final;
 
+  //     Is the point (x,y,z) inside the shape?
+  virtual bool isOnSurface (const double Px, const double Py, const double Pz, const GeoTrf::Transform3D & trans) const override final;
+
  protected:
   virtual ~GeoRectSurface() = default;
   

@@ -43,6 +43,9 @@ class GeoVSurfaceShape : public RCBase
   //    TODO: Introduce GeoVSurfaceShapeAction in future
   virtual void exec (GeoShapeAction *action) const = 0;
 
+  //    Is the point (x,y,z) inside the shape?
+  virtual bool isOnSurface (const double Px, const double Py, const double Pz, const GeoTrf::Transform3D & trans) const = 0;
+
  protected:
   virtual ~GeoVSurfaceShape() = default;
 };

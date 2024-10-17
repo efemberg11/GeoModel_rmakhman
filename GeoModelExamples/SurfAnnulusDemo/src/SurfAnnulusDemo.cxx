@@ -143,14 +143,11 @@ void SurfAnnulusDemo::create(GeoVPhysVol *world, bool /*publish*/) {
     GeoLogVol  *boxLog = new GeoLogVol("BoxLog",boxShape,Air);
     GeoFullPhysVol *boxPhys3 = new GeoFullPhysVol(boxLog);
 
-    GeoAnnulusSurface* annulus = new GeoAnnulusSurface(-4.0, -5.0, 7.0, 10.0, 2*M_PI); // Ox, Oy, Rin, Rout, Phi
+    GeoAnnulusSurface* annulus = new GeoAnnulusSurface(-4.0, -5.0, 7.0, 10.0, 0.3*M_PI); // Ox, Oy, Rin, Rout, Phi
     GeoVSurface* surf3 = new GeoVSurface(annulus);
     GeoAlignableTransform *move_together3=new GeoAlignableTransform(GeoTrf::RotateY3D(0.4*M_PI)*GeoTrf::TranslateX3D(20));
     //GeoTransform * point_trans = new GeoTransform(GeoTrf::RotateY3D(0.4*M_PI)*GeoTrf::TranslateX3D(20));
 
-
-    boxPhys->add(move_together3);
-    boxPhys->add(boxPhys3);
     boxPhys->add(move_together3);   
     boxPhys->add(surf3);
     // boxPhys->add(transform_point); // move the point (initially at (0,0,0)) to the starting position (5.66, -5.66, 0)

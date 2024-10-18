@@ -76,10 +76,6 @@
 + LArCalorimeter/LArGeoModel/LArGeoCode
 + LArCalorimeter/LArGeoModel/LArGeoEndcap
 + LArCalorimeter/LArGeoModel/LArGeoFcal
-+ LArCalorimeter/LArGeoModel/LArGeoH62002Algs
-+ LArCalorimeter/LArGeoModel/LArGeoH62003Algs
-+ LArCalorimeter/LArGeoModel/LArGeoH62004Algs
-+ LArCalorimeter/LArGeoModel/LArGeoH6Cryostats
 + LArCalorimeter/LArGeoModel/LArGeoHec
 + LArCalorimeter/LArGeoModel/LArGeoRAL
 + LArCalorimeter/LArGeoModel/LArGeoTBBarrel
@@ -88,7 +84,6 @@
 + LArCalorimeter/LArGeoModel/LArReadoutGeometry
 + LArCalorimeter/LArROD
 + LArCalorimeter/LArTrackingGeometry
-+ MuonSpectrometer/Amdcsimrec/AmdcAth
 + MuonSpectrometer/MuonAlignment/MuonAlignmentData
 + MuonSpectrometer/MuonCablings/CSCcabling
 + MuonSpectrometer/MuonCnv/MuonEventTPCnv
@@ -103,8 +98,8 @@
 + MuonSpectrometer/MuonDetDescr/MuonTrackingGeometry
 + MuonSpectrometer/MuonDigitization/RPC_Digitization
 + MuonSpectrometer/MuonDigitization/TGC_Digitization
-+ MuonSpectrometer/MuonGeoModel
-+ MuonSpectrometer/MuonGeoModelTest
++ MuonSpectrometer/MuonDetDescr/MuonGeoModel
++ MuonSpectrometer/MuonDetDescr/MuonGeoModelTest
 + MuonSpectrometer/MuonPhaseII/MuonDetDescr/MuonGeoModelR4
 + MuonSpectrometer/MuonPhaseII/MuonDetDescr/MuonGeoModelTestR4
 + MuonSpectrometer/MuonPhaseII/MuonDetDescr/MuonReadoutGeometryR4

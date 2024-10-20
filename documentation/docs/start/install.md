@@ -23,6 +23,8 @@ Add the geomodel repository to your source list:
 
 ```
 sudo add-apt-repository ppa:kaktusjoe/geomodel
+sudo add-apt-repository ppa:kaktusjoe/coingraphics
+sudo add-apt-repository ppa:kaktusjoe/g4dist
 sudo apt-get update
 ```
 

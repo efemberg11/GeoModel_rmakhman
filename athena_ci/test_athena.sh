@@ -12,9 +12,6 @@ export ATHENA_REF=main
 
 _pwd=$PWD
 
-export ATHENA_SOURCE=$PWD/athena
-
-
 tmp=/tmp/ath_build
 rm -rf $tmp
 mkdir -p $tmp

@@ -44,6 +44,7 @@
 + InnerDetector/InDetDetDescr/InDetTrackingGeometry
 + InnerDetector/InDetDetDescr/PixelGeoModel
 + InnerDetector/InDetDetDescr/PixelGeoModelXml
++ InnerDetector/InDetDetDescr/PixelReadoutDefinitions
 + InnerDetector/InDetDetDescr/PixelReadoutGeometry
 + InnerDetector/InDetDetDescr/SCT_GeoModel
 + InnerDetector/InDetDetDescr/SCT_ReadoutGeometry
@@ -128,14 +129,3 @@
 + Tracking/TrkDetDescr/TrkDetDescrGeoModelCnv
 + Tracking/TrkDetDescr/TrkDetElementBase
 + Trigger/TrigAlgorithms/TrigL2MuonSA
-+ graphics/GeometryJiveXML
-+ graphics/VP1/VP1Base
-+ graphics/VP1/VP1Systems/VP1AODSystems
-+ graphics/VP1/VP1Systems/VP1CaloSystems
-+ graphics/VP1/VP1Systems/VP1GeometrySystems
-+ graphics/VP1/VP1Systems/VP1GuideLineSystems
-+ graphics/VP1/VP1Systems/VP1PRDSystems
-+ graphics/VP1/VP1Systems/VP1RawDataSystems
-+ graphics/VP1/VP1Systems/VP1TrackSystems
-+ graphics/VP1/VP1Systems/VP1TrackingGeometrySystems
-+ graphics/VP1/VP1Utils

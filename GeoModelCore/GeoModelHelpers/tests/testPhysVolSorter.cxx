@@ -20,14 +20,14 @@ int main() {
     GeoIntrusivePtr<GeoPhysVol> world{createGeoWorld()};
 
     const GeoMaterial* air = world->getLogVol()->getMaterial();
-    GeoIntrusivePtr<GeoBox> externalBox{new GeoBox(500.,500., 500.)};
-    GeoIntrusivePtr<GeoBox> internalBox{new GeoBox(100.,100., 100.)};
+    GeoIntrusivePtr<GeoBox> externalBox{make_intrusive<GeoBox>(500.,500., 500.)};
+    GeoIntrusivePtr<GeoBox> internalBox{make_intrusive<GeoBox>(100.,100., 100.)};
     auto  makeBox = [&](bool bigOne) {
-        return PVLink(new GeoPhysVol(new GeoLogVol("TestVolume", bigOne ? externalBox : internalBox, air)));
+        return make_intrusive<GeoPhysVol>(make_intrusive<GeoLogVol>("TestVolume", bigOne ? externalBox : internalBox, air));
     };
 
     auto makeFullBox = [&](bool bigOne) {
-        return PVLink(new GeoFullPhysVol(new GeoLogVol("TestFullPhysVol", bigOne ? externalBox : internalBox, air)));
+        return make_intrusive<GeoFullPhysVol>(make_intrusive<GeoLogVol>("TestFullPhysVol", bigOne ? externalBox : internalBox, air));
     };
     /// 
     PVLink extVolume = makeBox(true);
@@ -54,7 +54,7 @@ int main() {
         return EXIT_FAILURE;
     }
     extVolume = makeBox(true);
-    extVolume->add(new GeoTransform(GeoTrf::TranslateX3D(50.)));
+    extVolume->add(make_intrusive<GeoTransform>(GeoTrf::TranslateX3D(50.)));
     extVolume->add(makeBox(false));
     if (!physVolSet.insert(extVolume).second) {
         std::cerr<<"testPhysVolSorter() "<<__LINE__<<" A box with a displaced box inside is not the same as box ception "<<std::endl;

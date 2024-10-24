@@ -1,0 +1,13 @@
+diff --git a/DetectorDescription/GeoModel/DumpGeo/python/DumpGeoConfig.py b/DetectorDescription/GeoModel/DumpGeo/python/DumpGeoConfig.py
+index af3d65bffbe..d3b3053e97b 100644
+--- a/DetectorDescription/GeoModel/DumpGeo/python/DumpGeoConfig.py
++++ b/DetectorDescription/GeoModel/DumpGeo/python/DumpGeoConfig.py
+@@ -97,7 +97,7 @@ def configureGeometry(flags, cfg):
+     # to bypass a crash due to lack of support 
+     # for EllipticTube in GeoModelIO 
+     # See: https://its.cern.ch/jira/browse/ATLASSIM-7263
+-    cfg.getService("GeoModelSvc").DetectorTools["ForwardRegionGeoModelTool"].vp1Compatibility=True
++    # cfg.getService("GeoModelSvc").DetectorTools["ForwardRegionGeoModelTool"].vp1Compatibility=True
+ 
+ 
+ def getATLASVersion():

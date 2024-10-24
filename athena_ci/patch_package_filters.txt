@@ -1,3 +1,3 @@
 # These Athena packages need to be rebuilt 
 # due to patches in the `patches` directory
-
++ DetectorDescription/GeoModel/DumpGeo

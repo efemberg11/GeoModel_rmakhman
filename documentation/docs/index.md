@@ -3,7 +3,7 @@
 # GeoModel - A Detector Description Toolkit for HEP experiments
 
 
-GeoModel is a complete toolkit to writ and manage the detetcvor description for High Energy Physics experiments.
+GeoModel is a complete toolkit to write and manage the detetcor description for High Energy Physics experiments.
 
 
 The GeoModel Toolkit offers classes that provide geometrical primitives for describing detectors, as well as a set of tools for writing, accessing, handling, manipulating, dumping, restoring, visualizing, inspecting, and debugging the detector geometry.

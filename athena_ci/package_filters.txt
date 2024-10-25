@@ -18,6 +18,7 @@
 + DetectorDescription/GeoModel/GeoModelSvc
 + DetectorDescription/GeoModel/GeoModelUtilities
 + DetectorDescription/GeoModel/GeoSpecialShapes
++ DetectorDescription/GeoModel/DumpGeo
 + DetectorDescription/IdDictDetDescrCnv
 + DetectorDescription/ReadoutGeometryBase
 + ForwardDetectors/AFP/AFP_GeoModel

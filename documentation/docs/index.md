@@ -22,35 +22,54 @@ you can pick the modules and tools you need, and **you will use only what you re
 
 ### Geometry Description
 
-A complete set of shapes and geometrical primitives to describe your detector
+A complete set of shapes and geometrical primitives to describe your detector's geometry
 
 A set of 'nodes' to build your detector tree
 
+### Alignment
+
 A smart mechanism to handle detector alignment, with multiple alignment costants kept in cache and synchronized
+
+
+### Virtual Geometry / Surfaces
+
+Tools to describe and handle 2D surfaces as part of a Virtual Geometry, which can be placed and misaligned alongside the regular, full geometry
+
+Very useful to describe a simplified Tracking Geometry and still move and handle together with the full geometry
 
 ### Visualization 
 
-A complete, standalone visualization tool to interactively check, inspect, debug your detector geometry in an easy way
+A complete, **interactive visualization** tool to check, inspect, debug your detector geometry in an easy way
 
 ### GDML support
 
-An exporter to export a GeoModel geometry into GDML
+An **exporter** to export a GeoModel geometry into GDML
 
-An importer to import a GDML geometry into GeoModel *(work in progress)*
+An **importer** to import a GDML geometry into GeoModel *(work in progress)*
 
 ### Standalone Detector Simulation
 
-#### Quick Feedback with a Geant4-based simulation 
+#### Easy Geant4-based simulation 
 
-An interactive graphical interface to steer a standalone Geant4-based simulation of your detector, to get quick feedback on your detector while you're still working on it
+An **interactive graphical interface** to steer a standalone Geant4-based simulation of your detector, to get quick feedback on your detector while you're still working on it
+
+#### Clash Detection & Visualization
+
+Standalone tools to identify clash points and overlaps between geometry volumes with a fast Geant4-based algorithm
+
+Interactive visualization of clash points in the standalone GeoModel visualization module
+
+#### Volume Computation
+
+Methods to compute the volume of all shapes, included Boolean shapes, and store it in the GeoModel I/O file for later use
 
 #### Mass calculation
 
-A standalone mass calculator tool, to quickly compute the masses of your detector from the command line
+A standalone **mass calculator tool**, to quickly compute the masses of your detector from the command line
 
 #### Geantino Maps
 
-A standalone tool to generate geantino maps of your newly built detector
+A standalone tool to **generate geantino maps** of your newly built detector
 
 
 

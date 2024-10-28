@@ -112,6 +112,7 @@
 + Simulation/G4Utilities/Geo2G4
 + Simulation/G4Utilities/GeoMaterial2G4
 + Simulation/ISF/ISF_FastCaloSim/ISF_FastCaloSimParametrization
++ Simulation/AtlasGeant4
 + TileCalorimeter/TileConditions
 + TileCalorimeter/TileDetDescr
 + TileCalorimeter/TileFastCaloSim

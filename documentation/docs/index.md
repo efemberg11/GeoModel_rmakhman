@@ -60,13 +60,17 @@ A standalone tool to generate geantino maps of your newly built detector
 
 The external dependencies are minimal:
 
-- The Eigen math library for the core packages
-- SQLite and the `fmt` formatting library for I/O, when I/O is used
-- The `Xerces-C` XML parser and the `nlohmann_json` JSON parser to import external data, when the XML interface is chosen
-- The Qt framework for the GUI, when the visualization module is used
-- The Coin3D and SoQt libraries for 3D graphics, when the visualization module is used
-- Geant4, when the standalone detector simulation tool is used
+- The [Eigen](https://eigen.tuxfamily.org) math library for the core packages
 
+Additional external dependencies:
+
+- The lighweight [SQLite](https://www.sqlite.org/) file-based database for I/O, when the `I/O` module is used
+- The [`nlohmann_json`](https://github.com/nlohmann/json) JSON parser library to import external data, when the `Visualization` and `Tools` modules are used
+- The Apache [`Xerces-C`](https://xerces.apache.org/xerces-c/) XML parser library, when the XML interface of the `Tools` module is used
+- The open-source ("Community") version of the [Qt graphics framework](https://www.qt.io/) for the GUI, when the `Visualization` module is used
+- The [Coin](https://github.com/coin3d/coin) and [SoQt](https://github.com/coin3d/soqt) libraries for 3D graphics, when the `Visualization` module is used
+- The [Geant4](https://geant4.web.cern.ch/) detector simulation toolkit, when the standalone detector simulation module `FullSimLight` is used
+- The [`fmt`](https://github.com/fmtlib/fmt) formatting library for advanced string formatting, when the `I/O` module is used
 
 ----
 

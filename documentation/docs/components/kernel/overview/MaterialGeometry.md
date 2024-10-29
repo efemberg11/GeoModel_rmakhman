@@ -1,17 +1,17 @@
 
 ## Material Geometry
 
-Material geometry consists of a set of classes that bears a large resemblance to the material geometry within GEANT4. These classes, however, are designed to take a minimal size in memory. This requirement determines the basic data structure used to hold the data for the geometry description. That structure is a graph of nodes consisting of both volumes and their properties. The tree is built directly and accessed in a way that provides users access to volumes and, simultaneously, to the properties accumulated during graph traversal that apply to the volumes. See the [Actions](/components/kernel/overview/#actions) section, below.
+Material geometry consists of a set of classes that bears a large resemblance to the material geometry within GEANT4. These classes, however, are designed to take a minimal size in memory. This requirement determines the basic data structure used to hold the data for the geometry description. That structure is a graph of nodes consisting of both volumes and their properties. The tree is built directly and accessed in a way that provides users access to volumes and, simultaneously, to the properties accumulated during graph traversal that apply to the volumes. See the [Actions](#actions) section, below.
 
-The requirement of minimizing the memory consumption has led us to foresee a system in which objects (as well as classes) in the detector description can be re-used. This is called shared instancing and is described below. It essentially means that an element, compound, volume, or entire tree of volumes may be referenced by more than one object in the detector description.   Shared instancing can make the deletion of objects difficult unless special measures are taken.  We have used reference counting in order to facilitate clean-up and make it less error prone. See the section [How Objects are Created and Destroyed](/components/kernel/overview/#how-objects-are-created-and-destroyed).
+The requirement of minimizing the memory consumption has led us to foresee a system in which objects (as well as classes) in the detector description can be re-used. This is called shared instancing and is described below. It essentially means that an element, compound, volume, or entire tree of volumes may be referenced by more than one object in the detector description.   Shared instancing can make the deletion of objects difficult unless special measures are taken.  We have used reference counting in order to facilitate clean-up and make it less error prone. See the section [How Objects are Created and Destroyed](#how-objects-are-created-and-destroyed).
 
 Before creating hierarchies of volumes representing positioned pieces of detectors, we need to create lower-level primitives, such as elements, materials, and shapes. So, we will discuss these first.
 
 ### Materials
 
-Materials are represented within the geometry kernel class library by the class [GeoMaterial](/components/kernel/reference/#geomaterial), and are built up by combining different elements, specifying each element and its fraction-by-mass.  Material constants such as the radiation length and the interaction length, as well as constants for ionization energy loss, are available through the interface but do not need to be provided to the constructor.  Instead, they are computed from the material’s element list.
+Materials are represented within the geometry kernel class library by the class [GeoMaterial](../reference/#geomaterial), and are built up by combining different elements, specifying each element and its fraction-by-mass.  Material constants such as the radiation length and the interaction length, as well as constants for ionization energy loss, are available through the interface but do not need to be provided to the constructor.  Instead, they are computed from the material’s element list.
 
-The class [GeoElement](/components/kernel/reference/#geoelement) is used to represent elements.  Their constructor requires a name, symbol, and effective Z and A. These properties can also be retrieved from the element.
+The class [GeoElement](../reference/#geoelement) is used to represent elements.  Their constructor requires a name, symbol, and effective Z and A. These properties can also be retrieved from the element.
 
 `GeoMaterial` objects are created by specifying a name and a density.  The material is “empty” until elements are added, one by one, using the `GeoMaterial::add()` method, which is overloaded so that one may provide either elements or prebuilt materials.  After all materials are added, the `GeoMaterial::lock()` method must be called, which prevents further elements or materials from being added.
 
@@ -86,7 +86,7 @@ polycone->addPlane(z2, rmin2, rmax2);
 
 This creates a polycone whose projection subtends an angle of 10 degrees between 40 degrees and 50 degrees, with planes at z=0, z=10, and z=15, with minimum and maximum radii there of (5,10), (6, 12), and (5,10).
 
-The shapes can provide their data to a client through their accessors, and in addition support several other operations. Boolean operations on shapes are possible.  They can be accomplished through Boolean operators in class [GeoShape](/components/kernel/reference/#introduction_1):
+The shapes can provide their data to a client through their accessors, and in addition support several other operations. Boolean operations on shapes are possible.  They can be accomplished through Boolean operators in class [GeoShape](../reference/#introduction_1):
 
 ```cpp
 GeoShape       * donut  = new GeoTube();
@@ -126,9 +126,9 @@ Having created elements, materials, shapes, and logical volumes, you are now rea
  * Regular Physical Volumes, designed to be small.
  * Full Physical Volumes, designed to hold in cache complete information about how the volume is located with respect to the world volume, its formatted name string and other important information.
 
-There is a common abstract [base class](/components/kernel/overview/#geomodel-kernel-overview) for all of these:  `GeoVPhysVol`.  In addition both the full physical volumes have another layer of abstraction, `GeoVFullPhysVol`. All physical volumes allow access to their children.
+There is a common abstract [base class](#geomodel-kernel-overview) for all of these:  `GeoVPhysVol`.  In addition both the full physical volumes have another layer of abstraction, `GeoVFullPhysVol`. All physical volumes allow access to their children.
 
-The concrete subclasses that you have at your disposition for detector description are called [GeoPhysVol](/components/kernel/reference/#geophysvol) and [GeoFullPhysVol](/components/kernel/reference/#geofullphysvol).  Both of these have a method to add either volumes or volume properties:
+The concrete subclasses that you have at your disposition for detector description are called [GeoPhysVol](../reference/#geophysvol) and [GeoFullPhysVol](../reference/#geofullphysvol).  Both of these have a method to add either volumes or volume properties:
 
 ```cpp
 GeoPhysVol* myVol;
@@ -150,8 +150,8 @@ The model of the raw geometry is a tree of nodes, property nodes and volume node
 Finally, we provide three mechanisms for giving names to volumes:
 
 * Do nothing.  The volume will be called "ANON".
-* Add a [GeoNameTag](/components/kernel/reference/#geonametag) object to the graph before adding a volume.  The next volume to be added will be given the `GeoNameTag`’s name.
-* Add a [GeoSerialDenominator](/components/kernel/reference/#geoserialdenominator) object to the graph before adding more volumes. The volumes will be named according to the base name of the `GeoSerialDenominator`, plus given a serial number: 0, 1, 2, 3, ...
+* Add a [GeoNameTag](../reference/#geonametag) object to the graph before adding a volume.  The next volume to be added will be given the `GeoNameTag`’s name.
+* Add a [GeoSerialDenominator](../reference/#geoserialdenominator) object to the graph before adding more volumes. The volumes will be named according to the base name of the `GeoSerialDenominator`, plus given a serial number: 0, 1, 2, 3, ...
 
 In effect this last method can be thought of as a way of parametrizing the name of the volume.
 
@@ -169,7 +169,7 @@ for(int c=0; c<myVol->getNChildVols(); ++c) {
 
 One could then iterate in a similar way over the grand children, by using a double loop.  Ultimately one would probably to visit all the volumes, whatever their depth in the tree, so probably this would call on some form of recursion.  An easy way would be to embed the small sample of code shown above in a recursive subroutine or method.  That would be fine and is conceptually simple. However, within the geometry model’s kernel, we have provided an alternate, probably better way to visit the entire tree.
 
-That mechanism involves a [GeoVolumeAction]().  A `GeoVolumeAction` is a way (for applications programmers) to obtain recursive behavior without writing any recursive routines.  It’s a class with a handler routine (`handleVPhysVol()`) which is called for each node before (or after) it is called on its children.  This can descend to an arbitrary depth in the tree.  The `GeoVolumeAction` is an abstract base class and should be subclassed by programmers to suit their needs.  Another class `TemplateVolAction` is provided as a template that one can take and modify.  To run it, one does this:
+That mechanism involves a `GeoVolumeAction`.  A `GeoVolumeAction` is a way (for applications programmers) to obtain recursive behavior without writing any recursive routines.  It’s a class with a handler routine (`handleVPhysVol()`) which is called for each node before (or after) it is called on its children.  This can descend to an arbitrary depth in the tree.  The `GeoVolumeAction` is an abstract base class and should be subclassed by programmers to suit their needs.  Another class `TemplateVolAction` is provided as a template that one can take and modify.  To run it, one does this:
 
 ```cpp
 PVConstLink myVol;
@@ -179,7 +179,7 @@ myVol->apply(tempVolAction);
 
 The `handleVPhysVol()` function within the `TemplateVolAction` is where the work is supposed to get done.  It will be invoked repeatedly, once for each node in the tree.  Within that routine, one can access the physical volume as a subroutine parameter, and information about the transformation and the path to the node through the base class for actions, `GeoVolumeAction`.  The action can be designed to run from the bottom up or from the top down.
 
-Incidentally, there is another kind of action in the library called [GeoNodeAction]().  `GeoNodeActions` visit all nodes in the geometry tree, including naming nodes, transformation nodes, and perhaps other property nodes that may be added later to the model.  Since usually an application programmer wants to see volumes and their properties, the `GeoVolumeAction` is more suited to casual users than the `GeoNodeAction`, which is considered mostly internal.  However the usage is similar, except that node actions are “exec’d” while volume actions are “applied”.  Here for example is how we can rewrite the loop over children using volume actions:
+Incidentally, there is another kind of action in the library called `GeoNodeAction`.  `GeoNodeActions` visit all nodes in the geometry tree, including naming nodes, transformation nodes, and perhaps other property nodes that may be added later to the model.  Since usually an application programmer wants to see volumes and their properties, the `GeoVolumeAction` is more suited to casual users than the `GeoNodeAction`, which is considered mostly internal.  However the usage is similar, except that node actions are “exec’d” while volume actions are “applied”.  Here for example is how we can rewrite the loop over children using volume actions:
 
 ```cpp
 PVConstLink myVol;

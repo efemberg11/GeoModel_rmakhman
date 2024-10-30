@@ -122,7 +122,7 @@ cmake -S "${SCRIPT_DIR}/.." -B geomodel-build \
   -DCMAKE_MAKE_PROGRAM="$NINJA" \
   -DCMAKE_CXX_FLAGS="$EXTRA_FLAGS" \
   -DCMAKE_INSTALL_PREFIX=$gm_install_dir \
-  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DCMAKE_BUILD_TYPE=Release \
   -DGEOMODEL_BUILD_TOOLS=ON \
 
 heading "Build GeoModel"
@@ -196,6 +196,7 @@ cmake "$ATHENA_SOURCE/Projects/WorkDir" \
   -DCMAKE_MAKE_PROGRAM="$NINJA" \
   -DCMAKE_CXX_FLAGS="$EXTRA_FLAGS -isystem ${gm_install_dir}/include" \
   -DATLAS_PACKAGE_FILTER_FILE="$package_filters" \
+  -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=$install_dir
 
 popd

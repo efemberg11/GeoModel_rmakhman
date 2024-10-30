@@ -119,18 +119,35 @@ void SiliconSystemPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
   GeoLogVol  *boxLog = new GeoLogVol("BoxLog",boxShape,Air);
   GeoPhysVol *worldBOX = new GeoPhysVol(boxLog);
 
+  GeoBox *box1 = new GeoBox (0.1,1*1.7,20);
+  GeoLogVol  *boxLog1 = new GeoLogVol("SiDet", box1, Aluminium);
+
+  GeoBox *box2 = new GeoBox (0.1,2*1.7,20);
+  GeoLogVol  *boxLog2 = new GeoLogVol("SiDet", box2, Aluminium);
+
+  GeoBox *box3 = new GeoBox (0.1,3*1.7,20);
+  GeoLogVol  *boxLog3 = new GeoLogVol("SiDet", box3, Aluminium);    
+
+  GeoRectSurface* rectSurface1 = new GeoRectSurface(1*1.9, 20.2);
+  GeoRectSurface* rectSurface2 = new GeoRectSurface(2*1.9, 20.2);
+  GeoRectSurface* rectSurface3 = new GeoRectSurface(3*1.9, 20.2);
+
   for (int k=0;k<3;k++) {
     for (int j=0;j<3;j++)  {
-      GeoBox *box = new GeoBox (0.1,(j+1)*1.7,20);
-      GeoLogVol  *boxLog=new GeoLogVol("SiDet", box, Aluminium);
+      GeoLogVol* boxLog;
+      if(j==0) boxLog = boxLog1;
+      else if(j==1) boxLog = boxLog2;
+      else boxLog = boxLog3;
 
-      GeoRectSurface* rectSurface = new GeoRectSurface((j+1)*1.9, 20.2);
-      GeoVSurface* surf = new GeoVSurface(rectSurface);
-
+      GeoRectSurface* rectSurface;
+      if(j==0) rectSurface = rectSurface1;
+      else if(j==1) rectSurface = rectSurface2;
+      else rectSurface = rectSurface3;
+      
       for (int i=0;i<16;i++) {
         double theta = i/16.0*2*M_PI;
         GeoFullPhysVol *boxPhys=new GeoFullPhysVol(boxLog);
-
+        GeoVSurface* surf = new GeoVSurface(rectSurface);
         // Initial transform is very tricky. Because the Virtual surface is always facing to Z axis initially.
         GeoAlignableTransform* xf0 = new GeoAlignableTransform(GeoTrf::RotateZ3D(theta)*GeoTrf::TranslateX3D((j+1)*8.0+0.4*(i%2))*GeoTrf::TranslateX3D(0.5)*GeoTrf::TranslateZ3D((k-1)*44.0)*GeoTrf::RotateX3D(M_PI/2.0)*GeoTrf::RotateY3D(M_PI/2.0));
         GeoAlignableTransform *xf = new GeoAlignableTransform(GeoTrf::RotateZ3D(theta)*GeoTrf::TranslateX3D((j+1)*8.0+0.4*(i%2)));
@@ -163,14 +180,14 @@ void SiliconSystemPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
     }
     
   }
+  double L=10.0;
+  GeoTrapezoidSurface* trapezoid = new GeoTrapezoidSurface(1.2, 5.2, L); 
+  GeoTrd *trd=new GeoTrd(.2, .2, 1, 5, L);
+  GeoLogVol *trdLog=new GeoLogVol("SiDetEnd", trd,Aluminium);
+
   for (int j=0;j<16;j++) {
     for (int i=-1;i<2;i+=2)  {     
-
-      double L=10.0;
-      GeoTrapezoidSurface* trapezoid = new GeoTrapezoidSurface(1.2, 5.2, L);
       GeoVSurface* surf = new GeoVSurface(trapezoid);
-      GeoTrd *trd=new GeoTrd(.2, .2, 1, 5, L);
-      GeoLogVol *trdLog=new GeoLogVol("SiDetEnd", trd,Aluminium);
       GeoFullPhysVol *trdPhys=new GeoFullPhysVol(trdLog);
 
       GeoTransform *sf0=new GeoTransform(GeoTrf::RotateY3D(j*2*M_PI/16.0)*GeoTrf::RotateX3D(M_PI/2.0)*GeoTrf::TranslateY3D(1.5*L));

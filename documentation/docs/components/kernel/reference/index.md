@@ -15,6 +15,10 @@ Detailed descriptions of the geometry kernel classes follow.
 
 {% include 'components/kernel/reference/LogicalVolumes.md' %}
 
+{% include 'components/kernel/reference/VirtualSurfaceShape.md' %}
+
+{% include 'components/kernel/reference/VirtualSurface.md' %}
+
 {% include 'components/kernel/reference/PhysicalVolumes.md' %}
 
 {% include 'components/kernel/reference/Transformations.md' %}

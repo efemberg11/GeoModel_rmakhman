@@ -21,20 +21,15 @@ Material classes, as well as all other classes, use the units defined in `GeoMod
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 ...
-GeoMaterial *water = new GeoMaterial(“H20”, 1.0*SYSTEM_OF_UNITS::gram/SYSTEM_OF_UNITS::cm3);
+GeoIntrusivePtr<GeoMaterial>  water{new GeoMaterial(“H20”, 1.0*SYSTEM_OF_UNITS::gram/SYSTEM_OF_UNITS::cm3)};
 ```
 
 To finish constructing this material, water, one needs to follow the constructor with the following lines
 
 ```cpp
-GeoElement *hydrogen = new GeoElement("Hydrogen",
-                                      "H",
-                                      1.0,
-                                      1.010);
-GeoElement *oxygen = new GeoElement("Oxygen",
-                                    "O",
-                                    8.0,
-                                    16.0);
+GeoIntrusivePtr<GeoElement> hydrogen{new GeoElement("Hydrogen", "H", 1.0, 1.010)};
+GeoIntrusivePtr<GeoElement> oxygen{new GeoElement("Oxygen", "O", 8.0, 16.0)};
+
 water->add(hydrogen,0.11);
 water->add(oxygen,0.89);
 water->lock();
@@ -44,7 +39,7 @@ The materials are then used to together with shapes to form logical volumes, dis
 
 ### Shapes
 
-Shapes are created using the new operator. Essentially, shapes within this system are required to store and provide access to the geometrical constants that describe their geometrical form. This data is, insofar as possible, to be specified on the constructor.
+Essentially, shapes within this system are required to store and provide access to the geometrical constants that describe their geometrical form. This data is, insofar as possible, to be specified on the constructor.
 
 Shapes are extensible and custom shapes can be built.
 
@@ -55,7 +50,7 @@ double length = 100*SYSTEM_OF_UNITS::cm;
 double width  = 200*SYSTEM_OF_UNITS::cm;
 double depth  =  33*SYSTEM_OF_UNITS::cm;
 
-GeoBox* box = new GeoBox(length, width, depth);
+GeoIntrusivePtr<GeoBox> box{new GeoBox(length, width, depth)};
 ```
 
 Most objects can be constructed along similar lines; exceptions are objects with multiple planes such as polycones and polygons; their interface allows one to add planes successively. For the polycone, for example, the shape is built as follows:
@@ -65,7 +60,7 @@ double dphi = 10*SYSTEM_OF_UNITS::deg;
 double sphi = 40*SYSTEM_OF_UNITS::deg;
 
 // Create polycone object
-GeoPcon* polycone = new GeoPcon(dphi,sphi);
+GeoIntrusivePtr<GeoPcon> polycone{new GeoPcon(dphi,sphi)};
 
 // Add planes successively
 double z0    =  0.;
@@ -89,9 +84,11 @@ This creates a polycone whose projection subtends an angle of 10 degrees between
 The shapes can provide their data to a client through their accessors, and in addition support several other operations. Boolean operations on shapes are possible.  They can be accomplished through Boolean operators in class [GeoShape](../reference/#introduction_1):
 
 ```cpp
-GeoShape       * donut  = new GeoTube();
-GeoShape       * hole   = new GeoTube();
-const GeoShape & result = (donut->subtract(*hole));
+#include "GeoModelKernel/GeoShapeSubtraction.h"
+...
+GeoIntrusivePtr<GeoShape> donut{new GeoTube(.....)};
+GeoIntrusivePtr<GeoShape> hole{new GeoTube(.....)};
+const GeoShape & result = donut->subtract(*hole);
 ```
 
 The result of a Boolean operation is a shape in a boolean expression tree that can, for example, be decoded when the geometry is declared to GEANT4.

@@ -96,10 +96,6 @@ echo "LCG_PLATFORM: ${LCG_PLATFORM}"
 
 lsetup "views ${LCG_RELEASE} ${LCG_PLATFORM}" || true
 
-CCACHE=$(command -v ccache)
-$CCACHE -z
-
-
 export 
 
 if [ "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" == "main" ];then
@@ -128,12 +124,10 @@ cmake -S "${SCRIPT_DIR}/.." -B geomodel-build \
   -DCMAKE_INSTALL_PREFIX=$gm_install_dir \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DGEOMODEL_BUILD_TOOLS=ON \
-  -DCMAKE_CXX_COMPILER_LAUNCHER=$CCACHE \
 
 heading "Build GeoModel"
 
 cmake --build geomodel-build
-$CCACHE -s
 
 echo "Installing GeoModel"
 cmake --install geomodel-build > gm_install.log
@@ -155,13 +149,7 @@ popd > /dev/null
 echo
 fill_line "="
 
-echo "$CCACHE -z"
-$CCACHE -z
-
-echo "$CCACHE -C"
-$CCACHE -C
 export CMAKE_PREFIX_PATH="${gm_install_dir}:$CMAKE_PREFIX_PATH"
-
 
 heading "Configure Athena"
 
@@ -208,7 +196,6 @@ cmake "$ATHENA_SOURCE/Projects/WorkDir" \
   -DCMAKE_MAKE_PROGRAM="$NINJA" \
   -DCMAKE_CXX_FLAGS="$EXTRA_FLAGS -isystem ${gm_install_dir}/include" \
   -DATLAS_PACKAGE_FILTER_FILE="$package_filters" \
-  -DCMAKE_CXX_COMPILER_LAUNCHER=$CCACHE \
   -DCMAKE_INSTALL_PREFIX=$install_dir
 
 popd
@@ -222,15 +209,11 @@ echo "export LD_LIBRARY_PATH=\"${gm_install_dir}/lib64:\${LD_LIBRARY_PATH}\"" >>
 echo "export PATH=\"${gm_install_dir}/share:\${PATH}\"" >> athena-build/*/env_setup.sh
 echo "export ROOT_INCLUDE_PATH=\"${gm_install_dir}/include:\${ROOT_INCLUDE_PATH}\"" >> athena-build/*/env_setup.sh
 
-
-
 heading "Build Athena"
-
 if [ -z "$CI" ]; then
-  heading "Interactive mode, dropping into shell"
-  bash
+    heading "Interactive mode, dropping into shell"
+    bash
 else
-  cmake --build athena-build -- -j3
-  $CCACHE -s
-  cmake --install athena-build > athena_install.log
+    cmake --build athena-build -- -j5
+    cmake --install athena-build > athena_install.log
 fi

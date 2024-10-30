@@ -24,6 +24,7 @@
 #include "GeoModelKernel/GeoGenericTrap.h"
 
 #include "GeoModelKernel/Units.h"
+#include "GeoModelHelpers/TransformSorter.h"
 
 #include <vector>
 
@@ -51,12 +52,28 @@ unsigned int countComposedShapes(const GeoShape* shape) {
 }
 
 GeoIntrusivePtr<const GeoShape> compressShift(const GeoShape* shift) {    
-    if (shift->typeID() != GeoShapeShift::getClassTypeID()) return GeoIntrusivePtr<const GeoShape>{shift};
-    const GeoShapeShift* shapeShift = dynamic_cast<const GeoShapeShift*>(shift);
-    if (shapeShift->getOp()->typeID() != GeoShapeShift::getClassTypeID()) return GeoIntrusivePtr<const GeoShape>{shift};
+    GeoIntrusivePtr<const GeoShape> retPtr{shift};
+    if (shift->typeID() != GeoShapeShift::getClassTypeID()) {
+        return retPtr;
+    }
+    
+    GeoIntrusivePtr<const GeoShapeShift> shapeShift = dynamic_pointer_cast<const GeoShapeShift>(retPtr);
+    /// If the shape shift is an Identity no need to go go further.
+    if (!GeoTrf::TransformSorter{}.compare(shapeShift->getX(), GeoTrf::Transform3D::Identity())) {
+        retPtr = shapeShift->getOp();
+    }
+    if (shapeShift->getOp()->typeID() != GeoShapeShift::getClassTypeID()) {
+        return retPtr;
+    }
     GeoIntrusivePtr<const GeoShape> subShape{compressShift(shapeShift->getOp())};
-    const GeoShapeShift* subShift = dynamic_cast<const GeoShapeShift*>(subShape.get());
-    return GeoIntrusivePtr<const GeoShape>{new GeoShapeShift(subShift->getOp(), subShift->getX() * shapeShift->getX())};
+    
+    GeoIntrusivePtr<const GeoShapeShift> subShift = dynamic_pointer_cast<const GeoShapeShift>(subShape);
+    /// Check that the GeoShape shift is actually neccesary. If not bail out
+    GeoTrf::Transform3D shiftTrf{subShift->getX() * shapeShift->getX()};
+    if (!GeoTrf::TransformSorter{}.compare(shiftTrf, GeoTrf::Transform3D::Identity())) {
+        return GeoIntrusivePtr<const GeoShape>{subShift->getOp()};
+    }
+    return make_intrusive<GeoShapeShift>(subShift->getOp(), std::move(shiftTrf));
 }
 std::vector<const GeoShape*> getBooleanComponents(const GeoShape* booleanShape) {
      std::pair<const GeoShape*, const GeoShape*> operands = getOps(booleanShape);

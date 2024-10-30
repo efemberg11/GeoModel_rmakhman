@@ -85,7 +85,8 @@ GmxUtil::GmxUtil(GmxInterface &gmxInterface):
     geoItemRegistry.enregister("shaperef",  &tagHandler.shaperef);
     geoItemRegistry.enregister("transformation",  &tagHandler.transformation);
     geoItemRegistry.enregister("transformationref",  &tagHandler.transformationref);
-
+    geoItemRegistry.enregister("shapeshift", &tagHandler.shapeshift);
+    
     tagHandler.addplane.gmxUtil=this;
 }
 

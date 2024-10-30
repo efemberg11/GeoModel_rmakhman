@@ -77,7 +77,7 @@ A standalone tool to **generate geantino maps** of your newly built detector
 
 ## External Dependencies
 
-The external dependencies are minimal:
+The GeoModel Toolkit offers C++ classes that provide geometrical primitives for describing detector geometry (e.g., shapes, logical/physical volumes, transformations), as well as a set of tools for writing, accessing, handling, manipulating, dumping, restoring, visualizing, inspecting, and debugging detector geometries.
 
 - The [Eigen](https://eigen.tuxfamily.org) math library for the core packages
 

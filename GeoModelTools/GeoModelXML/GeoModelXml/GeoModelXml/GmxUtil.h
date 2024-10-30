@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEO_MODEL_XML_GMXUTIL_H
@@ -54,6 +54,8 @@
 #include "GeoModelXml/shape/MakeSubtraction.h"
 #include "GeoModelXml/shape/MakeShaperef.h"
 #include "GeoModelXml/shape/AddPlane.h"
+#include "GeoModelXml/shape/MakeShapeShift.h"
+
 
 #include "GeoModelXml/PositionIndex.h"
 //#include "GeoModelXml/SensitiveId.h"
@@ -114,6 +116,7 @@ public:
         MakeUnion onion; // union is reserved
         MakeSubtraction subtraction;
         MakeShaperef shaperef;
+        MakeShapeShift shapeshift;
         MakeTransformation transformation;
         MakeTransformationref transformationref;
 //

@@ -1,7 +1,7 @@
 
 ## GeoModel Kernel Overview
 
-In this section we give a short overview of all of the pieces of the GeoModel Kernel. These pieces are described in detail in the kernel [Class Reference](/components/kernel/reference). In this section our goal is to describe the “big picture”.  A subset of the GeoModel kernel class tree is shown on the diagram below.
+In this section we give a short overview of all of the pieces of the GeoModel Kernel. These pieces are described in detail in the kernel [Class Reference](../reference). In this section our goal is to describe the “big picture”.  A subset of the GeoModel kernel class tree is shown on the diagram below.
 
 ```mermaid
 classDiagram

@@ -150,7 +150,7 @@ run_workflow_tests_run2_mc:
   extends: .run_base
   script:
     - cd run
-    - RunWorkflowTests_Run2.py --CI -r -w MCReco --threads 0 -e '--CA "all:True" "RDOtoRDOTrigger:False" --conditionsTag "default:OFLCOND-MC16-SDR-RUN2-11" "RDOtoRDOTrigger:OFLCOND-MC16-SDR-RUN2-08-02" --maxEvents 25' --detailed-comparison
+    - RunWorkflowTests_Run2.py --CI -r -w MCReco --threads 0 -e '--maxEvents 25 --conditionsTag OFLCOND-MC16-SDR-RUN2-12' --detailed-comparison
 
 run_workflow_tests_run3_mc:
   extends: .run_base

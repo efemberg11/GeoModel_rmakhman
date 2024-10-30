@@ -49,8 +49,9 @@ If you have outdated packages, these commands will replace those packages with t
 
     The GeoModelExplorer (GMEX) application appears to crash when run on the latest version of the Ubuntu "Wayland" window manager. The problem is that the SoQt/Coin third-party packages we use in GMEX have not been ported to work to the latest Wayland yet. As far as we know, all applications that use the Coin/SoQt graphics layers as their graphics interface crash on the latest Wayland. The Coin3D community is aware of the problem but there are no fixes, yet.
 
-    We strongly suggest to use the alternative X11 window manager when running GEMX (or all other SoQt/Coin3D-based applications) on Ubuntu, for the time being.
+    We strongly suggest to use the alternative X11 window manager when running GMEX (or all other SoQt/Coin3D-based applications) on Ubuntu, for the time being.
 
+    Note also:  hardware acceleration is required for the GMEX application to work properly.  On computers with NVidia graphics, install and run the `nvidia-settings` application; go into the `PRIME Profiles` section and choose performance mode.  
 
 ## How to install GeoModel on macOS
 

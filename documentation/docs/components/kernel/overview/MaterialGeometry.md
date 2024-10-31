@@ -111,9 +111,7 @@ The methods `typeId()` and `classTypeId()` return unsigned integers, making the 
 Logical volumes represent, conceptually, a specific manufactured piece that can be placed in one or more locations around the detector.  A logical volume is created by specifying a name tag for the volume, a shape, and a material:
 
 ```cpp
-const GeoLogVol *myLog = new  GeoLogVol("MyLogVol",
-                                        myShape,
-                                        gNitrogen);
+GeoIntrusivePtr<const GeoLogVol> myLog{GeoLogVol("MyLogVol", myShape, myMaterial)};
 ```
 
 ### Physical Volumes and the Geometry Graph
@@ -123,17 +121,17 @@ Having created elements, materials, shapes, and logical volumes, you are now rea
  * Regular Physical Volumes, designed to be small.
  * Full Physical Volumes, designed to hold in cache complete information about how the volume is located with respect to the world volume, its formatted name string and other important information.
 
-There is a common abstract [base class](#geomodel-kernel-overview) for all of these:  `GeoVPhysVol`.  In addition both the full physical volumes have another layer of abstraction, `GeoVFullPhysVol`. All physical volumes allow access to their children.
+There is a common abstract [base class](#geomodel-kernel-overview) for all of these:  `GeoVPhysVol`.  In addition the full physical volumes have another layer of abstraction, `GeoVFullPhysVol`. All physical volumes allow access to their children.
 
 The concrete subclasses that you have at your disposition for detector description are called [GeoPhysVol](../reference/#geophysvol) and [GeoFullPhysVol](../reference/#geofullphysvol).  Both of these have a method to add either volumes or volume properties:
 
 ```cpp
-GeoPhysVol* myVol;
+GeoIntrusivePtr<GeoPhysVol> myVol{new GeoPhysVol(myLog)};
 myVol->add(aTransformation);
 myVol->add(anotherVolume);
 ```
 
-When you add a transformation, you change the position of the subsequent volume with respect to the parent.  If you add no transformation, you will not shift the daughter relative to the parent and commonly will create a daughter which is centered directly in the parent. If you add more than one transformation to the volume before adding a parent, they will be multiplied.  The last transformation to be added is applied first to the child. Transformations are discussed next. Like logical volumes, they may be shared.
+When you add a transformation, you change the position of the subsequent volume with respect to the parent.  If you add no transformation, you will not shift the daughter relative to the parent and commonly will create a daughter which is centered directly in the parent. If you add more than one transformation to the volume before adding a child volume, they will be multiplied.  The last transformation to be added is applied first to the child. Transformations are discussed next. Like logical volumes, they may be shared.
 
 Like physical volumes, transformations come in two types:
 
@@ -142,7 +140,7 @@ Like physical volumes, transformations come in two types:
 
 When you create a transformation, you must choose the type.
 
-The model of the raw geometry is a tree of nodes, property nodes and volume nodes. The tree can be thought of as a tree of volumes, each one “having” a set of properties (inherited from property nodes throughout the tree). The subsystem engineer judiciously chooses which of the volumes are to contain full, cached, position information – usually, these first-class volumes are to be associated with a detector. He or she also judiciously decides which of the transformations are to be alignable—usually these are the transformations which position something that ultimately has a detector bolted, glued, riveted or otherwise clamped onto a sensitive piece.  Then, the developer can apply several techniques for keeping track of these pointers so that the important volumes can later be connected to detector elements, and the alignable transformations can be connected to the alignment database for periodic updating.
+The model of the raw geometry is a tree of nodes, property nodes and volume nodes. The tree can be thought of as a tree of volumes, each one “having” a set of properties (inherited from property nodes throughout the tree). The subsystem engineer judiciously chooses which of the volumes are to contain full, cached, position information – usually, these first-class volumes are to be associated with a detector. The subsystem engineer also judiciously decides which of the transformations are to be alignable—usually these are the transformations which position something that ultimately has a detector bolted, glued, riveted or otherwise clamped onto a sensitive piece.  Then, the developer can apply several techniques for keeping track of these pointers so that the important volumes can later be connected to detector elements, and the alignable transformations can be connected to the alignment database for periodic updating.
 
 Finally, we provide three mechanisms for giving names to volumes:
 
@@ -154,19 +152,19 @@ In effect this last method can be thought of as a way of parametrizing the name 
 
 ### Actions
 
-There are two ways of getting raw geometry information out of the model.  Suppose that one has access to a particular physical volume (it could be the “World” physical volume). One can access its children, there names, and their transformations with respect to the parent in the following way:
+There are two ways of getting raw geometry information out of the model.  Suppose that one has access to a particular physical volume (it could be the “World” physical volume). One can access its children, their names, and their transformations with respect to the parent in the following way:
 
 ```cpp
-PVConstLink myVol;
+PVConstLink myVol; // PVConstLink is a typedef to GeoIntrusivePtr<const GeoVPhysVol>
 for(int c=0; c<myVol->getNChildVols(); ++c) {
 	PVConstLink child = myVol->getChildVol(c);
 	GeoTrf::Transform3D xf = getXToChildVol(c);
 }
 ```
 
-One could then iterate in a similar way over the grand children, by using a double loop.  Ultimately one would probably to visit all the volumes, whatever their depth in the tree, so probably this would call on some form of recursion.  An easy way would be to embed the small sample of code shown above in a recursive subroutine or method.  That would be fine and is conceptually simple. However, within the geometry model’s kernel, we have provided an alternate, probably better way to visit the entire tree.
+One could then iterate in a similar way over the grand children, by using a double loop.  Ultimately one would probably want to visit all the volumes, whatever their depth in the tree, so probably this would call on some form of recursion. An easy way would be to embed the small sample of code shown above in a recursive subroutine or method.  That would be fine and is conceptually simple. However, within the geometry model’s kernel, we have provided an alternate, probably better way to visit the entire tree.
 
-That mechanism involves a `GeoVolumeAction`.  A `GeoVolumeAction` is a way (for applications programmers) to obtain recursive behavior without writing any recursive routines.  It’s a class with a handler routine (`handleVPhysVol()`) which is called for each node before (or after) it is called on its children.  This can descend to an arbitrary depth in the tree.  The `GeoVolumeAction` is an abstract base class and should be subclassed by programmers to suit their needs.  Another class `TemplateVolAction` is provided as a template that one can take and modify.  To run it, one does this:
+That mechanism involves a `GeoVolumeAction`.  A `GeoVolumeAction` is a way (for applications programmers) to obtain recursive behavior without writing any recursive routines.  It’s a class with a handler routine (`handleVPhysVol()`) which is called for each node before (or after) it is called on its children.  This can descend to an arbitrary depth in the tree.  The `GeoVolumeAction` is a base class and should be subclassed by programmers to suit their needs.  Another class `TemplateVolAction` is provided as a template that one can take and modify.  To run it, one does this:
 
 ```cpp
 PVConstLink myVol;
@@ -181,8 +179,8 @@ Incidentally, there is another kind of action in the library called `GeoNodeActi
 ```cpp
 PVConstLink myVol;
 for(int c=0; c<myVol->getNChildVols(); ++c) {
-	GeoAccessVolumeAction av(c);
-	myVol->exec(&ac);
+	GeoAccessVolumeAction av(c,nullptr);
+	myVol->exec(&av);
 	PVConstLink child = av.getVolume();
 	GeoTrf::Transform3D xf = av.getTransform();
 }
@@ -194,7 +192,7 @@ This, it turns out, will execute faster than the loop shown above, which (intern
 
 We now come to the important topic of how objects in this system are created and destroyed.  The geometry kernel uses a technique called reference counting.  Reference counting, shortly stated, is a way to perform an automatic garbage collection of nodes that are no longer in use.  This is important when describing a large tree of information, much of which is ideally to be shared — used again and again in many places.
 
-You may have noticed, in several code examples used throughout the GeoModel Kernel Overview section many of the objects have been created using operator `new`. You may have also noticed, if you’ve tried to play around with the kernel classes, that statements which allocate most kernel classes on the stack, such as
+You may have noticed, in several code examples used throughout the GeoModel Kernel Overview section many of the objects have been created using operator `new`, and the resulting pointers were never used directly. Instead they have always been wrapped into objects of a special smart pointer class `GeoIntrusivePtr`. You may have also noticed, if you’ve tried to play around with the kernel classes, that statements which allocate most kernel classes on the stack, such as
 
 ```cpp
 GeoBox box(100*SYSTEM_OF_UNITS::cm
@@ -207,13 +205,13 @@ are not allowed. Who is going to clean up the memory after all these `new `opera
 Let's consider this example:
 
 ```cpp
-const GeoBox* worldBox = new GeoBox(100*SYSTEM_OF_UNITS::cm
-                                    , 100*SYSTEM_OF_UNITS::cm
-                                    , 100*SYSTEM_OF_UNITS::cm);
-const GeoLogVol* worldLog = new GeoLogVol("WorldLog"
-                                          , worldBox
-                                          , worldMaterial);
-GeoPhysVol* worldPhys = new GeoPhysVol(worldLog);
+GeoIntrusivePtr<const GeoBox> worldBox{new GeoBox(100*SYSTEM_OF_UNITS::cm
+                                                  , 100*SYSTEM_OF_UNITS::cm
+                                                  , 100*SYSTEM_OF_UNITS::cm)};
+GeoIntrusivePtr<const GeoLogVol> worldLog{new GeoLogVol("WorldLog"
+                                                        , worldBox
+                                                        , worldMaterial)};
+GeoIntrusivePtr<GeoPhysVol> worldPhys{new GeoPhysVol(worldLog)};
 ```
 
 Each of the three objects (`worldBox`, `worldLog`, and `worldPhys`) are created with a reference count.  `worldBox`’s is initially zero, at the time it is created.  `worldLog`’s is also zero when it is created.  However, when `worldLog` is created, the reference count of `worldBox` increases to one, since now it is referenced somewhere — namely by the logcal volume `worldLog`. Now, when the physical volume `worldPhys` is created, the reference count of the logical volume will increase to one — since it is used once by a single physical volume.
@@ -222,22 +220,6 @@ Each time a physical volume is positioned within another physical volume, its re
 
 When the very last node referencing the physical volume is destroyed, this means that the physical volume itself has outlived its usefulness and *should disappear*.  And that is what happens.  The destruction of objects is carried out automatically when the reference count falls to zero.  And in fact, the only way to delete an object is to arrange for all of its references to disappear.  This is because the destructor of all reference counted objects is private.
 
-This scheme applies to elements, materials, shapes, logical volumes, physical volumes, full physical volumes, and instances of all other classes which also inherit from the `RCBase` class.
+This scheme applies to elements, materials, shapes, logical volumes, physical volumes, full physical volumes, and instances of all other classes which also inherit from the `RCBase` class. The reference counting machanism described above is implemented automatically by the smart pointer class `GeoIntrusivePtr` (which works similarly to [Boost intrusive_ptr](https://www.boost.org/doc/libs/1_86_0/libs/smart_ptr/doc/html/smart_ptr.html#intrusive_ptr)). While in theory it is possible to operate GeoModel objects by using bare pointers and manual handling of reference counting (by calling `ref()` and `unref()` methods of the `RCBase` base class), it is *not recommended* to do that as this approach is error-prone, and it can easily lead to memory leaks and other memory access problems.
 
-So far, we have described what happens to an object when it is no longer used by any other node in the tree.  However, what about the top of the tree, which has no nodes that refer to it?  Since the destructors of our physical volumes are private, how do you arrange to get it to go away?
-
-Reference counts can also be manipulated manually, by using the methods `ref()` and `unref()`.  The physical volume at the head of the tree, often known as the “world” physical volume, can be referenced manually using this call:
-
-```cpp
-worldPhys->ref(); // increments reference count by one
-```
-
-Later, you can destroy the world volume and trigger a global collection of garbage by using this call:
-
-```cpp
-worldPhys->unref() // decrements reference count by one
-```
-
-When the reference count becomes 0, the world physical volume deletes itself, decreasing the reference counts of its logical volume and any children. These will then begin dereferencing and possibly deleting their own children, until all the memory has been freed.
-
-Suppose now that you want to arrange for a node to not be deleted automatically in this fashion — even when nobody references it any more. In order to do this, simply call the `ref()` method on this object. That way, the reference counts starts at 1 and will not fall to zero until you call `unref()`, manually.
+So far, we have described what happens to an object when it is no longer used by any other node in the tree.  However, what about the top of the tree, which has no nodes that refer to it?  How do you arrange to get it to go away? Well, the answer on this question is pretty simple: it is enough for all corresponding instances of the `GeoIntrusivePtr` to go out of scope. This will bring the embedded reference count of the tree top object to 0 and the object will delete itself, decreasing the reference counts of its logical volume and any children. These will then begin dereferencing and possibly deleting their own children, until all the memory has been freed.

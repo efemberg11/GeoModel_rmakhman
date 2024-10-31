@@ -2,17 +2,6 @@
 
 In this section, you will find instructions on how to **install** the latest **stable** version of GeoModel applications and development kits on different platforms.  If you are a developer and would like to install the GeoModel toolkit from source, please refer to the [Developers installation instructions](../dev/index.md).
 
-The GeoModel applications include:
-
-* **gmex**, the geometry explorer, an interactive 3d geometry visualizer
-* **gmstatistics**, tool to monitor the memory consumption
-* **fullsimlight**, a command-line tool to run Geant4 simulation, and its graphical user interface, *fsl*.
-* **gmclash**, a Geant4 based command-line tool to perform clash detection
-* **gmgeantino**, a Geant4 based command-line tool to generate geantino maps
-* **gmmasscalc**, a Geant4 based command-line tool to compute the mass of a given piece of detector geometry
-* **gm2gdml** and **gdml2gm**, command line tools to convert GeoModel to and from GDML
-* **gmcat**, a command line tool to assemble geometry from multiple inputs
-
 The development kits include header files and precompiled libraries for the development of detector description code. On some platforms (macOS) the development environment is installed together with the prebuild applications and libraries.  
 
 

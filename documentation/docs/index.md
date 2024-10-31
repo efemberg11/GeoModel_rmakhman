@@ -73,6 +73,17 @@ A standalone tool to **generate geantino maps** of your newly built detector
 
 
 
+The GeoModel Toolkit includes:
+
+* **gmex**, the geometry explorer, an interactive 3D geometry visualizer
+* **gmstatistics**, tool to monitor the memory consumption
+* **fullsimlight**, a command-line tool to run experiment agnostic Geant4 simulation, and its graphical user interface, *fsl*.
+* **gmclash**, a Geant4 based command-line tool to perform clash detection
+* **gmgeantino**, a Geant4 based command-line tool to generate geantino maps
+* **gmmasscalc**, a Geant4 based command-line tool to compute the mass of a given piece of detector geometry
+* **gm2gdml** and **gdml2gm**, command line tools to convert GeoModel to and from GDML
+* **gmcat**, a command line tool to assemble geometry from multiple inputs
+
 ----
 
 ## External Dependencies

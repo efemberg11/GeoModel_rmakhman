@@ -27,7 +27,9 @@ nav:
             - 'Overview': 'components/kernel/overview/index.md'
             - 'Class Reference': 'components/kernel/reference/index.md'
         - GeoModelTools:
-            - 'GDML2GeoModel': 'components/geomodeltools/gdml2gm/index.md'
+            - 'GeoModelCat (gmcat)': 'components/geomodeltools/gmcat/index.md'
+            - 'GeoModelStatistics (gmstatistics)': 'components/geomodeltools/gmstatistics/index.md'
+            - 'GDML2GeoModel (gdml2gm)': 'components/geomodeltools/gdml2gm/index.md'
         - GeoModelXML:
             - 'GeoModelXML Overview' : 'components/geomodelxml/index.md'
             - 'Building a geometry' : 'components/geomodelxml/buildinggeometry.md'
@@ -40,18 +42,18 @@ nav:
             - 'Troubleshooting' : 'components/geomodelxml/troubleshooting.md'    
             - 'User Guide (old, ATLAS specific)' : 'components/geomodelxml/old.md'
         - GeoModelVisualization:
-            - 'GeoModelExplorer': 'components/geomodelvisualization/gmex/index.md'
+            - 'GeoModelExplorer (gmex)': 'components/geomodelvisualization/gmex/index.md'
     - FullSimLight tools:
         - 'FullSimLight': 'fullsimlight/fullsimlight/index.md'
-        - 'GeoModelClash': 'fullsimlight/gmclash/index.md'
-        - 'GeoModelGeantino': 'fullsimlight/gmgeantino/index.md'
-        - 'GeoModelMassCalculator': 'fullsimlight/gmmasscalc/index.md'
-        - 'GeoModel2GDML': 'fullsimlight/gm2gdml/index.md'
-        - 'fsl': 'fullsimlight/fsl/index.md'
+        - 'fsl GUI': 'fullsimlight/fsl/index.md'
+        - 'GeoModelClash (gmclash)': 'fullsimlight/gmclash/index.md'
+        - 'GeoModelGeantino (gmgeantino)': 'fullsimlight/gmgeantino/index.md'
+        - 'GeoModelMassCalculator (gmmasscalc)': 'fullsimlight/gmmasscalc/index.md'
+        - 'GeoModel2GDML (gm2gdml)': 'fullsimlight/gm2gdml/index.md'
+        
         - 'Plugin Examples': 'fullsimlight/plugins/index.md'
         - 'Plugin Support': 'fullsimlight/plugin-support/index.md'
         - 'ATLAS Extensions': 'fullsimlight/atlas-extensions/index.md'
-    - FAQ: 'faq.md'
     - For Developers:
         - 'Build the Libraries and Tools': 'dev/index.md'
         - 'Build FullSimLight': 'dev/build_fullsimlight.md'
@@ -60,6 +62,7 @@ nav:
         - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
         - 'Contributing to the Documentation': 'dev/docs-contrib.md'
         - 'Dev FAQ': 'dev/dev-faq.md'
+    - FAQ: 'faq.md'
     - Papers & Presentations: 'papers.md'
       #   - 'Public': 'papers/public.md'
       #  - 'Internal': 'papers/internal.md'

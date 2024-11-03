@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16...3.26)
 
 project(fsl VERSION 0.1 LANGUAGES CXX)
 
+file( GLOB MANPAGES man/man1/* )
+
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # I am top-level project.
     # Make the root module directory visible to CMake.
@@ -96,3 +98,7 @@ install( TARGETS fsl
    LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
    COMPONENT Runtime )
 
+
+install( FILES ${MANPAGES}
+   DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1
+   COMPONENT Runtime )

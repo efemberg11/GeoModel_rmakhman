@@ -1,0 +1,112 @@
+.\" Manpage for fullSimLight.
+.\" Contact geomodel-core-team@cern.ch to correct errors or typos.
+.TH man 1 "01 Nov 2024" "6.5" "fullSimLight man page"
+.SH NAME
+fullSimLight \- Geant4 simulation from the command line
+.SH SYNOPSIS
+
+fullSimLight [-g geometry-input]  [-m macro-file] [-f physics-list-name] [-P pythia-event-type] [-p] [-o] [h]  ...
+
+fullSimLight [-c json-config-file]
+
+.SH DESCRIPTION
+fullSimLight is a command-line interface to the Geant4, the toolkit
+for simulation of particle transport and interaction with matter used
+in particle physics and medical physics.  fullSimLight takes geometry
+data from a source specified on the command line. Event data is also
+taken from a source specified on the command line or generated
+internally using the Pythia event generator. Plugins for User Actions
+and Sensitive Detectors can be used to interrupt processing, for
+example in order to generate and record hits; by default no output is
+generated.  fullSimLight is intended as a convenient way to develop,
+study, and benchmark Geant4 simulation outside of the context of large
+scale applications.
+
+Default configuration files for fullSimLight are typically installed in
+/usr/share/FullSimLight on linux systems. 
+
+The fullSimLight application can be run from the command line, or alternately,
+through the graphical user interface fsl (see fsl(1)). By default it runs 10
+events, each consisting of a single electron of energy 10 Gev and produces no
+output. 
+
+For more information on writing custom plugins for fullSimLight, see the web
+page
+.IR geomodel.web.cern.ch \.
+
+.SH OPTIONS
+
+.TP
+.BI \-c \ json-config-file
+Configure the run of fullSimLight through options recorded in a json
+configuration file.  These files are most easily produced through the
+fsl utility (see fsl(1)), a graphical user front-end to fullSimLight. 
+
+.TP
+.BI \-g \ geometry-input
+Specifies the geometry input.  The input may be a GeoModel plugin, an SQLite
+file containing a GeoModel description of a geometry, or a GDML file containing
+a GDML description of a geometry. 
+
+
+.TP
+.BI \-m \ macro-file
+Override the Macro file used to steer Geant4 (typically installed in /usr/share/FullSimLight) with a custom macro file. 
+
+.TP
+.BI \-f \ physics-list-name 
+Geant4 physics list name. Currently FTP_BERT is default. 
+
+.TP
+.BI \-P \ event-type
+Use the pythia primary event generator to generate events of specified type,
+which may be ttbar (top antitop production), higgs (higgs boson production), 
+or minbias (minimum bias events), each arising from proton-proton collisions
+at 13 TeV center-of-mass energy.
+
+.TP
+.BI \-o
+Check for geometry overlaps
+
+.TP
+.BI \-p
+Run in performance mode
+
+.TP
+.BI \-h
+Prints a help message
+
+
+
+
+
+.\" ====================================================================
+.SH "SEE ALSO"
+.\" ====================================================================
+.
+gmcat(1), gmclash(1), gmstatistics(1), gmex(1), fsl(1) 
+
+
+.IR "geant4.web.cern.ch"
+is the web page for the Geant4 toolkit, the development of which is led
+by CERN.
+
+.IR "pythia.org"
+is the web page for the pythia event generator
+
+.IR "geomodel.web.cern.ch"
+is the location of the main documentation for the GeoModel Tools Suite. 
+.
+
+.SH AUTHORS
+
+.MT Marilena.Bandieramonte@\:cern\:.ch
+Marilena Bandieramonte
+.ME ,
+.MT Raees.Ahmad.Khan@\:cern\:.ch
+Raees Khan
+.ME
+and 
+.MT boudreau@\:pitt\:.edu
+Joe Boudreau
+.ME .

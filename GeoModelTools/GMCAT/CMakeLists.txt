@@ -1,5 +1,8 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
+
+file( GLOB MANPAGES man/man1/* )
+
 # Declare the package's executable.
 add_executable( gmcat src/gmcat.cxx src/publishMetaData.cpp)
 target_link_libraries( gmcat PRIVATE GeoModelCore::GeoModelKernel
@@ -20,4 +23,8 @@ target_compile_options( gmcat PRIVATE "-DGMVERSION=${GeoModel_VERSION}" )
 install( TARGETS gmcat
    EXPORT ${PROJECT_NAME}-export
    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   COMPONENT Runtime )
+
+install( FILES ${MANPAGES}
+   DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1
    COMPONENT Runtime )

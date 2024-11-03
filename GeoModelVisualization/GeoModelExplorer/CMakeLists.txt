@@ -1,5 +1,7 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
+file( GLOB MANPAGES man/man1/* )
+
 # Add the executable.
 add_executable( gmex src/main.cxx )
 
@@ -14,4 +16,8 @@ source_group( "src" FILES "src/main.cxx" )
 install( TARGETS gmex
    EXPORT ${PROJECT_NAME}-export
    LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
+   COMPONENT Runtime )
+   
+install( FILES ${MANPAGES}
+   DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1
    COMPONENT Runtime )

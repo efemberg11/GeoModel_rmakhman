@@ -3,6 +3,9 @@
 # CMake settings
 cmake_minimum_required(VERSION 3.16...3.26)
 
+
+file( GLOB MANPAGES man/man1/* )
+
 #Set up the project. Check if we build it with GeoModel or individually
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   # I am top-level project.
@@ -222,3 +225,8 @@ install(FILES FullSimLight/FSLSensitiveDetectorPlugin.h
     	      FullSimLight/FSLUserActionPlugin.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/FullSimLight
   COMPONENT Development )
+
+
+install( FILES ${MANPAGES}
+   DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1
+   COMPONENT Runtime )

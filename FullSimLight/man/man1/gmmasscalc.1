@@ -1,0 +1,68 @@
+.\" Manpage for gmmasscalc.
+.\" Contact geomodel-core-team@cern.ch to correct errors or typos.
+.TH man 1 "01 Nov 2024" "6.5" "gmmasscalc man page"
+.SH NAME
+gmmasscalc \- detect and report clashes in a geometry model
+.SH SYNOPSIS
+
+gmmasscalc [-g geometry-input]  [-p prefix-logical-volume] [-o output-file-name] [-m material-of-interest] [-v] [h]  ...
+
+.SH DESCRIPTION
+gmmasscalc is a command-line utility for performing a mass inventory of
+a geometry model. The geometry may be provided in the form of a GeoModel description in an SQLite file, a GDML file description, or a GeoModel plugin with .so or .dylib extension. gmmasscalc reports the total inclusive mass, the total inclusive mass, and the apparent weight in air of the geometry. A summary in the form of a .json file is also saved.   
+
+gmmasscalc uses the Geant4 toolkit. 
+
+.SH OPTIONS
+
+.TP
+.BI \-o \ output-file-name
+Specify the output file.  Default: gmmasscalc_report.json
+
+.TP
+.BI \-g \ geometry-input
+Specify the geometry input.  The input may be a GeoModel plugin, an SQLite
+file containing a GeoModel description of a geometry, or a GDML file containing
+a GDML description of a geometry. 
+
+.TP
+.BI \-p \ prefix-logical-volume
+Specify root volume name.  If not specified, all volumes are considered. 
+
+.TP
+.BI \-m \ material-of-interest
+Restrict the inventory to volumes of specific material composition. 
+
+.TP
+.BI \-h
+Prints a help message
+
+.TP
+.BI \-v
+Enable verbose output 
+
+
+
+
+
+.\" ====================================================================
+.SH "SEE ALSO"
+.\" ====================================================================
+.
+gmcat(1), gmclash(1), gmstatistics(1), gmex(1), fullSimLight(1), fsl(1) 
+
+
+.IR "geant4.web.cern.ch"
+is the web page for the Geant4 toolkit, the development of which is led
+by CERN.
+
+.IR "geomodel.web.cern.ch"
+is the location of the main documentation for the GeoModel Tools Suite. 
+.
+
+.SH AUTHORS
+
+.MT Marilena.Bandieramonte@\:cern\:.ch
+Marilena Bandieramonte
+.ME
+

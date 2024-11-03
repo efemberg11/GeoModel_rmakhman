@@ -1,5 +1,9 @@
 # Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
 
+
+
+file( GLOB MANPAGES man/man1/* )
+
 # Declare the package's executable.
 add_executable( gmstatistics src/gmstatistics.cxx  src/GeoInventoryGraphAction.cxx )
 target_link_libraries( gmstatistics PRIVATE GeoModelCore::GeoModelKernel
@@ -19,4 +23,9 @@ endif()
 install( TARGETS gmstatistics
    EXPORT ${PROJECT_NAME}-export
    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   COMPONENT Runtime )
+
+
+install( FILES ${MANPAGES}
+   DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1
    COMPONENT Runtime )

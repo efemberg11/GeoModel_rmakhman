@@ -5,9 +5,17 @@ GeoModelClash (`gmclash`) allows to run geometry overlap checks on a geometry fi
 Run the executable with the `--help` option to see the available options:
 
 ``` bash
--g :   MANDATORY: the Geometry file name [.db/.gdml/.dylib/.so] 
--o :   OPTIONAL : clashes report file name (default: gmclash_report.json)
-``` 
+-g :   [MANDATORY] the Geometry file name [.db/.gdml/.dylib/.so] 
+-r :   [OPTIONAL] root volume name (default: the Geometry top volume)
+-o :   [OPTIONAL] clashes report file name (default: gmclash_report.json)
+-t :   [OPTIONAL] tolerance threshold value in mm (default: 0)
+-n :   [OPTIONAL] number of random points (default: 1000)
+-v :   [OPTIONAL] verbose output (default: off)
+```   
+
+By default `gmclash` starts the analysis from the Geometry top volume. Alternatively the user can specify a different root volume name by using the `-r` option. The tolerance threshold value is by default zero, but that value can be modified with the `-t` option. Another parameter that can be tuned is the number of random points that are shoot by `gmclash` to determine the overlapping points. By default it is set to 1000, but if the user wants to increase the precision of the report, this number can be increased with the `-n` option. 
+
+ 
 The output json file format is the following:
 
 ``` bash
@@ -53,6 +61,11 @@ To execute a clash detection on a geometry described with the SQLite file `LArBa
 To execute a clash detection on a geometry described with one of the [GeoModelPlugins repo](https://gitlab.cern.ch/atlas/GeoModelPlugins), i.e.  `HGTDPlugin` and write out the clashes report in the `cr_HGTD.json` file :
 ``` bash
 ./gmclash -g libHGTDPlugin.1.0.0.dylib -o cr_HGTD.json 
+``` 
+
+To execute a clash detection on `mygeometry.db` starting from the root volume   `EndCap` and increasing the number of random points to 10k:
+``` bash
+./gmclash -g mygeometry.db -n 10000 -r EndCap -o cr_mygeometry_EndCap.json 
 ``` 
 
 ## How to visualize the gmclash clashes report in gmex

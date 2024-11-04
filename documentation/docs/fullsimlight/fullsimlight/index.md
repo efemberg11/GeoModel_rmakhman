@@ -14,9 +14,11 @@ For information on the specific tool please refer to the relevant section.
 
 ## FullSimLight: an experiment agnostic simulation tool
 
-`fullSimLight` is an experiment agnostic simulation tool that allows to easily run `Geant4` simulations by supporting multiple detector description formats (.gdml, plugins .dylib/.so,.db). It provides extended functionality by allowing the user to customise their simulation adding customized `Geant4` User Actions, Sensitive Detectors, specialised Physics Lists, custom particle generators, etc. These flexibility is provided through the mechanism of plugins which come in the form of shared libraries (.dylib or .so) containing user custom code. 
+`fullSimLight` is an experiment agnostic simulation tool that allows to easily run `Geant4` simulations by supporting multiple detector description formats (SQLite `.db`, `.gdml`, plugins `.dylib/.so`). It provides extended functionality by allowing the user to customise their simulation adding customized `Geant4` User Actions, Sensitive Detectors, specialised Physics Lists, custom particle generators, etc. These flexibility is provided through the mechanism of plugins which come in the form of shared libraries (`.dylib` or `.so`) containing user custom code. 
 
-A built-in visualization for `fullSimLight` output is available in [gmex](https://geomodel.web.cern.ch/home/components/geomodelvisualization/gmex/) (the interactive 3D geometry visualization tool which is part of GeoModel). HITS steps and tracks generated with `fullSimLight` can be fed into `gmex`and consequently visualised. As an example the following figures can be seen. Figure 1 shows a HITS steps display of events transported with `fullSimLight` in the full ATLAS detector.
+Two plugins that implement User Actions are available as examples for the users: the [Hits](https://geomodel.web.cern.ch/home/fullsimlight/plugins/#hits-plugin) plugin and the [Tracks](https://geomodel.web.cern.ch/home/fullsimlight/plugins/#tracks-plugin) plugin.
+
+A built-in visualization for `fullSimLight` output is available in [gmex](https://geomodel.web.cern.ch/home/components/geomodelvisualization/gmex/) (the interactive 3D geometry visualization tool which is part of GeoModel). Hits steps and tracks generated with `fullSimLight` can be fed into `gmex`and consequently visualised. As an example the following figures can be seen. Figure 1 shows a Hits steps display of events transported with `fullSimLight` in the full ATLAS detector.
 
 {{ imgutils_image_caption('StepDisplay.png', 
    alt='StepDisplay', 

@@ -20,9 +20,7 @@ One can also load in a configuration by running `fsl` with the `-c` flag.
 ```
 
 !!! Tip "Watch!"
-
     Watch the following video for a quick demo on how to configure and launch `fullSimLight` with its GUI `fsl`! 
-
     <video src="../fsl/fslDemo.mov" width="720" height="540" controls></video>
 
 
@@ -47,9 +45,7 @@ The main tab allows configuration of the following parameters:
 It also contains the view button which shows the current configuration on the main display. The user can also run `fullSimLight` in the main display at any time with the current configuration by clicking on the `fullSimLight` button in the main tab. `fsl` provides similar buttons to run `gmex` and `gmclash` once a geometry input has been selected through the interface.
 
 !!! Tip "Watch!"
-
     Watch the following video for a demo on how to easily run clash detection and visualize the clashing point together with the 3D geometry directly within `fsl`! 
-
     <video src="../fsl/fsl_gmclashDemo.mov" width="720" height="540" controls></video>
 
 

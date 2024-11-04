@@ -1,6 +1,6 @@
 # Plugin Support
 
-FullSimLight provides the user support with writing plugins by providing the abstract classes which one has to override. These abstract classes serve as a link to interface various Geant4 functionality with simulation using FullSimLight. Header files containing these abstract classes are automatically installed with FullSimLight installation.
+`fullSimLight` provides the user support with writing plugins by providing the abstract classes which one has to override. These abstract classes serve as a link to interface various `Geant4` functionality with simulation using FullSimLight. Header files containing these abstract classes are automatically installed with FullSimLight installation.
 
 ## User Actions & Event Generators
 <!---->

@@ -1,6 +1,6 @@
 # Plugins Examples
 
-FullSimLight provides a convenient mechanism for users to extend their simulations through plugins in the form of shared libraries. Plugins can be used to add:
+`fullSimLight` provides a convenient mechanism for users to extend their simulations through plugins in the form of shared libraries. Plugins can be used to add:
 
 - Geometry description
 - User Actions
@@ -21,15 +21,15 @@ You can find some example user actions plugins under the FullSimLight/Plugins fo
 
 ###Hits Plugin
 
-The [Hits plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/HitsPlugin) implements both `G4UserSteppingAction` and `G4UserEventAction`. At each step the particle position (x,y,z coordinates) is saved and at the end of the event the hits are saved into a HDF5 output file. The same file can be in a second step visualized in `gmex`.
+The [Hits plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/HitsPlugin) implements both `G4UserSteppingAction` and `G4UserEventAction`. At each step the particle position (x,y,z coordinates) is saved and at the end of the event the hits are saved into a `HDF5` output file. The same file can be in a second step visualized in `gmex`.
 
 ###Tracks Plugin
 
-The [Tracks Plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/TracksPlugin) implements `G4UserRunAction`, `G4UserEventAction`, `G4UserSteppingAction`, `G4UserTrackingAction`. For each track at each step the position is recorded and mapped into a map. At the end of the event the information is saved into a HDF5 output file (the default name is Tracks_data.h5). The tracks file data can be in a second step visualized in `gmex`.
+The [Tracks Plugin](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/tree/main/FullSimLight/Plugins/TracksPlugin) implements `G4UserRunAction`, `G4UserEventAction`, `G4UserSteppingAction`, `G4UserTrackingAction`. For each track at each step the position is recorded and mapped into a map. At the end of the event the information is saved into a `HDF5` output file (the default name is `Tracks_data.h5`). The tracks file data can be in a second step visualized in `gmex`.
 
 ##Sensitive Detectors plugins
 
-One sensitive detectors example plugin is provided [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/main/FullSimLight/Plugins/Examples/SensitiveDetectorPlugins/SDPlugin/src/SDPlugin.cxx). It's a dummy plugin that serves the purpose of showing how to implement the corresponding FullSimLight abstract interface. 
+One sensitive detectors example plugin is provided [here](https://gitlab.cern.ch/GeoModelDev/GeoModel/-/blob/main/FullSimLight/Plugins/Examples/SensitiveDetectorPlugins/SDPlugin/src/SDPlugin.cxx). It's a dummy plugin that serves the purpose of showing how to implement the corresponding `fullSimLight` abstract interface. 
 
 ##Magnetic Field plugins
 
@@ -119,7 +119,7 @@ extern "C" GenerateHitsPlugin * createGenerateHitsPlugin();
 
 - The first two classes `GenerateHitsStep` & `GenerateHitsEvent` will inherit from `G4UserSteppingAction` and `G4UserEventAction` respectively, since these contain the methods that are relevant for our purpose as discussed earlier. In general you will need one class for every type of User Action you decide to use.
 
-- The final class `GenerateHitsPlugin` is neccesary for defining the plugin and ***must have the same name as the name specified within the add_library command in the CMakeLists.txt file.*** This class will inherit from the `FSLUserActionPlugin` class, which is the abstract class provided by FullSimLight to allow it to interface with our custom defined User Actions. This class must always be defined.
+- The final class `GenerateHitsPlugin` is necessary for defining the plugin and ***must have the same name as the name specified within the add_library command in the CMakeLists.txt file.*** This class will inherit from the `FSLUserActionPlugin` class, which is the abstract class provided by FullSimLight to allow it to interface with our custom defined User Actions. This class must always be defined.
 
 - Finally the function `createGenerateHitsPlugin` is neccesary for properly loading in the plugin to FullSimLight and ***must always have the name create + name of plugin class.*** This function must always be defined.
 

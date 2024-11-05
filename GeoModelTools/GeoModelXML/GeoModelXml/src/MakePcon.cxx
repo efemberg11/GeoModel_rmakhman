@@ -8,7 +8,7 @@
 #include <xercesc/dom/DOM.hpp>
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelHelpers/GeoShapeUtils.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 

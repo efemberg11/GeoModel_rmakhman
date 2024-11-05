@@ -19,7 +19,7 @@
 #include "GeoModelKernel/GeoNameTag.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 #include "GeoModelHelpers/StringUtils.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 
 #include "xercesc/util/XMLString.hpp"

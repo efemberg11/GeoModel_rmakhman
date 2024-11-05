@@ -1,9 +1,10 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include "GeoModelKernel/throwExcept.h"
 #include <cmath>
 #include <stdexcept>
 
@@ -16,13 +17,10 @@ GeoPgon::GeoPgon (double SPhi, double DPhi, unsigned int NSides)
   , m_nSides (NSides)
 {}
 
-double GeoPgon::volume (int) const
-{
-#ifndef M_PI
-  constexpr double M_PI = 3.14159265358979323846;
-#endif
+double GeoPgon::volume (int) const {
+
   if (!isValid ())
-    throw std::runtime_error ("Volume requested for incomplete polygon");
+    THROW_EXCEPTION("Volume requested for incomplete polygon");
   double vol = 0.0;
   for (size_t k = 0; k < getNPlanes() - 1; ++k) {
     double z1 = getZPlane(k);
@@ -45,11 +43,9 @@ double GeoPgon::volume (int) const
 void GeoPgon::extent (double& xmin, double& ymin, double& zmin,
                       double& xmax, double& ymax, double& zmax) const
 {
-#ifndef M_PI
-  constexpr double M_PI = 3.14159265358979323846;
-#endif
+
   if (!isValid ())
-    throw std::runtime_error ("Extent requested for incomplete polygon");
+    THROW_EXCEPTION("Extent requested for incomplete polygon");
   double rmin = getRMinPlane(0);
   double rmax = getRMaxPlane(0);
   zmin = zmax = getZPlane(0);

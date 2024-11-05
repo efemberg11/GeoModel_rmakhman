@@ -14,7 +14,7 @@
 
 #include "GeoModelHelpers/TransformSorter.h"
 #include "GeoModelHelpers/GeoShapeUtils.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 

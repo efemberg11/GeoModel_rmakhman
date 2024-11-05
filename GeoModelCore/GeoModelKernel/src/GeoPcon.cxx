@@ -1,9 +1,10 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include "GeoModelKernel/throwExcept.h"
 #include <cmath>
 #include <stdexcept>
 
@@ -18,7 +19,7 @@ GeoPcon::GeoPcon (double SPhi, double DPhi)
 double GeoPcon::volume (int) const
 {
   if (!isValid ())
-    throw std::runtime_error ("Volume requested for incomplete polycone");
+    THROW_EXCEPTION("Volume requested for incomplete polycone");
   double vol = 0;
   for (size_t k = 0; k < getNPlanes() - 1; ++k)
   {
@@ -38,7 +39,7 @@ void GeoPcon::extent (double& xmin, double& ymin, double& zmin,
                       double& xmax, double& ymax, double& zmax) const
 {
   if (!isValid ())
-    throw std::runtime_error ("Extent requested for incomplete polycone");
+    THROW_EXCEPTION("Extent requested for incomplete polycone");
   double rmin = getRMinPlane(0);
   double rmax = getRMaxPlane(0);
   zmin = zmax = getZPlane(0);

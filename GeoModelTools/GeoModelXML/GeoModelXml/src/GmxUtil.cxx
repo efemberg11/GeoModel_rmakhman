@@ -11,7 +11,7 @@
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelXml/GmxInterface.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 #include <cstdlib>
 #include <sstream>

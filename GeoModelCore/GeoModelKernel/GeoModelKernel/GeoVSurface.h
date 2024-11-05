@@ -20,19 +20,13 @@
 #include "GeoModelKernel/GeoPlacement.h"
 #include "GeoModelKernel/GeoNodePositioning.h"
 #include "GeoModelKernel/GeoDefinitions.h"
+#include "GeoModelKernel/throwExcept.h"
 #include <iostream>
 
 #include <exception>
 #include <sstream>
 
-#define THROW_EXCEPTION(MESSAGE)                      \
-    {                                                 \
-        std::stringstream except_str{};               \
-        except_str<<__FILE__<<":"<<__LINE__<<" --- "; \
-        except_str<<MESSAGE;                          \
-        throw std::runtime_error(except_str.str());   \
-    }
-    
+
 class GeoVSurface : public GeoPlacement, public GeoNodePositioning {
  public:
     using VSConstLink = GeoIntrusivePtr<const GeoVSurface>;

@@ -100,7 +100,7 @@
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 
 #include "GeoModelHelpers/variantHelpers.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "GeoModelHelpers/StringUtils.h"
 
 // Units

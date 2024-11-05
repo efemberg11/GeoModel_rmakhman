@@ -3,6 +3,7 @@
 */
 
 #include "GeoModelKernel/GeoNodePositioning.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "GeoModelKernel/GeoVPhysVol.h"
 
 #include <mutex>
@@ -19,7 +20,7 @@ GeoNodePositioning::GeoNodePositioning(const GeoPlacement* node):
     GeoTrf::Transform3D tProd{GeoTrf::Transform3D::Identity()};
     
     if(m_node->isShared()) {
-      throw std::runtime_error("GeoPlacement node is shared");
+      THROW_EXCEPTION("GeoPlacement node is shared");
     }
     GeoIntrusivePtr<const GeoPlacement> child{m_node}, parent{m_node->getParent()};
     while (parent) {
@@ -27,7 +28,7 @@ GeoNodePositioning::GeoNodePositioning(const GeoPlacement* node):
       tProd = transform * tProd;
       child = parent;
       if(child->isShared()) {
-        throw std::runtime_error("GeoPlacement node is shared.");
+        THROW_EXCEPTION("GeoPlacement node is shared.");
       } else {
         parent = child->getParent();
       }
@@ -70,7 +71,7 @@ const GeoTrf::Transform3D& GeoNodePositioning::getCachedAbsoluteTransform(const 
       assert(storedPos != nullptr);    
       if(storedPos) return *storedPos;
   }
-  throw std::runtime_error("Failed to find the cached absolute transform ");
+  THROW_EXCEPTION("Failed to find the cached absolute transform ");
 }
 
 void GeoNodePositioning::clearPositionInfo() const {
@@ -115,7 +116,7 @@ const GeoTrf::Transform3D&
     
     if(storedPos) return *storedPos;
   }
-  throw std::runtime_error("Failed to find the cached default absolute transform. ");
+  THROW_EXCEPTION("Failed to find the cached default absolute transform. ");
 }
 
 

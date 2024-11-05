@@ -6,7 +6,7 @@
 
 #include "GeoModelHelpers/StringUtils.h"
 #include "GeoModelHelpers/FileUtils.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 
 #include "GeoModelXml/GmxInterface.h"

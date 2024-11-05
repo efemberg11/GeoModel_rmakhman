@@ -7,7 +7,7 @@
 //
 #include "OutputDirector.h"
 #include "GeoModelXml/AssemblyrefProcessor.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 #include "xercesc/util/XercesDefs.hpp"
 #include <xercesc/dom/DOM.hpp>

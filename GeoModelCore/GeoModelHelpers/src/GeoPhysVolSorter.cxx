@@ -3,12 +3,13 @@
 */
 #include "GeoModelHelpers/GeoPhysVolSorter.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
+#include "GeoModelKernel/throwExcept.h"
 
 #include "GeoModelHelpers/TransformSorter.h"
 #include "GeoModelHelpers/GeoLogVolSorter.h"
 #include "GeoModelKernel/GeoVolumeCursor.h"
 #include "GeoModelHelpers/getChildNodesWithTrf.h"
-#include "GeoModelHelpers/throwExcept.h"
+
 
 
 int GeoPhysVolSorter::compare(const GeoVPhysVol* a, const GeoVPhysVol* b) const {

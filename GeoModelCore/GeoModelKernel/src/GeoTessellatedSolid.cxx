@@ -1,9 +1,9 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-
 #include "GeoModelKernel/GeoTessellatedSolid.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include "GeoModelKernel/throwExcept.h"
 #include <stdexcept>
 
 const std::string GeoTessellatedSolid::s_classType = "TessellatedSolid";
@@ -16,7 +16,7 @@ GeoTessellatedSolid::GeoTessellatedSolid()
 double GeoTessellatedSolid::volume(int) const
 {
   if (!isValid ())
-    throw std::runtime_error ("Volume requested for incomplete tessellated solid");
+    THROW_EXCEPTION("Volume requested for incomplete tessellated solid");
   double v = 0.;
   for (size_t i = 0; i < getNumberOfFacets(); ++i)
   {
@@ -28,7 +28,7 @@ double GeoTessellatedSolid::volume(int) const
     v += facet->getVertex(0).dot(e1.cross(e2));
   }
   if (v < 0.)
-    throw std::runtime_error ("Incorrect order of vertices in tessellated solid");
+    THROW_EXCEPTION("Incorrect order of vertices in tessellated solid");
   return v*(1./6.);
 }
 
@@ -36,7 +36,7 @@ void GeoTessellatedSolid::extent (double& xmin, double& ymin, double& zmin,
                                   double& xmax, double& ymax, double& zmax) const
 {
   if (!isValid ())
-    throw std::runtime_error ("Extent requested for incomplete tessellated solid");
+    THROW_EXCEPTION("Extent requested for incomplete tessellated solid");
   GeoFacet* facet = getFacet(0);
   GeoTrf::Vector3D vertex = facet->getVertex(0);
   xmin = xmax = vertex.x();
@@ -63,7 +63,7 @@ void GeoTessellatedSolid::extent (double& xmin, double& ymin, double& zmin,
 
 bool GeoTessellatedSolid::contains (double x, double y, double z) const
 {
-  throw std::runtime_error ("GeoTessellatedSolid::contains(x,y,z) is not implemented");
+  THROW_EXCEPTION("GeoTessellatedSolid::contains(x,y,z) is not implemented");
   return false;
 }
 

@@ -1,14 +1,17 @@
+/*
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+*/
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
 #include "GeoModelKernel/Query.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include "GeoModelKernel/throwExcept.h"
 #include <stdexcept>
 
 const std::string         GeoUnidentifiedShape::_classType="UnidentifiedShape";
 const ShapeType           GeoUnidentifiedShape::_classTypeID=0xFFFFFFFF;
 
 // Destructor:
-GeoUnidentifiedShape::~GeoUnidentifiedShape() {
-}
+GeoUnidentifiedShape::~GeoUnidentifiedShape() = default;
 
 // Constructor:
 GeoUnidentifiedShape::GeoUnidentifiedShape(const std::string & name):
@@ -44,14 +47,14 @@ double GeoUnidentifiedShape::volume () const {
 void GeoUnidentifiedShape::extent (double& xmin, double& ymin, double& zmin,
                                    double& xmax, double& ymax, double& zmax) const
 {
-  throw std::runtime_error ("GeoUndefinedShape::extent is not implemented");
+  THROW_EXCEPTION("GeoUndefinedShape::extent is not implemented");
   xmin = ymin = zmin = xmax = ymax = zmax = 0.;
 }
 
 // Returns true if the shape contains the point, false otherwise
 bool GeoUnidentifiedShape::contains (double x, double y, double z) const
 {
-  throw std::runtime_error ("GeoUndefinedShape::contains(x,y,z) is not implemented");
+  THROW_EXCEPTION("GeoUndefinedShape::contains(x,y,z) is not implemented");
   return false;
 }
 

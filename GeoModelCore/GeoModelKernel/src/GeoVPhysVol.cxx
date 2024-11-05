@@ -67,7 +67,7 @@ void GeoVPhysVol::apply(GeoVolumeAction *action) const {
     if(action->shouldTerminate()) return;  // To Do: do I need this?
     break;
   default:
-    throw std::runtime_error("GeoVPhysVol::apply(). Unsupported GeoVolumeAction type " + std::to_string((unsigned)action->getType()));
+    THROW_EXCEPTION("GeoVPhysVol::apply(). Unsupported GeoVolumeAction type "<<action->getType());
   }
 }
 

@@ -12,9 +12,9 @@ PVLink cloneVolume(const PVLink& volume,
     PVLink newVolume{volume};
     if (!allowShared || hasFullPhysVolInTree(volume)) {
         if (typeid(*volume) == typeid(GeoPhysVol)) {
-            newVolume = new GeoPhysVol(volume->getLogVol());
+            newVolume = make_intrusive<GeoPhysVol>(volume->getLogVol());
         } else if (typeid(*volume) == typeid(GeoFullPhysVol)) {
-            newVolume = new GeoFullPhysVol(volume->getLogVol());
+            newVolume = make_intrusive<GeoFullPhysVol>(volume->getLogVol());
         }
         for (unsigned int ch = 0; ch < volume->getNChildNodes(); ++ch){
           const GeoGraphNode* node = (*volume->getChildNode(ch));

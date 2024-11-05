@@ -35,7 +35,7 @@
 #include "GeoModelXml/GeoNodeList.h"
 #include "xercesc/util/XMLString.hpp"
 
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 // using namespace CLHEP;
 
 using namespace std;

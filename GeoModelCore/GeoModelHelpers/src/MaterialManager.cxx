@@ -10,7 +10,7 @@
 #include "GeoModelKernel/GeoMaterial.h"
 #include "GeoModelKernel/Units.h"
 
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "GeoModelHelpers/StringUtils.h"
 
 #include <cstdio>

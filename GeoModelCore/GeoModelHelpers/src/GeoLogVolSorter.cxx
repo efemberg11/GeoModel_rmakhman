@@ -2,7 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 #include "GeoModelHelpers/GeoLogVolSorter.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "GeoModelHelpers/GeoShapeSorter.h"
 
 bool GeoLogVolSorter::operator()(const GeoLogVol* a, const GeoLogVol* b) const{

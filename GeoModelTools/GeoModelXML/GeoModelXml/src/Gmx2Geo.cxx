@@ -29,7 +29,7 @@
 #include "GeoModelXml/GmxInterface.h"
 #include "GeoModelXml/createdomdocument.h"
 #include "GeoModelHelpers/MaterialManager.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 using namespace std;
 using namespace xercesc;

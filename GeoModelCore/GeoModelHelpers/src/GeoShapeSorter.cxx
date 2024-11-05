@@ -5,7 +5,7 @@
 #include "GeoModelHelpers/TransformSorter.h"
 #include "GeoModelHelpers/TransformToStringConverter.h"
 #include "GeoModelHelpers/GeoShapeUtils.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 #include "GeoModelKernel/Units.h"
 

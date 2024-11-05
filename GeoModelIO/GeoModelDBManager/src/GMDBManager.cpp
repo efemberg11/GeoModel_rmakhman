@@ -25,7 +25,7 @@
 
 #include <GeoModelDBManager/GMDBManager.h>
 
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "GeoModelHelpers/StringUtils.h"
 
 

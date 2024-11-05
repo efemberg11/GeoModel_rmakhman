@@ -5,7 +5,7 @@
 #include "GeoModelXMLParser/XMLHandler.h"
 #include "GeoModelXMLParser/XMLHandlerStore.h"
 #include "GeoModelHelpers/StringUtils.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "ExpressionEvaluator/ExpressionEvaluator.h"
 
 #include <vector>

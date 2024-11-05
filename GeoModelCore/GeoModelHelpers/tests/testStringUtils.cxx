@@ -3,7 +3,7 @@
 */
 
 #include "GeoModelHelpers/StringUtils.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include <cstdlib>
 #include <iostream>
 using namespace GeoStrUtils;

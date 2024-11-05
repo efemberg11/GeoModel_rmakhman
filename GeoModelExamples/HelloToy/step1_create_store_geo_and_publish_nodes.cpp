@@ -54,7 +54,7 @@
 
 #include "GeoModelWrite/WriteGeoModel.h"
 
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 
 // Units

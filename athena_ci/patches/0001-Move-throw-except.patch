@@ -1,0 +1,584 @@
+From eca80303324ee9b19f75dd507a7d13da0fbe6b2c Mon Sep 17 00:00:00 2001
+From: Johannes Josef Junggeburth <johannes.josef.junggeburth@cern.ch>
+Date: Thu, 24 Oct 2024 10:06:45 +0200
+Subject: [PATCH] Move throw except
+
+---
+ .../GeoModelUtilities/GeoModelUtilities/TransformMap.icc        | 2 +-
+ .../MuonCablings/MuonCablingData/src/MuonMDT_CablingMap.cxx     | 2 +-
+ .../MuonCalib/MdtCalib/MdtCalibData/src/BFieldCorFunc.cxx       | 2 +-
+ .../MuonCalib/MdtCalib/MdtCalibData/src/RtChebyshev.cxx         | 2 +-
+ .../MdtCalib/MdtCalibData/src/RtResolutionChebyshev.cxx         | 2 +-
+ .../MuonCalib/MdtCalib/MdtCalibInterfaces/src/MdtCalibInput.cxx | 2 +-
+ .../MuonCalib/MdtCalib/MdtCalibSvc/src/MdtCalibrationTool.cxx   | 2 +-
+ .../MuonCalibUtils/MuonCalibMath/src/BaseFunctionFitter.cxx     | 2 +-
+ .../MuonCalib/MuonCalibUtils/MuonCalibMath/src/PolygonBase.cxx  | 2 +-
+ .../MuonCnv/MuonRPC_CnvTools/src/RpcRdoToPrepDataToolMT.cxx     | 2 +-
+ .../MuonCondGeneral/MuonCondAlg/src/MdtAsBuiltCondAlg.cxx       | 2 +-
+ .../MuonCondGeneral/MuonCondAlg/src/MdtCalibDbAlg.cxx           | 2 +-
+ .../MuonCondGeneral/MuonCondAlg/src/NswCalibDbAlg.cxx           | 2 +-
+ .../MuonCondGeneral/MuonCondAlg/src/NswDcsDbAlg.cxx             | 2 +-
+ .../MuonCondGeneral/MuonCondData/src/DigitEffiData.cxx          | 2 +-
+ .../MuonCondGeneral/MuonCondData/src/MdtCondDbData.cxx          | 2 +-
+ .../MuonCondData/src/NswCalibDbTimeChargeData.cxx               | 2 +-
+ .../MuonCondGeneral/MuonCondData/src/NswDcsDbData.cxx           | 2 +-
+ .../MuonCondGeneral/MuonCondData/src/NswErrorCalibData.cxx      | 2 +-
+ .../MuonCondGeneral/MuonCondData/src/NswT0Data.cxx              | 2 +-
+ .../MuonDetDescr/MuonReadoutGeometry/src/MdtReadoutElement.cxx  | 2 +-
+ .../MuonReadoutGeometry/src/MuonDetectorManager.cxx             | 2 +-
+ .../RPC_Digitization/src/RpcDigitizationTool.cxx                | 2 +-
+ .../MuonPhaseII/Event/MuonSpacePoint/src/UtilFunctions.cxx      | 2 +-
+ .../Event/xAOD/xAODMuonPrepData/Root/UtilFunctions.cxx          | 2 +-
+ .../xAODMuonPrepData/xAODMuonPrepData/versions/AccessorMacros.h | 2 +-
+ .../Event/xAOD/xAODMuonViews/xAODMuonViews/ChamberViewer.h      | 2 +-
+ .../MuonAlignmentDataR4/src/MdtAlignmentStore.cxx               | 2 +-
+ .../MuonDigitizationR4/src/MuonDigitizationTool.cxx             | 2 +-
+ .../MuonSensitiveDetectorsR4/src/MdtSensitiveDetector.cxx       | 2 +-
+ .../MuonG4/MuonSensitiveDetectorsR4/src/MmSensitiveDetector.cxx | 2 +-
+ .../MuonSensitiveDetectorsR4/src/RpcSensitiveDetector.cxx       | 2 +-
+ .../MuonSensitiveDetectorsR4/src/TgcSensitiveDetector.cxx       | 2 +-
+ .../MuonSensitiveDetectorsR4/src/sTgcSensitiveDetector.cxx      | 2 +-
+ .../MuonPatternHelpers/Root/SegmentFitHelperFunctions.cxx       | 2 +-
+ .../MuonValidation/MuonPRDTestR4/Root/TesterModuleBase.cxx      | 2 +-
+ .../MuonStationIntersectCond/src/MdtIntersectGeometry.cxx       | 2 +-
+ Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx             | 2 +-
+ Tracking/Acts/ActsGeoUtils/src/SurfaceCache.cxx                 | 2 +-
+ Tracking/Acts/ActsGeometry/src/ActsDetectorElement.cxx          | 2 +-
+ .../TrkDriftCircleMath/src/MdtChamberGeometry.cxx               | 2 +-
+ 41 files changed, 41 insertions(+), 41 deletions(-)
+
+diff --git a/DetectorDescription/GeoModel/GeoModelUtilities/GeoModelUtilities/TransformMap.icc b/DetectorDescription/GeoModel/GeoModelUtilities/GeoModelUtilities/TransformMap.icc
+index 9d71a8653a2..45134100c37 100755
+--- a/DetectorDescription/GeoModel/GeoModelUtilities/GeoModelUtilities/TransformMap.icc
++++ b/DetectorDescription/GeoModel/GeoModelUtilities/GeoModelUtilities/TransformMap.icc
+@@ -5,7 +5,7 @@
+ #ifndef GEOMODELUTILITIES_TRANSFORMMAP_ICC
+ #define GEOMODELUTILITIES_TRANSFORMMAP_ICC
+ 
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ #include "CxxUtils/inline_hints.h"
+ 
+ 
+diff --git a/MuonSpectrometer/MuonCablings/MuonCablingData/src/MuonMDT_CablingMap.cxx b/MuonSpectrometer/MuonCablings/MuonCablingData/src/MuonMDT_CablingMap.cxx
+index 6796d45aa05..5d83f76571a 100644
+--- a/MuonSpectrometer/MuonCablings/MuonCablingData/src/MuonMDT_CablingMap.cxx
++++ b/MuonSpectrometer/MuonCablings/MuonCablingData/src/MuonMDT_CablingMap.cxx
+@@ -11,7 +11,7 @@
+ #include "CxxUtils/ArrayHelper.h"
+ #include "StoreGate/StoreGateSvc.h"
+ #include "Identifier/Identifier.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ namespace {
+ /// Four mezzanine channels explicitly break the cabling schema in the legacy
+diff --git a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/BFieldCorFunc.cxx b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/BFieldCorFunc.cxx
+index c991661e9c3..c481008c31e 100644
+--- a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/BFieldCorFunc.cxx
++++ b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/BFieldCorFunc.cxx
+@@ -9,7 +9,7 @@
+ #include "MdtCalibData/IRtRelation.h"
+ #include "MuonCalibMath/BaseFunctionFitter.h"
+ #include "MuonCalibMath/LegendrePolynomial.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ #include "cmath"
+ 
+ using namespace MuonCalib;
+diff --git a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/RtChebyshev.cxx b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/RtChebyshev.cxx
+index 6a75398569e..813dc50bfd5 100644
+--- a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/RtChebyshev.cxx
++++ b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/RtChebyshev.cxx
+@@ -3,7 +3,7 @@
+ */
+ #include "MdtCalibData/RtChebyshev.h"
+ #include "MuonCalibMath/ChebychevPoly.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ using namespace MuonCalib;
+ 
+ RtChebyshev::RtChebyshev(const ParVec& vec) : 
+diff --git a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/RtResolutionChebyshev.cxx b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/RtResolutionChebyshev.cxx
+index 111b63529c1..24e70884ff4 100644
+--- a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/RtResolutionChebyshev.cxx
++++ b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibData/src/RtResolutionChebyshev.cxx
+@@ -3,7 +3,7 @@
+ */
+ #include "MdtCalibData/RtResolutionChebyshev.h"
+ #include "MuonCalibMath/ChebychevPoly.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ using namespace MuonCalib;
+ 
+diff --git a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibInterfaces/src/MdtCalibInput.cxx b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibInterfaces/src/MdtCalibInput.cxx
+index a1862fa9c16..e9643299143 100644
+--- a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibInterfaces/src/MdtCalibInput.cxx
++++ b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibInterfaces/src/MdtCalibInput.cxx
+@@ -16,7 +16,7 @@
+ #include <MuonDigitContainer/MdtDigit.h>
+ #include <MuonPrepRawData/MdtPrepData.h>
+ #include <TrkSurfaces/StraightLineSurface.h>
+-#include <GeoModelHelpers/throwExcept.h>
++#include <GeoModelKernel/throwExcept.h>
+ 
+ std::ostream& operator<<(std::ostream& ostr, const MdtCalibInput& input){
+    ostr<<"adc: "<<input.adc()<<", ";
+diff --git a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibSvc/src/MdtCalibrationTool.cxx b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibSvc/src/MdtCalibrationTool.cxx
+index e556c062c44..88903fcbf18 100644
+--- a/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibSvc/src/MdtCalibrationTool.cxx
++++ b/MuonSpectrometer/MuonCalib/MdtCalib/MdtCalibSvc/src/MdtCalibrationTool.cxx
+@@ -23,7 +23,7 @@
+ #include "MagFieldElements/AtlasFieldCache.h"
+ #include "MuonCalibEvent/MdtCalibHit.h"
+ 
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ namespace {
+   static double const twoBySqrt12 = 2/std::sqrt(12);
+ }
+diff --git a/MuonSpectrometer/MuonCalib/MuonCalibUtils/MuonCalibMath/src/BaseFunctionFitter.cxx b/MuonSpectrometer/MuonCalib/MuonCalibUtils/MuonCalibMath/src/BaseFunctionFitter.cxx
+index 641e9aca192..1a52a629edb 100644
+--- a/MuonSpectrometer/MuonCalib/MuonCalibUtils/MuonCalibMath/src/BaseFunctionFitter.cxx
++++ b/MuonSpectrometer/MuonCalib/MuonCalibUtils/MuonCalibMath/src/BaseFunctionFitter.cxx
+@@ -3,7 +3,7 @@
+ */
+ 
+ #include "MuonCalibMath/BaseFunctionFitter.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ #include <cmath>
+ 
+ namespace MuonCalib {
+diff --git a/MuonSpectrometer/MuonCalib/MuonCalibUtils/MuonCalibMath/src/PolygonBase.cxx b/MuonSpectrometer/MuonCalib/MuonCalibUtils/MuonCalibMath/src/PolygonBase.cxx
+index 14143d0b8c3..876165a4aa0 100644
+--- a/MuonSpectrometer/MuonCalib/MuonCalibUtils/MuonCalibMath/src/PolygonBase.cxx
++++ b/MuonSpectrometer/MuonCalib/MuonCalibUtils/MuonCalibMath/src/PolygonBase.cxx
+@@ -5,7 +5,7 @@
+ #include <iostream>
+ #include <cstdlib>
+ #include "MuonCalibMath/PolygonBase.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ using namespace MuonCalib;
+ 
+ PolygonBase::PolygonBase(const std::vector<double> & x) {
+diff --git a/MuonSpectrometer/MuonCnv/MuonRPC_CnvTools/src/RpcRdoToPrepDataToolMT.cxx b/MuonSpectrometer/MuonCnv/MuonRPC_CnvTools/src/RpcRdoToPrepDataToolMT.cxx
+index 3c3b0aadfef..714c9adc230 100755
+--- a/MuonSpectrometer/MuonCnv/MuonRPC_CnvTools/src/RpcRdoToPrepDataToolMT.cxx
++++ b/MuonSpectrometer/MuonCnv/MuonRPC_CnvTools/src/RpcRdoToPrepDataToolMT.cxx
+@@ -13,7 +13,7 @@
+ #include "TrkSurfaces/Surface.h"
+ #include "xAODMuonPrepData/RpcStripAuxContainer.h"
+ #include "MuonIdHelpers/IdentifierByDetElSorter.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ using namespace MuonGM;
+ using namespace Trk;
+ namespace Muon{
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/MdtAsBuiltCondAlg.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/MdtAsBuiltCondAlg.cxx
+index 4c64dca466f..0f2b2e2486d 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/MdtAsBuiltCondAlg.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/MdtAsBuiltCondAlg.cxx
+@@ -8,7 +8,7 @@
+ #include <AthenaKernel/IOVInfiniteRange.h>
+ #include <PathResolver/PathResolver.h>
+ #include <CxxUtils/StringUtils.h>
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ MdtAsBuiltCondAlg::MdtAsBuiltCondAlg(const std::string& name, ISvcLocator* pSvcLocator):
+         AthReentrantAlgorithm{name, pSvcLocator} {}
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/MdtCalibDbAlg.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/MdtCalibDbAlg.cxx
+index c55a2f88544..01816d4ced2 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/MdtCalibDbAlg.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/MdtCalibDbAlg.cxx
+@@ -41,7 +41,7 @@
+ 
+ #include "TFile.h"
+ #include "TSpline.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ using namespace MuonCalib;
+ using namespace CxxUtils;
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/NswCalibDbAlg.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/NswCalibDbAlg.cxx
+index 9511c7aee35..50dbfd82214 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/NswCalibDbAlg.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/NswCalibDbAlg.cxx
+@@ -15,7 +15,7 @@
+ #include "MuonNSWCommonDecode/NSWResourceId.h"
+ #include "MuonNSWCommonDecode/NSWOfflineHelper.h"
+ #include "AthenaKernel/IOVInfiniteRange.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ #include<ctime>
+ 
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/NswDcsDbAlg.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/NswDcsDbAlg.cxx
+index 1e678614884..4178c37054a 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/NswDcsDbAlg.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondAlg/src/NswDcsDbAlg.cxx
+@@ -10,7 +10,7 @@
+ #include <regex>
+ #include "nlohmann/json.hpp"
+ #include "MuonIdHelpers/IMuonIdHelperSvc.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ // Initialize
+ StatusCode
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/DigitEffiData.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/DigitEffiData.cxx
+index 762b59cb827..b5b5eeadd53 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/DigitEffiData.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/DigitEffiData.cxx
+@@ -2,7 +2,7 @@
+   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+ */
+ #include "MuonCondData/DigitEffiData.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ namespace Muon{
+     DigitEffiData::DigitEffiData(const Muon::IMuonIdHelperSvc* idHelperSvc, double defaultEffi):
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/MdtCondDbData.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/MdtCondDbData.cxx
+index 7749ba87665..10629c98e83 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/MdtCondDbData.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/MdtCondDbData.cxx
+@@ -4,7 +4,7 @@
+ 
+ #include "MuonCondData/MdtCondDbData.h"
+ #include "MuonIdHelpers/MdtIdHelper.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ using DcsConstants = MdtCondDbData::DcsConstants;
+ // --- writing identifiers -------
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswCalibDbTimeChargeData.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswCalibDbTimeChargeData.cxx
+index ca2082f1832..97d5dd92a42 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswCalibDbTimeChargeData.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswCalibDbTimeChargeData.cxx
+@@ -5,7 +5,7 @@
+ #include "MuonCondData/NswCalibDbTimeChargeData.h"
+ #include "MuonIdHelpers/IMuonIdHelperSvc.h"
+ #include "Identifier/Identifier.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ std::ostream& operator<<(std::ostream& ostr, const NswCalibDbTimeChargeData::CalibConstants& obj) {
+     ostr<<"slope: "<<std::setprecision(15)<<obj.slope;//<<" pm "<<std::setprecision(15)<<obj.slopeError;
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswDcsDbData.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswDcsDbData.cxx
+index ed816396bcb..17fcf8345e6 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswDcsDbData.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswDcsDbData.cxx
+@@ -14,7 +14,7 @@
+ #include "MuonNSWCommonDecode/MapperSTG.h"
+ #include "MuonNSWCommonDecode/MapperMMG.h"
+ 
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ 
+ 
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswErrorCalibData.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswErrorCalibData.cxx
+index e56a569c825..b9c76271b03 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswErrorCalibData.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswErrorCalibData.cxx
+@@ -1,6 +1,6 @@
+ #include "MuonCondData/NswErrorCalibData.h"
+ #include <sstream>
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ using errorParametrizer = NswErrorCalibData::errorParametrizer;
+ using Input = NswErrorCalibData::Input;
+diff --git a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswT0Data.cxx b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswT0Data.cxx
+index cd09fe770c1..54b03336b10 100644
+--- a/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswT0Data.cxx
++++ b/MuonSpectrometer/MuonConditions/MuonCondGeneral/MuonCondData/src/NswT0Data.cxx
+@@ -6,7 +6,7 @@
+ #include "MuonIdHelpers/sTgcIdHelper.h"
+ #include "Identifier/Identifier.h"
+ #include "AthenaKernel/IOVInfiniteRange.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ 
+ NswT0Data::NswT0Data(const Muon::IMuonIdHelperSvc* idHelperSvc): 
+diff --git a/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MdtReadoutElement.cxx b/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MdtReadoutElement.cxx
+index 77af374334f..ac8a3342658 100644
+--- a/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MdtReadoutElement.cxx
++++ b/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MdtReadoutElement.cxx
+@@ -17,7 +17,7 @@
+ #include "GeoModelUtilities/GeoGetIds.h"
+ #include "GeoPrimitives/GeoPrimitivesHelpers.h"
+ #include "GeoPrimitives/GeoPrimitivesToStringConverter.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ #include "GeoModelHelpers/TransformToStringConverter.h"
+ #include "GeoModelHelpers/GeoShapeUtils.h"
+ 
+diff --git a/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MuonDetectorManager.cxx b/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MuonDetectorManager.cxx
+index 2e1ba678861..2db3e773178 100644
+--- a/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MuonDetectorManager.cxx
++++ b/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MuonDetectorManager.cxx
+@@ -8,7 +8,7 @@
+ #include <utility>
+ 
+ #include "GeoPrimitives/GeoPrimitivesHelpers.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ #include "MuonAlignmentData/ALinePar.h"
+ #include "MuonAlignmentData/BLinePar.h"
+ #include "MuonReadoutGeometry/CscReadoutElement.h"
+diff --git a/MuonSpectrometer/MuonDigitization/RPC_Digitization/src/RpcDigitizationTool.cxx b/MuonSpectrometer/MuonDigitization/RPC_Digitization/src/RpcDigitizationTool.cxx
+index b1628ab290f..a9b640dbdf8 100644
+--- a/MuonSpectrometer/MuonDigitization/RPC_Digitization/src/RpcDigitizationTool.cxx
++++ b/MuonSpectrometer/MuonDigitization/RPC_Digitization/src/RpcDigitizationTool.cxx
+@@ -39,7 +39,7 @@
+ #include "AtlasHepMC/GenParticle.h"
+ #include "TruthUtils/HepMCHelpers.h"
+ #include "GeneratorObjects/HepMcParticleLink.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ // Random Numbers
+ #include "AthenaKernel/RNGWrapper.h"
+ #include "CLHEP/Random/RandExponential.h"
+diff --git a/MuonSpectrometer/MuonPhaseII/Event/MuonSpacePoint/src/UtilFunctions.cxx b/MuonSpectrometer/MuonPhaseII/Event/MuonSpacePoint/src/UtilFunctions.cxx
+index 95f2a7f5780..e8e72592e8c 100644
+--- a/MuonSpectrometer/MuonPhaseII/Event/MuonSpacePoint/src/UtilFunctions.cxx
++++ b/MuonSpectrometer/MuonPhaseII/Event/MuonSpacePoint/src/UtilFunctions.cxx
+@@ -2,7 +2,7 @@
+    Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+ */
+ #include <MuonSpacePoint/UtilFunctions.h>
+-#include <GeoModelHelpers/throwExcept.h>
++#include <GeoModelKernel/throwExcept.h>
+ #include <GeoPrimitives/GeoPrimitivesToStringConverter.h>
+ #include <GaudiKernel/SystemOfUnits.h>
+ namespace MuonR4{
+diff --git a/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonPrepData/Root/UtilFunctions.cxx b/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonPrepData/Root/UtilFunctions.cxx
+index cefb331b5ad..77bdddfb10f 100644
+--- a/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonPrepData/Root/UtilFunctions.cxx
++++ b/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonPrepData/Root/UtilFunctions.cxx
+@@ -2,7 +2,7 @@
+    Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+ */
+ #include "xAODMuonPrepData/UtilFunctions.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ #include "MuonReadoutGeometryR4/MdtReadoutElement.h"
+ #include "MuonReadoutGeometryR4/RpcReadoutElement.h"
+diff --git a/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonPrepData/xAODMuonPrepData/versions/AccessorMacros.h b/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonPrepData/xAODMuonPrepData/versions/AccessorMacros.h
+index 275e9350f11..9756d6fd564 100644
+--- a/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonPrepData/xAODMuonPrepData/versions/AccessorMacros.h
++++ b/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonPrepData/xAODMuonPrepData/versions/AccessorMacros.h
+@@ -3,7 +3,7 @@
+ */
+ #ifndef XAODMUONPREPDATA_ACCESSOR_MACROS_H
+ #define XAODMUONPREPDATA_ACCESSOR_MACROS_H
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ /**
+  *  Macros to implement the scalar variables of the xAOD::MuonPrepData objects
+ */
+diff --git a/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonViews/xAODMuonViews/ChamberViewer.h b/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonViews/xAODMuonViews/ChamberViewer.h
+index 0f6933d6ecc..ef944aa67cb 100644
+--- a/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonViews/xAODMuonViews/ChamberViewer.h
++++ b/MuonSpectrometer/MuonPhaseII/Event/xAOD/xAODMuonViews/xAODMuonViews/ChamberViewer.h
+@@ -8,7 +8,7 @@
+ 
+ #include <xAODMeasurementBase/MeasurementDefs.h>
+ #include <MuonIdHelpers/IMuonIdHelperSvc.h>
+-#include <GeoModelHelpers/throwExcept.h>
++#include <GeoModelKernel/throwExcept.h>
+ 
+ #define BUILD_TRAIT(traitName, conceptPass) \
+     template <typename T> struct traitName{}; \
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonConditions/MuonAlignmentDataR4/src/MdtAlignmentStore.cxx b/MuonSpectrometer/MuonPhaseII/MuonConditions/MuonAlignmentDataR4/src/MdtAlignmentStore.cxx
+index c27ed232615..6ef58b6ec92 100644
+--- a/MuonSpectrometer/MuonPhaseII/MuonConditions/MuonAlignmentDataR4/src/MdtAlignmentStore.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonConditions/MuonAlignmentDataR4/src/MdtAlignmentStore.cxx
+@@ -3,7 +3,7 @@
+ */
+ #include <MuonAlignmentDataR4/MdtAlignmentStore.h>
+ 
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ MdtAlignmentStore::MdtAlignmentStore(const Muon::IMuonIdHelperSvc* idHelperSvc):
+     m_idHelperSvc{idHelperSvc}{
+     /// Reserve enough space in the vector
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonDigitization/MuonDigitizationR4/src/MuonDigitizationTool.cxx b/MuonSpectrometer/MuonPhaseII/MuonDigitization/MuonDigitizationR4/src/MuonDigitizationTool.cxx
+index 3f30fa61b65..e3c11c9ee49 100644
+--- a/MuonSpectrometer/MuonPhaseII/MuonDigitization/MuonDigitizationR4/src/MuonDigitizationTool.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonDigitization/MuonDigitizationR4/src/MuonDigitizationTool.cxx
+@@ -5,7 +5,7 @@
+ 
+ #include <xAODMuonSimHit/MuonSimHitAuxContainer.h>
+ #include <AthenaKernel/RNGWrapper.h>
+-#include <GeoModelHelpers/throwExcept.h>
++#include <GeoModelKernel/throwExcept.h>
+ 
+ namespace MuonR4{
+ 
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/MdtSensitiveDetector.cxx b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/MdtSensitiveDetector.cxx
+index 78daca7ed52..01e8f3b2893 100755
+--- a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/MdtSensitiveDetector.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/MdtSensitiveDetector.cxx
+@@ -13,7 +13,7 @@
+ #include <limits>
+ #include <iostream>
+ #include <GeoPrimitives/CLHEPtoEigenConverter.h>
+-#include <GeoModelHelpers/throwExcept.h>
++#include <GeoModelKernel/throwExcept.h>
+ #include <xAODMuonSimHit/MuonSimHitAuxContainer.h>
+ #include <GaudiKernel/SystemOfUnits.h>
+ #include <StoreGate/ReadHandle.h>
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/MmSensitiveDetector.cxx b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/MmSensitiveDetector.cxx
+index 32d6995e9df..92de5defbec 100644
+--- a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/MmSensitiveDetector.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/MmSensitiveDetector.cxx
+@@ -14,7 +14,7 @@
+ 
+ #include "GeoPrimitives/CLHEPtoEigenConverter.h"
+ #include "xAODMuonSimHit/MuonSimHitAuxContainer.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ #include "GaudiKernel/SystemOfUnits.h"
+ 
+ 
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/RpcSensitiveDetector.cxx b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/RpcSensitiveDetector.cxx
+index 9692f835173..8d4f974a8ae 100755
+--- a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/RpcSensitiveDetector.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/RpcSensitiveDetector.cxx
+@@ -15,7 +15,7 @@
+ #include "GeoPrimitives/CLHEPtoEigenConverter.h"
+ #include "xAODMuonSimHit/MuonSimHitAuxContainer.h"
+ #include "GaudiKernel/SystemOfUnits.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ using namespace MuonGMR4;
+ using namespace CxxUtils;
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/TgcSensitiveDetector.cxx b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/TgcSensitiveDetector.cxx
+index 06563ce7cbb..48ecda92fed 100644
+--- a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/TgcSensitiveDetector.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/TgcSensitiveDetector.cxx
+@@ -16,7 +16,7 @@
+ #include "GeoPrimitives/CLHEPtoEigenConverter.h"
+ #include "xAODMuonSimHit/MuonSimHitAuxContainer.h"
+ #include "GaudiKernel/SystemOfUnits.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ using namespace ActsTrk;
+ 
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/sTgcSensitiveDetector.cxx b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/sTgcSensitiveDetector.cxx
+index 66bab981140..9631290cc90 100755
+--- a/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/sTgcSensitiveDetector.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonG4/MuonSensitiveDetectorsR4/src/sTgcSensitiveDetector.cxx
+@@ -15,7 +15,7 @@
+ #include "GeoPrimitives/CLHEPtoEigenConverter.h"
+ #include "xAODMuonSimHit/MuonSimHitAuxContainer.h"
+ #include "GaudiKernel/SystemOfUnits.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ 
+ using namespace MuonGMR4;
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonPatternRecognition/MuonPatternHelpers/Root/SegmentFitHelperFunctions.cxx b/MuonSpectrometer/MuonPhaseII/MuonPatternRecognition/MuonPatternHelpers/Root/SegmentFitHelperFunctions.cxx
+index f8bb93dade5..397a74a1862 100644
+--- a/MuonSpectrometer/MuonPhaseII/MuonPatternRecognition/MuonPatternHelpers/Root/SegmentFitHelperFunctions.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonPatternRecognition/MuonPatternHelpers/Root/SegmentFitHelperFunctions.cxx
+@@ -8,7 +8,7 @@
+ #include "GeoPrimitives/GeoPrimitivesHelpers.h"
+ #include "AthenaBaseComps/AthMessaging.h"
+ #include "GaudiKernel/PhysicalConstants.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ #include "xAODMuonPrepData/MdtDriftCircle.h"
+ #include "MuonSpacePoint/UtilFunctions.h"
+ 
+diff --git a/MuonSpectrometer/MuonPhaseII/MuonValidation/MuonPRDTestR4/Root/TesterModuleBase.cxx b/MuonSpectrometer/MuonPhaseII/MuonValidation/MuonPRDTestR4/Root/TesterModuleBase.cxx
+index f4014b412d7..a783fb300bf 100644
+--- a/MuonSpectrometer/MuonPhaseII/MuonValidation/MuonPRDTestR4/Root/TesterModuleBase.cxx
++++ b/MuonSpectrometer/MuonPhaseII/MuonValidation/MuonPRDTestR4/Root/TesterModuleBase.cxx
+@@ -3,7 +3,7 @@
+ */
+ 
+ #include "MuonPRDTestR4/TesterModuleBase.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ #include "StoreGate/ReadHandle.h"
+ #include "StoreGate/StoreGateSvc.h"
+ 
+diff --git a/MuonSpectrometer/MuonReconstruction/MuonRecUtils/MuonStationIntersectCond/src/MdtIntersectGeometry.cxx b/MuonSpectrometer/MuonReconstruction/MuonRecUtils/MuonStationIntersectCond/src/MdtIntersectGeometry.cxx
+index 58da3a4c40c..9d79d6073a3 100755
+--- a/MuonSpectrometer/MuonReconstruction/MuonRecUtils/MuonStationIntersectCond/src/MdtIntersectGeometry.cxx
++++ b/MuonSpectrometer/MuonReconstruction/MuonRecUtils/MuonStationIntersectCond/src/MdtIntersectGeometry.cxx
+@@ -15,7 +15,7 @@
+ #include "MuonReadoutGeometry/MuonDetectorManager.h"
+ #include "TrkDriftCircleMath/MdtChamberGeometry.h"
+ #include "TrkDriftCircleMath/MdtId.h"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ // maxNTubesPerLayer is included via MdtChamberGeometry.h -> DriftCircle.h
+ 
+ namespace Muon {
+diff --git a/Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx b/Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx
+index f0cf086271e..70c3bf4be2d 100644
+--- a/Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx
++++ b/Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx
+@@ -23,7 +23,7 @@
+ #include "G4ReflectionFactory.hh"
+ #include "G4LogicalBorderSurface.hh"
+ #include "G4OpticalSurface.hh"
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ #include <map>
+ #include <iostream>
+diff --git a/Tracking/Acts/ActsGeoUtils/src/SurfaceCache.cxx b/Tracking/Acts/ActsGeoUtils/src/SurfaceCache.cxx
+index fe3cd686a02..ce0e87c38e4 100644
+--- a/Tracking/Acts/ActsGeoUtils/src/SurfaceCache.cxx
++++ b/Tracking/Acts/ActsGeoUtils/src/SurfaceCache.cxx
+@@ -5,7 +5,7 @@
+ #include <ActsGeoUtils/SurfaceCache.h>
+ #ifndef SIMULATIONBASE
+ #include <Acts/Surfaces/Surface.hpp>
+-#include <GeoModelHelpers/throwExcept.h>
++#include <GeoModelKernel/throwExcept.h>
+ 
+ namespace ActsTrk{
+ 
+diff --git a/Tracking/Acts/ActsGeometry/src/ActsDetectorElement.cxx b/Tracking/Acts/ActsGeometry/src/ActsDetectorElement.cxx
+index 73a6866b88b..d02b6374f4a 100644
+--- a/Tracking/Acts/ActsGeometry/src/ActsDetectorElement.cxx
++++ b/Tracking/Acts/ActsGeometry/src/ActsDetectorElement.cxx
+@@ -4,7 +4,7 @@
+ 
+ #include "ActsGeometry/ActsDetectorElement.h"
+ 
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ // ATHENA
+ #include "ActsInterop/IdentityHelper.h"
+diff --git a/Tracking/TrkUtilityPackages/TrkDriftCircleMath/src/MdtChamberGeometry.cxx b/Tracking/TrkUtilityPackages/TrkDriftCircleMath/src/MdtChamberGeometry.cxx
+index 22ef92a3ca6..b39defbc350 100644
+--- a/Tracking/TrkUtilityPackages/TrkDriftCircleMath/src/MdtChamberGeometry.cxx
++++ b/Tracking/TrkUtilityPackages/TrkDriftCircleMath/src/MdtChamberGeometry.cxx
+@@ -10,7 +10,7 @@
+ #include "TrkDriftCircleMath/SortDcsByY.h"
+ #include <AthenaKernel/getMessageSvc.h>
+ #include <MuonReadoutGeometry/MdtReadoutElement.h>
+-#include "GeoModelHelpers/throwExcept.h"
++#include "GeoModelKernel/throwExcept.h"
+ 
+ namespace {
+     constexpr int maxNTubesPerLayer = MdtIdHelper::maxNTubesPerLayer;
+-- 
+2.34.1
+

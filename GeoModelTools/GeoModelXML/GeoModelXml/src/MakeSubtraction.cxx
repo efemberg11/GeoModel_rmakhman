@@ -11,7 +11,7 @@
 #include "GeoModelKernel/GeoShapeSubtraction.h"
 #include "GeoModelKernel/GeoShapeShift.h"
 #include "GeoModelKernel/GeoTransform.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"

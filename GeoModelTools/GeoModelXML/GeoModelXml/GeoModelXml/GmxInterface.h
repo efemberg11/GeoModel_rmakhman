@@ -21,7 +21,7 @@
 #include <variant>
 #include "GeoModelKernel/GeoVFullPhysVol.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 class GeoPublisher;
 

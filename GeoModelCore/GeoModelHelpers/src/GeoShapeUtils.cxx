@@ -3,7 +3,7 @@
 */
 #include "GeoModelHelpers/GeoShapeUtils.h"
 #include "GeoModelHelpers/TransformToStringConverter.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 /// Boolean volume shapes
 #include "GeoModelKernel/GeoShapeUnion.h"

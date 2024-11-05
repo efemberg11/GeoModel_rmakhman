@@ -11,7 +11,7 @@
 
 #include "GeoModelKernel/GeoPcon.h"
 #include "GeoModelHelpers/variantHelpers.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 #include <vector>
 #include <iostream>

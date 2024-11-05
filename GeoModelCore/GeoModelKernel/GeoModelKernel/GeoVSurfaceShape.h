@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
  * 
  *
  * Created on: Jul, 2024
@@ -14,17 +14,11 @@
 #include "GeoModelKernel/RCBase.h"
 #include "GeoModelKernel/GeoShapeAction.h"
 #include <GeoModelKernel/GeoDefinitions.h>
+#include <GeoModelKernel/throwExcept.h>
 #include <string>
 #include <exception>
 #include <sstream>
 
-#define THROW_EXCEPTION(MESSAGE)                      \
-    {                                                 \
-        std::stringstream except_str{};               \
-        except_str<<__FILE__<<":"<<__LINE__<<" --- "; \
-        except_str<<MESSAGE;                          \
-        throw std::runtime_error(except_str.str());   \
-    }
 using SurfaceShapeType = unsigned int; // here use decimal numbers. (why use hexadecimal int?)
 
 class GeoVSurfaceShape : public RCBase

@@ -1,9 +1,10 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoShapeAction.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "PolygonTriangulator.h"//For volume.
 #include <cmath>
 #include <stdexcept>
@@ -17,7 +18,7 @@ GeoSimplePolygonBrep::GeoSimplePolygonBrep(double dz)
 
 double GeoSimplePolygonBrep::volume (int) const {
   if (!isValid())
-    throw std::runtime_error ("Volume requested for incomplete simple polygon brep");
+    THROW_EXCEPTION("Volume requested for incomplete simple polygon brep");
   int n = getNVertices();
   double area = m_xVertices[n - 1] * m_yVertices[0] - m_xVertices[0] * m_yVertices[n - 1];
   for (int k = 1; k < n; ++k)
@@ -31,7 +32,7 @@ void GeoSimplePolygonBrep::extent (double& xmin, double& ymin, double& zmin,
                                    double& xmax, double& ymax, double& zmax) const
 {
   if (!isValid())
-    throw std::runtime_error ("Extent requested for incomplete simple polygon brep");
+    THROW_EXCEPTION("Extent requested for incomplete simple polygon brep");
   xmin = xmax = m_xVertices[0];
   ymin = ymax = m_yVertices[0];
   for (size_t k = 1; k < getNVertices(); ++k)

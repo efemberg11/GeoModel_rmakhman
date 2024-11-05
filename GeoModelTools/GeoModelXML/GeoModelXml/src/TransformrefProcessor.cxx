@@ -12,7 +12,7 @@
 #include "GeoModelXml/GmxUtil.h"
 #include "GeoModelXml/GeoNodeList.h"
 #include "xercesc/util/XMLString.hpp"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 using namespace std;
 using namespace xercesc;

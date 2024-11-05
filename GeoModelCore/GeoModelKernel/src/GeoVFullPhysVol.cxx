@@ -1,9 +1,10 @@
 /*
-  Copyright (C) 2002-2017 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoVFullPhysVol.h"
 #include "GeoModelKernel/GeoVAlignmentStore.h"
+#include "GeoModelKernel/throwExcept.h"
 #include <string>
 GeoVFullPhysVol::GeoVFullPhysVol(const GeoLogVol* logVol)
   : GeoVPhysVol{logVol},
@@ -16,12 +17,11 @@ const std::string &  GeoVFullPhysVol::getAbsoluteName () const
   //                                                                                                //     
   // Get ready for something to go wrong:                                                           //     
   //                                                                                                //     
-  static std::string errorMessage("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume:  ");
   //                                                                                                //     
   //------------------------------------------------------------------------------------------------//     
 
   if(m_absName == "") {
-    if(isShared()) throw std::runtime_error(errorMessage);
+    if(isShared()) THROW_EXCEPTION("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume: ");
 
     //
     // Check the cache.  If it is empty, compute the absolute position from the
@@ -37,7 +37,7 @@ const std::string &  GeoVFullPhysVol::getAbsoluteName () const
       tProd = tProd + "/" + name;
       child = parent;
       if (child->isShared ()) {
-        throw std::runtime_error(errorMessage);
+        THROW_EXCEPTION("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume: ");
       }
       else {
         parent = child->getParent ();
@@ -55,12 +55,11 @@ unsigned int GeoVFullPhysVol::getId () const
   //                                                                                                //     
   // Get ready for something to go wrong:                                                           //     
   //                                                                                                //     
-  static std::string errorMessage("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume:  ");
   //                                                                                                //     
   //------------------------------------------------------------------------------------------------//     
 
   if(!m_id) {
-    if(isShared()) throw std::runtime_error(errorMessage);
+    if(isShared()) THROW_EXCEPTION("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume:  ");
 
     //     
     // Check the cache.  If it is empty, compute the absolute position from the     
@@ -68,7 +67,7 @@ unsigned int GeoVFullPhysVol::getId () const
     //     
     PVConstLink child = this, parent = nullptr;
     if(child->isShared()) {
-      throw std::runtime_error(errorMessage);
+      THROW_EXCEPTION("Full Physical Volume errroneously placed in a shared portion of a detector description graph.\nName of shared volume:  ");
     }	
     else {
       parent = child->getParent();

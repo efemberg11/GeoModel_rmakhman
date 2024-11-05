@@ -15,7 +15,7 @@
 #include "GeoModelKernel/GeoFullPhysVol.h"
 
 #include "GeoModelHelpers/variantHelpers.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 
 

@@ -1,9 +1,10 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
+#include "GeoModelKernel/throwExcept.h"
 #include "GeoModelHelpers/TransformSorter.h"
 #include "GeoModelKernel/GeoAlignableTransform.h"
-#include "GeoModelHelpers/throwExcept.h"
+
 
 namespace GeoTrf {
     bool TransformSorter::operator()(const std::unique_ptr<Transform3D>& a, 

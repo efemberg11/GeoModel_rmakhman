@@ -31,7 +31,7 @@ GeoTrf::Transform3D GeoPlacement::getX(const GeoVAlignmentStore* store) const {
   //
   // Check we are not shared:
   //
-  if (isShared()) throw std::runtime_error("Transform requested from shared volume");
+  if (isShared()) THROW_EXCEPTION("Transform requested from shared volume");
   GeoTrf::Transform3D xform{GeoTrf::Transform3D::Identity()};
 
   if (!m_parentPtr) {
@@ -74,7 +74,7 @@ GeoTrf::Transform3D GeoPlacement::getDefX(const GeoVAlignmentStore* store) const
   //
   // Check we are not shared:
   //
-  if (isShared()) throw std::runtime_error("Transform requested from shared volume");
+  if (isShared()) THROW_EXCEPTION("Transform requested from shared volume");
   GeoTrf::Transform3D xform{GeoTrf::Transform3D::Identity()};
 
   if (!m_parentPtr) {

@@ -27,7 +27,7 @@
 
 #include "GeoModelHelpers/GeoShapeUtils.h"
 #include "GeoModelHelpers/getChildNodesWithTrf.h"
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "GeoModelHelpers/TransformToStringConverter.h"
 #include "GeoModelHelpers/StringUtils.h"
 #include "GeoModelHelpers/FileUtils.h"

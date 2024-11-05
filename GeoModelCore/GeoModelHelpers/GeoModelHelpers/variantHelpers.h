@@ -12,7 +12,7 @@
 #ifndef GEOMODELHELPERS_VARIANTHELPERS_H
 #define GEOMODELHELPERS_VARIANTHELPERS_H
 
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 #include <iostream> 
 #include <string> 

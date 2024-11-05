@@ -10,7 +10,7 @@
 #include "GeoModelXml/shape/MakeSimplePolygonBrep.h"
 #include "GeoModelKernel/GeoSimplePolygonBrep.h"
 #include <xercesc/dom/DOM.hpp>
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 #include "xercesc/util/XMLString.hpp"
 #include "GeoModelXml/GmxUtil.h"
 

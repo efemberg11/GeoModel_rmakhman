@@ -37,7 +37,7 @@
 #include "GeoModelXml/ProcessorRegistry.h"
 #include "GeoModelXml/GmxUtil.h"
 
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 using namespace xercesc;
 using namespace std;

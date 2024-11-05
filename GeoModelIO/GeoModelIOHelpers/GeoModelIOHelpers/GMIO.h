@@ -22,7 +22,7 @@
 #include "GeoModelRead/ReadGeoModel.h"
 #include "GeoModelWrite/WriteGeoModel.h"
 
-#include "GeoModelHelpers/throwExcept.h"
+#include "GeoModelKernel/throwExcept.h"
 
 namespace GeoModelIO {
 

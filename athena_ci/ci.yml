@@ -2,6 +2,8 @@ build_geomodel_athena:
   image: gitlab-registry.cern.ch/atlas-sit/docker/alma9-atlasos-dev
 
   stage: step-A
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
   variables:
     CCACHE_KEY_SUFFIX: r2
@@ -47,6 +49,9 @@ build_geomodel_athena:
 
 .run_base:
   stage: step-B
+
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
   # This image sould work, but it seems it doesn't. Using my derivative until 
   # I figure out what the difference is.

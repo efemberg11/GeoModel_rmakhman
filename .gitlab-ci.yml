@@ -371,7 +371,8 @@ ubu-geomodelatlas:
 docs-build:
     stage: step-A
     rules:
-      - changes:
+      - if: '$CI_COMMIT_BRANCH == "main"' # Build documentation only if changes are pushed to main.
+        changes:
         - documentation/**/*
     allow_failure: true
     timeout: 30 minutes

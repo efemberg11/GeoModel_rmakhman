@@ -4,6 +4,11 @@ build_geomodel_athena:
   stage: step-A
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+      - GeoModelCore/**/*
+      - GeoModelIO/**/*
+      - cmake/**/*
+      - CMakeLists.txt
 
   variables:
     CCACHE_KEY_SUFFIX: r2
@@ -52,6 +57,11 @@ build_geomodel_athena:
 
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+      - GeoModelCore/**/*
+      - GeoModelIO/**/*
+      - cmake/**/*
+      - CMakeLists.txt
 
   # This image sould work, but it seems it doesn't. Using my derivative until 
   # I figure out what the difference is.

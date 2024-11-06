@@ -47,9 +47,13 @@ workflow:
 # of the build, by using the 'standalone' job only
 .ubuntu-template-job-default: &ubuntu-job
   image: gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
+  variables:
+    CHANGEDIR: '[!d]*'
   rules:
-    - when: always
-
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+      - $CHANGEDIR/**/*
+      - CMakeLists.txt
 
 # TEMPLATES FOR BUILDING PACKAGES
 .geomodel-build-template: &geomodel-job
@@ -364,6 +368,7 @@ ubu-geomodelatlas:
     - git clone https://${EOS_ACCOUNT_USERNAME}:${GEOMODEL_READ_ACCESS}@gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS.git
     - ls -lh
     - CI/compile_GeoModel.sh
+
 #####################
 ### Documentation ###
 #####################
@@ -371,7 +376,7 @@ ubu-geomodelatlas:
 docs-build:
     stage: step-A
     rules:
-      - if: '$CI_COMMIT_BRANCH == "main"' # Build documentation only if changes are pushed to main.
+      - if: $CI_COMMIT_BRANCH == "main" || $CI_PIPELINE_SOURCE == "merge_request_event"
         changes:
         - documentation/**/*
     allow_failure: true
@@ -506,16 +511,16 @@ persist-tag-artifacts:
       - install
     expire_in: never
 
-
 tests-ubuntu:
   <<: *ubuntu-job
-  stage: step-test
-  needs: ["ubu-gm-all"]
   stage: test
+  needs: ["ubu-gm-all"]
+  variables:
+      DUMMY: dummy # Work around weird configuration problems
   script:
     - mv build ../
     - cd ../build
-    - ctest #--output-on-failure
+    - ctest
   
 include:
   - athena_ci/ci.yml

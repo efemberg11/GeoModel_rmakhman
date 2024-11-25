@@ -455,11 +455,11 @@ GeoVPhysVol* ReadGeoModel::buildGeoModelPrivate() {
         // needs LogVols
         std::thread t5(&ReadGeoModel::buildAllPhysVols, this);
         std::thread t6(&ReadGeoModel::buildAllFullPhysVols, this);
-        std::thread t29(&ReadGeoModel::buildAllVSurfaces, this);
+        std::thread t50(&ReadGeoModel::buildAllVSurfaces, this);
         
         t5.join();  // ok, all PhysVols have been built
         t6.join();  // ok, all FullPhysVols have been built
-        t29.join();        
+        t50.join();        
         //  t7.join(); // ok, all Functions have been built
         // needs Functions, PhysVols, FullPhysVols
         std::thread t12(&ReadGeoModel::buildAllSerialTransformers, this);

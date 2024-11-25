@@ -47,12 +47,19 @@ workflow:
 # of the build, by using the 'standalone' job only
 .ubuntu-template-job-default: &ubuntu-job
   image: gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
-  variables:
-    CHANGEDIR: '[!d]*'
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
-      - $CHANGEDIR/**/*
+      - ATLASExtensions/**/*
+      - FSL/**/*
+      - FullSimLight/**/*
+      - GeoModelCore/**/*
+      - GeoModelExamples/**/*
+      - GeoModelG4/**/*
+      - GeoModelIO/**/*
+      - GeoModelTools/**/*
+      - GeoModelVisualization/**/*
+      - cmake/**/*
       - CMakeLists.txt
 
 # TEMPLATES FOR BUILDING PACKAGES

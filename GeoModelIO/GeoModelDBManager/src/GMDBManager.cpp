@@ -70,15 +70,9 @@ class GMDBManager::Imp {
 };
 
 GMDBManager::GMDBManager(const std::string& path)
-    : m_dbpath(path), m_debug(false), m_d(new Imp(this)) {
-    // Check if the user asked for running in serial or multi-threading mode
-    if ("" != GeoStrUtils::getEnvVar("GEOMODEL_ENV_IO_DBMANAGER_DEBUG")) {
-        m_debug = true;
-        std::cout << "*** NOTE: You defined the GEOMODEL_IO_DEBUG variable, so you will "
-                     "see a verbose output."
-                  << std::endl;
-    }
-
+    : m_loglevel(0), 
+    m_dbpath(path), 
+    m_d(new Imp(this)) {
 
     // FIXME: TODO: we should check the existence of the file, otherwise SQLite
     // will create a new file from scratch
@@ -96,11 +90,12 @@ GMDBManager::GMDBManager(const std::string& path)
     }
 
     // set verbosity level
-    m_verbose = 0;
-    if (const char* env_p = std::getenv("GEOMODEL_GEOMODELIO_VERBOSE")) {
+    m_loglevel = 0;
+    if (const char* env_p = std::getenv("GEOMODEL_GEOMODELIO_LOGLEVEL")) {
         std::cout << "GeoModelDBManager -- You set the verbosity level to: "
                   << env_p << '\n';
-        m_verbose = std::stoi(env_p);
+        m_loglevel = std::stoi(env_p);
+
     }
 
     /// get info from the input DB, if populated,
@@ -544,16 +539,18 @@ DBRowsList GMDBManager::getTableFromNodeType_VecVecData(
     
     if (tableName.empty())
     {
-        std::mutex coutMutex;
-        coutMutex.lock();
-        std::cout << 
-            "\t ===> WARNING! The geometry input file does not contain a table for the" 
-            << nodeType 
-            << "nodes. That means that you are probably using an "
-            << "old geometry file. Unless you know exactly what you are doing, "
-            << "please expect to see incomplete geometries or crashes.\n" 
-            << std::endl;
-        coutMutex.unlock();
+        if (m_loglevel > 1)
+        {
+            std::mutex coutMutex;
+            coutMutex.lock();
+            std::cout << "\t ===> WARNING! The geometry input file does not contain a table for the '"
+                      << nodeType
+                      << "' nodes. That means that you are probably using an "
+                      << "old geometry file. Unless you know exactly what you are doing, "
+                      << "please expect to see incomplete geometries or crashes.\n"
+                      << std::endl;
+            coutMutex.unlock();
+        }
     }
     else
     {
@@ -682,7 +679,7 @@ bool GMDBManager::addListOfPublishedAlignableTransforms(
     {
         tableName += "_";
         tableName += suffix;
-        if (m_debug)
+        if (m_loglevel > 0)
         {
             std::cout << "\nSaving the published '" << nodeType
                       << "' nodes to the custom table : '" << tableName
@@ -706,7 +703,7 @@ bool GMDBManager::addListOfPublishedFullPhysVols(
     {
         tableName += "_";
         tableName += suffix;
-        if (m_debug)
+        if (m_loglevel > 0)
         {
             std::cout << "\nSaving the published '" << nodeType
                       << "' nodes to the custom table : '"
@@ -723,8 +720,6 @@ bool GMDBManager::addListOfPublishedFullPhysVols(
 bool GMDBManager::addListOfRecords(
     const std::string& geoType,
     const std::vector<std::vector<std::string>>& records) {
-    //  if (m_debug) qDebug() << "GMDBManager::addListOfRecords():" <<
-    //  geoType;
 
     std::string tableName = m_childType_tableName[geoType];
 
@@ -736,7 +731,7 @@ bool GMDBManager::addListOfRecords(
         return addListOfRecordsToTable(
             tableName, records);  // needs SQLite >= 3.7.11
     } else {
-        if (m_debug)
+        if (m_loglevel > 1)
             std::cout << "Info: no records to save for geoType '" << geoType
                       << "'. Skipping..." << std::endl;
     }
@@ -746,8 +741,6 @@ bool GMDBManager::addListOfRecords(
 bool GMDBManager::addListOfRecords(
     const std::string& geoType,
     const DBRowsList& records) {
-    //  if (m_debug) qDebug() << "GMDBManager::addListOfRecords():" <<
-    //  geoType;
     std::string tableName = m_childType_tableName[geoType];
 
     if (tableName.size() == 0) {
@@ -758,7 +751,7 @@ bool GMDBManager::addListOfRecords(
         return addListOfRecordsToTable(
             tableName, records);  // needs SQLite >= 3.7.11
     } else {  
-        if (m_debug)
+        if (m_loglevel > 1)
             std::cout << "Info: no records to save for geoType '" << geoType
                       << "'. Skipping..." << std::endl;
     }
@@ -784,7 +777,7 @@ bool GMDBManager::addListOfRecordsToTable(
     // get table columns and format them for query
     std::string tableColString =
         "(" + GeoStrUtils::chainUp(m_tableNames.at(tableName), ", ") + ")";
-    if (m_debug) std::cout << "tableColString:" << tableColString << std::endl;
+    if (m_loglevel > 2) std::cout << "tableColString:" << tableColString << std::endl;
 
     unsigned int nRecords = records.size();
     std::cout << "Info: number of " << tableName
@@ -813,7 +806,7 @@ for (const std::string& item : rec) {
             sql += ";";
         }
     }
-    if (m_debug) std::cout << "Query string:" << sql << std::endl;  // debug
+    if (m_loglevel > 2) std::cout << "Query string:" << sql << std::endl;  // debug
 
     // executing the SQL query
     if (!(execQuery(sql))) {
@@ -834,7 +827,7 @@ bool GMDBManager::addListOfRecordsToTable(
     // get table columns and format them for query
     std::string tableColString =
         "(" + GeoStrUtils::chainUp(m_tableNames.at(tableName), ", ") + ")";
-    if (m_debug) std::cout << "tableColString:" << tableColString << std::endl;
+    if (m_loglevel > 2) std::cout << "tableColString:" << tableColString << std::endl;
 
     unsigned int nRecords = records.size();
     std::cout << "Info: number of " << tableName
@@ -884,7 +877,7 @@ bool GMDBManager::addListOfRecordsToTable(
             sql += ";";
         }
     }
-    if (m_debug) std::cout << "Query string:" << sql << std::endl;  // debug
+    if (m_loglevel > 2) std::cout << "Query string:" << sql << std::endl;  // debug
 
     // executing the SQL query
     if (!(execQuery(sql))) {
@@ -903,7 +896,7 @@ bool GMDBManager::addRecordsToTable(
     // get table columns and format them for query
     std::string tableColString =
         "(" + GeoStrUtils::chainUp(m_tableNames.at(tableName), ", ") + ")";
-    if (m_debug) std::cout << "tableColString:" << tableColString << std::endl;
+    if (m_loglevel > 2) std::cout << "tableColString:" << tableColString << std::endl;
 
     unsigned int nRecords = records.size();
 
@@ -972,7 +965,7 @@ bool GMDBManager::addRecordsToTable(
     std::string values = GeoStrUtils::chainUp<std::string>(items, "");
 
     sql += " " + values + ";";
-    if (m_debug)
+    if (m_loglevel > 2)
         std::cout << "Query string:" << sql << std::endl; // debug
 
     // executing the SQL query
@@ -1122,12 +1115,16 @@ std::string GMDBManager::getTableNameFromNodeType(const std::string& nodeType) {
     if (m_cache_nodeType_tableName.count(nodeType)) {
         st = m_cache_nodeType_tableName.at(nodeType);
     } else {
-        std::mutex coutMutex;
-        coutMutex.lock();
-        std::cout << "\t ===> WARNING! A table for nodeType '" << nodeType
-                  << "' has not been found in the input geometry file."
-                  << std::endl;
-        coutMutex.unlock();
+        if (m_loglevel > 1)
+        {
+
+            std::mutex coutMutex;
+            coutMutex.lock();
+            std::cout << "\t ===> WARNING! A table for nodeType '" << nodeType
+                      << "' has not been found in the input geometry file."
+                      << std::endl;
+            coutMutex.unlock();
+        }
     }
     return st;
 }
@@ -1157,7 +1154,7 @@ int GMDBManager::loadGeoNodeTypesAndBuildCache() {
             reinterpret_cast<const char*>(sqlite3_column_text(st, 1)));
         tableName = std::string(
             reinterpret_cast<const char*>(sqlite3_column_text(st, 2)));
-        if (m_debug)
+        if (m_loglevel > 2)
             std::cout << "row: " << id << "," << nodeType << "," << tableName
                       << std::endl;
         // fill the caches
@@ -1322,7 +1319,7 @@ void GMDBManager::getAllDBTableColumns() {
 
     // populate the cache with tables' names, if needed
     if (!m_cache_tables.size()) {
-        if (m_debug) {
+        if (m_loglevel > 2) {
             std::cout << "*** WARNING! Tables' cache is empty! That's normal if you are saving a GeoModel tree into a new .db file. ***\n";
         }
         return;
@@ -1518,7 +1515,7 @@ bool GMDBManager::createCustomTable(
         queryStr += colStr;
     }
     queryStr += ")";
-    if (m_verbose > 0)
+    if (m_loglevel > 0)
         std::cout << "- table definition: " << queryStr << std::endl;
 
     (void)execQuery(queryStr);
@@ -2450,7 +2447,7 @@ bool GMDBManager::createTables() {
     tab.clear();     
 
 //----------------------------------------------------------------------------
-    if (m_debug) {
+    if (m_loglevel > 1) {
         std::cout << "All these tables have been successfully created:"
                   << std::endl;  // debug
         printAllDBTables();
@@ -2463,7 +2460,7 @@ bool GMDBManager::createTables() {
 }
 
 int GMDBManager::execQuery(const std::string& queryStr) {
-    if (m_debug)
+    if (m_loglevel > 2)
         std::cout << "queryStr to execute: " << queryStr << std::endl;  // debug
     checkIsDBOpen();
     int result = -1;
@@ -2511,7 +2508,7 @@ void GMDBManager::storeNodeType(const std::string& nodeType, const std::string& 
     if (rc != SQLITE_OK) {
         THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
-    if (m_debug)
+    if (m_loglevel > 2)
         std::cout << "storeNodeType - Query string:" << sql
                   << std::endl;  // debug
     // bind the parameters
@@ -2585,7 +2582,7 @@ bool GMDBManager::storeRootVolume(const unsigned &id,
     if (rc != SQLITE_OK) {
         THROW_EXCEPTION("[SQLite ERR] (" << __func__ << ") : Error msg: " << sqlite3_errmsg(m_d->m_dbSqlite));
     }
-    if (m_debug) std::cout << "Query string:" << sql << std::endl;  // debug
+    if (m_loglevel > 2) std::cout << "Query string:" << sql << std::endl;  // debug
     // bind the parameters
     rc = sqlite3_bind_int(st, 1, id);
     rc = sqlite3_bind_int(st, 2, typeId);

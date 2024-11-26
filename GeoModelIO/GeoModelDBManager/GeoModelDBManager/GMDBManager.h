@@ -56,7 +56,15 @@ class GMDBManager {
      * Close the db connection
      */
     ~GMDBManager();
-    void DestructorGMDBManagerStd();
+    
+     /// Set the 'loglevel', that is the level of output messages.
+    /// The loglevel is set to 0 by default, but it can be set
+    /// to a larger value.
+    /// Loglevel:
+    /// - 0 : Default
+    /// - 1 : Verbose
+    /// - 2 : Debug
+    void setLogLevel(unsigned loglevel) { m_loglevel = loglevel; };
 
     bool initDB();
 
@@ -407,10 +415,8 @@ class GMDBManager {
 
        std::string m_dbpath;
 
-       bool m_debug;
-
-       // verbosity level
-       int m_verbose;
+       /// Stores the loglevel, the level of output messages
+       unsigned m_loglevel;
 
        /// stores the column names for each table
        std::unordered_map<std::string, std::vector<std::string>> m_tableNames;

@@ -35,8 +35,8 @@
 static bool         parCreateGeantinoMaps  = true;
 static bool         parIsPerformance       = false;
 static bool         parCreateEtaPhiMaps    = false;
-static bool         parCreateDetectorsMaps = false;
-static bool         parCreateMaterialsMaps  = false;
+//static bool         parCreateDetectorsMaps = false;
+//static bool         parCreateMaterialsMaps  = false;
 static bool         parCreateElementsMaps   = false;
 static bool         parRunOverlapCheck = false;
 static G4String     parGeometryFileName= "";
@@ -112,8 +112,8 @@ int main(int argc, char** argv) {
     << "   Geometry file              =  " << parGeometryFileName     << G4endl
     << "   Output file                =  " << parOutputFileName       << G4endl
     << "   Create eta-phi maps        =  " << parCreateEtaPhiMaps     << G4endl
-    << "   Create Detectors maps      =  " << parCreateDetectorsMaps  << G4endl
-    << "   Create Materials maps      =  " << parCreateMaterialsMaps  << G4endl
+//    << "   Create Detectors maps      =  " << parCreateDetectorsMaps  << G4endl
+//    << "   Create Materials maps      =  " << parCreateMaterialsMaps  << G4endl
     << "   Create Elements maps       =  " << parCreateElementsMaps   << G4endl
     << " ===================================================== "      << G4endl;
     
@@ -195,8 +195,8 @@ int main(int argc, char** argv) {
     gm_config->SetEtamin(parEtamin);
     gm_config->SetEtamax(parEtamax);
     gm_config->SetCreateEtaPhiMaps(parCreateEtaPhiMaps);
-    gm_config->SetCreateDetectorsMaps(parCreateDetectorsMaps);
-    gm_config->SetCreateMaterialsMaps(parCreateMaterialsMaps);
+//    gm_config->SetCreateDetectorsMaps(parCreateDetectorsMaps);
+//    gm_config->SetCreateMaterialsMaps(parCreateMaterialsMaps);
     gm_config->SetCreateElementsMaps(parCreateElementsMaps);
     gm_config->SetCreateGeantinoMaps(parCreateGeantinoMaps);
     gm_config->SetMapsFilename(parOutputFileName);
@@ -231,8 +231,8 @@ static struct option options[] = {
     {"macro file            "  , required_argument, 0, 'm'},
     {"output ROOT file name "  , required_argument, 0, 'o'},
     {"etaphiMap             "  , no_argument      , 0, 'e'},
-    {"detectorsMap          "  , no_argument      , 0, 'd'},
-    {"materialsMap          "  , no_argument      , 0, 'a'},
+//    {"detectorsMap          "  , no_argument      , 0, 'd'},
+//    {"materialsMap          "  , no_argument      , 0, 'a'},
     {"elementsMap           "  , no_argument      , 0, 'l'},
     {"help"                    , no_argument      , 0, 'h'},
     {0, 0, 0, 0}
@@ -248,8 +248,8 @@ void Help() {
     <<"      -m :   [OPTIONAL] the standard Geant4 macro file name (default: 'geantino.g4') \n"
     <<"      -o :   [OPTIONAL] output ROOT file name  (supported extention: .root - default: 'geantinoMaps.root') \n"
     <<"      -e :   [FLAG]     use this flag to create eta-phi radiation-interaction length 1D profile histograms (caveat: the process might run out of memory!)\n"
-    <<"      -d :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'detectors' (caveat: the process might run out of memory!)\n"
-    <<"      -a :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'materials' (caveat: the process might run out of memory!)\n"
+//    <<"      -d :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'detectors' (caveat: the process might run out of memory!)\n"
+//    <<"      -a :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'materials' (caveat: the process might run out of memory!)\n"
     <<"      -l :   [FLAG]     use this flag to create xy-rz   radiation-interaction length 2D profile histograms for 'elements'  (caveat: the process might run out of memory!)\n"
     << std::endl;
     std::cout <<"\nUsage: ./gmgeantino [OPTIONS] -g <geometry-file-name> \n" <<std::endl;
@@ -288,12 +288,12 @@ void GetInputArguments(int argc, char** argv) {
             case 'e':
                 parCreateEtaPhiMaps = true;
                 break;
-            case 'd':
-                parCreateDetectorsMaps = true;
-                break;
-            case 'a':
-                parCreateMaterialsMaps = true;
-                break;
+//            case 'd':
+//                parCreateDetectorsMaps = true;
+//                break;
+//            case 'a':
+//                parCreateMaterialsMaps = true;
+//                break;
             case 'l':
                 parCreateElementsMaps = true;
                 break;

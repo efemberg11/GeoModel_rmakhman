@@ -202,7 +202,7 @@ ubu-gm-tools:
 ubu-gm-visualization:
   <<: *ubuntu-job
   <<: *geomodel-job
-  stage: step-C
+  stage: step-A
   variables:
     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
 

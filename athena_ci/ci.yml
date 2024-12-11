@@ -7,6 +7,7 @@ build_geomodel_athena:
       changes:
       - GeoModelCore/**/*
       - GeoModelIO/**/*
+      - GeoModelTools/**/*
       - cmake/**/*
       - CMakeLists.txt
 
@@ -60,6 +61,7 @@ build_geomodel_athena:
       changes:
       - GeoModelCore/**/*
       - GeoModelIO/**/*
+      - GeoModelTools/**/*
       - cmake/**/*
       - CMakeLists.txt
 

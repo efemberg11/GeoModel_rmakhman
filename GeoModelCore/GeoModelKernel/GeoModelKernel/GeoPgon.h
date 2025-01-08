@@ -62,14 +62,29 @@ class GeoPgon : public GeoShape
     return m_zPlane[i];
   }
 
+  // Get a pointer to the memory buffer with Z Positions
+  const double* getZPlaneBuff() const {
+    return m_zPlane.data();
+  }
+
   //    Get the RMin of the specified plane.
   double getRMinPlane (unsigned int i) const {
      return m_rMinPlane[i];
   }
 
+  // Get a pointer to the memory buffer with RMin-s
+  const double* getRMinBuff() const {
+    return m_rMinPlane.data();
+  }
+
   //    Get the Z Position of the specified plane.
   double getRMaxPlane (unsigned int i) const {
      return m_rMaxPlane[i];
+  }
+
+  // Get a pointer to the memory buffer with RMax-s
+  const double* getRMaxBuff() const {
+    return m_rMaxPlane.data();
   }
 
   //    Executes a GeoShapeAction

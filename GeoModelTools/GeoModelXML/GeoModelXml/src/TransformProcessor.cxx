@@ -39,7 +39,7 @@ void TransformProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, Ge
     XMLCh * alignable_tmp;
 
     alignable_tmp = XMLString::transcode("alignable");
-    bool alignable = element->hasAttribute(alignable_tmp);
+    const bool alignable = element->hasAttribute(alignable_tmp);
     //
     //    Do second element first, to find what sort of transform is needed (shape or logvol etc.?)
     //
@@ -57,8 +57,11 @@ void TransformProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, Ge
     tagName = XMLString::transcode(transformation->getTagName()); // transformation or transformationref
  
     // TODO:  ******* Should check here that an alignable transform is given an alignable transformation and object; to be done
+    // If alignable is true, this is passed on to Element2GeoItem::process in order to allow multiple transforms to be created with the same name
+    // This is necessary because we need an AlignableTransform for each element we want to align, even if the initial transform is identical.
+    // Without this, the de-duplication will return an already-exisiting transform if one already exists with that name
  
-    toAdd.push_back(dynamic_pointer_cast<GeoGraphNode>(gmxUtil.geoItemRegistry.find(string(tagName))->process(transformation, gmxUtil)));
+    toAdd.push_back(dynamic_pointer_cast<GeoGraphNode>(gmxUtil.geoItemRegistry.find(string(tagName))->process(transformation, gmxUtil, alignable)));
     XMLString::release(&tagName);
     //
     //    Add transformation to DetectorManager via GmxInterface, if it is alignable

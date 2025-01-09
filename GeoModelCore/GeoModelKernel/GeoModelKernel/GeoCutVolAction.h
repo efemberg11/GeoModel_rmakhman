@@ -63,16 +63,16 @@ class GeoCutVolAction : public GeoVolumeAction
   virtual void handleVPhysVol (const GeoVPhysVol* vPV);
   
   // Get the cutoff result
-  GeoPhysVol* getPV();
-  GeoFullPhysVol* getFPV();
+  GeoIntrusivePtr<GeoPhysVol> getPV();
+  GeoIntrusivePtr<GeoFullPhysVol> getFPV();
 
  private: 
-  GeoVPhysVol*               m_physVol{nullptr};
+  PVLink m_physVol{nullptr};
 
   const GeoShape&            m_shape;
   const GeoTrf::Transform3D& m_transform;
 
-  std::stack<GeoVPhysVol*>   m_copyStack;
+  std::stack<PVLink>   m_copyStack;
 };
 
 #endif

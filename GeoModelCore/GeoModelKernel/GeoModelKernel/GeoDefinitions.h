@@ -70,9 +70,12 @@ namespace GeoTrf {
 
   class Translate3D : public Transform3D {
   public:
+    
+    Translate3D(const GeoTrf::Vector3D& v):
+      Translate3D{v.x(),v.y(),v.z()}{}
+
     Translate3D(double x, double y, double z)
-      : Transform3D(Translation3D(x,y,z))
-      {}
+      : Transform3D(Translation3D(x,y,z)){}
     virtual ~Translate3D() = default;
   };
 

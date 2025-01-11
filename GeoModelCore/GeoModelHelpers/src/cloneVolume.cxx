@@ -7,8 +7,7 @@
 #include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 
-PVLink cloneVolume(const PVLink& volume, 
-                   bool allowShared) {
+PVLink cloneVolume(const PVLink& volume, bool allowShared) {
     PVLink newVolume{volume};
     if (!allowShared || hasFullPhysVolInTree(volume)) {
         if (typeid(*volume) == typeid(GeoPhysVol)) {
@@ -27,8 +26,6 @@ PVLink cloneVolume(const PVLink& volume,
             newVolume->add(const_cast<GeoGraphNode*>(node));
           }
         }
-        
     }
     return newVolume;
-    
 }

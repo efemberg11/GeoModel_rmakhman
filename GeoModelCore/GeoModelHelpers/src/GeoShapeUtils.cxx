@@ -28,6 +28,10 @@
 
 #include <vector>
 
+namespace{
+    constexpr unsigned tubeApproxEdges = 8;
+}
+
 std::pair<const GeoShape* , const GeoShape*> getOps(const GeoShape* composed) {
     if (composed->typeID() == GeoShapeUnion::getClassTypeID()) {
         const GeoShapeUnion* unionShape = dynamic_cast<const GeoShapeUnion*>(composed);
@@ -48,7 +52,7 @@ std::pair<const GeoShape* , const GeoShape*> getOps(const GeoShape* composed) {
 unsigned int countComposedShapes(const GeoShape* shape) {
     std::pair<const GeoShape*, const GeoShape*> ops = getOps(shape);
     return 1 + (ops.first ? countComposedShapes(ops.first) : 0) +
-                (ops.second ? countComposedShapes(ops.second) : 0);
+               (ops.second ? countComposedShapes(ops.second) : 0);
 }
 
 GeoIntrusivePtr<const GeoShape> compressShift(const GeoShape* shift) {    
@@ -227,6 +231,46 @@ std::vector<GeoTrf::Vector3D> getPolyShapeEdges(const GeoShape* shape,
                                                                   brep->getYVertex(vtx),
                                                                   sZ * brep->getDZ()});
             
+            }
+        }
+    } else if (shape->typeID() == GeoTube::getClassTypeID()) {
+        constexpr double stepLength = 2.*M_PI / tubeApproxEdges;
+        const GeoTube* tube = static_cast<const GeoTube*>(shape);
+        for (const double z :{-1., 1.}){
+            for (unsigned int e = 0; e < tubeApproxEdges; ++e) {
+                edgePoints.emplace_back(tube->getRMax()*std::cos(stepLength*e),
+                                        tube->getRMax()*std::sin(stepLength*e),
+                                        z*tube->getZHalfLength());
+            }
+        }
+    } else if (shape->typeID() == GeoTubs::getClassTypeID()) {
+        const GeoTubs* tubs = static_cast<const GeoTubs*>(shape);
+        const double stepSize = tubs->getDPhi() / tubeApproxEdges;
+        for (const double z : {-1., 1.}) {
+            for (unsigned e = 0; e <= tubeApproxEdges; ++e) {
+                edgePoints.emplace_back(tubs->getRMax()*std::cos(tubs->getSPhi() + stepSize*e), 
+                                        tubs->getRMax()*std::sin(tubs->getSPhi() + stepSize*e), 
+                                        z*tubs->getZHalfLength());
+            }
+        }
+    } else if (shape->typeID() == GeoEllipticalTube::getClassTypeID()) {
+        const GeoEllipticalTube* tube = static_cast<const GeoEllipticalTube*>(shape);
+        constexpr double stepSize = 2.*M_PI / tubeApproxEdges;
+        for (const double z : {-1.,1.}) {
+            for (unsigned e = 0; e<tubeApproxEdges; ++e){
+                edgePoints.emplace_back(tube->getXHalfLength()*std::cos(stepSize*e),
+                                        tube->getYHalfLength()*std::sin(stepSize*e),
+                                        z* tube->getZHalfLength());
+            }
+        }
+    } else if (shape->typeID() == GeoTorus::getClassTypeID()) {
+        constexpr double stepSize = 2.*M_PI / tubeApproxEdges;
+        const GeoTorus* torus = static_cast<const GeoTorus*>(shape);
+        for (unsigned int donut =0; donut < tubeApproxEdges; ++donut) {
+            for (unsigned int slice =0; slice < tubeApproxEdges; ++slice) {
+                edgePoints.emplace_back((torus->getRTor() + torus->getRMax()* std::cos(slice *stepSize))*std::cos(donut*stepSize),
+                                        (torus->getRTor() + torus->getRMax()* std::cos(slice *stepSize))*std::sin(donut*stepSize),
+                                         torus->getRMax()* std::sin(slice*stepSize));
             }
         }
     } else {

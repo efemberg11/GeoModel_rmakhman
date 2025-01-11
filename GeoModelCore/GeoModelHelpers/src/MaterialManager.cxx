@@ -33,15 +33,14 @@ namespace {
 const GeoMaterial* MaterialManager::MaterialFactory::get() const { return m_material; }
 MaterialManager::MaterialFactory::~MaterialFactory() {
     if (!m_material) return;
-    // std::cout<<"MaterialFactory() -- finalize " <<m_material->getName()<<std::endl;
+
     if (m_components.empty()) {
       m_material->lock();
       return;
     }
     const double inv_totalFraction = 1. / m_totFraction;
     for(const auto& [element, fraction] : m_components) {
-      m_material->add(element, 
-                      fraction * element->getA() * inv_totalFraction);
+      m_material->add(element, fraction * element->getA() * inv_totalFraction);
     }
     m_material->lock();
 }
@@ -56,8 +55,7 @@ void MaterialManager::MaterialFactory::addComponent(const ConstMaterialPtr& mat,
         addComponent(elePtr, mat->getFraction(ele) * fraction);
     }
 }
-void MaterialManager::MaterialFactory::addComponent(const ConstElementPtr& ele, 
-                                                    double fraction) {
+void MaterialManager::MaterialFactory::addComponent(const ConstElementPtr& ele, double fraction) {
     m_components.emplace_back(std::make_pair(ele, fraction));
     m_totFraction += fraction;
 }
@@ -135,7 +133,7 @@ void MaterialManager::printAll() const {
 }
 
 void MaterialManager::addElement(const std::string &name, const std::string &symbol, double z, double a) {
-    GeoIntrusivePtr<GeoElement> newElement{new GeoElement(name,symbol,z,a*atomicDensity)};
+    GeoIntrusivePtr<GeoElement> newElement{make_intrusive<GeoElement>(name,symbol,z,a*atomicDensity)};
     addElement(newElement);
 }
 
@@ -158,7 +156,7 @@ void MaterialManager::setMaterialNamespace(const std::string &name) {
 void MaterialManager::lockMaterial() { m_factory.reset(); }
 
 void MaterialManager::addMaterial(const std::string &name, double density) {
-    MaterialPtr newMat{new GeoMaterial(name, density * volDensity)};
+    MaterialPtr newMat{make_intrusive<GeoMaterial>(name, density * volDensity)};
     addMaterial(newMat);
 }
 
@@ -200,14 +198,14 @@ void MaterialManager::addMatComponent(const std::string &name, double fraction) 
 }
 void MaterialManager::buildSpecialMaterials() {
   // Ether  
-  GeoIntrusivePtr<GeoElement> ethElement{new GeoElement("Ether","ET",500.0,0.0)};
+  GeoIntrusivePtr<GeoElement> ethElement{make_intrusive<GeoElement>("Ether","ET",500.0,0.0)};
   m_elements.insert(std::make_pair("Ether",ethElement));
-  GeoIntrusivePtr<GeoMaterial> ether{new GeoMaterial("special::Ether",0.0)};
+  GeoIntrusivePtr<GeoMaterial> ether{make_intrusive<GeoMaterial>("special::Ether",0.0)};
   ether->add(ethElement,1.);
   ether->lock();
   m_materials.insert(std::make_pair("special::Ether", ether));
   // HyperUranium
-  GeoIntrusivePtr<GeoMaterial> hu{new GeoMaterial("special::HyperUranium",0.0)};
+  GeoIntrusivePtr<GeoMaterial> hu{make_intrusive<GeoMaterial>("special::HyperUranium",0.0)};
   hu->add(ethElement,1.);
   hu->lock();
   m_materials.insert(std::make_pair("special::HyperUranium", hu));

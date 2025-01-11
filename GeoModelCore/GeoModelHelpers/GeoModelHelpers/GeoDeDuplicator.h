@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 #ifndef GeoModelHelpers_GEODEDUPLICATOR_H
 #define GeoModelHelpers_GEODEDUPLICATOR_H
@@ -7,6 +7,8 @@
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoTransform.h"
+#include "GeoModelKernel/GeoSerialIdentifier.h"
+#include "GeoModelKernel/GeoNameTag.h"
 
 #include "GeoModelHelpers/GeoLogVolSorter.h"
 #include "GeoModelHelpers/GeoPhysVolSorter.h"
@@ -14,6 +16,7 @@
 #include "GeoModelHelpers/TransformSorter.h"
 
 #include <set>
+#include <map>
 #include <mutex>
 #include <thread>
 /***
@@ -71,20 +74,48 @@ class GeoDeDuplicator {
         using GeoLogVolPtr = GeoIntrusivePtr<GeoLogVol>;
         using GeoTrfPtr =  GeoIntrusivePtr<GeoTransform>;
         using GeoPhysVolPtr = GeoIntrusivePtr<GeoPhysVol>;
+        using GeoSerialIdPtr = GeoIntrusivePtr<GeoSerialIdentifier>;
+        using GeoNamePtr = GeoIntrusivePtr<GeoNameTag>;
 
+        /** @brief Standard constructor */
         GeoDeDuplicator() = default;
+        /** @brief Standard destructor */
         virtual ~GeoDeDuplicator() = default;
-
+        /** @brief Takes a GeoPhysVol and adds it to the cache. If physVol deduplication 
+         *          is turned on and an equivalent volume has been parsed before, 
+         *          then that volume is returned instead */
         GeoPhysVolPtr cacheVolume(GeoPhysVolPtr vol) const;
+        /** @brief Converts the transform into GeoTransform with(out) deduplication
+         *         of equivalent transform nodes */
         GeoTrfPtr makeTransform(const GeoTrf::Transform3D& trf) const;
+        /** @brief Take a GeoTransform node and adds it to the cahce. If transform deduplication 
+         *          is turned on and an equivalent transform node has been parsed before, 
+         *          then that mpde is returned instead */
+        GeoTrfPtr cacheTransform(GeoTrfPtr transform) const;
+        /** @brief Takes a GeoLogVol and adds it to the cache. If LogVol deduplication 
+         *          is turned on and an equivalent volume has been parsed before, 
+         *          then that volume is returned instead */
         GeoLogVolPtr cacheVolume(GeoLogVolPtr vol) const;
+        /** @brief Takes a GeoShape and adds it to the cache. If shape deduplication 
+         *          is turned on and an equivalent shape has been parsed before, 
+         *          then that shape is returned instead */
         GeoShapePtr cacheShape(GeoShapePtr shape) const;
+        /** @brief Returns a new GeoName tag */
+        GeoNamePtr nameTag(const std::string& tagName) const;
+        /** @brief Returns a new GeoSerial Id  */
+        GeoSerialIdPtr serialId(const int id) const;
 
+        /** @brief Toggles whether shape deduplication shall be enabled */
         void setShapeDeDuplication(bool enable);
+        /** @brief Toggles whether logVol deduplication shall be enabled */
         void setLogVolDeDuplication(bool enable);
+        /** @brief Toggles whether transform node deduplication shall be enabled */
         void setTransformDeDuplication(bool enable);
+        /** @brief Toggles whether physVol node deduplication shall be enabled */
         void setPhysVolDeDuplication(bool enable);
 
+        /** @brief Clears the shared Shape / Transform / SerialId & NameTag cache */
+        static void clearSharedCaches();
     private:
         bool m_deDuplicateLogVol{true};
         bool m_deDuplicatePhysVol{true};
@@ -94,12 +125,17 @@ class GeoDeDuplicator {
         using LogVolSet = std::set<GeoLogVolPtr, GeoLogVolSorter>;
         using TrfSet = std::set<GeoTrfPtr, GeoTrf::TransformSorter>;
         using ShapeSet = std::set<GeoShapePtr, GeoShapeSorter>;
+        using SerialIdMap = std::map<int, GeoSerialIdPtr>;
+        using NameTagMap = std::map<std::string, GeoNamePtr>;
+
         mutable PhysVolSet m_physVolStore{};
         mutable LogVolSet m_logVolStore{};
         mutable std::vector<GeoIntrusivePtr<const RCBase>> m_genericCache{};
 
         static TrfSet s_trfStore;
         static ShapeSet s_shapeStore;
+        static SerialIdMap s_serialIds;
+        static NameTagMap s_nameTags;
 
         mutable std::mutex m_mutex{};
 };

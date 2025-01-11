@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOSERIALIDENTIFIER_H
@@ -13,29 +13,22 @@
 
 #include "GeoModelKernel/GeoGraphNode.h"
 
-class GeoSerialIdentifier : public GeoGraphNode  
-{
+class GeoSerialIdentifier : public GeoGraphNode {
  public:
   GeoSerialIdentifier(int baseId);
 
   virtual void exec(GeoNodeAction *action) const;
 
-  inline int getBaseId() const;
+  inline int getBaseId() const{
+      return m_baseId;
+  }
   
  protected:
-  virtual ~GeoSerialIdentifier();
+    virtual ~GeoSerialIdentifier();
 
  private:
-  GeoSerialIdentifier(const GeoSerialIdentifier &right);
-  const GeoSerialIdentifier & operator=(const GeoSerialIdentifier &right);
-
-  int  m_baseId;
+    int m_baseId{0};
 };
-
-inline int GeoSerialIdentifier::getBaseId() const
-{
-  return m_baseId;
-}
 
 #endif
 

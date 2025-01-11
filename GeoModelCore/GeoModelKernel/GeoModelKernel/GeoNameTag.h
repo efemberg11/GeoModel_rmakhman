@@ -25,21 +25,15 @@ class GeoNameTag : public GeoGraphNode
 
   //	Specifies the name of the next physical volume in the
   //	node tree.
-  const std::string& getName () const;
+  const std::string& getName() const {
+      return m_name;
+  }
   
  protected:
   virtual ~GeoNameTag();
   
  private:
-  GeoNameTag(const GeoNameTag &right);
-  GeoNameTag & operator=(const GeoNameTag &right);
-  
-  std::string m_name;
+    std::string m_name{};
 };
-
-inline const std::string& GeoNameTag::getName () const
-{
-  return m_name;
-}
 
 #endif

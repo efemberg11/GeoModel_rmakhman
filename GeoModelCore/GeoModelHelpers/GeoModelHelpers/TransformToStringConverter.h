@@ -28,6 +28,10 @@ namespace GeoTrf{
     std::string toString(const Transform3D& trans, bool useCoordAngles = false, int precision = 4);
     std::string toString(const EulerAngles& angles, int precision = 4);
     std::string toString(const CoordEulerAngles& angles, int precision = 4);
+
+    std::string toString(const Line3D& line, int precision = 4);
+    std::string toString(const Plane3D& plane, int precision = 4);
+
 }
 
 #endif

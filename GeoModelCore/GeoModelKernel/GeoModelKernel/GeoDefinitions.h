@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEODEFINITIONS_H
@@ -14,64 +14,115 @@
 #else
 #include <Eigen/Dense>
 #endif
+#include <optional>
 
 namespace GeoTrf {
   using Rotation3D = Eigen::Quaternion<double>;
   using Translation3D = Eigen::Translation<double, 3>;
   using AngleAxis3D =  Eigen::AngleAxisd;
   using Transform3D = Eigen::Affine3d;
-  template<size_t N> using VectorN =  Eigen::Matrix<double, N, 1>;
+  template<int N> using VectorN =  Eigen::Matrix<double, N, 1>;
   using Vector3D = VectorN<3>;
   using Vector2D = VectorN<2>;
   using RotationMatrix3D =  Eigen::Matrix<double, 3, 3>;
   using Diagonal3DMatrix = Eigen::DiagonalMatrix <double, 3>;
 
-  /// check if we can use Eigen Hyperplane for this
-  struct Plane3D {
-  protected:
-    double a_{0.};
-    double b_{0.};
-    double c_{1.};
-    double d_{0.};
-    
-  public:
-    /**
-     *  Default constructor - creates plane z=0. */
-    Plane3D() = default;
-    /**
-     * Constructor from four numbers - creates plane a*x+b*y+c*z+d=0. */
-    Plane3D(double a1, double b1, double c1, double d1)
-    :  a_(a1), b_(b1), c_(c1), d_(d1) 
-    {}
+  /** @brief Returns a unit vector from an arbitrary vector */
+  template <int N>
+    VectorN<N> unit(const VectorN<N>& a);
+  /** @brief Helper struct describing a Line in 3D space */
+  class Plane3D;
+  class Line3D{
+    private:
+      Vector3D m_pos{Vector3D::Zero()};
+      Vector3D m_dir{Vector3D::Zero()};
+    public:
+       /** @brief Default empty constructor */
+       Line3D() = default;
+       /*** @brief Constructor taking a point on the line and the line direction
+        *   @param pos: Point on the line
+        *   @param dir: Direction vector (Needs to be normalized) */
+       Line3D(const Vector3D& pos, const Vector3D& dir):
+          m_pos{pos},
+          m_dir{dir} {}
+        /** @brief Returns the position of the line */
+        const Vector3D& position() const {
+            return m_pos;
+        }
+        /** @brief Returns the direction of the line */
+        const Vector3D& direction() const {
+            return m_dir;
+        }
+        /** @brief Travels a distance x along the line */
+        GeoTrf::Vector3D travel(const double x) const {
+          return position() + x * direction();
+        }
+        /** @brief Returns the distance of the point along the line */
+        double distance(const Vector3D& v) const {
+            return direction().dot(v-position());
+        }
+        /** @brief Returns the intersection point with another line
+         *  @param other: Other line to intersect */
+        std::optional<Vector3D> intersect(const Line3D& other) const;
+        /** @brief the intersection point with a plane */
+        std::optional<Vector3D> intersect(const Plane3D& other) const;
+  };
+  /** @brief Helper struct describing a Plane in 3D dimensional space */
+  class Plane3D {
+    private:
+      Vector3D m_normal{Vector3D::Zero()};
+      double m_offSet{0.};    
+    public:
+      /**
+       *  Default constructor - creates plane z=0. */
+      Plane3D() = default;
+      /**
+       * Constructor from four numbers - creates plane a*x+b*y+c*z+d=0. */
+      Plane3D(double a1, double b1, double c1, double d1): 
+        m_normal{a1,b1,c1},
+        m_offSet{d1} {}
 
-    /**
-     * Constructor from normal and point. */
-    Plane3D(const Vector3D& n, const Vector3D& p)
-    : a_(n.x()), b_(n.y()), c_(n.z()), d_(-n.dot(p)) 
-    {}
+      /*** Constructor from normal and point. */
+      Plane3D(const Vector3D& n, const Vector3D& p): 
+        m_normal{n},
+        m_offSet{-n.dot(p)} {}
+      
+      /** @brief Constructor from two direction vectors and one point in the plane
+       *  @param dir1: First direction along the plane
+       *  @param dir2: Second direction vector along the plane
+       *  @param point: Arbitrary point inside the plane */
+      Plane3D(const Vector3D& dir1,
+              const Vector3D& dir2,
+              const Vector3D& point):
+        Plane3D{unit(dir1.cross(dir2)), point} {}
     
     /**
      * Returns the a-coefficient in the plane equation: a*x+b*y+c*z+d=0. */
-    double a() const { return a_; }
+    double a() const { return m_normal.x(); }
     /**
      * Returns the b-coefficient in the plane equation: a*x+b*y+c*z+d=0. */
-    double b() const { return b_; }
+    double b() const { return m_normal.y(); }
     /**
      * Returns the c-coefficient in the plane equation: a*x+b*y+c*z+d=0. */
-    double c() const { return c_; }
+    double c() const { return m_normal.z(); }
     /**
      * Returns the free member of the plane equation: a*x+b*y+c*z+d=0. */
-    double d() const { return d_; }
+    double d() const { return m_offSet; }
     
-    /**
-     * Returns normal. */
-    Vector3D normal() const { return Vector3D(a_,b_,c_); }
+    /** @brief Returns the plane normal vector */
+    const Vector3D& normal() const { return m_normal; }
+    /** @brief Returns the offset  or the d of the plane equation*/
+    double offSet() const { return m_offSet; }
+    /** @brief Returns the intersection of the plane with a line */
+    std::optional<Vector3D> intersect(const Line3D& other) const;
+    /** @brief Returns whether a point is inside a plane */
+    bool inside(const Vector3D& point) const;
   };
 
   class Translate3D : public Transform3D {
   public:
     
-    Translate3D(const GeoTrf::Vector3D& v):
+    Translate3D(const Vector3D& v):
       Translate3D{v.x(),v.y(),v.z()}{}
 
     Translate3D(double x, double y, double z)
@@ -264,5 +315,5 @@ namespace GeoTrf {
     virtual ~GeoTransformRT() = default;
   };
 }
-
+#include "GeoModelKernel/GeoDefinitions.icc"
 #endif // GEOMODELKERNEL_GEODEFINITIONS_H

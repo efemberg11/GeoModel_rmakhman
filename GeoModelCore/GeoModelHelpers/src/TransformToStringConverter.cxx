@@ -56,4 +56,15 @@ namespace GeoTrf{
         ostr <<"gamma: "<<angles.gamma * toDeg;        
         return ostr.str();
     }
+    std::string toString(const Line3D& line, int precision) {
+        std::stringstream ostr{};
+        ostr<<"line --- "<<toString(line.position(), precision)<<" + "<<toString(line.direction(), precision);
+        return ostr.str();
+    }
+    std::string toString(const Plane3D& plane, int precision) {
+        std::stringstream ostr{};
+        ostr << std::setiosflags(std::ios::fixed) << std::setprecision(precision);
+        ostr<<"plane -- normal: "<<toString(plane.normal(), 4)<<" - C: "<<plane.offSet();
+        return ostr.str();
+    }
 }

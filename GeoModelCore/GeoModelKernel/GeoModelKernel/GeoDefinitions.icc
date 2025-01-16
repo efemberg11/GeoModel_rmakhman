@@ -1,0 +1,38 @@
+/*
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+*/
+#ifndef GEOMODELKERNEL_GEODEFINITIONS_ICC
+#define GEOMODELKERNEL_GEODEFINITIONS_ICC
+
+#include <climits>
+namespace GeoTrf{
+    template <int N>
+        VectorN<N> unit(const VectorN<N>& a) {
+        return a / std::sqrt(a.dot(a));
+    }   
+    inline std::optional<Vector3D> Line3D::intersect(const Line3D& other) const {
+        const double dirDots = direction().dot(other.direction());
+        const double divisor = 1. - dirDots*dirDots;
+        if (std::abs(divisor) < std::numeric_limits<double>::epsilon()){
+                return std::nullopt;
+        }
+        const Vector3D AminusB = other.position() - position();
+        const double lambda = (AminusB.dot(direction()) - AminusB.dot(other.direction()) * dirDots) / divisor;
+        return std::make_optional<Vector3D>(position()+ lambda*direction());
+    }
+    inline std::optional<Vector3D> Line3D::intersect(const Plane3D& other) const {
+        const double normDot = other.normal().dot(direction());
+        if (std::abs(normDot) < std::numeric_limits<double>::epsilon()) {
+            return std::nullopt;
+        }
+        const double lambda = (other.offSet() - position().dot(other.normal())) / normDot;
+        return std::make_optional<Vector3D>(position() + lambda * direction());
+    }
+    inline std::optional<Vector3D> Plane3D::intersect(const Line3D& other) const {
+        return other.intersect(*this);
+    }
+    inline bool Plane3D::inside(const Vector3D& point) const {
+        return (normal().dot(point) - offSet()) < std::numeric_limits<double>::epsilon();
+    }
+}
+#endif

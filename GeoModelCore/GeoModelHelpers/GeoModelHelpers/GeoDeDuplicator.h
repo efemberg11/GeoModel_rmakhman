@@ -7,8 +7,12 @@
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoShape.h"
 #include "GeoModelKernel/GeoTransform.h"
+#include "GeoModelKernel/GeoAlignableTransform.h"
+#include "GeoModelKernel/GeoPhysVol.h"
+#include "GeoModelKernel/GeoFullPhysVol.h"
 #include "GeoModelKernel/GeoSerialIdentifier.h"
 #include "GeoModelKernel/GeoNameTag.h"
+#include "GeoModelKernel/GeoIdentifierTag.h"
 
 #include "GeoModelHelpers/GeoLogVolSorter.h"
 #include "GeoModelHelpers/GeoPhysVolSorter.h"
@@ -16,7 +20,7 @@
 #include "GeoModelHelpers/TransformSorter.h"
 
 #include <set>
-#include <map>
+#include <unordered_map>
 #include <mutex>
 #include <thread>
 /***
@@ -75,6 +79,7 @@ class GeoDeDuplicator {
         using GeoTrfPtr =  GeoIntrusivePtr<GeoTransform>;
         using GeoPhysVolPtr = GeoIntrusivePtr<GeoPhysVol>;
         using GeoSerialIdPtr = GeoIntrusivePtr<GeoSerialIdentifier>;
+        using GeoIdPtr = GeoIntrusivePtr<GeoIdentifierTag>;
         using GeoNamePtr = GeoIntrusivePtr<GeoNameTag>;
 
         /** @brief Standard constructor */
@@ -104,6 +109,12 @@ class GeoDeDuplicator {
         GeoNamePtr nameTag(const std::string& tagName) const;
         /** @brief Returns a new GeoSerial Id  */
         GeoSerialIdPtr serialId(const int id) const;
+        /** @brief Returns a new GeoIdentifier tag */
+        GeoIdPtr geoId(const int id) const;
+
+        /** @brief Clones a physical volume. All components in the tree are 
+         *         parsed through the deduplication chain */
+        PVLink clone(PVConstLink vol) const;
 
         /** @brief Toggles whether shape deduplication shall be enabled */
         void setShapeDeDuplication(bool enable);
@@ -113,7 +124,6 @@ class GeoDeDuplicator {
         void setTransformDeDuplication(bool enable);
         /** @brief Toggles whether physVol node deduplication shall be enabled */
         void setPhysVolDeDuplication(bool enable);
-
         /** @brief Clears the shared Shape / Transform / SerialId & NameTag cache */
         static void clearSharedCaches();
     private:
@@ -125,8 +135,9 @@ class GeoDeDuplicator {
         using LogVolSet = std::set<GeoLogVolPtr, GeoLogVolSorter>;
         using TrfSet = std::set<GeoTrfPtr, GeoTrf::TransformSorter>;
         using ShapeSet = std::set<GeoShapePtr, GeoShapeSorter>;
-        using SerialIdMap = std::map<int, GeoSerialIdPtr>;
-        using NameTagMap = std::map<std::string, GeoNamePtr>;
+        using SerialIdMap = std::unordered_map<int, GeoSerialIdPtr>;
+        using GeoIdMap = std::unordered_map<int, GeoIdPtr>;
+        using NameTagMap = std::unordered_map<std::string, GeoNamePtr>;
 
         mutable PhysVolSet m_physVolStore{};
         mutable LogVolSet m_logVolStore{};
@@ -136,6 +147,7 @@ class GeoDeDuplicator {
         static ShapeSet s_shapeStore;
         static SerialIdMap s_serialIds;
         static NameTagMap s_nameTags;
+        static GeoIdMap s_geoIds;
 
         mutable std::mutex m_mutex{};
 };

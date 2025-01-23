@@ -10,9 +10,9 @@
 #define GEOMATERIALHELPER_H
 
 #include <GeoModelKernel/GeoDefinitions.h>
+#include <GeoModelKernel/GeoMaterial.h>
+#include <GeoModelKernel/GeoVPhysVol.h>
 
-class GeoMaterial;
-class GeoVPhysVol;
 
 namespace GeoModelTools {
 
@@ -24,30 +24,29 @@ namespace GeoModelTools {
     @author sarka.todorova@cern.ch
     */
 
-    typedef  std::pair< const GeoMaterial*, double >  MaterialComponent;
+    using GeoMaterialPtr = GeoIntrusivePtr<const GeoMaterial>;
+    using MaterialComponent = std::pair<GeoMaterialPtr, double>;
     
     class GeoMaterialHelper {
       
       public:
         /** Default constructor*/
-        GeoMaterialHelper()
-       {}
-
+        GeoMaterialHelper() = default;
         /** Destructor*/
-        virtual ~GeoMaterialHelper(){}
+        virtual ~GeoMaterialHelper() = default;
     
         /** Evaluate mass ( of a GeoModel tree/branch/volume ) */
-        float evaluateMass(const GeoVPhysVol* gv, bool inclusive = true) const;
+        double evaluateMass(PVConstLink gv, bool inclusive = true) const;
 
         /** Collect and blend material : return blended material (the client takes the ownership) and effective volume */
-        MaterialComponent collectMaterial(const GeoVPhysVol* gv) const;
+        MaterialComponent collectMaterial(PVConstLink gv) const;
 
         /** hardcoded dummy materials : TODO : find generic criterium ( density ? radiation length ? )  */
-        bool dummy_material(const GeoVPhysVol*) const;
+        bool dummy_material(PVConstLink gv) const;
 
       private:
-	/** Internal recursive loop over material components */
-	void collectMaterialContent( const GeoVPhysVol* gv, std::vector< MaterialComponent >& materialContent ) const; 
+	        /** Internal recursive loop over material components */
+	        void collectMaterialContent( PVConstLink gv, std::vector< MaterialComponent >& materialContent) const; 
    };
  
 

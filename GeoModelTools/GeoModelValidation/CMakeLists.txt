@@ -8,7 +8,9 @@ file( GLOB HEADERS GeoModelValidation/*.h )
 
 # Create the library.
 add_library( GeoModelValidation SHARED ${HEADERS} ${SOURCES} )
-target_link_libraries( GeoModelValidation  PUBLIC Eigen3::Eigen GeoModelCore::GeoGenericFunctions GeoModelCore::GeoModelKernel GeoModelIO::GeoModelDBManager GeoModelIO::GeoModelWrite GeoModelIO::GeoModelRead ) 
+target_link_libraries( GeoModelValidation  PUBLIC Eigen3::Eigen GeoModelCore::GeoGenericFunctions GeoModelCore::GeoModelKernel 
+                                                                GeoModelCore::GeoModelHelpers GeoModelIO::GeoModelDBManager 
+                                                                GeoModelIO::GeoModelWrite GeoModelIO::GeoModelRead ) 
 target_include_directories( GeoModelValidation PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )

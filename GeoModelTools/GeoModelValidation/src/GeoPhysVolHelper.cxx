@@ -34,6 +34,9 @@
 #include "GeoModelKernel/GeoPgon.h"
 #include "GeoModelKernel/GeoPara.h"
 
+#include "GeoModelHelpers/GeoShapeSorter.h"
+#include "GeoModelHelpers/TransformSorter.h"
+
 #include "GeoModelKernel/Units.h"
 #define SYSTEM_OF_UNITS GeoModelKernelUnits
 
@@ -539,173 +542,10 @@ void GeoModelTools::GeoPhysVolHelper::printChildren(const GeoVPhysVol* pv, int l
   }
 }
 
-bool GeoModelTools::GeoPhysVolHelper::compareShapes( const GeoShape* sh1, const GeoShape* sh2, float tol ) const {
-
-  if (sh1->type() != sh2->type()) return false;
-
-  if ( sh1->type()=="Pgon") {
-    const GeoPgon* pgon1 = dynamic_cast<const GeoPgon*>(sh1);
-    const GeoPgon* pgon2 = dynamic_cast<const GeoPgon*>(sh2);
-    if (!pgon1 || !pgon2)  return false;
-
-    if (pgon1->getNPlanes() != pgon2->getNPlanes())  return false;
-    if (pgon1->getNSides() != pgon2->getNSides())  return false;
-    if (fabs(pgon1->getSPhi() - pgon2->getSPhi()) > tol) return false; 
-    if (fabs(pgon1->getDPhi() - pgon2->getDPhi()) > tol) return false; 
-
-    return true;
-
-  } else if (sh1->type()=="Trd") {
-    const GeoTrd* trd1 = dynamic_cast<const GeoTrd*> (sh1);
-    const GeoTrd* trd2 = dynamic_cast<const GeoTrd*> (sh2);
-    
-    if ((trd1->getXHalfLength1() - trd2->getXHalfLength1())>tol) return false;
-    if ((trd1->getXHalfLength2() - trd2->getXHalfLength2())>tol) return false;
-    if ((trd1->getYHalfLength1() - trd2->getYHalfLength1())>tol) return false;
-    if ((trd1->getYHalfLength2() - trd2->getYHalfLength2())>tol) return false;
-    if ((trd1->getZHalfLength() - trd2->getZHalfLength())>tol) return false;
-
-    return true;
-
-  } else if ( sh1->type()=="Box") {
-    const GeoBox* box1 = dynamic_cast<const GeoBox*> (sh1);
-    const GeoBox* box2 = dynamic_cast<const GeoBox*> (sh2);
-
-    if (fabs(box1->getXHalfLength() - box2->getXHalfLength()) > tol) return false;
-    if (fabs(box1->getYHalfLength() - box2->getYHalfLength()) > tol) return false;
-    if (fabs(box1->getZHalfLength() - box2->getZHalfLength()) > tol) return false;
-
-   return true;  
-
-  } else if ( sh1->type() == "Tube" ) {
-    const GeoTube* tube1=dynamic_cast<const GeoTube*> (sh1);
-    const GeoTube* tube2=dynamic_cast<const GeoTube*> (sh2);
-    
-    if ( fabs(tube1->getRMin() - tube2->getRMin()) > tol) return false;
-    if ( fabs(tube1->getRMax() - tube2->getRMax()) > tol) return false;
-    if ( fabs(tube1->getZHalfLength()  - tube2->getZHalfLength()) > tol) return false;
- 
-    return true;
-
-  } else   if ( sh1->type() == "Tubs" ) {
-    const GeoTubs* tubs1=dynamic_cast<const GeoTubs*> (sh1);
-    const GeoTubs* tubs2=dynamic_cast<const GeoTubs*> (sh2);
-
-    if ( fabs(tubs1->getRMin()  - tubs2->getRMin()) >tol) return false;
-    if ( fabs(tubs1->getRMax()  - tubs2->getRMax()) > tol) return false;
-    if ( fabs(tubs1->getZHalfLength()  - tubs2->getZHalfLength()) > tol) return false;
-    if ( fabs(tubs1->getSPhi()  - tubs2->getSPhi()) > tol) return false;
-    if ( fabs(tubs1->getDPhi() - tubs2->getDPhi()) > tol) return false;
- 
-    return true;
-
-  }  else if  ( sh1->type() == "Cons" ) {
-    const GeoCons* cons1=dynamic_cast<const GeoCons*> (sh1);
-    const GeoCons* cons2=dynamic_cast<const GeoCons*> (sh2);
-
-    if ( fabs(cons1->getRMin1()  - cons2->getRMin1())  > tol) return false;
-    if ( fabs(cons1->getRMin2()  - cons2->getRMin2()) >tol) return false;
-    if ( fabs(cons1->getRMax1()  - cons2->getRMax1()) > tol)  return false;
-    if ( fabs(cons1->getRMax2()  - cons2->getRMax2()) > tol) return false;
-    if ( fabs(cons1->getDZ()  - cons2->getDZ()) > tol) return false;
-    if ( fabs(cons1->getSPhi()  - cons2->getSPhi()) > tol) return false;
-    if ( fabs(cons1->getDPhi()  - cons2->getDPhi()) > tol) return false;
-
-    return true;
-
-  } else  if ( sh1->type()=="SimplePolygonBrep") {
-    const GeoSimplePolygonBrep* spb1 = dynamic_cast<const GeoSimplePolygonBrep*> (sh1);
-    const GeoSimplePolygonBrep* spb2 = dynamic_cast<const GeoSimplePolygonBrep*> (sh2);
-    if (!spb1 || !spb2) return false;
-
-    unsigned int nv1 = spb1->getNVertices();
-    unsigned int nv2 = spb2->getNVertices();
-    if (nv1 != nv2)  return false;
-    if (fabs(spb1->getDZ() - spb2->getDZ()) > tol)  return false;
-   
-    for (unsigned int iv = 0; iv < nv1; iv++) {
-
-      if (fabs(spb1->getXVertex(iv) - spb2->getXVertex(iv)) > tol) return false; 
-      if (fabs(spb1->getYVertex(iv) - spb2->getYVertex(iv)) > tol) return false; 
-    }
-
-    return true;
-
-  } else  if ( sh1->type()=="Pcon") {
-    const GeoPcon* pc1 = dynamic_cast<const GeoPcon*> (sh1);
-    const GeoPcon* pc2 = dynamic_cast<const GeoPcon*> (sh2);
-    if (!pc1 || !pc2) return false;
-
-    if ( fabs(pc1->getSPhi()  - pc2->getSPhi()) > tol) return false;
-    if ( fabs(pc1->getDPhi()  - pc2->getDPhi()) > tol) return false;
-
-    unsigned int nv1 = pc1->getNPlanes();
-    unsigned int nv2 = pc2->getNPlanes();
-    if (nv1 != nv2)  return false;
-  
-    for (unsigned int iv = 0; iv < nv1; iv++) {
-
-      if (fabs(pc1->getZPlane(iv) - pc2->getZPlane(iv)) > tol) return false; 
-      if (fabs(pc1->getRMinPlane(iv) - pc2->getRMinPlane(iv)) > tol) return false; 
-      if (fabs(pc1->getRMaxPlane(iv) - pc2->getRMaxPlane(iv)) > tol) return false; 
-    }
-
-    return true;
- 
-  } else   if ( sh1->type()=="Subtraction") {
-    const GeoShapeSubtraction* sub1 = dynamic_cast<const GeoShapeSubtraction*> (sh1);
-    const GeoShapeSubtraction* sub2 = dynamic_cast<const GeoShapeSubtraction*> (sh2);
-
-    if (!sub1 || !sub2) return false;
-  
-    if (!compareShapes(sub1->getOpA(),sub2->getOpA(),tol)) return false;
-    if (!compareShapes(sub1->getOpB(),sub2->getOpB(),tol)) return false;
-
-    return true;
-
-  } else  if ( sh1->type()=="Union") {
-    const GeoShapeUnion* sub1 = dynamic_cast<const GeoShapeUnion*> (sh1);
-    const GeoShapeUnion* sub2 = dynamic_cast<const GeoShapeUnion*> (sh2);
-
-    if (!sub1 || !sub2) return false;
-
-    if (!compareShapes(sub1->getOpA(),sub2->getOpA(),tol)) return false;
-    if (!compareShapes(sub1->getOpB(),sub2->getOpB(),tol)) return false;
-
-    return true;
-
-  } else  if ( sh1->type()=="Shift") {
-    const GeoShapeShift* shift1 = dynamic_cast<const GeoShapeShift*> (sh1);
-    const GeoShapeShift* shift2 = dynamic_cast<const GeoShapeShift*> (sh2);
-
-    if (!shift1 || !shift2) return false;
-
-    if (!compareShapes(shift1->getOp(),shift2->getOp(),tol)) return false;
-    
-    const GeoTrf::Transform3D& transf1 = shift1->getX();
-    const GeoTrf::Transform3D& transf2 = shift2->getX();
-    
-    if ((transf1.translation()-transf2.translation()).norm()>tol)    return false;
-  
-    if (!identity_check(transf1.rotation()*transf2.rotation().inverse(), tol))   return false;
-    
-    return true;
-  }
-
-  std::cout <<"unknown shape to compare:"<<sh1->type()<< std::endl;
-  
-  return false;
-
+bool GeoModelTools::GeoPhysVolHelper::compareShapes( const GeoShape* sh1, const GeoShape* sh2, float /*tol*/ ) const {
+  GeoShapeSorter sorter{};
+  return sorter.compare(sh1, sh2) != 0;
 }
-
-bool GeoModelTools::GeoPhysVolHelper::identity_check(GeoTrf::RotationMatrix3D rotation, float tol) const {
-
-  if (fabs(rotation(0,1))>tol) return false;  
-  if (fabs(rotation(0,2))>tol) return false;  
-  if (fabs(rotation(1,2))>tol) return false;  
-
-  return true;
-} 
 
 void GeoModelTools::GeoPhysVolHelper::decodeShape(const GeoShape* sh) const {
 
@@ -763,15 +603,10 @@ void GeoModelTools::GeoPhysVolHelper::decodeShape(const GeoShape* sh) const {
 
 }
 
-int GeoModelTools::GeoPhysVolHelper::compareTransforms(GeoTrf::Transform3D tr_test, GeoTrf::Transform3D tr_ref, float tolerance) const {
-
-  int trcode = 0;    // assuming identical  
-
-  if ((tr_test.translation()-tr_ref.translation()).norm()>tolerance)  trcode = 6;
-
-  if (!identity_check(tr_test.rotation()*tr_ref.rotation().inverse(), tolerance))   trcode = 7;
-
-  return trcode;
+int GeoModelTools::GeoPhysVolHelper::compareTransforms(GeoTrf::Transform3D tr_test, GeoTrf::Transform3D tr_ref, 
+                                                        float /*tolerance*/) const {
+  GeoTrf::TransformSorter sorter{};
+  return sorter.compare(tr_test, tr_ref);
 }
 						   
 void GeoModelTools::GeoPhysVolHelper::printTranslationDiff(GeoTrf::Transform3D tr_test, GeoTrf::Transform3D tr_ref, float tolerance) const {

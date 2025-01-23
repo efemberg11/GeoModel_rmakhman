@@ -115,7 +115,7 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
     //   
     LogVolStore* store{&m_map[name]};
     if(isNamed) {
-        nameTag_physVolName = make_intrusive<GeoNameTag>(name);
+        nameTag_physVolName = nameTag(name);
         store->name = nameTag_physVolName;
     }   
     //
@@ -228,15 +228,15 @@ void LogvolProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, GeoNo
             newName.append("_");
             newName.append(std::to_string(index_i.second));
     }
-    nameTag_physChildVolName = make_intrusive<GeoNameTag>(newName);//Make sensitive always have a name, to extra Id information from
+    nameTag_physChildVolName = nameTag(newName);//Make sensitive always have a name, to extra Id information from
     toAdd.push_back(nameTag_physChildVolName);
     if(hasIdentifier) { //TODO: check if all "sensitive" volumes must have an identifier. If that's the case, then we can remove this "if" here
-        toAdd.push_back(make_intrusive<GeoIdentifierTag>(sensId));
+        toAdd.push_back(geoId(sensId));
     }
   }
   else {
       if(hasIdentifier) {
-          toAdd.push_back(make_intrusive<GeoIdentifierTag>(m_map[name].id)); // Normal copy number
+          toAdd.push_back(geoId(m_map[name].id)); // Normal copy number
           gmxUtil.positionIndex.setCopyNo(m_map[name].id++);
       }
   }

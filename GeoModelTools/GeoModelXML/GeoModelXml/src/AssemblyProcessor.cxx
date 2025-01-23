@@ -50,7 +50,7 @@ void AssemblyProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, Geo
         //
         //    Name
         AssemblyStore& store {m_map[name]};
-        physVolName = make_intrusive<GeoNameTag>(name); 
+        physVolName = nameTag(name); 
         store.name = physVolName;
     } else { // Already in the registry; use it.
         physVolName = entry->second.name;
@@ -58,7 +58,7 @@ void AssemblyProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, Geo
     lv = gmxUtil.getAssemblyLV();
     toAdd.push_back(physVolName);
     gmxUtil.positionIndex.setCopyNo(m_map[name].id);
-    toAdd.push_back(make_intrusive<GeoIdentifierTag>(m_map[name].id++)); 
+    toAdd.push_back(geoId(m_map[name].id++)); 
 //
 //    Process the assembly's children
 //

@@ -148,6 +148,16 @@ bool GeoPgon::contains (double x, double y, double z) const
 
 void GeoPgon::addPlane (double ZPlane, double RMinPlane, double RMaxPlane)
 {
+  // Basic sanity checks
+  if(RMinPlane < 0.
+     || RMaxPlane <= 0.
+     || RMaxPlane < RMinPlane) {
+    THROW_EXCEPTION("GeoPcon::addPlane() wrong arguments! ("
+		    << ZPlane << ","
+		    << RMinPlane << ","
+		    << RMaxPlane << ")");
+  }
+
   m_zPlane.push_back (ZPlane);
   m_rMinPlane.push_back (RMinPlane);
   m_rMaxPlane.push_back (RMaxPlane);
@@ -155,5 +165,8 @@ void GeoPgon::addPlane (double ZPlane, double RMinPlane, double RMaxPlane)
 
 void GeoPgon::exec (GeoShapeAction *action) const
 {
+  if (!isValid ())
+    THROW_EXCEPTION("Requested to execute action for incomplete polygon");
+
   action->handlePgon(this);
 }

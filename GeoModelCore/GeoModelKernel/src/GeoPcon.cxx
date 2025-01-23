@@ -93,6 +93,16 @@ bool GeoPcon::contains (double x, double y, double z) const
 
 void GeoPcon::addPlane (double ZPlane, double RMinPlane, double RMaxPlane)
 {
+  // Basic sanity checks
+  if(RMinPlane < 0.
+     || RMaxPlane <= 0.
+     || RMaxPlane < RMinPlane) {
+    THROW_EXCEPTION("GeoPcon::addPlane() wrong arguments! ("
+		    << ZPlane << ","
+		    << RMinPlane << ","
+		    << RMaxPlane << ")");
+  }
+
   m_zPlane.push_back (ZPlane);
   m_rMinPlane.push_back (RMinPlane);
   m_rMaxPlane.push_back (RMaxPlane);
@@ -100,5 +110,8 @@ void GeoPcon::addPlane (double ZPlane, double RMinPlane, double RMaxPlane)
 
 void GeoPcon::exec (GeoShapeAction *action) const
 {
+  if (!isValid ())
+    THROW_EXCEPTION("Requested to execute action for incomplete polycone");
+
   action->handlePcon(this);
 }

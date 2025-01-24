@@ -26,42 +26,45 @@ class GeoElement : public RCBase
   int operator!=(const GeoElement &right) const;
   
   //	Returns the effective number of nucleons in the element.
-  double getN () const;
+  double getN () const{
+    return m_a * (GeoModelKernelUnits::mole / GeoModelKernelUnits::gram);
+  }
 
   //	The name of the element, e.g. "Carbon".
-  const std::string& getName () const;
+  const std::string& getName () const {
+    return m_name;
+  }
 
   //	The chemical symbol for the element, e.g. C, O, S, Na....
-  const std::string& getSymbol () const;
+  const std::string& getSymbol () const {
+    return m_symbol;
+  }
 
   //	The atomic number Z for the material.
-  const double& getZ () const;
+  double getZ() const{
+    return m_z;
+  }
 
   //	The average atomic mass for the element.
-  const double& getA () const;
+  double getA() const {
+    return m_a;
+  }
   
   //        Tsai formula for the radiation length
-  double getRadTsai () const;
+  double getRadTsai() const;
   
  protected:
-  virtual ~GeoElement();
+  virtual ~GeoElement() = default;
   
  private:
-  GeoElement(const GeoElement &right);
-  GeoElement & operator=(const GeoElement &right);
-  
-  std::string m_name;
-  std::string m_symbol;
-
-  double m_z;
-  double m_a;  
+  std::string m_name{};
+  std::string m_symbol{};
+  double m_z{0.};
+  double m_a{0.};  
 };
 
-inline int GeoElement::operator==(const GeoElement &right) const
-{
-  return
-    m_name ==
-    right.m_name && m_symbol == right.m_symbol && m_z == right.m_z && m_a == right.m_a;
+inline int GeoElement::operator==(const GeoElement &right) const{
+  return m_name == right.m_name && m_symbol == right.m_symbol && m_z == right.m_z && m_a == right.m_a;
 }
 
 inline int GeoElement::operator!=(const GeoElement &right) const
@@ -70,29 +73,5 @@ inline int GeoElement::operator!=(const GeoElement &right) const
     m_symbol != right.m_symbol || m_z != right.m_z || m_a != right.m_a;
 }
 
-inline double GeoElement::getN () const
-{
-  return m_a * (GeoModelKernelUnits::mole / GeoModelKernelUnits::gram);
-}
-
-inline const std::string& GeoElement::getName () const
-{
-  return m_name;
-}
-
-inline const std::string& GeoElement::getSymbol () const
-{
-  return m_symbol;
-}
-
-inline const double& GeoElement::getZ () const
-{
-  return m_z;
-}
-
-inline const double& GeoElement::getA () const
-{
-  return m_a;
-}
 
 #endif

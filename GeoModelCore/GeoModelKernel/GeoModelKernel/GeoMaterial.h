@@ -31,95 +31,92 @@
 #include "GeoModelKernel/GeoIntrusivePtr.h"
 #include <vector>
 
-class GeoMaterial : public RCBase
-{
+class GeoMaterial : public RCBase {
  public:
   GeoMaterial (const std::string& name, double density);
   
-  //	Add an element to the material.
+  // Add an element to the material.
   void add (const GeoElement* element, double fraction = 1.0);
   
-  //	Add another material to the material (this copies all of
-  //	the element from the other material into this one).
-  //	Fraction is by mass.
+  // Add another material to the material (this copies all of
+  // the element from the other material into this one).
+  // Fraction is by mass.
   void add (const GeoMaterial* material, double fraction);
   
-  //	Lock the material against the addition of other
-  //	materials or elements.
+  // Lock the material against the addition of other
+  // materials or elements.
   void lock ();
   
-  //	Constant dEdx term.
+  // Constant dEdx term.
   double getDeDxConstant () const;
   
-  //	I0 term (ionization potential).  From tables. Units:  eV.
+  // I0 term (ionization potential).  From tables. Units:  eV.
   double getDeDxI0 () const;
   
-  //	Get dEdx_min.  dEdxConstant*11.528 Paul Avery, CBX-92-39.
+  // Get dEdx_min.  dEdxConstant*11.528 Paul Avery, CBX-92-39.
   double getDeDxMin () const;
   
-  //	Returns the radiation length, computed from the density
-  //	and the list of constituents, and their properties.
+  // Returns the radiation length, computed from the density
+  // and the list of constituents, and their properties.
   double getRadLength () const;
   
-  //	Return the nuclear interaction length, computed from the
-  //	density, the list of constituents, and their properties.
+  // Return the nuclear interaction length, computed from the
+  // density, the list of constituents, and their properties.
   double getIntLength () const;
 
-  //	Return the number of elements  
+  // Return the number of elements  
   unsigned int getNumElements () const;
   
-  //	Gets the ith element.
+  // Gets the ith element.
   const GeoElement* getElement (unsigned int i) const;
   
-  //	Gets the fraction by weight of the ith element
+  // Gets the fraction by weight of the ith element
   double getFraction (int i) const;
   
-  //	The name of the material.
+  // The name of the material.
   const std::string& getName () const;
   
-  //	The density of the material.
+  // The density of the material.
   const double& getDensity () const;
   
-  //	Gives an integral identifier for the material.  For
-  //	convenience.
+  // Gives an integral identifier for the material.  For
+  // convenience.
   const unsigned int& getID () const;
   
  protected:
   virtual ~GeoMaterial() = default;
   
  private:
-  GeoMaterial() = delete;
-  GeoMaterial(const GeoMaterial &right) = delete;
-  GeoMaterial & operator=(const GeoMaterial &right) = delete;
   
   std::string m_name{};
   double m_density{0.};
   unsigned int m_iD{0};
 
-  //	A list of the fractional composition of each material.
-  //	Fraction is by mass.
-  std::vector<double> m_fractions;
 
-  //	The radiation length of the material.
+  // The radiation length of the material.
   double m_radLength{0.};
   
-  //	The interaction length of the material.
+  // The interaction length of the material.
   double m_intLength{0.};
 
-  //	The constant term in the formula governing dE/dx.
+  // The constant term in the formula governing dE/dx.
   double m_dedDxConst{0.};
 
-  //	The ionization potential in the formula governing dE/dx.
+  // The ionization potential in the formula governing dE/dx.
   double m_deDxI0{0.};
 
-  //	A flag used to lock the material from further addition
-  //	of elements or other constituents.
+  // A flag used to lock the material from further addition
+  // of elements or other constituents.
   bool m_locked{false};
 
-  //	The list of GeoElements composing a GeoMaterial.
-  std::vector<GeoIntrusivePtr<const GeoElement>> m_elements;
+  // A list of the fractional composition of each material.
+  // Fraction is by mass.
 
-  //	A static used to assign unique identifiers to new materials.
+  /// The list of GeoElements composing a GeoMaterial with the corresponding fraction.
+  using ElementWithFrac = std::pair<GeoIntrusivePtr<const GeoElement>, double>;
+  std::vector<ElementWithFrac> m_elements{};
+
+  // A static used to assign unique identifiers to new materials.
   static std::atomic<unsigned int> s_lastID;
   
 };

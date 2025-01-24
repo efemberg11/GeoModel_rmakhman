@@ -111,18 +111,18 @@ GeoDeDuplicator::GeoIdPtr
     return newId;
 }
 
-PVLink GeoDeDuplicator::clone(PVConstLink vol) const {
+PVLink GeoDeDuplicator::clone(PVConstLink cloneMe) const {
     PVLink newVol{};
     bool tryPhysVolDeDup{m_deDuplicatePhysVol};
-    GeoLogVolPtr logVol{const_cast<GeoLogVol*>(vol->getLogVol())};
-    if (dynamic_cast<const GeoPhysVol*>(vol.get())) {
+    GeoLogVolPtr logVol{const_cast<GeoLogVol*>(cloneMe->getLogVol())};
+    if (dynamic_cast<const GeoPhysVol*>(cloneMe.get())) {
         newVol = make_intrusive<GeoPhysVol>(cacheVolume(logVol));
     } else {
         newVol = make_intrusive<GeoFullPhysVol>(cacheVolume(logVol));
         tryPhysVolDeDup = false;
     }
-    for(unsigned int chNode =0; chNode < newVol->getNChildNodes(); ++chNode) {
-        GeoIntrusivePtr<const GeoGraphNode>node{*newVol->getChildNode(chNode)};
+    for(unsigned int chNode =0; chNode < cloneMe->getNChildNodes(); ++chNode) {
+        GeoIntrusivePtr<const GeoGraphNode>node{*cloneMe->getChildNode(chNode)};
         /** transform nodes */
         if (typeid(*node) == typeid(GeoAlignableTransform)) {
             const auto geoTrf = dynamic_pointer_cast<const GeoAlignableTransform>(node);
@@ -149,7 +149,7 @@ PVLink GeoDeDuplicator::clone(PVConstLink vol) const {
             newVol->add(const_pointer_cast(node));
         }
     }
-    if (tryPhysVolDeDup){
+    if (tryPhysVolDeDup) {
         newVol = cacheVolume(dynamic_pointer_cast<GeoPhysVol>(newVol));
     }
     return newVol;

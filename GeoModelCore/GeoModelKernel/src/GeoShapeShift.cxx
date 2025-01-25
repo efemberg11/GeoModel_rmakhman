@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoShapeShift.h"
@@ -53,6 +53,14 @@ void GeoShapeShift::extent (double& xmin, double& ymin, double& zmin,
   }
 }
 
+#if defined(FLATTEN) && defined(__GNUC__)
+// We compile this package with optimization, even in debug builds; otherwise,
+// the heavy use of Eigen makes it too slow.  However, from here we may call
+// to out-of-line Eigen code that is linked from other DSOs; in that case,
+// it would not be optimized.  Avoid this by forcing all Eigen code
+// to be inlined here if possible.
+__attribute__ ((flatten))
+#endif
 bool GeoShapeShift::contains (double x, double y, double z) const {
   const GeoShape* shape = getOp();
   const GeoTrf::Transform3D& trans = getX();

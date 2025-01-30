@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoAccessVolumeAction.h"
@@ -9,26 +9,13 @@
 
 #include <string>
 
-GeoAccessVolumeAction::GeoAccessVolumeAction(unsigned int Index, const GeoVAlignmentStore* store)
-  : m_transform(GeoTrf::Transform3D::Identity())
-  , m_defTransform(GeoTrf::Transform3D::Identity())
-  , m_index(Index)
-  , m_counter(0)
-  , m_nameTag(nullptr)
-  , m_serialDenominator(nullptr)
-  , m_idTag(nullptr)
-  , m_serialDenomPosition(0)
-  , m_serialIdentifier(nullptr)
-  , m_serialIdentPosition(0)
-  , m_alignStore(store)
-{
+GeoAccessVolumeAction::GeoAccessVolumeAction(unsigned int Index, const GeoVAlignmentStore* store):
+    m_index(Index),
+   m_alignStore(store) {
   setDepthLimit (1);
   m_pendingTransformList.reserve(1);
 }
 
-GeoAccessVolumeAction::~GeoAccessVolumeAction()
-{
-}
 
 void GeoAccessVolumeAction::handleTransform (const GeoTransform *xform)
 {
@@ -137,8 +124,7 @@ const GeoTrf::Transform3D & GeoAccessVolumeAction::getDefTransform () const
   return m_defTransform;
 }
 
-const std::string & GeoAccessVolumeAction::getName () const
-{
+const std::string & GeoAccessVolumeAction::getName () const {
   if(m_name.empty()) {
     if(m_nameTag) {
       m_name = m_nameTag->getName();
@@ -199,16 +185,14 @@ void GeoAccessVolumeAction::handleIdentifierTag (const GeoIdentifierTag *idTag)
   m_serialIdentPosition = 0;
 }
 
-Query<int> GeoAccessVolumeAction::getId () const
-{
-  Query<int> id;
+Query<int> GeoAccessVolumeAction::getId () const {
   if(m_idTag) {
-    id = Query<int>(m_idTag->getIdentifier());
+    return Query<int>(m_idTag->getIdentifier());
   }
   else if(m_serialIdentifier) {
-    id = Query<int>(m_index - m_serialIdentPosition + m_serialIdentifier->getBaseId());
+    return Query<int>(m_index - m_serialIdentPosition + m_serialIdentifier->getBaseId());
   }
-  return id;
+  return std::nullopt;
 }
 
 void GeoAccessVolumeAction::handleSerialIdentifier(const GeoSerialIdentifier *sI)

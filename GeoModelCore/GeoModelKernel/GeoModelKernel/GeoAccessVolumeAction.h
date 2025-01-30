@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GeoAccessVolumeAction_h
@@ -25,7 +25,7 @@ class GeoAccessVolumeAction final : public GeoNodeAction
  public:
 
   GeoAccessVolumeAction (unsigned int Index, const GeoVAlignmentStore* store);
-  virtual ~GeoAccessVolumeAction() override;
+  virtual ~GeoAccessVolumeAction()  =default; 
 
   /// Handles a Transform.
   virtual void handleTransform (const GeoTransform *xform) override;
@@ -70,49 +70,42 @@ class GeoAccessVolumeAction final : public GeoNodeAction
   virtual void handleSerialIdentifier(const GeoSerialIdentifier *sI) override;
 
  private:
-
-  GeoAccessVolumeAction(const GeoAccessVolumeAction &right);
-  GeoAccessVolumeAction & operator=(const GeoAccessVolumeAction &right);
-
   /// Returns a pointer to the ith physical volume under this one.
-  PVConstLink m_volume;
+  PVConstLink m_volume{};
 
   /// The transformation to the ith volume.
-  GeoTrf::Transform3D m_transform;
+  GeoTrf::Transform3D m_transform{GeoTrf::Transform3D::Identity()};
 
   /// The default transformation to the ith volume.
-  GeoTrf::Transform3D m_defTransform;
+  GeoTrf::Transform3D m_defTransform{GeoTrf::Transform3D::Identity()};
 
   /// The volume which we are interested in seeking.
-  unsigned int m_index;
+  unsigned int m_index{0};
 
   /// The volume which we are interested in seeking.
-  unsigned int m_counter;
+  unsigned int m_counter{0};
 
   /// The name of the volume.  From a nametag or a serial denominator.
-  mutable std::string m_name;
-
-  /// The identifier of the volume.  From an identifier tag.
-  mutable Query<int> m_id;
+  mutable std::string m_name{};
 
   /// A pointer to a name tag.  If the volume is named.
-  const GeoNameTag *m_nameTag;
+  const GeoNameTag *m_nameTag{nullptr};
 
   /// A pointer to a serial denominator.  If one exists.
-  const GeoSerialDenominator *m_serialDenominator;
+  const GeoSerialDenominator *m_serialDenominator{nullptr};
 
   /// A pointer to an identifier tag.  If the volume is identified.
-  const GeoIdentifierTag *m_idTag;
+  const GeoIdentifierTag *m_idTag{nullptr};
 
   /// List of Pending Transformations.
-  std::vector<const GeoTransform *>  m_pendingTransformList;
+  std::vector<const GeoTransform *>  m_pendingTransformList{};
 
   /// Position of the serial denominator.  Used to assign a numeric suffix to the name, eg BaseName+99
-  unsigned int m_serialDenomPosition;
+  unsigned int m_serialDenomPosition{0};
 
-  const GeoSerialIdentifier *m_serialIdentifier;
-  unsigned int m_serialIdentPosition;
-  const GeoVAlignmentStore* m_alignStore;
+  const GeoSerialIdentifier *m_serialIdentifier{nullptr};
+  unsigned int m_serialIdentPosition{0};
+  const GeoVAlignmentStore* m_alignStore{nullptr};
 };
 
 #endif

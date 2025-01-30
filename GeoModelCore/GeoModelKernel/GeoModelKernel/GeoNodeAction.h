@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEONODEACTION_H
@@ -40,10 +40,10 @@ class GeoNodeAction
   { ALL_ANCESTORS = -1, SELF = 0, SELF_AND_CHILDREN = 1 };
 
  public:
-  GeoNodeAction();
+  GeoNodeAction() = default;
   GeoNodeAction(const GeoNodeAction &right) = delete;
   GeoNodeAction & operator=(const GeoNodeAction &right) = delete; 
-  virtual ~GeoNodeAction();
+  virtual ~GeoNodeAction() = default;
   
   //	Handles a Node.
   virtual void handleNode (const GeoGraphNode *);
@@ -109,15 +109,15 @@ class GeoNodeAction
   
  protected:
   //	Termination flag; causes an abortion of action execution.
-  bool m_terminate;
+  bool m_terminate{false};
 
  private:
   
   //	A limit may be placed upon the depth to which the action
   //	descends.  0 = self.  1 = self and children.
-  Query<unsigned int> m_depth;
+  Query<unsigned int> m_depth{};
 
-  GeoNodePath m_path;  
+  GeoNodePath m_path{};  
 };
 
 #endif

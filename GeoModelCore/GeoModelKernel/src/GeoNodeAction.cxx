@@ -1,17 +1,8 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "GeoModelKernel/GeoNodeAction.h"
-
-GeoNodeAction::GeoNodeAction()
- : m_terminate (false)
-{
-}
-
-GeoNodeAction::~GeoNodeAction()
-{
-}
 
 void GeoNodeAction::handleNode (const GeoGraphNode *)
 {
@@ -64,9 +55,8 @@ void GeoNodeAction::setDepthLimit (unsigned int limit)
   m_depth = limit;
 }
 
-void GeoNodeAction::clearDepthLimit ()
-{
-  m_depth = Query < unsigned int >();
+void GeoNodeAction::clearDepthLimit () {
+  m_depth = std::nullopt;
 }
 
 void GeoNodeAction::handleSerialTransformer (const GeoSerialTransformer  *)

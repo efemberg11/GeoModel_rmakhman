@@ -255,19 +255,16 @@ std::string  GeoVolumeCursor::getName () const
   return name;
 }
 
-Query<int> GeoVolumeCursor::getId () const
-{
-  Query<int> id;
+Query<int> GeoVolumeCursor::getId () const {
   if (m_idTag) {
-    id = Query<int> (m_idTag->getIdentifier ());
+    return Query<int>{m_idTag->getIdentifier ()};
   }
   else if (m_serialIdentifier) {
-    id = Query<int> (m_volCount - m_serialIdentPosition - 1 + m_serialIdentifier->getBaseId());
+    return Query<int>{m_volCount - m_serialIdentPosition - 1 + m_serialIdentifier->getBaseId()};
   }
-  return id;
+  return std::nullopt;
 }
 
-bool GeoVolumeCursor::hasAlignableTransform() const
-{
+bool GeoVolumeCursor::hasAlignableTransform() const {
   return m_hasAlignTrans;
 }

@@ -74,14 +74,18 @@ class GeoMaterial : public RCBase {
   double getFraction (int i) const;
   
   // The name of the material.
-  const std::string& getName () const;
-  
+  const std::string& getName () const{
+      return m_name;
+  }
   // The density of the material.
-  const double& getDensity () const;
-  
+   double getDensity () const{
+      return m_density;
+   }
   // Gives an integral identifier for the material.  For
   // convenience.
-  const unsigned int& getID () const;
+  unsigned int getID () const {
+      return m_iD;
+  }
   
  protected:
   virtual ~GeoMaterial() = default;
@@ -120,20 +124,5 @@ class GeoMaterial : public RCBase {
   static std::atomic<unsigned int> s_lastID;
   
 };
-
-inline const std::string& GeoMaterial::getName () const
-{
-  return m_name;
-}
-
-inline const double& GeoMaterial::getDensity () const
-{
-  return m_density;
-}
-
-inline const unsigned int& GeoMaterial::getID () const
-{
-  return m_iD;
-}
 
 #endif

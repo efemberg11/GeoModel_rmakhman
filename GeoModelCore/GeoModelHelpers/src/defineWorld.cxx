@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 #include "GeoModelHelpers/defineWorld.h"
 #include "GeoModelHelpers/cloneVolume.h"
@@ -8,8 +8,6 @@
 #include "GeoModelKernel/GeoBox.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoFullPhysVol.h"
-#include "GeoModelKernel/GeoVolumeCursor.h"
-#include "GeoModelKernel/GeoAlignableTransform.h"
 #include "GeoModelKernel/Units.h"
 
 GeoIntrusivePtr<GeoPhysVol> createGeoWorld(const double worldBoxX, 
@@ -22,13 +20,13 @@ GeoIntrusivePtr<GeoPhysVol> createGeoWorld(const double worldBoxX,
     constexpr double cm3 =  GeoModelKernelUnits::cm3;
 
     // Define the chemical elements
-    GeoIntrusivePtr<GeoElement>  Nitrogen{new GeoElement ("Nitrogen" ,"N"  ,  7.0 ,  14.0031 *gr/mole)};
-    GeoIntrusivePtr<GeoElement>  Oxygen{new GeoElement ("Oxygen"   ,"O"  ,  8.0 ,  15.9949 *gr/mole)};
-    GeoIntrusivePtr<GeoElement>  Argon{new GeoElement ("Argon"    ,"Ar" , 18.0 ,  39.9624  *gr/mole)};
-    GeoIntrusivePtr<GeoElement>  Hydrogen{new GeoElement ("Hydrogen" ,"H"  ,  1.0 ,  1.00782503081372 *gr/mole)};
+    GeoIntrusivePtr<GeoElement>  Nitrogen{make_intrusive<GeoElement>("Nitrogen" ,"N"  ,  7.0 ,  14.0031 *gr/mole)};
+    GeoIntrusivePtr<GeoElement>  Oxygen{make_intrusive<GeoElement>("Oxygen"   ,"O"  ,  8.0 ,  15.9949 *gr/mole)};
+    GeoIntrusivePtr<GeoElement>  Argon{make_intrusive<GeoElement>("Argon"    ,"Ar" , 18.0 ,  39.9624  *gr/mole)};
+    GeoIntrusivePtr<GeoElement>  Hydrogen{make_intrusive<GeoElement>("Hydrogen" ,"H"  ,  1.0 ,  1.00782503081372 *gr/mole)};
 
     constexpr double densityOfAir=0.001290 *gr/cm3;
-    GeoIntrusivePtr<GeoMaterial> air{new GeoMaterial("GeoModelAir", densityOfAir)};
+    GeoIntrusivePtr<GeoMaterial> air{make_intrusive<GeoMaterial>("GeoModelAir", densityOfAir)};
     air->add(Nitrogen  , 0.7494);
     air->add(Oxygen, 0.2369);
     air->add(Argon, 0.0129);
@@ -36,9 +34,9 @@ GeoIntrusivePtr<GeoPhysVol> createGeoWorld(const double worldBoxX,
     air->lock();
 
 
-    GeoIntrusivePtr<GeoBox> worldBox{new GeoBox(worldBoxX, worldBoxY, worldBoxZ)};
-    GeoIntrusivePtr<GeoLogVol> worldLog{new GeoLogVol("WorldLog", worldBox, air)};
-    GeoIntrusivePtr<GeoPhysVol> world{new GeoPhysVol(worldLog)};
+    GeoIntrusivePtr<GeoBox> worldBox{make_intrusive<GeoBox>(worldBoxX, worldBoxY, worldBoxZ)};
+    GeoIntrusivePtr<GeoLogVol> worldLog{make_intrusive<GeoLogVol>("WorldLog", worldBox, air)};
+    GeoIntrusivePtr<GeoPhysVol> world{make_intrusive<GeoPhysVol>(worldLog)};
 
     return world;    
 }

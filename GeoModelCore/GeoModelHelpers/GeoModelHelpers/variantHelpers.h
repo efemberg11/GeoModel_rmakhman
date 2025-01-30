@@ -1,4 +1,4 @@
-// Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+// Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 
 /*
  * This header file provides helper C++ functions used in GeoModel IO code. 
@@ -23,12 +23,10 @@
 
 namespace GeoModelHelpers {
 
-    class variantHelper
-    {
+    class variantHelper {
     public:
-
-        static void printStdVectorVariants(const std::vector<std::variant<int, long, float, double, std::string>> vec)
-        {
+        using VariantType_t = std::variant<int, long, float, double, std::string>;
+        static void printStdVectorVariants(const std::vector<VariantType_t>& vec) {
             for (const auto &item : vec)
             {
                 if (std::holds_alternative<int>(item))
@@ -47,71 +45,57 @@ namespace GeoModelHelpers {
                 std::cout << std::endl;
         }
 
-        static std::string getFromVariant_String(const std::variant<int, long, float, double, std::string> &record, std::string_view logMsg = "")
-        {
-            std::string_view type{"string"};
+        static std::string getFromVariant_String(const VariantType_t &record, std::string_view logMsg = "") {
+            constexpr std::string_view type{"string"};
             std::string ret;
-            try
-            {
+            try {
                 ret = std::get<std::string>(record);
-            }
-            catch (std::bad_variant_access const &ex)
-            {
-                THROW_EXCEPTION(std::string(ex.what()) + ": '" + std::string(logMsg) + "'  is not a '" + std::string(type) + "'! It's a '" + getFromVariant_Type(record) + "'.");
+            } catch (std::bad_variant_access const &ex){
+                THROW_EXCEPTION(ex.what()<<": '"<<logMsg<<"'  is not a '"<<type<<"'! It's a '" 
+                                         <<getFromVariant_Type(record)<<"'.");
             }
             return ret;
         }
-        static int getFromVariant_Int(const std::variant<int, long, float, double, std::string> &record, std::string_view logMsg = "")
-        {
+        static int getFromVariant_Int(const VariantType_t &record, std::string_view logMsg = "") {
             std::string_view type{"int"};
-            int ret;
+            int ret{0};
             
-            try
-            {
+            try {
                 ret = std::get<int>(record);
             }
-            catch (std::bad_variant_access const &ex)
-            {
-                THROW_EXCEPTION(std::string(ex.what()) + ": '" + std::string(logMsg) + "'  is not a '" + std::string(type) + "'! It's a '" + getFromVariant_Type(record) + "'.");
-
+            catch (std::bad_variant_access const &ex) {
+                THROW_EXCEPTION(ex.what()<<": '"<<logMsg<<"'  is not a '"<<type<<"'! It's a '" 
+                                         <<getFromVariant_Type(record)<<"'.");
             }
             return ret;
         }
-        static double getFromVariant_Double(const std::variant<int, long, float, double, std::string> &record, std::string_view logMsg = "")
-        {
-            std::string_view type{"double"};
-            double ret;
-            try
-            {
+        static double getFromVariant_Double(const VariantType_t &record, std::string_view logMsg = "")  {
+            constexpr std::string_view type{"double"};
+            double ret{0.};
+            try {
                 ret = std::get<double>(record);
             }
-            catch (std::bad_variant_access const &ex)
-            {
-                THROW_EXCEPTION(std::string(ex.what()) + ": '" + std::string(logMsg) + "'  is not a '" + std::string(type) + "'! It's a '" + getFromVariant_Type(record) + "'.");
+            catch (std::bad_variant_access const &ex) {
+                THROW_EXCEPTION(ex.what()<<": '"<<logMsg<<"'  is not a '"<<type<<"'! It's a '" 
+                                         <<getFromVariant_Type(record)<<"'.");
             }
             return ret;
         }
-        static std::string getFromVariant_Type(const std::variant<int, long, float, double, std::string> &record)
-        {
+        static std::string getFromVariant_Type(const VariantType_t &record) {
             std::string type;
-            if (std::holds_alternative<int>(record))
-            {
+            if (std::holds_alternative<int>(record)) {
                 type = "int";
             }
-            else if (std::holds_alternative<long>(record))
-            {
+            else if (std::holds_alternative<long>(record)) {
                 type = "long";
             }
-            else if (std::holds_alternative<float>(record))
-            {
+            else if (std::holds_alternative<float>(record)) {
                 type = "float";
             }
-            else if (std::holds_alternative<double>(record))
-            {
+            else if (std::holds_alternative<double>(record)){ 
                 type = "double";
             }
-            else if (std::holds_alternative<std::string>(record))
-            {
+            else if (std::holds_alternative<std::string>(record)) {
                 type = "string";
             } else {
                 type = "UNKOWN";

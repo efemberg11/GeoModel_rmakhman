@@ -146,28 +146,28 @@ int main(int argc, char ** argv) {
       GeoGeometryPluginLoader loader;
       GeoVGeometryPlugin *factory=loader.load(plugin);
       if (!factory) {
-	std::cerr << "Could not load plugin " << plugin << std::endl;
-	std::cout.rdbuf(coutBuff);
-	return 5;
+	      std::cerr << "Could not load plugin " << plugin << std::endl;
+	      std::cout.rdbuf(coutBuff);
+	      return 5;
       }
       unsigned int expand{0};
       unsigned int net{0};
       {
-	GeoIntrusivePtr<GeoVPhysVol> world{createGeoWorld()};
+	      GeoIntrusivePtr<GeoVPhysVol> world{createGeoWorld()};
 
-	int before=snoop();
-	factory->create(world);
-	net=snoop()-before;
-	std::cout.rdbuf(coutBuff);
+	      int before=snoop();
+	      factory->create(world);
+	      net=snoop()-before;
+	      std::cout.rdbuf(coutBuff);
 	
-	if (printTree) {
-	  GeoInventoryGraphAction action(std::cout);
-	  world->exec(&action);
-	}
-	expand=heapsize();
+        if (printTree) {
+          GeoInventoryGraphAction action(std::cout);
+          world->exec(&action);
+        }
+	      expand=heapsize();
       }
       unsigned int contract=expand-heapsize();
-      std::cout << basename((char *) plugin.c_str()) << " allocates " << net/factor << " MB" << " net GeoModel " << contract/1000000.0 << " MB" << std::endl;
+      std::cout <<factory->getName() << " allocates " << net/factor << " MB" << " net GeoModel " << contract/1000000.0 << " MB" << std::endl;
       delete factory;
       std::cout.rdbuf(fileBuff);
     }

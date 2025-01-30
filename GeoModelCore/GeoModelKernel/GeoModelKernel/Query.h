@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_QUERY_H
@@ -18,54 +18,31 @@
  * based on Barton & Nackman's "Scientific and Engineering C++"              
  */
 
-#include <stdexcept>
-template < class T > class Query
+#include <GeoModelKernel/throwExcept.h>
+#include <optional>
+template < class T > class Query: public std::optional<T>
 {
 
 public:
-
-  // Constructor: 
-  inline Query (const T &);
-
-  // Default constructor: 
-  inline Query ();
+  /// Use all constructors from the std::optional
+  using std::optional<T>::optional;
 
   // Convert to "T"  
-  inline operator         T () const;
+  inline operator T () const;
 
   // Test Validity 
   inline bool isValid () const;
 
-private:
-
-  bool m_failed;
-  T m_instance;
-
 };
 
-
-template < class T > inline Query < T >::Query (const T & t):
-m_failed (false),
-m_instance (t)
-{
+template < class T > inline Query < T >::operator T () const {
+  if (!this->isValid()){
+    THROW_EXCEPTION("Nothing has been saved in query of type "<<typeid(T).name());
+  }
+  return this->value_or(T{});
 }
-
-template < class T > inline Query < T >::Query ():
-m_failed (true),
-m_instance (T())
-{
-}
-
-template < class T > inline Query < T >::operator         T () const
-{
-  if (m_failed)
-    throw std::range_error ("Failed query");
-  return m_instance;
-}
-
-template < class T > inline bool Query < T >::isValid () const
-{
-  return !m_failed;
+template < class T > inline bool Query < T >::isValid () const {
+  return this->has_value();
 }
 
 

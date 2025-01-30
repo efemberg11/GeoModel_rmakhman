@@ -7,6 +7,7 @@
 #include "GeoModelKernel/GeoVPhysVol.h"
 #include "GeoModelKernel/GeoDefinitions.h"
 
+#include <optional>
 
 class GeoVolumeCursor;
 
@@ -27,9 +28,10 @@ struct GeoChildNodeWithTrf {
         bool isAlignable{false};
         /// @brief tag whether the physical volume is a full physVol
         bool isSensitive{false};
-
+        /// @brief Identifier of the volume. If there's any and no copies are active
+        std::optional<int> volumeId{std::nullopt};
         GeoChildNodeWithTrf() = default;
-        GeoChildNodeWithTrf(GeoVolumeCursor& curs);
+        GeoChildNodeWithTrf(GeoVolumeCursor& curs);      
 };
 
 /*** @brief Returns all direct children of a volume with their transform. Equicalent volumes can be summarized.

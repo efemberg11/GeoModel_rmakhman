@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 #include <utility>
 
@@ -20,11 +20,11 @@ namespace {
     volume{curs.getVolume()},
     nodeName{curs.getName()},
     isAlignable{curs.hasAlignableTransform()},
-    isSensitive{typeid(*volume) == typeid(GeoFullPhysVol)} {
+    isSensitive{typeid(*volume) == typeid(GeoFullPhysVol)},
+    volumeId{static_cast<const std::optional<int>&>(curs.getId())} {
     //// Do not specify a node name if it's a dummy one
     if (nodeName == dummyNodeName) {
         nodeName = volume->getLogVol()->getName();
-
     }
 }
 
@@ -53,6 +53,7 @@ std::vector <GeoChildNodeWithTrf> getChildrenWithRef(PVConstLink physVol,
             children.emplace_back(std::move(currentChild));
          } else if (prevChild.nCopies == 1) {
             ++prevChild.nCopies;
+            prevChild.volumeId = std::nullopt;
             prevChild.inductionRule = prevChild.transform.inverse() * 
                                       currentChild.transform;            
          } else if (!transSort.compare(prevChild.inductionRule, 

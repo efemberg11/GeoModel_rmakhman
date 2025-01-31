@@ -43,7 +43,7 @@ class GeoAccessVolAndSTAction final : public GeoNodeAction {
 
   virtual void handleIdentifierTag(const GeoIdentifierTag* idTag) override final;
 
-  Query<unsigned int> getId() const;
+  std::optional<unsigned int> getId() const;
 
  private:
   GeoAccessVolAndSTAction(const GeoAccessVolAndSTAction &right);
@@ -64,9 +64,6 @@ class GeoAccessVolAndSTAction final : public GeoNodeAction {
 
   /// The name of the volume.  From a nametag or a serial denominator
   mutable std::string m_name;
-
-  /// The identifier of the volume.  From an identifier tag.
-  mutable Query<unsigned int> m_id;
 
   /// A pointer to a name tag.  If the volume is named.
   const GeoNameTag *m_nameTag{nullptr};

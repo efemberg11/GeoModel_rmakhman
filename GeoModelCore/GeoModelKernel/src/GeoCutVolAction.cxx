@@ -64,8 +64,8 @@ void GeoCutVolAction::handleVPhysVol(const GeoVPhysVol *vPV)
     std::string pvName = getState()->getName();
     if(!pvName.empty()) copyParent->add(make_intrusive<GeoNameTag>(pvName));
 
-    const Query<int> pvId = getState()->getId();
-    if(pvId.isValid()) copyParent->add(make_intrusive<GeoIdentifierTag>(pvId));
+    const std::optional<int> pvId = getState()->getId();
+    if(pvId) copyParent->add(make_intrusive<GeoIdentifierTag>(*pvId));
 
     copyParent->add(make_intrusive<GeoTransform>(getState()->getTransform()));
     copyParent->add(pvNew);

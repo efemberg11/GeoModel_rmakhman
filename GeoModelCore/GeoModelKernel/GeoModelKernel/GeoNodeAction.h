@@ -90,7 +90,7 @@ class GeoNodeAction
   //	Returns a pointer to the path object.
   GeoNodePath* getPath ();
   
-  Query<unsigned int>  getDepthLimit ();
+  std::optional<unsigned int>  getDepthLimit ();
   
   //	Cause the action to terminate.
   void terminate ();
@@ -115,7 +115,7 @@ class GeoNodeAction
   
   //	A limit may be placed upon the depth to which the action
   //	descends.  0 = self.  1 = self and children.
-  Query<unsigned int> m_depth{};
+  std::optional<unsigned int> m_depth{};
 
   GeoNodePath m_path{};  
 };

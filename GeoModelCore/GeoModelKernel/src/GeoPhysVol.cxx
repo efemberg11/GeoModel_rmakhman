@@ -21,7 +21,7 @@ void GeoPhysVol::exec(GeoNodeAction *action) const {
   // Put this node on the head of the path:    
   //    
   action->getPath()->push(this);
-  if(action->getDepthLimit().isValid()
+  if(action->getDepthLimit()
      && action->getPath()->getLength() - 1 > action->getDepthLimit()) {
     action->getPath ()->pop ();
     return;
@@ -37,7 +37,7 @@ void GeoPhysVol::exec(GeoNodeAction *action) const {
   //    
   // Pass this on to the children.    
   //    
-  if(action->getDepthLimit().isValid()
+  if(action->getDepthLimit()
      && action->getPath()->getLength() > action->getDepthLimit()) {
   }
   else {

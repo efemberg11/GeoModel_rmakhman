@@ -77,7 +77,7 @@ void GeoShapeShift::exec (GeoShapeAction *action) const {
     return;
   }
 
-  if (action->getDepthLimit ().isValid ()
+  if (action->getDepthLimit()
       && action->getPath ()->getLength () > action->getDepthLimit ())
   {
   }

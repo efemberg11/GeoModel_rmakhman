@@ -7,8 +7,6 @@
 
 #include "GeoModelKernel/GeoIntrusivePtr.h"
 #include "GeoModelKernel/GeoDefinitions.h"
-#include "GeoModelKernel/Query.h"
-
 
 #include "GeoModelKernel/GeoLogVol.h"
 #include "GeoModelKernel/GeoPlacement.h"
@@ -17,6 +15,8 @@
 
 #include <string>
 #include <shared_mutex>
+#include <optional>
+
 class GeoVolumeAction;
 class GeoVAlignmentStore;
 
@@ -29,10 +29,8 @@ class GeoVPhysVol: public GeoPlacement {
   
 
 
-    /// Returns the index of a specific daughter volume.  The Query class can be used
-    /// just like an unsigned int, but it provides and isValid() method to determine
-    /// whether it is valid and throws an exception if an invalid value is blithely used.
-    Query<unsigned int> indexOf(const PVConstLink& daughter) const;
+    /// Returns the index of a specific daughter volume.
+    std::optional<unsigned int> indexOf(const PVConstLink& daughter) const;
 
     /// Returns the logical volume.
     const GeoLogVol* getLogVol() const {
@@ -61,7 +59,7 @@ class GeoVPhysVol: public GeoPlacement {
 
  
     /// Returns the id of the child.
-    Query<int> getIdOfChildVol(unsigned int i) const;
+    std::optional<int> getIdOfChildVol(unsigned int i) const;
 
     /// Returns the number of child physical volumes and Serial Transformers.
     unsigned int getNChildVolAndST() const;

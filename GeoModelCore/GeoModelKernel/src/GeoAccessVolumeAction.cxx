@@ -185,12 +185,12 @@ void GeoAccessVolumeAction::handleIdentifierTag (const GeoIdentifierTag *idTag)
   m_serialIdentPosition = 0;
 }
 
-Query<int> GeoAccessVolumeAction::getId () const {
+std::optional<int> GeoAccessVolumeAction::getId () const {
   if(m_idTag) {
-    return Query<int>(m_idTag->getIdentifier());
+    return std::optional<int>(m_idTag->getIdentifier());
   }
   else if(m_serialIdentifier) {
-    return Query<int>(m_index - m_serialIdentPosition + m_serialIdentifier->getBaseId());
+    return std::optional<int>(m_index - m_serialIdentPosition + m_serialIdentifier->getBaseId());
   }
   return std::nullopt;
 }

@@ -95,12 +95,12 @@ const GeoNodePath * GeoTraversalState::getPath () const
   return &m_path;
 }
 
-void GeoTraversalState::setId (const Query<int> &id)
+void GeoTraversalState::setId (const std::optional<int> &id)
 {
   m_id=id;
 }
 
-const Query<int> GeoTraversalState::getId () const
+const std::optional<int> GeoTraversalState::getId () const
 {
   return m_id;
 }

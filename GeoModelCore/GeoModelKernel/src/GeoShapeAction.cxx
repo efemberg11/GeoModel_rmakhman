@@ -39,7 +39,7 @@ GeoShapeAction::~GeoShapeAction()
 {
 }
 
-Query<unsigned int>  GeoShapeAction::getDepthLimit ()
+std::optional<unsigned int>  GeoShapeAction::getDepthLimit ()
 {
   return m_depth;
 }
@@ -51,7 +51,7 @@ void GeoShapeAction::setDepthLimit (unsigned int limit)
 
 void GeoShapeAction::clearDepthLimit ()
 {
-  m_depth=Query<unsigned int> ();
+  m_depth=std::nullopt;
 }
 
 void GeoShapeAction::terminate ()

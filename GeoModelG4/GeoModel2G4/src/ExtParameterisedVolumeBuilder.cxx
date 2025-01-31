@@ -129,15 +129,15 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
           // Get child phys volume
           theGeoPhysChild = av.getVolume();
           // Get its transform
-            G4Transform3D theG4Position(Amg::EigenTransformToCLHEP(av.getTransform()));
+	  G4Transform3D theG4Position(Amg::EigenTransformToCLHEP(av.getTransform()));
 
-          Query<int> Qint =  av.getId();
-          if(Qint.isValid()) id = Qint;
+	  std::optional<int> Qint =  av.getId();
+          if(Qint) id = *Qint;
           if(m_matEther->getName()  == theGeoPhysChild->getLogVol()->getMaterial()->getName() || hasEnding(theGeoPhysChild->getLogVol()->getMaterial()->getName(), "Ether"))
             {
               Geo2G4AssemblyVolume* assembly = BuildAssembly(theGeoPhysChild);
 
-              if(Qint.isValid())
+              if(Qint)
                 assembly->MakeImprint(theG4LogVolume,theG4Position,id);
               else
                 assembly->MakeImprint(theG4LogVolume,theG4Position);
@@ -146,7 +146,7 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
             {
               Geo2G4AssemblyVolume* assembly = BuildAssembly(theGeoPhysChild);
 
-              if(Qint.isValid())
+              if(Qint)
                 assembly->MakeImprint(theG4LogVolume,theG4Position,id,true);
               else
                 assembly->MakeImprint(theG4LogVolume,theG4Position,0,true);
@@ -224,7 +224,7 @@ Geo2G4AssemblyVolume* ExtParameterisedVolumeBuilder::BuildAssembly(PVConstLink p
         }
       else
         {
-          Query<int> Qint =  av.getId();
+	  std::optional<int> Qint =  av.getId();
 
           // Build the child
           if(!(theG4LogChild = Build(theGeoPhysChild))) return 0;
@@ -233,7 +233,7 @@ Geo2G4AssemblyVolume* ExtParameterisedVolumeBuilder::BuildAssembly(PVConstLink p
             G4Transform3D theG4Position(Amg::EigenTransformToCLHEP(av.getTransform()));
 
           int placedID = 0;
-          if(Qint.isValid()) placedID = Qint;
+          if(Qint) placedID = *Qint;
 
           std::string placedName = nameChild=="ANON" ? "" : nameChild;
 

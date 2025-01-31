@@ -255,12 +255,12 @@ std::string  GeoVolumeCursor::getName () const
   return name;
 }
 
-Query<int> GeoVolumeCursor::getId () const {
+std::optional<int> GeoVolumeCursor::getId () const {
   if (m_idTag) {
-    return Query<int>{m_idTag->getIdentifier ()};
+    return std::optional<int>{m_idTag->getIdentifier ()};
   }
   else if (m_serialIdentifier) {
-    return Query<int>{m_volCount - m_serialIdentPosition - 1 + m_serialIdentifier->getBaseId()};
+    return std::optional<int>{m_volCount - m_serialIdentPosition - 1 + m_serialIdentifier->getBaseId()};
   }
   return std::nullopt;
 }

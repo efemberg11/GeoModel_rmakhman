@@ -17,7 +17,7 @@
 #ifndef _GeoUnidentifiedShape_h_
 #define _GeoUnidentifiedShape_h_
 #include "GeoModelKernel/GeoShape.h"
-#include "GeoModelKernel/Query.h"
+#include <optional>
 #include <string>
 
 class GeoUnidentifiedShape: public GeoShape {
@@ -79,7 +79,7 @@ class GeoUnidentifiedShape: public GeoShape {
 
   const std::string         _name;
   const std::string         _asciiData;
-  const Query<double>       _volume;
+  const std::optional<double>       _volume;
   static const std::string         _classType;
   static const ShapeType           _classTypeID;
 

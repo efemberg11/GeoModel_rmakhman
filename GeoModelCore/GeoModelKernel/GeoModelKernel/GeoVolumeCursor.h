@@ -44,7 +44,7 @@ class GeoVolumeCursor final : public GeoNodeAction
   std::string getName () const;
       
   /// Returns the id of the volume.  From the identifier.
-  Query<int> getId () const;
+  std::optional<int> getId () const;
 
   bool hasAlignableTransform() const;
 

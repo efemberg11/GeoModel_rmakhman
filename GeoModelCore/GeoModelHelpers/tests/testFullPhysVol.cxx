@@ -87,13 +87,13 @@ int main(int argc, char *argv[]){
     PVConstLink cParent{parent->getParent()};
     parent.reset();
     while (cParent) {        
-        Query<int> query = cParent->getIdOfChildVol(0);
-        if (!query.isValid()) {
+      std::optional<int> query = cParent->getIdOfChildVol(0);
+        if (!query) {
             std::cerr<<__FILE__<<":"<<__LINE__<<" Failed to obtain a valid child volume ID. Expected "<<currentK
                      <<" "<<typeid(*cParent->getChildVol(0)).name()<<std::endl;
             return EXIT_FAILURE;
         }
-        unsigned int parentID = query;
+        unsigned int parentID = *query;
         if (parentID != currentK) {
             std::cerr<<__FILE__<<":"<<__LINE__<<" Expected "<<currentK<<" but got "<<parentID;
             return EXIT_FAILURE;

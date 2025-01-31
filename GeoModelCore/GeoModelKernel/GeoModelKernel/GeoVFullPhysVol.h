@@ -27,7 +27,7 @@ class GeoVFullPhysVol : public GeoVPhysVol, public GeoNodePositioning {
   mutable std::string m_absName{};
 
   /// An identifier. This is locally cached in a full physical volume.
-  mutable std::unique_ptr<Query<int>> m_id{nullptr};
+  mutable std::unique_ptr<std::optional<int>> m_id{nullptr};
 
  
 };

@@ -13,7 +13,6 @@
 //
 #include "GeoModelXml/GmxInterface.h"
 #include "OutputDirector.h"
-#include "GeoModelKernel/Query.h"
 #include "GeoModelKernel/GeoPhysVol.h"
 #include "GeoModelKernel/GeoVFullPhysVol.h"
 #include "GeoModelKernel/GeoPublisher.h"

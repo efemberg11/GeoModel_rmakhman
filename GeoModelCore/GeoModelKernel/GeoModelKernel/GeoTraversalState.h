@@ -70,10 +70,10 @@ class GeoTraversalState
   const GeoNodePath * getPath () const;
   
   //	Sets the identifier for the current node.
-  void setId (const Query<int> &id);
+  void setId (const std::optional<int> &id);
   
   //	Gets the id of the current node.
-  const Query<int> getId () const;
+  const std::optional<int> getId () const;
 
  private:
   GeoTraversalState(const GeoTraversalState &right);
@@ -109,7 +109,7 @@ class GeoTraversalState
   std::string m_name;
   
   //	And identifier for this volume.
-  Query<int> m_id;
+  std::optional<int> m_id;
   
   //	The path from the point at which the action started, to
   //	the current node.

@@ -164,13 +164,13 @@ void GeoAccessVolAndSTAction::handleIdentifierTag(const GeoIdentifierTag *idTag)
   m_idTag = idTag;
 }
 
-Query<unsigned int> GeoAccessVolAndSTAction::getId() const
+std::optional<unsigned int> GeoAccessVolAndSTAction::getId() const
 {
   if(m_idTag) {
-    return Query<unsigned int>(m_idTag->getIdentifier());
+    return std::optional<unsigned int>(m_idTag->getIdentifier());
   }
   else {
-    return Query<unsigned int>();
+    return std::nullopt;
   }
 }
 

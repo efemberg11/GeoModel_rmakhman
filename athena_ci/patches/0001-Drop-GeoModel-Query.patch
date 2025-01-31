@@ -1,0 +1,306 @@
+diff --git a/DetectorDescription/GeoModel/GeoModelExamples/src/ToyDetectorTool.cxx b/DetectorDescription/GeoModel/GeoModelExamples/src/ToyDetectorTool.cxx
+index cc24b6dafa6..c161a849744 100755
+--- a/DetectorDescription/GeoModel/GeoModelExamples/src/ToyDetectorTool.cxx
++++ b/DetectorDescription/GeoModel/GeoModelExamples/src/ToyDetectorTool.cxx
+@@ -67,7 +67,7 @@ void ToyDetectorTool::printVolume(GeoPVConstLink volume, int level /*= 0*/)
+     GeoPVConstLink physChild = cursor.getVolume();
+     GeoTrf::Transform3D position = cursor.getTransform();
+     for(int k{0};k<level;++k) std::cout << "... ";
+-    std::cout << cursor.getName() << " " << (cursor.getId().isValid()?std::to_string(cursor.getId()).c_str():"N/A") 
++    std::cout << cursor.getName() << " " << (cursor.getId()?std::to_string(cursor.getId().value()).c_str():"N/A") 
+ 	      << " Transform:" << "\n";
+     for(int i{0};i<3;++i) {
+       for(int j{0};j<4;++j) {
+diff --git a/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MuonReadoutElement.cxx b/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MuonReadoutElement.cxx
+index dc0cdd381f1..ecdace13def 100644
+--- a/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MuonReadoutElement.cxx
++++ b/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/MuonReadoutElement.cxx
+@@ -107,11 +107,12 @@ namespace MuonGM {
+             ATH_MSG_FATAL(__FILE__<<":"<<__LINE__<<" No parent station found for "<<m_idHelperSvc->toStringDetEl(identify()));
+             throw std::runtime_error("Parent station is a nullptr");
+         }
+-        Query<unsigned int> c = par->indexOf(getMaterialGeom());
+-        if (c.isValid()) {
+-            m_indexOfREinMuonStation = (int)c;
+-        } else
++	std::optional<unsigned int> c = par->indexOf(getMaterialGeom());
++        if (c) {
++	  m_indexOfREinMuonStation = (int)(*c);
++        } else {
+             m_indexOfREinMuonStation = -999;
++	}
+     }
+ 
+     Amg::Transform3D MuonReadoutElement::toParentStation() const {
+diff --git a/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/sTgcReadoutElement.cxx b/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/sTgcReadoutElement.cxx
+index eb5c3fdff6d..26f2d085d04 100644
+--- a/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/sTgcReadoutElement.cxx
++++ b/MuonSpectrometer/MuonDetDescr/MuonReadoutGeometry/src/sTgcReadoutElement.cxx
+@@ -83,7 +83,7 @@ namespace MuonGM {
+       IRDBRecordset_ptr nswPars   = accessSvc->getRecordsetPtr("NSWPARS","","");
+ 
+       PVConstLink parent = getMaterialGeom()->getParent();
+-      unsigned int index=parent->indexOf(getMaterialGeom());
++      unsigned int index=parent->indexOf(getMaterialGeom()).value();
+       std::string pVName=parent->getNameOfChildVol(index);
+       float yCutoutCathode(0);
+       if (nswPars->size()==0) {
+diff --git a/MuonSpectrometer/MuonDetDescr/MuonTrackingGeometry/src/MuonStationBuilderImpl.cxx b/MuonSpectrometer/MuonDetDescr/MuonTrackingGeometry/src/MuonStationBuilderImpl.cxx
+index 0e222e44bcf..b3364ee51f6 100644
+--- a/MuonSpectrometer/MuonDetDescr/MuonTrackingGeometry/src/MuonStationBuilderImpl.cxx
++++ b/MuonSpectrometer/MuonDetDescr/MuonTrackingGeometry/src/MuonStationBuilderImpl.cxx
+@@ -863,17 +863,19 @@ MuonStationBuilderImpl::retrieveGMsensitive(const MuonGM::MuonDetectorManager* m
+ 
+                 if (it == sensitive.end()) {
+                     std::vector<std::pair<Amg::Transform3D, int>> cloneList;
+-                    cloneList.push_back(std::make_pair(transform, vol.getId()));
++                    cloneList.push_back(std::make_pair(transform, vol.getId().value()));
+                     sensitive.push_back(std::make_pair(tv, cloneList));
+                 } else {
+                     Amg::Transform3D transf = transform;
+                     // order transforms to position prototype at phi=0/ 0.125 pi
+                     double phiTr = transf.translation().phi();
+-                    if (phiTr > -0.001 && phiTr < 0.4)
+-                        (*it).second.insert((*it).second.begin(),
+-                                            std::make_pair(transform, vol.getId()));
+-                    else
+-                        (*it).second.push_back(std::make_pair(transform, vol.getId()));
++                    if (phiTr > -0.001 && phiTr < 0.4) {
++		      (*it).second.insert((*it).second.begin(),
++					  std::make_pair(transform, vol.getId().value()));
++		    }
++                    else {
++		      (*it).second.push_back(std::make_pair(transform, vol.getId().value()));
++		    }
+                 }
+ 
+             }  // end loop over TGC
+@@ -892,17 +894,19 @@ MuonStationBuilderImpl::retrieveGMsensitive(const MuonGM::MuonDetectorManager* m
+ 
+             if (it == sensitive.end()) {
+                 std::vector<std::pair<Amg::Transform3D, int>> cloneList;
+-                cloneList.push_back(std::make_pair(vol.getTransform(), vol.getId()));
++                cloneList.push_back(std::make_pair(vol.getTransform(), vol.getId().value()));
+                 sensitive.push_back(std::make_pair(cv, cloneList));
+             } else {
+                 Amg::Transform3D transf = vol.getTransform();
+                 // order transforms to position prototype at phi=0/ 0.125 pi
+                 double phiTr = transf.translation().phi();
+-                if (phiTr > -0.001 && phiTr < 0.4)
+-                    (*it).second.insert((*it).second.begin(),
+-                                        std::make_pair(vol.getTransform(), vol.getId()));
+-                else
+-                    (*it).second.push_back(std::make_pair(vol.getTransform(), vol.getId()));
++                if (phiTr > -0.001 && phiTr < 0.4) {
++		  (*it).second.insert((*it).second.begin(),
++				      std::make_pair(vol.getTransform(), vol.getId().value()));
++		}
++                else {
++		  (*it).second.push_back(std::make_pair(vol.getTransform(), vol.getId().value()));
++		}
+             }
+         }  // end non-TGC
+         vol.next();
+@@ -1271,4 +1275,4 @@ void MuonStationBuilderImpl::checkLayerId(std::string_view comment, const MuonGM
+         }
+     }
+ }
+-}
+\ No newline at end of file
++}
+diff --git a/MuonSpectrometer/MuonValidation/MuonDQA/MuonRawDataMonitoring/MdtRawDataMonitoring/src/MdtRawDataMonAlg.cxx b/MuonSpectrometer/MuonValidation/MuonDQA/MuonRawDataMonitoring/MdtRawDataMonitoring/src/MdtRawDataMonAlg.cxx
+index 23c3bc7d8d7..eeea37e9d5a 100755
+--- a/MuonSpectrometer/MuonValidation/MuonDQA/MuonRawDataMonitoring/MdtRawDataMonitoring/src/MdtRawDataMonAlg.cxx
++++ b/MuonSpectrometer/MuonValidation/MuonDQA/MuonRawDataMonitoring/MdtRawDataMonitoring/src/MdtRawDataMonAlg.cxx
+@@ -1244,8 +1244,8 @@ void MdtRawDataMonAlg::initDeadChannels(const MuonGM::MdtReadoutElement* mydetEl
+         for (int tube = 1; tube <= mydetEl->getNtubesperlayer(); ++tube) {
+             bool tubefound = false;
+             for (unsigned int kk = 0; kk < cv->getNChildVols(); ++kk) {
+-                int tubegeo = cv->getIdOfChildVol(kk) % maxNTubesPerLayer;
+-                int layergeo = (cv->getIdOfChildVol(kk) - tubegeo) / maxNTubesPerLayer;
++	        int tubegeo = cv->getIdOfChildVol(kk).value() % maxNTubesPerLayer;
++	        int layergeo = (cv->getIdOfChildVol(kk).value() - tubegeo) / maxNTubesPerLayer;
+                 if (tubegeo == tube && layergeo == layer) {
+                     tubefound = true;
+                     break;
+diff --git a/Simulation/G4Utilities/Geo2G4/src/ExtParameterisedVolumeBuilder.cxx b/Simulation/G4Utilities/Geo2G4/src/ExtParameterisedVolumeBuilder.cxx
+index a702e36bdc8..9d69e84c9ff 100644
+--- a/Simulation/G4Utilities/Geo2G4/src/ExtParameterisedVolumeBuilder.cxx
++++ b/Simulation/G4Utilities/Geo2G4/src/ExtParameterisedVolumeBuilder.cxx
+@@ -128,8 +128,8 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
+           // Get its transform
+           G4Transform3D theG4Position(Amg::EigenTransformToCLHEP(av.getTransform()));
+ 
+-          Query<int> Qint =  av.getId();
+-          if(Qint.isValid()) id = Qint;
++	  std::optional<int> Qint =  av.getId();
++          if(Qint) id = *Qint;
+ 
+ 	  bool isEther = theGeoPhysChild->getLogVol()->getMaterial()->getName().compare("special::Ether")==0;
+ 	  bool isHypUr = theGeoPhysChild->getLogVol()->getMaterial()->getName().compare("special::HyperUranium")==0;
+@@ -137,7 +137,7 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
+ 	  if(isEther) {
+ 	    Geo2G4AssemblyVolume* assembly = BuildAssembly(theGeoPhysChild);
+ 	    
+-	    if(Qint.isValid()) {
++	    if(Qint) {
+ 	      assembly->MakeImprint(theG4LogVolume,theG4Position,id);
+ 	    }
+ 	    else {
+@@ -147,7 +147,7 @@ G4LogicalVolume* ExtParameterisedVolumeBuilder::Build(const PVConstLink theGeoPh
+           else if(isHypUr) {
+ 	    Geo2G4AssemblyVolume* assembly = BuildAssembly(theGeoPhysChild);
+ 	    
+-	    if(Qint.isValid()) {
++	    if(Qint) {
+ 	      assembly->MakeImprint(theG4LogVolume,theG4Position,id,true);
+ 	    }
+ 	    else {
+@@ -222,7 +222,7 @@ Geo2G4AssemblyVolume* ExtParameterisedVolumeBuilder::BuildAssembly(const PVConst
+ 	assemblyVolume->AddPlacedAssembly(theG4AssemblyChild,theG4Position);
+       }
+       else {
+-	Query<int> Qint =  av.getId();
++	std::optional<int> Qint =  av.getId();
+ 
+ 	// Build the child
+ 	if(!(theG4LogChild = Build(theGeoPhysChild))) return nullptr;
+@@ -231,7 +231,7 @@ Geo2G4AssemblyVolume* ExtParameterisedVolumeBuilder::BuildAssembly(const PVConst
+ 	G4Transform3D theG4Position(Amg::EigenTransformToCLHEP(av.getTransform()));
+ 	
+ 	int placedID = 0;
+-	if(Qint.isValid()) placedID = Qint;
++	if(Qint) placedID = *Qint;
+ 	
+ 	std::string placedName = nameChild=="ANON" ? "" : nameChild;
+ 
+diff --git a/Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx b/Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx
+index 70c3bf4be2d..6a5e86cfdb1 100644
+--- a/Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx
++++ b/Simulation/G4Utilities/Geo2G4/src/Geo2G4Builder.cxx
+@@ -123,18 +123,18 @@ G4LogicalVolume* Geo2G4Builder::BuildTree()
+       for(unsigned int i=0; i<m_treeTops.size(); i++) {
+         // Current Tree Top and its index
+         PVConstLink pv = m_treeTops[i];
+-        Query<unsigned int> childIndx = world->indexOf(pv);
++	std::optional<unsigned int> childIndx = world->indexOf(pv);
+ 
+         // Tree Top transformation
+-        G4Transform3D theG4Position(Amg::EigenTransformToCLHEP(world->getXToChildVol(childIndx)));
++        G4Transform3D theG4Position(Amg::EigenTransformToCLHEP(world->getXToChildVol(*childIndx)));
+ 
+         // Copy number
+         int id = 16969;
+-        Query<int> Qint = world->getIdOfChildVol(childIndx);
+-        if(Qint.isValid()) id = Qint;
++	std::optional<int> Qint = world->getIdOfChildVol(*childIndx);
++        if(Qint) id = *Qint;
+ 
+         // PV Tree Top name
+-        std::string nameTT =  world->getNameOfChildVol(childIndx);
++        std::string nameTT =  world->getNameOfChildVol(*childIndx);
+         if (nameTT == "ANON") nameTT = pv->getLogVol()->getName();
+ 
+ 
+diff --git a/Simulation/ISF/ISF_Fatras/ISF_FatrasToolsMS/src/SimHitCreatorMS.cxx b/Simulation/ISF/ISF_Fatras/ISF_FatrasToolsMS/src/SimHitCreatorMS.cxx
+index 1fa804192e0..9467a63226a 100644
+--- a/Simulation/ISF/ISF_Fatras/ISF_FatrasToolsMS/src/SimHitCreatorMS.cxx
++++ b/Simulation/ISF/ISF_Fatras/ISF_FatrasToolsMS/src/SimHitCreatorMS.cxx
+@@ -535,8 +535,8 @@ void iFatras::SimHitCreatorMS::initDeadChannels(const MuonGM::MdtReadoutElement*
+     for(int tube = 1; tube <= mydetEl->getNtubesperlayer(); tube++){
+       bool tubefound = false;
+       for(unsigned int kk=0; kk < cv->getNChildVols(); kk++) {
+-        int tubegeo = cv->getIdOfChildVol(kk) % maxNTubesPerLayer;
+-        int layergeo = ( cv->getIdOfChildVol(kk) - tubegeo ) / maxNTubesPerLayer;
++        int tubegeo = cv->getIdOfChildVol(kk).value() % maxNTubesPerLayer;
++        int layergeo = ( cv->getIdOfChildVol(kk).value() - tubegeo ) / maxNTubesPerLayer;
+         if( tubegeo == tube && layergeo == layer ) {
+           tubefound=true;
+           break;
+diff --git a/graphics/VP1/VP1Systems/VP1CaloSystems/src/VP1MbtsHelper.cxx b/graphics/VP1/VP1Systems/VP1CaloSystems/src/VP1MbtsHelper.cxx
+index 88d1162a1a8..8a72e9d9784 100644
+--- a/graphics/VP1/VP1Systems/VP1CaloSystems/src/VP1MbtsHelper.cxx
++++ b/graphics/VP1/VP1Systems/VP1CaloSystems/src/VP1MbtsHelper.cxx
+@@ -151,7 +151,7 @@ void VP1MbtsHelper::systemcreate(StoreGateSvc* detstore)
+     {
+       scin1Exists = true;
+       pvScin1 = child;
+-      int copyNo=  cursor2.getId();
++      int copyNo=  cursor2.getId().value();
+ 
+       aTransforms1[copyNo] = xfLArECA * xfMbtsMother * cursor2.getTransform();
+       cTransforms1[copyNo] = xfLArECC * xfMbtsMother * cursor2.getTransform();
+@@ -160,7 +160,7 @@ void VP1MbtsHelper::systemcreate(StoreGateSvc* detstore)
+     {
+       scin2Exists = true;
+       pvScin2 = child;
+-      int copyNo=  cursor2.getId();
++      int copyNo=  cursor2.getId().value();
+ 
+       aTransforms2[copyNo] = xfLArECA * xfMbtsMother * cursor2.getTransform();
+       cTransforms2[copyNo] = xfLArECC * xfMbtsMother * cursor2.getTransform();
+@@ -173,7 +173,7 @@ void VP1MbtsHelper::systemcreate(StoreGateSvc* detstore)
+     while(!cursor2a.atEnd()) {                                                                                    
+       PVConstLink pvAirEnv = cursor2a.getVolume();                                                               
+       if(pvAirEnv->getLogVol()->getName().find("MBTSAirEnv")!=std::string::npos) {                                
+-       int copyNo =  cursor2a.getId();                                                                           
++       int copyNo =  cursor2a.getId().value();                                                                           
+                                                                                                                    
+        // **** Find Aluminun Envelope ****                                                                         
+        GeoVolumeCursor cursor3(pvAirEnv);                                                                        
+diff --git a/graphics/VP1/VP1Systems/VP1GeometrySystems/src/VP1GeometrySystem.cxx b/graphics/VP1/VP1Systems/VP1GeometrySystems/src/VP1GeometrySystem.cxx
+index 9ab023e1a0c..f36cb624423 100644
+--- a/graphics/VP1/VP1Systems/VP1GeometrySystems/src/VP1GeometrySystem.cxx
++++ b/graphics/VP1/VP1Systems/VP1GeometrySystems/src/VP1GeometrySystem.cxx
+@@ -1066,15 +1066,15 @@ void VP1GeometrySystem::userPickedNode(SoNode* , SoPath *pickedPath)
+     parentVH = parentVH->parent();
+     PVConstLink parentPVLink = parentVH ? parentVH->geoPVConstLink() : childVH->geoPVConstLink()->getParent();
+     if (parentPVLink) {
+-      int indexOfChild = parentVH ? childVH->childNumber() : (int)parentPVLink->indexOf(childVH->geoPVConstLink());
++      int indexOfChild = parentVH ? childVH->childNumber() : parentPVLink->indexOf(childVH->geoPVConstLink()).value();
+       
+       std::string childPVName = parentPVLink->getNameOfChildVol(indexOfChild);
+       QString pathEntry = childPVName=="ANON" ? detFactoryName+childVH->getName() : QString(childPVName.c_str());
+       
+-      Query<int> childCopyNo = parentPVLink->getIdOfChildVol(indexOfChild);
+-      if(childCopyNo.isValid()) {
++      std::optional<int> childCopyNo = parentPVLink->getIdOfChildVol(indexOfChild);
++      if(childCopyNo) {
+ 	    QString strCopyNo;
+-	    strCopyNo.setNum(childCopyNo);
++	    strCopyNo.setNum(*childCopyNo);
+ 	    pathEntry += ("::"+strCopyNo);
+       }
+       partspectPath.push(pathEntry);
+diff --git a/graphics/VP1/VP1Systems/VP1GeometrySystems/src/VolumeHandle.cxx b/graphics/VP1/VP1Systems/VP1GeometrySystems/src/VolumeHandle.cxx
+index 83f6e4decb8..dab8014c6b5 100644
+--- a/graphics/VP1/VP1Systems/VP1GeometrySystems/src/VolumeHandle.cxx
++++ b/graphics/VP1/VP1Systems/VP1GeometrySystems/src/VolumeHandle.cxx
+@@ -469,8 +469,8 @@ int VolumeHandle::copyNumber() const
+   int i(0);//We need to check the childNumber since volumes in a replica have same volume link
+   while (!av.atEnd()) {
+     if (m_childNumber==i&&m_d->pV==av.getVolume()) {
+-       Query<int> Qint = av.getId();
+-       return Qint.isValid() ? int(Qint) : -1;//-1 for "Invalid"
++       std::optional<int> Qint = av.getId();
++       return Qint ? *Qint : -1;//-1 for "Invalid"
+     }
+     av.next();
+     ++i;
+diff --git a/graphics/VP1/VP1Systems/VP1RawDataSystems/src/VP1RawDataHandle_BCM_RDO.cxx b/graphics/VP1/VP1Systems/VP1RawDataSystems/src/VP1RawDataHandle_BCM_RDO.cxx
+index 12e57eb71f0..dd4d95a0392 100644
+--- a/graphics/VP1/VP1Systems/VP1RawDataSystems/src/VP1RawDataHandle_BCM_RDO.cxx
++++ b/graphics/VP1/VP1Systems/VP1RawDataSystems/src/VP1RawDataHandle_BCM_RDO.cxx
+@@ -137,9 +137,9 @@ void VP1RawDataHandle_BCM_RDO::Imp::ensureInitModuleInfo()
+ 	  int bcmModLogCopyNumber(-1);
+ 	  if (pv.getVolume()->getLogVol()->getName()=="bcmModLog") {
+ 	    Amg::Transform3D tr_bcmmod = pv.getTransform();
+-	    Query<int> Qint = pv.getId();
+-	    if (Qint.isValid()) {
+-	      bcmModLogCopyNumber = int(Qint);
++	    std::optional<int> Qint = pv.getId();
++	    if (Qint) {
++	      bcmModLogCopyNumber = *Qint;
+ 	      ModuleInfo * modInfo = new ModuleInfo(bcmModLogCopyNumber - 951);
+ 	      GeoVolumeCursor bv(pv.getVolume());
+ 	      while (!bv.atEnd()) {

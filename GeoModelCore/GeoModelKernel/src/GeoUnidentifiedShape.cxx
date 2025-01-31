@@ -2,7 +2,6 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 #include "GeoModelKernel/GeoUnidentifiedShape.h"
-#include "GeoModelKernel/Query.h"
 #include "GeoModelKernel/GeoShapeAction.h"
 #include "GeoModelKernel/throwExcept.h"
 #include <stdexcept>
@@ -40,7 +39,7 @@ const std::string & GeoUnidentifiedShape::asciiData() const {
 
 // Returns the volume of the shape, for mass inventory
 double GeoUnidentifiedShape::volume () const {
-  return _volume;
+  return *_volume;
 }
 
 // Returns the bonding box of the shape

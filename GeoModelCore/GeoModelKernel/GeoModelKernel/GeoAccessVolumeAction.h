@@ -64,7 +64,7 @@ class GeoAccessVolumeAction final : public GeoNodeAction
   virtual void handleIdentifierTag (const GeoIdentifierTag *idTag) override;
 
   /// Returns the id of the volume.  From the identifier.
-  Query<int> getId () const;
+  std::optional<int> getId () const;
 
   /// Handles an Serial Identifier
   virtual void handleSerialIdentifier(const GeoSerialIdentifier *sI) override;

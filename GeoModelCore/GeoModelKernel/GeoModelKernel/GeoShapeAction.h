@@ -14,8 +14,8 @@
  *	This is essentially an internal class.
  */
 
-#include "GeoModelKernel/Query.h"
 #include "GeoModelKernel/GeoShapePath.h"
+#include <optional>
 
 class GeoShape;
 class GeoShapeIntersection;
@@ -52,7 +52,7 @@ class GeoShapeAction
   GeoShapeAction();
   virtual ~GeoShapeAction();
 
-  Query<unsigned int>  getDepthLimit ();
+  std::optional<unsigned int>  getDepthLimit ();
 
   //	Sets a depth limit.
   void setDepthLimit (unsigned int limit);
@@ -143,7 +143,7 @@ class GeoShapeAction
 
   //	A limit may be placed upon the depth to which the action
   //	descends.  0 = self.  1 = self and children.
-  Query<unsigned int> m_depth;
+  std::optional<unsigned int> m_depth;
   
   //	Termination flag; causes an abortion of action execution.
   bool m_terminate;

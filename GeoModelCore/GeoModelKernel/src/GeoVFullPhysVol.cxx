@@ -31,7 +31,7 @@ const std::string &  GeoVFullPhysVol::getAbsoluteName () const
     std::string tProd;
 
     while (parent) {
-      int index = parent->indexOf (child);
+      int index = *(parent->indexOf(child));
       std::string name = parent->getNameOfChildVol (index);
 
       tProd = tProd + "/" + name;
@@ -73,9 +73,9 @@ unsigned int GeoVFullPhysVol::getId () const
       parent = child->getParent();
     }
 
-    int index = parent->indexOf(child);
-    m_id = std::make_unique<Query<int>>(parent->getIdOfChildVol(index));
+    int index = *(parent->indexOf(child));
+    m_id = std::make_unique<std::optional<int>>(parent->getIdOfChildVol(index));
   }
-  return *m_id;
+  return **m_id;
 }
 

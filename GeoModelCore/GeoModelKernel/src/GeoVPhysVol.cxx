@@ -15,12 +15,12 @@
 GeoVPhysVol::GeoVPhysVol(const GeoLogVol* LogVol): 
     m_logVol(LogVol) {}
 
-Query<unsigned int> GeoVPhysVol::indexOf(const PVConstLink& daughter) const {
+std::optional<unsigned int> GeoVPhysVol::indexOf(const PVConstLink& daughter) const {
   unsigned int nChildVols{getNChildVols()};
   for(unsigned int i=0; i<nChildVols; i++) { // To Do: replace this with Volume Iterator!
-    if(getChildVol(i) == daughter) return i;
+    if(getChildVol(i) == daughter) return std::optional<unsigned int>{i};
   }
-  return Query<unsigned int >();
+  return std::nullopt;
 }
 
 void GeoVPhysVol::apply(GeoVolumeAction *action) const {
@@ -111,7 +111,7 @@ std::string GeoVPhysVol::getNameOfChildVol(unsigned int i) const {
   return av.getName();
 }
 
-Query<int> GeoVPhysVol::getIdOfChildVol(unsigned int i) const {
+std::optional<int> GeoVPhysVol::getIdOfChildVol(unsigned int i) const {
   GeoAccessVolumeAction    av(i,nullptr);
   exec(&av);
   return av.getId();

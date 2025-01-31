@@ -27,7 +27,7 @@ GeoNodePath* GeoNodeAction::getPath ()
   return &m_path;
 }
 
-Query<unsigned int>  GeoNodeAction::getDepthLimit ()
+std::optional<unsigned int>  GeoNodeAction::getDepthLimit ()
 {
   return m_depth;
 }

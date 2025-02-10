@@ -8,7 +8,7 @@
     void add (GeoGraphNode * graphNode)
   //Public Methods from GeoVPhysVol
     bool isShared() const
-    Query<unsigned int> indexOf (PVConstLink daughter) const
+    std::optional<unsigned int> indexOf (PVConstLink daughter) const
     PVConstLink getParent () const
     const GeoLogVol * getLogVol () const
     unsigned int getNChildVols () const
@@ -16,7 +16,7 @@
     GeoTrf::Transform3D getXToChildVol (unsigned int index) const
     GeoTrf::Transform3D getDefXToChildVol (unsigned int index) const
     std::string getNameOfChildVol (unsigned int i) const
-    Query<unsigned int> getIdOfChildVol() const
+    std::optional<unsigned int> getIdOfChildVol() const
     void apply (GeoVolumeAction * action) const
     unsigned int getNChildVolAndST() const
     GeoTrf::Transform3D getX    (const GeoVAlignmentStore* store=nullptr) const
@@ -35,7 +35,7 @@
 
 `bool isShared() const` Accessor to determine whether the physical volume is shared; i.e, used more than once in the geometry description.
 
-`Query<unsigned int> indexOf (PVConstLink daughter) const` Accessor to determine the index of a daughter physical volume, in other words, in position within the list of daughters.  The result only counts physical volumes as daughters, not their properties.  
+`std::optional<unsigned int> indexOf (PVConstLink daughter) const` Accessor to determine the index of a daughter physical volume, in other words, in position within the list of daughters.  The result only counts physical volumes as daughters, not their properties.  
 
 `PVConstLink getParent () const` Returns the parent physical volume.  In case the parent is not unique (i.e., if the physical volume is shared), return NULL.
 
@@ -51,7 +51,7 @@
 
 `std::string getNameOfChildVol (unsigned int i) const` Returns the name of the child volume, relative to this object.
 
-`Query<unsigned int> getIdOfChildVol() const` Returns the identifier of the child volume.
+`std::optional<unsigned int> getIdOfChildVol() const` Returns the identifier of the child volume.
 
 `void apply (GeoVolumeAction * action) const` Applies a volume action to the volume.  This action normally recursively visits each daughter volume.
 

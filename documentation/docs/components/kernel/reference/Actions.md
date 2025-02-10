@@ -63,7 +63,7 @@ Your `handleVPhysVol()` routine can obtain information about the current node fr
   // Const Public Methods:
   const HepTransform3D & getTransform () const
   const std::string & getName () const
-  Query<unsigned int> getId() const
+  std::optional<unsigned int> getId() const
   const HepTransform3D & getDefTransform () const
   const std::string & getAbsoluteName () const
   const HepTransform3D & getDefAbsoluteTransform () const
@@ -155,7 +155,7 @@ void TemplateVolAction::handleVPhysVol (const GeoVPhysVol *)
 The following methods are available on all `GeoNodeAction` classes, and control the depth limit:
 
 - `void setDepthLimit(int limit)`;
-- `Query<unsigned int> getDepthLimit() const`;
+- `std::optional<unsigned int> getDepthLimit() const`;
 - `void clearDepthLimit()`,
 
 Specific `GeoNodeAction` classes may set specific defaults for their depth limits.   See the documentation on these actions.
@@ -201,7 +201,7 @@ int count = cv.getCount ();
   const HepTransform3D & getTransform () const
   const HepTransform3D & getDefTransform () const
   const std::string & getName () const
-  Query<unsigned int> getId() const
+  std::optional<unsigned int> getId() const
 ```
 
 `GeoAccessVolumeAction` is used to retrieve physical volume and some of its properties from within the geometry tree.  
@@ -245,7 +245,7 @@ GeoNodeAction has the following interface:
 
   // Public Methods:
   GeoNodePath * getPath () const
-  Query<unsigned int>  getDepthLimit () const
+  std::optional<unsigned int>  getDepthLimit () const
   void terminate ()
   bool shouldTerminate () const
   void setDepthLimit (unsigned int limit)

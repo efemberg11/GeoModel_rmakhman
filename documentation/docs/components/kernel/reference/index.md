@@ -28,9 +28,3 @@ Detailed descriptions of the geometry kernel classes follow.
 {% include 'components/kernel/reference/Actions.md' %}
 
 {% include 'components/kernel/reference/SubsystemDescription.md' %}
-
-{% include 'components/kernel/reference/Appendix_Query.md' %}
-
-
-
-

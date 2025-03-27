@@ -72,7 +72,9 @@ void MulticopyProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, Ge
 
     map<string, GeoNodeList>::iterator entry;
     GeoNodeList *xfList;
-    if ((entry = m_map.find(name)) == m_map.end()) { // Not in registry; make a new item
+    // Check that the item is not already in the registry, or is alignable and so a new transform must *always* be made to allow unique alignment corrections; make a new item
+    //See also handling in TransformProcessor/Element2GeoItem
+    if ((entry = m_map.find(name)) == m_map.end() || alignable) { 
         //
         //    Add empty node list to the map
         //       
@@ -153,7 +155,7 @@ void MulticopyProcessor::process(const DOMElement *element, GmxUtil &gmxUtil, Ge
                 hepXf = hepXf0 * hepXf; //multiply by hepXf0 again for each copy
             }
         }
-    } else {
+    } else { //if it is already in the registry, use existing version (if allowed)
         xfList = &entry->second;
     }
 

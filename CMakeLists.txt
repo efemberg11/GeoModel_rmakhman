@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 
 # === Preamble ===
 cmake_minimum_required(VERSION 3.16...3.26)
@@ -34,6 +34,9 @@ endif()
 include( SetupEigen3 )
 include( SetupXercesC )
 include( SetupJSON )
+# Add the GoogleTest framework, for tests
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
 
 # Find the dependencies that the project always picks up from its environment.
 find_package( SQLite3 3.7.17 )

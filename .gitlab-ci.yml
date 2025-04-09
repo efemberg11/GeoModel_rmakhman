@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
 # List of the CI build stages.
 stages:
   - step-A
@@ -25,7 +27,7 @@ workflow:
 
 # TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
 
-# general macOS job template
+# Base template for all macOS jobs
 .macos-template-job: &macos-job
   tags:
     - macos
@@ -41,10 +43,7 @@ workflow:
     - export CPPFLAGS="-I/usr/local/opt/expat/include"
     - export PATH="/usr/local/opt/qt5/bin:$PATH" # to make Qt5 discoverable by CMake
 
-# NOTE
-# The Ubuntu package 'nlohmann-json-dev' is version 2.x, too old for us.
-# Thus, for GeoModelVisualization (GMEX), we now build nlohmann_json as part
-# of the build, by using the 'standalone' job only
+# Base template for all Ubuntu jobs
 .ubuntu-template-job-default: &ubuntu-job
   image: gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
   rules:

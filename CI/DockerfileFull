@@ -2,8 +2,12 @@
 ARG BASEIMAGE=gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
 FROM ${BASEIMAGE}
 
+# Install GoogleTest
+# FIXME: we want to move this to the main image later
+RUN apt-get update && apt-get install -y libgtest-dev
+
 ### Compile then geo model
-COPY . /workdir/GeoModel_src/ 
+COPY . /workdir/GeoModel_src/
 RUN mkdir -p /workdir/build_geomodel/ && \   
     cd /workdir/build_geomodel/ && \
     . ~/.bashrc && \

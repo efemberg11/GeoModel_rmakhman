@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     //------------------------------------------------------------------------------------//
     //  Open a geometry file
     //------------------------------------------------------------------------------------//
-    std::string path = "geometry.db";
+    std::string path = "test_geometry.db";
 
     // check if DB file exists. If not, return.
     // FIXME: TODO: this check should go in the 'GMDBManager' constructor.

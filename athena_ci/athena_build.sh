@@ -102,11 +102,15 @@ if [ "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" == "main" ];then
     heading "Rebase the GeoModel code base w.r.t. main"
     cd ${CI_PROJECT_DIR}
 
-    fill_line "Changes w.r.t to main before rebase"
+    fill_line "-"
+    echo "Changes w.r.t to main before rebase"
+    fill_line "-"
     git fetch origin
     git diff HEAD origin/main
     git rebase origin/main
-    fill_line "Changes w.r.t to main after rebase"
+    fill_line "-"
+    echo "Changes w.r.t to main after rebase"
+    fill_line "-"
 
     git diff HEAD origin/main
 

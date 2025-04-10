@@ -17,10 +17,7 @@ class GeoVolumeCursor final : public GeoNodeAction
  public:
   using VSConstLink = GeoVSurface::VSConstLink;
   GeoVolumeCursor (PVConstLink parent, GeoVAlignmentStore* store=nullptr);
-  virtual ~GeoVolumeCursor() override;
- 
-  GeoVolumeCursor(const GeoVolumeCursor &right) = delete;
-  GeoVolumeCursor & operator=(const GeoVolumeCursor &right) = delete;
+  virtual ~GeoVolumeCursor() = default;
 
   /// Advance
   void next();
@@ -79,29 +76,28 @@ class GeoVolumeCursor final : public GeoNodeAction
   /// Ressucitate (undo terminate)
   void resuscitate();
 
-
-  PVConstLink                           m_parent;
-  PVConstLink                           m_volume;
-  VSConstLink                           m_surface;
-  GeoTrf::Transform3D                           m_transform;
-  GeoTrf::Transform3D                           m_defTransform;
+  PVConstLink                           m_parent{nullptr};
+  PVConstLink                           m_volume{nullptr};
+  VSConstLink                           m_surface{nullptr};
+  GeoTrf::Transform3D                   m_transform{GeoTrf::Transform3D::Identity()};
+  GeoTrf::Transform3D                   m_defTransform{GeoTrf::Transform3D::Identity()};
   
-  unsigned int                          m_majorIndex;
-  unsigned int                          m_minorIndex;
-  unsigned int                          m_minorLimit;
-  const GeoSerialTransformer           *m_serialTransformer;
+  unsigned int                          m_majorIndex{0};
+  unsigned int                          m_minorIndex{0};
+  unsigned int                          m_minorLimit{0};
+  const GeoSerialTransformer*           m_serialTransformer{nullptr};
   
-  const GeoNameTag                     *m_nameTag;
-  const GeoSerialDenominator           *m_serialDenominator;
-  const GeoIdentifierTag               *m_idTag;
-  std::vector<const GeoTransform *>     m_pendingTransformList;
-  unsigned int                          m_serialDenomPosition;
-  const GeoSerialIdentifier            *m_serialIdentifier;
-  unsigned int                          m_serialIdentPosition;
-  unsigned int                          m_volCount;
-  bool                                  m_hasAlignTrans;
+  const GeoNameTag*                     m_nameTag{nullptr};
+  const GeoSerialDenominator*           m_serialDenominator{nullptr};
+  const GeoIdentifierTag*               m_idTag{nullptr};
+  std::vector<const GeoTransform *>     m_pendingTransformList{};
+  unsigned int                          m_serialDenomPosition{0};
+  const GeoSerialIdentifier*            m_serialIdentifier{nullptr};
+  unsigned int                          m_serialIdentPosition{0};
+  unsigned int                          m_volCount{0};
+  bool                                  m_hasAlignTrans{false};
 
-  GeoVAlignmentStore                   *m_alignStore;
+  GeoVAlignmentStore*                   m_alignStore{};
 };
 
 #endif

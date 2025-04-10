@@ -138,16 +138,16 @@ class GeoShapeAction
 
   
  private:
-  GeoShapeAction(const GeoShapeAction &right);
-  GeoShapeAction & operator=(const GeoShapeAction &right);
+  GeoShapeAction(const GeoShapeAction &right) = delete;
+  GeoShapeAction & operator=(const GeoShapeAction &right) = delete;
 
   //	A limit may be placed upon the depth to which the action
   //	descends.  0 = self.  1 = self and children.
-  std::optional<unsigned int> m_depth;
+  std::optional<unsigned int> m_depth{std::nullopt};
   
   //	Termination flag; causes an abortion of action execution.
-  bool m_terminate;
-  GeoShapePath m_path;
+  bool m_terminate{false};
+  GeoShapePath m_path{};
 
 };
 

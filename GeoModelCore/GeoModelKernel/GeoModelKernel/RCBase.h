@@ -7,8 +7,8 @@
  *
  * @brief This is a base class for objects whose memory is managed
  *	through reference counting.  Reference-counted objects
- *	can only be created using
- *	operator new, the cannot be created on the stack.
+ *	should only be created using
+ *	operator new, they should not be created on the stack.
  *
  *	The methods ref() and unref() can be called to increase
  *	and decrease the reference count of an object.  When

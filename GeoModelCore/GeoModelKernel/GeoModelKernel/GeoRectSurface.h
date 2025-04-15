@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -36,11 +36,11 @@ class GeoRectSurface : public GeoVSurfaceShape
     return m_yHalfLength;
   }
 
-  virtual const std::string & type () const{
+  virtual const std::string & type () const override final{
      return s_classType;
   }
 
-  virtual ShapeType typeID () const{
+  virtual ShapeType typeID () const override final{
      return s_classTypeID;
   }
 

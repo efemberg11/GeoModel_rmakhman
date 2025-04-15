@@ -12,6 +12,12 @@ GeoDeDuplicator::GeoIdMap GeoDeDuplicator::s_geoIds{};
 
 namespace {
     std::mutex s_mutex{};
+    ///typeis function uses simple arguments to typeid (not an expression) to avoid warnings
+    template<class A, class B>
+    bool
+    typeis(B && b){
+      return typeid(A) == typeid(b);
+    }
 }
 
 void GeoDeDuplicator::setShapeDeDuplication(bool enable){
@@ -124,10 +130,10 @@ PVLink GeoDeDuplicator::clone(PVConstLink cloneMe) const {
     for(unsigned int chNode =0; chNode < cloneMe->getNChildNodes(); ++chNode) {
         GeoIntrusivePtr<const GeoGraphNode>node{*cloneMe->getChildNode(chNode)};
         /** transform nodes */
-        if (typeid(*node) == typeid(GeoAlignableTransform)) {
+        if (typeis<GeoAlignableTransform>(*node)) {
             const auto geoTrf = dynamic_pointer_cast<const GeoAlignableTransform>(node);
             newVol->add(make_intrusive<GeoAlignableTransform>(geoTrf->getDefTransform()));
-        } else if (typeid(*node) == typeid(GeoTransform)) {
+        } else if (typeis<GeoTransform>(*node)) {
             const auto geoTrf = dynamic_pointer_cast<const GeoTransform>(node);
             auto geoTrfNonConst = const_pointer_cast(geoTrf);
             newVol->add(cacheTransform(geoTrfNonConst));

@@ -13,6 +13,15 @@
 #include <GeoModelHelpers/getChildNodesWithTrf.h>
 #include <iostream>
 
+namespace{
+  ///typeis function uses simple arguments to typeid (not an expression) to avoid warnings
+  template<class A>
+  const char*
+  safeTypeIdName(A && a){
+    return typeid(A).name();
+  }
+}
+
 
 int main(int argc, char *argv[]){
     GeoIntrusivePtr<GeoMaterial> material = make_intrusive<GeoMaterial>("Snow", 1.45);
@@ -90,7 +99,7 @@ int main(int argc, char *argv[]){
       std::optional<int> query = cParent->getIdOfChildVol(0);
         if (!query) {
             std::cerr<<__FILE__<<":"<<__LINE__<<" Failed to obtain a valid child volume ID. Expected "<<currentK
-                     <<" "<<typeid(*cParent->getChildVol(0)).name()<<std::endl;
+                     <<" "<<safeTypeIdName(*cParent->getChildVol(0))<<std::endl;
             return EXIT_FAILURE;
         }
         unsigned int parentID = *query;

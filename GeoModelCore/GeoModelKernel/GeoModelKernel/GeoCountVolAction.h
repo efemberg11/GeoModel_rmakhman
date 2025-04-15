@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef GEOMODELKERNEL_GEOCOUNTVOLACTION_H
@@ -14,13 +14,13 @@ class GeoCountVolAction : public GeoNodeAction
   virtual ~GeoCountVolAction() = default;
 
   //	Handles a physical volume.
-  virtual void handlePhysVol (const GeoPhysVol *);
+  virtual void handlePhysVol (const GeoPhysVol *) override;
   
   //	Handles a physical volume.
-  virtual void handleFullPhysVol (const GeoFullPhysVol *);
+  virtual void handleFullPhysVol (const GeoFullPhysVol *) override;
   
   //	Handles a Serial Transformer
-  virtual void handleSerialTransformer (const GeoSerialTransformer  *st);
+  virtual void handleSerialTransformer (const GeoSerialTransformer  *st) override;
   
   //	Handles a virtual surface.
   virtual void handleVSurface (const GeoVSurface *) override;

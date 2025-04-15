@@ -12,6 +12,12 @@
 
 namespace {
     constexpr std::string_view dummyNodeName{"ANON"};
+    ///typeis function uses simple arguments to typeid (not an expression) to avoid warnings
+    template<class A, class B>
+    bool
+    typeis(B && b){
+      return typeid(A) == typeid(b);
+    }
 }
 
 
@@ -20,7 +26,7 @@ namespace {
     volume{curs.getVolume()},
     nodeName{curs.getName()},
     isAlignable{curs.hasAlignableTransform()},
-    isSensitive{typeid(*volume) == typeid(GeoFullPhysVol)},
+    isSensitive{typeis<GeoFullPhysVol>(*volume)},
     volumeId{static_cast<const std::optional<int>&>(curs.getId())} {
     //// Do not specify a node name if it's a dummy one
     if (nodeName == dummyNodeName) {
@@ -95,8 +101,8 @@ std::vector<GeoChildNodeWithTrf> getAllSubVolumes(PVConstLink physVol) {
 }
 
 bool hasFullPhysVolInTree(const PVConstLink& physVol) {
-    if (typeid(*physVol) == typeid(GeoFullPhysVol) ||
-        typeid(*physVol) == typeid(GeoVFullPhysVol)){
+    if (typeis<GeoFullPhysVol>(*physVol) ||
+        typeis<GeoVFullPhysVol>(*physVol)){
         return true;
     }
     for (unsigned int ch = 0; ch < physVol->getNChildVols(); ++ch) {

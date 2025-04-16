@@ -4,6 +4,7 @@
 
 
 #include "GeoModelKernel/RCBase.h"
+#include <exception>
 #include <gtest/gtest.h>
 #include <limits>
 
@@ -13,7 +14,10 @@ class Stub:public RCBase{
   virtual ~Stub() = default;
 };
 
-TEST(GeoModelKernel, RCBaseStub_CanBeConstructedOnStack) {
+//Making the destructor of RCBase private would cause all the defaulted destructors
+//of derived classes (e.g the 'Stub' above, and many others) no longer compile.
+//However, keeping it protected results in this undesirable behaviour:
+TEST(RCBase, StubCanBeConstructedOnStack) {
   EXPECT_NO_THROW([[maybe_unused]] Stub stub);
   //Stub stub1; (unused here if the following are commented out)
   //none of the following compile (correctly so)
@@ -23,14 +27,14 @@ TEST(GeoModelKernel, RCBaseStub_CanBeConstructedOnStack) {
   //Stub stub5 = std::move(stub3);
 }
 
-TEST(GeoModelKernel, RCBase_CanBeConstructedOnHeap) {
+TEST(RCBase, CanBeConstructedOnHeap) {
   RCBase * p{};
   EXPECT_NO_THROW(p = new RCBase);
   EXPECT_NE(p, nullptr);
   //deliberate leak here, RCBase d'tor is protected, so cannot delete
 }
 
-TEST(GeoModelKernel, RCBaseStub_CanBeConstructedOnHeap) {
+TEST(RCBase, StubCanBeConstructedOnHeap) {
   Stub * p{};
   EXPECT_NO_THROW(p = new Stub);
   EXPECT_NE(p, nullptr);
@@ -38,20 +42,29 @@ TEST(GeoModelKernel, RCBaseStub_CanBeConstructedOnHeap) {
   EXPECT_NO_THROW(delete p);
 }
 
-TEST(GeoModelKernel, RCBaseStub_ReferenceCountOk){
+TEST(RCBase, CanIncrementAndDecrementReference){
   //do on heap, as is supposed to be
   Stub * pStub = new Stub;
   EXPECT_EQ(pStub->refCount(), 0);
   EXPECT_NO_THROW(pStub->ref());
   EXPECT_EQ(pStub->refCount(), 1);
   EXPECT_NO_THROW(pStub->unref());
-  //now, where is the object? The pointer has not been set to zero.. so...
-  //the following line would execute (not crash) and return a nonsense value, 
-  //EXPECT_EQ(pStub->refCount(), 0); //returns 2043 on my machine
-  //segfault : delete pStub;
-  Stub * pStub2 = new Stub;
-  EXPECT_NO_THROW(pStub2->unref());
-  EXPECT_EQ(pStub2->refCount(), std::numeric_limits<unsigned int>::max());
+}
+//undesirable behaviours
+TEST(RCBase, DISABLED_CannotDecrementReferenceBelowZero){
+  Stub * pStub = new Stub;
+  pStub->unref(); //should this throw?
+  EXPECT_EQ(pStub->refCount(), 0);//fails
   //now it's cursed, so euthanise it
-  delete pStub2;
+  delete pStub;
+}
+
+TEST(RCBase, DISABLED_CannotBeUsedAfterRefCountBecomesZero){
+  Stub * pStub = new Stub;
+  EXPECT_NO_THROW(pStub->ref());
+  EXPECT_NO_THROW(pStub->unref());//object destroyed, but pointer still valid
+  EXPECT_THROW(pStub->ref(), std::exception);//compiles, doesn't throw
+  //now the refcount is some random value (returns 2043 on my machine)
+  //deleting would cause segfault
+  //delete pStub;
 }

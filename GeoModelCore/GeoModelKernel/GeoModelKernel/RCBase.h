@@ -49,6 +49,7 @@ class RCBase {
  private:
     RCBase(const RCBase &right) = delete;
     RCBase & operator=(const RCBase &right) = delete;
+    
 
     //	The reference count
     mutable std::atomic<unsigned> m_count{0};

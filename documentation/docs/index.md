@@ -100,7 +100,6 @@ Additional external dependencies:
 - The open-source ("Community") version of the [Qt graphics framework](https://www.qt.io/) for the GUI, when the `Visualization` module is used
 - The [Coin](https://github.com/coin3d/coin) and [SoQt](https://github.com/coin3d/soqt) libraries for 3D graphics, when the `Visualization` module is used
 - The [Geant4](https://geant4.web.cern.ch/) detector simulation toolkit, when the standalone detector simulation module `FullSimLight` is used
-- The [`fmt`](https://github.com/fmtlib/fmt) formatting library for advanced string formatting, when the `I/O` module is used
 
 ----
 

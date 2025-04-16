@@ -10,7 +10,7 @@
 ################################################################################
 
 # Find the header and source files.
-file( GLOB SOURCES src/*.cpp fmt/*.h )
+file( GLOB SOURCES src/*.cpp )
 file( GLOB HEADERS GeoModelDBManager/*.h )
 
 # Set up the library.

@@ -14,7 +14,6 @@ The core packages only depend on these third-party libraries:
 
 - Eigen3, as the maths library (header-only)
 - SQLite, as the underlying format to store detector description data
-- fmt, as formatting library (header-only)
 
 
 

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /*
@@ -28,11 +28,6 @@
 #include "GeoModelKernel/throwExcept.h"
 #include "GeoModelHelpers/StringUtils.h"
 
-
-// include the 'fmt' library, which is hosted locally as header-only
-#define FMT_HEADER_ONLY 1  // to use 'fmt' header-only
-#include "fmt/format.h"
-
 // include SQLite
 #include <sqlite3.h>
 
@@ -42,6 +37,7 @@
 #include <mutex>
 #include <sstream>
 #include <utility>
+#include <format>
 
 static std::string dbversion =
     "1.0.0";  // New format with REAL columns for numeric values
@@ -786,7 +782,7 @@ bool GMDBManager::addListOfRecordsToTable(
 
     // preparing the SQL query
     std::string sql =
-        fmt::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
+        std::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
     unsigned int id = 0;
     for (const std::vector<std::string>& rec : records) {
         ++id;
@@ -837,7 +833,7 @@ bool GMDBManager::addListOfRecordsToTable(
 
     // preparing the SQL query
     std::string sql =
-        fmt::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
+        std::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
     unsigned int id = 0;
     for (const DBRowEntry&
              rec : records) {
@@ -906,7 +902,7 @@ bool GMDBManager::addRecordsToTable(
 
     // preparing the SQL query
     std::string sql =
-        fmt::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
+        std::format("INSERT INTO {0} {1} VALUES ", tableName, tableColString);
     unsigned int id = 0;
     // a vector to store string-conversions of values, to build the SQL
     // query
@@ -1045,7 +1041,7 @@ std::vector<std::string> GMDBManager::getItemFromTableName(
     std::vector<std::string> item;
     // set a SQL command string with the right table name
     std::string sql =
-        fmt::format("SELECT * FROM {0} WHERE id = (?)", tableName);
+        std::format("SELECT * FROM {0} WHERE id = (?)", tableName);
     // prepare the query
     sqlite3_stmt* stmt = nullptr;
     int rc = -1;
@@ -1214,7 +1210,7 @@ sqlite3_stmt* GMDBManager::Imp::selectAllFromTableSortBy(
     int rc = -1;                 // SQLite return code
     // set the SQL query string
     std::string sql =
-        fmt::format("SELECT * FROM {0} ORDER BY {1}", tableName, sortColumn);
+        std::format("SELECT * FROM {0} ORDER BY {1}", tableName, sortColumn);
     // prepare the query
     rc = sqlite3_prepare_v2(m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) {
@@ -1228,7 +1224,7 @@ bool GMDBManager::Imp::checkTableFromDB_imp(const std::string& tableName) const 
     sqlite3_stmt* st = nullptr;  // SQLite statement to be returned
     int rc = -1;                 // SQLite return code
     // set the SQL query string
-    std::string sql = fmt::format("SELECT * FROM {0}", tableName);
+    std::string sql = std::format("SELECT * FROM {0}", tableName);
     // prepare the query
     rc = sqlite3_prepare_v2(m_dbSqlite, sql.c_str(), -1, &st, NULL);
     if (rc != SQLITE_OK) return false;
@@ -1430,7 +1426,7 @@ bool GMDBManager::createTableCustomPublishedNodes(
     tab.insert(tab.begin(), {tableName, "id", "key", "nodeID", "keyType"});
     storeTableColumnNames(tab);
 
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0} ({1} integer primary key, {2} {3} not null, {4} "
         "integer not null REFERENCES {5}(id), {6} varchar not null)",
         tab[0], tab[1], tab[2], keyTypeDB, tab[3], referencedTable, tab[4]);
@@ -1473,7 +1469,7 @@ bool GMDBManager::createCustomTable(
 
     // prepare the dynamic query to create the custom table
     queryStr =
-        fmt::format("create table {0} ( id integer primary key ", tab[0]);
+        std::format("create table {0} ( id integer primary key ", tab[0]);
     for (size_t ii = 0; ii < tableColNames.size(); ++ii) {
         std::string colType = "";
 
@@ -1512,7 +1508,7 @@ bool GMDBManager::createCustomTable(
                 tableColTypes[ii]);
 
         std::string colStr =
-            fmt::format(", {0} {1} ", tableColNames[ii], colType);
+            std::format(", {0} {1} ", tableColNames[ii], colType);
         queryStr += colStr;
     }
     queryStr += ")";
@@ -1541,7 +1537,7 @@ bool GMDBManager::createTables() {
     tab.insert(tab.begin(), {tableName, "id", "version"});
     storeTableColumnNames(tab);
     queryStr =
-        fmt::format("create table {0} ({1} integer primary key, {2} integer)",
+        std::format("create table {0} ({1} integer primary key, {2} integer)",
                     tab[0], tab[1], tab[2]);
     rc = execQuery(queryStr);
     tab.clear();
@@ -1551,7 +1547,7 @@ bool GMDBManager::createTables() {
     tableName = "GeoNodesTypes";
     tab.insert(tab.begin(), {tableName, "id", "nodeType", "tableName"});
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} varchar, {3} "
         "varchar)",
         tab[0], tab[1], tab[2], tab[3]);
@@ -1572,7 +1568,7 @@ bool GMDBManager::createTables() {
     tab.push_back("childId");
     tab.push_back("childCopyNumber");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} integer, "
         "{3} integer not null REFERENCES GeoNodesTypes(id), "
         "{4} integer, {5} integer, "
@@ -1590,7 +1586,7 @@ bool GMDBManager::createTables() {
     tab.push_back("id");
     tab.push_back("data");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real not null)",
         tab[0], tab[1], tab[2]);
     rc = execQuery(queryStr);
@@ -1604,7 +1600,7 @@ bool GMDBManager::createTables() {
     tab.push_back("volId");
     tab.push_back("volTable");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} integer not null, "
         "{3} "
         "integer not null REFERENCES GeoNodesTypes(id))",
@@ -1620,7 +1616,7 @@ bool GMDBManager::createTables() {
     tab.push_back("id");
     tab.push_back("logvol");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} integer not null)",
         tab[0], tab[1], tab[2]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1636,7 +1632,7 @@ bool GMDBManager::createTables() {
     tab.push_back("id");
     tab.push_back("logvol");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} integer not null)",
         tab[0], tab[1], tab[2]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1655,7 +1651,7 @@ bool GMDBManager::createTables() {
     tab.push_back("shapeType");
     tab.push_back("material");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} varchar, {3} "
         "integer "
         "not null, {4} varchar not null, {5} integer not null)",
@@ -1676,7 +1672,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dataStart");
     tab.push_back("dataEnd");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} varchar, "
         "{3} real, {4} integer, {5} integer)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
@@ -1692,7 +1688,7 @@ bool GMDBManager::createTables() {
     tab.push_back("element");
     tab.push_back("fraction");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, "
         "{2} integer not null, "
         "{3} real )",
@@ -1711,7 +1707,7 @@ bool GMDBManager::createTables() {
     tab.push_back("Z");
     tab.push_back("A");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} varchar, "
         "{3} varchar, "
         "{4} real, {5} real)",
@@ -1731,7 +1727,7 @@ bool GMDBManager::createTables() {
     tab.push_back("type");
     tab.push_back("parameters");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} varchar, {3} "
         "varchar)",
         tab[0], tab[1], tab[2], tab[3]);
@@ -1752,7 +1748,7 @@ bool GMDBManager::createTables() {
     tab.push_back("YHalfLength");
     tab.push_back("ZHalfLength");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1772,7 +1768,7 @@ bool GMDBManager::createTables() {
     tab.push_back("YHalfLength");
     tab.push_back("ZHalfLength");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1791,7 +1787,7 @@ bool GMDBManager::createTables() {
     tab.push_back("RMax");
     tab.push_back("ZHalfLength");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1814,7 +1810,7 @@ bool GMDBManager::createTables() {
     tab.push_back("SPhi");
     tab.push_back("DPhi");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real, {8} real, {9} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8], tab[9]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1836,7 +1832,7 @@ bool GMDBManager::createTables() {
     tab.push_back("Theta");
     tab.push_back("Phi");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real, {8} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -1863,7 +1859,7 @@ bool GMDBManager::createTables() {
     tab.push_back("Dxdypdzp");
     tab.push_back("Angleydzp");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real, {8} real, {9} real, {10} real, {11} real, {12} real, {13} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8], tab[9], tab[10], tab[11], tab[12], tab[13] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -1884,7 +1880,7 @@ bool GMDBManager::createTables() {
     tab.push_back("YHalfLength2");
     tab.push_back("ZHalfLength");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -1905,7 +1901,7 @@ bool GMDBManager::createTables() {
     tab.push_back("SPhi");
     tab.push_back("DPhi");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -1926,7 +1922,7 @@ bool GMDBManager::createTables() {
     tab.push_back("SPhi");
     tab.push_back("DPhi");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -1953,7 +1949,7 @@ bool GMDBManager::createTables() {
     tab.push_back("X4HalfLength");
     tab.push_back("TiltAngleAlpha");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
          "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real, {8} real, {9} real, {10} real, {11} real, {12} real, {13} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8], tab[9], tab[10], tab[11], tab[12], tab[13] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -1974,7 +1970,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dataStart");
     tab.push_back("dataEnd");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} integer, {6} integer, {7} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -1996,7 +1992,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dataStart");
     tab.push_back("dataEnd");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} integer, {6} integer, {7} integer, {8} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7], tab[8]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2016,7 +2012,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dataStart");
     tab.push_back("dataEnd");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} integer, {5} integer, {6} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2036,7 +2032,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dataStart");
     tab.push_back("dataEnd");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} integer, {5} integer, {6} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2056,7 +2052,7 @@ bool GMDBManager::createTables() {
     tab.push_back("shapeBType");
     tab.push_back("shapeBId");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} integer, {5} varchar, {6} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -2075,7 +2071,7 @@ bool GMDBManager::createTables() {
     tab.push_back("shapeId");
     tab.push_back("transformId");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} integer, {5} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -2095,7 +2091,7 @@ bool GMDBManager::createTables() {
     tab.push_back("shapeBType");
     tab.push_back("shapeBId");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} integer, {5} varchar, {6} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -2115,7 +2111,7 @@ bool GMDBManager::createTables() {
     tab.push_back("shapeBType");
     tab.push_back("shapeBId");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} integer, {5} varchar, {6} integer )",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6] );
     if (0 == (rc = execQuery(queryStr))) {
@@ -2134,7 +2130,7 @@ bool GMDBManager::createTables() {
     tab.push_back("name");
     tab.push_back("asciiData");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} varchar, {4} varchar )",
         tab[0], tab[1], tab[2], tab[3], tab[4]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2150,7 +2146,7 @@ bool GMDBManager::createTables() {
     tab.push_back("RMinPlane");
     tab.push_back("RMaxPlane");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4]);
     rc = execQuery(queryStr);
@@ -2164,7 +2160,7 @@ bool GMDBManager::createTables() {
     tab.push_back("RMinPlane");
     tab.push_back("RMaxPlane");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real )",
         tab[0], tab[1], tab[2], tab[3], tab[4]);
     rc = execQuery(queryStr);
@@ -2177,7 +2173,7 @@ bool GMDBManager::createTables() {
     tab.push_back("XVertex");
     tab.push_back("YVertex");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real )",
         tab[0], tab[1], tab[2], tab[3]);
     rc = execQuery(queryStr);
@@ -2190,7 +2186,7 @@ bool GMDBManager::createTables() {
     tab.push_back("XVertex");
     tab.push_back("YVertex");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real )",
         tab[0], tab[1], tab[2], tab[3]);
     rc = execQuery(queryStr);
@@ -2205,7 +2201,7 @@ bool GMDBManager::createTables() {
     tab.push_back("baseName");
     storeTableColumnNames(tab);
     queryStr =
-        fmt::format("create table {0}({1} integer primary key, {2} varchar)",
+        std::format("create table {0}({1} integer primary key, {2} varchar)",
                     tab[0], tab[1], tab[2]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
@@ -2221,7 +2217,7 @@ bool GMDBManager::createTables() {
     tab.push_back("baseId");
     storeTableColumnNames(tab);
     queryStr =
-        fmt::format("create table {0}({1} integer primary key, {2} integer)",
+        std::format("create table {0}({1} integer primary key, {2} integer)",
                     tab[0], tab[1], tab[2]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
@@ -2237,7 +2233,7 @@ bool GMDBManager::createTables() {
     tab.push_back("identifier");
     storeTableColumnNames(tab);
     queryStr =
-        fmt::format("create table {0}({1} integer primary key, {2} integer)",
+        std::format("create table {0}({1} integer primary key, {2} integer)",
                     tab[0], tab[1], tab[2]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
@@ -2255,7 +2251,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dataEnd");
     storeTableColumnNames(tab);
     queryStr =
-        fmt::format("create table {0}({1} integer primary key, {2} varchar, {3} integer, {4} integer)",
+        std::format("create table {0}({1} integer primary key, {2} varchar, {3} integer, {4} integer)",
                     tab[0], tab[1], tab[2], tab[3], tab[4]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
@@ -2273,7 +2269,7 @@ bool GMDBManager::createTables() {
     tab.push_back("volTable");
     tab.push_back("copies");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} integer not null "
         "REFERENCES Functions(id), {3} integer not null, {4} integer not "
         "null "
@@ -2303,7 +2299,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dy");
     tab.push_back("dz");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} "
         "real, {5} real, {6} real, {7} real, {8} real, {9} real, {10} "
         "real, "
@@ -2334,7 +2330,7 @@ bool GMDBManager::createTables() {
     tab.push_back("dy");
     tab.push_back("dz");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} "
         "real, {5} real, {6} real, {7} real, {8} real, {9} real, {10} "
         "real, "
@@ -2355,7 +2351,7 @@ bool GMDBManager::createTables() {
     tab.push_back("name");
     storeTableColumnNames(tab);
     queryStr =
-        fmt::format("create table {0}({1} integer primary key, {2} varchar)",
+        std::format("create table {0}({1} integer primary key, {2} varchar)",
                     tab[0], tab[1], tab[2]);
     if (0 == (rc = execQuery(queryStr))) {
         storeNodeType(geoNode, tableName);
@@ -2372,7 +2368,7 @@ bool GMDBManager::createTables() {
     tab.push_back("shapeType");
     tab.push_back("shapeId");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} varchar not null, {3} integer not null)",
         tab[0], tab[1], tab[2], tab[3]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2392,7 +2388,7 @@ bool GMDBManager::createTables() {
     tab.push_back("XHalfLength");
     tab.push_back("YHalfLength");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real)",
         tab[0], tab[1], tab[2], tab[3], tab[4]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2413,7 +2409,7 @@ bool GMDBManager::createTables() {
     tab.push_back("XHalfLengthMax");
     tab.push_back("YHalfLength");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2436,7 +2432,7 @@ bool GMDBManager::createTables() {
     tab.push_back("radius_out");
     tab.push_back("phi");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2459,7 +2455,7 @@ bool GMDBManager::createTables() {
     tab.push_back("Y_bottom_half");
     tab.push_back("Y_top_half");
     storeTableColumnNames(tab);
-    queryStr = fmt::format(
+    queryStr = std::format(
         "create table {0}({1} integer primary key, {2} real, {3} real, {4} real, {5} real, {6} real, {7} real)",
         tab[0], tab[1], tab[2], tab[3], tab[4], tab[5], tab[6], tab[7]);
     if (0 == (rc = execQuery(queryStr))) {
@@ -2594,7 +2590,7 @@ bool GMDBManager::storeRootVolume(const unsigned &id,
 
     // set the SQL query
     std::string queryStr;
-    std::string sql = fmt::format("INSERT INTO {0} ({1}, {2}) VALUES (?, ?)",
+    std::string sql = std::format("INSERT INTO {0} ({1}, {2}) VALUES (?, ?)",
                                   tableName, cols[1], cols[2]);
     // preparing the SQL query
     sqlite3_stmt* st = nullptr;

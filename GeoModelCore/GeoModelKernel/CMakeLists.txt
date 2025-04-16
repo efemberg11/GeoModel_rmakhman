@@ -65,4 +65,5 @@ foreach(_exeFile ${files})
 endforeach()
 include(GoogleTest)
 gtest_discover_tests(testRCBase)
+gtest_discover_tests(testGeoGraphNode)
 

@@ -7,6 +7,8 @@ cmake_minimum_required(VERSION 3.16...3.26)
 include( ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GeoModel-version.cmake )
 project( "GeoModel" VERSION ${GeoModel_VERSION} LANGUAGES CXX )
 
+set(CMAKE_CXX_STANDARD 20)
+
 # Make the 'cmake' module directory visible to CMake.
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake )
 

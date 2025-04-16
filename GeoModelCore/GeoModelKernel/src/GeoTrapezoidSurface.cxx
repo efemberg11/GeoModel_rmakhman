@@ -25,10 +25,8 @@ bool GeoTrapezoidSurface::isOnSurface (const double Px, const double Py, const d
     double Pp_y = P_prime_4d[1];
     double Pp_z = P_prime_4d[2];
 
-    if(Pp_z != 0 && Pp_z > 1e-5 && Pp_z < -1e-5){
-        // now I take tolerance as 1e-5
-        return false;
-    }
+    // now I take tolerance as 1e-5
+    if(std::abs(Pp_z) > 1e-5) return false;
 
     double half_x_max = this -> getXHalfLengthMax();
     double half_x_min = this -> getXHalfLengthMin();

@@ -66,4 +66,5 @@ endforeach()
 include(GoogleTest)
 gtest_discover_tests(testRCBase)
 gtest_discover_tests(testGeoGraphNode)
-
+gtest_discover_tests(testGeoMaterial)
+gtest_discover_tests(testGeoElement)

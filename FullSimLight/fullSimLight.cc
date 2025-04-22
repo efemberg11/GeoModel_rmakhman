@@ -46,7 +46,7 @@ static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
 bool isBatch = true;
 static std::string  parConfigFileName  = "atlas-config.json";
-
+bool isG4vis = false;
 
 
 void GetInputArguments(int argc, char** argv);

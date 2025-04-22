@@ -1,0 +1,25 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+# First off, import the upstream dependencies of the project.
+include( CMakeFindDependencyMacro )
+find_dependency( GeoModelCore @GeoModel_VERSION@ CONFIG EXACT )
+find_dependency( GeoModelIO @GeoModel_VERSION@ CONFIG EXACT )
+find_dependency( nlohmann_json @nlohmann_json_VERSION@ )
+find_dependency( XercesC @XercesC_VERSION@ )
+
+# Include the exported configuration of GeoModelTools.
+get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )
+include( ${SELF_DIR}/GeoModelToolsTargets.cmake )
+
+# Set the version of the installed project.
+set( GeoModelTools_VERSION "@PROJECT_VERSION@" )
+
+# Print some standard messages about the package being found.
+include( FindPackageHandleStandardArgs )
+find_package_handle_standard_args( GeoModelTools
+   FOUND_VAR GeoModelTools_FOUND
+   REQUIRED_VARS SELF_DIR
+   VERSION_VAR GeoModelTools_VERSION )
+
+# Clean up.
+unset( SELF_DIR )

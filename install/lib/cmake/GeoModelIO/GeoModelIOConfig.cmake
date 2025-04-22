@@ -1,0 +1,23 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+# First off, import the upstream dependencies of the project.
+include( CMakeFindDependencyMacro )
+find_dependency( GeoModelCore 6.9.0 CONFIG EXACT )
+#find_dependency( SQLite3 3.37.2 EXACT )
+
+# Now include the exported configuration of GeoModelIO.
+get_filename_component( SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )
+include( ${SELF_DIR}/GeoModelIOTargets.cmake )
+
+# Set the version of the installed project.
+set( GeoModelIO_VERSION "6.9.0" )
+
+# Print some standard messages about the package being found.
+include( FindPackageHandleStandardArgs )
+find_package_handle_standard_args( GeoModelIO
+   FOUND_VAR GeoModelIO_FOUND
+   REQUIRED_VARS SELF_DIR GeoModelCore_FOUND
+   VERSION_VAR GeoModelIO_VERSION )
+
+# Clean up.
+unset( SELF_DIR )

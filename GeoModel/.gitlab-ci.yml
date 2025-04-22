@@ -1,0 +1,533 @@
+# List of the CI build stages.
+stages:
+  - step-A
+  - step-B
+  - step-C
+  - step-D
+  - step-E
+  - step-F
+  - post-deploy
+  - test
+
+
+
+# List global variables
+variables:
+  # also, 'CMAKE_EXTRA_FLAGS' will be specified by specific jobs when needed, and used by job templates like 'geomodel-job'
+  GIT_SUBMODULE_STRATEGY: recursive
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+# TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
+
+# general macOS job template
+.macos-template-job: &macos-job
+  tags:
+    - macos
+  rules:
+    - if: '$CI_PROJECT_ROOT_NAMESPACE == "GeoModelDev"'
+  allow_failure: true
+  timeout: 30 minutes
+  before_script:
+    - brew tap davidchall/hep
+    - brew bundle --file=CI/Brewfile # install third-party dependencies, if needed
+    - export PATH="/usr/local/opt/expat/bin:$PATH" # to make CMake use expat from Homebrew instead of the old one shipped with the system in /usr/lib
+    - export LDFLAGS="-L/usr/local/opt/expat/lib"
+    - export CPPFLAGS="-I/usr/local/opt/expat/include"
+    - export PATH="/usr/local/opt/qt5/bin:$PATH" # to make Qt5 discoverable by CMake
+
+# NOTE
+# The Ubuntu package 'nlohmann-json-dev' is version 2.x, too old for us.
+# Thus, for GeoModelVisualization (GMEX), we now build nlohmann_json as part
+# of the build, by using the 'standalone' job only
+.ubuntu-template-job-default: &ubuntu-job
+  image: gitlab-registry.cern.ch/geomodeldev/ubuntu-geant4-image:main-base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+      - ATLASExtensions/**/*
+      - FSL/**/*
+      - FullSimLight/**/*
+      - GeoModelCore/**/*
+      - GeoModelExamples/**/*
+      - GeoModelG4/**/*
+      - GeoModelIO/**/*
+      - GeoModelTools/**/*
+      - GeoModelVisualization/**/*
+      - cmake/**/*
+      - CMakeLists.txt
+
+# TEMPLATES FOR BUILDING PACKAGES
+.geomodel-build-template: &geomodel-job
+  script:
+    - CI/compile_GeoModel.sh
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+
+
+# ACTUAL BUILD JOBS
+
+## a debug job
+debug-job:
+  stage: step-A
+  script:
+    - echo "CI_REPOSITORY_URL -- $CI_REPOSITORY_URL"
+    - echo "GITLAB_USER_NAME -- $GITLAB_USER_NAME"
+    - echo "GITLAB_USER_LOGIN -- $GITLAB_USER_LOGIN"
+    - echo "CI_PROJECT_URL -- $CI_PROJECT_URL"
+    - echo "CI_PROJECT_NAMESPACE -- $CI_PROJECT_NAMESPACE"
+    - echo "CI_PROJECT_ROOT_NAMESPACE -- $CI_PROJECT_ROOT_NAMESPACE"
+    - echo "CI_PROJECT_PATH -- $CI_PROJECT_PATH"
+  when: manual
+
+
+### MACOS BUILD JOBS
+
+# *** NOTE ***
+# gitlab-runner on needs to be run in user's space "shell executor" on macOS,
+# thus, it's not possibke to containerize the jobs.
+# Also, `brew` cannot be run in parallel jobs, as it throw error, making the job fail.
+# Thus, for our macOS pipeline, we use 'brew bundle' to check and install all needed
+# dependencies, which are listed in a custom Brewfile under the CI folder.
+
+# mac-coin:
+#   <<: *macos-job
+#   <<: *coin-job
+#   stage: step-A
+
+# mac-soqt:
+#   <<: *macos-job
+#   <<: *soqt-job
+#   stage: step-B
+#   needs: ["mac-coin"]
+
+# mac-gm:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-A
+
+# mac-gm-tools:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
+
+# mac-gm-visualization:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-C
+#   needs: ["mac-coin", "mac-soqt"]
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
+
+# mac-gm-examples:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   # needs: ["mac-config"]
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
+
+# mac-gm-gmg4:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
+
+# mac-gm-examples-gmg4:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
+
+# mac-gm-fullsimlight:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+
+# mac-gm-fsl:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FSL=TRUE
+
+# mac-gm-all:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-C
+#   needs: ["mac-coin", "mac-soqt"]
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+  
+# mac-gm-atlasextras:
+#   <<: *macos-job
+#   <<: *geomodel-job
+#   stage: step-A
+#   variables:
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
+
+
+### UBUNTU ALL-IN-ONE BUILD JOBS
+
+### These jobs build the various GeoModel sub-packages with the use of the CMake
+### build options.
+
+ubu-gm-base:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+
+ubu-gm-tools:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_TOOLS=TRUE
+
+
+ubu-gm-visualization:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_VISUALIZATION=TRUE
+
+ubu-gm-examples:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES=TRUE
+
+
+ubu-gm-examples-gmg4:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_EXAMPLES_W_GEANT4=TRUE
+
+ubu-gm-gmg4:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_GEOMODELG4=TRUE
+
+
+ubu-gm-fullsimlight:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE
+
+
+ubu-gm-fsl:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FSL=TRUE
+
+
+ubu-gm-all:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ALL=TRUE
+  script: 
+     - CI/compile_GeoModel.sh
+     - mv ${CI_PROJECT_DIR}/../build ./
+  artifacts:
+    paths:
+      - build
+      - install
+    expire_in: 30 minutes
+
+
+ubu-gm-atlasextras:
+  <<: *ubuntu-job
+  <<: *geomodel-job
+  stage: step-A
+  variables:
+    CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_ATLASEXTENSIONS=TRUE
+
+#TODO: this does not work properly. Needs some work...
+# ubu-gm-fullsimlight-customxercesc-builtinjson:
+#   <<: *ubuntu-job
+#   <<: *geomodel-job
+#   stage: step-C
+#   variables:
+#     XERCESC_VERSION: 3.2.3
+#     CMAKE_CONFIG_FLAGS: -DGEOMODEL_BUILD_FULLSIMLIGHT=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE -DXercesC_INCLUDE_DIR=../install/xerces-c-${XERCESC_VERSION}/include -DXercesC_LIBRARY=../install/xerces-c-${XERCESC_VERSION}/lib/libxerces-c.dylib
+#   rules:
+#     - when: manual
+
+
+
+
+### UBUNTU SINGLE BUILD JOBS
+
+### These jobs build the various GeoModel sub-packages as single top-tree packages,
+### one of top of the others. This is what is used, for example, when building 
+### distribution kits, such as the Homebrew 'bottles' for macOS. 
+### Therefore, these jobs test the succesfull build of the GeoModel side for the 
+### distribution kits. If these jobs fail, the formula building the 
+### distribution kits will fail as well.
+
+ubu-single-gmbase:
+  <<: *ubuntu-job
+  stage: step-A
+  variables:
+      CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - CI/compile_GeoModel.sh
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmtools:
+  <<: *ubuntu-job
+  stage: step-B
+  needs: ["ubu-single-gmbase"]
+  variables:
+      SOURCE_DIR: "${CI_PROJECT_DIR}/GeoModelTools"
+  script:
+    - CI/compile_GeoModel.sh
+
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmviz:
+  <<: *ubuntu-job
+  stage: step-C
+  needs: ["ubu-single-gmbase"]
+  variables:
+      SOURCE_DIR: "${CI_PROJECT_DIR}/GeoModelVisualization"
+  script:
+    - CI/compile_GeoModel.sh
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmg4:
+  <<: *ubuntu-job
+  stage: step-C
+  needs: ["ubu-single-gmbase"]
+  variables:
+      SOURCE_DIR: "${CI_PROJECT_DIR}/GeoModelG4"
+  script:
+    - CI/compile_GeoModel.sh
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmfullsimlight:
+  <<: *ubuntu-job
+  stage: step-D
+  needs: ["ubu-single-gmg4"]
+  variables:
+      SOURCE_DIR: "${CI_PROJECT_DIR}/FullSimLight"
+  script:
+    - CI/compile_GeoModel.sh
+  artifacts:
+    paths:
+      - install
+    expire_in: 1 day
+
+ubu-single-gmfsl:
+  <<: *ubuntu-job
+  stage: step-E
+  needs: ["ubu-single-gmfullsimlight"]
+  variables:
+      SOURCE_DIR: ${CI_PROJECT_DIR}/FSL
+  script:
+    - CI/compile_GeoModel.sh
+
+ubu-geomodelatlas:
+  <<: *ubuntu-job
+  stage: step-B
+  needs : ["ubu-gm-all"]
+  variables:
+      SOURCE_DIR: ${CI_PROJECT_DIR}/GeoModelATLAS
+  script:
+    - git clone https://${EOS_ACCOUNT_USERNAME}:${GEOMODEL_READ_ACCESS}@gitlab.cern.ch/atlas/geomodelatlas/GeoModelATLAS.git
+    - ls -lh
+    - CI/compile_GeoModel.sh
+
+#####################
+### Documentation ###
+#####################
+
+docs-build:
+    stage: step-A
+    rules:
+      - if: $CI_COMMIT_BRANCH == "main" || $CI_PIPELINE_SOURCE == "merge_request_event"
+        changes:
+        - documentation/**/*
+    allow_failure: true
+    timeout: 30 minutes
+    image: gitlab-registry.cern.ch/authoring/documentation/mkdocs:stable
+    before_script:
+        - apt-get update -qq && apt-get install -y -qq git wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
+        - pip install --upgrade pip
+        - pip install -r documentation/requirements.txt
+        #- pip install markdown
+        #- pip install mkdocs-material
+        #- pip install markdown-include
+        #- pip install 'mkdocs-macros-plugin==0.5.0'
+        - pip install mkdocs-mermaid2-plugin # adds support for mermaid diagrams / flowcharts
+        ##- pip install mkdocs-git-revision-date-plugin # See: https://github.com/mkdocs/mkdocs/issues/1408#issuecomment-443592097
+    script:
+        #- git --version #TODO: update the docker image to have git
+        - ls
+        - cd documentation
+        - ls
+        - mkdocs build --clean --site-dir public
+        - ls
+        - cp .htaccess public/papers/internal/
+        - ls
+    artifacts:
+        paths:
+            - documentation/public
+        expire_in: 1 hour
+
+docs-deploy:
+    stage: step-B
+    needs: ["docs-build"]
+    rules:
+      - if: '$CI_COMMIT_BRANCH == "main"' # Deploy, only if changes are pushed to main.
+        changes:
+        - documentation/**/*
+    allow_failure: true
+    timeout: 30 minutes
+    variables:
+      "EOS_PATH": "/eos/project/g/geomodel/www/home"
+    image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+    script:
+        - ls
+        - cd documentation
+        - ls
+        - deploy-eos
+
+
+
+#####################
+### Docker images ###
+#####################
+## New build jobs for Docker images based on Dockerfiles
+## It uses the new CERN Kaniko infrastructure
+## See: 
+## - https://gitlab.cern.ch/gitlabci-examples/build_docker_image/-/blob/master/.gitlab-ci.yml#L11-27
+## ---
+
+# Build the 'full' docker image containing the system packages
+##  Note:
+##  - we build the docker image only from 'main' and tags
+##  - image's final name is, e.g., "gitlab-registry.cern.ch/geomodeldev/geomodel:ci-with-docker-g4-ubuntu-full"
+build_docker_system:
+  stage: step-A
+  only:
+    refs:
+      - main
+      - tags
+
+#  rules:
+#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  variables:
+    # To push to a specific docker tag other than latest(the default), amend the --destination parameter, e.g. --destination $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+    # See https://docs.gitlab.com/ee/ci/variables/predefined_variables.html#variables-reference for available variables
+    IMAGE_DESTINATION: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-full
+    # === Git-related variables
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+  image: 
+      # The kaniko debug image is recommended because it has a shell, and a shell is required for an image to be used with GitLab CI/CD.
+      name: gcr.io/kaniko-project/executor:debug
+      entrypoint: [""]
+  script:
+      # Prepare Kaniko configuration file
+      - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+      # Build and push the image from the Dockerfile at the root of the project.
+      - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/CI/DockerfileFull --destination $IMAGE_DESTINATION
+      # Print the full registry path of the pushed image
+      - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
+
+
+##########
+## TAGS ##
+##########
+after-tag-creation:
+  stage: step-A
+  # only run on tags
+  #only:
+  #  - tags
+  # manual mode, for testing the script
+  when: manual
+  script:
+    - 'TAG=$(curl -Ss --request GET "https://gitlab.cern.ch/api/v4/projects/95156/repository/tags" | jq -r ".[0] | .name")'
+    - 'echo "Latest TAG: ${TAG}"'
+    - test -z "$TAG" && echo "no tag found" && exit 1
+    - 'VERSION=$(sed -n -E "s#(^.*GeoModel_VERSION.*[\"])(.*)([\"].*)\$#\2#p" cmake/GeoModel-version.cmake)' # -E for extended regex on macOS, as -r on linux
+    - 'echo "Latest GeoModel VERSION: ${VERSION}"'
+    - test -z "$VERSION" && echo "no version found" && exit 1
+    - 'echo "Latest TAG: ${TAG} -- Latest GeoModel VERSION: ${VERSION}"'
+    - test "$TAG" != "$VERSION" && echo "ERROR --> There is a TAG/VERSION mismatch" && exit 1
+    - echo "OK."
+
+
+
+###########
+# A special job, only meant to change the default expiry policy 
+# from '1day' to 'never' for jobs which run on 'tags'.
+# This is done to keep the artifacts from tags indefinitely,
+# while deleting all the others.
+##########
+persist-tag-artifacts:
+  # Use this job to specify artifacts that should never expire for tag pipelines.
+  stage: post-deploy
+  rules:
+    - if: '$CI_COMMIT_TAG != null'
+  script:
+    - echo "Persisting artifacts for tag pipelines"
+  artifacts:
+    # Specify artifacts from previous jobs to be persisted indefinitely
+    paths:
+      - install
+    expire_in: never
+
+tests-ubuntu:
+  <<: *ubuntu-job
+  stage: test
+  needs: ["ubu-gm-all"]
+  variables:
+      DUMMY: dummy # Work around weird configuration problems
+  script:
+    - mv build ../
+    - cd ../build
+    - ctest
+  
+include:
+  - athena_ci/ci.yml

@@ -1,0 +1,355 @@
+{
+    "VolVisAttributes": [
+        {
+            "ambient": {
+                "B": 1.0,
+                "G": 0.4000000059604645,
+                "R": 0.4000000059604645
+            },
+            "diffuse": {
+                "B": 1.0,
+                "G": 0.4000000059604645,
+                "R": 0.4000000059604645
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+                "LAr::Barrel::Cryostat::Cylinder::#0",
+                "LAr::Barrel::Cryostat::Cylinder::#1",
+                "LAr::Barrel::Cryostat::Cylinder::#2",
+                "LAr::Barrel::Cryostat::Cylinder::#3",
+                "LAr::Barrel::Cryostat::Cylinder::Ear",
+                "LAr::Barrel::Cryostat::Cylinder::OuterWall"
+            ],
+            "shininess": 0.6700000166893005,
+            "specular": {
+                "B": 0.44166699051856995,
+                "G": 0.44166699051856995,
+                "R": 0.44166699051856995
+            },
+            "transparency": 0.0
+        },
+        {
+            "ambient": {
+                "B": 0.4000000059604645,
+                "G": 0.4000000059604645,
+                "R": 1.0
+            },
+            "diffuse": {
+                "B": 0.4000000059604645,
+                "G": 0.4000000059604645,
+                "R": 1.0
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+                "LAr::Barrel::Cryostat::Cylinder::#4",
+                "LAr::Barrel::Cryostat::Cylinder::#5",
+                "LAr::Barrel::Cryostat::Cylinder::#6",
+                "LAr::Barrel::Cryostat::Cylinder::#7",
+                "LAr::Barrel::Cryostat::Cylinder::#8",
+                "LAr::Barrel::Cryostat::Cylinder::#9",
+                "LAr::Barrel::Cryostat::Cylinder::InnerWall",
+                "LAr::Barrel::Cryostat::Cylinder::InnerEndWall",
+                "LAr::Barrel::Cryostat::Cylinder::Leg"
+            ],
+            "shininess": 0.6700000166893005,
+            "specular": {
+                "B": 0.44166699051856995,
+                "G": 0.44166699051856995,
+                "R": 0.44166699051856995
+            },
+            "transparency": 0.0
+        },
+        {
+            "ambient": {
+                "B": 0.4000000059604645,
+                "G": 0.4000000059604645,
+                "R": 1.0
+            },
+            "diffuse": {
+                "B": 0.4000000059604645,
+                "G": 0.4000000059604645,
+                "R": 1.0
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+                "LAr::Barrel::Cryostat::InnerEndWall"
+            ],
+            "shininess": 0.6700000166893005,
+            "specular": {
+                "B": 0.44166699051856995,
+                "G": 0.44166699051856995,
+                "R": 0.44166699051856995
+            },
+            "transparency": 0.0
+        },
+        {
+            "ambient": {
+                "B": 0.4000000059604645,
+                "G": 0.4000000059604645,
+                "R": 1.0
+            },
+            "diffuse": {
+                "B": 0.4000000059604645,
+                "G": 0.4000000059604645,
+                "R": 1.0
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+                "LAr::Barrel::Cryostat::Leg"
+            ],
+            "shininess": 0.6700000166893005,
+            "specular": {
+                "B": 0.44166699051856995,
+                "G": 0.44166699051856995,
+                "R": 0.44166699051856995
+            },
+            "transparency": 0.0
+        },
+        {
+            "ambient": {
+                "B": 0.27000001072883606,
+                "G": 0.5400000214576721,
+                "R": 0.5400000214576721
+            },
+            "diffuse": {
+                "B": 0.5,
+                "G": 1.0,
+                "R": 1.0
+            },
+            "emissive": {
+                "B": 0.06700000166893005,
+                "G": 0.13300000131130219,
+                "R": 0.13300000131130219
+            },
+            "name": [
+                "bcmModLog",
+		"bcmWallLog"
+            ],
+            "shininess": 0.20000000298023224,
+            "specular": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "transparency": 0.0
+        },
+	{
+            "ambient": {
+                "B": 0.20000000298023224,
+                "G": 0.20000000298023224,
+                "R": 0.20000000298023224
+            },
+            "diffuse": {
+                "B": 1.0,
+                "G": 0.666700005531311,
+                "R": 0.0
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+                "MDTEnvelopeLog"
+            ],
+            "shininess": 0.20000000298023224,
+            "specular": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "transparency": 0.0
+        },
+	{
+            "ambient": {
+                "R": 0.20000000298023224,
+                "G": 0.20000000298023224,
+                "B": 0.20000000298023224
+            },
+            "diffuse": {
+                "B": 1.0,
+                "G": 0.666700005531311,
+                "R": 0.0
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+                "DriftTubeLog"
+            ],
+            "shininess": 0.20000000298023224,
+            "specular": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "transparency": 0.0
+        },
+	{
+            "ambient": {
+                "R": 0.20000000298023224,
+                "G": 0.20000000298023224,
+                "B": 0.20000000298023224
+            },
+            "diffuse": {
+                "B": 0.54,
+                "G": 0.8,
+                "R": 0.8
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+                "foamLog"
+            ],
+            "shininess": 0.20000000298023224,
+            "specular": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "transparency": 0.0
+        },
+	{
+            "ambient": {
+                "R": 0.20000000298023224,
+                "G": 0.20000000298023224,
+                "B": 0.20000000298023224
+            },
+            "diffuse": {
+                "R": 0.8,
+                "G": 0.2,
+                "B": 0.0
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+		"BIL1_RPC",
+		"BIL2_RPC",
+		"BIL2_RPC_1",
+		"BIL2_RPC_2",
+		"BIL4_RPC_1",
+		"BIL4_RPC_2",
+		"BIL5_RPC_1",
+		"BIL5_RPC_2",
+		"BIL6_RPC_1",
+		"BIL6_RPC_2",
+		"BIL7_RPC_1",
+		"BIL7_RPC_2",
+		"BIL8_RPC_1",
+		"BIL8_RPC_2",
+		"BIL9_RPC_1",
+		"BML1_RPC_up_1",
+		"BML1_RPC_down_1",
+		"BML1_RPC_up_2",
+		"BML1_RPC_down_2",
+		"BML2_RPC_up_1",
+		"BML2_RPC_down_1",
+		"BML2_RPC_up_2",
+		"BML2_RPC_down_2",
+		"BML3_RPC_up",
+		"BML3_RPC_down",
+		"BML5_RPC_up",
+		"BML5_RPC_down",
+		"BML6_RPC_up_1",
+		"BML6_RPC_down_1",
+		"BML6_RPC_up_2",
+		"BML6_RPC_down_2",
+		"BML7_RPC_up_1",
+		"BML7_RPC_down_1",
+		"BML8_RPC_up_1",
+		"BML8_RPC_down_1",
+		"BML9_RPC_up_1",
+		"BML9_RPC_down_1",
+		"BML9_RPC_up_2",
+		"BML9_RPC_down_2",
+		"BMS1_RPC_up",
+		"BMS1_RPC_down",
+		"BMS2_RPC_up_1",
+		"BMS2_RPC_down_1",
+		"BMS2_RPC_up_2",
+		"BMS2_RPC_down_2",
+		"BMS3_RPC_up_1",
+		"BMS3_RPC_down_1",
+		"BMS3_RPC_up_2",
+		"BMS3_RPC_down_2",
+		"BMS4_RPC_up_1",
+		"BMS4_RPC_down_1",
+		"BMS4_RPC_up_2",
+		"BMS4_RPC_down_2",
+		"BMS5_RPC_up_1",
+		"BMS5_RPC_down_1",
+		"BMS5_RPC_up_2",
+		"BMS5_RPC_down_2",
+		"BMS5_RPC_up_3",
+		"BMS5_RPC_down_3",
+		"BMS5_RPC_up_4",
+		"BMS5_RPC_down_4",
+		"BMS6_RPC_up_1",
+		"BMS6_RPC_down_1",
+		"BMS6_RPC_up_2",
+		"BMS6_RPC_down_2",
+		"BMS6_RPC_up_3",
+		"BMS6_RPC_down_3",
+		"BMS6_RPC_up_4",
+		"BMS7_RPC_up_1",
+		"BMS7_RPC_down_1",
+		"BMS7_RPC_up_2",
+		"BMS7_RPC_down_2",
+		"BMS8_RPC_up_1",
+		"BMS8_RPC_down_1",
+		"BMS8_RPC_up_2",
+		"BMS8_RPC_down_2",
+		"BOL1_RPC_up",
+		"BOL1_RPC_down",
+		"BOL2_RPC_up",
+		"BOL2_RPC_down",
+		"BOL3_RPC_up",
+		"BOL3_RPC_down",
+		"BOL4_RPC_up",
+		"BOL4_RPC_down",
+		"BOL5_RPC_up",
+		"BOL5_RPC_down",
+		"BOL6_RPC_up",
+		"BOL6_RPC_down",
+		"BOL7_RPC_up",
+		"BOL7_RPC_down",
+		"BOS2_RPC_up",
+		"BOS2_RPC_down",
+		"BOS3_RPC_up",
+		"BOS3_RPC_down"
+            ],
+            "shininess": 0.20000000298023224,
+            "specular": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "transparency": 0.0
+        }
+
+    ]
+}

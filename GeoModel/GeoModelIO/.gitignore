@@ -1,0 +1,11 @@
+.DS_Store
+
+# Eclipse IDE
+.cproject
+.project
+
+# Visual Studio Code IDE
+.vscode
+
+# VI / VIM
+*.swp

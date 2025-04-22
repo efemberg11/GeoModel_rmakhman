@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/GeoModelHelpers.dir/src/FileUtils.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/FileUtils.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoDeDuplicator.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoDeDuplicator.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoLogVolSorter.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoLogVolSorter.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoMaterialSorter.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoMaterialSorter.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoPhysVolSorter.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoPhysVolSorter.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoShapeSorter.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoShapeSorter.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoShapeUtils.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/GeoShapeUtils.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/MaterialManager.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/MaterialManager.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/StringUtils.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/StringUtils.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/TransformSorter.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/TransformSorter.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/TransformToStringConverter.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/TransformToStringConverter.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/cloneVolume.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/cloneVolume.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/defineWorld.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/defineWorld.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/getChildNodesWithTrf.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/getChildNodesWithTrf.cxx.o.d"
+  "CMakeFiles/GeoModelHelpers.dir/src/printVolume.cxx.o"
+  "CMakeFiles/GeoModelHelpers.dir/src/printVolume.cxx.o.d"
+  "libGeoModelHelpers.pdb"
+  "libGeoModelHelpers.so"
+  "libGeoModelHelpers.so.6"
+  "libGeoModelHelpers.so.6.9.0"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/GeoModelHelpers.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

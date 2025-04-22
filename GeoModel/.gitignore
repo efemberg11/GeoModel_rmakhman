@@ -1,0 +1,9 @@
+
+# VIM temp files
+*.swp
+*.swo
+
+# VSCode-related files and folders
+build
+.vscode
+install

@@ -1,0 +1,209 @@
+# List of the CI build stages.
+stages:
+  - deps-A
+  - deps-B
+  - build
+
+# List global variables
+variables:
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install
+  GIT_SUBMODULE_STRATEGY: recursive
+
+
+# TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
+.macos-template-job: &macos-job
+  tags:
+    - macos
+  allow_failure: true
+  timeout: 30 minutes
+  before_script:
+    - brew install nlohmann-json
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+
+.ubuntu-template-job-base: &ubuntu-job-base
+  image: ubuntu:18.04
+  tags:
+    - docker
+
+# NOTE
+# The Ubuntu package 'nlohmann-json-dev' is version 2.x, too old for us.
+# Thus, for GeoModelVisualization (GMEX), we now build nlohmann_json as part
+# of the build, by using the 'standalone' job only
+.ubuntu-template-job-default: &ubuntu-job
+  <<: *ubuntu-job-base
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev libsqlite3-dev
+
+
+
+# TEMPLATES FOR PACKAGES
+.coin-build-template: &coin-job
+  stage: deps-A
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
+    - unzip coin-4.0.0-src.zip -d coin-sources
+    - mv coin-sources/* coin
+    - mkdir build_coin
+    - cd build_coin
+    - cmake ${CMAKE_ARGS} ../coin
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - dependencies-install/
+
+.soqt-build-template: &soqt-job
+  stage: deps-B
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
+    # - unzip soqt-1b4fe9d-macos-mojave-fix.zip
+    # - wget https://bitbucket.org/rmbianchi/soqt/get/CI-fix-25692a8.zip
+    # - unzip CI-fix-25692a8.zip
+    # - mv rmbianchi-soqt-25692a805a2c soqt
+    - hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
+    - mkdir build_soqt
+    - cd build_soqt
+    - cmake ${CMAKE_ARGS} ../soqt
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - dependencies-install/
+
+.geomodelcore-build-template: &geomodelcore-job
+  stage: deps-A
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - mkdir geomodelcore-build
+    - cd geomodelcore-build
+    - cmake ${CMAKE_ARGS} ../GeoModelCore
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - dependencies-install/
+
+.geomodelio-build-template: &geomodelio-job
+  stage: deps-B
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - mkdir geomodelio-build
+    - cd geomodelio-build
+    - cmake ${CMAKE_ARGS} ../GeoModelIO
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - dependencies-install/
+
+.geomodelvisualization-build-template: &geomodelvisualization-job
+  stage: build
+  script:
+    - echo "PWD; LS"
+    - pwd; ls
+    - cmake --version
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_ARGS} ${CMAKE_EXTRA_FLAGS} ..
+    - cmake --build . -- -j
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - dependencies-install/
+
+.geomodelvisualization-build-template-mac: &geomodelvisualization-job-mac
+  stage: build
+  script:
+    - echo "PWD; LS"
+    - pwd; ls
+    - cmake --version
+    - mkdir build
+    # - pwd; ls # for debug
+    # - ls dependencies-install/ # for debug
+    # - ls ../../; # for debug
+    # - ls ../../../; # for debug
+    # - ls ../../../../ # for debug
+    - cd build
+    - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ../
+    - cmake --build . -- -j
+    - cmake --build . -- install
+  artifacts:
+    paths:
+      - install
+
+# ACTUAL JOBS
+
+### MACOS PATH
+mac-coin:
+  <<: *macos-job
+  <<: *coin-job
+
+mac-soqt:
+  <<: *macos-job
+  <<: *soqt-job
+  needs: ["mac-coin"]
+
+mac-geomodelcore:
+  <<: *macos-job
+  <<: *geomodelcore-job
+
+mac-geomodelio:
+  <<: *macos-job
+  <<: *geomodelio-job
+  needs: ["mac-geomodelcore"]
+
+mac-gmex:
+  <<: *macos-job
+  <<: *geomodelvisualization-job-mac
+  needs: ["mac-coin", "mac-soqt", "mac-geomodelcore", "mac-geomodelio"]
+
+
+### UBUNTU PATH
+ubuntu-coin:
+  <<: *ubuntu-job
+  <<: *coin-job
+
+ubuntu-soqt:
+  <<: *ubuntu-job
+  <<: *soqt-job
+  needs: ["ubuntu-coin"]
+
+ubuntu-geomodelcore:
+  <<: *ubuntu-job
+  <<: *geomodelcore-job
+
+ubuntu-geomodelio:
+  <<: *ubuntu-job
+  <<: *geomodelio-job
+  needs: ["ubuntu-geomodelcore"]
+
+# NOTE
+# The Ubuntu package 'nlohmann-json-dev' is version 2.x, too old for us.
+# Thus, we now build nlohmann_json as part of the build,
+# by using the 'standalone' job only
+# ubuntu-gmex:
+#   <<: *ubuntu-job
+#   <<: *geomodelvisualization-job
+#   needs: ["ubuntu-coin", "ubuntu-soqt", "ubuntu-geomodelcore", "ubuntu-geomodelio"]
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+
+ubuntu-gmex-standalone:
+  <<: *ubuntu-job
+  <<: *geomodelvisualization-job
+  needs: ["ubuntu-coin", "ubuntu-soqt", "ubuntu-geomodelcore", "ubuntu-geomodelio"]
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_JSON=TRUE

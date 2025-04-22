@@ -1,0 +1,144 @@
+stages:
+  - dependencies-coin
+  - dependencies-soqt
+  - dependencies-core
+  - dependencies-io
+  - build
+
+# Build (Ubuntu 16.04 / CMake / clang):
+#     stage: build
+#     image: ubuntu:16.04
+#     script:
+#         - apt-get update -qq && apt-get install -y -qq git cmake clang
+#         - mkdir build
+#         - cd build
+#         - cmake .. -DBUILD_DEMO=OFF -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+#         - make
+
+
+# before_script:
+#   - yum -y install cmake glibc-devel freeglut-devel which
+#   - alias cmake='/cvmfs/sft.cern.ch/lcg/contrib/CMake/3.11.1/Linux-x86_64/bin/cmake'
+# #   - ps -p $$
+# #   - source $ATLAS_LOCAL_ROOT_BASE/user/atlasLocalSetup.sh
+# #   - asetup none,gcc8,cmakesetup
+# #   - export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+# #   - set +e && source CI/setup_lcg.sh; set -e
+
+variables:
+  # CMAKE_BASE_ARGS: -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  GIT_SUBMODULE_STRATEGY: recursive
+#   ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+
+
+.macos-template-job: &macos-job
+  tags:
+    - macos
+  before_script:
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+
+
+coin-build:
+  <<: *macos-job
+  stage: dependencies-coin
+  script:
+    - pwd; ls
+    - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
+    - unzip coin-4.0.0-src.zip -d coin-sources
+    - mv coin-sources/* coin
+    - mkdir build_coin
+    - cd build_coin
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+soqt-build:
+  <<: *macos-job
+  stage: dependencies-soqt
+  script:
+    - pwd; ls
+    #- export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+    # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
+    # - unzip soqt-1b4fe9d-macos-mojave-fix.zip
+    # - wget https://bitbucket.org/rmbianchi/soqt/get/CI-fix-25692a8.zip
+    # - unzip CI-fix-25692a8.zip
+    # - mv rmbianchi-soqt-25692a805a2c soqt
+    - hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
+    - mkdir build_soqt
+    - cd build_soqt
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+geomodelcore-build:
+  <<: *macos-job
+  stage: dependencies-core
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - mkdir geomodelcore-build
+    - cd geomodelcore-build
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+geomodelio-build:
+  <<: *macos-job
+  stage: dependencies-io
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - mkdir geomodelio-build
+    - cd geomodelio-build
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+
+
+.build_template: &build_template
+  <<: *macos-job
+  stage: build
+  script:
+    - echo "PWD; LS"
+    - pwd; ls
+    - mkdir build
+    - cd build
+    - echo "${CMAKE_ARGS}"
+    - cmake ${CMAKE_ARGS}  ..
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+
+build_new:
+  <<: *build_template
+#   image: cern/slc6-base
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+
+# build_slc6:
+#   <<: *build_template
+#   image: cern/slc6-base
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+
+# build_cc7:
+#   <<: *build_template
+#   image: cern/cc7-base
+#   variables:
+#     CMAKE_ARGS: ${CMAKE_BASE_ARGS}

@@ -1,0 +1,107 @@
+site_name: GeoModel - A Detector Description Toolkit for HEP
+site_description: GeoModel - An experiment-agnostic Detector Description Toolkit for HEP
+site_author: ATLAS Collaboration & Contributors
+site_url: https://cern.ch/geomodel/home
+repo_name: GeoModel
+repo_url: https://gitlab.cern.ch/GeoModelDev/GeoModel
+site_author: geomodel-developers@cern.ch
+
+theme:
+    name: material
+
+nav:
+    - Home: 'index.md'
+    - 'Install Libraries & Tools': 'start/install.md'
+    # - Getting Started:
+    #     - 'Install Libraries & Tools': 'start/install.md'
+    #     - 'The Basic Concepts': 'start/basic_concepts.md'
+    #     - 'The Basic Building Blocks': 'start/basic_building_blocks.md'
+    # - How To:
+    #     - 'Build a basic geometry': 'how/how_basic_geo_cpp.md'
+    #     - 'Build a simple detector': 'how/how_simple_detector_cpp.md'
+    #     - 'Dump the geometry with `dump-geo`': 'how/how_dump_geo.md'
+    #     - 'Load a geometry from a file': 'how/how_load_geo.md'
+    #     - 'Describe a geometry with a file': 'how/how_describe_geo_file.md'
+    - GeoModel Components:
+        - Kernel:
+            - 'Overview': 'components/kernel/overview/index.md'
+            - 'Class Reference': 'components/kernel/reference/index.md'
+        - GeoModelTools:
+            - 'GeoModelCat (gmcat)': 'components/geomodeltools/gmcat/index.md'
+            - 'GeoModelStatistics (gmstatistics)': 'components/geomodeltools/gmstatistics/index.md'
+            - 'GDML2GeoModel (gdml2gm)': 'components/geomodeltools/gdml2gm/index.md'
+        - GeoModelXML:
+            - 'GeoModelXML Overview' : 'components/geomodelxml/index.md'
+            - 'Building a geometry' : 'components/geomodelxml/buildinggeometry.md'
+            - 'Defining detector readout' : 'components/geomodelxml/readout.md'
+            - 'Setting alignment properties' : 'components/geomodelxml/alignment.md'
+            - Components:
+              - 'Gmx2Geo': 'components/geomodelxml/components/gmx2geo.md'
+              - 'GmxInterface' : 'components/geomodelxml/components/gmxinterface.md'
+              - 'Processors' : 'components/geomodelxml/components/processors.md'
+            - 'Troubleshooting' : 'components/geomodelxml/troubleshooting.md'    
+            - 'User Guide (old, ATLAS specific)' : 'components/geomodelxml/old.md'
+        - GeoModelVisualization:
+            - 'GeoModelExplorer (gmex)': 'components/geomodelvisualization/gmex/index.md'
+    - FullSimLight tools:
+        - 'FullSimLight': 'fullsimlight/fullsimlight/index.md'
+        - 'fsl GUI': 'fullsimlight/fsl/index.md'
+        - 'GeoModelClash (gmclash)': 'fullsimlight/gmclash/index.md'
+        - 'GeoModelGeantino (gmgeantino)': 'fullsimlight/gmgeantino/index.md'
+        - 'GeoModelMassCalculator (gmmasscalc)': 'fullsimlight/gmmasscalc/index.md'
+        - 'GeoModel2GDML (gm2gdml)': 'fullsimlight/gm2gdml/index.md'
+        
+        - 'Plugin Examples': 'fullsimlight/plugins/index.md'
+        - 'Plugin Support': 'fullsimlight/plugin-support/index.md'
+        - 'ATLAS Extensions': 'fullsimlight/atlas-extensions/index.md'
+    - For Developers:
+        - 'Build the Libraries and Tools': 'dev/index.md'
+        - 'Build FullSimLight': 'dev/build_fullsimlight.md'
+        - 'Install single packages': 'dev/install-single-packages.md'
+        - 'Troubleshooting': 'dev/troubleshooting.md'
+        - 'Doxygen documentation': https://cern.ch/geomodel/doxygen
+        - 'Contributing to the Documentation': 'dev/docs-contrib.md'
+        - 'Dev FAQ': 'dev/dev-faq.md'
+    - FAQ: 'faq.md'
+    - Papers & Presentations: 'papers.md'
+      #   - 'Public': 'papers/public.md'
+      #  - 'Internal': 'papers/internal.md'
+    - Team & History: 'about/team.md'
+    - Contacts: 'about/contacts.md'
+
+extra_css:
+    - material_nested_lists_rendering.css
+
+markdown_extensions:
+    - smarty                # to use 'SmartyPants' typography extensions as '---' for em-dashes
+    - admonition            # to use notes, warnings, tips, ...
+    - footnotes             # to set footnotes
+    - pymdownx.superfences  
+    - pymdownx.superfences: # to use code blocks nested under lists items
+        # make exceptions to highlighting of code:
+        custom_fences:
+          - name: mermaid
+            class: mermaid
+            format: !!python/name:mermaid2.fence_mermaid
+    - toc:
+        permalink: true
+    - markdown_include.include:
+        base_path: docs
+    - pymdownx.arithmatex:  # to use LaTeX syntax in Markdown files
+        generic: true
+    #- markdown.extensions.attr_list # to use custom css settings, e.g. {: .center}. Not used now
+
+plugins:
+  - search
+  - macros:
+        module_name: imgutils
+        verbose: true # enables debug through the 'chatter' method
+  - mermaid2 # for diagrams
+  #- git-revision-date #TODO: the mkdocs docker image apparently lacks the git exec, so this cannot be used. Update the image!
+
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://unpkg.com/mermaid/dist/mermaid.min.js
+

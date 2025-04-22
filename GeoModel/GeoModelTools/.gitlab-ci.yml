@@ -1,0 +1,91 @@
+# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+
+# List of the CI build stages.
+stages:
+  - dependencies
+  - build
+
+# Common setup for the CI Docker images.
+before_script:
+  - yum -y install glibc-devel which git make gmp-devel sqlite sqlite-devel
+  - set +e && source CI/setup_lcg.sh; set -e
+
+# Build the upstream project(s) needed by this one.
+.dependencies_template: &dependencies_template
+  stage: dependencies
+  tags:
+    - docker
+    - cvmfs
+  script:
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - mkdir GeoModelCore-build GeoModelIO-build
+    - cd GeoModelCore-build/
+    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install ${CMAKE_EXTRA_FLAGS} ../GeoModelCore/
+    - cmake --build . --target install
+    - cd ../GeoModelIO-build/
+    - cmake -GNinja -DCMAKE_INSTALL_PREFIX=../dependencies-install -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ${CMAKE_EXTRA_FLAGS} ../GeoModelIO/
+    - cmake --build . --target install
+  artifacts:
+    paths:
+      - dependencies-install/
+
+dependencies:slc6:
+  <<: *dependencies_template
+  image: cern/slc6-base:latest
+
+dependencies:centos7:
+  <<: *dependencies_template
+  image: cern/cc7-base:latest
+
+dependencies:slc6-standalone:
+  <<: *dependencies_template
+  image: cern/slc6-base:latest
+  variables:
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
+
+dependencies:centos7-standalone:
+  <<: *dependencies_template
+  image: cern/cc7-base:latest
+  variables:
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_EIGEN3=TRUE
+
+# Build this project.
+.build_template: &build_template
+  stage: build
+  tags:
+    - docker
+    - cvmfs
+  script:
+    - mkdir build
+    - cd build/
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=${PWD}/../dependencies-install ${CMAKE_EXTRA_FLAGS} ../
+    - cmake --build .
+
+build:slc6:
+  <<: *build_template
+  image: cern/slc6-base:latest
+  dependencies:
+    - dependencies:slc6
+
+build:centos7:
+  <<: *build_template
+  image: cern/cc7-base:latest
+  dependencies:
+    - dependencies:centos7
+
+build:slc6-standalone:
+  <<: *build_template
+  image: cern/slc6-base:latest
+  dependencies:
+    - dependencies:slc6-standalone
+  variables:
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE
+
+build:centos7-standalone:
+  <<: *build_template
+  image: cern/cc7-base:latest
+  dependencies:
+    - dependencies:centos7-standalone
+  variables:
+    CMAKE_EXTRA_FLAGS: -DGEOMODEL_USE_BUILTIN_XERCESC=TRUE -DGEOMODEL_USE_BUILTIN_JSON=TRUE

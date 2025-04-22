@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wno-deprecated-declarations -O3 -DNDEBUG CMakeFiles/hellogeo.dir/main.cpp.o -o hellogeo  -Wl,-rpath,/home/rmakhman/dev_geomodel/build/GeoModelCore/GeoModelKernel:/home/rmakhman/dev_geomodel/build/GeoModelCore/GeoGenericFunctions ../../GeoModelCore/GeoModelKernel/libGeoModelKernel.so.6.9.0 ../../GeoModelCore/GeoGenericFunctions/libGeoGenericFunctions.so.6.9.0 -ldl 

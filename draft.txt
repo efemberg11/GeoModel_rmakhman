@@ -1,0 +1,7 @@
+"/control/verbose 2",
+        "/control/saveHistory",
+        "/run/verbose 2",
+        "/control/macroPath /home/rmakhman/dev_geomodel/GeoModel/FullSimLight",
+        "/control/execute vis.mac"
+
+        /home/rmakhman/dev_geomodel/install/share/FullSimLight/MagneticFieldPlugins/libATLASMagneticFieldMapPlugin.so

@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wno-deprecated-declarations -O3 -DNDEBUG CMakeFiles/atlasSimLight.dir/atlasSimLight.cpp.o -o atlasSimLight 

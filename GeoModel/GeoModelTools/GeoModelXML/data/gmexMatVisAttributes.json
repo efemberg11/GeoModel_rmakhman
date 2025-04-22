@@ -1,0 +1,193 @@
+{
+    "MatVisAttributes": [
+        {
+            "ambient": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.3
+            },
+            "diffuse": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.3
+            },
+            "emissive": {
+                "B": 1.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "name": [
+                "Air"
+            ],
+            "shininess": 0.900000166893005,
+            "specular": {
+                "B": 1.0,
+                "G": 0.0,
+                "R": 0.0
+            },
+            "transparency": 0.8
+        },
+        {
+            "ambient": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.3
+            },
+            "diffuse": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.3
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.5,
+                "R": 0.0
+            },
+            "name": [
+                "N2","ArCO2"
+            ],
+            "shininess": 0.900000166893005,
+            "specular": {
+                "B": 0.0,
+                "G": 1.0,
+                "R": 0.0
+            },
+            "transparency": 0.5
+        },
+        {
+            "ambient": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "diffuse": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 0.4
+            },
+            "name": [
+                "BeMetal"
+            ],
+            "shininess": 0.900000166893005,
+            "specular": {
+                "B": 0.0,
+                "G": 0.0,
+                "R": 1.0
+            },
+            "transparency": 0.5
+        },
+        {
+            "ambient": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "diffuse": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "emissive": {
+                "B": 0.7,
+                "G": 0.7,
+                "R": 0.0
+            },
+            "name": [
+                "SiliconMat"
+            ],
+            "shininess": 0.900000166893005,
+            "specular": {
+                "B": 1.0,
+                "G": 1.0,
+                "R": 0.0
+            },
+            "transparency": 0.0
+        },
+        {
+            "ambient": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "diffuse": {
+                "B": 0.7,
+                "G": 0.7,
+                "R": 0.6
+            },
+            "emissive": {
+                "B": 0.7,
+                "G": 0.7,
+                "R": 0.0
+            },
+            "name": [
+                "AlMetal"
+            ],
+            "shininess": 0.900000166893005,
+            "specular": {
+                "B": 1.0,
+                "G": 1.0,
+                "R": 0.0
+            },
+            "transparency": 0.0
+        },
+        {
+            "ambient": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "diffuse": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "emissive": {
+                "B": 0.0,
+                "G": 0.7,
+                "R": 0.7
+            },
+            "name": [
+                "HybridPCB","Teflon"
+            ],
+            "shininess": 0.900000166893005,
+            "specular": {
+                "B": 0.0,
+                "G": 1.0,
+                "R": 1.0
+            },
+            "transparency": 0.0
+        },
+	        {
+            "ambient": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "diffuse": {
+                "B": 0.3,
+                "G": 0.3,
+                "R": 0.6
+            },
+            "emissive": {
+                "B": 0.33,
+                "G": 0.0,
+                "R": 0.33
+            },
+            "name": [
+                "Bakelite"
+            ],
+            "shininess": 0.900000166893005,
+            "specular": {
+                "B": 0.0,
+                "G": 1.0,
+                "R": 1.0
+            },
+            "transparency": 0.0
+        }
+    ]
+}

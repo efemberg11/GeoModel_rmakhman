@@ -1,0 +1,39 @@
+{
+    "Generator": "Generator Plugin",
+    "Generator Plugin": "/home/rmakhman/dev_geomodel/install/share/FullSimLight/EventGeneratorPlugins/libExamplePrimaryGeneratorPlugin.so.1.0",
+    "Geometry": "/home/rmakhman/dev_geomodel/install/lib/libHelloToyWritePlugin.so.SOVERSION",
+    "HepMC3 file": "",
+    "HepMC3 type of file": "",
+    "Magnetic Field Plugin": "/home/rmakhman/dev_geomodel/install/share/FullSimLight/MagneticFieldPlugins/libUniformMagneticFieldPlugin.so",
+    "Magnetic Field Type": "Plugin",
+    "Number of events": 1,
+    "Physics list name": "FTFP_BERT",
+    "Pythia event input file": "",
+    "Pythia type of event": "",
+    "Regions data": [],
+    "Sensitive Detector Extensions": [],
+    "User Action Extensions": [],
+    "g4ui_commands": [
+        "/control/cout/prefixString G4Worker_",
+        "/run/numberOfThreads 1",
+        "/FSLgun/primaryPerEvt 1",
+        "/FSLgun/energy 10.000000 GeV",
+        "/FSLgun/particle e-",
+        "/FSLgun/direction 1.000000 0.00 0.000000"
+    ],
+    "g4visui_commands": [
+        "/control/cout/prefixString G4Worker_",
+        "/run/numberOfThreads 8",
+        "/gun/number 1",
+        "/gun/particle e-",
+        "/gun/direction 0.000000 1.00 0.000000",
+        "/control/verbose 2",
+        "/control/saveHistory",
+        "/run/verbose 2",
+        "/control/macroPath /home/rmakhman/dev_geomodel/GeoModel/FullSimLight",
+        "/control/execute vis.mac"
+    ],
+    "p_x": 0.0,
+    "p_y": 10.0,
+    "p_z": 0.0
+}

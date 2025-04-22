@@ -1,0 +1,158 @@
+stages:
+  - deps-A
+  - deps-B
+  - build
+
+
+variables:
+  CMAKE_BASE_ARGS: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../install
+  GIT_SUBMODULE_STRATEGY: recursive
+
+
+# TEMPLATES FOR BUILDING ON DIFFERENT PLATFORMS
+.macos-template-job: &macos-job
+  tags:
+    - macos
+  allow_failure: true
+  timeout: 30 minutes
+  before_script:
+    - export PATH="/usr/local/opt/qt/bin:$PATH" # to make Qt5 discoverable by CMake
+
+.ubuntu-template-job: &ubuntu-job
+  image: ubuntu:18.04
+  tags:
+    - docker
+  before_script:
+  - apt-get update -qq && apt-get install -y -qq git cmake wget unzip build-essential freeglut3-dev libboost-all-dev qt5-default mercurial libeigen3-dev
+
+
+
+# TEMPLATES FOR PACKAGES
+.coin-build-template-job: &coin-job
+  stage: deps-A
+  script:
+    - pwd; ls
+    - wget https://bitbucket.org/Coin3D/coin/downloads/coin-4.0.0-src.zip
+    - unzip coin-4.0.0-src.zip -d coin-sources
+    - mv coin-sources/* coin
+    - mkdir build_coin
+    - cd build_coin
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../coin
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.soqt-build-template-job: &soqt-job
+  stage: deps-B
+  script:
+    - pwd; ls
+    # - wget https://bitbucket.org/rmbianchi/soqt/downloads/soqt-1b4fe9d-macos-mojave-fix.zip
+    # - unzip soqt-1b4fe9d-macos-mojave-fix.zip
+    # - wget https://bitbucket.org/rmbianchi/soqt/get/CI-fix-25692a8.zip
+    # - unzip CI-fix-25692a8.zip
+    # - mv rmbianchi-soqt-25692a805a2c soqt
+    - hg clone https://rmbianchi@bitbucket.org/rmbianchi/soqt
+    - mkdir build_soqt
+    - cd build_soqt
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../soqt
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodelcore-build-template-job: &geomodelcore-job
+  stage: deps-A
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelCore.git
+    - mkdir geomodelcore-build
+    - cd geomodelcore-build
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelCore
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodelio-build-template-job: &geomodelio-job
+  stage: deps-B
+  script:
+    - pwd; ls
+    - git clone https://gitlab.cern.ch/GeoModelDev/GeoModelIO.git
+    - mkdir geomodelio-build
+    - cd geomodelio-build
+    - cmake -DCMAKE_INSTALL_PREFIX=../install ../GeoModelIO
+    - make -j2
+    - make install
+  artifacts:
+    paths:
+      - install
+
+.geomodelvisualization-build-template: &geomodelvisualization-job
+  stage: build
+  variables:
+    CMAKE_ARGS: ${CMAKE_BASE_ARGS}
+  script:
+    - echo "PWD; LS"
+    - pwd; ls
+    - mkdir build
+    - cd build
+    - echo "${CMAKE_ARGS}"
+    - cmake ${CMAKE_ARGS}  ..
+    - cmake --build . -- -j2
+    - cmake --build . -- install
+
+
+# ACTUAL JOBS
+
+### MACOS PATH
+coin-mac:
+  <<: *macos-job
+  <<: *coin-job
+
+soqt-mac:
+  <<: *macos-job
+  <<: *soqt-job
+  needs: ["coin-mac"]
+
+geomodelcore-mac:
+  <<: *macos-job
+  <<: *geomodelcore-job
+
+geomodelio-mac:
+  <<: *macos-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-mac"]
+
+geomodelvisualization-mac:
+  <<: *macos-job
+  <<: *geomodelvisualization-job
+  needs: ["coin-mac", "soqt-mac", "geomodelcore-mac", "geomodelio-mac"]
+
+
+### UBUNTU PATH
+coin-ubuntu:
+  <<: *ubuntu-job
+  <<: *coin-job
+
+soqt-ubuntu:
+  <<: *ubuntu-job
+  <<: *soqt-job
+  needs: ["coin-ubuntu"]
+
+geomodelcore-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelcore-job
+
+geomodelio-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelio-job
+  needs: ["geomodelcore-ubuntu"]
+
+geomodelvisualization-ubuntu:
+  <<: *ubuntu-job
+  <<: *geomodelvisualization-job
+  needs: ["coin-ubuntu", "soqt-ubuntu", "geomodelcore-ubuntu", "geomodelio-ubuntu"]

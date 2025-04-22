@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wno-deprecated-declarations -O3 -DNDEBUG CMakeFiles/testEulerAngles.dir/tests/testEulerAngles.cxx.o -o testEulerAngles  -Wl,-rpath,/home/rmakhman/dev_geomodel/build/GeoModelCore/GeoModelKernel:/home/rmakhman/dev_geomodel/build/GeoModelCore/GeoGenericFunctions libGeoModelKernel.so.6.9.0 ../GeoGenericFunctions/libGeoGenericFunctions.so.6.9.0 -ldl 

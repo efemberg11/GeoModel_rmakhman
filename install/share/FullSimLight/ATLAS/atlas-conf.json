@@ -1,0 +1,146 @@
+{
+    "Generator": "Particle Gun",
+    "Generator Plugin": "",
+    "Geometry": "",
+    "HepMC3 file": "",
+    "HepMC3 type of file": "",
+    "Magnetic Field Plugin": "/home/rmakhman/dev_geomodel/install/share/FullSimLight/MagneticFieldPlugins/libATLASMagneticFieldMapPlugin.so",
+    "Magnetic Field Type": "Plugin",
+    "Number of events": 10,
+    "Physics list name": "FTFP_BERT",
+    "Pythia event input file": "",
+    "Pythia type of event": "",
+    "Regions data": [
+        {
+            "ElectronCut": 0.05,
+            "GammaCut": 0.05,
+            "PositronCut": 0.05,
+            "ProtonCut": 1.0,
+            "RegionName": "Pixel",
+            "RootLVNames": [
+                "siLog",
+                "siBLayLog",
+                "dbmDiamondLog"
+            ]
+        },
+        {
+            "ElectronCut": 0.05,
+            "GammaCut": 0.05,
+            "PositronCut": 0.05,
+            "ProtonCut": 1.0,
+            "RegionName": "SCT",
+            "RootLVNames": [
+                "BRLSensor",
+                "ECSensor0",
+                "ECSensor1",
+                "ECSensor2",
+                "ECSensor3"
+            ]
+        },
+        {
+            "ElectronCut": 30.0,
+            "GammaCut": 0.05,
+            "PositronCut": 30.0,
+            "ProtonCut": 1.0,
+            "RegionName": "TRT",
+            "RootLVNames": [
+                "Gas",
+                "GasMA"
+            ]
+        },
+        {
+            "ElectronCut": 30.0,
+            "GammaCut": 0.05,
+            "PositronCut": 30.0,
+            "ProtonCut": 1.0,
+            "RegionName": "TRT_Ar",
+            "RootLVNames": [
+                "Gas_Ar",
+                "GasMA_Ar"
+            ]
+        },
+        {
+            "ElectronCut": 0.1,
+            "GammaCut": 0.1,
+            "PositronCut": 0.1,
+            "ProtonCut": 1.0,
+            "RegionName": "EMB",
+            "RootLVNames": [
+                "LAr::EMB::STAC"
+            ]
+        },
+        {
+            "ElectronCut": 0.1,
+            "GammaCut": 0.1,
+            "PositronCut": 0.1,
+            "ProtonCut": 1.0,
+            "RegionName": "EMEC",
+            "RootLVNames": [
+                "LAr::EMEC::Mother"
+            ]
+        },
+        {
+            "ElectronCut": 1.0,
+            "GammaCut": 1.0,
+            "PositronCut": 1.0,
+            "ProtonCut": 1.0,
+            "RegionName": "HEC",
+            "RootLVNames": [
+                "LAr::HEC::LiquidArgon"
+            ]
+        },
+        {
+            "ElectronCut": 0.03,
+            "GammaCut": 0.03,
+            "PositronCut": 0.03,
+            "ProtonCut": 1.0,
+            "RegionName": "FCAL",
+            "RootLVNames": [
+                "LAr::FCAL::LiquidArgonC"
+            ]
+        },
+        {
+            "ElectronCut": 0.05,
+            "GammaCut": 1.0,
+            "PositronCut": 0.05,
+            "ProtonCut": 1.0,
+            "RegionName": "DriftWall",
+            "RootLVNames": [
+                "MDTDriftWall"
+            ]
+        },
+        {
+            "ElectronCut": 1.0,
+            "GammaCut": 1.0,
+            "PositronCut": 1.0,
+            "ProtonCut": 1.0,
+            "RegionName": "DriftWall1",
+            "RootLVNames": [
+                "Endplug"
+            ]
+        },
+        {
+            "ElectronCut": 1.0,
+            "GammaCut": 1.0,
+            "PositronCut": 1.0,
+            "ProtonCut": 1.0,
+            "RegionName": "DriftWall2",
+            "RootLVNames": [
+                "SensitiveGas"
+            ]
+        }
+    ],
+    "Sensitive Detector Extensions": [],
+    "User Action Extensions": [],
+    "g4ui_commands": [
+        "/control/cout/prefixString G4Worker_",
+        "/run/numberOfThreads 8",
+        "/FSLgun/primaryPerEvt 1",
+        "/FSLgun/energy 10.000000 GeV",
+        "/FSLgun/particle e-",
+        "/FSLgun/direction 0.000000 1.000000 0.000000"
+    ],
+    "p_x": 0.0,
+    "p_y": 10.0,
+    "p_z": 0.0
+}

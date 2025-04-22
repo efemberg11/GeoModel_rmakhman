@@ -1,8 +1,0 @@
-# MkDocs output
-_build
-
-# Python temp files
-__pycache__
-
-# Python3 virtual env for MkDocs packages
-venvp3

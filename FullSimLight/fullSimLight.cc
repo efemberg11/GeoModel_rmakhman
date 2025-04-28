@@ -288,10 +288,6 @@ int main(int argc, char** argv) {
                 } 
                 if (!(element.contains(command))){UI->ApplyCommand(element);}
             }
-            // if (!visMacroFound){
-            //     std::cout<<"JALAP Vis macro found JALAP!"<<std::endl;
-            //     std::cout<<visMacroFound<<std::endl;
-            // }
             
             
             ui->SessionStart();

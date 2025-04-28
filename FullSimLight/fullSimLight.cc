@@ -13,6 +13,9 @@
 #include "G4UIsession.hh"
 #include "G4UIterminal.hh"
 
+#include "G4UIExecutive.hh"
+#include "G4UImanager.hh"
+#include "G4VisExecutive.hh"
 
 #include "Randomize.hh"
 #include "FSLDetectorConstruction.hh"
@@ -39,6 +42,7 @@
 
 static const std::string fullSimLightShareDir=FULLSIMLIGHTSHAREDIR;
 static std::string  parMacroFileName   = fullSimLightShareDir+"/macro.g4";
+static std::string  visMacroFileName   = fullSimLightShareDir+"/vis.g4";
 static bool         parIsPerformance   = false;
 static bool         parIsCustomUserActions = false;
 static G4String     geometryFileName   = "";
@@ -46,7 +50,7 @@ static std::string  parPhysListName    = "FTFP_BERT";
 static bool         parRunOverlapCheck = false;
 bool isBatch = true;
 static std::string  parConfigFileName  = "atlas-config.json";
-bool isG4vis = false;
+bool doVis = false;
 
 
 void GetInputArguments(int argc, char** argv);
@@ -261,15 +265,52 @@ int main(int argc, char** argv) {
 
 
         G4bool initialized=false;
-        //parse and apply G4Commands
-        for (G4String element : simConfig::jf["g4ui_commands"]){
-            //std::cout<<"Applying G4Commands: "<<element<<std::endl;
-            //Initialize the Geant4 kernel before applying the first FSL user interface command
-            if(element.contains("FSLgun") && !initialized) {
-                runManager->Initialize();
-                initialized=true;
+        if (doVis){
+            G4UIExecutive* ui = nullptr;
+            ui = new G4UIExecutive(argc, argv);
+            // Initialize visualization with the default graphics system
+            auto visManager = new G4VisExecutive(argc, argv); 
+            visManager->Initialize();
+            runManager->Initialize();
+            initialized=true;
+            G4String command = "/control/execute ";
+            for (G4String element : simConfig::jf["g4visui_commands"]){
+                std::cout<<"Applying G4_Vis_Commands: "<<element<<std::endl;
+                if ((element.contains(command))){
+                    std::cout<< "Found something to execute"<<std::endl;
+                    if (element.contains("g4") || element.contains("mac")){
+                        std::cout<< "additional Macro Found, hoping there is something for visualization. applying it "<<element<<std::endl;
+                        UI->ApplyCommand(element);
+                    } else{
+                        std::cout<< "no macro provided. Executing default "<<visMacroFileName<<std::endl;
+                        UI->ApplyCommand(command+visMacroFileName);
+                    }
+                } 
+                if (!(element.contains(command))){UI->ApplyCommand(element);}
             }
-            UI->ApplyCommand(element);
+            // if (!visMacroFound){
+            //     std::cout<<"JALAP Vis macro found JALAP!"<<std::endl;
+            //     std::cout<<visMacroFound<<std::endl;
+            // }
+            
+            
+            ui->SessionStart();
+            delete ui;
+            delete visManager;
+        } else{
+            //parse and apply G4Commands
+            for (G4String element : simConfig::jf["g4ui_commands"]){
+                //std::cout<<"Applying G4Commands: "<<element<<std::endl;
+                //Initialize the Geant4 kernel before applying the first FSL user interface command
+                if(element.contains("FSLgun") && !initialized) {
+                    runManager->Initialize();
+                    initialized=true;
+                }
+                UI->ApplyCommand(element);
+            }
+            // Initialize the G4 kernel if it hasn't been initialized
+            if (!initialized) runManager->Initialize();
+            runManager->BeamOn(simConfig::fsl.nEvents);
         }
         
         G4cout
@@ -283,9 +324,7 @@ int main(int argc, char** argv) {
         << " ===================================================== "      << G4endl;
         
         
-        // Initialize the G4 kernel if it hasn't been initialized
-        if (!initialized) runManager->Initialize();
-        runManager->BeamOn(simConfig::fsl.nEvents);
+
     }
     
     //
@@ -332,6 +371,7 @@ void Help() {
     <<"      -f :   physics list name (default: FTFP_BERT) \n"
     <<"      -P :   use Pythia primary generator [config. available: ttbar/higgs/minbias or use a Pythia command input file]\n"
     <<"      -p :   flag  ==> run the application in performance mode i.e. no user actions \n"
+    <<"      -v :   flag  ==> run the application with G4 vis manager. check vis macro in share folder, or provide vis macro in config \n"
     <<"         :   -     ==> run the application in NON performance mode i.e. with user actions (default) \n"<< std::endl;
     
     std::cout <<"\nUsage: ./fullSimLight [OPTIONS] -m <MACRO_FILE>\n" <<std::endl;
@@ -350,7 +390,7 @@ void GetInputArguments(int argc, char** argv) {
     }
     while (true) {
         int c, optidx = 0;
-        c = getopt_long(argc, argv, "P:pm:f:g:c:oh", options, &optidx);
+        c = getopt_long(argc, argv, "P:pm:f:g:c:voh", options, &optidx);
         if (c == -1)
             break;
         //
@@ -382,6 +422,11 @@ void GetInputArguments(int argc, char** argv) {
             case 'c':
                 isBatch = false;
                 parConfigFileName = optarg;
+                break;
+            case 'v':
+                isBatch = false;
+                doVis = true;
+                std::cout<< "G4 visualisation enabled" <<std::endl;
                 break;
             case 'o':
                 parRunOverlapCheck = true;

@@ -70,6 +70,7 @@ struct fslConfig{
 
 
     std::vector<std::string> g4UiCommands;
+    std::vector<std::string> g4VisUiCommands;
 };
 
 fslConfig fsl;
@@ -78,7 +79,7 @@ json jf;
 
 inline void to_json(json& j, const fslConfig& p) {
     j = json{{"Geometry", p.geometry},{"Physics list name", p.physicsList},{"Number of events", p.nEvents},{"Generator", p.eventGeneratorName},{"Pythia event input file", p.eventInputFile},{"Pythia type of event", p.typeOfEvent},{"Sensitive Detector Extensions", p.sensitiveDetectors},{"Magnetic Field Type", p.magFieldType},{"Magnetic Field Plugin", p.magFieldPlugin},{"User Action Extensions", p.userActions},{"g4ui_commands", p.g4UiCommands},
-        {"HepMC3 file", p.hepmc3InputFile}, {"HepMC3 type of file", p.hepmc3TypeOfFile},
+        {"g4visui_commands", p.g4VisUiCommands},{"HepMC3 file", p.hepmc3InputFile}, {"HepMC3 type of file", p.hepmc3TypeOfFile},
         {"Generator Plugin", p.generatorPlugin}
     };
     
@@ -98,6 +99,7 @@ inline void from_json(const json& j, fslConfig& p) {
     p.magFieldPlugin=j.at("Magnetic Field Plugin").get<std::string>();
     p.userActions=j.at("User Action Extensions").get<std::vector<std::string>>();
     p.g4UiCommands=j.at("g4ui_commands").get<std::vector<std::string>>();
+    p.g4VisUiCommands=j.at("g4visui_commands").get<std::vector<std::string>>();
     p.hepmc3InputFile = j.at("HepMC3 file").get<std::string>();
     p.hepmc3TypeOfFile = j.at("HepMC3 type of file").get<std::string>();
     p.generatorPlugin = j.at("Generator Plugin").get<std::string>();

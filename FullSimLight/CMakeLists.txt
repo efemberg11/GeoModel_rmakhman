@@ -157,6 +157,7 @@ set(FULLSIMLIGHT_SCRIPTS
   geantino_LAr.g4
   geantino_Tile.g4
   geantino_Muon.g4
+  vis.g4
   macro.g4
   pythia.g4
   drawMagField.C

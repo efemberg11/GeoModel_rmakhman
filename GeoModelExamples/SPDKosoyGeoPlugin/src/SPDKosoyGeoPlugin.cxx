@@ -4,24 +4,10 @@
 
 // -------------------------------------------------------------------
 //
-// Kitchen Sink Plugin
-// Joe Boudreau Jan 11 2021
+// SPD Alternative sextant straw tracker detector ("Kosoy" prototype)
+// Ramdas Makhmanazarov May 29 2025
 //
-// This is an example plugin. It compiles to a shared library 
-// (with .so or .dylib extension) which can be viewed with gmex.
-// In this example there is no "envelope", all the components of
-// the kitchen sink are placed into the world.  This example
-// contains a geometry clash or two.  Therefore it may also be
-// used to test clash detection.
-//
-// This example illustrates the use of:
-//
-//    --the plugin mechanism.
-//    --simple shapes, logical volumes, physical volumes
-//    --Boolean operations
-//    --define air 
-//    --pure materials (aluminium)
-//    --mixtures (stainless steel)
+// This is an example plugin of SPD sextant straw tracker detector.
 //
 // --------------------------------------------------------------------
 

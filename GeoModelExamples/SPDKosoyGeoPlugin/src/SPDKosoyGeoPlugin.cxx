@@ -4,10 +4,12 @@
 
 // -------------------------------------------------------------------
 //
-// SPD Alternative sextant straw tracker detector ("Kosoy" prototype)
+// Sextant-based geometry of the SPD straw tracker ("Kosoy" prototype)
 // Ramdas Makhmanazarov May 29 2025
 //
 // This is an example plugin of SPD sextant straw tracker detector.
+// Geometry information taken from:
+// https://indico.jinr.ru/event/5231/contributions/30361/attachments/21672/38135/Ruslan_SPD&MC_Meeting_2025-02-19.pdf
 //
 // --------------------------------------------------------------------
 
@@ -42,7 +44,6 @@ class SPDKosoyGeoPlugin : public GeoVGeometryPlugin  {
   virtual void create(GeoVPhysVol *world, bool publish=false);
 
   // Helper filler
-
   void fillTrapezoid(GeoVPhysVol *world, GeoPhysVol *oPhys, double cShift, double oRad, int nTubes, double downShift);
 
  private:
@@ -66,11 +67,6 @@ SPDKosoyGeoPlugin::~SPDKosoyGeoPlugin()
 {
 }
 
-// The create algorithm creates a tree of physical volumes rooted under the
-// "world" physical volume. The optional flag publish is not used in this
-// example (normally one may "publish" a list of FullPhysVol's and Alignable
-// transforms, but this example has none such).
-//
 void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
   const double degree = M_PI / 180.0;
 
@@ -79,8 +75,6 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
   GeoElement  *nitrogen      = new GeoElement("Nitrogen",  "N",   7,  14*gram/mole);
   GeoElement  *argon         = new GeoElement("Argon",     "Ar", 18,  40*gram/mole);
   GeoElement  *aluminium     = new GeoElement("Aluminium", "Al", 13,  26*gram/mole);
-  GeoElement  *iron          = new GeoElement("Iron",      "Fe", 26,  55.8*gram/mole);
-  GeoElement  *chromium      = new GeoElement("Chromium",  "Cr", 24,  52*gram/mole);
 
   // Define materials:
   
@@ -98,24 +92,13 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
   Aluminium->add(aluminium,1.0);
   Aluminium->lock();
 
-  // Define Iron
-  double densityOfIron=7.9*gram/cm3;                       // g/cm^3
-  GeoMaterial *Iron           = new GeoMaterial("Iron", densityOfIron);
-  Iron->add(iron,1.0);
-  Iron->lock();
-
-  // Define Stainless Steel ("Stainless")
-  double densityOfStainless=7.9*gram/cm3;                  // g/cm^3
-  GeoMaterial *Stainless       = new GeoMaterial("Stainless", densityOfStainless);
-  Stainless->add(iron,0.89);
-  Stainless->add(chromium, 0.11);
-  Stainless->lock();
+  
 
   // Some dimensions used below:
 
   double t1TubeLength = 1.7*m;                            // Overall length of tube t1;
-  double iRad=0.9/2.0*cm;                          // 3/4 inch (inner diameter) pipe
-  double oRad=1.0/2.0*cm;                          // 1-1/16   (outer diameter) 
+  double iRad=0.9/2.0*cm;                          // inner raduis
+  double oRad=1.0/2.0*cm;                          // outer radius
   double cShift    = sqrt(3.)*cm/2;                 // for circles compact placing
   double alpha = 2.5*1; // red and blue OY rotation angle
   // For imagination
@@ -130,7 +113,7 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
     // world->add(xax);
     // world->add(t1axPhys);
   }
-  // Add the four legs of the kitchen sink:
+  // Build trapezoidal volumes from tubes
   {
     const GeoTube      *t1Tube    = new GeoTube(iRad,oRad, t1TubeLength/2.0);
     const GeoLogVol    *t1Log     = new  GeoLogVol("T1Log", t1Tube, Aluminium);

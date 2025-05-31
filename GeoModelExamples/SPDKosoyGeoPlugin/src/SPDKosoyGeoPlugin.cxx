@@ -156,10 +156,10 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
     const GeoLogVol    *t1Log     = new  GeoLogVol("T1Log", t1Tube, Aluminium);
     GeoPhysVol         *t1Phys    = new GeoPhysVol(t1Log);
 
-    nLayers = 8;
-    nTubes  =34;
-    cShift    = sqrt(3.)/2
-    
+    int nLayers = 8;
+    int nTubes  =34; // from first
+    double cShift    = sqrt(3.)*cm/2; // for circles compact placing
+
     for (int i=0; i<17; i++){
       GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, 0, 0));
       GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, 0, 0));
@@ -168,20 +168,20 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
       world->add(xform2);
       world->add(t1Phys);
     }
-
     for (int i=0; i<17; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -sqrt(3.)*cm/2, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -sqrt(3.)*cm/2, 0));
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -cShift, 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -cShift, 0));
       world->add(xform1);
       world->add(t1Phys);
       world->add(xform2);
       world->add(t1Phys);
       if (i==16){
-        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -sqrt(3.)*cm/2, 0));
+        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -cShift, 0));
         world->add(xform1);
         world->add(t1Phys);
       }
     }
+
     for (int i=0; i<18; i++){
       GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -2*sqrt(3.)*cm/2, 0));
       GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -2*sqrt(3.)*cm/2, 0));
@@ -203,6 +203,7 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
         world->add(t1Phys);
       }
     }
+
     for (int i=0; i<19; i++){
       GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -4*sqrt(3.)*cm/2, 0));
       GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -4*sqrt(3.)*cm/2, 0));
@@ -224,6 +225,7 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
         world->add(t1Phys);
       }
     }
+
     for (int i=0; i<20; i++){
       GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -6*sqrt(3.)*cm/2, 0));
       GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -6*sqrt(3.)*cm/2, 0));
@@ -245,100 +247,166 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
         world->add(t1Phys);
       }
     }
+
+    // red tubes
+    const GeoTube      *tRedTube    = new GeoTube(iRad,oRad, t1TubeLength/1.9);
+    const GeoLogVol    *tRedLog     = new  GeoLogVol("TRedLog", tRedTube, Aluminium);
+    GeoPhysVol         *tRedPhys    = new GeoPhysVol(tRedLog);
+    double downShift1 = 7*cShift+2*oRad;
+    int nTubesR = 47; // first red
+    //nTubesR = 43   //second red
+    int nTredblue = 53;
+    
+    
+    for (int i=0; i<23; i++){
+      if (i<23){
+        GeoTransform  *xform1         = new GeoTransform(GeoTrf::RotateY3D(-0*degree)*GeoTrf::Translate3D(0*oRad+(i+1)*cm, -(downShift1+1*cShift), 0));
+        world->add(xform1);
+        world->add(tRedPhys);
+      } 
+      
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::RotateY3D(-0*degree)*GeoTrf::Translate3D(0*oRad-i*cm, -(downShift1+1*cShift), 0));
+      
+      
+      world->add(xform2);
+      world->add(tRedPhys);
+    }
+    // for (int i=0; i<26; i++){
+    //   if (i<21){
+    //     GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(1*oRad+(i+1)*cm, -(downShift1+0*cShift), 0));
+    //     world->add(xform1);
+    //     world->add(tRedPhys);
+    //   }
+      
+    //   GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(1*oRad-(i)*cm, -(downShift1+0*cShift), 0));
+    //   world->add(xform2);
+    //   world->add(tRedPhys);
+    //   if (i==25){
+    //     GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i+1)*cm, -(downShift1+0*cShift), 0));
+    //     world->add(xform2);
+    //     world->add(tRedPhys);
+    //   }
+    // }
+    
+    // for (int i=0; i<28; i++){
+    //   GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -(downShift+6*cShift), 0));
+    //   GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -(downShift+6*cShift), 0));
+    //   world->add(xform1);
+    //   world->add(t1Phys);
+    //   world->add(xform2);
+    //   world->add(t1Phys);
+    //   if (i==27){
+    //     GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -(downShift+6*cShift), 0));
+    //     world->add(xform1);
+    //     world->add(t1Phys);
+    //   }
+    // }
+
+
     // Second Tube-Trapezoid
     const GeoLogVol    *t2Log     = new  GeoLogVol("T2Log", t1Tube, Aluminium);
     GeoPhysVol         *t2Phys    = new GeoPhysVol(t2Log);
 
+    nLayers = 8;
+    nTubes  =58; //from last
+    
+    
+
+
+
     //skip rotated layers
-    downShift = 8*cShift+2*oRad+cShift+2*oRad+cShift+2*oRad;
+    double downShift = 7*cShift+(2*oRad+cShift+2*oRad+cShift)*2+2*oRad;
 
     
 
     for (int i=0; i<29; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, 0, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, 0, 0));
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -(downShift+7*cShift), 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -(downShift+7*cShift), 0));
       world->add(xform1);
       world->add(t1Phys);
       world->add(xform2);
       world->add(t1Phys);
+    }
+    for (int i=0; i<28; i++){
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -(downShift+6*cShift), 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -(downShift+6*cShift), 0));
+      world->add(xform1);
+      world->add(t1Phys);
+      world->add(xform2);
+      world->add(t1Phys);
+      if (i==27){
+        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -(downShift+6*cShift), 0));
+        world->add(xform1);
+        world->add(t1Phys);
+      }
     }
 
-    for (int i=0; i<29; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -sqrt(3.)*cm/2, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -sqrt(3.)*cm/2, 0));
+    for (int i=0; i<28; i++){
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -(downShift+5*cShift), 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -(downShift+5*cShift), 0));
       world->add(xform1);
       world->add(t1Phys);
       world->add(xform2);
       world->add(t1Phys);
-      if (i==28){
-        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -sqrt(3.)*cm/2, 0));
+    }
+    for (int i=0; i<27; i++){
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -(downShift+4*cShift), 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -(downShift+4*cShift), 0));
+      world->add(xform1);
+      world->add(t1Phys);
+      world->add(xform2);
+      world->add(t1Phys);
+      if (i==26){
+        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -(downShift+4*cShift), 0));
         world->add(xform1);
         world->add(t1Phys);
       }
     }
-    for (int i=0; i<18; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -2*sqrt(3.)*cm/2, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -2*sqrt(3.)*cm/2, 0));
+
+    for (int i=0; i<27; i++){
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -(downShift+3*cShift), 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -(downShift+3*cShift), 0));
       world->add(xform1);
       world->add(t1Phys);
       world->add(xform2);
       world->add(t1Phys);
     }
-    for (int i=0; i<18; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -3*sqrt(3.)*cm/2, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -3*sqrt(3.)*cm/2, 0));
+    for (int i=0; i<26; i++){
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -(downShift+2*cShift), 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -(downShift+2*cShift), 0));
       world->add(xform1);
       world->add(t1Phys);
       world->add(xform2);
       world->add(t1Phys);
-      if (i==17){
-        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -3*sqrt(3.)*cm/2, 0));
+      if (i==25){
+        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -(downShift+2*cShift), 0));
         world->add(xform1);
         world->add(t1Phys);
       }
     }
-    for (int i=0; i<19; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -4*sqrt(3.)*cm/2, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -4*sqrt(3.)*cm/2, 0));
+
+    for (int i=0; i<26; i++){
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -(downShift+1*cShift), 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -(downShift+1*cShift), 0));
       world->add(xform1);
       world->add(t1Phys);
       world->add(xform2);
       world->add(t1Phys);
     }
-    for (int i=0; i<19; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -5*sqrt(3.)*cm/2, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -5*sqrt(3.)*cm/2, 0));
+    for (int i=0; i<25; i++){
+      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -(downShift+0*cShift), 0));
+      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -(downShift+0*cShift), 0));
       world->add(xform1);
       world->add(t1Phys);
       world->add(xform2);
       world->add(t1Phys);
-      if (i==18){
-        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -5*sqrt(3.)*cm/2, 0));
+      if (i==24){
+        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -(downShift+0*cShift), 0));
         world->add(xform1);
         world->add(t1Phys);
       }
     }
-    for (int i=0; i<20; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D(oRad+(i+1)*cm, -6*sqrt(3.)*cm/2, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(oRad-i*cm, -6*sqrt(3.)*cm/2, 0));
-      world->add(xform1);
-      world->add(t1Phys);
-      world->add(xform2);
-      world->add(t1Phys);
-    }
-    for (int i=0; i<20; i++){
-      GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+1)*cm, -7*sqrt(3.)*cm/2, 0));
-      GeoTransform  *xform2         = new GeoTransform(GeoTrf::Translate3D(-(i)*cm, -7*sqrt(3.)*cm/2, 0));
-      world->add(xform1);
-      world->add(t1Phys);
-      world->add(xform2);
-      world->add(t1Phys);
-      if (i==19){
-        GeoTransform  *xform1         = new GeoTransform(GeoTrf::Translate3D((i+2)*cm, -7*sqrt(3.)*cm/2, 0));
-        world->add(xform1);
-        world->add(t1Phys);
-      }
-    }
+    
 
 
   }

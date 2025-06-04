@@ -109,25 +109,23 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
   Aluminium->add(aluminium,1.0);
   Aluminium->lock();
 
-  
-
   // Some dimensions used below:
 
-  double t1TubeLength = 1.7*m;                            // Overall length of tube t1;
-  double iRad=0.9/2.0*cm;                          // inner raduis
-  double outerRadius=1.0/2.0*cm;                          // outer radius
-  double cShift    = sqrt(3.)*cm/2;                 // for circles compact placing
-  double alpha = 3*1; // red and blue OY rotation angle
-  double angZ = 0;                                  // sector rotation angle
+  double t1TubeLength = 1.7*m;          // Overall length of tube t1;
+  double iRad=0.9/2.0*cm;               // inner raduis
+  double outerRadius=1.0/2.0*cm;        // outer radius
+  double cShift    = sqrt(3.)*cm/2;     // for circles compact placing
+  double alpha = 3*1;                   // red and blue OY rotation angle
+  double angZ = 0;                      // sector rotation angle
   
-  // Build trapezoidal volumes from tubes
+  // Create tube volumes
 
+  // Green
   const GeoTube      *t1Tube    = new GeoTube(iRad,outerRadius, t1TubeLength/2.0);
   const GeoLogVol    *t1Log     = new  GeoLogVol("T1Log", t1Tube, Aluminium);
   GeoPhysVol         *t1Phys    = new GeoPhysVol(t1Log);
 
-  // Red and blue tubes
-      
+  // Red and blue tubes 
   const GeoTube      *tRedTube    = new GeoTube(iRad,outerRadius, (t1TubeLength/cos(alpha*degree))/2);
   const GeoLogVol    *tRedLog     = new  GeoLogVol("TRedLog", tRedTube, Aluminium);
   GeoPhysVol         *tRedPhys    = new GeoPhysVol(tRedLog);
@@ -137,37 +135,18 @@ void SPDKosoyGeoPlugin::create(GeoVPhysVol *world, bool /*publish*/) {
   GeoPhysVol         *tBluePhys    = new GeoPhysVol(tBlueLog);
 
   
-
+  // Build Sectors from trapezoids add fill barrel (currently world) 
   buildSextantA(world, t1Phys, tRedPhys, tBluePhys, cShift, outerRadius, alpha, 300);
   buildSextantA(world, t1Phys, tRedPhys, tBluePhys, cShift, outerRadius, alpha, 180);
   buildSextantA(world, t1Phys, tRedPhys, tBluePhys, cShift, outerRadius, alpha, 60);
   buildSextantB(world, t1Phys, tRedPhys, tBluePhys, cShift, outerRadius, alpha, 0);
   buildSextantB(world, t1Phys, tRedPhys, tBluePhys, cShift, outerRadius, alpha, 120);
   buildSextantB(world, t1Phys, tRedPhys, tBluePhys, cShift, outerRadius, alpha, 240);
-  
-  // buildSextantA(sextantAB120Phys, cShift, outerRadius, iRad, alpha, t1TubeLength, Aluminium);
-  // buildSextantB(sextantAB120Phys, cShift, outerRadius, iRad, alpha, t1TubeLength, Aluminium);
-
-  // buildSextantA(sextantAB240Phys, cShift, outerRadius, iRad, alpha, t1TubeLength, Aluminium);
-  // buildSextantB(sextantAB240Phys, cShift, outerRadius, iRad, alpha, t1TubeLength, Aluminium);
-
-  //buildSextantA()
-  // GeoTransform *rotate120 = new GeoTransform(GeoTrf::RotateZ3D(120*degree));
-  // world->add(rotate120);
-  // world->add(sextantAB120Phys);  
-  // GeoTransform *rotate240 = new GeoTransform(GeoTrf::RotateZ3D(240*degree));
-  // world->add(rotate240);
-  // world->add(sextantAB240Phys);
-
-
-  
-  
-  
-
 
   //--------------------------------------//
 }
 
+// trapezoid from green tubes
 void SPDKosoyGeoPlugin::fillTrapezoid(GeoVPhysVol *world, GeoPhysVol *oPhys,
   double cShift, double outerRadius, int nTubes, int nLayers, double downShift, double angZ){
  
@@ -212,6 +191,7 @@ void SPDKosoyGeoPlugin::fillTrapezoid(GeoVPhysVol *world, GeoPhysVol *oPhys,
   }
 }
 
+// fill only one layer of tubes (green)
 void SPDKosoyGeoPlugin::fillLayer(GeoVPhysVol *world, GeoPhysVol *oPhys,
   double cShift, double outerRadius, int nTubes, int nLayers, double downShift, double angZ){
   
@@ -243,7 +223,7 @@ void SPDKosoyGeoPlugin::fillLayer(GeoVPhysVol *world, GeoPhysVol *oPhys,
   }
 }
 
-
+// Trapezoid from red and blue tubes
 void SPDKosoyGeoPlugin::fillTrapezoid2(GeoVPhysVol* world, GeoPhysVol* redPhys, GeoPhysVol* bluePhys,
   double cShift, double outerRadius, int nTubes, double downShift, double angleY, double angZ) {
 

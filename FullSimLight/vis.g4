@@ -1,5 +1,5 @@
 # Macro file for the visualization setting in the initialization phase 
-# of the B1 example when running in interactive mode
+# of the spdKosoyGeomodel
 #
 
 # Specify a viewer, e.g., /vis/open OGL, or allow a system choice:
@@ -15,8 +15,6 @@
 /vis/viewer/set/specialMeshRenderingOption surfaces
 /vis/drawVolume
 
-
-/vis/geometry/set/colour Envelope 0 0 0 1 .3
 /vis/viewer/set/style surface
 /vis/viewer/set/hiddenMarker true
 /vis/viewer/set/viewpointThetaPhi 120 150
@@ -31,9 +29,19 @@
 /vis/touchable/set/colour 0 1 0 1
 /vis/viewer/refresh
 
+
 /vis/set/touchable WorldLog 0 TRedLog 16969
 /vis/touchable/set/colour 1 0 0 1
 /vis/viewer/refresh
 
+
 /vis/set/touchable WorldLog 0 TBlueLog 16969
 /vis/touchable/set/colour 0 0 1 1
+
+
+
+/vis/viewer/set/targetPoint -0 0 0 cm
+
+/vis/scene/add/axes 0 0 0 1 m
+
+/vis/viewer/set/lineSegmentsPerCircle 10

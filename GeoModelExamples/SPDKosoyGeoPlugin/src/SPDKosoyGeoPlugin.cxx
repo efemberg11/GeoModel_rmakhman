@@ -291,7 +291,6 @@ void SPDKosoyGeoPlugin::buildSextantB(GeoVPhysVol *world, GeoPhysVol *t1Phys,Geo
   nTubes = 30;
   fillTrapezoid2(world, tRedPhys, tBluePhys,  cShift, outerRadius, nTubes, downShift1, alphaY,angZ);
 
-  // nTubes  =56; //from last
   nTubes = 49;
   //skip red and blues tubes
   double downShift2 = downShift1 + (2*outerRadius+cShift+2*outerRadius+cShift)*2;
@@ -299,7 +298,7 @@ void SPDKosoyGeoPlugin::buildSextantB(GeoVPhysVol *world, GeoPhysVol *t1Phys,Geo
   fillTrapezoid(world, t1Phys,-cShift, outerRadius, nTubes, nLayers, downShift2,angZ );
 
   
-  // Second red and blue layer (same as previous)
+  // Second red and blue layer 
   double downShift3 = downShift2+7*cShift+2*outerRadius;
   nTubes = 64;
   fillTrapezoid2(world, tRedPhys, tBluePhys,  cShift, outerRadius, nTubes, downShift3, alphaY,angZ);
@@ -312,7 +311,7 @@ void SPDKosoyGeoPlugin::buildSextantB(GeoVPhysVol *world, GeoPhysVol *t1Phys,Geo
 
   // third red and blue tubes layer
   double downShift5 = downShift4 + 7*cShift+2*outerRadius;
-  nTubes = 63; // from first (56 from last)
+  nTubes = 63; 
   fillTrapezoid2(world, tRedPhys, tBluePhys,  cShift, outerRadius, nTubes, downShift5, alphaY,angZ);
   
 
